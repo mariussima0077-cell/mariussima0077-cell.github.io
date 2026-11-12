@@ -1,0 +1,12 @@
+# Only needed if you deploy with the wrangler command line. From the phone use the Cloudflare dashboard (see GOOGLE_PLAY.md).
+name = "torque-guard"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[triggers]
+crons = ["*/10 * * * *"]   # the bot checks all players every 10 minutes
+
+[[d1_databases]]
+binding = "DB"
+database_name = "torque_guard"
+database_id = "PUT-YOUR-D1-DATABASE-ID-HERE"

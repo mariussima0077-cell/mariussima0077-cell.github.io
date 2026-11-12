@@ -1,0 +1,17 @@
+{
+  "name": "Torque Empire – Garage Tycoon",
+  "short_name": "Torque Empire",
+  "description": "Idle garage tycoon: repair cars, hire mechanics and fight car-part monsters in the campaign.",
+  "start_url": "./index.html?src=app",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0b1420",
+  "theme_color": "#0b1019",
+  "categories": ["games", "simulation"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
