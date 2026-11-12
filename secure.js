@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 // ====== CONFIG – after you deploy the server, put its address here (see GOOGLE_PLAY.md) ======
-const API = '';            // e.g. 'https://torque-guard.YOURNAME.workers.dev'
+const API = 'https://torque-guard.torqueempirehelp.workers.dev';            // e.g. 'https://torque-guard.YOURNAME.workers.dev'
 const SALT = 'tE-v15-9c41f7';  // also set the same value as SAVE_SALT in the server
 // SKUs = product IDs you create in Play Console (Monetize → Products)
 const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly'};

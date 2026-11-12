@@ -19,7 +19,8 @@
 ### 1. Cât așteptăm verificarea Google
 - [x] **Textele pentru magazin** (engleză) → `store/STORE_LISTING.md`.
 - [x] **Capturi de ecran** pentru magazin → `store/play-screenshot-1..6.png` (1080×1920; cele din `assets/` sunt prea înalte pentru Play).
-- [ ] **Botul anti-cheat Torque Guard** pe Cloudflare (gratis) – pașii din `GOOGLE_PLAY.md`, secțiunea 3. După ce e pornit, Claude pune adresa worker-ului în `secure.js` (`const API = '...'`) și urcă pe GitHub.
+- [x] **Botul anti-cheat Torque Guard** pornit: https://torque-guard.torqueempirehelp.workers.dev (Cloudflare, cont torqueempirehelp). Baza D1 `torque_guard`. Se instalează singur din GitHub (folderul `server/`) la fiecare push. Adresa e pusă în `secure.js`.
+- [ ] Cheia de admin pentru pagina botului (`ADMIN_KEY`, secret în Cloudflare → torque-guard → Settings → Variables and Secrets).
 - [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau comunități ca r/AndroidClosedTesting).
 
 ### 2. După ce Google aprobă contul
@@ -46,5 +47,5 @@
 
 ## ⚠️ REGULI DUPĂ PUBLICARE
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
-- La fiecare update: se schimbă `const V='te-v15-2'` din `sw.js` (ex. `te-v15-3`) și se urcă fișierele pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update: se schimbă `const V='te-v15-3'` din `sw.js` (ex. `te-v15-4`) și se urcă fișierele pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Google Drive și același Package ID `com.torqueempire.game`.
