@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.torqueempire.game",
-    "sha256_cert_fingerprints": ["PUT:THE:SHA256:FINGERPRINT:FROM:PLAY:CONSOLE:HERE"]
+    "sha256_cert_fingerprints": ["2F:F9:21:56:9B:2B:DC:23:9C:4F:02:02:E9:B6:35:F0:B5:99:62:D1:EB:3F:E9:74:2B:FF:45:C6:22:E8:35:A7"]
   }
 }]
