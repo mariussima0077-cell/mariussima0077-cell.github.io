@@ -1,5 +1,5 @@
 # TORQUE EMPIRE – Publicare Google Play · stare și pașii următori
-*(trimite fișierul ăsta la începutul unui chat nou cu Claude, împreună cu arhiva v15 dacă trebuie modificat jocul)*
+*(trimite fișierul ăsta la începutul unui chat nou cu Claude. Arhiva nu mai trebuie: Claude ia jocul direct de pe GitHub)*
 
 ## ✅ CE E GATA (12 noiembrie 2026)
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
@@ -17,8 +17,8 @@
 
 ## ⏳ CE URMEAZĂ (în ordine)
 ### 1. Cât așteptăm verificarea Google
-- [ ] **Textele pentru magazin** (engleză): titlu, descriere scurtă (max 80 caractere), descriere lungă → le scrie Claude.
-- [ ] **Capturi de ecran** pentru magazin (minim 2, telefon portret) – din `assets/screen-v15-*.png` sau capturi noi.
+- [x] **Textele pentru magazin** (engleză) → `store/STORE_LISTING.md`.
+- [x] **Capturi de ecran** pentru magazin → `store/play-screenshot-1..6.png` (1080×1920; cele din `assets/` sunt prea înalte pentru Play).
 - [ ] **Botul anti-cheat Torque Guard** pe Cloudflare (gratis) – pașii din `GOOGLE_PLAY.md`, secțiunea 3. După ce e pornit, Claude pune adresa worker-ului în `secure.js` (`const API = '...'`) și urcă pe GitHub.
 - [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau comunități ca r/AndroidClosedTesting).
 
