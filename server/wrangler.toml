@@ -1,7 +1,11 @@
-# Only needed if you deploy with the wrangler command line. From the phone use the Cloudflare dashboard (see GOOGLE_PLAY.md).
+# Torque Guard – Cloudflare takes this folder from GitHub automatically (Workers Builds, root directory: server)
 name = "torque-guard"
 main = "worker.js"
 compatibility_date = "2026-11-01"
+keep_vars = true          # keep the secrets/variables you add in the dashboard (ADMIN_KEY, GOOGLE_SA)
+
+[vars]
+PACKAGE_NAME = "com.torqueempire.game"
 
 [triggers]
 crons = ["*/10 * * * *"]   # the bot checks all players every 10 minutes
@@ -9,4 +13,4 @@ crons = ["*/10 * * * *"]   # the bot checks all players every 10 minutes
 [[d1_databases]]
 binding = "DB"
 database_name = "torque_guard"
-database_id = "PUT-YOUR-D1-DATABASE-ID-HERE"
+database_id = "322aec9e-ddaa-4741-874e-5a2105c89523"
