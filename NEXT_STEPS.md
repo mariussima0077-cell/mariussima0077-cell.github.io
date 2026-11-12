@@ -1,51 +1,72 @@
 # TORQUE EMPIRE – Publicare Google Play · stare și pașii următori
-*(trimite fișierul ăsta la începutul unui chat nou cu Claude. Arhiva nu mai trebuie: Claude ia jocul direct de pe GitHub)*
+*(trimite fișierul ăsta la începutul unui chat nou cu Claude. Arhiva NU mai trebuie: Claude ia jocul direct de pe GitHub și îl poate testa live)*
 
-## ✅ CE E GATA (12 noiembrie 2026)
+## ✅ CE E GATA (12 noiembrie 2026, seara)
+### Jocul
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
-  - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, are `.nojekyll`)
-  - Claude are acces de scriere la repository (aplicația GitHub „Claude” instalată pe „All repositories”)
-- **Politica de confidențialitate**: https://mariussima0077-cell.github.io/privacy.html (e-mail: torqueempirehelp@gmail.com)
-- **Cont Google al jocului**: torqueempirehelp@gmail.com (Gmail și Google Drive conectate la Claude)
-- **Pachet Android (PWABuilder)**:
-  - Package ID: `com.torqueempire.game` · nume: Torque Empire · fullscreen
-  - ⚠️ **Fără Play Billing** → plățile din Shop nu merg încă (butoanele spun „Google Play payments are not available”). Pachetul cu plăți se face mai târziu.
-  - Cheia de semnare + parolele: Google Drive (torqueempirehelp) → folderul **„Torque Empire - Cheie Google Play (NU STERGE)”** (`signing.keystore` + `signing-key-info.txt`). Fișierul `.aab` e în zip-ul PWABuilder de pe telefon.
-  - Amprenta cheii de upload (SHA-256), deja pusă în `.well-known/assetlinks.json`:
-    `2F:F9:21:56:9B:2B:DC:23:9C:4F:02:02:E9:B6:35:F0:B5:99:62:D1:EB:3F:E9:74:2B:FF:45:C6:22:E8:35:A7`
-- **Cont de dezvoltator Google Play**: creat (cont personal, plătit 25 $), **se așteaptă verificarea identității** (buletin românesc, adresă în Franța).
+  - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
+  - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
+  - Versiunea curentă în `sw.js`: `const V='te-v15-3'`.
+- **Politica de confidențialitate**: https://mariussima0077-cell.github.io/privacy.html (e-mail: torqueempirehelp@gmail.com) – menționează și serverul anti-cheat.
+- **Cont Google al jocului**: torqueempirehelp@gmail.com (Gmail și Google Drive conectate la Claude).
 
-## ⏳ CE URMEAZĂ (în ordine)
-### 1. Cât așteptăm verificarea Google
-- [x] **Textele pentru magazin** (engleză) → `store/STORE_LISTING.md`.
-- [x] **Capturi de ecran** pentru magazin → `store/play-screenshot-1..6.png` (1080×1920; cele din `assets/` sunt prea înalte pentru Play).
-- [x] **Botul anti-cheat Torque Guard** pornit: https://torque-guard.torqueempirehelp.workers.dev (Cloudflare, cont torqueempirehelp). Baza D1 `torque_guard`. Se instalează singur din GitHub (folderul `server/`) la fiecare push. Adresa e pusă în `secure.js`.
-- [ ] Cheia de admin pentru pagina botului (`ADMIN_KEY`, secret în Cloudflare → torque-guard → Settings → Variables and Secrets).
-- [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau comunități ca r/AndroidClosedTesting).
+### Securitate (făcut azi)
+- Pe site (browser) pachetele din Shop **nu mai sunt gratis** – afișează „Packs are available in the Torque Empire app on Google Play”.
+- **Mod de test doar pentru Marius**: link secret `?dev=...` (îl găsești în Google Drive, fișierul „Torque Empire - link test”). `?dev=off` îl oprește. Cheia NU se scrie niciodată pe GitHub (repository-ul e public).
+- În modul de test există `__DEV.startBattle(etapa)` (Claude îl folosește pentru capturi).
+- Scoase mesajele „Test version” din Shop/VIP/oferta ×2 și comenzile ascunse de debug (`window.__TE` are doar ce trebuie, `window.CAMPAIGN` doar `open/close/openGear`).
 
-### 2. După ce Google aprobă contul
+### Botul anti-cheat Torque Guard (GRATIS, Cloudflare Free)
+- Adresa: https://torque-guard.torqueempirehelp.workers.dev (răspunde `{"ok":true,"name":"Torque Guard"}`).
+- Cont Cloudflare: torqueempirehelp@gmail.com · worker `torque-guard` · bază D1 `torque_guard` (ID `322aec9e-ddaa-4741-874e-5a2105c89523`, 5 tabele create).
+- **Se instalează singur din GitHub** (Workers Builds, root directory `/server`, `npx wrangler deploy`) la fiecare push pe `main`. Config: `server/wrangler.toml` (D1 + cron la 10 minute + `PACKAGE_NAME`).
+- Jocul trimite datele la bot (`secure.js` → `const API = 'https://torque-guard.torqueempirehelp.workers.dev'`).
+- Cheia de admin + linkul paginii de admin: Google Drive, fișierul „Torque Empire - bot anti-cheat (Torque Guard)”.
+- Limite gratuite: 100.000 cereri/zi, D1 5 mil. citiri + 100.000 scrieri/zi → ajunge pentru câteva sute de jucători activi/zi. Peste asta: optimizăm botul sau plan Cloudflare ~5 $/lună. Dacă se depășește, jocul merge normal, doar botul stă până a doua zi.
+- ⚠️ Claude NU are acces la contul Cloudflare – pașii acolo îi face Marius (Claude ghidează). Claude NU poate deschide adresa botului din sandbox (doar Marius o poate verifica în Chrome).
+
+### Magazin (Store listing)
+- Texte în engleză → `store/STORE_LISTING.md` (titlu „Torque Empire: Garage Tycoon”, descriere scurtă 79/80, descriere lungă).
+- 6 capturi 1080×1920 → `store/play-screenshot-1..6.png` (toate din v15; nr. 3 = bătălie „Dusk Acid Throne”). Script: capturile au titlu sus, fundal închis cu portocaliu.
+- Icon 512: `store/play-icon-512.png` · Feature graphic: `store/feature-graphic-1024x500.png`.
+
+### Pachet Android (PWABuilder)
+- Package ID: `com.torqueempire.game` · nume: Torque Empire · fullscreen.
+- ⚠️ **Fără Play Billing** → în aplicație plățile nu merg încă („Google Play payments are not available”). Pachetul cu plăți se face mai târziu.
+- Cheia de semnare + parolele: Google Drive → folderul **„Torque Empire - Cheie Google Play (NU STERGE)”** (`signing.keystore` + `signing-key-info.txt`).
+- ⚠️ Fișierul `.aab` e doar în zip-ul PWABuilder de pe telefon → **de urcat și el în același folder din Drive**, ca să nu se piardă.
+- Amprenta cheii de upload (SHA-256), deja în `.well-known/assetlinks.json`:
+  `2F:F9:21:56:9B:2B:DC:23:9C:4F:02:02:E9:B6:35:F0:B5:99:62:D1:EB:3F:E9:74:2B:FF:45:C6:22:E8:35:A7`
+
+### Cont Google Play
+- Cont de dezvoltator creat (personal, 25 $). **Se așteaptă verificarea identității** (buletin românesc, adresă în Franța).
+
+## ⏳ CE A MAI RĂMAS
+### Acum (cât așteptăm Google)
+- [ ] Verifică dacă `ADMIN_KEY` e pus în Cloudflare (torque-guard → Settings → Variables and Secrets → Secret). Test: linkul de admin din Drive trebuie să arate pagina „🛡️ Torque Guard” (nu „no”).
+- [ ] Urcă `.aab`-ul în Google Drive (folderul cu cheia).
+- [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau r/AndroidClosedTesting). Claude poate scrie mesajul de invitație.
+
+### După ce Google aprobă contul
 - [ ] Play Console → **Create app**: Torque Empire · Game · Free · categoria Simulation.
-- [ ] **Test fermé / Closed testing**: urci `Torque Empire.aab`.
-- [ ] **Setup → App signing**: copiezi **SHA-256 al cheii Google** și i-l dai lui Claude → îl adaugă în `assetlinks.json` (lângă cel de mai sus), altfel apare bara de adresă în aplicația din magazin.
-- [ ] Fișa aplicației: icon 512 (`store/play-icon-512.png`), feature graphic (`store/feature-graphic-1024x500.png`), capturi, privacy policy (linkul de mai sus).
-- [ ] **Data safety**, **Content rating** (IARC), **Target audience 13+**, **Ads: No** – răspunsurile sunt în `GOOGLE_PLAY.md`, secțiunea 6.
+- [ ] **Closed testing**: urci `.aab`-ul.
+- [ ] **Setup → App signing**: copiezi **SHA-256 al cheii Google** și i-l dai lui Claude → îl adaugă în `assetlinks.json` (altfel apare bara de adresă în aplicație).
+- [ ] Fișa aplicației: textele din `store/STORE_LISTING.md`, icon, feature graphic, cele 6 capturi, privacy policy.
+- [ ] **Data safety**, **Content rating** (IARC), **Target audience 13+**, **Ads: No** – răspunsurile sunt în `GOOGLE_PLAY.md`, secțiunea 6 (datele trimise la bot: ID anonim + progres joc, scop „Fraud prevention, security”).
 
-### 3. Testul închis – 12 testeri × 14 zile
-- [ ] groups.google.com → grup „torque-empire-testers” (oricine se poate alătura).
-- [ ] În Closed testing → Testeurs: adaugi adresa grupului → primești **linkul de înscriere**.
-- [ ] Trimiți testerilor: linkul grupului + linkul de înscriere. Toți trebuie să rămână înscriși **14 zile la rând** și să joace puțin.
-- [ ] După 14 zile: ceri accesul la **Production** din Play Console.
+### Testul închis – 12 testeri × 14 zile
+- [ ] groups.google.com → grup „torque-empire-testers”.
+- [ ] Closed testing → Testers: adresa grupului → **linkul de înscriere**.
+- [ ] Testerii rămân înscriși **14 zile la rând** și joacă puțin.
+- [ ] După 14 zile: ceri accesul la **Production**.
 
-### 4. Mai târziu
+### Mai târziu
 - [ ] Pachet Android **cu plăți** (Play Billing) + produsele în Play Console: `vip_car` 3.99 €, `vip_mechanic` 2.99 €, `battle_speed_x2` 4.99 €, abonament `vip_pass_monthly` 5.99 €/lună.
-- [ ] Cont de serviciu Google pentru bot (`GOOGLE_SA`), ca botul să confirme cumpărăturile.
+- [ ] Cont de serviciu Google pentru bot (secretul `GOOGLE_SA` în Cloudflare), ca botul să confirme cumpărăturile (altfel Google le rambursează după 3 zile).
 
-## 🧪 MOD DE TEST (doar pentru Marius)
-- Pe site, pachetele NU se mai deblochează gratis. Pentru teste: deschizi o dată linkul secret (`?dev=...`, e în Google Drive, fișierul „Torque Empire - link test”). Cu `?dev=off` îl oprești.
-- În modul de test există `__DEV.startBattle(etapa)` – Claude îl folosește pentru capturi și verificări live.
-- Cheia secretă NU se scrie niciodată în GitHub (repository-ul e public).
-
-## ⚠️ REGULI DUPĂ PUBLICARE
+## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
-- La fiecare update: se schimbă `const V='te-v15-3'` din `sw.js` (ex. `te-v15-4`) și se urcă fișierele pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
-- Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Google Drive și același Package ID `com.torqueempire.game`.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v15-4`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
+- Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
+- Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.
