@@ -21,7 +21,15 @@ if(!PID){ PID = (crypto.randomUUID ? crypto.randomUUID() : 'p'+Math.random().toS
 const fromApp = document.referrer.startsWith('android-app://') || LS('te_twa')==='1';
 if(document.referrer.startsWith('android-app://')) LS('te_twa','1');
 const STORE_BUILD = fromApp;            // real money only in the Play app
-const TEST_MODE = !STORE_BUILD;         // in the browser (testing on your phone) packs unlock for free
+// Test mode (packs free) ONLY for the owner: open the site once with ?dev=SECRET (?dev=off to turn it off).
+const DEV_H = '8c6657646a1b238565301291ff80b48909c3bffdf73b274812a13040a6eb6458';
+(function(){ const q = new URLSearchParams(location.search).get('dev'); if(q===null) return;
+  const back = () => location.replace(location.pathname);
+  if(q==='off'){ try{localStorage.removeItem('te_dev');}catch(e){} back(); return; }
+  if(crypto.subtle) crypto.subtle.digest('SHA-256', new TextEncoder().encode(q)).then(b=>{
+    const h=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); if(h===DEV_H) LS('te_dev',DEV_H); back(); });
+})();
+const TEST_MODE = !STORE_BUILD && LS('te_dev')===DEV_H;   // owner only – everyone else in the browser cannot unlock packs
 
 // ---------- save signature (stops editing the save file) ----------
 function h32(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36); }
@@ -109,6 +117,7 @@ async function verify(sku, token, type){
 async function buy(pack){
   const sku = SKU[pack]; const t=T();
   if(TEST_MODE){ t.toast('🧪 TEST MODE (browser): unlocked for free. In the Google Play app this is a real payment.',3500); return true; }
+  if(!STORE_BUILD){ t.toast('📱 Packs can be bought only in the Torque Empire app on Google Play.',3500); return false; }
   const s = await billing();
   if(!s){ t.toast('⚠️ Google Play payments are not available on this device.',3500); return false; }
   try{

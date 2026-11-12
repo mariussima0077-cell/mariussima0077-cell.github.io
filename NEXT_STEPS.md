@@ -39,7 +39,12 @@
 - [ ] Pachet Android **cu plăți** (Play Billing) + produsele în Play Console: `vip_car` 3.99 €, `vip_mechanic` 2.99 €, `battle_speed_x2` 4.99 €, abonament `vip_pass_monthly` 5.99 €/lună.
 - [ ] Cont de serviciu Google pentru bot (`GOOGLE_SA`), ca botul să confirme cumpărăturile.
 
+## 🧪 MOD DE TEST (doar pentru Marius)
+- Pe site, pachetele NU se mai deblochează gratis. Pentru teste: deschizi o dată linkul secret (`?dev=...`, e în Google Drive, fișierul „Torque Empire - link test”). Cu `?dev=off` îl oprești.
+- În modul de test există `__DEV.startBattle(etapa)` – Claude îl folosește pentru capturi și verificări live.
+- Cheia secretă NU se scrie niciodată în GitHub (repository-ul e public).
+
 ## ⚠️ REGULI DUPĂ PUBLICARE
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
-- La fiecare update: se schimbă `const V='te-v15-1'` din `sw.js` (ex. `te-v16-1`) și se urcă fișierele pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update: se schimbă `const V='te-v15-2'` din `sw.js` (ex. `te-v15-3`) și se urcă fișierele pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Google Drive și același Package ID `com.torqueempire.game`.

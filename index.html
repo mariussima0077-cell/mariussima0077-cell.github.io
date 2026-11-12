@@ -2174,7 +2174,7 @@ function renderPanel(){
     $('shTitle').textContent='🛒 Shop';$('shDots').innerHTML='<span>Packs stay forever – every chapter, every stage</span>';$('shDesc').textContent='';
     $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th"><i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vipThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i></div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
       (p.id==='sub'?(subOn()?'<button class="buy own">ACTIVE<br>'+Math.ceil((PK.sub-Date.now())/864e5)+'d</button>':'<button class="buy" data-buy="sub">'+p.price+'</button>'):PK[p.id]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-buy="'+p.id+'">'+p.price+'</button>')+'</div>').join('')+
-      (SEC.TEST_MODE?'<div class="note">🧪 Browser test: tapping the price unlocks the pack without payment. In the Google Play app it is a real Google Play payment.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
+      (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
     $('shBtn').style.display='none';return;}
   if(sel==='vip'){const sub=subOn(),key='vip'+G.vip+sub+(sub?Math.ceil((PK.sub-Date.now())/864e5):0);if(key===lastPanelKey)return;lastPanelKey=key;
     const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×1.3':'');
@@ -2189,7 +2189,7 @@ function renderPanel(){
     h+='<div class="sec">ALL VIP LEVELS'+(sub?' (with VIP Pass)':'')+'</div>';
     for(let n=1;n<=VIP_MAX;n++){const nw=VIP_BEN.filter(b=>b.from===n);
       h+='<div class="vlv'+(n===VLV?' cur':n>VLV?' off':'')+'"><b>'+(n<=VLV?'👑':'🔒')+' VIP '+n+'</b><span>'+VIP_PTS[n]+' pts · '+VIP_BEN.filter(b=>n>=b.from).map(b=>b.ic+' '+pctT(benAt(b,n,sub),b.neg)).join(' · ')+(nw.length?'<br><span style="color:#ffd54a">NEW: '+nw.map(b=>b.n).join(', ')+'</span>':'')+'</span></div>';}
-    h+='<div class="note">Test version: tapping the price activates the VIP Pass without payment.</div>';
+    if(SEC.TEST_MODE)h+='<div class="note">🧪 TEST MODE (owner): tapping the price activates the VIP Pass without payment.</div>';
     $('shStats').innerHTML=h;const b=$('shBtn');b.style.display='';b.disabled=false;b.textContent='📋 DAILY QUESTS';return;}
   if(sel==='rep'){const key='rep'+G.xp;if(key===lastPanelKey)return;lastPanelKey=key;
     $('shTitle').textContent='⭐ Reputation '+G.rep;const nx=REP_XP[G.rep];$('shDots').innerHTML='<span>'+(nx?G.xp+' / '+nx+' XP':'MAX – '+G.xp+' XP')+'</span>';
@@ -2830,7 +2830,7 @@ function startLoader(){
     drawLoader(t);requestAnimationFrame(lf);})(t0);
   $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
-window.__TE={openPanel:id=>openPanel(id),cam:(x,y,z)=>{if(z)Z=clampS(z);camX=x-VW/2/Z;camY=y-(VH-TOP)/2/Z;clampCam();},update:(dt)=>update(dt),relayoutAfterUpgrade,secLayout,partsLayout,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,closePanel,popPicker,popCompare,renderTeam,fuseSel:()=>fuseSel,summon,openSummon,openTeam,popIdle,assign,HEROES,heroRefresh,popPicker,popHero,showResults,closePop,closeTeam,closeSummon,idleNow,yardSpots,expSpots,G,thief,guards,police,addVip,qAdd,openDQ,openPanel,spawnThief,cars,orders,drivers,bays,setSpeed:s=>SPD=s,start:()=>{$('loader').classList.add('hide');started=true;},cam:(x,y,z)=>{Z=clampS(baseS()*z);camX=x-VW/Z/2;camY=y-(VH-TOP)/Z/2;clampCam();},heli,truck,addXP,PK,TYPES,newCar,amb,trailer,VIP_T,_draw:(g,c)=>{const sX=X,sD=DET,s2=DET2;X=g;DET=true;DET2=true;drawCar(c);X=sX;DET=sD;DET2=s2;},trailY:TRAIL_Y,_tr:(g)=>{const sX=X,sD=DET;X=g;DET=true;drawTrailer();X=sX;DET=sD;}};
+window.__TE={savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)window.CAMPAIGN.open();};
 makeGrass();resize();startLoader();requestAnimationFrame(frame);
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});

@@ -1508,7 +1508,7 @@ function drawOffer(t){g.fillStyle='rgba(0,0,0,.78)';g.fillRect(0,0,W,H);HIT=[];c
   g.drawImage(badgeCv('aspd','#ff6d00',96),W/2-36,y+16,72,72);g.textAlign='center';g.fillStyle='#ffe082';g.font='900 '+Math.round(22*Math.min(1.2,S))+'px system-ui';g.fillText('BATTLE SPEED ×2',W/2,y+116);
   g.fillStyle='#e0c6ad';g.font='700 13px system-ui';g.fillText('×1.5 is free for everyone.',W/2,y+142);g.fillText('×2 is a pack – yours forever, every chapter.',W/2,y+161);
   btn(x+20,y+182,bw-40,48,'€4.99 · UNLOCK ×2',true,'buy');btn(x+20,y+240,bw-40,40,'NO THANKS',false,'nobuy');
-  g.fillStyle='#9a8';g.font='700 10px system-ui';g.fillText('Test version: tapping the price unlocks without payment',W/2,y+bh2+18);}
+  if(window.SEC&&SEC.TEST_MODE){g.fillStyle='#9a8';g.font='700 10px system-ui';g.fillText('TEST MODE (owner): tapping the price unlocks without payment',W/2,y+bh2+18);}}
 function drawPause(){g.fillStyle='rgba(0,0,0,.7)';g.fillRect(0,0,W,H);g.textAlign='center';g.font='900 '+Math.round(30*S)+'px system-ui';g.fillStyle='#ffe082';g.fillText('PAUSED',W/2,H*.36);
   HIT=[];const bw=Math.min(260,W*.7);btn(W/2-bw/2,H*.44,bw,52,'▶  RESUME',true,'resume');btn(W/2-bw/2,H*.44+66,bw,52,'🏳  RETREAT',false,'retreat');}
 
@@ -1882,6 +1882,6 @@ $('cpChN').onclick=()=>chList();
 $('cpBack').onclick=close;$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
 // v15: GEAR title is the player's picture
 $('cpGearB').innerHTML=IMGI(glyphURL('bag','#ffd54a'),'1.25em','-.3em')+'<small>GEAR</small>';
-window.CAMPAIGN={monPreview,open,close,openGear,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},_B:()=>B,_sim:(si,ids)=>{const r=simRun(si,ids.map(heroOf));$('bt').classList.remove('open');return r;},_cast:u=>cast(u),_wave:n=>{B.wave=n;B.mons=[];spawnWave();for(const m of B.mons)if(m.b!=='titan')m.x=W*.7;},
-  STAGES,MON,CHAP,bestTeam,enemyPower,teamPower,crewHero,dropItem,GR,pow,heroOf,unitStats,badge,glyphURL,itemIconURL,openTeam,openCard,popItem,popTeamCmp,popReplace,showMap,stageMul};
+window.CAMPAIGN={open,close,openGear};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));}};
 })();
