@@ -6,7 +6,8 @@
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v15-4'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v15-5'`.
+  - **v16 (13 nov)**: deschise Car Wash (Rep 2, $1.500), Gas Station (Rep 3, $4.000), Car Factory (Rep 5, $60.000) pe o stradă nouă sub drumul camionului (pozele lui Marius `img/x_wash1-4`, `x_gas1-4`, `x_factory1-4`; poza se schimbă LV1-4, LV5-10 doar beneficii). Spălătoria: mașini trec prin tunel, + bonus la vânzare. Benzinăria: mașini la pompe (2/2/3/4), camionul revine mai repede. Fabrica: mașină nouă vândută direct. Botul acceptă acum suma nivelurilor până la 140. Rail Terminal și Collection rămân „coming soon”. Prețuri/timpi alese fără simulator → de ajustat după test.
 - **Politica de confidențialitate**: https://mariussima0077-cell.github.io/privacy.html (e-mail: torqueempirehelp@gmail.com) – menționează și serverul anti-cheat.
 - **Cont Google al jocului**: torqueempirehelp@gmail.com (Gmail și Google Drive conectate la Claude).
 
