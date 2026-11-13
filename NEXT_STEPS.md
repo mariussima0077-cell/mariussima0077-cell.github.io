@@ -49,6 +49,7 @@
 
 ## ⏳ CE A MAI RĂMAS
 ### Acum (cât așteptăm Google)
+- [ ] **Demo efecte noi în bătălii (FX v2)** – deschide jocul cu `?fx=2` la final de link, intră într-o bătălie și apasă butonul mov „FX: NEW / FX: OLD” ca să compari. Pentru jucători e OPRIT până aprobă Marius. Texturi gratuite CC0 (Kenney Particle Pack) în `img/fx/`. Dacă e aprobat: FX2 devine implicit și butonul de comparație dispare.
 - [ ] **Client ID pentru login Google** (Google Cloud Console, contul torqueempirehelp@gmail.com): proiect nou → OAuth consent screen (External, „Torque Empire”, publicat) → Credentials → OAuth client ID → *Web application* → Authorized JavaScript origins: `https://mariussima0077-cell.github.io` → copiezi Client ID-ul (`…apps.googleusercontent.com`) și i-l dai lui Claude.
 - [ ] Verifică dacă `ADMIN_KEY` e pus în Cloudflare (torque-guard → Settings → Variables and Secrets → Secret). Test: linkul de admin din Drive trebuie să arate pagina „🛡️ Torque Guard” (nu „no”).
 - [ ] Urcă `.aab`-ul în Google Drive (folderul cu cheia).
