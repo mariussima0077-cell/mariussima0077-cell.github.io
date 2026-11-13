@@ -40,7 +40,8 @@
   `2F:F9:21:56:9B:2B:DC:23:9C:4F:02:02:E9:B6:35:F0:B5:99:62:D1:EB:3F:E9:74:2B:FF:45:C6:22:E8:35:A7`
 
 ### Cont Google Play
-- Cont de dezvoltator creat (personal, 25 $). **Se așteaptă verificarea identității** (buletin românesc, adresă în Franța).
+- Cont de dezvoltator **aprobat** (13 nov): „Torque Studios”, personal.
+- **Aplicația creată** (13 nov): Torque Empire: Garage Tycoon · `com.torqueempire.game` · Jeu · Sans frais · en-US.
 
 ## ⏳ CE A MAI RĂMAS
 ### Acum (cât așteptăm Google)
@@ -49,7 +50,7 @@
 - [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau r/AndroidClosedTesting). Claude poate scrie mesajul de invitație.
 
 ### După ce Google aprobă contul
-- [ ] Play Console → **Create app**: Torque Empire · Game · Free · categoria Simulation.
+- [x] Play Console → **Create app** (făcut 13 nov). Categoria Simulation se pune la fișa magazinului.
 - [ ] **Closed testing**: urci `.aab`-ul.
 - [ ] **Setup → App signing**: copiezi **SHA-256 al cheii Google** și i-l dai lui Claude → îl adaugă în `assetlinks.json` (altfel apare bara de adresă în aplicație).
 - [ ] Fișa aplicației: textele din `store/STORE_LISTING.md`, icon, feature graphic, cele 6 capturi, privacy policy.
