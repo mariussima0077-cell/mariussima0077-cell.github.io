@@ -39,7 +39,7 @@ async function report(b, env) {
   const newFlags = (b.flags || []).filter(f => FLAG_PTS[f] && !(old && (old.flags || '').split(',').includes(f)));
   newFlags.forEach(f => { pts += FLAG_PTS[f]; why.push('client:' + f); });
   // 2) impossible numbers
-  if (s.mythic > 6 || s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 110 || s.best > 1000 || s.money < 0) { pts += 100; why.push('impossible_values'); }
+  if (s.mythic > 6 || s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 1000 || s.money < 0) { pts += 100; why.push('impossible_values'); }
   // 3) compared with the last report
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);

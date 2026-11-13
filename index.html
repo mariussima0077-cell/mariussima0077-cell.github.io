@@ -458,10 +458,18 @@ const SH1=Y1+SLO, SHM=YM+SLO, SH2=Y2+SLO, SVL=VL+SLO, SVA=AV+SLO, SVR=VR+SLO, SV
 const YT=1360+DY, YK=3.03, SPOT=101.67/YK, YARD_ROWS=6, YB=YT+Math.round((1162-355)/YK), SV_BOT=YT-24;
 const YX0=AV-150, YX1=AV+150, SO_X=YX1+34, SO_Y=YT-14;
 let SO_W=190, SO_H=173; // v14: Security grows with my LV2-LV4 pictures (LV3/LV4 are wide)
-const CONN_Y=YB+60, TRAIL_Y=CONN_Y+65, H=TRAIL_Y+640;   // v8: room below for the coming-soon district
+const CONN_Y=YB+60, TRAIL_Y=CONN_Y+65, SY=TRAIL_Y+376, H=SY+400;   // v16: business street (car wash, gas station, car factory) + rail terminal below
 const PB={x:905,y:96,w:196,h:197};           // parts building (my picture)
 const COL={x:1300,y:528,w:190,h:Math.round(190*1033/560)}, COL_RX=1395; // collection garage (classic cars showroom)
-const SOON={wash:{x:540,y:TRAIL_Y+52,w:340,h:200},gas:{x:980,y:TRAIL_Y+52,w:400,h:200},rail:{x:40,y:TRAIL_Y+300,w:800,h:250},factory:{x:900,y:TRAIL_Y+290,w:560,h:230},railY:TRAIL_Y+585};
+const SOON={rail:{x:40,y:SY+52,w:800,h:250},railY:SY+337};
+// =================== v16: CAR WASH · GAS STATION · CAR FACTORY (my pictures LV1-LV4; LV5-10 = only benefits) ===================
+const DS_B=TRAIL_Y+338, XLOOP=322, XLANE_Y=TRAIL_Y+47, XCON=740, XIDS=['wash','gas','factory'];
+const XART={"wash1":{"w":684,"h":771,"lv":[208,333,458,390]},"wash2":{"w":726,"h":794,"lv":[228,349,500,406]},"wash3":{"w":730,"h":795,"lv":[225,349,482,406]},"wash4":{"w":796,"h":813,"lv":[261,359,520,416]},"gas1":{"w":701,"h":734,"lv":[240,245,455,293]},"gas2":{"w":844,"h":803,"lv":[310,310,570,366]},"gas3":{"w":807,"h":807,"lv":[300,300,552,364]},"gas4":{"w":888,"h":825,"lv":[310,312,575,378]},"factory1":{"w":1600,"h":503,"lv":[709,217,884,254]},"factory2":{"w":1600,"h":518,"lv":[707,229,891,264]},"factory3":{"w":1600,"h":521,"lv":[705,223,884,262]},"factory4":{"w":1600,"h":523,"lv":[699,226,887,272]}};
+const XM={wash:{cx:168,h:270,plate:'#02101a',col:'#1e88e5'},gas:{cx:510,h:290,plate:'#5c0707',col:'#d32f2f'},factory:{cx:1112,w:640,plate:'#03121b',col:'#f9a825'}};
+const XWASH={lane:[.5,.49,.49,.5],stop:.68,roof:.535}, XGAS={p:[[.3,.69],[.35,.69],[.31,.52,.75],[.25,.41,.57,.73]],bot:[.84,.82,.82,.80]}, XFAC={door:.885,doorY:.64,arms:[[.38,.6],[.55,.6],[.33,.62],[.5,.6],[.67,.6]]};
+const WASH_EVERY=[14,12,10,8.5,7.6,6.9,6.3,5.8,5.3,4.8], WASH_PAY=[12,16,21,27,34,42,52,64,78,95], WASH_SALE=[.02,.03,.04,.05,.06,.07,.08,.09,.10,.12], WASH_T=4;
+const GAS_EVERY=[9,8,7,6,5.5,5,4.6,4.2,3.8,3.4], GAS_PAY=[20,26,33,42,52,64,78,95,115,140], GAS_TRL=[.05,.08,.11,.14,.16,.18,.20,.22,.24,.26], FUEL_T=5;
+const FAC_EVERY=[50,45,40,35,32,29,26,24,22,20], FAC_PRICE=[900,1150,1450,1800,2200,2650,3150,3700,4300,5000];
 const PAD={x:1410,y:360}, EBULB={x:1300,y:360}, WBULB={x:938,y:360};
 const TRK={x0:20,y0:440,x1:345,y1:1320+DY};     // race track (coming soon)
 
@@ -469,7 +477,7 @@ const TRK={x0:20,y0:440,x1:345,y1:1320+DY};     // race track (coming soon)
 const ISC={loading:.8};
 let PASS='all'; // 'static' = painted once into the cached map tiles, 'dyn' = drawn every frame
 function DI(o,sx,sy,sw,sh,dx,dy,dw,dh){const k=o.sc||1;X.drawImage(o.el,sx*k,sy*k,sw*k,sh*k,dx,dy,dw,dh);}
-const IMG={};['garage','mech','vip','loading','b_arrivals','b_arrivals0','b_office','b_office0','b_yard','b_arm','b_security','b_security2','b_security3','b_security4','b_ysign',...['paint','elec','inspect','tuning','engine'].flatMap(g=>[2,3,4].map(t=>'g_'+g+t)),'s_paint','s_elec','s_inspect','s_tuning','s_engine','p_parts0','p_parts2','p_parts3','p_parts4','b_collection'].forEach(n=>{const el=new Image();IMG[n]={el,ok:false};el.onload=()=>{try{const sc=ISC[n]||1,c=document.createElement('canvas');c.width=Math.round(el.naturalWidth*sc);c.height=Math.round(el.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(el,0,0,c.width,c.height);IMG[n].el=c;IMG[n].sc=sc;}catch(e){}IMG[n].ok=true;};el.onerror=()=>{IMG[n].bad=true;};el.src='img/'+n+'.webp';});
+const IMG={};['garage','mech','vip','loading','b_arrivals','b_arrivals0','b_office','b_office0','b_yard','b_arm','b_security','b_security2','b_security3','b_security4','b_ysign',...['paint','elec','inspect','tuning','engine'].flatMap(g=>[2,3,4].map(t=>'g_'+g+t)),'s_paint','s_elec','s_inspect','s_tuning','s_engine','p_parts0','p_parts2','p_parts3','p_parts4','b_collection',...XIDS.flatMap(g=>[1,2,3,4].map(t=>'x_'+g+t))].forEach(n=>{const el=new Image();IMG[n]={el,ok:false};el.onload=()=>{try{const sc=ISC[n]||1,c=document.createElement('canvas');c.width=Math.round(el.naturalWidth*sc);c.height=Math.round(el.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(el,0,0,c.width,c.height);IMG[n].el=c;IMG[n].sc=sc;}catch(e){}IMG[n].ok=true;};el.onerror=()=>{IMG[n].bad=true;};el.src='img/'+n+'.webp';});
 const IM={"garage":{"w":1000,"h":568,"floor":[0,569,207,340],"door":[211,569,190,27],"floorT":[[243,198,457,538],[467,198,684,538],[696,198,913,538]],"doorT":[[257,540,447,567],[485,540,675,567],[713,540,903,567]]},"mech":{"cw":66,"ch":89,"cols":16,"rows":6,"pad":2,"anims":["idle","walk","work","repair","think","celebrate"]},"vip":{"cw":72,"ch":101,"cols":16,"rows":7,"pad":2,"anims":["idle","walk","work","repair","inspect","think","celebrate"]},"vipcar":{"cw":184,"ch":117,"cols":4,"rows":4,"pad":2,"sizes":[[133,112],[129,106],[180,74],[177,73]]},"loading":{"w":922,"h":1706,"bar":[117,1482,797,1529],"txt":[461,1572],"track":[17,28,41],"panel":[20,31,45]}};
 // =================== PACKS (kept forever: every chapter & stage) ===================
 const BM={"arrivals":{"w":1536,"h":1024,"cols":[142,293,447,604,765,921,1079,1238,1398],"rows":[[158,460],[626,914]]},"office":{"w":1672,"h":941,"crop":[15,10,1657,925],"desks":[[262,505,525,748],[597,505,860,748],[932,505,1195,748],[1262,492,1590,724]],"chairs":[[393,540],[728,540],[1063,540],[1412,530]]},"yard":{"crop":[36,318,1052,1218],"arms":[[452,344,628,365],[452,1152,628,1173]],"road":543,"spots":{"xL":355,"xR":730,"y0":480,"y1":1090}},"security":{"crop":[70,165,1146,1145],"rec":[938,228],"chair":[608,758],"door":[608,960],"out":[608,1150],"beacon":[850,622],"mon":[[155,372,438,545],[462,372,760,545],[783,372,1065,545]]}};
@@ -515,6 +523,9 @@ const BLD={
  office:{rep:1,cost:[0,600,2000,5000,270000,620000,1400000,3100000,6700000,15000000]},
  security:{name:'Security',rep:1,cost:[0,400,1500,4000,240000,550000,1200000,2800000,6000000,13000000]},
  trailer:{rep:1,cost:[0,500,1800,4500,250000,580000,1300000,2900000,6300000,14000000]},
+ wash:{name:'Car Wash',rep:2,cost:[1500,2800,5500,11000,240000,550000,1250000,2800000,6000000,13000000]},
+ gas:{name:'Gas Station',rep:3,cost:[4000,6500,11000,18000,300000,680000,1500000,3300000,7200000,15500000]},
+ factory:{name:'Car Factory',rep:5,cost:[60000,110000,190000,320000,800000,1700000,3600000,7600000,16000000,34000000]},
 };
 const SPEED=[1,1.2,1.45,1.75,2.0,2.25,2.5,2.8,3.1,3.5];
 const PAYB=[0,0,0,0,.10,.20,.32,.45,.60,.80]; // v14: extra money on every job done in a garage of that level
@@ -595,7 +606,7 @@ const SKINS=['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac'], HAIRS=['#2b1d14
 
 // =================== STATE ===================
 const SAVE_KEY='torqueEmpire_v15';
-const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1},up:{}};
+const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
 function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;G.rep=repFor(G.xp);}}catch(e){}}
 function save(){try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
@@ -933,7 +944,7 @@ function sales(dt){
   const olv=G.lv.office;
   for(let j=0;j<PLV('office');j++){const a=agents[j];
     if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
-    else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale')));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
+    else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale()));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
       G.money+=price;G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip)driveAway(c);
       const xp=1+c.jobs.reduce((s,j)=>s+j.xp,0);addXP(xp);
       float(c.x,c.y-30,'+'+fmt(price),'#ffd54a');float(a.p.x,a.p.y-22,'SOLD ONLINE','#b39ddb');save();}}
@@ -968,7 +979,7 @@ function updateTrailer(dt){
     if(t.loaded>0&&t.loaded===t.assigned&&(t.loaded>=cap||t.t>16)){t.st='leave';t.v=0;}
   }else if(t.st==='leave'){t.v=Math.min(110,t.v+60*dt);t.x+=t.v*dt;
     if(t.x>W+60){for(let i=cars.length-1;i>=0;i--)if(cars[i].state==='loaded')cars.splice(i,1);t.st='away';t.t=0;}
-  }else if(t.st==='away'){t.t+=dt;if(t.t>TRAILER_AWAY[G.lv.trailer-1]){t.st='arrive';t.x=-(trLen()+200);}
+  }else if(t.st==='away'){t.t+=dt;if(t.t>TRAILER_AWAY[G.lv.trailer-1]*(1-xGasTrl())){t.st='arrive';t.x=-(trLen()+200);}
   }else if(t.st==='arrive'){t.x+=Math.max(25,Math.min(110,(30-t.x)*1.2))*dt;if(t.x>=30){t.x=30;t.st='docked';t.assigned=0;t.loaded=0;t.t=0;}}
   for(const c of cars)if(c.state==='loaded'){c.x=deckX(c.deck);c.y=TRAIL_Y;c.a=0;}
 }
@@ -1135,7 +1146,7 @@ function update(dt){
   for(let i=cars.length-1;i>=0;i--)if(cars[i].gone)cars.splice(i,1);
   updateTrailer(dt);updateHeli(dt);updateTruck(dt);updateSecurity(dt);
   for(const id in drivers)for(const d of drivers[id])personStep(d.p,dt);
-  updateMechs(dt);
+  updateMechs(dt);updateDistrict(dt);
   // bay doors & lifts
   STIDS.forEach(id=>bays[id].forEach(b=>{const c=b.car;const t=(c&&(c.state==='drive'||c.state==='await')&&dist(c,b)<95)?1:0;b.door+=(t-b.door)*Math.min(1,dt*6);}));
   for(const c of cars){const up=(c.state==='work'&&(c.atS==='service'||c.atS==='engine'))?1:0;c.lift+=(up-c.lift)*Math.min(1,dt*3);
@@ -1227,7 +1238,7 @@ function tree(x,y,r,v){X.drawImage(TREE_SPR[v%3],x-r*1.45,y-r*1.45,r*2.9,r*2.9);
 let seed=17;const srnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
 const TREES=[];
 function addTrees(x0,y0,x1,y1,n,rmin,rmax){for(let i=0;i<n;i++)TREES.push([x0+srnd()*(x1-x0),y0+srnd()*(y1-y0),rmin+srnd()*(rmax-rmin),Math.floor(srnd()*3)]);}
-addTrees(1305,1120+DY,1490,1320+DY,9,12,18);addTrees(30,TRAIL_Y+50,500,TRAIL_Y+260,12,11,17);addTrees(1400,TRAIL_Y+60,1490,TRAIL_Y+250,4,11,15);addTrees(860,TRAIL_Y+520,1490,TRAIL_Y+560,10,10,14);addTrees(30,130,400,180,6,11,16);addTrees(30,370,420,425,5,11,15);
+addTrees(1305,1120+DY,1490,1320+DY,9,12,18);addTrees(1442,TRAIL_Y+60,1492,DS_B-10,4,10,14);addTrees(880,SY+60,1490,SOON.railY-40,16,11,17);addTrees(-10,TRAIL_Y+52,26,DS_B-10,3,9,13);addTrees(30,130,400,180,6,11,16);addTrees(30,370,420,425,5,11,15);
 addTrees(440,1340+DY,620,1660+DY,12,11,17);addTrees(1150,1340+DY,1490,1660+DY,16,12,18);addTrees(1180,110,1490,150,5,10,13);addTrees(1130,180,1480,300,8,11,16);
 for(let i=TREES.length-1;i>=0;i--){const [x,y,r]=TREES[i];if(x>SO_X-10-r&&x<SO_X+370+r&&y>SO_Y-12-r&&y<SO_Y+200+r)TREES.splice(i,1);}
 TREES.sort((a,b)=>a[1]-b[1]);
@@ -1899,34 +1910,118 @@ function drawCollection(){
   for(const [lx,ly] of[[fx0+4,(fy0+fy1)/2],[fx1-4,(fy0+fy1)/2]]){X.fillStyle='rgba(255,236,170,.12)';circ(lx,ly,26);X.fillStyle='#546e7a';circ(lx,ly,2.6);X.fillStyle='#fff8e1';circ(lx,ly,1.3);}
   sign((fx0+fx1)/2,fy0-10,'🏆 CLASSIC COLLECTION · PREMIUM','#8d6e00');
 }
+// =================== v16: BUSINESS STREET – CAR WASH · GAS STATION · CAR FACTORY ===================
+// Pictures change at LV1-LV4 (my pictures); LV5-LV10 only give more money / faster customers.
+const xTier=id=>Math.max(1,PLV(id));
+function xRect(id){const t=xTier(id),a=XART[id+t],m=XM[id];let w,h;if(m.w){w=m.w;h=w*a.h/a.w;}else{h=m.h;w=h*a.w/a.h;}return{x:m.cx-w/2,y:DS_B-h,w,h,t,a,k:w/a.w};}
+const xRepM=()=>IDLE_REP[G.rep-1];
+const xWashSale=()=>G.lv.wash?WASH_SALE[G.lv.wash-1]:0, xGasTrl=()=>G.lv.gas?GAS_TRL[G.lv.gas-1]:0;
+const washPay=l=>Math.round(WASH_PAY[l-1]*xRepM()), gasPay=l=>Math.round(GAS_PAY[l-1]*xRepM()), facPrice=l=>Math.round(FAC_PRICE[l-1]*Math.max(1,xRepM()/5));
+function xPic(id,r,clipH){const I=IMG['x_'+id+r.t];if(!I||!I.ok)return false;const hh=clipH||r.h;
+  DI(I,0,0,r.a.w,hh/r.k,r.x,r.y,r.w,hh);if(r.a.lv[3]*r.k<=hh+1)picLv(r.a.lv,r.x,r.y,r.k,Math.max(1,G.lv[id]||1),XM[id].plate,'#ffffff');return true;}
+function drawDistrict(){
+  const T=TRAIL_Y+28;
+  // street (customers drive east on the lower lane), connector to the transporter road
+  RQ=[];roadH(-2500,W+2500,SY);roadV(XCON,T-2,SY);roadFlush();dashH(-2500,W+2500,SY);dashV(XCON,T+8,SY-RW);
+  // car wash exit lane: out of the back of the tunnel, around, back to the street
+  const rw=xRect('wash'),lx=rw.x+rw.w*XWASH.lane[rw.t-1];
+  X.fillStyle=CURB;X.fillRect(lx-15,XLANE_Y-15,XLOOP-lx+30,30);X.fillRect(XLOOP-15,XLANE_Y-15,30,SY-RW-XLANE_Y+15);
+  X.fillStyle=ASP;X.fillRect(lx-12,XLANE_Y-12,XLOOP-lx+24,24);X.fillRect(XLOOP-12,XLANE_Y-12,24,SY-RW-XLANE_Y+14);
+  X.fillStyle='rgba(255,255,255,.75)';for(const [ax,ay,an] of[[lx+60,XLANE_Y,0],[XLOOP,XLANE_Y+90,Math.PI/2],[XLOOP,XLANE_Y+200,Math.PI/2]]){X.save();X.translate(ax,ay);X.rotate(an);X.beginPath();X.moveTo(7,0);X.lineTo(-3,-6);X.lineTo(-3,6);X.closePath();X.fill();X.fillRect(-12,-1.5,10,3);X.restore();}
+  if(DET){X.fillStyle='#fff';X.font='900 7px system-ui';X.textAlign='center';X.fillText('EXIT',XLOOP,SY-RW-8);}
+  for(const id of XIDS){const r=xRect(id),lv=G.lv[id],locked=G.rep<BLD[id].rep;
+    // driveway between the building and the street
+    X.fillStyle=ASP;X.fillRect(r.x+r.w*.08,DS_B-6,r.w*.84,SY-RW-DS_B+8);
+    X.fillStyle='rgba(0,0,0,.28)';rr(r.x+6,r.y+8,r.w-4,r.h-4,14);X.fill();
+    if(lv>0){if(!xPic(id,r)){X.fillStyle='#78909c';X.fillRect(r.x,r.y,r.w,r.h);}continue;}
+    // not built yet: a faded preview of LV1 + build / reputation pill
+    xPic(id,r);X.fillStyle='rgba(22,30,38,.6)';rr(r.x,r.y,r.w,r.h,14);X.fill();
+    const cx=r.x+r.w/2,cy=r.y+r.h*.62;X.textAlign='center';
+    X.fillStyle=locked?'#455a64':XM[id].col;rr(cx-64,cy-2,128,28,8);X.fill();X.strokeStyle='rgba(255,255,255,.85)';X.lineWidth=1.5;X.stroke();
+    X.fillStyle='#fff';X.font='900 13px system-ui';X.fillText(locked?'🔒 REP '+BLD[id].rep:'BUILD '+fmt(BLD[id].cost[0]),cx,cy+17);
+    X.font='900 12px system-ui';X.lineWidth=4;X.strokeStyle='rgba(0,0,0,.65)';const nm={wash:'🫧 CAR WASH',gas:'⛽ GAS STATION',factory:'🏭 CAR FACTORY'}[id];X.strokeText(nm,cx,cy-12);X.fillText(nm,cx,cy-12);}
+}
+// ---- customers & produced cars (their own little traffic, separate from the garage cars)
+const dcars=[],XS={washT:0,gasT:0,facT:0,wash:null,pumps:[null,null,null,null]};
+const XLN=SY+13;
+function xCarNew(k){const c=newCar(false);c.xk=k;c.xs='in';c.x=-90;c.y=XLN;c.a=0;c.sp=105;c.dmg=[];return c;}
+function xStep(c,dt){if(!c.path.length)return true;let sp=c.sp*dt;const p0=c.path[0];
+  if(!p0.rev){const hx=Math.cos(c.a),hy=Math.sin(c.a);let bl=false;
+    for(const o of dcars){if(o===c)continue;const rx=o.x-c.x,ry=o.y-c.y,f=rx*hx+ry*hy;if(f>0&&f<44&&Math.abs(rx*hy-ry*hx)<14){bl=true;break;}}
+    if(bl){c.bt=(c.bt||0)+dt;if(c.bt<3)return false;}else c.bt=0;}
+  if(p0.rev)sp*=.55;
+  while(sp>0&&c.path.length){const p=c.path[0],dx=p.x-c.x,dy=p.y-c.y,d=Math.hypot(dx,dy);
+    if(d>.01)c.a=lerpA(c.a,Math.atan2(dy,dx)+(p.rev?Math.PI:0),Math.min(1,dt*12));
+    if(d<=sp){c.x=p.x;c.y=p.y;sp-=d;c.path.shift();continue;}
+    c.x+=dx/d*sp;c.y+=dy/d*sp;sp=0;}
+  return !c.path.length;}
+const xLaneFree=()=>!dcars.some(o=>o.x<30&&Math.abs(o.y-XLN)<20);
+function xEarn(n,x,y,txt,col){G.money+=n;qAdd('earn',n);float(x,y,txt+' +'+fmt(n),col);}
+function updateDistrict(dt){
+  // --- car wash: one car at a time drives through the tunnel
+  if(G.lv.wash>0){const r=xRect('wash'),lx=r.x+r.w*XWASH.lane[r.t-1];XS.washT+=dt;
+    if(!XS.wash&&XS.washT>=WASH_EVERY[G.lv.wash-1]&&xLaneFree()){XS.washT=0;const c=xCarNew('wash');c.dirt=rnd(.6,.95);
+      c.path=roundPath([{x:-90,y:XLN},{x:lx,y:XLN},{x:lx,y:r.y+r.h*XWASH.stop}],20);dcars.push(c);XS.wash=c;}}
+  // --- gas station: one car per pump
+  if(G.lv.gas>0){const r=xRect('gas'),P=XGAS.p[r.t-1];XS.gasT+=dt;
+    if(XS.gasT>=GAS_EVERY[G.lv.gas-1]&&xLaneFree()){const free=P.map((_,i)=>i).filter(i=>!XS.pumps[i]);
+      if(free.length){XS.gasT=0;const i=pick(free),px=r.x+r.w*P[i],c=xCarNew('gas');c.pi=i;c.px=px;
+        c.path=roundPath([{x:-90,y:XLN},{x:px,y:XLN},{x:px,y:r.y+r.h*XGAS.bot[r.t-1]+c.type.L/2-3}],20);dcars.push(c);XS.pumps[i]=c;}}}
+  // --- car factory: a new car leaves the right door every few seconds
+  if(G.lv.factory>0){const r=xRect('factory'),lv=G.lv.factory;XS.facT+=dt;
+    if(XS.facT>=FAC_EVERY[lv-1]){const dx=r.x+r.w*XFAC.door,y0=r.y+r.h*XFAC.doorY;
+      if(!dcars.some(o=>Math.abs(o.x-dx)<30&&o.y>y0-30&&o.y<y0+60)){XS.facT=0;const c=newCar(false);c.xk='fac';c.xs='out';c.col=pick(VIVID);c.dirt=0;c.dmg=[];c.sp=70;
+        if(Math.random()<.5)c.tune[pick(['rims','led','tint','street','lower'])]=true;c.x=dx;c.y=y0;c.a=Math.PI/2;c.fade=0;
+        c.path=roundPath([{x:dx,y:y0},{x:dx,y:XLN},{x:W+140,y:XLN}],20);dcars.push(c);
+        const pr=facPrice(lv);xEarn(pr,dx,y0-28,'🏭 NEW CAR','#ffd54a');addXP(1);}}}
+  for(let i=dcars.length-1;i>=0;i--){const c=dcars[i];if(c.fade!=null&&c.fade<1)c.fade=Math.min(1,c.fade+dt*1.8);
+    const done=c.xs==='wash'||c.xs==='fuel'?false:xStep(c,dt);
+    if(c.xk==='wash'){const r=xRect('wash'),lx=r.x+r.w*XWASH.lane[r.t-1];
+      if(c.xs==='in'&&done){c.xs='wash';c.t=0;}
+      else if(c.xs==='wash'){c.t+=dt;c.dirt=Math.max(0,c.dirt-dt*.3);
+        if(DET&&parts.length<150&&Math.random()<dt*30){const s=pick([-1,1]);parts.push({x:c.x+s*rnd(10,16),y:c.y+rnd(-22,22),vx:-s*rnd(10,30),vy:rnd(-12,12),life:.6,max:.6,r:rnd(1.4,2.8),col:pick(['#e1f5fe','#ffffff','#81d4fa'])});}
+        if(c.t>=WASH_T){c.xs='out';c.dirt=0;xEarn(washPay(G.lv.wash||1),lx,r.y+r.h*.86,'🫧 WASH','#81d4fa');
+          c.path=roundPath([{x:lx,y:c.y},{x:lx,y:XLANE_Y},{x:XLOOP,y:XLANE_Y},{x:XLOOP,y:XLN},{x:W+140,y:XLN}],16);}}
+      else if(c.xs==='out'&&XS.wash===c&&c.y<r.y+r.h*.3)XS.wash=null;}
+    else if(c.xk==='gas'){const r=xRect('gas');
+      if(c.xs==='in'&&done){c.xs='fuel';c.t=0;}
+      else if(c.xs==='fuel'){c.t+=dt;if(c.t>=FUEL_T){c.xs='out';xEarn(gasPay(G.lv.gas||1),c.x,c.y-30,'⛽ FUEL','#ffb74d');
+        const px=c.x,q=[{x:px,y:XLN-22,rev:1}];for(let k=1;k<=6;k++){const t=k/6,u=1-t;q.push({x:u*u*px+2*u*t*px+t*t*(px-34),y:u*u*(XLN-22)+2*u*t*XLN+t*t*XLN,rev:1});}
+        q.push({x:W+140,y:XLN});c.path=q;}}
+      else if(c.xs==='out'&&XS.pumps[c.pi]===c&&c.y>r.y+r.h+4)XS.pumps[c.pi]=null;}
+    if(c.xs==='out'&&done&&!c.path.length&&c.x>W+100){if(XS.wash===c)XS.wash=null;if(c.xk==='gas'&&XS.pumps[c.pi]===c)XS.pumps[c.pi]=null;dcars.splice(i,1);continue;}
+    if(c.path.length&&onScreen(c.x,c.y,60)&&Math.random()<dt*3)exhaust(c,false);}
+}
+function drawDistrictDyn(){
+  if(!inView(-60,TRAIL_Y,W+120,SY-TRAIL_Y+60))return;
+  for(const c of dcars){if(!onScreen(c.x,c.y,40))continue;if(c.fade!=null&&c.fade<1)X.globalAlpha=c.fade;drawCar(c);X.globalAlpha=1;}
+  // the car wash roof covers the car inside the tunnel
+  if(G.lv.wash>0){const r=xRect('wash');
+    if(dcars.some(o=>o.xk==='wash'&&o.y>r.y-24&&o.y<r.y+r.h*XWASH.roof+28))xPic('wash',r,r.h*XWASH.roof);
+    if(XS.wash&&XS.wash.xs==='wash'){const w=XS.wash,p=w.t/WASH_T;X.fillStyle='rgba(0,0,0,.6)';rr(w.x-22,w.y+30,44,7,3.5);X.fill();X.fillStyle='#4fc3f7';rr(w.x-21,w.y+31,42*p,5,2.5);X.fill();
+      if(DET){X.fillStyle='rgba(225,245,255,.35)';for(let k=0;k<3;k++){const yy=w.y-18+((time*60+k*14)%40);X.fillRect(w.x-16,yy,32,2);}}}}
+  // gas: hose from the pump to the car + fuel bar
+  if(G.lv.gas>0){const r=xRect('gas'),by=r.y+r.h*XGAS.bot[r.t-1];
+    for(const c of dcars)if(c.xk==='gas'&&c.xs==='fuel'){const p=Math.min(1,c.t/FUEL_T),fx=c.x+8,fy=c.y-c.type.L/2+12;
+      X.strokeStyle='#212121';X.lineWidth=1.8;X.beginPath();X.moveTo(c.x+9,by-22);X.quadraticCurveTo(c.x+18,by,fx,fy);X.stroke();
+      X.fillStyle='rgba(0,0,0,.6)';rr(c.x-20,c.y+c.type.L/2+3,40,7,3.5);X.fill();X.fillStyle='#ffb300';rr(c.x-19,c.y+c.type.L/2+4,38*p,5,2.5);X.fill();
+      if(DET){X.font='900 7px monospace';X.textAlign='center';X.fillStyle='#76ff03';X.fillText((p*45).toFixed(1)+' L',c.x,c.y+c.type.L/2+17);}}}
+  // factory: next-car bar + welding sparks
+  if(G.lv.factory>0){const r=xRect('factory'),lv=G.lv.factory,p=Math.min(1,XS.facT/FAC_EVERY[lv-1]),bx=r.x+r.w*XFAC.door,by=r.y+r.h*.47;
+    const oc=dcars.find(o=>o.xk==='fac'&&o.y<r.y+r.h*.95&&o.y>r.y);if(oc&&r.t>1){const o=1-Math.max(0,(oc.y-(r.y+r.h*.8))/(r.h*.15));X.fillStyle='rgba(8,12,18,'+(.85*o)+')';X.fillRect(r.x+r.w*.848,r.y+r.h*.51,r.w*.074,r.h*.27);drawCar(oc);}
+    X.fillStyle='rgba(0,0,0,.65)';rr(bx-26,by-4,52,8,4);X.fill();X.fillStyle='#ffd54a';rr(bx-25,by-3,50*p,6,3);X.fill();
+    if(DET){X.font='900 7px system-ui';X.textAlign='center';X.fillStyle='#fff';X.fillText('NEXT CAR',bx,by-9);}
+    if(DET&&parts.length<150&&Math.random()<.5){const a=pick(XFAC.arms.slice(0,r.t+1));parts.push({x:r.x+r.w*a[0]+rnd(-4,4),y:r.y+r.h*a[1]+rnd(-3,3),vx:rnd(-40,40),vy:rnd(-40,10),life:.35,max:.35,r:rnd(.8,1.6),col:pick(['#fff59d','#ffeb3b','#ffffff','#ff9800'])});}}
+}
 function drawSoon(){
   const T=TRAIL_Y+28,S=SOON;if(!inView(-60,T-10,W+120,H-T+80))return;
-  // service road + railway
-  roadV(930,T,S.factory.y+4);dashV(930,T+10,S.factory.y);
+  drawDistrict();
+  // railway
   const ry=S.railY;X.fillStyle='#8d8378';X.fillRect(-2500,ry-20,W+5000,40);X.fillStyle='#6d4c41';for(let xx=-400;xx<W+400;xx+=11)X.fillRect(xx,ry-15,5,30);
   X.fillStyle='#b0bec5';X.fillRect(-2500,ry-10,W+5000,2.5);X.fillRect(-2500,ry+7.5,W+5000,2.5);
-  // ---- car wash
-  let {x,y,w,h}=S.wash;X.fillStyle='#9aa3aa';X.fillRect(x,y,w,h);X.fillStyle='#b9c2c8';X.fillRect(x+4,y+4,w-8,h-8);
-  X.fillStyle='rgba(0,0,0,.25)';X.fillRect(x+44,y+46,w-88,74);X.fillStyle='#e3f2fd';X.fillRect(x+40,y+42,w-80,74);X.fillStyle='#1e88e5';X.fillRect(x+40,y+42,w-80,8);X.fillRect(x+40,y+108,w-80,8);
-  X.fillStyle='#455a64';X.fillRect(x+50,y+60,w-100,38);for(let k=0;k<5;k++){const cx=x+80+k*(w-160)/4;X.fillStyle='#29b6f6';circ(cx,y+62,9);circ(cx,y+96,9);X.fillStyle='#0277bd';circ(cx,y+62,4);circ(cx,y+96,4);}
-  X.fillStyle='rgba(255,255,255,.75)';for(let k=0;k<14;k++)circ(x+60+((k*53)%(w-120)),y+70+((k*29)%22),2+(k%3));
-  mcar(x+140,y+79,0,'#e53935',1.2);
-  X.fillStyle='#fff';for(let k=0;k<3;k++){X.beginPath();X.moveTo(x+12+k*10,y+74);X.lineTo(x+20+k*10,y+79);X.lineTo(x+12+k*10,y+84);X.fill();}
-  for(let k=0;k<5;k++){const vx=x+40+k*60;X.strokeStyle='#fff';X.lineWidth=1.4;X.strokeRect(vx,y+136,42,48);X.fillStyle='#ffca28';rr(vx+16,y+130,10,10,2);X.fill();X.fillStyle='#37474f';circ(vx+21,y+135,2.5);}
-  X.fillStyle='#0d47a1';rr(x+w/2-70,y+10,140,22,6);X.fill();X.fillStyle='#fff';X.font='900 12px system-ui';X.textAlign='center';X.fillText('🫧 CAR WASH',x+w/2,y+25);
-  soonTape(x,y,w,h,-.28,16);
-  // ---- gas station
-  ({x,y,w,h}=S.gas);X.fillStyle='#8a939a';X.fillRect(x,y,w,h);X.fillStyle='#9ea7ad';X.fillRect(x+3,y+3,w-6,h-6);
-  X.fillStyle='rgba(0,0,0,.25)';X.fillRect(x+30,y+46,w-150,98);X.fillStyle='#f5f5f5';X.fillRect(x+24,y+40,w-150,98);X.fillStyle='#d32f2f';X.fillRect(x+24,y+40,w-150,9);X.fillRect(x+24,y+129,w-150,9);
-  for(let k=0;k<3;k++){const px=x+60+k*(w-220)/2;X.fillStyle='#78909c';rr(px-14,y+80,28,18,3);X.fill();X.fillStyle='#d32f2f';rr(px-6,y+82,12,14,2);X.fill();X.fillStyle='#ffeb3b';X.fillRect(px-4,y+84,8,3);}
-  mcar(x+60,y+64,0,'#1e88e5');mcar(x+60+(w-220),y+114,Math.PI,'#fdd835');
-  X.fillStyle='rgba(0,0,0,.25)';X.fillRect(x+w-112,y+36,100,110);X.fillStyle='#eceff1';X.fillRect(x+w-116,y+32,100,110);X.fillStyle='#d32f2f';X.fillRect(x+w-116,y+32,100,14);X.fillStyle='#4fc3f7';X.fillRect(x+w-110,y+120,88,12);
-  X.fillStyle='#fff';X.font='900 10px system-ui';X.textAlign='center';X.fillText('SHOP',x+w-66,y+43);
-  X.fillStyle='#263238';rr(x+w-60,y+160,48,30,4);X.fill();X.fillStyle='#ffd600';X.font='900 8px system-ui';X.fillText('FUEL',x+w-36,y+170);X.fillStyle='#76ff03';X.font='900 9px monospace';X.fillText('1.79',x+w-36,y+183);
-  X.fillStyle='#d32f2f';rr(x+w/2-100,y+8,140,22,6);X.fill();X.fillStyle='#fff';X.font='900 12px system-ui';X.fillText('⛽ GAS STATION',x+w/2-30,y+23);
-  soonTape(x,y,w,h,-.22,16);
+  let {x,y,w,h}=S.rail;
   // ---- rail terminal (the train comes to take many cars at once)
-  ({x,y,w,h}=S.rail);X.fillStyle='#a0a8ae';X.fillRect(x,y,w,h);X.fillStyle='#b8bfc4';X.fillRect(x+4,y+4,w-8,h-8);
+  X.fillStyle='#a0a8ae';X.fillRect(x,y,w,h);X.fillStyle='#b8bfc4';X.fillRect(x+4,y+4,w-8,h-8);
   X.fillStyle='#78909c';X.fillRect(x,ry-36,w,14);X.fillStyle='#ffd600';X.fillRect(x,ry-24,w,3);
   for(let r=0;r<3;r++)for(let k=0;k<12;k++)mcar(x+150+k*50,y+70+r*42,Math.PI/2,COLORS[(k*5+r*3)%COLORS.length]);
   X.fillStyle='rgba(0,0,0,.25)';X.fillRect(x+16,y+56,104,110);X.fillStyle='#8d6e63';X.fillRect(x+12,y+52,104,110);X.fillStyle='#5d4037';X.fillRect(x+12,y+52,104,12);X.fillStyle='#fff';circ(x+64,y+110,12);X.strokeStyle='#333';X.lineWidth=1.5;X.beginPath();X.moveTo(x+64,y+110);X.lineTo(x+64,y+102);X.moveTo(x+64,y+110);X.lineTo(x+70,y+112);X.stroke();
@@ -1936,13 +2031,6 @@ function drawSoon(){
   for(let k=0;k<6;k++){const wx=tx+86+k*112;X.fillStyle='#455a64';rr(wx,ry-12,108,24,3);X.fill();X.fillStyle='#90a4ae';X.fillRect(wx+3,ry-10,102,2);X.fillRect(wx+3,ry+8,102,2);for(let c=0;c<4;c++)mcar(wx+16+c*26,ry,0,COLORS[(k*4+c)%COLORS.length],.95);}
   X.fillStyle='#1565c0';rr(x+w/2-90,y+8,180,22,6);X.fill();X.fillStyle='#fff';X.font='900 12px system-ui';X.textAlign='center';X.fillText('🚆 RAIL TERMINAL · CAR EXPORT',x+w/2,y+23);
   soonTape(x+100,y,w-200,h-40,-.12,20);
-  // ---- car factory
-  ({x,y,w,h}=S.factory);X.fillStyle='rgba(0,0,0,.28)';X.fillRect(x+6,y+8,w,h);X.fillStyle='#78909c';X.fillRect(x,y,w,h);
-  for(let k=0;k<w;k+=28){X.fillStyle='#90a4ae';X.fillRect(x+k,y,14,h-60);X.fillStyle='#b3e5fc';X.fillRect(x+k+14,y,4,h-60);}
-  X.fillStyle='#546e7a';X.fillRect(x,y+h-60,w,60);X.fillStyle='#37474f';for(let k=0;k<4;k++){X.fillRect(x+40+k*130,y+h-50,80,44);X.fillStyle='#ffd600';X.fillRect(x+40+k*130,y+h-8,80,3);X.fillStyle='#37474f';}
-  for(const [cx,cy] of[[x+w-50,y+30],[x+w-90,y+30]]){X.fillStyle='#8d6e63';circ(cx,cy,14);X.fillStyle='#3e2723';circ(cx,cy,8);X.fillStyle='rgba(200,200,200,.5)';circ(cx+8,cy-14,10);circ(cx+18,cy-26,13);}
-  X.fillStyle='#212121';rr(x+w/2-110,y+h-46,220,26,6);X.fill();X.fillStyle='#ffd54a';X.font='900 13px system-ui';X.textAlign='center';X.fillText('🏭 TORQUE MOTORS · CAR FACTORY',x+w/2,y+h-28);
-  soonTape(x,y,w,h-60,-.2,20);
 }
 
 // =================== DRAWING: UI OVER CARS ===================
@@ -2039,6 +2127,7 @@ function render(){
   drawTrailer();
   for(const c of cars)if(onScreen(c.x,c.y,40))drawCar(c);
   for(const c of police)if(onScreen(c.x,c.y,40))drawCar(c);
+  drawDistrictDyn();
   if(thief.car&&thief.car.alarm)drawAlarm(thief.car);
   drawTruck();drawCams();
   for(const a of anims){const t=a.t/a.d;crate(a.x0+(a.x1-a.x0)*t,a.y0+(a.y1-a.y0)*t-Math.sin(t*Math.PI)*10);}
@@ -2106,7 +2195,8 @@ function tap(sx,sy){
   if(inR(x,y,YX0-10,YT-30,YX1-YX0+20,YB-YT+40))return openPanel('yard');
   if(inR(x,y,-3000,TRAIL_Y-30,W+6000,60))return openPanel('trailer');
   if(inR(x,y,1290,COL.y-40,W-1290,Y2-RW-COL.y+40))return openPanel('collection');
-  for(const k of['wash','gas','rail','factory']){const r=SOON[k];if(inR(x,y,r.x,r.y,r.w,r.h))return openPanel(k);}
+  for(const k of XIDS){const r=xRect(k);if(inR(x,y,r.x,r.y,r.w,r.h+14))return openPanel(k);}
+  {const r=SOON.rail;if(inR(x,y,r.x,r.y,r.w,r.h))return openPanel('rail');}
   if(inR(x,y,-3000,SOON.railY-22,W+6000,44))return openPanel('rail');
   if(inR(x,y,TRK.x0,TRK.y0,TRK.x1-TRK.x0,TRK.y1-TRK.y0)||inR(x,y,150,200,116,76))return openPanel('race');
   closePanel();
@@ -2126,14 +2216,17 @@ const INFO={
   security:{title:'🛡️ Security',desc:'Your guard watches the CCTV. Sometimes a thief tries to steal a car from the Transport Yard or Export Parking. If the guard catches him, the police take him away and you get a reward. If he escapes, you lose money and the police chase him.',
     rows:[['Guards',l=>SEC_GUARDS[TIER(l)-1]+(l>=3?' (1 patrols)':'')],['Catch chance',l=>Math.round(Math.min(.95,SEC_CATCH[l-1]+VB('thief')+guardBonus().cat)*100)+'%'],['Guard run speed',l=>SEC_SPEED[l-1]],['Reward per thief',l=>Math.round(SEC_REWARD[l-1]*100)+'% of car'],['Extra CCTV cameras',l=>SEC_XCAMS[TIER(l)-1]]]},
   collection:{title:'🏆 Collection Garage',desc:'COMING SOON. A premium showroom for classic and vintage cars. Because these cars are priceless it has its own fence, CCTV cameras, a guard house, a barrier and a laser gate.',rows:[]},
-  wash:{title:'🫧 Car Wash',desc:'COMING SOON. A car wash next to the highway.',rows:[]},
-  gas:{title:'⛽ Gas Station',desc:'COMING SOON. Your own gas station on the highway.',rows:[]},
+  wash:{title:'🫧 Car Wash',desc:'Drivers come from the street for a wash and pay you. Your sold cars also get a free shine before delivery, so they sell for more. LV 1-4 make the car wash bigger, LV 5-10 bring more money.',
+    rows:[['Customer every',l=>l?WASH_EVERY[l-1]+'s':'—'],['Pay per wash',l=>l?fmt(washPay(l)):'—'],['Shine bonus on sold cars',l=>l?'+'+Math.round(WASH_SALE[l-1]*100)+'%':'—']]},
+  gas:{title:'⛽ Gas Station',desc:'Drivers stop at your pumps to fill up and pay you. Your car transporter fills up for free, so it comes back faster. LV 1-4 add pumps (2, 2, 3, 4), LV 5-10 bring more money.',
+    rows:[['Fuel pumps',l=>l?XGAS.p[TIER(l)-1].length:'—'],['Car every',l=>l?GAS_EVERY[l-1]+'s':'—'],['Pay per fill',l=>l?fmt(gasPay(l)):'—'],['Transporter back faster',l=>l?Math.round(GAS_TRL[l-1]*100)+'%':'—']]},
   rail:{title:'🚆 Rail Terminal',desc:'COMING SOON. A train will come to collect many cars at once.',rows:[]},
-  factory:{title:'🏭 Car Factory',desc:'COMING SOON. A factory where you build your own cars.',rows:[]},
+  factory:{title:'🏭 Car Factory',desc:'Robots build brand-new cars. Every new car leaves through the right gate and is sold straight to a dealer. LV 1-4 make the factory bigger with more robots, LV 5-10 build faster and sell for more.',
+    rows:[['New car every',l=>l?FAC_EVERY[l-1]+'s':'—'],['Price per new car',l=>l?fmt(facPrice(l)):'—'],['Robot arms',l=>l?[2,3,4,5][TIER(l)-1]:'—']]},
   race:{title:'🏁 Race Track',desc:'COMING SOON. Here you will test the cars built by your garage, enter races and win competitions. Unlocks in a later chapter.',rows:[]},
 };
 STIDS.forEach(id=>INFO[id]={title:ST[id].icon+' '+ST[id].name,desc:ST[id].desc,rows:stRows(id)});
-const SOON_IDS=['collection','wash','gas','rail','factory'];
+const SOON_IDS=['collection','rail'];
 const NOUP=id=>SOON_IDS.includes(id)||id==='export'||id==='yard'||id==='race'||id==='car'||id==='rep'||id==='shop'||id==='vip';
 // v15 pacing (tested with a simulator): LV 5–10 cost ×2.5 but are paid in 5 PARTS – every part gives progress (garages: part of the next level's job bonus)
 const UPN=5,UPM=2.5;for(const id in BLD){const c=BLD[id].cost;if(c)for(let i=4;i<c.length;i++)c[i]=Math.round(c[i]*UPM/1000)*1000;}
@@ -2218,7 +2311,7 @@ $('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(!sel||N
   G.money-=cost;if(lv>=4){G.up=G.up||{};G.up[sel]=UPP(sel)+1;if(G.up[sel]<UPN){qAdd('upgrade',1);save();lastPanelKey='';renderPanel();toast('⚙️ Part '+G.up[sel]+'/'+UPN+' done · LV '+(lv+1)+' at '+UPN+'/'+UPN,1800);return;}G.up[sel]=0;}
   G.lv[sel]++;qAdd('upgrade',1);relayoutAfterUpgrade(sel);if(sel==='security')secLayout(true);if(sel==='parts')partsLayout();save();lastPanelKey='';renderPanel();
   let fx=AV,fy=300;const g=GAR[sel];
-  if(g){const p=L2W(g,150,75);fx=p.x;fy=p.y;}else if(sel==='parts'){fx=PB.x+PB.w/2;fy=PB.y+40;}else if(sel==='trailer'){fx=200;fy=TRAIL_Y-30;}else if(sel==='parking'){fx=600;fy=AY;}else if(sel==='security'){fx=SO_X+SO_W/2;fy=SO_Y+50;}
+  if(g){const p=L2W(g,150,75);fx=p.x;fy=p.y;}else if(sel==='parts'){fx=PB.x+PB.w/2;fy=PB.y+40;}else if(sel==='trailer'){fx=200;fy=TRAIL_Y-30;}else if(sel==='parking'){fx=600;fy=AY;}else if(sel==='security'){fx=SO_X+SO_W/2;fy=SO_Y+50;}else if(XIDS.includes(sel)){const r=xRect(sel);fx=r.x+r.w/2;fy=r.y+r.h*.4;}
   float(fx,fy,lv===0?'BUILT!':'LEVEL '+(lv+1)+'!','#ffd54a');
   for(let i=0;i<30;i++)parts.push({x:fx,y:fy,vx:rnd(-80,80),vy:rnd(-80,80),life:.7,max:.7,r:rnd(1.5,3),col:pick(['#ffd54a','#fff','#ff9800'])});};
 let toastTO=0;function toast(t,ms){const el=$('toast');el.innerHTML=t;el.style.opacity=1;clearTimeout(toastTO);toastTO=setTimeout(()=>el.style.opacity=0,ms||3500);}
