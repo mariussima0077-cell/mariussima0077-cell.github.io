@@ -4,6 +4,8 @@
 //   • POST /api/purchase  – checks a Google Play purchase with Google and ACKNOWLEDGES it (needed, or Google refunds after 3 days)
 //   • cron every 10 min   – scans all players again over 24 h, bans cheaters, finds shared purchase tokens, cleans old data
 //   • GET  /admin?key=…   – your page (works on the phone): flagged / banned players, unban button
+//   • POST /api/cloud/*   – Google sign-in + cloud save (login / save / load / delete). Only a HASH of the Google account ID
+//                           is stored – never the e-mail or the name. Table `accounts` is created by itself.
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
 
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
@@ -20,6 +22,7 @@ export default {
     try {
       if (url.pathname === '/api/report' && req.method === 'POST') return json(await report(await req.json(), env));
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
+      if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') return json(await cloud(url.pathname.slice(11), await req.json(), env));
       if (url.pathname === '/admin') return admin(url, env);
       if (url.pathname === '/') return json({ok:true, name:'Torque Guard', time:Date.now()});
       return json({err:'not found'}, 404);
@@ -90,6 +93,55 @@ async function scan(env) {
   await db.prepare('DELETE FROM players WHERE last<? AND banned=0').bind(now - 180 * day).run();
   await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'scan', 'checked ' + rows.length + ' active players').run();
   await db.prepare("DELETE FROM events WHERE kind='scan' AND t<?").bind(now - day).run();
+  // d) cloud saves not used for 2 years are deleted (as written in the privacy policy)
+  await ensureCloud(env); await db.prepare('DELETE FROM accounts WHERE t<?').bind(now - 730 * day).run();
+}
+
+// ------------------------------------------------------------------ Google sign-in + cloud save
+let cloudReady = false;
+async function ensureCloud(env) {
+  if (cloudReady) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS accounts(uid TEXT PRIMARY KEY, sess TEXT UNIQUE, pid TEXT, created INTEGER, t INTEGER, save TEXT, sig TEXT, sum TEXT)').run();
+  cloudReady = true;
+}
+const b64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+let jwks = {t:0, keys:[]};
+async function googleUser(cred, env) {                // checks the Google ID token (signature, audience, expiry)
+  if (!env.GOOGLE_CLIENT_ID) throw new Error('GOOGLE_CLIENT_ID not set');
+  const [h, p, sg] = String(cred).split('.');
+  const head = JSON.parse(new TextDecoder().decode(b64u(h))), pay = JSON.parse(new TextDecoder().decode(b64u(p)));
+  if (jwks.t < Date.now() || !jwks.keys.find(k => k.kid === head.kid)) jwks = {t:Date.now() + 6 * 3600e3, keys:(await (await fetch('https://www.googleapis.com/oauth2/v3/certs')).json()).keys};
+  const jwk = jwks.keys.find(k => k.kid === head.kid); if (!jwk) return null;
+  const key = await crypto.subtle.importKey('jwk', jwk, {name:'RSASSA-PKCS1-v1_5', hash:'SHA-256'}, false, ['verify']);
+  const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64u(sg), new TextEncoder().encode(h + '.' + p));
+  if (!ok || pay.aud !== env.GOOGLE_CLIENT_ID || !['accounts.google.com', 'https://accounts.google.com'].includes(pay.iss) || pay.exp * 1000 < Date.now()) return null;
+  const d = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('te-acc:' + pay.sub)));
+  return [...d].map(x => x.toString(16).padStart(2, '0')).join('');   // we keep only this hash
+}
+async function cloud(op, b, env) {
+  await ensureCloud(env); const db = env.DB, now = Date.now();
+  if (op === 'login') {
+    const uid = await googleUser(b.cred, env); if (!uid) return {err:'bad_token'};
+    let a = await db.prepare('SELECT uid,sess,pid,t,sum FROM accounts WHERE uid=?').bind(uid).first();
+    if (!a) { const sess = crypto.randomUUID() + crypto.randomUUID();
+      await db.prepare('INSERT INTO accounts(uid,sess,pid,created,t) VALUES(?,?,?,?,0)').bind(uid, sess, String(b.pid || '').slice(0, 64), now).run();
+      a = {sess, pid:b.pid, t:0, sum:null}; }
+    return {ok:true, sess:a.sess, pid:a.pid, t:a.t, sum:a.sum ? JSON.parse(a.sum) : null};
+  }
+  const a = b && typeof b.sess === 'string' ? await db.prepare('SELECT uid,pid,t,sum FROM accounts WHERE sess=?').bind(b.sess).first() : null;
+  if (!a) return {err:'signed_out'};
+  if (op === 'meta') return {ok:true, pid:a.pid, t:a.t, sum:a.sum ? JSON.parse(a.sum) : null};
+  if (op === 'load') { const r = await db.prepare('SELECT save,sig,pid,t,sum FROM accounts WHERE uid=?').bind(a.uid).first(); return {ok:true, ...r, sum:r.sum ? JSON.parse(r.sum) : null}; }
+  if (op === 'delete') { await db.prepare('DELETE FROM accounts WHERE uid=?').bind(a.uid).run(); return {ok:true}; }
+  if (op === 'save') {
+    if (typeof b.save !== 'string' || b.save.length > 300000 || typeof b.pid !== 'string' || b.pid.length > 64) return {err:'bad'};
+    const p = await db.prepare('SELECT banned FROM players WHERE pid=?').bind(b.pid).first();
+    if (p && p.banned) return {err:'banned'};
+    if (b.base !== undefined && b.base !== a.t && a.t) return {err:'conflict', t:a.t, sum:a.sum ? JSON.parse(a.sum) : null};  // another phone saved meanwhile
+    await db.prepare('UPDATE accounts SET save=?, sig=?, pid=?, t=?, sum=? WHERE uid=?').bind(b.save, String(b.sig || '').slice(0, 64), b.pid, now, JSON.stringify(b.sum || {}).slice(0, 2000), a.uid).run();
+    return {ok:true, t:now};
+  }
+  return {err:'not found'};
 }
 
 // ------------------------------------------------------------------ Google Play purchases
@@ -142,6 +194,11 @@ async function admin(url, env) {
   const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY);
   const act = url.searchParams.get('unban');
   if (act) { await db.prepare('UPDATE players SET banned=0, score=0, reason=? WHERE pid=?').bind('unbanned by admin', act).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
+  const del = url.searchParams.get('delete');          // "Delete my data" e-mail: /admin?key=…&delete=PLAYER_ID (first 8 characters are enough)
+  if (del && del.length >= 8) { await ensureCloud(env); const like = del + '%';
+    await db.prepare('DELETE FROM accounts WHERE pid LIKE ?').bind(like).run(); await db.prepare('DELETE FROM snaps WHERE pid LIKE ?').bind(like).run();
+    await db.prepare('DELETE FROM events WHERE pid LIKE ?').bind(like).run(); await db.prepare('DELETE FROM players WHERE pid LIKE ? AND banned=0').bind(like).run();
+    return new Response('deleted ' + del, {headers:{'content-type':'text/plain'}}); }
   const ban = url.searchParams.get('ban');
   if (ban) { await db.prepare('UPDATE players SET banned=1, score=999, reason=? WHERE pid=?').bind('banned by admin', ban).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
   const tot = await db.prepare('SELECT COUNT(*) n, SUM(last>?) d FROM players').bind(Date.now() - 864e5).first();

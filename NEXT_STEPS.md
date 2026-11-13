@@ -1,12 +1,15 @@
 # TORQUE EMPIRE – Publicare Google Play · stare și pașii următori
 *(trimite fișierul ăsta la începutul unui chat nou cu Claude. Arhiva NU mai trebuie: Claude ia jocul direct de pe GitHub și îl poate testa live)*
 
+> 📜 **Ce am declarat la Google Play și ce NU avem voie să schimbăm → `PLAY_RULES.md`** (Claude îl citește înainte de orice schimbare).
+
 ## ✅ CE E GATA (12 noiembrie 2026, seara)
 ### Jocul
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v16-1'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v16-2'`.
+  - **v16-2 (13 nov)**: login cu Google (opțional) + salvare în cloud – `cloud.js`, căsuța „☁️ Cloud save” jos în Shop. ⚠️ Pornește abia după ce Marius face **Client ID-ul OAuth** (vezi mai jos). Politica de confidențialitate și pagina de ștergere actualizate.
   - **v16-1 (13 nov)**: VIP Pass NU mai dă summon gratuit zilnic (era element aleatoriu plătit → 18+ Brazilia, interzis în Belgia). Idle Rewards: 4h standard + 30 min pe nivel VIP (VIP 20 = 14h); VIP Pass nu crește orele. Diamante: de adăugat mai târziu. În Play: Classification → „éléments aléatoires” = **Non**.
   - **v16 (13 nov)**: deschise Car Wash (Rep 2, $1.500), Gas Station (Rep 3, $4.000), Car Factory (Rep 5, $60.000) pe o stradă nouă sub drumul camionului (pozele lui Marius `img/x_wash1-4`, `x_gas1-4`, `x_factory1-4`; poza se schimbă LV1-4, LV5-10 doar beneficii). Spălătoria: mașini trec prin tunel, + bonus la vânzare. Benzinăria: mașini la pompe (2/2/3/4), camionul revine mai repede. Fabrica: mașină nouă vândută direct. Botul acceptă acum suma nivelurilor până la 140. Rail Terminal și Collection rămân „coming soon”. Prețuri/timpi alese fără simulator → de ajustat după test.
 - **Politica de confidențialitate**: https://mariussima0077-cell.github.io/privacy.html (e-mail: torqueempirehelp@gmail.com) – menționează și serverul anti-cheat.
@@ -46,6 +49,7 @@
 
 ## ⏳ CE A MAI RĂMAS
 ### Acum (cât așteptăm Google)
+- [ ] **Client ID pentru login Google** (Google Cloud Console, contul torqueempirehelp@gmail.com): proiect nou → OAuth consent screen (External, „Torque Empire”, publicat) → Credentials → OAuth client ID → *Web application* → Authorized JavaScript origins: `https://mariussima0077-cell.github.io` → copiezi Client ID-ul (`…apps.googleusercontent.com`) și i-l dai lui Claude.
 - [ ] Verifică dacă `ADMIN_KEY` e pus în Cloudflare (torque-guard → Settings → Variables and Secrets → Secret). Test: linkul de admin din Drive trebuie să arate pagina „🛡️ Torque Guard” (nu „no”).
 - [ ] Urcă `.aab`-ul în Google Drive (folderul cu cheia).
 - [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau r/AndroidClosedTesting). Claude poate scrie mesajul de invitație.
@@ -55,7 +59,7 @@
 - [ ] **Closed testing**: urci `.aab`-ul.
 - [ ] **Setup → App signing**: copiezi **SHA-256 al cheii Google** și i-l dai lui Claude → îl adaugă în `assetlinks.json` (altfel apare bara de adresă în aplicație).
 - [ ] Fișa aplicației: textele din `store/STORE_LISTING.md`, icon, feature graphic, cele 6 capturi, privacy policy.
-- [ ] **Data safety**, **Content rating** (IARC), **Target audience 13+**, **Ads: No** – răspunsurile sunt în `GOOGLE_PLAY.md`, secțiunea 6 (datele trimise la bot: ID anonim + progres joc, scop „Fraud prevention, security”).
+- [ ] **Data safety**, **Content rating** (IARC), **Target audience 13+**, **Ads: No** – răspunsurile sunt în `PLAY_RULES.md` (s-au schimbat cu login-ul Google: + „User IDs”, opțional, + ștergere cont).
 
 ### Testul închis – 12 testeri × 14 zile
 - [ ] groups.google.com → grup „torque-empire-testers”.
@@ -69,7 +73,8 @@
 
 ## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
-- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-2`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- Orice schimbare se verifică întâi cu `PLAY_RULES.md`.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-3`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.

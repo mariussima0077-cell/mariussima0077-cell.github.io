@@ -6,6 +6,7 @@ keep_vars = true          # keep the secrets/variables you add in the dashboard 
 
 [vars]
 PACKAGE_NAME = "com.torqueempire.game"
+GOOGLE_CLIENT_ID = ""      # Google sign-in: the OAuth Web client ID (public, not a secret) – see PLAY_RULES.md
 
 [triggers]
 crons = ["*/10 * * * *"]   # the bot checks all players every 10 minutes

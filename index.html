@@ -609,7 +609,7 @@ const SAVE_KEY='torqueEmpire_v15';
 const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
 function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;G.rep=repFor(G.xp);}}catch(e){}}
-function save(){try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
+function save(){if(window.__noSave)return;try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
 load();
 let time=0, started=false, SPD=1;
 
@@ -2266,8 +2266,8 @@ function renderPanel(){
     $('shTitle').textContent='🛒 Shop';$('shDots').innerHTML='<span>Packs stay forever – every chapter, every stage</span>';$('shDesc').textContent='';
     $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th"><i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vipThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i></div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
       (p.id==='sub'?(subOn()?'<button class="buy own">ACTIVE<br>'+Math.ceil((PK.sub-Date.now())/864e5)+'d</button>':'<button class="buy" data-buy="sub">'+p.price+'</button>'):PK[p.id]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-buy="'+p.id+'">'+p.price+'</button>')+'</div>').join('')+
-      (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
-    $('shBtn').style.display='none';return;}
+      (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div id="cloudBox"></div><div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
+    if(window.CLOUD)CLOUD.mount($('cloudBox'));$('shBtn').style.display='none';return;}
   if(sel==='vip'){const sub=subOn(),key='vip'+G.vip+sub+(sub?Math.ceil((PK.sub-Date.now())/864e5):0);if(key===lastPanelKey)return;lastPanelKey=key;
     const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×1.3':'');
     $('shDots').innerHTML='<span>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL – '+G.vip+' VIP points')+'</span>';
@@ -2931,5 +2931,6 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
 })();
 </script>
 <script src="battle.js"></script>
+<script src="cloud.js"></script>
 </body>
 </html>

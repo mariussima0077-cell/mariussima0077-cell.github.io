@@ -44,7 +44,7 @@ Ce face botul: compară fiecare raportare cu cea dinainte (bani, bilete, puncte 
 - **Create app** → Game · Free · nume, descriere scurtă/lungă (engleză).
 - Grafică: icon 512 (`store/play-icon-512.png`), feature graphic (`store/feature-graphic-1024x500.png`), capturile `store/play-screenshot-1..6.png` (1080×1920).
 - **Privacy policy**: `https://mariussima0077-cell.github.io/privacy.html`.
-- **Data safety**: colectezi *App activity / Game progress* și *Device or other IDs* (ID anonim) → scop: *Fraud prevention, security*; nu se partajează; criptat în tranzit: da; nu există cont/login. Achiziții: *Purchase history* (prin Google Play).
+- **Data safety**: răspunsurile exacte sunt în `PLAY_RULES.md` (secțiunea „Data safety”) – de la v16-2 există login Google opțional (salvare în cloud), deci răspunsurile s-au schimbat.
 - **Content rating** (chestionar IARC): violență de desene animate (monștri din piese de mașină), fără sânge; are achiziții în aplicație; casele de noroc: summon-ul e **doar cu bilete câștigate în joc, nu cu bani** (șansele sunt afișate în Rate Info).
 - **Target audience**: 13+ (nu „pentru copii").  **Ads**: No.
 
