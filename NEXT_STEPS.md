@@ -6,7 +6,8 @@
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v15-5'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v16-1'`.
+  - **v16-1 (13 nov)**: VIP Pass NU mai dă summon gratuit zilnic (era element aleatoriu plătit → 18+ Brazilia, interzis în Belgia). Idle Rewards: 4h standard + 30 min pe nivel VIP (VIP 20 = 14h); VIP Pass nu crește orele. Diamante: de adăugat mai târziu. În Play: Classification → „éléments aléatoires” = **Non**.
   - **v16 (13 nov)**: deschise Car Wash (Rep 2, $1.500), Gas Station (Rep 3, $4.000), Car Factory (Rep 5, $60.000) pe o stradă nouă sub drumul camionului (pozele lui Marius `img/x_wash1-4`, `x_gas1-4`, `x_factory1-4`; poza se schimbă LV1-4, LV5-10 doar beneficii). Spălătoria: mașini trec prin tunel, + bonus la vânzare. Benzinăria: mașini la pompe (2/2/3/4), camionul revine mai repede. Fabrica: mașină nouă vândută direct. Botul acceptă acum suma nivelurilor până la 140. Rail Terminal și Collection rămân „coming soon”. Prețuri/timpi alese fără simulator → de ajustat după test.
 - **Politica de confidențialitate**: https://mariussima0077-cell.github.io/privacy.html (e-mail: torqueempirehelp@gmail.com) – menționează și serverul anti-cheat.
 - **Cont Google al jocului**: torqueempirehelp@gmail.com (Gmail și Google Drive conectate la Claude).
@@ -68,7 +69,7 @@
 
 ## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
-- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v15-5`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-2`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.

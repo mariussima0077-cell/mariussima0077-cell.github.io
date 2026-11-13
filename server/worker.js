@@ -44,7 +44,7 @@ async function report(b, env) {
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);
     const ps = capPerSec(Math.max(s.lv, old.lv));
-    const capMoney = 600 * ps + ps * dt + 12 * 3600 * ps / 20;     // + a full idle chest
+    const capMoney = 600 * ps + ps * dt + 16 * 3600 * ps / 20;     // + a full idle chest (max 14h at VIP 20)
     if (s.money - old.money > capMoney) { pts += 40; why.push(`money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`); }
     if (s.tk - old.tk > 100 + dt / 45) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
     if (s.gtk - old.gtk > 100 + dt / 45) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }

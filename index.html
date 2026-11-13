@@ -2533,7 +2533,7 @@ function gain(id){const h=HB[id],o=own(id);let r;
 function summon(cat,n){const P=G.h.pity[cat],out=[];
   for(let i=0;i<n;i++){const gr=rollGrade(P),L=heroesOf(cat,gr);const res=gain(pick(L).id);out.push(res);G.h.hist.unshift({c:cat,id:res.id,r:res.r,t:Date.now()});}
   G.h.hist.length=Math.min(G.h.hist.length,60);save();heroRefresh();return out;}
-const freeOK=()=>subOn()&&G.h.free!==dayKey();
+const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
 // ---------- DOM: summon page (my picture) ----------
 const smEl=$('sm'),smBox=$('smBox');(new Image()).src='img/summon.webp';let smCat='m',smKey='';
@@ -2672,7 +2672,7 @@ const popEl=$('pop'),popBox=$('popBox');let popCtx=null;
 function pop(html,ctx){popCtx=ctx||null;popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+html;popEl.classList.add('open');}
 function closePop(){popEl.classList.remove('open');popCtx=null;}
 function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets</div><div class="pD">One ticket type for Mechanics, Guards and Drivers. You have <b>'+G.h.tk+'</b>.</div>'+
-  ['📋 Every claimed Daily Quest: +1','🎁 Daily Quest gifts: +1 / +2 / +2 / +3','👮 Every thief caught: +1','⭐ Every new Reputation level: +5','👑 Every new VIP level: +5','🧰 Idle Rewards: +1 every 2 hours','👑 VIP Pass: 1 FREE summon every day'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
+  ['📋 Every claimed Daily Quest: +1','🎁 Daily Quest gifts: +1 / +2 / +2 / +3','👮 Every thief caught: +1','⭐ Every new Reputation level: +5','👑 Every new VIP level: +5','🧰 Idle Rewards: +1 every 2 hours (4h storage + 30 min per VIP level)'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*1000)/10)+'%';
   const row=(i,pct,right)=>'<div class="rRow" style="--gc:'+GRADES[i].c+'"><span><i class="gear"></i>'+GRADES[i].n+'</span><b>'+pct+'</b><em>'+right+'</em></div>';
   pop('<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">'+CATS[smCat].n.toUpperCase()+'</span>'+RATES.map((r,i)=>row(i,pc(r),'👤 '+heroesOf(smCat,i).length+' heroes')).join('')+
@@ -2808,19 +2808,21 @@ teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}co
     const r=gain(pick(heroesOf(cat,5)).id);G.h.hist.unshift({c:cat,id:r.id,r:r.r,t:Date.now()});save();heroRefresh();teamKey='';renderTeam();showResults([r],cat,0);resEl.querySelector('.resT').textContent='🧪 FUSION · MYTHIC '+CATS[cat].one.toUpperCase();resEl.querySelector('.resB').style.display='none';}});
 
 // ---------- idle rewards (my picture) — v11: also grows with the VIP level ----------
-const IDLE_MAX=12, IDLE_TK_H=2, IDLE_REP=[1,1.5,2.3,3.5,5,7];
+const IDLE_BASE_H=4, IDLE_VIP_H=0.5, IDLE_TK_H=2; // v16: 4h standard + 30 min per VIP level (VIP 20 = 14h). VIP Pass does NOT boost hours
+const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV;
+const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*IDLE_REP[G.rep-1];} // v15: high levels also earn well while you are away
 function idleRate(){return Math.round(idleBase()*(1+VB('idle')));}
-function idleNow(){const hrs=Math.min(IDLE_MAX,Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),full:hrs>=IDLE_MAX};}
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}
 function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNow(),key=hm(I.hrs)+I.money+I.tk+VLV+VSUB;if(key===idlKey)return;idlKey=key;
   const vb=VB('idle');let h='';
   h+='<div data-i="x" style="'+box(1078,38,100,100)+'"></div>';
-  h+='<div class="idBar" style="'+box(114,624,968,28)+'"><i style="width:'+Math.max(3,I.hrs/IDLE_MAX*100)+'%"></i></div>';
-  h+='<div class="idTime" style="'+box(500,664,420,50)+'">'+hm(I.hrs)+' / '+IDLE_MAX+'h'+(I.full?' <b>FULL</b>':'')+'</div>';
+  h+='<div class="idBar" style="'+box(114,624,968,28)+'"><i style="width:'+Math.max(3,I.hrs/idleMax()*100)+'%"></i></div>';
+  h+='<div class="idTime" style="'+box(500,664,420,50)+'">'+hm(I.hrs)+' / '+idleMax()+'h'+(I.full?' <b>FULL</b>':'')+'</div>';
   h+='<div class="idV gold" style="'+box(560,740,270,70)+'">'+fmt(I.money)+'</div>';
   h+='<div class="idV grn" style="'+box(860,740,265,70)+'">'+fmt(idleRate())+' / hour</div>';
   h+='<div class="idV" style="'+box(560,836,270,70)+'">'+I.tk+'</div>';
