@@ -1034,7 +1034,7 @@ function startBattle(si,team){
   B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>portraitCv(u.h));
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
   bsize();buildBG();spawnWave();
-  $('bt').classList.add('open');window.__BATTLE_ON=true;running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
+  $('bt').classList.add('open');window.__BATTLE_ON=true;if(!window.__SIM){let n=0;try{n=+localStorage.getItem('te_bhint')||0;localStorage.setItem('te_bhint',n+1);}catch(e){}if(n<3)setTimeout(()=>{if(B&&!B.res)TE().toast('🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',4200);},2600);}running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
 function spawnWave(){const w=B.stage.w[B.wave];
   w.forEach((t,i)=>{const m=mkMon(t,i);const n=w.length;
     if(m.b==='titan'){m.x=W*.78;m.d=.42;m.st='idle';}
@@ -1603,14 +1603,18 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);
     let left=raw*ts;while(left>0){const s=Math.min(1/60,left);step(s);left-=s;}}
   const t0=performance.now();render();
   B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>90){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes){B.lowRes=true;bsize();}}}
-cv.addEventListener('pointerdown',e=>{if(!B)return;const x=e.clientX,y=e.clientY;for(const h of HIT){if(x>=h.x&&x<=h.x+h.w&&y>=h.y&&y<=h.y+h.h){
+cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
   if(h.id==='fx'){FX2=!FX2;try{localStorage.setItem('te_fx2',FX2?'1':'0');}catch(e){}if(FX2)fxPre();B.fx2=[];}
   else if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
   else if(h.id==='spd'){if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(TE().PK.spd2)B.spd=2;else{B.offer=true;B.paused=true;}}else B.spd=1;TE().G.cp.spd=B.spd;}
   else if(h.id==='buy'){const T=TE();T.PK.spd2=true;T.savePacks();B.spd=2;T.G.cp.spd=2;B.offer=false;B.paused=false;lastT=performance.now();T.toast('⏩ Battle Speed ×2 unlocked forever!',3000);}
   else if(h.id==='nobuy'){B.offer=false;B.paused=false;B.spd=1;TE().G.cp.spd=1;lastT=performance.now();}else if(h.id==='auto'){B.auto=!B.auto;TE().G.cp.auto=B.auto;}
-  else if(h.id==='card'&&!B.paused){if(canCast(h.u))cast(h.u);}
-  return;}}});
+  else if(h.id==='card'&&!B.paused){if(canCast(h.u))cast(h.u);else if(!h.u.dead&&B.phase==='fight')tapHint(1);}
+  return;}}
+  if(!B.paused&&!B.res)tapHint(0);});
+// v16-3: testers thought they had to tap to attack – explain that fights are automatic
+let hintT=0;function tapHint(card){const n=performance.now();if(n-hintT<3500)return;hintT=n;
+  TE().toast(card?'⚡ Skill charging – tap the card when it shows TAP!':'🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',3200);}
 addEventListener('resize',()=>{if(running)bsize();});
 
 // ---------------------------------------------------------------- results
