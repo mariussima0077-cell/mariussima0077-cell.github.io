@@ -82,7 +82,7 @@
 ### După ce Google aprobă contul
 - [x] Play Console → **Create app** (făcut 13 nov). Categoria Simulation se pune la fișa magazinului.
 - [ ] **Closed testing**: urci `.aab`-ul.
-- [ ] **Setup → App signing**: copiezi **SHA-256 al cheii Google** și i-l dai lui Claude → îl adaugă în `assetlinks.json` (altfel apare bara de adresă în aplicație).
+- [x] **Cheia Google de semnare în `assetlinks.json`** (14 nov): Marius a descărcat `certificates.zip` din Play Console (Protégé avec Play → Protection Play Store → Signature d'application). Adăugate: `deployment_cert` (cheia Google, SHA-256 `CC:0B:81:F7:…:7A:4B`) + `hybrid_classical_cert` (`21:3D:A3:A8:…:D7:9B`), păstrată și cheia de upload (`2F:F9:…:35:A7`). Fără asta aplicația din Play arăta bara de adresă Chrome.
 - [ ] Fișa aplicației: textele din `store/STORE_LISTING.md`, icon, feature graphic, cele 6 capturi, privacy policy.
 - [ ] **Data safety**, **Content rating** (IARC), **Target audience 13+**, **Ads: No** – răspunsurile sunt în `PLAY_RULES.md` (s-au schimbat cu login-ul Google: + „User IDs”, opțional, + ștergere cont).
 

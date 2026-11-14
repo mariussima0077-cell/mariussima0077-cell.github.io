@@ -3,6 +3,10 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.torqueempire.game",
-    "sha256_cert_fingerprints": ["2F:F9:21:56:9B:2B:DC:23:9C:4F:02:02:E9:B6:35:F0:B5:99:62:D1:EB:3F:E9:74:2B:FF:45:C6:22:E8:35:A7"]
+    "sha256_cert_fingerprints": [
+      "CC:0B:81:F7:46:3E:A1:1C:6E:19:62:14:31:FA:EC:D5:BB:F7:C1:8A:8C:E7:7C:CE:1B:46:EE:B4:63:82:7A:4B",
+      "21:3D:A3:A8:31:D8:6F:7F:AD:5B:1C:E6:4B:B8:C9:9C:AF:B9:C6:F7:19:3B:9E:E1:F2:BE:9B:CE:6B:99:D7:9B",
+      "2F:F9:21:56:9B:2B:DC:23:9C:4F:02:02:E9:B6:35:F0:B5:99:62:D1:EB:3F:E9:74:2B:FF:45:C6:22:E8:35:A7"
+    ]
   }
 }]
