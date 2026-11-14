@@ -664,7 +664,10 @@ const SPRD={
  m4_0:{a:[130,246],m:[230,150],cs:[[3,0],[3,1],[3,2],[3,3]],fx:'quake'},m4_1:{a:[129,246],m:[250,109],look:'wrench',cs:[[3,0],[3,1]],fx:'holy'},
  m4_2:{a:[120,246],m:[250,112],col:'#d05cff',cs:[[3,0],[3,1]],fx:'vortex'},m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
  m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
- m5_0:{a:[124,246],m:[230,150],cs:[[3,0],[3,1],[3,2]],fx:'gearboom'},m5_1:{a:[123,246],m:[230,150],cs:[[3,0]],fire:1}};
+ m5_0:{a:[124,246],m:[230,150],cs:[[3,0],[3,1],[3,2]],fx:'gearboom'},m5_1:{a:[123,246],m:[230,150],cs:[[3,0]],fire:1},
+ // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
+ d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
+ d0_4:{w:384,a:[190,248],m:[300,150]},d0_5:{w:384,a:[180,248],m:[300,150]},d0_6:{w:384,a:[193,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
@@ -2198,9 +2201,9 @@ $('cpChN').onclick=()=>chList();
 $('cpBack').onclick=close;$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
 // v15: GEAR title is the player's picture
 $('cpGearB').innerHTML=IMGI(glyphURL('bag','#ffd54a'),'1.25em','-.3em')+'<small>GEAR</small>';
-// v16-20: mini hero on the garage map (same sprite sheet as in battle). an: idle · walk · work · cel. hgt = height on the map.
+// v16-20: mini hero on the garage map (same sprite sheet as in battle). an: idle · walk · work · cel, or a row number (drivers). hgt = height on the map.
 function mini(X,id,an,t,x,y,hgt,face,ph){const d=SPRD[id];if(!sprOK(d))return false;const R=d.R||[0,1,2,3,4,5];
-  const row=an==='walk'?R[1]:an==='work'?R[2]:an==='cel'?R[5]:R[0],fps=an==='walk'?9:an==='work'?6:4,c=Math.floor(t*fps+(ph||0)*3)%4;
+  const num=typeof an==='number',row=num?R[an]:an==='walk'?R[1]:an==='work'?R[2]:an==='cel'?R[5]:R[0],fps=num?[4,9,11,6,5,4][an]:an==='walk'?9:an==='work'?6:4,c=Math.floor(t*fps+(ph||0)*3)%4;
   const k=hgt/215,w=d.w||256,cw=w*SPCELL/256;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
   X.drawImage(d.im,c*cw,row*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);X.restore();return true;}
 window.CAMPAIGN={open,close,openGear,mini};

@@ -1,6 +1,8 @@
 import numpy as np, sys
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-def avatar(hid):
+# grade background colours (centre, middle)
+GBG={0:([110,130,138],[32,42,50]),1:([60,150,70],[14,45,18]),2:([50,120,200],[10,30,70]),3:([150,60,200],[40,10,60]),4:([200,150,40],[70,45,5]),5:([200,50,50],[70,8,8])}
+def avatar(hid,gr=3):
     full=Image.open(f'out/full_{hid}.png')
     cell=full.crop((0,0,384,256))
     a=np.asarray(cell)[...,3]>100
@@ -11,7 +13,7 @@ def avatar(hid):
     bust=cell.crop((x0,y0,x0+S,y0+S)).resize((256,256),Image.LANCZOS)
     yy,xx=np.mgrid[0:256,0:256]
     d=np.sqrt((xx-128)**2+((yy-70)*1.0)**2)/200
-    c0=np.array([150,60,200.]);c1=np.array([40,10,60.]);c2=np.array([6,4,10.])
+    c0=np.array(GBG[gr][0],float);c1=np.array(GBG[gr][1],float);c2=np.array([6,4,10.])
     t=np.clip(d,0,1)[...,None]
     bg=np.where(t<.55,c0+(c1-c0)*(t/.55),c1+(c2-c1)*((t-.55)/.45))
     bg=bg*(1-np.clip((yy-150)/106,0,1)[...,None]*.85)
@@ -26,4 +28,7 @@ def avatar(hid):
     dr=ImageDraw.Draw(S2);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',110)
     dr.text((128,128),'?',font=f,fill=(74,86,98),anchor='mm')
     S2.convert('RGB').save(f'out/{hid}s.webp',quality=90)
-for i in range(7):avatar(f'm3_{i}')
+if __name__=='__main__':
+    # usage: python3 avatar.py <grade> <id> [<id> ...]   (reads out/full_<id>.png, writes out/<id>.webp + out/<id>s.webp)
+    import sys
+    for h in sys.argv[2:]:avatar(h,int(sys.argv[1]))

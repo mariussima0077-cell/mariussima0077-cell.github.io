@@ -916,7 +916,7 @@ function startDrive(c,d){
   const t=c.target;c.path=carPathTo(c,t);c.slot=t;c.target=null;c.state='drive';c.driver=d;
   c.onArrive=()=>{c.driver=null;
     if(c.wasSold){c.wasSold=false;c.state='yard';}else arriveSlot(c);
-    const tb=drvBonus(d.pool,d.k);if(tb.tip>0&&Math.random()<tb.tip){const dh=heroIn('d|'+d.pool+'|'+d.k),tp=Math.round((10+8*G.rep)*(1+(dh?dh.gr:0)*.5));G.money+=tp;float(c.x,c.y-22,'💵 TIP +'+fmt(tp),'#a5d6a7');}
+    const tb=drvBonus(d.pool,d.k);if(tb.tip>0&&Math.random()<tb.tip){const dh=heroIn('d|'+d.pool+'|'+d.k),tp=Math.round((10+8*G.rep)*(1+(dh?dh.gr:0)*.5));G.money+=tp;float(c.x,c.y-22,'💵 TIP +'+fmt(tp),'#a5d6a7');if(dh&&SPRD_OK(dh))d.p.tipT=1.0;}
     const p=d.p,side=carSide(c);p.x=side.x;p.y=side.y;p.vis=true;p.a=c.a+Math.PI/2;
     p.legs=legsTo(c.slot.loc,side,d.loc,d.loc.homes[d.k],tierOf(d.pool));
     p.onDone=()=>{d.busy=false;d.car=null;p.a=d.loc.homeA;};
@@ -1158,7 +1158,7 @@ function update(dt){
   work(dt);dispatch();sales(dt);
   for(let i=cars.length-1;i>=0;i--)if(cars[i].gone)cars.splice(i,1);
   updateTrailer(dt);updateHeli(dt);updateTruck(dt);updateSecurity(dt);
-  for(const id in drivers)for(const d of drivers[id])personStep(d.p,dt);
+  for(const id in drivers)for(const d of drivers[id]){if(d.p.tipT>0){d.p.tipT-=dt;continue;}personStep(d.p,dt);}
   updateMechs(dt);updateDistrict(dt);
   // bay doors & lifts
   STIDS.forEach(id=>bays[id].forEach(b=>{const c=b.car;const t=(c&&(c.state==='drive'||c.state==='await')&&dist(c,b)<95)?1:0;b.door+=(t-b.door)*Math.min(1,dt*6);}));
@@ -1478,6 +1478,19 @@ function drawVipCar(c){
 }
 function vipThumb(){try{const cv2=document.createElement('canvas');cv2.width=184;cv2.height=116;const g=cv2.getContext('2d'),sX=X,sD=DET;X=g;DET=true;
   g.translate(92,58);g.scale(2.15,2.15);drawVipCar({type:VIP_T,x:0,y:0,a:0,id:3,path:[],jobs:[],tune:{}});X=sX;DET=sD;return cv2.toDataURL();}catch(e){return '';}}
+// v16-21: a hero driver is drawn from his sprite sheet: walk · scooter · idle (signature move now and then) · tip
+const SPRD_OK=h=>h.cat==='d'&&!!HPIC[h.id]; // drivers that have a sprite sheet (tip animation pauses them 1 s)
+function drawDriver(d){const p=d.p;p.miniOK=false;
+  if(p.vis&&window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('d|'+d.pool+'|'+d.k);if(h){
+    if(p.ph==null)p.ph=Math.random()*12;
+    const riding=p.ride>=0;let an=0,t=time;
+    if(p.tipT>0){an=5;t=1-p.tipT;}else if(riding)an=3;else if(p.moving)an=1;
+    else{const q=(time+p.ph)%12;if(q<1.6){an=4;t=q;}}
+    const face=riding||p.moving||p.tipT>0?(Math.cos(p.a)>=0?1:-1):(p.face||1);if(riding||p.moving)p.face=face;
+    X.fillStyle='rgba(0,0,0,.28)';ell(p.x,p.y+6,riding?10:7,2.6);
+    p.mode=riding||p.moving||p.tipT>0?'':'work'; // standing at home: grade badge only, no name (like working mechanics)
+    if(CAMPAIGN.mini(X,h.id,an,t,p.x,p.y+6,riding?27:24,face,0)){p.miniOK=true;return;}}}
+  drawPerson(p);}
 function drawPerson(p){
   if(!p.vis)return;
   X.save();X.translate(p.x,p.y);X.rotate(p.a);
@@ -2156,7 +2169,7 @@ function render(){
   STIDS.forEach(id=>bays[id].forEach(b=>{if(b.mech&&onScreen(b.mech.x,b.mech.y,24))drawMech(b.mech);}));
   for(let k=0;k<PLV('office');k++){const a=agents[k];if(!onScreen(a.p.x,a.p.y,30))continue;if(k<3||!IMG.b_office.ok)drawPerson(a.p);if(a.car){const p=a.t/SELL_T[G.lv.office-1];X.fillStyle='rgba(0,0,0,.6)';rr(a.p.x-16,a.p.y-20,32,6,3);X.fill();X.fillStyle='#b39ddb';rr(a.p.x-15,a.p.y-19,30*p,4,2);X.fill();}}
   if(G.lv.parts>0)drawPerson(clerk);
-  for(const id in drivers)for(const d of drivers[id])if(onScreen(d.p.x,d.p.y,20))drawPerson(d.p);
+  for(const id in drivers)for(const d of drivers[id])if(onScreen(d.p.x,d.p.y,20))drawDriver(d);
   drawSecPeople();drawHeroBadges();
   for(const p of parts){if(!onScreen(p.x,p.y,10))continue;X.globalAlpha=Math.max(0,p.life/p.max)*(p.grow?.45:.85);X.fillStyle=p.col;circ(p.x,p.y,p.r);}X.globalAlpha=1;
   gates.forEach(drawBarrier);
@@ -2493,7 +2506,7 @@ function addTickets(n,why){G.h.tk+=n;save();if(why)toast(''+TKI+' +'+n+' Recruit
 const PCACHE={};
 function hashS(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 // v16-5: Marius' own pictures for these heroes (cut from his sprite sheets)
-const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1};
+const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1};
 function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/hero/'+key+'.webp';if(PCACHE[key])return PCACHE[key];
   const S=128,cv2=document.createElement('canvas');cv2.width=cv2.height=S;const g=cv2.getContext('2d');
   let sd=hashS(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
