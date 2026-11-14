@@ -8,7 +8,8 @@
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v16-4'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v16-5'`.
+  - **v16-5 (14 nov)**: avatarele lui Rusty Joe, Benny Bolt, Tom Wrench, Ollie Oil, Mia Brush = decupate din sprite sheet-urile lui Marius (4×6 cadre, 256 px, fond verde) → `img/hero/m0_0..4.webp` (+ `…s.webp` = siluetă pt. eroi nedescoperiți). Apar peste tot (summon, colecție, echipă, bătălie) prin `HPIC` din `portrait()`. Sheet-urile întregi pot fi folosite mai târziu pt. animațiile din bătălie (rânduri: idle, mers, atac, skill, lovit/KO, victorie).
   - **v16-4 (14 nov)**: un tester a zis că „nu poate ataca” în bătălie. Nu s-a reprodus (eroii atacă singuri, testat pe 3 ecrane + telefon lent). Adăugat: mesaj la primele 3 bătălii + la atingerea câmpului („mechanics attack on their own · tap a card when it shows TAP!”); atingerea cardurilor calculată față de canvas (mai sigur pe unele telefoane). De aflat de la tester: model telefon + captură.
   - **v16-2 (13 nov)**: login cu Google (opțional) + salvare în cloud – `cloud.js`, căsuța „☁️ Cloud save” jos în Shop. ⚠️ Pornește abia după ce Marius face **Client ID-ul OAuth** (vezi mai jos). Politica de confidențialitate și pagina de ștergere actualizate.
   - **v16-1 (13 nov)**: VIP Pass NU mai dă summon gratuit zilnic (era element aleatoriu plătit → 18+ Brazilia, interzis în Belgia). Idle Rewards: 4h standard + 30 min pe nivel VIP (VIP 20 = 14h); VIP Pass nu crește orele. Diamante: de adăugat mai târziu. În Play: Classification → „éléments aléatoires” = **Non**.
@@ -76,7 +77,7 @@
 ## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
 - Orice schimbare se verifică întâi cu `PLAY_RULES.md`.
-- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-3`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-6`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.
