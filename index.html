@@ -419,6 +419,49 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 .abPC{display:grid;grid-template-columns:1fr 1fr;gap:6px}.abPC>div{border-radius:12px;padding:6px 8px;font-size:11.5px}.abPC h4{margin:0 0 4px;font-size:11px}.abPC .pro{background:#0e3a1e;border:1px solid #69f0ae55}.abPC .pro h4{color:#69f0ae}.abPC .con{background:#3a0e0e;border:1px solid #ff6e6e55}.abPC .con h4{color:#ff8a80}.abPC p{margin:0 0 3px}.abPC p.no{opacity:.5}
 
 .upParts{display:flex;align-items:center;gap:3px;margin-top:5px;width:100%}.upParts b{flex:0 0 22px;height:7px;border-radius:4px;background:#2a3442;box-shadow:inset 0 1px 2px #000}.upParts b.on{background:linear-gradient(#ffe27a,#ffb300);box-shadow:0 0 6px #ffb300}.upParts small{margin-left:6px;font-size:10.5px;color:#ffd54a;font-weight:900}
+/* v16-36: Check-in · News · Mail – buttons top-right + full-screen pages */
+#side2{position:fixed;right:8px;top:60px;display:flex;flex-direction:column;gap:9px;z-index:5}
+#side2 button{position:relative;width:46px;height:46px;padding:0;border:0;border-radius:15px;background:linear-gradient(180deg,#324356,#141c26);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #e0aa25,0 0 0 4px #5e3d00,0 6px 12px rgba(0,0,0,.6),inset 0 1.5px 0 rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center}
+#side2 button:active{transform:scale(.93)}
+#side2 svg{width:34px;height:34px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+#side2 small{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font:900 8.5px system-ui;color:#ffd54a;background:#0b1118;border:1px solid #e0aa25;border-radius:6px;padding:0 4px;white-space:nowrap;letter-spacing:.3px}
+#side2 i{position:absolute;right:-5px;top:-5px;min-width:17px;height:17px;border-radius:9px;background:radial-gradient(#ff6b5b,#d01b0b);box-shadow:0 0 0 1.5px #fff,0 0 6px #f44;display:none;font:900 10px/17px system-ui;color:#fff;font-style:normal;text-align:center}
+#side2 i.on{display:block}
+#xp{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;background:radial-gradient(ellipse at 50% 0%,#3a2a10,#14100a 45%,#06070a);color:#fff;font-family:system-ui}
+#xp.open{display:flex}
+#xpT{font-size:23px!important}
+body:has(#xp.open) #toast{top:auto;bottom:30px}
+#xpBody{flex:1;overflow-y:auto;touch-action:pan-y;padding:12px 12px 34px}
+.ciGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ciD{position:relative;border-radius:14px;padding:6px 3px 8px;text-align:center;background:linear-gradient(#1f2a38,#0e141c);box-shadow:0 0 0 1.5px #3d4a5e;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.ciD.big{grid-column:span 2;background:linear-gradient(#4a2f08,#1a1003);box-shadow:0 0 0 2px #ffb300,0 0 16px #ffb30055}
+.ciD b{font-size:11px;color:#9fb3c8;letter-spacing:.5px}
+.ciD .rw{font-size:12.5px;font-weight:900;color:#fff;line-height:1.25}
+.ciD .rw img{height:20px;vertical-align:-5px}
+.ciD .ico{font-size:26px;line-height:1}
+.ciD.done>*{opacity:.4}.ciD.done:after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#69f0ae;text-shadow:0 2px 6px #000}
+.ciD.now{box-shadow:0 0 0 2.5px #69f0ae,0 0 18px #69f0ae88;animation:ciP 1.2s ease-in-out infinite}
+@keyframes ciP{50%{transform:scale(1.04)}}
+.xBtn{display:block;width:100%;margin:14px 0 0;padding:13px;border:0;border-radius:14px;background:linear-gradient(#ffe27a,#ffb300 55%,#e08a00);color:#2a1600;font:900 17px system-ui;box-shadow:0 4px 0 #8a4a00,0 0 14px #ffb30055}
+.xBtn:disabled{background:linear-gradient(#3a4252,#1b212c);color:#aab;box-shadow:0 0 0 2px #6a7488}
+.xNote{margin:12px 2px 0;font-size:12px;color:#c8b48a;text-align:center;line-height:1.4}
+.nwI{border-radius:16px;margin:0 0 12px;background:linear-gradient(#1c2532,#0d131b);box-shadow:0 0 0 1.5px #3d4a5e;overflow:hidden}
+.nwI.new{box-shadow:0 0 0 2px #ffb300,0 0 14px #ffb30044}
+.nwH{display:flex;align-items:center;gap:8px;padding:9px 12px;background:linear-gradient(90deg,#3a2a10,#1a1206);border-bottom:1px solid #5e3d00}
+.nwH .ic{font-size:24px}.nwH b{flex:1;font-size:15px;font-weight:900;color:#ffd54a;line-height:1.15}.nwH small{display:block;font-size:10.5px;color:#c8b48a;font-weight:700}
+.nwH em{font-style:normal;background:#d01b0b;color:#fff;font:900 10px system-ui;border-radius:6px;padding:2px 6px}
+.nwI ul{margin:0;padding:9px 12px 11px 30px;font-size:13.5px;line-height:1.45;color:#e8ecf2}.nwI li{margin:3px 0}.nwI li b{color:#ffe08a}
+.mlI{display:flex;gap:10px;align-items:center;border-radius:14px;margin:0 0 9px;padding:10px 12px;background:linear-gradient(#1c2532,#0d131b);box-shadow:0 0 0 1.5px #3d4a5e}
+.mlI.unread{box-shadow:0 0 0 2px #ffb300}
+.mlI .ic{font-size:28px}.mlI div{flex:1}.mlI b{display:block;font-size:14.5px;color:#ffd54a}.mlI small{font-size:11px;color:#9fb3c8}
+.mlI .gift{font-size:20px}
+.mlBody{border-radius:16px;padding:14px;background:linear-gradient(#1c2532,#0d131b);box-shadow:0 0 0 1.5px #3d4a5e;font-size:14px;line-height:1.5;color:#e8ecf2}
+.mlBody h3{margin:0 0 2px;color:#ffd54a;font-size:18px}.mlBody .fr{font-size:11.5px;color:#9fb3c8;margin-bottom:10px}
+.mlGift{margin-top:12px;border-radius:12px;padding:10px;background:#0b1118;border:1px dashed #e0aa25;text-align:center;font-weight:900;font-size:15px}.mlGift img{height:22px;vertical-align:-6px}
+.repBon{margin:6px 0 2px;padding:8px 10px;border-radius:12px;background:#0e3a1e;border:1px solid #2e7d32;font-weight:800;font-size:13px;color:#b9f6ca;text-align:center}
+#shDots{flex-wrap:wrap}#shDots .upParts{flex:0 0 100%}#shDots .upParts small{margin-left:8px;font-size:11.5px}
+.stepNote{margin-top:8px;padding:8px 10px;border-radius:12px;background:#0b1622;border:1px solid #2f5a85;font-size:12.5px;line-height:1.4;color:#cfe3ff}
+@media (max-height:700px){#side2 button{width:42px;height:42px}#side2 svg{width:30px;height:30px}}
 </style>
 </head>
 <body>
@@ -433,6 +476,8 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 <div id="toast"></div>
 <div id="zoom"><button id="zin">+</button><button id="zout">−</button></div>
 <div id="side"><button id="cpBtn"><img src="img/ui/ic_battle.webp" alt="Battle"></button><button id="smBtn"><img src="img/ui/ic_ticket.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/ui/ic_team.webp" alt="Team"><i id="rosDot"></i></button><button id="idBtn"><img src="img/ui/ic_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/ui/ic_dq.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small></button></div>
+<div id="side2"><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button></div>
+<div id="xp"><div class="rsTop"><button class="rsB" id="xpBack">↩</button><div class="rsTi"><b id="xpT"></b><small id="xpS"></small></div><div class="rsTk" id="xpTk"></div></div><div id="xpBody"></div></div>
 <div id="dq"><div id="dqBox"></div></div>
 <div id="sm"><div id="smBox"></div></div>
 <div id="team"><div id="tmBox"></div></div>
@@ -546,8 +591,11 @@ const WALK=48, INSP_T=5;
 const SELL_T=[7,6,5,4,3.6,3.3,3,2.7,2.4,2.1], SELL_BONUS=[0,.10,.25,.40,.50,.60,.72,.85,1.0,1.2], TRAILER_CAP=[2,4,6,8,8,8,8,8,8,8], TRAILER_AWAY=[5,5,5,5,4.2,3.6,3,2.4,1.8,1.2];
 const SPAWN_T=[5,4.2,3.5,2.9,2.6,2.35,2.15,2.0,1.85,1.7];
 const PARTS_TRUCK=[55,70,85,105,115,125,135,145,155,170], PARTS_CAP=[3,5,7,10,11,12,13,14,15,16], HELI_V=[150,180,215,260,280,300,320,340,360,390];
-const REP_XP=[0,10,35,90,180,320];
+const REP_XP=[0,10,35,90,180,320,420,550,720,940,1220,1600,2100,2700,3500,4600,6000,7800,10100,13100,17000,22100,28700,37300,48500,63000,81900,106500,138400,179900]; // v16-36: Rep 1-30 (was 1-6)
+const MAXREP=REP_XP.length, RC=a=>a[Math.min(G.rep,a.length)-1]; // RC = value for this Rep from a list made for Rep 1-6
+const repSale=r=>Math.max(0,(r||G.rep)-6)*.03, repIdle=r=>Math.max(0,(r||G.rep)-6)*.04, repGift=r=>r>=10&&r%5===0;
 const REP_TXT=['Inspection, Service, Body & Paint — small jobs only','Electronics · Wagon, SUV, Pickup, Van · suspension, rust, respray','Engine Shop · Parts Office & Helipad · Sports cars · clutch, timing belt, ECU','Tuning · Muscle cars · turbo, street kits, ECU stage 1','Supercars · engine & gearbox swaps · widebody · sport kits','V8 swaps · full Race builds'];
+for(let r=7;r<=30;r++)REP_TXT.push('Car sale price +'+Math.round(repSale(r)*100)+'% · Idle income +'+Math.round(repIdle(r)*100)+'%'+(repGift(r)?' · 🎁 bonus +10 Recruit & +5 Crew tickets':''));
 
 const JOBS=[
  {id:'oil',n:'Oil change',st:'service',t:5,pay:35,rep:1},
@@ -620,7 +668,7 @@ const SKINS=['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac'], HAIRS=['#2b1d14
 const SAVE_KEY='torqueEmpire_v15';
 const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,ct:5,ctInit:1,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0},c:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
-function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;G.rep=repFor(G.xp);}}catch(e){}}
+function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;if(s.ci)G.ci=s.ci;if(s.nw)G.nw=s.nw;if(s.ml)G.ml=s.ml;G.rep=repFor(G.xp);}}catch(e){}}
 function save(){if(window.__noSave)return;try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
 load();
 let time=0, started=false, SPD=1;
@@ -650,20 +698,21 @@ vipRefresh();
 
 // =================== DAILY QUESTS (reward: VIP points only) ===================
 const DQ_GIFTS=[{need:2,vip:10,tk:1},{need:3,vip:15,tk:2},{need:4,vip:20,tk:2},{need:5,vip:30,tk:3}];
+const QR=()=>Math.min(G.rep,10); // v16-36: daily quests stop growing after Rep 10
 const QN=[6,10,14,18,22,26], QEARN=[1500,3000,6000,12000,25000,50000];
 const QPOOL=[
- {id:'sell',t:'sell',ic:'🚗',n:g=>'Sell '+g+' cars',g:()=>QN[G.rep-1],vip:15},
- {id:'earn',t:'earn',ic:'💰',n:g=>'Earn '+fmt(g)+' from sales',g:()=>QEARN[G.rep-1],vip:20},
- {id:'inspect',t:'inspect',ic:'🔍',n:g=>'Inspect '+g+' cars',g:()=>8+G.rep*2,vip:10},
- {id:'service',t:'job',st:'service',ic:'🔧',n:g=>'Finish '+g+' Service jobs',g:()=>10+G.rep*2,vip:10},
- {id:'paint',t:'job',st:'paint',ic:'🎨',n:g=>'Finish '+g+' Body & Paint jobs',g:()=>6+G.rep*2,vip:15,ok:()=>G.lv.paint>0},
- {id:'elec',t:'job',st:'elec',ic:'⚡',n:g=>'Finish '+g+' Electronics jobs',g:()=>5+G.rep*2,vip:15,ok:()=>G.lv.elec>0},
- {id:'engine',t:'job',st:'engine',ic:'⚙️',n:g=>'Finish '+g+' Engine Shop jobs',g:()=>3+G.rep,vip:20,ok:()=>G.lv.engine>0},
- {id:'tuning',t:'job',st:'tuning',ic:'🏁',n:g=>'Finish '+g+' Tuning jobs',g:()=>4+G.rep,vip:20,ok:()=>G.lv.tuning>0},
+ {id:'sell',t:'sell',ic:'🚗',n:g=>'Sell '+g+' cars',g:()=>RC(QN),vip:15},
+ {id:'earn',t:'earn',ic:'💰',n:g=>'Earn '+fmt(g)+' from sales',g:()=>RC(QEARN),vip:20},
+ {id:'inspect',t:'inspect',ic:'🔍',n:g=>'Inspect '+g+' cars',g:()=>8+QR()*2,vip:10},
+ {id:'service',t:'job',st:'service',ic:'🔧',n:g=>'Finish '+g+' Service jobs',g:()=>10+QR()*2,vip:10},
+ {id:'paint',t:'job',st:'paint',ic:'🎨',n:g=>'Finish '+g+' Body & Paint jobs',g:()=>6+QR()*2,vip:15,ok:()=>G.lv.paint>0},
+ {id:'elec',t:'job',st:'elec',ic:'⚡',n:g=>'Finish '+g+' Electronics jobs',g:()=>5+QR()*2,vip:15,ok:()=>G.lv.elec>0},
+ {id:'engine',t:'job',st:'engine',ic:'⚙️',n:g=>'Finish '+g+' Engine Shop jobs',g:()=>3+QR(),vip:20,ok:()=>G.lv.engine>0},
+ {id:'tuning',t:'job',st:'tuning',ic:'🏁',n:g=>'Finish '+g+' Tuning jobs',g:()=>4+QR(),vip:20,ok:()=>G.lv.tuning>0},
  {id:'upgrade',t:'upgrade',ic:'⬆️',n:g=>g>1?'Upgrade buildings '+g+' times':'Upgrade a building',g:()=>G.rep<3?1:2,vip:15},
  {id:'thief',t:'thief',ic:'👮',n:()=>'Catch a thief',g:()=>1,vip:25},
  {id:'fleet',t:'fleet',ic:'🚨',n:g=>'Repair '+g+' city fleet vehicles',g:()=>2,vip:15},
- {id:'load',t:'load',ic:'🚛',n:g=>'Load '+g+' cars on the transporter',g:()=>QN[G.rep-1],vip:10},
+ {id:'load',t:'load',ic:'🚛',n:g=>'Load '+g+' cars on the transporter',g:()=>RC(QN),vip:10},
 ];
 function dayKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function dqCheck(){const k=dayKey();if(G.dq.day===k)return;
@@ -823,7 +872,7 @@ function pickType(){const av=TYPES.filter(t=>t.rep<=G.rep);let s=av.reduce((a,t)
 function genJobs(T){
   const sporty=['sports','muscle','super','coupe','conv'].includes(T.b)||T.sporty,r=G.rep;
   const pool=JOBS.filter(j=>j.rep<=r&&G.lv[j.st]>0&&(!j.parts||G.lv.parts>0)&&!(T.fleet&&(j.sport||j.st==='tuning'||j.id==='respray')));
-  const lo=[1,1,2,2,2,3][r-1],hi=[2,3,3,4,5,5][r-1];let n=Math.floor(rnd(lo,hi+1));const out=[];
+  const lo=[1,1,2,2,2,3][Math.min(r,6)-1],hi=[2,3,3,4,5,5][Math.min(r,6)-1];let n=Math.floor(rnd(lo,hi+1));const out=[];
   while(n-->0&&pool.length){
     const ws=pool.map(j=>(j.st==='tuning'?(sporty?1.3:.16):j.sport?(sporty?3:.45):1)*(j.rep>=r-1?1.6:1));
     let s=ws.reduce((a,b)=>a+b,0)*Math.random(),k=0;while(k<pool.length-1&&(s-=ws[k])>0)k++;
@@ -959,7 +1008,7 @@ function sales(dt){
   const olv=G.lv.office;
   for(let j=0;j<PLV('office');j++){const a=agents[j];
     if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
-    else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale()));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
+    else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale())*(1+repSale()));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
       G.money+=price;G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip)driveAway(c);
       const xp=1+c.jobs.reduce((s,j)=>s+j.xp,0);addXP(xp);
       float(c.x,c.y-30,'+'+fmt(price),'#ffd54a');float(a.p.x,a.p.y-22,'SOLD ONLINE','#b39ddb');save();}}
@@ -972,7 +1021,7 @@ function driveAway(c){const s=c.slot;c.state='leaving';c.siren=!!c.type.liv&&c.t
   c.onArrive=()=>{c.gone=true;};
   float(c.x,c.y-40,c.type.vip?'👑 SEE YOU SOON!':'🚨 BACK ON DUTY','#ffd54a');}
 function addXP(n){const r0=G.rep;G.xp+=n;G.rep=repFor(G.xp);
-  if(G.rep>r0){G.h.tk+=5;G.h.ct+=3;toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +5 · '+CTI+' +3 · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
+  if(G.rep>r0){const gb=repGift(G.rep);G.h.tk+=gb?15:5;G.h.ct+=gb?8:3;toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +'+(gb?15:5)+' · '+CTI+' +'+(gb?8:3)+' · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
     const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'REPUTATION '+G.rep+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#ff9800'])});}}
 
@@ -1976,7 +2025,7 @@ function drawCollection(){
 // Pictures change at LV1-LV4 (my pictures); LV5-LV10 only give more money / faster customers.
 const xTier=id=>Math.max(1,PLV(id));
 function xRect(id){const t=xTier(id),a=XART[id+t],m=XM[id];let w,h;if(m.w){w=m.w;h=w*a.h/a.w;}else{h=m.h;w=h*a.w/a.h;}return{x:m.cx-w/2,y:DS_B-h,w,h,t,a,k:w/a.w};}
-const xRepM=()=>IDLE_REP[G.rep-1];
+const xRepM=()=>RC(IDLE_REP)*(1+repIdle());
 const xWashSale=()=>G.lv.wash?WASH_SALE[G.lv.wash-1]:0, xGasTrl=()=>G.lv.gas?GAS_TRL[G.lv.gas-1]:0;
 const washPay=l=>Math.round(WASH_PAY[l-1]*xRepM()), gasPay=l=>Math.round(GAS_PAY[l-1]*xRepM()), facPrice=l=>Math.round(FAC_PRICE[l-1]*Math.max(1,xRepM()/5));
 function xPic(id,r,clipH){const I=IMG['x_'+id+r.t];if(!I||!I.ok)return false;const hh=clipH||r.h;
@@ -2347,14 +2396,14 @@ function renderPanel(){
     $('shStats').innerHTML=h;const b=$('shBtn');b.style.display='';b.disabled=false;b.textContent='📋 DAILY QUESTS';return;}
   if(sel==='rep'){const key='rep'+G.xp;if(key===lastPanelKey)return;lastPanelKey=key;
     $('shTitle').textContent='⭐ Reputation '+G.rep;const nx=REP_XP[G.rep];$('shDots').innerHTML='<span>'+(nx?G.xp+' / '+nx+' XP':'MAX – '+G.xp+' XP')+'</span>';
-    $('shDesc').textContent='Every sold car gives reputation. Bigger jobs give more. Higher reputation brings new workshops, harder repairs and better cars.';
-    $('shStats').innerHTML=REP_TXT.map((t,i)=>'<div class="job'+(i<G.rep?' done':' off')+'"><span class="ic">'+(i<G.rep?'⭐':'🔒')+'</span><span><b>Rep '+(i+1)+'</b> – '+t+'</span></div>').join('');
+    $('shDesc').textContent='Every sold car gives reputation. Bigger jobs give more. Rep 1-6 bring new workshops, harder repairs and better cars; Rep 7-30 raise your car prices and idle income. Every level up: Recruit +5 & Crew +3 tickets.';
+    $('shStats').innerHTML=(G.rep>6?'<div class="repBon">⭐ Your Rep bonus now: car sale price +'+Math.round(repSale()*100)+'% · idle income +'+Math.round(repIdle()*100)+'%</div>':'')+REP_TXT.map((t,i)=>'<div class="job'+(i<G.rep?' done':' off')+'"><span class="ic">'+(i<G.rep?'⭐':'🔒')+'</span><span><b>Rep '+(i+1)+'</b> – '+t+'</span></div>').join('');
     $('shBtn').style.display='none';return;}
   const inf=INFO[sel],nu=NOUP(sel),lv=nu?1:G.lv[sel],need=nu?1:BLD[sel].rep,locked=!nu&&G.rep<need;
   const cost=(!nu&&lv<MAXLV)?costOf(sel,lv):0,can=G.money>=cost&&!locked;
   const key=sel+lv+'p'+UPP(sel)+can+locked+G.rep+VLV+VSUB+'h'+HVER+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
   $('shTitle').textContent=inf.title;
-  $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lv?'Level '+lv+' / '+MAXLV:'Not built')+'</span>'+(lv>=4&&lv<MAXLV?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' parts '+UPP(sel)+'/'+UPN+'</small></div>':'');
+  $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lv?'Level '+lv+' / '+MAXLV:'Not built')+'</span>'+(lv>=4&&lv<MAXLV?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'');
   $('shDesc').textContent=inf.desc;
   let h=inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](lv)+'</b>'+(!nu&&lv<MAXLV?'<em>→ '+r[1](lv+1)+'</em>':'')+'</div>').join('');
   h+=teamRows(sel);
@@ -2364,13 +2413,14 @@ function renderPanel(){
   if(VB('disc')>0&&!nu&&lv<MAXLV)h+='<div class="note">👑 VIP upgrade discount '+pctT(VB('disc'),1)+' included.</div>';
   if(SOON_IDS.includes(sel))h+='<div class="lock">🚧 Coming soon – nothing to do here yet.</div>';
   if(locked)h+='<div class="lock">🔒 Unlocks at Reputation '+need+'. Sell more cars to grow your reputation.</div>';
+  if(!nu&&!locked&&lv>=4&&lv<MAXLV)h+='<div class="stepNote">⬆️ From LV 4, each level is built in <b>'+UPN+' steps</b>. A step costs only money – no items needed. Every step already adds part of the bonus; after step '+UPN+'/'+UPN+' the building reaches <b>LV '+(lv+1)+'</b>.</div>';
   $('shStats').innerHTML=h;
   const b=$('shBtn');if(nu){b.style.display='none';return;}b.style.display='';
   if(lv>=MAXLV){b.textContent='MAX LEVEL';b.disabled=true;}else if(locked){b.textContent='🔒 REPUTATION '+need+' NEEDED';b.disabled=true;}
-  else{b.textContent=lv>=4?'⚙️ PART '+(UPP(sel)+1)+'/'+UPN+' · '+fmt(cost):(lv===0?'BUILD ':'UPGRADE ')+fmt(cost);b.disabled=!can;}
+  else{b.textContent=lv>=4?'⬆️ STEP '+(UPP(sel)+1)+'/'+UPN+' · '+fmt(cost):(lv===0?'BUILD ':'UPGRADE ')+fmt(cost);b.disabled=!can;}
 }
 $('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(!sel||NOUP(sel))return;const lv=G.lv[sel];if(lv>=MAXLV||G.rep<BLD[sel].rep)return;const cost=costOf(sel,lv);if(G.money<cost)return;
-  G.money-=cost;if(lv>=4){G.up=G.up||{};G.up[sel]=UPP(sel)+1;if(G.up[sel]<UPN){qAdd('upgrade',1);save();lastPanelKey='';renderPanel();toast('⚙️ Part '+G.up[sel]+'/'+UPN+' done · LV '+(lv+1)+' at '+UPN+'/'+UPN,1800);return;}G.up[sel]=0;}
+  G.money-=cost;if(lv>=4){G.up=G.up||{};G.up[sel]=UPP(sel)+1;if(G.up[sel]<UPN){qAdd('upgrade',1);save();lastPanelKey='';renderPanel();toast('⬆️ Step '+G.up[sel]+'/'+UPN+' done · LV '+(lv+1)+' after step '+UPN+'/'+UPN,1800);return;}G.up[sel]=0;}
   G.lv[sel]++;qAdd('upgrade',1);relayoutAfterUpgrade(sel);if(sel==='security')secLayout(true);if(sel==='parts')partsLayout();save();lastPanelKey='';renderPanel();
   let fx=AV,fy=300;const g=GAR[sel];
   if(g){const p=L2W(g,150,75);fx=p.x;fy=p.y;}else if(sel==='parts'){fx=PB.x+PB.w/2;fy=PB.y+40;}else if(sel==='trailer'){fx=200;fy=TRAIL_Y-30;}else if(sel==='parking'){fx=600;fy=AY;}else if(sel==='security'){fx=SO_X+SO_W/2;fy=SO_Y+50;}else if(XIDS.includes(sel)){const r=xRect(sel);fx=r.x+r.w/2;fy=r.y+r.h*.4;}
@@ -2891,7 +2941,7 @@ const IDLE_BASE_H=4, IDLE_VIP_H=0.5, IDLE_TK_H=2; // v16: 4h standard + 30 min p
 const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV;
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
-function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*IDLE_REP[G.rep-1];} // v15: high levels also earn well while you are away
+function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
 function idleRate(){return Math.round(idleBase()*(1+VB('idle')));}
 function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),ct:Math.floor(hrs/(IDLE_TK_H*2)),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
@@ -2953,7 +3003,60 @@ let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=9
 const MINDPR=()=>Math.min(MAXDPR,(window.devicePixelRatio||1)>=2?1.5:1);
 // v16-27: less work for the phone – max 60 fps (120 Hz phones drew 120×/s), 30 fps when nobody touches the map,
 // ~6 fps behind see-through pages (Quests, Summon, Team…) and nothing behind the Campaign (it covers everything).
-const MAPCOV=['dq','sm','pop','team','idl','ros'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
+
+// =================== v16-36: DAILY CHECK-IN · NEWS · MAIL ===================
+// Check-in: fixed rewards (nothing random), a 7-day cycle; a missed day does NOT reset it.
+if(!G.ci)G.ci={n:0,day:''};if(!G.nw)G.nw=0;if(!G.ml)G.ml={r:[],c:[]};
+const CI=[{tk:2},{ct:2},{tk:3},{ct:2},{tk:3},{ct:3},{tk:5,ct:3}]; // only tickets (Marius)
+const ciMoney=h=>Math.max(500,Math.round(idleRate()*h/100)*100);
+const ciReady=()=>G.ci.day!==dayKey();
+function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);return a.join('<br>');}
+function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;return m;}
+// News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
+const NEWS=[
+ {id:6,d:'Nov 14, 2026',ic:'🎉',t:'Check-in, News, Mail & Reputation 30',l:['<b>Daily Check-in</b>: log in every day for free Recruit and Crew tickets. Day 7 is the big one – and a missed day never resets your week.','<b>News</b> (this page) and <b>Mail</b> with gifts from the Torque Studios team.','<b>Reputation now goes up to 30</b>: every level after Rep 6 raises your car sale prices (+3%) and idle income (+4%). Rep 10, 15, 20, 25 and 30 give bonus tickets.','Building upgrades after LV 4 are now called <b>Steps</b> (5 steps per level) – they cost only money.']},
+ {id:5,d:'Nov 14, 2026',ic:'👮',t:'All Security guards are here',l:['<b>29 guards</b> from Common to Mythic with new art and animations – The Wall and Night Hawk are the Mythic ones.','<b>6 new thieves</b> try their luck at night. Catch them and they leave in handcuffs!']},
+ {id:4,d:'Nov 14, 2026',ic:'🛵',t:'New drivers & the Crew summon',l:['<b>All drivers</b> have new art – from Zippy Zack to the Mythic Apex and Midnight Rider.','Drivers and guards now come from one <b>Crew summon</b> with its own <b>Crew Tickets</b>.','Your heroes now <b>work on the map</b> as small figures inside the garages.']},
+ {id:3,d:'Nov 14, 2026',ic:'⚔️',t:'Every hero has a unique skill',l:['All mechanics have <b>new animations</b> in battle and <b>their own unique skill</b>.','Hero cards in battle show their <b>grade frame</b>.','<b>AUTO NEXT</b>: after a win, the next stage starts by itself with the same team.']},
+ {id:2,d:'Nov 14, 2026',ic:'📱',t:'Smoother on every phone',l:['The game now uses <b>much less battery and processor</b> (max 60 FPS, lighter map and menus).','Fixed battles that would not start on some older phones.','Updates download faster and only ask you to tap <b>OK</b> – no surprise restarts.']},
+ {id:1,d:'Nov 13, 2026',ic:'🏁',t:'Welcome to the closed test!',l:['Thank you for testing <b>Torque Empire</b>! Tell us what you like and what feels wrong – every message is read.']},
+];
+// Mail: gifts are claimed once per player.
+const MAIL=[
+ {id:'m2',d:'Nov 14, 2026',ic:'🎁',t:'Thank you, tester!',b:'Thank you for helping us test Torque Empire before the launch. Here is a small gift for your garage. Have fun – and keep the reports coming!',g:{tk:10,ct:5}},
+ {id:'m1',d:'Nov 14, 2026',ic:'📅',t:'New: Daily Check-in',b:'Tap the calendar at the top right every day. Seven days of rewards, with a big chest on day 7. A missed day does not reset your progress.'},
+ {id:'m0',d:'Nov 13, 2026',ic:'🛠️',t:'Need help?',b:'Found a bug or have an idea? Write to us – we read every message. Tell us your phone model and what happened.',mail:1},
+];
+const mlUnread=()=>MAIL.filter(m=>!G.ml.r.includes(m.id)||(m.g&&!G.ml.c.includes(m.id))).length;
+const xpEl=$('xp');let xpMode='',xpMail='';
+function xpOpen(m){xpMode=m;xpMail='';if(m==='news'){G.nw=NEWS[0].id;save();}xpEl.classList.add('open');renderXP();updX();}
+function xpClose(){if(xpMode==='mail'&&xpMail){xpMail='';renderXP();return;}xpEl.classList.remove('open');xpMode='';updX();}
+$('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').onclick=()=>xpOpen('news');$('mlBtn').onclick=()=>xpOpen('mail');
+function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTML=TKI+' '+G.h.tk;
+  if(xpMode==='ci'){T.textContent='DAILY CHECK-IN';const k=G.ci.n%7,rd=ciReady();S.textContent='WEEK '+(Math.floor(G.ci.n/7)+1)+' · DAY '+(rd?k+1:(k||7))+' OF 7';
+    let h='<div class="ciGrid">'+CI.map((r,i)=>{const done=i<k||(!rd&&k===0&&G.ci.n>0),now=rd&&i===k;
+      return '<div class="ciD'+(i===6?' big':'')+(done?' done':'')+(now?' now':'')+'"><b>DAY '+(i+1)+'</b><div class="ico">'+(i===6?'🎁':r.tk?'🎟️':'🛵')+'</div><div class="rw">'+rwHtml(r)+'</div></div>';}).join('')+'</div>';
+    h+='<button class="xBtn" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'✅ CHECK IN · DAY '+(k+1):'✓ Checked in today – come back tomorrow')+'</button>';
+    h+='<div class="xNote">Free tickets every day – Day 7 is the big one. Missing a day never resets your week.</div>';
+    B.innerHTML=h;const g=$('ciGo');if(g)g.onclick=()=>{if(!ciReady())return;const r=CI[G.ci.n%7],m=giveRw(r);G.ci.n++;G.ci.day=dayKey();save();
+      toast('📅 Day '+((G.ci.n-1)%7+1)+' reward: '+rwHtml(r).replace(/<br>/g,' · '),3500);renderXP();updX();};return;}
+  if(xpMode==='news'){T.textContent='NEWS';S.textContent='LATEST UPDATES';
+    B.innerHTML=NEWS.map((n,i)=>'<div class="nwI'+(i===0?' new':'')+'"><div class="nwH"><span class="ic">'+n.ic+'</span><b>'+n.t+'<small>'+n.d+'</small></b>'+(i===0?'<em>NEW</em>':'')+'</div><ul>'+n.l.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>').join('');return;}
+  if(xpMode==='mail'){T.textContent='MAIL';S.textContent='MESSAGES FROM TORQUE STUDIOS';
+    if(xpMail){const m=MAIL.find(q=>q.id===xpMail),got=G.ml.c.includes(m.id);
+      let h='<div class="mlBody"><h3>'+m.ic+' '+m.t+'</h3><div class="fr">From: Torque Studios · '+m.d+'</div>'+m.b;
+      if(m.mail)h+='<div class="mlGift">✉️ torqueempirehelp@gmail.com</div>';
+      if(m.g)h+='<div class="mlGift">'+(got?'✓ Gift claimed':'🎁 Gift: '+rwHtml(m.g).replace(/<br>/g,' · '))+'</div>';h+='</div>';
+      if(m.g&&!got)h+='<button class="xBtn" id="mlGo">🎁 CLAIM GIFT</button>';
+      if(m.mail)h+='<button class="xBtn" id="mlW">✉️ WRITE TO US</button>';
+      B.innerHTML=h;const g=$('mlGo');if(g)g.onclick=()=>{if(G.ml.c.includes(m.id))return;giveRw(m.g);G.ml.c.push(m.id);save();toast('🎁 '+rwHtml(m.g).replace(/<br>/g,' · ')+' added!',3000);renderXP();updX();};
+      const w=$('mlW');if(w)w.onclick=()=>{location.href='mailto:torqueempirehelp@gmail.com?subject='+encodeURIComponent('Torque Empire – feedback');};return;}
+    B.innerHTML=MAIL.map(m=>{const un=!G.ml.r.includes(m.id),gift=m.g&&!G.ml.c.includes(m.id);
+      return '<div class="mlI'+(un||gift?' unread':'')+'" data-ml="'+m.id+'"><span class="ic">'+m.ic+'</span><div><b>'+m.t+'</b><small>Torque Studios · '+m.d+'</small></div>'+(gift?'<span class="gift">🎁</span>':un?'<i style="width:10px;height:10px;border-radius:5px;background:#ff5b4b"></i>':'')+'</div>';}).join('');}}
+$('xpBody').addEventListener('click',e=>{const m=e.target.closest('[data-ml]');if(!m)return;xpMail=m.dataset.ml;if(!G.ml.r.includes(xpMail)){G.ml.r.push(xpMail);save();}renderXP();updX();});
+function updX(){$('ciDot').classList.toggle('on',ciReady());$('nwDot').classList.toggle('on',G.nw<NEWS[0].id);const u=mlUnread(),d=$('mlDot');d.textContent=u;d.classList.toggle('on',u>0);}
+updX();setInterval(updX,5000);
+const MAPCOV=['dq','sm','pop','team','idl','ros','xp'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
 cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListener('pointermove',()=>{touchT=performance.now();},{passive:true});
 function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
 function frame(now){
