@@ -686,7 +686,9 @@ const SPRD={
  // v16-31: Uncommon guards (atlas_drivers.py keeps the dark-emerald accents + tools/fix_green_pockets.py; Sid's siren glow from atlas_rare.py)
  g1_0:{w:384,a:[202,248],m:[300,150]},g1_1:{w:384,a:[204,248],m:[300,150]},g1_2:{w:384,a:[206,248],m:[300,150]},g1_3:{w:384,a:[206,248],m:[300,150]},g1_4:{w:384,a:[198,248],m:[300,150]},g1_5:{w:384,a:[206,248],m:[300,150]},
  // v16-32: Rare guards (atlas_rare.py, clean – blue glows semi-transparent)
- g2_0:{w:384,a:[208,248],m:[300,150]},g2_1:{w:384,a:[200,248],m:[300,150]},g2_2:{w:384,a:[203,248],m:[300,150]},g2_3:{w:384,a:[204,248],m:[300,150]},g2_4:{w:384,a:[204,248],m:[300,150]}};
+ g2_0:{w:384,a:[208,248],m:[300,150]},g2_1:{w:384,a:[200,248],m:[300,150]},g2_2:{w:384,a:[203,248],m:[300,150]},g2_3:{w:384,a:[204,248],m:[300,150]},g2_4:{w:384,a:[204,248],m:[300,150]},
+ // v16-33: Epic guards (atlas_rare.py + tools/fix_purple_halo.py: grey-blue halo around the purple glows -> purple)
+ g3_0:{w:384,a:[207,248],m:[300,150]},g3_1:{w:384,a:[201,248],m:[300,150]},g3_2:{w:384,a:[206,248],m:[300,150]},g3_3:{w:384,a:[201,248],m:[300,150]},g3_4:{w:384,a:[205,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
