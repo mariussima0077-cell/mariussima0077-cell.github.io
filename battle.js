@@ -1135,7 +1135,7 @@ function drawMonster(g,u,t){
 }
 
 // ---------------------------------------------------------------- battle state
-const cv=$('btcv');let g=cv.getContext('2d');
+const cv=$('btcv');let g=cv.getContext('2d',{alpha:false}); // v16-26: opaque battle canvas = cheaper for the phone to show
 let W=390,H=844,DPR=1,BDPR=1,FY0=0,FY1=0,HOR=0,PANEL=0,S=1;
 let B=null,raf=0,lastT=0,running=false;
 const fy=d=>FY0+d*(FY1-FY0);
@@ -1606,22 +1606,27 @@ function buildBG(){LI=0;B._cA=null;const P=BIO[B.stage.bio],R=seeded(77+B.si*13)
       else{x.strokeStyle='#5a5f63';x.lineWidth=1.5*s;x.beginPath();x.arc(X0,py,3.5*s,0,TAU);x.stroke();}},px,30);}
   B.bgDet=c;B.bgp=[];}
 const BGC={};
+// v16-26: the 2 cached background pictures are copied pixel-for-pixel (no re-scaling) and only the rows they really cover
+// (sky part / ground part) – on a budget phone this was the most expensive part of every battle frame.
+function bgBlit(c,y0,y1){y0=Math.max(0,Math.floor(y0));y1=Math.min(H,Math.ceil(y1));if(y1<=y0)return;
+  if(!B.zoom&&!B.sx&&!B.sy){const a=Math.round(y0*DPR),b=Math.min(c.height,Math.round(y1*DPR));g.setTransform(1,0,0,1,0,0);g.drawImage(c,0,a,c.width,b-a,0,a,c.width,b-a);camT();}
+  else g.drawImage(c,0,y0*DPR,c.width,(y1-y0)*DPR,0,y0,W,y1-y0);}
 function tiled(c,par,y,h){const LW=B.LW,o=((B.scroll*par)%LW+LW)%LW;g.drawImage(c,-o,y,LW,h);if(LW-o<W)g.drawImage(c,LW-o,y,LW,h);}
 function drawBG(t){const P=B.bgP;
   // v15 speed-up: while the team stands still the background layers are merged into 2 cached pictures (2 copies per frame instead of 8)
   const still=B.phase!=='intro'&&B.phase!=='march'; // v16-25: before, the 2 full-screen caches were re-drawn EVERY frame while the background scrolled
-  if(still&&(B._cs!==B.scroll||B._cW!==W||B._cD!==BDPR||!B._cA)){B._cs=B.scroll;B._cW=W;B._cD=BDPR;
-    const mk=k=>{const c=BGC[k]||(BGC[k]=document.createElement('canvas'));const w=Math.round(W*BDPR),h=Math.round(H*BDPR);if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return c;};B._cA=mk('a');B._cB=mk('b');
+  if(still&&(B._cs!==B.scroll||B._cW!==W||B._cD!==DPR||!B._cA)){B._cs=B.scroll;B._cW=W;B._cD=DPR;
+    const mk=k=>{const c=BGC[k]||(BGC[k]=document.createElement('canvas'));const w=Math.round(W*DPR),h=Math.round(H*DPR);if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return c;};B._cA=mk('a');B._cB=mk('b');
     const g0=g;for(const [cv0,f] of [[B._cA,()=>{g.drawImage(B.bgSky,0,0,W,HOR+40);tiled(B.bgFar,.15,0,HOR+30);}],[B._cB,()=>{tiled(B.bgMid,.4,B.midY,B.midH);g.drawImage(B.bgGround,0,HOR-10,W,H-HOR+10);tiled(B.bgDet,1,HOR-10,H-HOR+10);}]]){
-      const x2=cv0.getContext('2d');x2.setTransform(BDPR,0,0,BDPR,0,0);x2.clearRect(0,0,W,H);g=x2;try{f();}finally{g=g0;}}}
-  if(still&&B._cA){g.drawImage(B._cA,0,0,W,H);
+      const x2=cv0.getContext('2d');x2.setTransform(DPR,0,0,DPR,0,0);x2.clearRect(0,0,W,H);g=x2;try{f();}finally{g=g0;}}}
+  if(still&&B._cA){bgBlit(B._cA,0,HOR+40);
   // smoke from stacks (behind mountains rim)
     const of=((B.scroll*.15)%B.LW+B.LW)%B.LW;
     for(const s of B.bgo.stacks){for(const X0 of[s.x-of,s.x-of+B.LW]){if(X0<-40||X0>W+40)continue;
       for(let k=0;k<6;k++){const p=((t*.18+k/6+s.x*.01)%1);g.fillStyle=P.night?'rgba(60,50,60,'+(.35*(1-p))+')':'rgba(90,80,90,'+(.3*(1-p))+')';circ(g,X0+p*40+Math.sin(p*5+k)*6,s.y-p*90,s.w*.5+p*22);}}}
     if(B.bgo.volc)for(const v of B.bgo.volc){for(const X0 of[v.x-of,v.x-of+B.LW]){if(X0<-120||X0>W+120)continue;for(let k=0;k<7;k++){const p=((t*.12+k/7)%1);g.fillStyle='rgba(50,40,40,'+(.42*(1-p))+')';circ(g,X0+p*60+Math.sin(p*4+k)*10,v.y-p*HOR*.55,10+p*34);}}}
     for(const cr of B.bgo.cranes){for(const X0 of[cr.x-of,cr.x-of+B.LW]){if(X0<-150||X0>W+150)continue;const sw=Math.sin(t*.6+cr.x)*.18,ax=X0+70;g.strokeStyle=P.far2;g.lineWidth=1;g.beginPath();g.moveTo(ax,cr.y+4);const ex=ax+Math.sin(sw)*40,ey=cr.y+4+Math.cos(sw)*40;g.lineTo(ex,ey);g.stroke();g.fillStyle=P.far2;ell(g,ex,ey+3,8,3.5);}}
-    g.drawImage(B._cB,0,0,W,H);
+    bgBlit(B._cB,B.midY,H);
   const om=((B.scroll*.4)%B.LW+B.LW)%B.LW;
   for(const f of B.bgo.fires){for(const X0 of[f.x-om,f.x-om+B.LW]){if(X0<-20||X0>W+20)continue;const y=B.midY+f.y;
     const fl=g.createRadialGradient(X0,y,1,X0,y,26);fl.addColorStop(0,'rgba(255,170,60,.45)');fl.addColorStop(1,'rgba(255,90,20,0)');g.fillStyle=fl;circ(g,X0,y,26);
@@ -1853,7 +1858,7 @@ function camT(){const z=1+(B.zoom||0);g.setTransform(DPR*z,0,0,DPR*z,DPR*(W/2*(1
 function punch(z){if(!B.sim)B.zoom=Math.max(B.zoom||0,z);}
 function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
   let sx=0,sy=0;if(B.shake>0){sx=rnd(-1,1)*B.shake;sy=rnd(-1,1)*B.shake*.6;}
-  B.sx=sx;B.sy=sy;g.save();camT();
+  B.sx=sx;B.sy=sy;if(sx||sy){g.fillStyle='#000';g.fillRect(0,0,W,H);}g.save();camT();
   drawBG(t);drawTele(t);drawGroundFx();drawFx2(true);
   const all=[...B.heroes,...B.mons].sort((a,b)=>a.d-b.d||(a.dead?-1:1));
   for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?1:1.22);drawUnit(g,u,B.t);}
@@ -1871,8 +1876,8 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);
     let left=raw*ts;while(left>0){const s=Math.min(1/60,left);step(s);left-=s;}}
   const t0=performance.now();render();
   // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".
-  // Now: only the drawing time counts, the first 2 s are ignored, and lower quality starts at the next wave change (hidden by the march) or next battle.
-  if(B.real>2){B.perf.push(performance.now()-t0);if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>22&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}}}
+  // Now: the first 2 s are ignored (on phones the drawing happens on the graphics chip, so the frame time must count too), and lower quality starts at the next wave change (hidden by the march) or next battle.
+  if(B.real>2){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}}}
   if(LOWRES&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}}
 cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
   if(h.id==='fx'){FX2=!FX2;try{localStorage.setItem('te_fx2',FX2?'1':'0');}catch(e){}if(FX2)fxPre();B.fx2=[];}
