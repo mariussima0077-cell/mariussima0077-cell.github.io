@@ -601,7 +601,7 @@ function muzzle(u,dx,dy){const d=u.spr,k=dsc(u.d);if(!sprOK(d))return[u.x+u.face
   return[u.x+u.face*(d.m[0]-d.a[0])*SPK*k,fy(u.d)-(u.lift||0)-(d.a[1]-d.m[1])*SPK*k];}
 function sprFrame(u,t){const a=u.act;
   if(u.dead)return[4,u.deadT<.25?2:3];
-  if(a&&a.k==='leap'){const k=a.t/a.dur;return[3,k<.2?0:k<.55?1:2];}
+  if(a&&a.k==='leap'){const k=a.t/a.dur;return[3,k<.2?0:k<.55||u.h.id==='m0_2'?1:2];} // Tom: his falling frame has a backpack he never wears → keep the jump frame
   if(a&&a.k==='dash'){if(a.back)return[1,Math.floor(u.wph/TAU*4+40)%4];return[3,a.t<.09?0:1+Math.floor(a.t/.06)%2];}
   if(a&&a.k==='cast'){const n=u.role==='paint'?3:4;return[3,Math.min(n-1,Math.floor(a.t/a.dur*n))];}
   if(u.land>0)return[3,u.role==='paint'?2:3];

@@ -8,7 +8,8 @@
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v16-6'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v16-7'`.
+  - **v16-7 (14 nov)**: Tom Wrench – cadrul de cădere din skill (rândul 4, cadrul 3) are un rucsac pe care nu-l poartă în rest → în aer rămâne pe cadrul de săritură, apoi aterizarea. Regula lui Marius: când o poză are o problemă, Claude caută singur o soluție (decupează, mută, prelungește) și îi spune ce a făcut.
   - **v16-6 (14 nov)**: primii 10 mecanici Common au avatare + ANIMAȚII în bătălie din sprite sheet-urile lui Marius (Rusty Joe, Benny Bolt, Tom Wrench, Ollie Oil, Mia Brush, Dan Dent, Sam Spark, Pete Gauge, Kim Tablet, Ricky Rev = `m0_0..m0_9`). Atlas `img/hero/sp_m0_X.webp` (4×6 cadre de 192 px, fond scos), originalele în `img/sheets/`. Cod: `SPRD` / `sprFrame` / `drawSprHero` în `battle.js` (a = punctul picioarelor, m = de unde iese efectul atacului, ca laserul/fulgerul/vopseaua să continue până la monstru). Explozia de vopsea din poză (Mia, Dan) apare la bomba-skill. Pentru eroi noi: adaugă-i în `SPRD` + `HPIC` (index.html) + `sw.js`.
   - **v16-5 (14 nov)**: avatarele lui Rusty Joe, Benny Bolt, Tom Wrench, Ollie Oil, Mia Brush = decupate din sprite sheet-urile lui Marius (4×6 cadre, 256 px, fond verde) → `img/hero/m0_0..4.webp` (+ `…s.webp` = siluetă pt. eroi nedescoperiți). Apar peste tot (summon, colecție, echipă, bătălie) prin `HPIC` din `portrait()`. Sheet-urile întregi pot fi folosite mai târziu pt. animațiile din bătălie (rânduri: idle, mers, atac, skill, lovit/KO, victorie).
   - **v16-4 (14 nov)**: un tester a zis că „nu poate ataca” în bătălie. Nu s-a reprodus (eroii atacă singuri, testat pe 3 ecrane + telefon lent). Adăugat: mesaj la primele 3 bătălii + la atingerea câmpului („mechanics attack on their own · tap a card when it shows TAP!”); atingerea cardurilor calculată față de canvas (mai sigur pe unele telefoane). De aflat de la tester: model telefon + captură.
@@ -78,7 +79,7 @@
 ## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
 - Orice schimbare se verifică întâi cu `PLAY_RULES.md`.
-- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-7`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-8`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.
