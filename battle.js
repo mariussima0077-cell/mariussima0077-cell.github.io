@@ -221,6 +221,7 @@ css.textContent=`
 #gsTiles{gap:5px!important}
 .gsT b{font-size:11px!important;text-shadow:0 1px 0 #000}
 .gsT .fs{font-size:12px!important}
+.gpBar{position:relative;height:24px;border-radius:12px;background:#05080e;box-shadow:inset 0 0 0 1.5px #6b5420;overflow:hidden}.gpBar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#b8860b,#ffd54a)}.gpBar span{position:relative;line-height:24px;text-shadow:0 1px 2px #000}
 #gsPity{background:linear-gradient(#141c2b,#0a0e17)!important;border:2px solid #e0a82e!important;color:#fff!important;font-size:14px!important;font-weight:800!important;box-shadow:0 0 12px #ffb30033}
 .gsBtn{height:78px!important;border-radius:16px!important;background:linear-gradient(#5ab4ff,#1f6fe0 55%,#0f3f9c)!important;box-shadow:0 0 0 2px #8fd0ff,0 5px 0 #082a66,0 0 18px #2f8cff88!important}
 .gsBtn b{font-size:22px!important;font-style:italic}
@@ -458,7 +459,7 @@ CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
 const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345]]; // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
 const stageMul=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
-const REWARD=i=>{const s=STAGES[i];return {money:Math.round((i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?5:s.mini?3:1,gtk:s.boss?5:s.mini?3:1};};
+const REWARD=i=>{const s=STAGES[i];return {money:Math.round((i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?5:s.mini?3:1,gtk:s.boss?5:s.mini?3:1,ct:s.boss?3:s.mini?1:0,dm:s.boss?100:s.mini?30:10};};
 const sLabel=i=>(STAGES[i].c+1)+'-'+(STAGES[i].j+1);
 
 // ---------------------------------------------------------------- GEAR (works only in battles)
@@ -1920,11 +1921,12 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);const T=TE(
     const drops=[];const big=S0.boss||S0.mini;const n=first?(S0.boss?2:1):(big||Math.random()<.4?1:0);for(let k=0;k<n;k++)drops.push(dropItem(S0.c,big));
     let sold=0;drops.forEach(d=>{if(d.sold){sold+=d.sold;G.money+=d.sold;}});
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;
+    const ct=first?R.ct:0,dmw=first?R.dm:0;if(ct)G.h.ct+=ct;if(dmw)G.dm=(G.dm||0)+dmw; // v16-37: bosses give Crew Tickets + Diamonds
     T.save();if(tk)T.addTickets(tk,'Campaign '+lab);
     const chDone=first&&S0.boss&&S0.c<NCH-1;
     html=`<div class="big" style="color:#ffd54a">VICTORY!</div><div class="stars">${'⭐'.repeat(st)}${'<span style="opacity:.25">⭐</span>'.repeat(3-st)}</div>
       <div class="sub">STAGE ${lab} · ${S0.n.toUpperCase()}</div>${chDone?`<div class="chUn">CHAPTER ${S0.c+1} CLEARED!<br><small>Chapter ${S0.c+2} · ${CHAP[S0.c+1].n} is now open</small></div>`:''}<div class="cpSec">${first?'FIRST CLEAR REWARDS':'REPLAY REWARD'}</div>
-      <div class="rw"><span>${IMGI(badge('coin','#ffb300'))} ${T.fmt(money)}</span>${tk?`<span>${TKI} +${tk}</span>`:''}${gtk?`<span>${GTKI} +${gtk}</span>`:''}</div>
+      <div class="rw"><span>${IMGI(badge('coin','#ffb300'))} ${T.fmt(money)}</span>${tk?`<span>${TKI} +${tk}</span>`:''}${gtk?`<span>${GTKI} +${gtk}</span>`:''}${ct?`<span><img class="tki" src="img/cticket.webp" style="height:1.15em;vertical-align:-.25em"> +${ct}</span>`:''}${dmw?`<span>${T.DMI} +${dmw}</span>`:''}</div>
       ${drops.length?`<div class="cpSec">${IMGI(glyphURL('bag','#ffb300'))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">Bag full (${GINV}) – sold for ${T.fmt(sold)}</div>`:''}`:''}
       <div class="sub" style="margin-top:10px">${st<3?'⭐⭐⭐ = finish with no mechanic knocked out':'Perfect! No mechanic was knocked out.'}</div>
       ${si<NST-1?'<div class="anx" data-a="atog"><span>⟳ AUTO NEXT</span><i id="anxC"></i><b id="anxS"></b></div>':''}
@@ -2037,7 +2039,7 @@ function openCard(i){const T=TE(),G=T.G,s=STAGES[i],C=CHAP[s.c],first=i>=G.cp.be
    <div class="cpSec">ENEMIES</div><div class="mons" id="cpMons"></div>
    <div class="cpSec">POWER</div><div style="display:flex;justify-content:space-around;font-weight:900"><div>Enemy <span style="color:#ff8a80">${IMGI(glyphURL('swords','#ff8a80'),'1em','-.12em')} ${ep.toLocaleString()}</span></div><div>Your team <span style="color:${col}">${IMGI(glyphURL('swords',col),'1em','-.12em')} ${tp.toLocaleString()}</span></div></div>
    ${(()=>{const st=G.cp.stuck;if(i!==G.cp.best||!st||st.si!==i)return '';const gk=Math.min(8,Math.floor((Date.now()-st.t)/216e5)),nx=gk<8?Math.ceil((216e5-(Date.now()-st.t)%216e5)/36e5):0;return `<div class="grit">🔥 NEVER GIVE UP: <b>+${Math.round(gk*7.5)}%</b> HP &amp; attack for this stage${gk<8?` · next +7.5% in ~${nx}h (max +60%)`:' (max)'}</div>`;})()}
-   <div class="cpSec">${first?'FIRST CLEAR REWARDS':'REPLAY REWARD'}</div><div class="rw"><span>${IMGI(badge('coin','#ffb300'))} ${T.fmt(first?R.money:Math.round(R.money*.25/10)*10)}</span>${first?`<span>${TKI} +${R.tk}</span>`:''}<span>${IMGI(glyphURL('bag','#ffd54a'))} ${first?(s.boss?'2 gear ★':big?'1 gear ★':'1 gear'):(big?'1 gear':'40% gear')}</span></div>
+   <div class="cpSec">${first?'FIRST CLEAR REWARDS':'REPLAY REWARD'}</div><div class="rw"><span>${IMGI(badge('coin','#ffb300'))} ${T.fmt(first?R.money:Math.round(R.money*.25/10)*10)}</span>${first?`<span>${TKI} +${R.tk}</span>${R.ct?`<span><img class="tki" src="img/cticket.webp" style="height:1.15em;vertical-align:-.25em"> +${R.ct}</span>`:''}<span>${T.DMI} +${R.dm}</span>`:''}<span>${IMGI(glyphURL('bag','#ffd54a'))} ${first?(s.boss?'2 gear ★':big?'1 gear ★':'1 gear'):(big?'1 gear':'40% gear')}</span></div>
    <div class="sub" style="margin-top:6px">Gear chance: ${['Common','Uncommon','Rare','Epic','Legendary','Mythic'].map((n,k)=>gdrop(s.c)[k]?`<span style="color:${T.GRADES[k].c}">${n} ${gdrop(s.c)[k]}%</span>`:'').filter(Boolean).join(' · ')}${big?' · ★ better':''}</div>
    <div class="cpRow"><button class="cpGo alt" data-a="close">BACK</button><button class="cpGo" data-a="team">${IMGI(glyphURL('swords','#2a1000'),'1em','-.12em')} BATTLE</button></div>`;
   const mc=$('cpMons');types.forEach(t=>{const d=document.createElement('div');d.className='mon'+(MON[t].boss?' bossm':'');d.appendChild(monPreview(t));const l=document.createElement('div');l.textContent=MON[t].n;d.appendChild(l);mc.appendChild(d);});
@@ -2185,6 +2187,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.s){const h=gHero(),it=h&&itemById((GR().eq[h.id]||{})[el.dataset.s]);if(it)popItem(it.id);else{gfil=el.dataset.s;renderGear();const iv=$('gInv');iv.scrollIntoView({behavior:'smooth',block:'start'});T.toast('Choose '+GS[el.dataset.s].n+' below – you will see before / after',2200);}return;}
   if(el.dataset.it)popItem(+el.dataset.it);});
 $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}G.cp.ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
+  if(a==='payOK'){const g=window.__payGo;window.__payGo=null;closePop();if(g)g();return;}
   if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsGear'){closePop();closeGSum();openGear();return;}
   if(a==='x'){closePop();return;}
   if(a==='tcmp'){popTeamCmp(+el.dataset.k,el.dataset.id||null);return;}
@@ -2201,15 +2204,16 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
 
 // ---------------------------------------------------------------- v14: GEAR SUMMON (blue Gear Tickets · gear works only in battles)
 const GTKI='<img src="img/gticket.webp" style="height:1.15em;vertical-align:-.25em" onerror="this.replaceWith(\'🎫\')">';
-const GS_RATE=[45,28,16,8,2.5,.5], GS_PITY={e:10,l:50,m:200};
+const GS_RATE=[45,28,16,8,2.5,.5], GS_PITY={l:500}; // v16-37: only one pity – Legendary every 500 (Marius)
 const GS_NAMES=['Common','Uncommon','Rare','Epic','Legendary','Mythic'];
 function GSD(){const g=GR();if(g.tk==null)g.tk=10;if(!g.pity)g.pity={e:0,l:0,m:0};if(!g.hist)g.hist=[];if(g.sum==null)g.sum=0;return g;}
 function addGTk(n,why){const g=GSD();g.tk+=n;TE().save();if(why)TE().toast(GTKI+' +'+n+' Gear Ticket'+(n>1?'s':'')+' · '+why,2600);gsBadge();}
 function gsRoll(){const g=GSD(),p=g.pity;p.e++;p.l++;p.m++;let x=Math.random()*100,r=0;for(;r<5;r++){x-=GS_RATE[r];if(x<0)break;}r=Math.min(5,r);
-  if(p.m>=GS_PITY.m)r=5;else if(p.l>=GS_PITY.l&&r<4)r=4;else if(p.e>=GS_PITY.e&&r<3)r=3;
-  if(r>=3)p.e=0;if(r>=4)p.l=0;if(r>=5)p.m=0;return r;}
-function gsummon(n){const T=TE(),g=GSD();if(g.tk<n){T.toast(GTKI+' Not enough Gear Tickets – win campaign stages to get more',2600);return;}
-  g.tk-=n;const cnt=n===10?11:1,res=[];let sold=0;
+  if(p.l>=GS_PITY.l&&r<4)r=4;
+  if(r>=4)p.l=0;return r;}
+function gsummon(n,paid){const T=TE(),g=GSD();
+  if(!paid&&g.tk<n){const have=g.tk;T.payAsk(have,n,GTKI,'Gear Tickets',()=>{g.tk-=have;T.G.dm-=(n-have)*T.DM_SUM;gsummon(n,1);},pop);return;}
+  if(!paid)g.tk-=n;const cnt=n===10?11:1,res=[];let sold=0;
   for(let k=0;k<cnt;k++){const r=gsRoll(),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,r);g.sum++;
     g.hist.unshift({s:it.s,r,t:Date.now()});if(g.inv.length>=GINV){sold+=salvageV(it);res.push({it,sold:1});}else{g.inv.push(it);res.push({it});}}
   g.hist.length=Math.min(g.hist.length,60);if(sold)T.G.money+=sold;T.save();gsBadge();renderGSum();gsResults(res,n,sold);}
@@ -2236,18 +2240,18 @@ function closeGSum(){$('gSum').classList.remove('open');cancelAnimationFrame(gsR
 function renderGSum(){const T=TE(),g=GSD(),p=g.pity;
   $('gsTk').innerHTML=GTKI+' '+g.tk;
   $('gsTiles').innerHTML=gsTiles();
-  $('gsPity').innerHTML=`<div><b>${GS_PITY.e-p.e}</b> summons to a guaranteed <b style="color:${T.GRADES[3].c}">Epic</b> or better</div><div><b>${GS_PITY.l-p.l}</b> to a guaranteed <b style="color:${T.GRADES[4].c}">Legendary</b> · <b>${GS_PITY.m-p.m}</b> to a guaranteed <b style="color:${T.GRADES[5].c}">Mythic</b></div>`;
-  $('gsB1').className='gsBtn'+(g.tk<1?' dis':'');$('gsB10').className='gsBtn big'+(g.tk<10?' dis':'');
+  $('gsPity').innerHTML=`<div class="gpBar"><i style="width:${Math.min(100,p.l/GS_PITY.l*100).toFixed(1)}%"></i><span>💛 LEGENDARY PITY <b>${p.l} / ${GS_PITY.l}</b></span></div><div style="margin-top:4px">${T.DMI} ${(T.G.dm||0).toLocaleString()} · no tickets? ${T.DM_SUM} ${T.DMI} = 1 summon</div>`;
+  const dm=T.G.dm||0;$('gsB1').className='gsBtn'+(g.tk<1&&dm<T.DM_SUM?' dis':'');$('gsB10').className='gsBtn big'+(g.tk+Math.floor(dm/T.DM_SUM)<10?' dis':'');
   $('gsBag').textContent='BAG '+g.inv.length+'/'+GINV;}
 function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r));
   let x=`<h2 style="color:${T.GRADES[best].c}">${best>=5?'MYTHIC GEAR!':best>=4?'LEGENDARY GEAR!':'GEAR SUMMONED'}</h2><div class="sub">${res.length} item${res.length>1?'s':''}${n===10?' · +1 BONUS':''}</div>
    <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${T.GRADES[o.it.r].c}">${GS_NAMES[o.it.r]}</i><i>${itemName(o.it)}</i>${o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
    ${sold?`<div class="sub">Bag full (${GINV}) – extra gear sold for ${T.fmt(sold)}</div>`:''}
-   <div class="cpRow"><button class="cpGo${GSD().tk<n?' dis':''}" data-p="gsAgain" data-n="${n}">AGAIN x${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
+   <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}">AGAIN x${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
 function gsRates(){const T=TE();pop(`<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">GEAR</span><div class="gsRates">${GS_RATE.map((p,r)=>`<div><b style="color:${T.GRADES[r].c}">${GS_NAMES[r]}</b><span>${p}%</span><small>max Lv ${GMAXR[r]} · ${GSUBN[r]} bonus stat${GSUBN[r]===1?'':'s'}</small></div>`).join('')}</div>
-  <div class="pD" style="margin-top:8px">Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).<br><b>Summon x10</b> gives <b>11</b> pieces.<br>Guaranteed: <b>Epic+</b> every ${GS_PITY.e}, <b>Legendary+</b> every ${GS_PITY.l}, <b>Mythic</b> every ${GS_PITY.m} summons.</div>
-  <div class="cpSec">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="pD">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b><br>Start: 10 tickets.</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}
+  <div class="pD" style="margin-top:8px">Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).<br><b>Summon x10</b> gives <b>11</b> pieces.<br>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons (no other pity).<br>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div>
+  <div class="cpSec">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="pD">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}
 function gsHist(){const T=TE(),g=GSD();pop(`<div class="pT pic"><img src="img/ui/t_hist.webp" alt="SUMMON HISTORY"></div><span class="pSub blue">Last ${g.hist.length} of ${g.sum} gear summons</span><div class="gsHist">${g.hist.length?g.hist.map(o=>`<div><img src="${itemIconURL(o.s,o.r)}"><b style="color:${T.GRADES[o.r].c}">${GNAMES[o.s][o.r]}</b><small style="color:${T.GRADES[o.r].c}">${GS_NAMES[o.r]}</small></div>`).join(''):'<div class="pD">Nothing yet.</div>'}</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}
 
 // ---------------------------------------------------------------- open / close

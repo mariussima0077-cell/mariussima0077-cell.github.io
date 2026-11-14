@@ -136,6 +136,10 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 .smFree{display:flex;align-items:center;justify-content:center;border-radius:calc(var(--u)*28);background:linear-gradient(#b388ff,#6a1b9a);color:#fff;font-weight:900;font-size:calc(var(--u)*34);box-shadow:0 0 calc(var(--u)*16) #b388ff;pointer-events:none}
 .smPity{display:flex;align-items:center;justify-content:center;color:#cfd8dc;font-weight:800;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000;pointer-events:none}
 .smPity b{color:#ffd54a;margin:0 .3em}
+.pBar{position:relative;width:100%;height:100%;border-radius:calc(var(--u)*18);background:#0b1118;box-shadow:inset 0 0 0 calc(var(--u)*2) #6b5420;overflow:hidden}
+.pBar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#b8860b,#ffd54a);box-shadow:0 0 calc(var(--u)*12) #ffb300}
+.pBar span{position:relative;display:flex;height:100%;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000}
+.payBox{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 4px}.payBox div{background:#0d151e;border:1.5px solid #e0aa25;border-radius:12px;padding:6px 12px;text-align:center;font-size:18px;color:#fff}.payBox small{display:block;font-size:10px;color:#9fb0c0}.payBox span{font:900 22px system-ui;color:#ffd54a}
 .smCnt{color:#ffd54a;font-weight:900;font-size:calc(var(--u)*22);text-align:center;text-shadow:0 1px 2px #000;pointer-events:none}
 .smBan{overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#5a3d0a 0%,#1a1206 45%,#0b0f14 80%);border-bottom:calc(var(--u)*4) solid #ffb300;pointer-events:none}
 .smBan>*{position:absolute}
@@ -433,6 +437,15 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 body:has(#xp.open) #toast{top:auto;bottom:30px}
 #xpBody{flex:1;overflow-y:auto;touch-action:pan-y;padding:12px 12px 34px}
 .ciGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.c5Top{text-align:center;padding:12px 10px 14px;border-radius:16px;background:linear-gradient(#4a2f08,#1a1003);box-shadow:0 0 0 2px #ffb300,0 0 18px #ffb30044;margin-bottom:12px}
+.c5Big{font:900 40px system-ui;color:#ffd54a;text-shadow:0 3px 0 #5a3500}.c5Big small{font-size:18px;color:#e0c6ad}
+.c5Lbl{font:900 11px system-ui;letter-spacing:1px;color:#e0c6ad;margin:2px 0 8px}
+.c5Bar{height:14px;border-radius:7px;background:#0b0703;box-shadow:inset 0 0 0 1.5px #6b5420;overflow:hidden}.c5Bar i{display:block;height:100%;background:linear-gradient(90deg,#ff9800,#ffd54a)}
+.c5Each{margin-top:8px;font:800 12px system-ui;color:#fff}.c5Each img{height:18px;vertical-align:-4px}
+.c5Grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.c5D{border-radius:10px;padding:4px 2px;text-align:center;background:linear-gradient(#1f2a38,#0e141c);box-shadow:0 0 0 1.5px #3d4a5e}
+.c5D b{display:block;font:800 8.5px system-ui;color:#9fb3c8}.c5D span{font:900 15px system-ui;color:#fff}
+.c5D.done{opacity:.45}.c5D.done span{color:#7CFC9A}.c5D.now{box-shadow:0 0 0 2px #ffd54a,0 0 12px #ffb300;background:linear-gradient(#5a3d0a,#22160a)}.c5D.big{background:linear-gradient(#3a1f5a,#160a22)}
 .ciD{position:relative;border-radius:14px;padding:6px 3px 8px;text-align:center;background:linear-gradient(#1f2a38,#0e141c);box-shadow:0 0 0 1.5px #3d4a5e;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
 .ciD.big{grid-column:span 2;background:linear-gradient(#4a2f08,#1a1003);box-shadow:0 0 0 2px #ffb300,0 0 16px #ffb30055}
 .ciD b{font-size:11px;color:#9fb3c8;letter-spacing:.5px}
@@ -520,6 +533,7 @@ const PB={x:905,y:96,w:196,h:197};           // parts building (my picture)
 const COL={x:1300,y:528,w:190,h:Math.round(190*1033/560)}, COL_RX=1395; // collection garage (classic cars showroom)
 const SOON={rail:{x:40,y:SY+52,w:800,h:250},railY:SY+337};
 // =================== v16: CAR WASH · GAS STATION · CAR FACTORY (my pictures LV1-LV4; LV5-10 = only benefits) ===================
+const SVC_Y=TRAIL_Y+80; // v16-37: service road – the garages are linked to the car wash and the gas station
 const DS_B=TRAIL_Y+338, XLOOP=322, XLANE_Y=TRAIL_Y+47, XCON=740, XIDS=['wash','gas','factory'];
 const XART={"wash1":{"w":684,"h":771,"lv":[208,333,458,390]},"wash2":{"w":726,"h":794,"lv":[228,349,500,406]},"wash3":{"w":730,"h":795,"lv":[225,349,482,406]},"wash4":{"w":796,"h":813,"lv":[261,359,520,416]},"gas1":{"w":701,"h":734,"lv":[240,245,455,293]},"gas2":{"w":844,"h":803,"lv":[310,310,570,366]},"gas3":{"w":807,"h":807,"lv":[300,300,552,364]},"gas4":{"w":888,"h":825,"lv":[310,312,575,378]},"factory1":{"w":1600,"h":503,"lv":[709,217,884,254]},"factory2":{"w":1600,"h":518,"lv":[707,229,891,264]},"factory3":{"w":1600,"h":521,"lv":[705,223,884,262]},"factory4":{"w":1600,"h":523,"lv":[699,226,887,272]}};
 const XM={wash:{cx:168,h:270,plate:'#02101a',col:'#1e88e5'},gas:{cx:510,h:290,plate:'#5c0707',col:'#d32f2f'},factory:{cx:1112,w:640,plate:'#03121b',col:'#f9a825'}};
@@ -554,7 +568,9 @@ const PACK_KEY='torqueEmpire_packs';
 const PK={car:false,vip:false,sub:0,spd2:false};
 try{Object.assign(PK,JSON.parse(localStorage.getItem(PACK_KEY))||{});}catch(e){}
 function savePacks(){try{localStorage.setItem(PACK_KEY,JSON.stringify(PK));}catch(e){}}
-const VIP_BOOST=1.3, VIP_CAR_EVERY=40;
+// v16-37: slower economy (Marius: "make money a bit harder") – income ×0.8, building costs ×1.2
+const ECO=.8, COST_M=1.2, BUYER_DRIVE=.45;
+const VIP_BOOST=1.25, VIP_CAR_EVERY=40; // v16-37: VIP Crew Boost = every mechanic +25% speed & money
 
 // =================== CONFIG ===================
 const ST={
@@ -666,15 +682,15 @@ const SKINS=['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac'], HAIRS=['#2b1d14
 
 // =================== STATE ===================
 const SAVE_KEY='torqueEmpire_v15';
-const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,ct:5,ctInit:1,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0},c:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
+const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,ct:5,ctInit:1,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0},c:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},dm:0,lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
-function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;if(s.ci)G.ci=s.ci;if(s.nw)G.nw=s.nw;if(s.ml)G.ml=s.ml;G.rep=repFor(G.xp);}}catch(e){}}
+function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;if(s.ci)G.ci=s.ci;if(s.nw)G.nw=s.nw;if(s.ml)G.ml=s.ml;if(s.dm)G.dm=s.dm;if(s.c5)G.c5=s.c5;G.rep=repFor(G.xp);}}catch(e){}}
 function save(){if(window.__noSave)return;try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
 load();
 let time=0, started=false, SPD=1;
 
 // =================== VIP (levels 1-20) — points only from Daily Quests ===================
-const VIP_MAX=20, SUB_MULT=1.3, SUB_DAYS=30, SUB_PRICE='€5.99';
+const VIP_MAX=20, SUB_MULT=1.5, SUB_DAYS=30, SUB_PRICE='€5.99';
 // v8: VIP 20 = 28,000 points ≈ 6 months of daily quests (max ~155 points/day)
 const VIP_PTS=[0];for(let n=1;n<=VIP_MAX;n++)VIP_PTS.push(n===VIP_MAX?28000:Math.round(50*Math.pow(n,Math.log(560)/Math.log(20))/10)*10);
 const VIP_BEN=[
@@ -692,12 +708,12 @@ function benAt(b,l,sub){return Math.max(0,l-b.from+1)*(b.per||.01)*(sub?SUB_MULT
 const VB=k=>VBC[k]||0;
 const pctT=(v,neg)=>(neg?'−':'+')+(Math.round(v*1000)/10)+'%';
 function addVip(n){const l0=VLV;G.vip+=n;vipRefresh();save();
-  if(VLV>l0){G.h.tk+=5*(VLV-l0);G.h.ct+=3*(VLV-l0);save();toast('👑 VIP '+VLV+'! Your benefits went up · '+TKI+' +'+5*(VLV-l0)+' · '+CTI+' +'+3*(VLV-l0),5000);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');
+  if(VLV>l0){G.h.tk+=5*(VLV-l0);G.h.ct+=3*(VLV-l0);G.dm=(G.dm||0)+100*(VLV-l0);save();toast('👑 VIP '+VLV+'! Your benefits went up · '+TKI+' +'+5*(VLV-l0)+' · '+CTI+' +'+3*(VLV-l0)+' · '+DMI+' +'+100*(VLV-l0),5000);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#b388ff'])});}}
 vipRefresh();
 
 // =================== DAILY QUESTS (reward: VIP points only) ===================
-const DQ_GIFTS=[{need:2,vip:10,tk:1},{need:3,vip:15,tk:2},{need:4,vip:20,tk:2},{need:5,vip:30,tk:3}];
+const DQ_GIFTS=[{need:2,vip:10,tk:1,dm:20},{need:3,vip:15,tk:2,dm:30},{need:4,vip:20,tk:2,dm:40},{need:5,vip:30,tk:3,dm:60}];
 const QR=()=>Math.min(G.rep,10); // v16-36: daily quests stop growing after Rep 10
 const QN=[6,10,14,18,22,26], QEARN=[1500,3000,6000,12000,25000,50000];
 const QPOOL=[
@@ -862,7 +878,7 @@ function ensureStaff(){
     while(arr.length<lv){const k=arr.length,h=loc.homes[k];
       const col=ST[id]?ST[id].color:DRV_VEST[id];
       arr.push({pool:id,k,loc,busy:false,car:null,p:mkPerson({x:h.x,y:h.y,a:loc.homeA,suit:'#263238',vest:'#ffd600',cap:col,spd:1+drvBonus(id,k).spd})});}}
-  STIDS.forEach(id=>{const lv=PLV(id),S=ST[id];bays[id].forEach((b,j)=>{if(j<lv&&!b.mech)b.mech=mkPerson({x:b.idle.x,y:b.idle.y,a:b.idleA,suit:S.suit,cap:S.cap,pants:shade(S.suit,-.35),u:0,tool:id==='paint'?'#9e9e9e':'#cfd8dc',st:id,bj:j,mode:'idle',cel:0,ph:Math.random()*4});if(b.mech&&j===0)b.mech.vip=PK.vip;});});
+  STIDS.forEach(id=>{const lv=PLV(id),S=ST[id];bays[id].forEach((b,j)=>{if(j<lv&&!b.mech)b.mech=mkPerson({x:b.idle.x,y:b.idle.y,a:b.idleA,suit:S.suit,cap:S.cap,pants:shade(S.suit,-.35),u:0,tool:id==='paint'?'#9e9e9e':'#cfd8dc',st:id,bj:j,mode:'idle',cel:0,ph:Math.random()*4});});});
 }
 const tierOf=pool=>G.lv[pool]-1; // scooter model follows the real level (1-10)
 const carSide=c=>{const o=c.type.W/2+7;return{x:c.x+Math.sin(c.a)*o,y:c.y-Math.cos(c.a)*o};};
@@ -897,8 +913,8 @@ let vipCarT=VIP_CAR_EVERY-8;
 function trySpawn(){
   if(cars.some(c=>c.arriving&&c.x<60))return false;
   const n=PLV('parking')*4,sp=arrSpots.find(s=>s.i<n&&!s.car);if(!sp)return false;
-  const wantVip=PK.car&&vipCarT>=VIP_CAR_EVERY&&!cars.some(c=>c.type.vip);
-  const c=newCar(wantVip);if(wantVip){vipCarT=0;toast('⭐ Your VIP client is here with his executive sedan!',3500);}
+  if(VT.hold||VT.st==='in'||VT.st==='unload')return false; // the VIP truck uses the entrance
+  const c=newCar(false);
   c.arriving=true;sp.car=c;c.slot=sp;
   const lane=offsetPath(route(carG,{x:AV,y:170},sp.road),LN);
   c.path=roundPath([{x:-70,y:96},{x:lane[0].x,y:96},...lane,sp.entry,...inn(sp),{x:sp.x,y:sp.y}],18);
@@ -923,6 +939,7 @@ function stepCar(c,dt){
   if(!p.rev){for(const o of cars){if(o===c||o.state==='loaded')continue;const rx=o.x-c.x,ry=o.y-c.y,f=rx*hx+ry*hy;
       if(f>0&&f<40&&Math.abs(rx*hy-ry*hx)<11){blocked=true;break;}}}
   else{for(const o of cars){if(o===c||o.state==='loaded'||!o.path.length||o.path[0].rev)continue;if(Math.hypot(o.x-c.x,o.y-c.y)<34){blocked=true;break;}}}
+  if(c.toX&&!p.rev&&Math.abs(c.x-COL_RX)<24&&c.y<TRAIL_Y-28&&c.y>TRAIL_Y-90&&hy>.5){const t=trailer;if((t.st==='leave'||t.st==='arrive')&&t.x<COL_RX+60&&t.x+trLen()+260>COL_RX-60){c.a=lerpA(c.a,ta,Math.min(1,dt*6));return;}}
   if(blocked){c.blockT+=dt;if(c.blockT<2.5)return;}else c.blockT=0;
   let sp=p.rev?(c.stolen?60:38):(c.arriving?95:(c.stolen?150:105));
   if(angDiff(c.a,ta)>.6)sp*=.35;
@@ -951,7 +968,7 @@ function nextTarget(c){
   return expSpots.find(s=>!s.car)||null;
 }
 function dispatch(){
-  for(const c of cars){
+  for(const c of (cars.some(o=>o.rich)?[...cars].sort((a,b)=>(b.rich|0)-(a.rich|0)):cars)){
     if((c.state!=='idle'&&c.state!=='sold')||c.path.length)continue;
     if(c.slot.kind==='exp'&&c.state!=='sold')continue;
     const pool=drivers[poolOf(c.slot)];if(!pool)continue;
@@ -973,7 +990,7 @@ function startDrive(c,d){
     p.onDone=()=>{d.busy=false;d.car=null;p.a=d.loc.homeA;};
   };
 }
-const vipBay=c=>PK.vip&&c.slot&&c.slot.kind==='bay'&&c.slot.j===0;
+const vipBay=c=>PK.vip&&c.slot&&c.slot.kind==='bay';
 function cheer(c){const m=c.slot&&c.slot.mech;if(m)m.cel=1.4;}
 function curJob(c){return c.jobs.find(j=>j.st===c.atS&&!j.done&&partsOK(j));}
 function work(dt){
@@ -988,13 +1005,13 @@ function work(dt){
   }
 }
 function finishInspect(c){
-  c.revealed=true;c.value+=(vipBay(c)?26:20)*(1+VB('income')+bayMB(c).inc+payB('inspect'));qAdd('inspect',1);c.work=0;c.state='idle';cheer(c);
+  c.revealed=true;c.value+=ECO*(c.rich?RICH_M:1)*(vipBay(c)?25:20)*(1+VB('income')+bayMB(c).inc+payB('inspect'));qAdd('inspect',1);c.work=0;c.state='idle';cheer(c);
   let np=0;for(const j of c.jobs)if(j.parts&&!j.order){const o={c,j,st:'ordered'};j.order=o;orders.push(o);np++;}
   float(c.x,c.y-30,'✓ '+c.jobs.length+' JOB'+(c.jobs.length>1?'S':'')+' FOUND','#7CFC9A');
   if(np)float(c.x,c.y-14,'📦 '+np+' PART'+(np>1?'S':'')+' ORDERED','#ffcc80');
 }
 function completeJob(c,j){
-  const vb=vipBay(c),mb=bayMB(c),crit=mb.crit>0&&Math.random()<mb.crit;j.done=true;c.value+=j.pay*c.type.m*(vb?VIP_BOOST:1)*(1+VB('income')+mb.inc+payB(j.st))*(crit?2:1);if(crit)float(c.x,c.y-58,'🎯 DOUBLE PAY!','#ff9800');qAdd('job',1,j.st);cheer(c);if(vb)float(c.x,c.y-46,'VIP +30%','#ffd54a');
+  const vb=vipBay(c),mb=bayMB(c),crit=mb.crit>0&&Math.random()<mb.crit;j.done=true;c.value+=ECO*(c.rich?RICH_M:1)*j.pay*c.type.m*(vb?VIP_BOOST:1)*(1+VB('income')+mb.inc+payB(j.st))*(crit?2:1);if(crit)float(c.x,c.y-58,'🎯 DOUBLE PAY!','#ff9800');qAdd('job',1,j.st);cheer(c);if(vb&&DET)float(c.x,c.y-46,'👑 +25%','#ffd54a');
   const t=c.tune;
   if(j.id==='respray'&&!c.type.liv)c.col=c.newCol;
   if(j.id==='polish'||j.id==='respray')c.dirt=0;
@@ -1007,21 +1024,29 @@ const agents=[0,1,2,3].map(k=>{const ch=BM.office.chairs[k];return{k,car:null,t:
 function sales(dt){
   const olv=G.lv.office;
   for(let j=0;j<PLV('office');j++){const a=agents[j];
-    if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
+    if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent&&c.rich)||cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
     else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale())*(1+repSale()));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
-      G.money+=price;G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip)driveAway(c);
+      G.money+=price;G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip||c.rich)driveAway(c);else if(Math.random()<BUYER_DRIVE)driveAway(c,1);
       const xp=1+c.jobs.reduce((s,j)=>s+j.xp,0);addXP(xp);
       float(c.x,c.y-30,'+'+fmt(price),'#ffd54a');float(a.p.x,a.p.y-22,'SOLD ONLINE','#b39ddb');save();}}
   }
 }
-function driveAway(c){const s=c.slot;c.state='leaving';c.siren=!!c.type.liv&&c.type.liv!=='taxi';
+// v16-37: clients leave through the business street: dirty cars → car wash, then our cheap diesel (−50%) at the gas station
+const DIRTY_P=.5;
+function driveAway(c,buyer){const s=c.slot;c.state='leaving';c.siren=!!c.type.liv&&c.type.liv!=='taxi';
+  if(G.lv.wash>0||G.lv.gas>0){if(Math.random()<DIRTY_P)c.dirt=rnd(.55,.9);c.xWash=G.lv.wash>0&&c.dirt>.4;c.xGas=G.lv.gas>0;
+    if(c.xWash||c.xGas){const cen=[...route(carG,s.road,{x:VR,y:Y2}),{x:COL_RX,y:Y2},{x:COL_RX,y:SVC_Y},{x:XCON,y:SVC_Y},{x:XCON,y:SY-LN}];
+      const lane=offsetPath(cen,LN),fwd=roundPath(lane,18);
+      c.path=[...innR(s),{x:s.entry.x,y:s.entry.y,rev:true},{x:lane[0].x,y:lane[0].y,rev:true,old:s},...fwd.slice(1)];c.slot=null;c.toX=1;
+      c.onArrive=()=>{c.gone=true;toDistrict(c);};
+      float(c.x,c.y-40,c.rich||c.type.vip?'💎 THANK YOU!':c.type.fleet?'🚨 BACK ON DUTY':'🔑 NEW OWNER','#ffd54a');return;}}
   const lane=offsetPath(route(carG,s.road,{x:AV,y:108}),LN),ex=lane[lane.length-1].x;
   const fwd=roundPath([...lane,{x:ex,y:72},{x:W+320,y:72}],18);
   c.path=[...innR(s),{x:s.entry.x,y:s.entry.y,rev:true},{x:lane[0].x,y:lane[0].y,rev:true,old:s},...fwd.slice(1)];c.slot=null;
   c.onArrive=()=>{c.gone=true;};
-  float(c.x,c.y-40,c.type.vip?'👑 SEE YOU SOON!':'🚨 BACK ON DUTY','#ffd54a');}
+  float(c.x,c.y-40,c.rich||c.type.vip?'💎 SEE YOU SOON!':c.type.fleet?'🚨 BACK ON DUTY':'🔑 NEW OWNER','#ffd54a');}
 function addXP(n){const r0=G.rep;G.xp+=n;G.rep=repFor(G.xp);
-  if(G.rep>r0){const gb=repGift(G.rep);G.h.tk+=gb?15:5;G.h.ct+=gb?8:3;toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +'+(gb?15:5)+' · '+CTI+' +'+(gb?8:3)+' · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
+  if(G.rep>r0){const gb=repGift(G.rep);G.h.tk+=gb?15:5;G.h.ct+=gb?8:3;G.dm=(G.dm||0)+(gb?200:100);toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +'+(gb?15:5)+' · '+CTI+' +'+(gb?8:3)+' · '+DMI+' +'+(gb?200:100)+' · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
     const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'REPUTATION '+G.rep+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#ff9800'])});}}
 
@@ -1204,8 +1229,9 @@ amb.forEach(ambSet);
 let spawnT=2,saveT=0;
 function update(dt){
   time+=dt;
-  spawnT+=dt;if(PK.car&&!cars.some(c=>c.type.vip))vipCarT+=dt;
-  if(spawnT>=SPAWN_T[G.lv.parking-1]/(1+VB('cust'))||(PK.car&&vipCarT>=VIP_CAR_EVERY&&!cars.some(c=>c.type.vip))){if(trySpawn())spawnT=0;}
+  spawnT+=dt;
+  if(spawnT>=SPAWN_T[G.lv.parking-1]/(1+VB('cust'))){if(trySpawn())spawnT=0;}
+  updateVipTruck(dt);
   ensureStaff();
   gates.forEach(g=>{const want=cars.some(c=>c.path.length&&Math.abs(c.x-AV)<40&&Math.abs(c.y-g.y)<95);const wp=want||police.some(c=>Math.abs(c.x-AV)<40&&Math.abs(c.y-g.y)<95);g.v+=((wp?1:0)-g.v)*Math.min(1,dt*5);});
   for(const c of cars)if(c.state!=='loaded')stepCar(c,dt);
@@ -1313,6 +1339,8 @@ addTrees(1305,1120+DY,1490,1320+DY,9,12,18);addTrees(1442,TRAIL_Y+60,1492,DS_B-1
 addTrees(440,1340+DY,620,1660+DY,12,11,17);addTrees(1150,1340+DY,1490,1660+DY,16,12,18);addTrees(1180,110,1490,150,5,10,13);addTrees(1130,180,1480,300,8,11,16);
 for(let i=TREES.length-1;i>=0;i--){const [x,y,r]=TREES[i];if(x>SO_X-10-r&&x<SO_X+370+r&&y>SO_Y-12-r&&y<SO_Y+200+r)TREES.splice(i,1);}
 TREES.sort((a,b)=>a[1]-b[1]);
+// v16-37: no trees on the new service road (garages → car wash / gas station)
+for(let i=TREES.length-1;i>=0;i--){const [x,y,r]=TREES[i];if((Math.abs(x-COL_RX)<RW+r*1.2&&y>Y2-RW&&y<SVC_Y+RW+r)||(Math.abs(y-SVC_Y)<RW+r*1.2&&x>XCON-RW&&x<COL_RX+RW+r))TREES.splice(i,1);}
 const DECO=[];for(const [x,y,r] of TREES){const n=1+((srnd()*2.4)|0);for(let i=0;i<n;i++){const a=srnd()*6.283,d=r*(1.3+srnd()*1.5);DECO.push([x+Math.cos(a)*d,y+Math.sin(a)*d,(srnd()*3)|0,3.5+srnd()*3.5,srnd()]);}}
 function drawDeco(){for(const [x,y,t,r,q] of DECO){if(!onScreen(x,y,14))continue;
   if(t===0){X.fillStyle='rgba(0,0,0,.22)';ell(x+1.5,y+2,r*1.25,r);X.fillStyle='#2a6a2a';circ(x-r*.5,y,r*.8);circ(x+r*.5,y+.5,r*.75);circ(x,y-r*.35,r*.85);X.fillStyle='#3f8f38';circ(x-r*.4,y-r*.3,r*.5);circ(x+r*.25,y-r*.45,r*.45);X.fillStyle='#6cbb4c';circ(x-r*.35,y-r*.55,r*.22);if(q>.5){X.fillStyle=q>.75?'#ff8fb1':'#ffe36b';circ(x+r*.4,y,1);circ(x-r*.6,y+r*.2,1);circ(x,y-r*.7,1);}}
@@ -1464,7 +1492,7 @@ function drawMech(m){
   if(m.st&&m.bj!=null&&window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('m|'+m.st+'|'+m.bj);if(h){ // v16-20: the hero assigned here works on the map
     const an=m.cel>0&&!m.moving?'cel':m.moving?'walk':m.mode==='work'?'work':'idle';
     X.fillStyle='rgba(0,0,0,.28)';ell(m.x,m.y+6,7,2.6);
-    if(CAMPAIGN.mini(X,h.id,an,time,m.x,m.y+6,24,Math.cos(m.a)>=0?1:-1,m.ph)){m.miniOK=true;return;}}}
+    if(CAMPAIGN.mini(X,h.id,an,time,m.x,m.y+6,24,Math.cos(m.a)>=0?1:-1,m.ph)){m.miniOK=true;vipTag(m.x,m.y+6);return;}}}
   m.miniOK=false;
   const I=m.vip?IMG.vip:IMG.mech;if(!I.ok){drawPerson(m);return;}
   const A=m.vip?IM.vip:IM.mech,ca=Math.cos(m.a),sa=Math.sin(m.a);
@@ -1477,8 +1505,9 @@ function drawMech(m){
   const s=17.5/76,fx=m.x,fy=m.y+6;
   X.fillStyle='rgba(0,0,0,.25)';ell(fx,fy,6,2.4);
   X.drawImage(I.el,col*A.cw,row*A.ch,A.cw,A.ch,fx-A.cw/2*s,fy-(A.ch-A.pad)*s,A.cw*s,A.ch*s);
-  if(m.vip&&DET){X.font='900 6px system-ui';X.textAlign='center';X.fillStyle='rgba(0,0,0,.6)';rr(fx-8,fy-27,16,7,3.5);X.fill();X.fillStyle='#ffd54a';X.fillText('VIP',fx,fy-21.6);}
+  vipTag(fx,fy);
 }
+function vipTag(fx,fy){if(!PK.vip||!DET)return;X.font='900 6px system-ui';X.textAlign='center';X.fillStyle='rgba(0,0,0,.6)';rr(fx-8,fy-33,16,7,3.5);X.fill();X.fillStyle='#ffd54a';X.fillText('VIP',fx,fy-27.6);}
 function drawVipCar(c){
   const L=c.type.L,W=c.type.W,hl=L/2,hw=W/2,mv=c.path&&c.path.length>0,id=c.id||1;
   X.save();X.translate(c.x,c.y);X.rotate(c.a);const lift=c.lift||0;if(lift>.01){const s=1+lift*.05;X.scale(s,s);}
@@ -1532,6 +1561,62 @@ function drawVipCar(c){
 }
 function vipThumb(){try{const cv2=document.createElement('canvas');cv2.width=184;cv2.height=116;const g=cv2.getContext('2d'),sX=X,sD=DET;X=g;DET=true;
   g.translate(92,58);g.scale(2.15,2.15);drawVipCar({type:VIP_T,x:0,y:0,a:0,id:3,path:[],jobs:[],tune:{}});X=sX;DET=sD;return cv2.toDataURL();}catch(e){return '';}}
+// =================== v16-37: VIP TRUCK (pack €5.99) – rich clients' cars, random arrivals, priority in the garages ===================
+const RICH_M=2, VT_SLOTS=4, VT_Y=96, VT_STOP=AV+40; // the truck stops just past the entrance; cars roll back off the rear ramp
+const VT={st:'off',t:0,next:25,x:-400,load:[],ut:0,v:0};
+const RICH_B=['super','limo','sports','muscle','conv','coupe'];
+function richCar(){const av=TYPES.filter(t=>RICH_B.includes(t.b)&&!t.liv),T=Math.random()<.18?VIP_T:pick(av);const c=newCar(T===VIP_T);
+  if(T!==VIP_T){c.type=T;c.jobs=genJobs(T);c.col=pick(['#111111','#eceff1','#b71c1c','#0d47a1','#ffd600','#4a148c','#212121','#c0c0c0']);}
+  c.rich=1;c.dirt=rnd(.05,.25);c.dmg=[];c.value=60;return c;}
+const vtDeckX=k=>VT.x+40+k*60;
+function updateVipTruck(dt){if(!PK.car)return;const n=PLV('parking')*4;
+  if(VT.st==='off'){VT.t+=dt;if(VT.t<VT.next)return;const free=arrSpots.filter(s=>s.i<n&&!s.car).length;
+    if(free<2){VT.t=VT.next-4;VT.hold=0;return;}
+    VT.hold=1;if(cars.some(c=>c.arriving&&c.y<130))return; // hold new arrivals until the highway entrance is clear
+    VT.hold=0;
+    const k=Math.min(VT_SLOTS,free,3+(Math.random()<.5?1:0));VT.load=[];for(let i=0;i<k;i++)VT.load.push(richCar());
+    VT.st='in';VT.x=-420;VT.v=120;toast('🚚 The VIP Truck is here with '+k+' rich clients! They get priority.',4000);return;}
+  if(VT.st==='in'){const d=VT_STOP-VT.x;VT.v=Math.max(18,Math.min(120,d*1.4));VT.x+=VT.v*dt;if(d<1){VT.st='unload';VT.ut=0;}}
+  else if(VT.st==='unload'){VT.ut+=dt;
+    if(VT.ut>1.6&&VT.load.length){if(cars.some(c=>c.arriving&&c.y<150))return;
+      const sp=arrSpots.find(s=>s.i<n&&!s.car),c=VT.load.shift();VT.ut=0;
+      if(!sp){VT.load=[];}else{c.y=VT_Y;c.a=0;c.arriving=true;sp.car=c;c.slot=sp;
+        const lane=offsetPath(route(carG,{x:AV,y:170},sp.road),LN);
+        c.path=[{x:lane[0].x,y:VT_Y,rev:true},...roundPath([{x:lane[0].x,y:VT_Y},...lane,sp.entry,...inn(sp),{x:sp.x,y:sp.y}],18).slice(1)];
+        c.onArrive=()=>{c.arriving=false;c.state='idle';};cars.push(c);float(c.x,c.y-26,'💎 RICH CLIENT','#ffd54a');}}
+    if(!VT.load.length&&VT.ut>1.5){VT.st='out';VT.v=20;}}
+  else if(VT.st==='out'){VT.v=Math.min(130,VT.v+50*dt);VT.x+=VT.v*dt;if(VT.x>W+300){VT.st='off';VT.t=0;VT.next=rnd(150,270);}}
+  const off=VT_SLOTS-VT.load.length;for(let k=0;k<VT.load.length;k++){const c=VT.load[k];c.x=vtDeckX(k+off);c.y=VT_Y;c.a=0;}}
+function vtBody(x,y,mv){const L=VT_SLOTS*60+20,cx=x+L+12;
+  X.fillStyle='rgba(0,0,0,.3)';rr(x+4,y-14,L+84,34,6);X.fill();
+  X.fillStyle='#111';for(let k=0;k<3;k++){X.fillRect(x+10+k*12,y-19,10,4);X.fillRect(x+10+k*12,y+15,10,4);}
+  X.fillStyle='#0d0d0f';rr(x,y-16,L,32,3);X.fill();X.fillStyle='#1d1b22';X.fillRect(x+2,y-14,L-4,28);
+  X.fillStyle='#2c2a33';X.fillRect(x+2,y-11,L-4,5);X.fillRect(x+2,y+6,L-4,5);
+  for(const s of[-1,1]){const g=X.createLinearGradient(0,s<0?y-17:y+13,0,s<0?y-13:y+17);g.addColorStop(0,'#fff3c4');g.addColorStop(.5,'#ffc107');g.addColorStop(1,'#8a6100');X.fillStyle=g;X.fillRect(x,s<0?y-17:y+13,L,4);}
+  X.fillStyle='#ffd54a';for(let k=0;k<=VT_SLOTS;k++){const px=x+10+k*60;X.fillRect(px-1.5,y-18,3,6);X.fillRect(px-1.5,y+12,3,6);}
+  X.fillStyle='#e53935';X.fillRect(x-1,y-15,2,5);X.fillRect(x-1,y+10,2,5);
+  X.fillStyle='#111';X.fillRect(x+L,y-5,12,10);
+  X.fillStyle='#111';for(const o of[6,20,52]){X.fillRect(cx+o,y-19,11,4.5);X.fillRect(cx+o,y+14.5,11,4.5);}
+  X.fillStyle='#16151a';rr(cx,y-15,40,30,3);X.fill();
+  for(const s of[-1,1]){const g=X.createLinearGradient(0,y+s*14-3,0,y+s*14+3);g.addColorStop(0,'#c9a227');g.addColorStop(.5,'#fff8e1');g.addColorStop(1,'#a07800');X.fillStyle=g;rr(cx+20,s<0?y-18:y+12,16,6,3);X.fill();}
+  X.fillStyle='#ffe082';circ(cx+40,y-11,2.6);circ(cx+40,y+11,2.6);
+  const g=X.createLinearGradient(0,y-17,0,y+17);g.addColorStop(0,'#000');g.addColorStop(.3,'#26222e');g.addColorStop(.5,'#3b3160');g.addColorStop(.7,'#26222e');g.addColorStop(1,'#000');
+  X.fillStyle=g;rr(cx+42,y-17,30,34,5);X.fill();X.strokeStyle='#ffca28';X.lineWidth=1;X.stroke();
+  X.fillStyle='#ffd54a';X.fillRect(cx+42,y-2,30,1.4);X.fillRect(cx+42,y+.6,30,1.4);
+  X.fillStyle='#1a2733';X.beginPath();X.moveTo(cx+63,y-14);X.lineTo(cx+69,y-15);X.lineTo(cx+69,y+15);X.lineTo(cx+63,y+14);X.closePath();X.fill();
+  X.save();X.translate(cx+53,y);X.rotate(Math.PI/2);X.fillStyle='#ffd54a';X.beginPath();X.moveTo(-6,3);X.lineTo(-6,-3);X.lineTo(-3,0);X.lineTo(0,-5);X.lineTo(3,0);X.lineTo(6,-3);X.lineTo(6,3);X.closePath();X.fill();X.restore();
+  const cg=X.createLinearGradient(0,y-15,0,y+15);cg.addColorStop(0,'#c9a227');cg.addColorStop(.5,'#fff');cg.addColorStop(1,'#c9a227');X.fillStyle=cg;X.fillRect(cx+71,y-14,3.4,28);
+  X.fillStyle='#fffde7';X.fillRect(cx+72,y-16,2.4,5);X.fillRect(cx+72,y+11,2.4,5);
+  if(mv&&DET){X.fillStyle='rgba(255,250,210,.12)';for(const s of[-1,1]){X.beginPath();X.moveTo(cx+74,y+s*13.5);X.lineTo(cx+120,y+s*24);X.lineTo(cx+120,y+s*4);X.closePath();X.fill();}}
+  const on=(time*5|0)%2;X.fillStyle=on?'#ffd54a':'#6d4c00';circ(cx+60,y-8,2);X.fillStyle=on?'#6d4c00':'#ffd54a';circ(cx+60,y+8,2);
+  X.fillStyle='#212121';X.fillRect(cx+64,y-21,2.4,5);X.fillRect(cx+64,y+16,2.4,5);}
+function drawVipTruck(){if(VT.st==='off'||!inView(VT.x-40,VT_Y-60,VT_SLOTS*60+180,120))return;const mv=VT.st!=='unload';
+  X.save();X.translate(0,mv?Math.sin(time*18)*.25:0);vtBody(VT.x,VT_Y,mv);X.restore();
+  for(const c of VT.load)drawCar(c);
+  if(DET&&VT.st==='unload')tag(VT.x+VT_SLOTS*30,VT_Y-28,'💎 VIP TRUCK · UNLOADING','#a07800');}
+function vtThumb(){try{const cv2=document.createElement('canvas');cv2.width=220;cv2.height=70;const g=cv2.getContext('2d'),sX=X,sD=DET;X=g;DET=true;
+  g.translate(3,35);g.scale(.63,.63);vtBody(0,0,false);[['super','#b71c1c'],['limo','#111111'],['sports','#ffd600'],['conv','#0d47a1']].forEach(([b,col],k)=>{const T=TYPES.find(t=>t.b===b);drawCarRaw({type:T,x:40+k*60,y:0,a:0,col,tune:{},jobs:[],dmg:[],dirt:0,lift:0,state:'x',id:k,acc:'#fff',num:7});});
+  X=sX;DET=sD;return cv2.toDataURL();}catch(e){return '';}}
 // v16-21: a hero driver is drawn from his sprite sheet: walk · scooter · idle (signature move now and then) · tip
 const SPRD_OK=h=>h.cat==='d'&&!!HPIC[h.id]; // drivers that have a sprite sheet (tip animation pauses them 1 s)
 function drawDriver(d){const p=d.p;p.miniOK=false;
@@ -1610,7 +1695,7 @@ function drawGround(){
   X.fillStyle='rgba(0,0,0,.2)';X.fillRect(-2500,112,W+5000,3);X.fillStyle='#d5dbe0';X.fillRect(-2500,8.6,W+5000,1.3);X.fillRect(-2500,110.1,W+5000,1.3);X.fillStyle='#7b858e';for(let x=-420;x<W+420;x+=22){X.fillRect(x,8,1.8,2.6);X.fillRect(x,109.4,1.8,2.6);}
   X.fillStyle='rgba(0,0,0,.07)';for(const y of[20,44,68,92]){X.fillRect(-2500,y,W+5000,3.5);X.fillRect(-2500,y+7,W+5000,3.5);}
   // vertical avenue + streets
-  RQ=[];roadV(AV,108,CONN_Y+RW);roadH(VL-RW,VR+RW,Y1);roadH(VL-RW,VR+RW,YM);roadH(VL-RW,VR+RW,Y2);roadV(VL,Y1,Y2);roadV(VR,Y1,Y2);roadH(VR,COL_RX+RW,Y2);roadH(430,AV,AY);roadFlush();
+  RQ=[];roadV(AV,108,CONN_Y+RW);roadH(VL-RW,VR+RW,Y1);roadH(VL-RW,VR+RW,YM);roadH(VL-RW,VR+RW,Y2);roadV(VL,Y1,Y2);roadV(VR,Y1,Y2);roadH(VR,COL_RX+RW,Y2);roadV(COL_RX,Y2,TRAIL_Y);roadH(430,AV,AY);roadFlush();
   for(const id of [...STIDS,'office'])softSh(GAR[id].x0,GAR[id].y0,GW,GD);softSh(PB.x,PB.y,PB.w,PB.h);softSh(SO_X,SO_Y,SO_W,SO_H);
   X.fillStyle=ASP;X.fillRect(AV-RW,104,RW*2,10);
   // connector + trailer road
@@ -1623,7 +1708,7 @@ function drawGround(){
   // scooter lanes
   slaneH(SVL-13,SVR+13,SH1);slaneH(SVL-13,SVR+13,SHM);slaneH(SVL-13,SVR+13,SH2);slaneV(SVL,SH1,SH2);slaneV(SVR,SH1,SH2);slaneV(SVA,SV_TOP-13,SV_BOT+13);
   slCross(AV-RW,SH1-13,RW*2,26);slCross(AV-RW,SH2-13,RW*2,26);slCross(VR-RW,SH1-13,RW*2,26);slCross(VR-RW,SH2-13,RW*2,26);slCross(AV-RW,SHM-13,RW*2,26);slCross(VR-RW,SHM-13,RW*2,26);slCross(SVA-13,YM-RW,26,RW*2);slCross(SVL-13,YM-RW,26,RW*2);slCross(SVR-13,YM-RW,26,RW*2);
-  slCross(SVA-13,Y1-RW,26,RW*2);slCross(SVA-13,Y2-RW,26,RW*2);dashH(VR+RW,COL_RX-RW,Y2);slCross(SVR-13,Y2-RW,26,RW*2);
+  slCross(SVA-13,Y1-RW,26,RW*2);slCross(SVA-13,Y2-RW,26,RW*2);dashH(VR+RW,COL_RX-RW,Y2);dashV(COL_RX,Y2+RW,TRAIL_Y-28);slCross(SVR-13,Y2-RW,26,RW*2);
   X.fillStyle=SL;X.fillRect(SVA-13,SH1-13,26,26);X.fillRect(SVA-13,SH2-13,26,26);X.fillRect(SVA-13,SHM-13,26,26);
   for(const x of[560,1000,1180])scooterIcon(x,SH1,false);for(const x of[560,1000])scooterIcon(x,SH2,false);for(const x of[560,1000])scooterIcon(x,SHM,false);for(const y of[300,500,1000,1310])scooterIcon(SVA,y,true);
   if(DET){X.fillStyle='rgba(255,255,255,.8)';X.font='800 7px system-ui';X.textAlign='center';X.fillText('SCOOTERS ONLY',SVA,SV_TOP+30);X.fillText('DRIVERS LANE',640,SH1+2.5);X.fillText('DRIVERS LANE',1060,SH2+2.5);X.fillText('DRIVERS LANE',640,SHM+2.5);}
@@ -1709,14 +1794,13 @@ function drawGarageArt(id,lv){
   if(PASS!=='static')for(let j=0;j<lv;j++){const b=bays[id][j],bx=6+67*j,d=b.door;
     if(d<.98){X.globalAlpha=(1-d)*.92;X.fillStyle='#90a4ae';X.fillRect(bx+5,GD-7,57,7);X.fillStyle='#607d8b';for(let k=2;k<57;k+=4)X.fillRect(bx+5+k,GD-7,1,7);X.globalAlpha=1;}
     if(b.car&&b.car.state==='work'&&id==='paint'){X.fillStyle='rgba(255,255,255,.08)';X.fillRect(bx+3,44,61,96);}}
-  if(PASS!=='dyn'&&PK.vip&&lv>0){X.fillStyle='rgba(255,213,74,.16)';X.fillRect(9,44,58,96);X.strokeStyle='rgba(255,213,74,.75)';X.lineWidth=1.2;X.strokeRect(9,44,58,96);}
+  
 }
 function drawGarageNew(id,lv,GI){
   const A=GA(id),pl=PLV(id),sp=A.n>1?Math.abs(A.bx[1]-A.bx[0]):70,bw=Math.min(sp*.92,70),bh=Math.min(46,(A.door-A.top)*.42);
   if(PASS!=='dyn'){X.drawImage(GI.el,0,A.top,GW,GD-A.top);
     // level 1: the 2nd bay of the LV2 picture is still locked
     for(let j=pl;j<A.n;j++){const x=A.bx[j],y=A.by[j];X.fillStyle='rgba(18,24,30,.66)';X.fillRect(x-bw/2,y-bh/2-6,bw,bh+12);hazard(x-bw/2,y+bh/2,bw,6,.7);}
-    if(PK.vip&&lv>0){const x=A.bx[0],y=A.by[0];X.fillStyle='rgba(255,213,74,.14)';X.fillRect(x-bw/2,y-bh/2-4,bw,bh+8);X.strokeStyle='rgba(255,213,74,.85)';X.lineWidth=1.2;X.strokeRect(x-bw/2,y-bh/2-4,bw,bh+8);}
     return;}
   // the big door opens when a car drives in or out
   let d=0;for(let j=0;j<pl;j++)d=Math.max(d,bays[id][j].door);
@@ -2033,7 +2117,8 @@ function xPic(id,r,clipH){const I=IMG['x_'+id+r.t];if(!I||!I.ok)return false;con
 function drawDistrict(){
   const T=TRAIL_Y+28;
   // street (customers drive east on the lower lane), connector to the transporter road
-  RQ=[];roadH(-2500,W+2500,SY);roadV(XCON,T-2,SY);roadFlush();dashH(-2500,W+2500,SY);dashV(XCON,T+8,SY-RW);
+  RQ=[];roadH(-2500,W+2500,SY);roadV(XCON,T-2,SY);roadV(COL_RX,T-2,SVC_Y);roadH(XCON,COL_RX+RW,SVC_Y);roadFlush();dashH(-2500,W+2500,SY);dashV(XCON,T+8,SVC_Y-RW);dashV(XCON,SVC_Y+RW,SY-RW);dashH(XCON+RW,COL_RX-RW,SVC_Y);dashV(COL_RX,T+8,SVC_Y-RW);
+  if(DET){sign(XCON+120,SVC_Y-RW-12,'🫧 CAR WASH · ⛽ DIESEL −50% ←','#1565c0');sign(COL_RX+70,Y2+70,'⬇ WASH & FUEL','#1565c0');}
   // car wash exit lane: out of the back of the tunnel, around, back to the street
   const rw=xRect('wash'),lx=rw.x+rw.w*XWASH.lane[rw.t-1];
   X.fillStyle=CURB;X.fillRect(lx-15,XLANE_Y-15,XLOOP-lx+30,30);X.fillRect(XLOOP-15,XLANE_Y-15,30,SY-RW-XLANE_Y+15);
@@ -2067,17 +2152,18 @@ function xStep(c,dt){if(!c.path.length)return true;let sp=c.sp*dt;const p0=c.pat
     c.x+=dx/d*sp;c.y+=dy/d*sp;sp=0;}
   return !c.path.length;}
 const xLaneFree=()=>!dcars.some(o=>o.x<30&&Math.abs(o.y-XLN)<20);
-function xEarn(n,x,y,txt,col){G.money+=n;qAdd('earn',n);float(x,y,txt+' +'+fmt(n),col);}
+function toDistrict(c){const L=SY-LN,x0=XCON-LN;c.path=[];c.sp=105;c.bt=0;c.toX=0;
+  const rw=G.lv.wash>0?xRect('wash'):null,rg=G.lv.gas>0?xRect('gas'):null;
+  if(c.xWash&&rw&&!XS.wash){const lx=rw.x+rw.w*XWASH.lane[rw.t-1];c.xk='wash';c.xs='in';XS.wash=c;
+    c.path=roundPath([{x:x0,y:L},{x:lx,y:L},{x:lx,y:rw.y+rw.h*XWASH.stop}],20);}
+  else if(c.xGas&&rg&&gasTo(c,[{x:x0,y:L}],L)){}
+  else{c.xk='pass';c.xs='out';c.path=roundPath([{x:x0,y:L},{x:x0,y:XLN},{x:W+140,y:XLN}],18);float(c.x,c.y-30,c.xWash?'🫧 WASH BUSY':'⛽ PUMPS FULL','#ff8a80');}
+  dcars.push(c);}
+function gasTo(c,pre,lane){const r=xRect('gas'),P=XGAS.p[r.t-1],free=P.map((_,i)=>i).filter(i=>!XS.pumps[i]);if(!free.length)return false;
+  const i=free[0],px=r.x+r.w*P[i];c.xk='gas';c.xs='in';c.pi=i;XS.pumps[i]=c;
+  c.path=roundPath([...pre,{x:px,y:lane},{x:px,y:r.y+r.h*XGAS.bot[r.t-1]+c.type.L/2-3}],20);return true;}
+function xEarn(n,x,y,txt,col){n=Math.round(n*ECO);G.money+=n;qAdd('earn',n);float(x,y,txt+' +'+fmt(n),col);}
 function updateDistrict(dt){
-  // --- car wash: one car at a time drives through the tunnel
-  if(G.lv.wash>0){const r=xRect('wash'),lx=r.x+r.w*XWASH.lane[r.t-1];XS.washT+=dt;
-    if(!XS.wash&&XS.washT>=WASH_EVERY[G.lv.wash-1]&&xLaneFree()){XS.washT=0;const c=xCarNew('wash');c.dirt=rnd(.6,.95);
-      c.path=roundPath([{x:-90,y:XLN},{x:lx,y:XLN},{x:lx,y:r.y+r.h*XWASH.stop}],20);dcars.push(c);XS.wash=c;}}
-  // --- gas station: one car per pump
-  if(G.lv.gas>0){const r=xRect('gas'),P=XGAS.p[r.t-1];XS.gasT+=dt;
-    if(XS.gasT>=GAS_EVERY[G.lv.gas-1]&&xLaneFree()){const free=P.map((_,i)=>i).filter(i=>!XS.pumps[i]);
-      if(free.length){XS.gasT=0;const i=pick(free),px=r.x+r.w*P[i],c=xCarNew('gas');c.pi=i;c.px=px;
-        c.path=roundPath([{x:-90,y:XLN},{x:px,y:XLN},{x:px,y:r.y+r.h*XGAS.bot[r.t-1]+c.type.L/2-3}],20);dcars.push(c);XS.pumps[i]=c;}}}
   // --- car factory: a new car leaves the right door every few seconds
   if(G.lv.factory>0){const r=xRect('factory'),lv=G.lv.factory;XS.facT+=dt;
     if(XS.facT>=FAC_EVERY[lv-1]){const dx=r.x+r.w*XFAC.door,y0=r.y+r.h*XFAC.doorY;
@@ -2092,11 +2178,13 @@ function updateDistrict(dt){
       else if(c.xs==='wash'){c.t+=dt;c.dirt=Math.max(0,c.dirt-dt*.3);
         if(DET&&parts.length<150&&Math.random()<dt*30){const s=pick([-1,1]);parts.push({x:c.x+s*rnd(10,16),y:c.y+rnd(-22,22),vx:-s*rnd(10,30),vy:rnd(-12,12),life:.6,max:.6,r:rnd(1.4,2.8),col:pick(['#e1f5fe','#ffffff','#81d4fa'])});}
         if(c.t>=WASH_T){c.xs='out';c.dirt=0;xEarn(washPay(G.lv.wash||1),lx,r.y+r.h*.86,'🫧 WASH','#81d4fa');
-          c.path=roundPath([{x:lx,y:c.y},{x:lx,y:XLANE_Y},{x:XLOOP,y:XLANE_Y},{x:XLOOP,y:XLN},{x:W+140,y:XLN}],16);}}
-      else if(c.xs==='out'&&XS.wash===c&&c.y<r.y+r.h*.3)XS.wash=null;}
+          const loop=[{x:lx,y:c.y},{x:lx,y:XLANE_Y},{x:XLOOP,y:XLANE_Y},{x:XLOOP,y:XLN}];
+          if(!(c.xGas&&G.lv.gas>0&&gasTo(c,loop,XLN)))c.path=roundPath([...loop,{x:W+140,y:XLN}],16);}}}
+    if(XS.wash===c&&c.xs!=='wash'&&!(c.xk==='wash'&&c.xs==='in')){const r=xRect('wash');if(c.y<r.y+r.h*.3)XS.wash=null;}
+    if(c.xk==='wash'){}
     else if(c.xk==='gas'){const r=xRect('gas');
       if(c.xs==='in'&&done){c.xs='fuel';c.t=0;}
-      else if(c.xs==='fuel'){c.t+=dt;if(c.t>=FUEL_T){c.xs='out';xEarn(gasPay(G.lv.gas||1),c.x,c.y-30,'⛽ FUEL','#ffb74d');
+      else if(c.xs==='fuel'){c.t+=dt;if(c.t>=FUEL_T){c.xs='out';xEarn(gasPay(G.lv.gas||1),c.x,c.y-30,'⛽ DIESEL −50%','#ffb74d');
         const px=c.x,q=[{x:px,y:XLN-22,rev:1}];for(let k=1;k<=6;k++){const t=k/6,u=1-t;q.push({x:u*u*px+2*u*t*px+t*t*(px-34),y:u*u*(XLN-22)+2*u*t*XLN+t*t*XLN,rev:1});}
         q.push({x:W+140,y:XLN});c.path=q;}}
       else if(c.xs==='out'&&XS.pumps[c.pi]===c&&c.y>r.y+r.h+4)XS.pumps[c.pi]=null;}
@@ -2108,7 +2196,7 @@ function drawDistrictDyn(){
   for(const c of dcars){if(!onScreen(c.x,c.y,40))continue;if(c.fade!=null&&c.fade<1)X.globalAlpha=c.fade;drawCar(c);X.globalAlpha=1;}
   // the car wash roof covers the car inside the tunnel
   if(G.lv.wash>0){const r=xRect('wash');
-    if(dcars.some(o=>o.xk==='wash'&&o.y>r.y-24&&o.y<r.y+r.h*XWASH.roof+28))xPic('wash',r,r.h*XWASH.roof);
+    if(dcars.some(o=>(o.xk==='wash'||o===XS.wash)&&o.y>r.y-24&&o.y<r.y+r.h*XWASH.roof+28))xPic('wash',r,r.h*XWASH.roof);
     if(XS.wash&&XS.wash.xs==='wash'){const w=XS.wash,p=w.t/WASH_T;X.fillStyle='rgba(0,0,0,.6)';rr(w.x-22,w.y+30,44,7,3.5);X.fill();X.fillStyle='#4fc3f7';rr(w.x-21,w.y+31,42*p,5,2.5);X.fill();
       if(DET){X.fillStyle='rgba(225,245,255,.35)';for(let k=0;k<3;k++){const yy=w.y-18+((time*60+k*14)%40);X.fillRect(w.x-16,yy,32,2);}}}}
   // gas: hose from the pump to the car + fuel bar
@@ -2151,7 +2239,7 @@ function wheelIcon(x,y,col){X.fillStyle=col;circ(x,y,7);X.strokeStyle='#fff';X.l
 function drawCarUI(c){
   if(c.state==='loaded'||c.state==='load')return;
   const y=c.y-26;
-  if(c.type.vip&&DET)tag(c.x,c.y+24,'👑 VIP CLIENT','#a07800');else if(c.type.fleet&&DET&&c.state!=='leaving')tag(c.x,c.y+24,'🚨 CITY FLEET','#1565c0');
+  if((c.type.vip||c.rich)&&DET)tag(c.x,c.y+24,'💎 RICH CLIENT · PRIORITY','#a07800');else if(c.type.fleet&&DET&&c.state!=='leaving')tag(c.x,c.y+24,'🚨 CITY FLEET','#1565c0');
   if(c.driver){const col=ST[c.driver.pool]?ST[c.driver.pool].color:DRV_VEST[c.driver.pool];wheelIcon(c.x,y,col);return;}
   if(c.state==='work'){const S=ST[c.atS];X.fillStyle='rgba(0,0,0,.6)';rr(c.x-24,y-4,48,8,4);X.fill();X.fillStyle=S.color;rr(c.x-23,y-3,46*Math.min(1,c.work),6,3);X.fill();
     if(DET){const n=c.atS==='inspect'?'INSPECTING':(c.cur?c.cur.n.toUpperCase():'');X.font='900 8px system-ui';X.textAlign='center';X.lineWidth=3;X.strokeStyle='rgba(0,0,0,.7)';X.strokeText(n,c.x,y-8);X.fillStyle='#fff';X.fillText(n,c.x,y-8);}return;}
@@ -2235,7 +2323,7 @@ function render(){
   drawBG();PASS='dyn';drawPartsGround();
   STIDS.forEach(drawGarage);drawOffice();drawPartsBuilding();drawSecurity();PASS='all';
   for(const a of amb)if(onScreen(a.x,a.y,40))drawCar(a);
-  drawTrailer();
+  drawTrailer();drawVipTruck();
   for(const c of cars)if(onScreen(c.x,c.y,40))drawCar(c);
   for(const c of police)if(onScreen(c.x,c.y,40))drawCar(c);
   drawDistrictDyn();
@@ -2340,7 +2428,7 @@ STIDS.forEach(id=>INFO[id]={title:ST[id].icon+' '+ST[id].name,desc:ST[id].desc,r
 const SOON_IDS=['collection','rail'];
 const NOUP=id=>SOON_IDS.includes(id)||id==='export'||id==='yard'||id==='race'||id==='car'||id==='rep'||id==='shop'||id==='vip';
 // v15 pacing (tested with a simulator): LV 5–10 cost ×2.5 but are paid in 5 PARTS – every part gives progress (garages: part of the next level's job bonus)
-const UPN=5,UPM=2.5;for(const id in BLD){const c=BLD[id].cost;if(c)for(let i=4;i<c.length;i++)c[i]=Math.round(c[i]*UPM/1000)*1000;}
+const UPN=5,UPM=2.5;for(const id in BLD){const c=BLD[id].cost;if(c)for(let i=0;i<c.length;i++){if(i>=4)c[i]=c[i]*UPM;c[i]=i>=4?Math.round(c[i]*COST_M/1000)*1000:Math.round(c[i]*COST_M/10)*10;}}
 const UPP=id=>(G.up&&G.up[id])||0;
 const costOf=(id,lv)=>Math.round(BLD[id].cost[lv]*(1-VB('disc'))/(lv>=4?UPN:1));
 const payB=id=>{const l=(G.lv[id]||1);return PAYB[l-1]+(l<10&&l>=4?(PAYB[l]-PAYB[l-1])*UPP(id)/UPN:0);};
@@ -2348,20 +2436,19 @@ function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';renderPanel()
 function closePanel(){sel=null;selCar=null;sheet.classList.remove('open');}
 $('shClose').onclick=closePanel;$('vipBtn').onclick=()=>openPanel('vip');$('dqBtn').onclick=openDQ;$('repPill').onclick=()=>openPanel('rep');$('shopBtn').onclick=()=>openPanel('shop');
 const PACKS=[
- {id:'car',name:'VIP Client Car',price:'€3.99',img:'vipcar',cw:92,ch:58,thumb:1,desc:'A VIP client brings his golden-black Royal Hypercar for maintenance very often. Every job on it pays ×2.5, and he drives away in style.'},
- {id:'sub',name:'VIP Pass · 30 days',price:SUB_PRICE,emoji:'👑',desc:'All your VIP level benefits are ×1.3 stronger for 30 days. VIP points still come from Daily Quests – for everyone.'},
+ {id:'car',name:'VIP Truck · Rich Clients',price:'€5.99',img:'vipcar',cw:110,ch:36,thumb:1,desc:'Forever: a golden car carrier arrives at random times and unloads 3-4 luxury cars of rich clients (supercars, limousines, the Royal Hypercar). They get PRIORITY in every garage and pay ×2.'},
+ {id:'sub',name:'VIP Pass · 30 days',price:SUB_PRICE,emoji:'👑',desc:'All your VIP level benefits are ×'+SUB_MULT+' stronger for 30 days. VIP points still come from Daily Quests – for everyone.'},
  {id:'spd2',name:'Battle Speed ×2',price:'€4.99',emoji:'⏩',desc:'Battles can run at ×2 speed. ×1.5 is free for everyone. Yours forever – every chapter, every stage.'},
- {id:'vip',name:'VIP Mechanic',price:'€2.99',img:'vip',cw:48,ch:67,bp:'0px 0px',bs:'761px 467px',desc:'A VIP mechanic works in the first bay of every workshop: 30% faster and 30% more money on his jobs.'},
+ {id:'vip',name:'VIP Crew Boost',price:'€3.99',emoji:'👑',desc:'Forever: EVERY mechanic in every workshop works 25% faster and earns 25% more money. Works together with your heroes.'},
 ];
 $('shStats').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){popPicker(pk.dataset.pick);return;}if(e.target.closest('[data-dq]')){closePanel();openDQ();return;}const b=e.target.closest('[data-buy]');if(!b)return;const id=b.dataset.buy;
   if(b.dataset.busy)return;b.dataset.busy=1;
-  if(id==='sub'){if(subOn())return;SEC.buy('sub').then(ok=>{delete b.dataset.busy;if(!ok)return;if(!PK.sub||PK.sub<Date.now())PK.sub=Date.now()+SUB_DAYS*864e5;savePacks();vipRefresh();lastPanelKey='';renderPanel();toast('👑 VIP Pass active for 30 days! All VIP benefits ×1.3',4500);});return;}
+  if(id==='sub'){if(subOn())return;SEC.buy('sub').then(ok=>{delete b.dataset.busy;if(!ok)return;if(!PK.sub||PK.sub<Date.now())PK.sub=Date.now()+SUB_DAYS*864e5;savePacks();vipRefresh();lastPanelKey='';renderPanel();toast('👑 VIP Pass active for 30 days! All VIP benefits ×'+SUB_MULT,4500);});return;}
   if(PK[id])return;
   SEC.buy(id).then(ok=>{delete b.dataset.busy;if(!ok)return;
   PK[id]=true;savePacks();lastPanelKey='';renderPanel();
-  if(id==='vip')STIDS.forEach(s=>{const m=bays[s][0].mech;if(m)m.vip=true;});
-  if(id==='car')vipCarT=VIP_CAR_EVERY;
-  toast(id==='vip'?'👑 VIP Mechanic unlocked!':id==='spd2'?'⏩ Battle Speed ×2 unlocked forever!':'⭐ VIP Client Car unlocked! He is on his way.',4000);});});
+  if(id==='car')VT.t=VT.next=8;
+  toast(id==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':id==='spd2'?'⏩ Battle Speed ×2 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000);});});
 $('zin').onclick=()=>zoomBtn(1.35);$('zout').onclick=()=>zoomBtn(1/1.35);
 function jobStatus(c,j){if(j.done)return'✓ done';if(j.parts){const s=j.order?j.order.st:'';return{ordered:'📦 ordered',heli:'🚁 flying in',pad:'🛬 on helipad',truck:'🛻 on the way',done:'✓ parts in stock'}[s]||'needs parts';}return'';}
 function renderPanel(){
@@ -2369,23 +2456,23 @@ function renderPanel(){
   if(sel==='car'){const c=selCar;if(!c||!cars.includes(c)||c.state==='loaded'){closePanel();return;}
     const key='car'+c.id+c.state+c.jobs.map(j=>j.done+(j.order?j.order.st:'')).join()+c.revealed+Math.round(c.value);if(key===lastPanelKey)return;lastPanelKey=key;
     $('shTitle').textContent=c.type.n;$('shDots').innerHTML='<span>'+({drive:'Driving',await:'Waiting for a driver',idle:c.revealed?'Waiting for a free workshop':'Waiting for inspection',work:'In the workshop',parts:'Waiting for parts',forsale:'For sale',sold:'Sold – going to the yard',yard:'Waiting for the transporter',load:'Loading'}[c.state]||'')+'</span>';
-    $('shDesc').textContent=(c.type.vip?'⭐ VIP client – comes back often for maintenance and pays ×2.5. ':'')+(c.revealed?'The inspection found these jobs:':'Not inspected yet. The mechanics will find out what this car needs.');
+    $('shDesc').textContent=(c.rich?'💎 Rich client from the VIP Truck – priority in every garage, every job pays ×2. ':'')+(c.revealed?'The inspection found these jobs:':'Not inspected yet. The mechanics will find out what this car needs.');
     let h='';if(c.revealed)h+=c.jobs.map(j=>'<div class="job'+(j.done?' done':'')+'"><span class="ic">'+ST[j.st].icon+'</span><span>'+j.n+'</span><span class="st">'+(jobStatus(c,j)||(fmt(j.pay*c.type.m)+' · '+j.t+'s'))+'</span></div>').join('');
     h+='<div class="row"><span>Value so far</span><b>'+fmt(c.value)+'</b></div><div class="row"><span>Car type bonus</span><b>×'+c.type.m+'</b></div>';
     $('shStats').innerHTML=h;$('shBtn').style.display='none';return;}
   if(sel==='shop'){if(!window.__pr&&SEC.STORE_BUILD){window.__pr=1;SEC.prices().then(o=>{if(!o)return;PACKS.forEach(p=>{if(o[p.id])p.price=o[p.id];});lastPanelKey='';});}const key='shop'+PK.car+PK.vip+PK.spd2+subOn();if(key===lastPanelKey)return;lastPanelKey=key;
     $('shTitle').textContent='🛒 Shop';$('shDots').innerHTML='<span>Packs stay forever – every chapter, every stage</span>';$('shDesc').textContent='';
-    $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th"><i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vipThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i></div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
+    $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th"><i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vtThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i></div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
       (p.id==='sub'?(subOn()?'<button class="buy own">ACTIVE<br>'+Math.ceil((PK.sub-Date.now())/864e5)+'d</button>':'<button class="buy" data-buy="sub">'+p.price+'</button>'):PK[p.id]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-buy="'+p.id+'">'+p.price+'</button>')+'</div>').join('')+
       (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div id="cloudBox"></div><div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
     if(window.CLOUD)CLOUD.mount($('cloudBox'));$('shBtn').style.display='none';return;}
   if(sel==='vip'){const sub=subOn(),key='vip'+G.vip+sub+(sub?Math.ceil((PK.sub-Date.now())/864e5):0);if(key===lastPanelKey)return;lastPanelKey=key;
-    const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×1.3':'');
+    const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'');
     $('shDots').innerHTML='<span>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL – '+G.vip+' VIP points')+'</span>';
-    $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. With the VIP Pass all benefits are ×1.3.';
+    $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. With the VIP Pass all benefits are ×'+SUB_MULT+'.';
     const a=VIP_PTS[VLV],fr=nx?(G.vip-a)/(nx-a):1;
     let h='<div class="vbar"><i style="width:'+Math.round(fr*100)+'%"></i></div>';
-    h+='<div class="subcard"><div style="font-size:38px">👑</div><div class="tx"><b>VIP Pass · '+SUB_PRICE+' / 30 days</b>'+(sub?'Active – '+Math.ceil((PK.sub-Date.now())/864e5)+' days left. All benefits ×1.3.':'All VIP benefits ×1.3 stronger than without the pass.')+'</div>'+
+    h+='<div class="subcard"><div style="font-size:38px">👑</div><div class="tx"><b>VIP Pass · '+SUB_PRICE+' / 30 days</b>'+(sub?'Active – '+Math.ceil((PK.sub-Date.now())/864e5)+' days left. All benefits ×'+SUB_MULT+'.':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.')+'</div>'+
       (sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
     h+='<div class="sec">YOUR BENEFITS · VIP '+VLV+(sub?'':' <span style="color:#9fb0c0;letter-spacing:0">(👑 = with VIP Pass)</span>')+'</div>'+VIP_BEN.map(b=>{const v=benAt(b,VLV,sub),on=VLV>=b.from;
       return '<div class="row"><span>'+b.ic+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a">'+pctT(benAt(b,VLV,true),b.neg)+' 👑</em>':'')+'</div>';}).join('');
@@ -2462,12 +2549,12 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   h+='<div data-close="1" style="'+box(820,0,102,90)+'"></div>';
   dqBox.innerHTML=h;}
 dqEl.addEventListener('click',e=>{if(e.target===dqEl||e.target.closest('[data-close]')){closeDQ();return;}
-  if(e.target.closest('[data-all]')){let vip=0,tk=0,ct=0,n=0;
+  if(e.target.closest('[data-all]')){let vip=0,tk=0,ct=0,dm=0,n=0;
     G.dq.q.forEach(q=>{if(q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;tk++;vip+=q.vip;n++;}});
-    DQ_GIFTS.forEach((G2,i)=>{if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;tk+=G2.tk;ct+=G2.tk;vip+=G2.vip;n++;}});
-    if(n){addVip(vip);toast('✅ Claimed '+n+': +'+vip+' VIP points · '+TKI+' +'+tk+(ct?' · '+CTI+' +'+ct:''),3000);}dqKey='';renderDQ();return;}
+    DQ_GIFTS.forEach((G2,i)=>{if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;G.dm=(G.dm||0)+G2.dm;dm+=G2.dm;tk+=G2.tk;ct+=G2.tk;vip+=G2.vip;n++;}});
+    if(n){addVip(vip);toast('✅ Claimed '+n+': +'+vip+' VIP points · '+TKI+' +'+tk+(ct?' · '+CTI+' +'+ct:'')+(dm?' · '+DMI+' +'+dm:''),3000);}dqKey='';renderDQ();return;}
   const c=e.target.closest('[data-claim]');if(c){const q=G.dq.q[+c.dataset.claim];if(q&&q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;addVip(q.vip);toast('👑 +'+q.vip+' VIP points · '+TKI+' +1',2500);}dqKey='';renderDQ();return;}
-  const g=e.target.closest('[data-gift]');if(g){const i=+g.dataset.gift,G2=DQ_GIFTS[i];if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;addVip(G2.vip);toast('🎁 Gift opened: +'+G2.vip+' VIP points · '+TKI+' +'+G2.tk+' · '+CTI+' +'+G2.tk,2500);}
+  const g=e.target.closest('[data-gift]');if(g){const i=+g.dataset.gift,G2=DQ_GIFTS[i];if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;G.dm=(G.dm||0)+G2.dm;addVip(G2.vip);toast('🎁 Gift opened: +'+G2.vip+' VIP points · '+TKI+' +'+G2.tk+' · '+CTI+' +'+G2.tk+' · '+DMI+' +'+G2.dm,2500);}
     else if(!G.dq.gifts[i])toast('🎁 Claim '+G2.need+' daily quests to open this gift',2500);dqKey='';renderDQ();}});
 addEventListener('resize',()=>{if(dqEl.classList.contains('open'))dqSize();});
 
@@ -2481,7 +2568,7 @@ const GRADES=[
  {n:'Legendary',c:'#ffd21a',d:'#8a5a00'},
  {n:'Mythic',c:'#ff3b3b',d:'#7f0000'},
  {n:'???',c:'#8fa3b8',d:'#1b2735'}];
-const RATES=[.49,.28,.15,.06,.02], PITY_E=10, PITY_L=50, MAXS=50, STAR_K=.2, STAR_K2=.04, FUSE_S=5;
+const RATES=[.49,.28,.15,.06,.02], PITY_E=0, PITY_L=500, MAXS=50, STAR_K=.2, STAR_K2=.04, FUSE_S=5;
 const CATS={
  m:{n:'Mechanics',one:'Mechanic',ic:'🔧',title:'MECHANIC',sub:'Recruit skilled Mechanics for your Garage!'},
  g:{n:'Guards',one:'Guard',ic:'🛡️',title:'GUARD',sub:'Hire tough Guards to stop the car thieves!'},
@@ -2492,6 +2579,9 @@ const SMK=['m','c']; // v16-20: summon pages – Mechanics · Crew (Drivers + Gu
 const inCat=(h,cat)=>cat==='c'?(h.cat==='g'||h.cat==='d'):h.cat===cat;
 const smOf=c=>c==='g'||c==='d'?'c':c;
 const CTI='<img class="tki" src="img/cticket.webp">';
+// v16-37: DIAMONDS 💎 – earned only by playing (campaign, quests, Rep/VIP levels, mail). 100 💎 = 1 summon when tickets are missing (always asked first).
+const DMI='<img class="tki" src="img/ui/diamond.svg">', DM_SUM=100;
+function addDm(n,why){G.dm=(G.dm||0)+n;save();if(why)toast(DMI+' +'+n+' Diamonds · '+why,2800);}
 const TIK=c=>c==='c'?CTI:TKI;
 const tkN=c=>c==='c'?G.h.ct:G.h.tk;
 // name : specialty (mechanics only) : f = woman
@@ -2651,7 +2741,7 @@ function shadeC(h,t){return h.startsWith('#')&&h.length===7?shade(h,t):h;}
 
 // ---------- summon ----------
 function rollGrade(P){P.e++;P.l++;let gr;
-  if(P.l>=PITY_L)gr=4;else if(P.e>=PITY_E)gr=Math.random()<1/7?4:3;
+  if(P.l>=PITY_L)gr=4; // v16-37: only one pity – a Legendary every 500 summons (Marius)
   else{let r=Math.random(),a=0;gr=0;for(let i=0;i<RATES.length;i++){a+=RATES[i];if(r<a){gr=i;break;}}}
   if(gr>=4)P.l=0;if(gr>=3)P.e=0;return gr;}
 function gain(id){const h=HB[id],o=own(id);let r;
@@ -2670,7 +2760,7 @@ function closeSummon(){smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
 function img(h,sil,cls){return '<img class="'+(cls||'')+'" src="'+portrait(h,sil)+'">';}
 function renderSm(){if(!smEl.classList.contains('open'))return;
-  const P=G.h.pity[smCat],free=freeOK(),key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+free+HVER;if(key===smKey){const mE=$('smMoney');if(mE)mE.textContent=fmt(G.money);return;}smKey=key;const C=CATS[smCat];
+  const P=G.h.pity[smCat],free=freeOK(),key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+free+HVER;if(key===smKey){const mE=$('smMoney');if(mE)mE.textContent=(G.dm||0).toLocaleString();return;}smKey=key;const C=CATS[smCat];
   let h='';
   if(smCat!=='m'){const top=[...HEROES.filter(x=>x.cat==='g'&&(x.gr===4||x.gr===3)).slice(-3),...HEROES.filter(x=>x.cat==='d'&&(x.gr===4||x.gr===3)).slice(-2)].reverse();
     h+='<div class="smBan" style="'+box(0,92,921,846)+'"><div class="smT" style="'+box(0,40,921,130)+'">'+C.title+' <span>SUMMON</span></div>'+
@@ -2681,7 +2771,7 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
     h+='<div class="smAv" style="'+box(292,956,340,50)+'">Available '+C.n+'</div>';}
   h+='<div class="smN" style="'+box(470,18,110,40)+'">'+tkN(smCat)+'</div>';
   if(smCat==='c')h+='<img src="img/cticket.webp" style="'+box(405,10,72,62)+'object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 4px #000)">'; // crew ticket over the red one
-  h+='<div class="smN" id="smMoney" style="'+box(735,18,118,40)+'">'+fmt(G.money)+'</div>';
+  h+='<div style="'+box(664,6,72,70)+'background:radial-gradient(#1a2a3a 55%,transparent 72%);pointer-events:none"></div><img src="img/ui/diamond.svg" style="'+box(670,10,62,62)+'pointer-events:none;filter:drop-shadow(0 0 4px #000)"><div class="smN" id="smMoney" style="'+box(735,18,118,40)+'">'+(G.dm||0).toLocaleString()+'</div>';
   h+='<div data-a="back" style="'+box(10,6,88,76)+'"></div><div data-a="tkinfo" style="'+box(582,12,54,54)+'"></div><div data-a="tkinfo" style="'+box(408,12,170,54)+'"></div>';
   h+='<div data-a="arrow" data-d="-1" class="smA" style="'+box(4,470,64,110)+'">‹</div><div data-a="arrow" data-d="1" class="smA" style="'+box(853,470,64,110)+'">›</div>';
   TILE_X.forEach((x,i)=>h+='<div data-a="tier" data-g="'+(i<5?i:6)+'" style="'+box(x-66,1035,132,170)+'"></div>');
@@ -2690,7 +2780,7 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   if(free)h+='<div class="smFree" style="'+box(150,1420,190,56)+'">FREE 👑</div>';
   h+='<div data-a="sum" data-n="1" style="'+box(35,1352,415,145)+'"></div><div data-a="sum" data-n="10" style="'+box(468,1340,430,157)+'"></div>';
   if(smCat==='c')[[180,1422],[615,1422]].forEach(([x,y])=>h+='<img src="img/cticket.webp" style="'+box(x,y,64,58)+'object-fit:contain;pointer-events:none">');
-  h+='<div class="smPity" style="'+box(20,1497,881,36)+'">💜 Epic+ guaranteed in <b>'+(PITY_E-P.e)+'</b> · 💛 Legendary guaranteed in <b>'+(PITY_L-P.l)+'</b></div>';
+  h+='<div class="smPity" style="'+box(40,1497,841,36)+'"><div class="pBar"><i style="width:'+Math.min(100,P.l/PITY_L*100).toFixed(1)+'%"></i><span>💛 LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
   h+='<div data-a="coll" style="'+box(85,1535,755,125)+'"></div>';
   h+='<div class="smCnt" style="'+box(330,1614,360,30)+'">'+discCount(smCat)+' / '+HEROES.filter(x=>inCat(x,smCat)&&!x.soon).length+' collected</div>';
   smBox.innerHTML=h;}
@@ -2706,8 +2796,17 @@ smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}cons
   else if(a==='sum')doSummon(+t.dataset.n);});
 function doSummon(n){
   if(n===1&&freeOK()){G.h.free=dayKey();showResults(summon(smCat,1),smCat,n);smKey='';renderSm();return;}
-  if(tkN(smCat)<n){toast(''+TIK(smCat)+' Not enough '+(smCat==='c'?'Crew':'Recruit')+' Tickets ('+tkN(smCat)+' / '+n+')',2800);popTickets();return;}
-  if(smCat==='c')G.h.ct-=n;else G.h.tk-=n;showResults(summon(smCat,n===10?11:1),smCat,n);smKey='';renderSm();}
+  const have=Math.min(n,tkN(smCat)),need=(n-have)*DM_SUM,go=()=>{if(smCat==='c')G.h.ct-=have;else G.h.tk-=have;G.dm-=need;showResults(summon(smCat,n===10?11:1),smCat,n);smKey='';renderSm();};
+  if(!need){go();return;}
+  payAsk(have,n,TIK(smCat),(smCat==='c'?'Crew':'Recruit')+' Tickets',go);}
+// v16-37: missing tickets are paid with diamonds – ONLY after the player says yes
+function payAsk(have,n,ic,name,go,popFn){const need=(n-have)*DM_SUM,dm=G.dm||0,P=popFn||pop;
+  if(dm<need){P('<div class="pT">'+DMI+' Not enough</div><div class="pD">Summon ×'+n+' needs <b>'+n+'</b> '+ic+' '+name+'. You have <b>'+have+'</b>.<br>The missing '+(n-have)+' cost <b>'+need.toLocaleString()+'</b> '+DMI+' – you have <b>'+dm.toLocaleString()+'</b>.</div><div class="pD">'+DMI+' Diamonds come from campaign stages (bosses give the most), Daily Quest gifts, new Reputation and VIP levels.</div><button class="pB grey" data-p="x">OK</button>');return;}
+  P('<div class="pT">'+DMI+' Use Diamonds?</div><div class="pD">You have <b>'+have+'</b> '+ic+' '+name+' – Summon ×'+n+' needs <b>'+n+'</b>.<br>Do you agree to pay the missing <b>'+(n-have)+'</b> with Diamonds?</div>'+
+    '<div class="payBox"><div>'+ic+' <b>'+have+'</b><small>tickets</small></div><span>+</span><div>'+DMI+' <b>'+need.toLocaleString()+'</b><small>diamonds</small></div></div><div class="pD" style="text-align:center">You have '+DMI+' '+dm.toLocaleString()+' → '+(dm-need).toLocaleString()+' after</div>'+
+    '<button class="pB" data-p="payOK">✓ YES, SUMMON ×'+n+'</button><button class="pB grey" data-p="x">NO, CANCEL</button>');
+  window.__payGo=go;}
+$('pop').addEventListener('click',e=>{if(!e.target.closest('[data-p="payOK"]'))return;const g=window.__payGo;window.__payGo=null;closePop();if(g)g();});
 
 // ---------- results ----------
 const resEl=$('res');
@@ -2800,13 +2899,13 @@ rosEl.addEventListener('click',e=>{const t=e.target.closest('[data-ro]');if(!t)r
 const popEl=$('pop'),popBox=$('popBox');let popCtx=null;
 function pop(html,ctx){popCtx=ctx||null;popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+html;popEl.classList.add('open');}
 function closePop(){popEl.classList.remove('open');popCtx=null;}
-function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets · '+CTI+' Crew Tickets</div><div class="pD">'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.<br>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.<br>Both are earned only by playing.</div>'+
-  [TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign rewards'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
+function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets · '+CTI+' Crew Tickets</div><div class="pD">'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.<br>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.<br>Both are earned only by playing.<br>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> – you have <b>'+(G.dm||0).toLocaleString()+'</b> (always asked first).</div>'+
+  ['📅 5000 FREE SUMMONS: every day '+TKI+' +10 · '+CTI+' +10 · Gear +10',TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign: +1 per stage · mini-boss +3 · boss +5 '+CTI+' +3 '+DMI+' +100'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*1000)/10)+'%';
   const row=(i,pct,right)=>'<div class="rRow" style="--gc:'+GRADES[i].c+'"><span><i class="gear"></i>'+GRADES[i].n+'</span><b>'+pct+'</b><em>'+right+'</em></div>';
   pop('<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</span>'+RATES.map((r,i)=>row(i,pc(r),'👤 '+heroesOf(smCat,i).length+' heroes')).join('')+
   row(5,'0%','👤 only from Fusion')+'<div class="rRow lockd"><span>🔒 ???</span><b>—</b><em>coming soon</em></div>'+
-  '<div class="rInfo"><div>💜 An <b>Epic or better</b> is guaranteed every <b>'+PITY_E+'</b> summons (now: '+P.e+'/'+PITY_E+').</div><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+').</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
+  '<div class="rInfo"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
 function popHist(){const L=G.h.hist;pop('<div class="pT pic"><img src="img/ui/t_hist.webp" alt="SUMMON HISTORY"></div><span class="pSub blue">Last '+L.length+' summons</span>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
   return '<div class="pR"><span>'+CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b></span><em>'+(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')+'</em></div>';}).join(''):'<div class="pD">No summons yet.</div>'));}
 function popTier(cat,gr){const L=heroesOf(cat,gr);
@@ -2942,7 +3041,7 @@ const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV;
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
-function idleRate(){return Math.round(idleBase()*(1+VB('idle')));}
+function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')));}
 function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),ct:Math.floor(hrs/(IDLE_TK_H*2)),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
@@ -2957,7 +3056,7 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV" style="'+box(560,836,270,70)+'">'+I.tk+'</div>';
   h+='<div class="idV grn" style="'+box(860,836,265,70)+'">1 every '+IDLE_TK_H+'h</div>';
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
-  h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×1.3)':'')+'</span></div>';
+  h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+'</span></div>';
   idlBox.innerHTML=h;}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
@@ -2993,7 +3092,7 @@ let lastV=-1,lastQ=-1;
 let lastTk=-1,lastIdle=-1;
 let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
-  const vk=VLV*10+(VSUB?1:0);if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×1.3</b>':'');}
+  const vk=VLV*10+(VSUB?1:0);if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
   if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
@@ -3006,14 +3105,20 @@ const MINDPR=()=>Math.min(MAXDPR,(window.devicePixelRatio||1)>=2?1.5:1);
 
 // =================== v16-36: DAILY CHECK-IN · NEWS · MAIL ===================
 // Check-in: fixed rewards (nothing random), a 7-day cycle; a missed day does NOT reset it.
-if(!G.ci)G.ci={n:0,day:''};if(!G.nw)G.nw=0;if(!G.ml)G.ml={r:[],c:[]};
+if(!G.ci)G.ci={n:0,day:''};if(!G.c5)G.c5={n:0,day:''};if(!G.nw)G.nw=0;if(!G.ml)G.ml={r:[],c:[]};
 const CI=[{tk:2},{ct:2},{tk:3},{ct:2},{tk:3},{ct:3},{tk:5,ct:3}]; // only tickets (Marius)
 const ciMoney=h=>Math.max(500,Math.round(idleRate()*h/100)*100);
-const ciReady=()=>G.ci.day!==dayKey();
-function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);return a.join('<br>');}
-function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;return m;}
+// v16-37: 5000 FREE SUMMONS – every day 10 Recruit + 10 Crew + 10 Gear tickets (fixed, nothing random) until 5000 tickets in total (167 days)
+const C5_TOTAL=5000,C5_DAY=10,C5_DAYS=Math.ceil(C5_TOTAL/(C5_DAY*3));
+const c5Got=n=>Math.min(C5_TOTAL,n*C5_DAY*3);
+function c5Rw(n){const left=C5_TOTAL-c5Got(n);if(left<=0)return null;const a=Math.min(C5_DAY,left),b=Math.min(C5_DAY,left-a),c=Math.min(C5_DAY,left-a-b);return {tk:a,ct:b,gt:c};}
+const ciReady=()=>G.c5.day!==dayKey()&&!!c5Rw(G.c5.n);
+const GTI='<img class="tki" src="img/gticket.webp">';
+function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);if(r.gt)a.push(GTI+' ×'+r.gt);if(r.dm)a.push(DMI+' ×'+r.dm);return a.join('<br>');}
+function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:7,d:'Nov 14, 2026',ic:'💎',t:'Diamonds, 5000 free summons & the VIP Truck',l:['<b>5000 FREE SUMMONS</b>: claim 10 Recruit + 10 Crew + 10 Gear tickets every day (the calendar at the top right).','<b>Diamonds</b> 💎: earned in the campaign (bosses give 100), Daily Quest gifts and new Rep / VIP levels. No tickets? <b>100 💎 = 1 summon</b> – you are always asked first.','<b>Legendary pity bar</b>: a Legendary is guaranteed every <b>500</b> summons.','Your garages are now <b>linked to the Car Wash and the Gas Station</b>: dirty cars get washed, and everybody fills up with our <b>diesel at −50%</b>.','Bosses now also give <b>Crew Tickets</b>. Money comes a bit slower – the game lasts longer.','New in the Shop: <b>VIP Truck</b> with rich clients (priority in every garage) and <b>VIP Crew Boost</b> (every mechanic +25%). The VIP Pass is now <b>×1.5</b>.']},
  {id:6,d:'Nov 14, 2026',ic:'🎉',t:'Check-in, News, Mail & Reputation 30',l:['<b>Daily Check-in</b>: log in every day for free Recruit and Crew tickets. Day 7 is the big one – and a missed day never resets your week.','<b>News</b> (this page) and <b>Mail</b> with gifts from the Torque Studios team.','<b>Reputation now goes up to 30</b>: every level after Rep 6 raises your car sale prices (+3%) and idle income (+4%). Rep 10, 15, 20, 25 and 30 give bonus tickets.','Building upgrades after LV 4 are now called <b>Steps</b> (5 steps per level) – they cost only money.']},
  {id:5,d:'Nov 14, 2026',ic:'👮',t:'All Security guards are here',l:['<b>29 guards</b> from Common to Mythic with new art and animations – The Wall and Night Hawk are the Mythic ones.','<b>6 new thieves</b> try their luck at night. Catch them and they leave in handcuffs!']},
  {id:4,d:'Nov 14, 2026',ic:'🛵',t:'New drivers & the Crew summon',l:['<b>All drivers</b> have new art – from Zippy Zack to the Mythic Apex and Midnight Rider.','Drivers and guards now come from one <b>Crew summon</b> with its own <b>Crew Tickets</b>.','Your heroes now <b>work on the map</b> as small figures inside the garages.']},
@@ -3023,6 +3128,7 @@ const NEWS=[
 ];
 // Mail: gifts are claimed once per player.
 const MAIL=[
+ {id:'m3',d:'Nov 14, 2026',ic:'💎',t:'Diamonds are here!',b:'Diamonds are new in Torque Empire! Use them to summon when you run out of tickets (100 Diamonds = 1 summon – we always ask before using them). Here are some to start with.',g:{dm:1000}},
  {id:'m2',d:'Nov 14, 2026',ic:'🎁',t:'Thank you, tester!',b:'Thank you for helping us test Torque Empire before the launch. Here is a small gift for your garage. Have fun – and keep the reports coming!',g:{tk:10,ct:5}},
  {id:'m1',d:'Nov 14, 2026',ic:'📅',t:'New: Daily Check-in',b:'Tap the calendar at the top right every day. Seven days of rewards, with a big chest on day 7. A missed day does not reset your progress.'},
  {id:'m0',d:'Nov 13, 2026',ic:'🛠️',t:'Need help?',b:'Found a bug or have an idea? Write to us – we read every message. Tell us your phone model and what happened.',mail:1},
@@ -3033,13 +3139,17 @@ function xpOpen(m){xpMode=m;xpMail='';if(m==='news'){G.nw=NEWS[0].id;save();}xpE
 function xpClose(){if(xpMode==='mail'&&xpMail){xpMail='';renderXP();return;}xpEl.classList.remove('open');xpMode='';updX();}
 $('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').onclick=()=>xpOpen('news');$('mlBtn').onclick=()=>xpOpen('mail');
 function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTML=TKI+' '+G.h.tk;
-  if(xpMode==='ci'){T.textContent='DAILY CHECK-IN';const k=G.ci.n%7,rd=ciReady();S.textContent='WEEK '+(Math.floor(G.ci.n/7)+1)+' · DAY '+(rd?k+1:(k||7))+' OF 7';
-    let h='<div class="ciGrid">'+CI.map((r,i)=>{const done=i<k||(!rd&&k===0&&G.ci.n>0),now=rd&&i===k;
-      return '<div class="ciD'+(i===6?' big':'')+(done?' done':'')+(now?' now':'')+'"><b>DAY '+(i+1)+'</b><div class="ico">'+(i===6?'🎁':r.tk?'🎟️':'🛵')+'</div><div class="rw">'+rwHtml(r)+'</div></div>';}).join('')+'</div>';
-    h+='<button class="xBtn" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'✅ CHECK IN · DAY '+(k+1):'✓ Checked in today – come back tomorrow')+'</button>';
-    h+='<div class="xNote">Free tickets every day – Day 7 is the big one. Missing a day never resets your week.</div>';
-    B.innerHTML=h;const g=$('ciGo');if(g)g.onclick=()=>{if(!ciReady())return;const r=CI[G.ci.n%7],m=giveRw(r);G.ci.n++;G.ci.day=dayKey();save();
-      toast('📅 Day '+((G.ci.n-1)%7+1)+' reward: '+rwHtml(r).replace(/<br>/g,' · '),3500);renderXP();updX();};return;}
+  if(xpMode==='ci'){T.textContent='5000 FREE SUMMONS';const n=G.c5.n,rd=ciReady(),got=c5Got(n),blk=Math.floor((rd?n:Math.max(0,n-1))/30)*30;
+    S.textContent=got>=C5_TOTAL?'ALL 5000 TICKETS COLLECTED!':'DAY '+(rd?n+1:n)+' OF '+C5_DAYS+' · LOG IN EVERY DAY';
+    let h='<div class="c5Top"><div class="c5Big">'+got.toLocaleString()+'<small> / '+C5_TOTAL.toLocaleString()+'</small></div><div class="c5Lbl">FREE SUMMON TICKETS COLLECTED</div><div class="c5Bar"><i style="width:'+(got/C5_TOTAL*100).toFixed(1)+'%"></i></div>'+
+      '<div class="c5Each">Every day: '+TKI+' ×10 Recruit · '+CTI+' ×10 Crew · '+GTI+' ×10 Gear</div></div>';
+    h+='<div class="c5Grid">';for(let d=blk;d<Math.min(blk+30,C5_DAYS);d++){const done=d<n,now=rd&&d===n,r=c5Rw(d);
+      h+='<div class="c5D'+(done?' done':'')+(now?' now':'')+((d+1)%30===0||d===C5_DAYS-1?' big':'')+'"><b>DAY '+(d+1)+'</b><span>'+(done?'✓':(r?(r.tk+r.ct+r.gt):0))+'</span></div>';}
+    h+='</div>';
+    const r=c5Rw(n);h+='<button class="xBtn" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'✅ CLAIM DAY '+(n+1)+' · +'+(r.tk+r.ct+r.gt)+' TICKETS':got>=C5_TOTAL?'🏆 All collected':'✓ Claimed today – come back tomorrow')+'</button>';
+    h+='<div class="xNote">Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.</div>';
+    B.innerHTML=h;const g=$('ciGo');if(g)g.onclick=()=>{if(!ciReady())return;const r=c5Rw(G.c5.n);giveRw(r);G.c5.n++;G.c5.day=dayKey();save();
+      toast('📅 Day '+G.c5.n+': '+rwHtml(r).replace(/<br>/g,' · '),3500);renderXP();updX();};return;}
   if(xpMode==='news'){T.textContent='NEWS';S.textContent='LATEST UPDATES';
     B.innerHTML=NEWS.map((n,i)=>'<div class="nwI'+(i===0?' new':'')+'"><div class="nwH"><span class="ic">'+n.ic+'</span><b>'+n.t+'<small>'+n.d+'</small></b>'+(i===0?'<em>NEW</em>':'')+'</div><ul>'+n.l.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>').join('');return;}
   if(xpMode==='mail'){T.textContent='MAIL';S.textContent='MESSAGES FROM TORQUE STUDIOS';
@@ -3113,7 +3223,9 @@ function startLoader(){
     drawLoader(t);requestAnimationFrame(lf);})(t0);
   $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
-window.__TE={savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
+window.__TE={payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
+if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
+if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)window.CAMPAIGN.open();};
 makeGrass();resize();startLoader();requestAnimationFrame(frame);
 // v16-11: auto-update – a new version on GitHub is downloaded by itself; v16-17: the player confirms the restart with OK (never in the middle of a battle)

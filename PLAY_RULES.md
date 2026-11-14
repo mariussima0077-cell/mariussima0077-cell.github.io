@@ -2,7 +2,7 @@
 
 *Claude citește fișierul ăsta ÎNAINTE de orice schimbare în joc. Dacă Marius cere ceva ce se lovește de o regulă de aici, Claude îi spune ÎNAINTE să facă schimbarea: ce regulă e încălcată, ce ar trebui actualizat în Play Console și dacă se poate face deloc.*
 
-Ultima actualizare: 13 noiembrie 2026 (v16-2).
+Ultima actualizare: 14 noiembrie 2026 (v16-37).
 
 ---
 
@@ -12,7 +12,7 @@ Ultima actualizare: 13 noiembrie 2026 (v16-2).
 |---|---|---|
 | Cont dezvoltator | „Torque Studios”, cont **personal** | ✅ aprobat 13 nov |
 | Aplicația | Torque Empire: Garage Tycoon · `com.torqueempire.game` · **Jeu** · **Sans frais (gratuit)** · limba en-US | ✅ creată 13 nov |
-| Classification / éléments aléatoires | **Non** (summon doar cu bilete câștigate în joc – Recruit Tickets pentru mecanici + Crew Tickets pentru șoferi/paznici din v16-20 –, VIP Pass fără summon gratuit; Crew Tickets nu se vând niciodată) | ✅ ales de Marius (v16-1) |
+| Classification / éléments aléatoires | **Non** (summon doar cu bilete și **diamante câștigate în joc** – Recruit / Crew / Gear Tickets + din v16-37 diamante 💎 (100 = 1 summon); VIP Pass fără summon gratuit; biletele și diamantele **nu se vând niciodată** pe bani reali) | ✅ ales de Marius (v16-1) |
 | Data safety | vezi secțiunea 3 de mai jos | ⏳ de completat |
 | Content rating (IARC) | violență cartoon, fără sânge, achiziții în aplicație, fără jocuri de noroc | ⏳ de completat |
 | Target audience | **13+** (NU pentru copii) | ⏳ de completat |
@@ -58,6 +58,11 @@ Ultima actualizare: 13 noiembrie 2026 (v16-2).
 - Secretele (cheie dev, ADMIN_KEY, parole, cheie de semnare) **niciodată pe GitHub** – doar în Google Drive.
 
 ---
+
+### Decizie în așteptare: pass-uri cu diamante/bilete (14 nov 2026, v16-37)
+- Marius a cerut pass-uri: Standard (pe diamante), Pass+ 2.99 €, Pro 5.99 €, Ultra 10.99 € – pe viață, cu diamante + bilete zilnice. Claude i-a spus: dacă un pass **plătit cu bani reali** dă diamante sau bilete (sau o monedă care cumpără bilete), Google și legile (Belgia, Brazilia din martie 2026 → 18+) le socotesc **summon pe bani = elemente aleatorii**.
+- Marius: „nu adăuga pass-urile încă”. **Nimic nu s-a schimbat în Play.** Standard Pass (pe diamante câștigate jucând) ar fi OK oricând.
+- Dacă se aleg pass-uri plătite cu diamante/bilete: ÎNAINTE de update → Classification „éléments aléatoires” = **Oui**, refaci IARC, scoți Belgia din țări, accepți 18+ în Brazilia, actualizezi `privacy.html`/fișa dacă e cazul, iar Rate Info rămâne afișat.
 
 ## 3. Data safety – răspunsurile corecte (de la v16-2)
 
