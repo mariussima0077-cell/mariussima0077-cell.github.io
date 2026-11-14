@@ -1061,7 +1061,8 @@ const PX_R=(YXR+SO_X)/2, PX_L=YXL-10, PY_T=YTOP-10, PY_B=YBOT+10;
 const PATROL=[{x:PX_R,y:SOUT.y},{x:PX_R,y:PY_B},{x:PX_L,y:PY_B},{x:PX_L,y:PY_T},{x:PX_R,y:PY_T}];
 const XCAMS=[{x:YXL+4,y:(YT+YB)/2,a:0},{x:YXR-4,y:(YT+YB)/2,a:Math.PI},{x:SO_X+6,y:SO_Y+6,a:-Math.PI*.62},{x:SO_X+SO_W-6,y:SO_Y+6,a:-Math.PI*.38}];
 var PATROL_OK=1;
-const guards=[0,1].map(k=>({k,mode:k?'off':'desk',route:[],pi:0,t:0,delay:0,p:mkPerson({x:CHAIR.x,y:CHAIR.y,a:-Math.PI/2,suit:'#2f5bb7',cap:'#0b0f1a',pants:'#1a2338',vest:'#1d3c80',skin:k?'#c68642':'#f1c27d',pose:k?'':'desk',vis:k===0})}));
+const OFFW=()=>Math.min(34,SO_W*.2); // how far the desk guard walks left/right in the office
+const guards=[0,1].map(k=>({k,mode:k?'off':'desk',route:[],pi:0,t:0,delay:0,p:mkPerson({x:CHAIR.x,y:CHAIR.y,a:-Math.PI/2,suit:'#2f5bb7',cap:'#0b0f1a',pants:'#1a2338',vest:'#1d3c80',skin:k?'#c68642':'#f1c27d',pose:'',vis:k===0})}));
 const thief={st:'none',next:rnd(50,80),t:0,route:[],car:null,win:false,cop:null,p:mkPerson({suit:'#1b1b1b',cap:'#2b2b2b',pants:'#111',skin:'#e0ac69',vis:false})};
 const police=[];
 const POLICE_T=TYPES.find(t=>t.liv==='police');
@@ -1120,7 +1121,9 @@ function updateSecurity(dt){
   else if(T.st==='toPolice'){if(goRoute(T,dt,36)){T.p.vis=false;T.st='inCar';T.cop.t=0;guards.forEach(g=>{if(g.mode==='hold')guardHome(g);});}}
   // guards
   for(const g of guards){if(!g.p.vis)continue;const p=g.p;
-    if(g.mode==='desk'){p.moving=false;p.pose='desk';p.x=CHAIR.x;p.y=CHAIR.y;p.a=lerpA(p.a,-Math.PI/2+Math.sin(time*.4)*.5,Math.min(1,dt*2));}
+    if(g.mode==='desk'){p.pose=''; // v16-31: no chair any more – the guard walks around the office (desk ↔ monitors ↔ door side)
+      if(g.route.length){goRoute(g,dt,20);}else{p.moving=false;g.wt=(g.wt==null?rnd(2,5):g.wt)-dt;
+        if(g.wt<=0){g.wt=rnd(3,7);const fy=CHAIR.y+(SDOOR.y-CHAIR.y)*.3,o=OFFW();g.route=[pick([{x:CHAIR.x-o,y:fy},{x:CHAIR.x+o,y:fy},{x:CHAIR.x,y:CHAIR.y},{x:CHAIR.x-o*.5,y:CHAIR.y+2},{x:CHAIR.x+o*.5,y:CHAIR.y+2}])];}}}
     else if(g.mode==='patrol'){if(goRoute(g,dt,30)){g.pi=(g.pi+1)%PATROL.length;g.route=[PATROL[g.pi]];}}
     else if(g.mode==='run'){if(g.delay>0){g.delay-=dt;p.a=lerpA(p.a,Math.PI/2,Math.min(1,dt*6));continue;}
       if(T.st==='break'&&g.route.length)g.route[g.route.length-1]=nearThief(g.route.length>1?g.route[g.route.length-2]:p);
@@ -2527,7 +2530,7 @@ function addTickets(n,why){G.h.tk+=n;save();if(why)toast(''+TKI+' +'+n+' Recruit
 const PCACHE={};
 function hashS(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 // v16-5: Marius' own pictures for these heroes (cut from his sprite sheets)
-const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1};
+const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1};
 function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/hero/'+key+'.webp';if(PCACHE[key])return PCACHE[key];
   const S=128,cv2=document.createElement('canvas');cv2.width=cv2.height=S;const g=cv2.getContext('2d');
   let sd=hashS(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};

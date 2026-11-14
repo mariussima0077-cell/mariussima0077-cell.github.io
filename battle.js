@@ -682,7 +682,9 @@ const SPRD={
  // v16-29: Mythic drivers (rebuild_row.py + fix_closeup.py --blend for row 4, fade_cell.py, fix_red_tint.py)
  d5_0:{w:384,a:[176,248],m:[300,150]},d5_1:{w:384,a:[193,248],m:[300,150]},
  // v16-30: Common guards (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 catch · 4 signature move · 5 reward
- g0_0:{w:384,a:[202,248],m:[300,150]},g0_1:{w:384,a:[207,248],m:[300,150]},g0_2:{w:384,a:[202,248],m:[300,150]},g0_3:{w:384,a:[199,248],m:[300,150]},g0_4:{w:384,a:[204,248],m:[300,150]},g0_5:{w:384,a:[195,248],m:[300,150]},g0_6:{w:384,a:[200,248],m:[300,150]}};
+ g0_0:{w:384,a:[202,248],m:[300,150]},g0_1:{w:384,a:[207,248],m:[300,150]},g0_2:{w:384,a:[202,248],m:[300,150]},g0_3:{w:384,a:[199,248],m:[300,150]},g0_4:{w:384,a:[204,248],m:[300,150]},g0_5:{w:384,a:[195,248],m:[300,150]},g0_6:{w:384,a:[200,248],m:[300,150]},
+ // v16-31: Uncommon guards (atlas_drivers.py keeps the dark-emerald accents + tools/fix_green_pockets.py; Sid's siren glow from atlas_rare.py)
+ g1_0:{w:384,a:[202,248],m:[300,150]},g1_1:{w:384,a:[204,248],m:[300,150]},g1_2:{w:384,a:[206,248],m:[300,150]},g1_3:{w:384,a:[206,248],m:[300,150]},g1_4:{w:384,a:[198,248],m:[300,150]},g1_5:{w:384,a:[206,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
