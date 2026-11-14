@@ -8,6 +8,16 @@
 <meta name="theme-color" content="#0b1019">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<script>
+// v16-12: old Chrome / WebView (e.g. Chrome 95 on Android 12) can't read colors like #fff1c1cc (#RRGGBBAA) in canvas → crashed the battle.
+// If the phone doesn't understand them, translate them to rgba() automatically.
+(function(){try{const t=document.createElement('canvas').getContext('2d');t.fillStyle='#ff000080';if(/^rgba/.test(t.fillStyle))return;
+  const fix=v=>{if(typeof v!=='string'||v[0]!=='#')return v;let h=v.slice(1);if(h.length===4)h=h.split('').map(c=>c+c).join('');
+    if(h.length!==8||/[^0-9a-f]/i.test(h))return v;const n=parseInt(h,16);return 'rgba('+(n>>>24&255)+','+(n>>>16&255)+','+(n>>>8&255)+','+((n&255)/255).toFixed(3)+')';};
+  const G=CanvasGradient.prototype,ac=G.addColorStop;G.addColorStop=function(o,c){return ac.call(this,o,fix(c));};
+  const C=CanvasRenderingContext2D.prototype;['fillStyle','strokeStyle','shadowColor'].forEach(k=>{const d=Object.getOwnPropertyDescriptor(C,k);if(d&&d.set)Object.defineProperty(C,k,{get:d.get,set:function(v){d.set.call(this,fix(v));},configurable:true});});
+}catch(e){}})();
+</script>
 <script src="secure.js"></script>
 <style>
 html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
