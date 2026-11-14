@@ -667,7 +667,9 @@ const SPRD={
  m5_0:{a:[124,246],m:[230,150],cs:[[3,0],[3,1],[3,2]],fx:'gearboom'},m5_1:{a:[123,246],m:[230,150],cs:[[3,0]],fire:1},
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
  d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
- d0_4:{w:384,a:[190,248],m:[300,150]},d0_5:{w:384,a:[180,248],m:[300,150]},d0_6:{w:384,a:[193,248],m:[300,150]}};
+ d0_4:{w:384,a:[190,248],m:[300,150]},d0_5:{w:384,a:[180,248],m:[300,150]},d0_6:{w:384,a:[193,248],m:[300,150]},
+ // v16-22: Uncommon drivers (tools/atlas_drivers.py keeps the dark-emerald accents; Gina rows 4-5 rescaled by tools/fix_d1_2_gina.py)
+ d1_0:{w:384,a:[196,248],m:[300,150]},d1_1:{w:384,a:[181,248],m:[300,150]},d1_2:{w:384,a:[192,248],m:[300,150]},d1_3:{w:384,a:[185,248],m:[300,150]},d1_4:{w:384,a:[186,248],m:[300,150]},d1_5:{w:384,a:[195,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
