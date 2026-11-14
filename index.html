@@ -2932,7 +2932,12 @@ function startLoader(){
 window.__TE={savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)window.CAMPAIGN.open();};
 makeGrass();resize();startLoader();requestAnimationFrame(frame);
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+// v16-11: auto-update – when a new version is on GitHub, it is installed and the game reloads by itself (never in the middle of a battle)
+if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!navigator.serviceWorker.controller;let upd=false;
+  navigator.serviceWorker.register('sw.js').then(reg=>{const chk=()=>reg.update().catch(()=>{});
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')chk();});setInterval(chk,15*60*1000);}).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadSW||upd)return;upd=true;
+    const go=()=>{if(window.__BATTLE_ON){setTimeout(go,3000);return;}try{save();}catch(e){}toast('🔄 Update ready – restarting…',1500);setTimeout(()=>location.reload(),1500);};go();});}
 })();
 </script>
 <script src="battle.js"></script>
