@@ -688,7 +688,9 @@ const SPRD={
  // v16-32: Rare guards (atlas_rare.py, clean – blue glows semi-transparent)
  g2_0:{w:384,a:[208,248],m:[300,150]},g2_1:{w:384,a:[200,248],m:[300,150]},g2_2:{w:384,a:[203,248],m:[300,150]},g2_3:{w:384,a:[204,248],m:[300,150]},g2_4:{w:384,a:[204,248],m:[300,150]},
  // v16-33: Epic guards (atlas_rare.py + tools/fix_purple_halo.py: grey-blue halo around the purple glows -> purple)
- g3_0:{w:384,a:[207,248],m:[300,150]},g3_1:{w:384,a:[201,248],m:[300,150]},g3_2:{w:384,a:[206,248],m:[300,150]},g3_3:{w:384,a:[201,248],m:[300,150]},g3_4:{w:384,a:[205,248],m:[300,150]}};
+ g3_0:{w:384,a:[207,248],m:[300,150]},g3_1:{w:384,a:[201,248],m:[300,150]},g3_2:{w:384,a:[206,248],m:[300,150]},g3_3:{w:384,a:[201,248],m:[300,150]},g3_4:{w:384,a:[205,248],m:[300,150]},
+ // v16-34: Legendary guards (atlas_rare.py + tools/fix_gold_halo.py: lemon glow -> gold, Gabriel's ghost frame without the brown cloud)
+ g4_0:{w:384,a:[209,248],m:[300,150]},g4_1:{w:384,a:[198,248],m:[300,150]},g4_2:{w:384,a:[213,248],m:[300,150]},g4_3:{w:384,a:[204,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
