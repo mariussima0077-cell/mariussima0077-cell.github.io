@@ -595,10 +595,11 @@ const SPRD={
  m1_0:{a:[132,248],m:[230,150]},m1_1:{a:[134,243],m:[230,150]},m1_2:{a:[133,247],m:[250,103],look:'wrench'},m1_3:{a:[118,245],m:[252,178],look:'oil'},m1_4:{a:[126,244],m:[252,98],col:'#b2ff59',boom:'fx_acidboom'},m1_5:{a:[131,248],m:[252,105],col:'#d05cff',boom:'fx_purpleboom'},m1_6:{a:[132,247],m:[252,98],col:'#b2ff59',n:3},m1_7:{a:[126,241],m:[250,120],col:'#b2ff59'},m1_8:{a:[136,246],m:[230,150]},
  m2_0:{a:[132,243],m:[230,150]},m2_1:{a:[128,247],m:[230,150]},m2_2:{a:[132,241],m:[249,107],look:'wrench'},m2_3:{a:[128,249],m:[252,93],col:'#29b6f6',boom:'fx_waterboom'},m2_4:{a:[128,247],m:[252,97],n:3},m2_5:{a:[129,243],m:[252,150]},m2_6:{a:[132,248],m:[252,90],col:'#ff5252'},m2_7:{a:[131,242],m:[230,150]},
  // v16-14 Epic: wide cells (w=384 px of the sheet, the pose can cross the 256-px column). R = rows [idle,walk,attack,skill,hurt/KO,win]
+ // hk = separate hurt/KO rows (h = hit, s = stunned, ko = falling sequence)
  // cs = skill frames · lp = leap frames · ld = landing frames (lt s) · ds = dash frames (first ones once, last 2 loop) · noKO = sheet has no hurt/KO row
  m3_0:{w:384,a:[195,248],m:[300,150],R:[0,1,2,3,5,6],lp:[[3,0],[3,1],[3,2],[3,3]],ld:[[4,0],[4,1],[4,2],[4,3]],lt:.6},
  m3_1:{w:384,a:[194,249],m:[300,100],look:'wrench'},
- m3_2:{w:384,a:[205,248],m:[312,102],col:'#d05cff',boom:'fx_purpleboom',R:[0,1,2,3,0,5],cs:[[3,1],[3,2],[3,3],[4,0],[4,1]],noKO:1},
+ m3_2:{w:384,a:[205,248],m:[312,102],col:'#d05cff',boom:'fx_purpleboom',R:[0,1,2,3,0,5],cs:[[3,1],[3,2],[3,3],[4,0],[4,1]],hk:{h:[6,1],s:[7,0],ko:[[6,2],[6,3],[7,1],[7,2],[7,3]]}},
  m3_3:{w:384,a:[184,250],m:[312,130],col:'#d05cff'},
  m3_4:{w:384,a:[201,248],m:[312,142],col:'#e040fb',R:[0,1,3,4,5,6]},
  m3_5:{w:384,a:[183,249],m:[300,150]},
@@ -611,7 +612,7 @@ const sprOK=d=>d&&d.im.complete&&d.im.naturalWidth>0;
 function muzzle(u,dx,dy){const d=u.spr,k=dsc(u.d);if(!sprOK(d))return[u.x+u.face*dx*S,fy(u.d)-(u.lift||0)-dy*k];
   return[u.x+u.face*(d.m[0]-d.a[0])*SPK*k,fy(u.d)-(u.lift||0)-(d.a[1]-d.m[1])*SPK*k];}
 function sprFrame(u,t){const a=u.act,d=u.spr,R=d.R||[0,1,2,3,4,5];
-  if(u.dead)return d.noKO?[R[0],0]:[R[4],u.deadT<.25?2:3];
+  if(u.dead){if(d.hk){const k=d.hk.ko;return k[Math.min(k.length-1,Math.floor(u.deadT/.12))];}return d.noKO?[R[0],0]:[R[4],u.deadT<.25?2:3];}
   if(a&&a.k==='leap'){const k=a.t/a.dur;if(d.lp)return d.lp[Math.min(d.lp.length-1,Math.floor(k*d.lp.length))];return[R[3],k<.2?0:k<.55||u.h.id==='m0_2'?1:2];} // Tom: his falling frame has a backpack he never wears → keep the jump frame
   if(a&&a.k==='dash'){if(a.back)return[R[1],Math.floor(u.wph/TAU*4+40)%4];
     if(d.ds){const n0=d.ds.length-2,i=Math.floor(a.t/.06);return d.ds[i<n0?i:n0+(i-n0)%2];}
@@ -620,8 +621,8 @@ function sprFrame(u,t){const a=u.act,d=u.spr,R=d.R||[0,1,2,3,4,5];
   if(a&&a.k==='cast'){const i=Math.min(cn-1,Math.floor(a.t/a.dur*cn));return cs?cs[i]:[R[3],i];}
   if(u.land>0){if(d.ld){const lt=d.lt||.32;return d.ld[Math.min(d.ld.length-1,Math.floor((1-u.land/lt)*d.ld.length))];}return cs?cs[cn-1]:[R[3],cn-1];}
   if(u.st==='atk')return[R[2],u.ap<.25?0:u.ap<.5?1:u.ap<.75?2:3];
-  if(u.stun>0)return d.noKO?[R[0],0]:[R[4],1];
-  if(u.hurt>.35)return d.noKO?[R[0],0]:[R[4],0];
+  if(u.stun>0)return d.hk?d.hk.s:d.noKO?[R[0],0]:[R[4],1];
+  if(u.hurt>.35)return d.hk?d.hk.h:d.noKO?[R[0],0]:[R[4],0];
   if(u.st==='walk'||u.st==='run')return[R[1],Math.floor(u.wph/TAU*4+40)%4];
   if(u.st==='win')return[R[5],Math.floor(t*5+u.k)%4];
   return[R[0],Math.floor(t*4+u.k*3)%4];}

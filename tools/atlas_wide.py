@@ -35,16 +35,16 @@ def unmix(a):
     F[..., 1] = np.minimum(F[..., 1], m + 12)
     return np.dstack([F, al * 255])
 
-def run(src, hid, rows, grid, out='out'):
+def run(src, hid, rows, grid, out='out', scale=1.0):
     im = np.asarray(Image.open(src).convert('RGB')).astype(float)
     H, W = im.shape[:2]
     rgba = unmix(im)
     if grid:
         dark = im.sum(2) < 150
         for y in range(H):
-            if dark[y].mean() > .6: rgba[max(0, y - 1):y + 2, :, 3] = 0
+            if dark[y].mean() > .9: rgba[max(0, y - 1):y + 2, :, 3] = 0
         for x in range(W):
-            if dark[:, x].mean() > .6: rgba[:, max(0, x - 1):x + 2, 3] = 0
+            if dark[:, x].mean() > .9: rgba[:, max(0, x - 1):x + 2, 3] = 0
     # feather where the generator cut an effect: image border (+ grid lines)
     f = 14
     yy, xx = np.mgrid[0:H, 0:W]
@@ -85,8 +85,11 @@ def run(src, hid, rows, grid, out='out'):
         oc = []
         for c in row:
             img = Image.fromarray(c.astype(np.uint8), 'RGBA')
+            if scale != 1:
+                nw = round(CW * scale); img = img.resize((nw, round(img.height * scale)), Image.LANCZOS)
+                pad = Image.new('RGBA', (CW, img.height)); pad.alpha_composite(img, ((CW - nw) // 2, 0)); img = pad
             canvas = Image.new('RGBA', (CW, 256))
-            top = 248 - gnd
+            top = 248 - round(gnd * scale)
             if top >= 0: canvas.alpha_composite(img, (0, top))
             else: canvas.alpha_composite(img.crop((0, -top, CW, img.height)), (0, 0))
             oc.append(canvas)
@@ -107,4 +110,4 @@ def run(src, hid, rows, grid, out='out'):
     print(json.dumps({'id': hid, 'rows': nR, 'feet_x': int(np.median(feet)), 'bottom': int(ys.max()), 'top': int(ys.min())}))
 
 if __name__ == '__main__':
-    run(sys.argv[1], sys.argv[2], [int(x) for x in sys.argv[3].split(',')], int(sys.argv[4]))
+    run(sys.argv[1], sys.argv[2], [int(x) for x in sys.argv[3].split(',')], int(sys.argv[4]), scale=float(sys.argv[5]) if len(sys.argv) > 5 else 1.0)
