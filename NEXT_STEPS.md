@@ -8,7 +8,8 @@
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v16-12'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v16-13'`.
+  - **v16-13 (14 nov)**: cei 8 Rare (Diesel Dave, Carlos Clutch, Max Brake, Rafael Chrome, Elena Spark, Lena Wire, Kenji Scan, Tess Turbo = `m2_0..m2_7`) au avatare (fond albastru Rare) + animații. Decupaj: `atlas3.py` (scoate și buzunarele de verde închise între brațe/corp și umbrele verzi de pe sol). Rezolvări: Elena – cadrul 4 din skill avea monștri negri desenați → sărit (`n:3`); Rafael – stropirea de apă era lipită de el → explozia de apă (`fx_waterboom`) apare la monstru, atacul cu jet albastru; Kenji – laser roșu din ochi; Max – aruncă cheia (look wrench). ⏳ Skill unic pe erou (cerut de Marius) – încă pe clasă, de făcut.
   - **v16-12 (14 nov)**: GĂSIT bugul testerului (Samsung S20 Ultra, Android 12, WebView Chrome 95): culorile `#RRGGBBAA` (ex. soarele `#fff1c1`+`cc`) aruncau eroare în `addColorStop` → bătălia nu pornea. Fix: polyfill la începutul `index.html` care, doar pe telefoanele care nu le înțeleg, le transformă în `rgba()` (gradient, fillStyle, strokeStyle, shadowColor). ⚠️ Pe viitor: în canvas nu folosi culoare+'cc'; folosește rgba().
   - **v16-11 (14 nov)**: actualizare automată – jocul verifică versiunea nouă la fiecare revenire în aplicație și la 15 min; când s-a instalat, salvează, arată „Update ready” și se reîncarcă singur (niciodată în timpul unei bătălii). Primul update după v16-11 tot trebuie prins o dată cu închis/deschis.
   - **v16-10 (14 nov)**: (1) un tester: FIGHT → îl întoarce la etape, bătălia nu pornește (nereprodus pe telefonul de test). Acum `safeStart()`: dacă pornirea crapă, reîncearcă fără efectele FX2; dacă tot crapă, arată eroarea + modelul telefonului → de cerut captura de la tester. (2) Bara de sus: cifrele (bani, REP, mașini) stau în căsuța lor și se micșorează singure (`fitT`); mașinile vândute scurtate (1.2K, 98K).
@@ -84,7 +85,7 @@
 ## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
 - Orice schimbare se verifică întâi cu `PLAY_RULES.md`.
-- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-13`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-14`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.
