@@ -8,7 +8,8 @@
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
   - Repository GitHub: `mariussima0077-cell/mariussima0077-cell.github.io` (public, GitHub Pages din `main` / root, `.nojekyll`).
   - Claude are acces de scriere la repository și poate porni jocul live (browser automat) ca să verifice și să facă capturi.
-  - Versiunea curentă în `sw.js`: `const V='te-v16-9'`.
+  - Versiunea curentă în `sw.js`: `const V='te-v16-10'`.
+  - **v16-10 (14 nov)**: (1) un tester: FIGHT → îl întoarce la etape, bătălia nu pornește (nereprodus pe telefonul de test). Acum `safeStart()`: dacă pornirea crapă, reîncearcă fără efectele FX2; dacă tot crapă, arată eroarea + modelul telefonului → de cerut captura de la tester. (2) Bara de sus: cifrele (bani, REP, mașini) stau în căsuța lor și se micșorează singure (`fitT`); mașinile vândute scurtate (1.2K, 98K).
   - **v16-9 (14 nov)**: Leo Lift – căruciorul (luat din cadrul de repaus) pus lângă el în cadrele de skill, lovit, KO și ultima victorie, unde lipsea (aprobat de Marius).
   - **v16-8 (14 nov)**: cei 9 Uncommon (Gina Gear, Bruno Piston, Marco Torque, Leo Lift, Hank Hammer, Vic Spray, Ivy Volt, Nora Check, Axel Grind = `m1_0..m1_8`) au avatare + animații. Decupaj NOU pentru planșe cu mult verde (`atlas2.py`: scoate doar verdele pur de fond, legat în zone mari, păstrează verdele de pe haine/efecte). Rezolvări: Ivy – cadrul 4 din skill avea un fundal verde pătrat cu monștri → sărit; Leo – strălucirea de la vindecare era tăiată pătrat → margini estompate; Hank – explozia acidă tăiată din poza lui și oglindită (era lipită de el) → apare la monstru; Vic – aceeași explozie colorată mov. Culori proprii pt. efecte (`col` în `SPRD`): laser/fulger/jet verde la Nora, Ivy, Hank, mov la Vic, roșu la Pete/Kim.
   - **v16-7 (14 nov)**: Tom Wrench – cadrul de cădere din skill (rândul 4, cadrul 3) are un rucsac pe care nu-l poartă în rest → în aer rămâne pe cadrul de săritură, apoi aterizarea. Regula lui Marius: când o poză are o problemă, Claude caută singur o soluție (decupează, mută, prelungește) și îi spune ce a făcut.
@@ -81,7 +82,7 @@
 ## ⚠️ REGULI
 - **Nu mai resetăm salvarea** la update-uri (cheia rămâne `torqueEmpire_v15`).
 - Orice schimbare se verifică întâi cu `PLAY_RULES.md`.
-- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-10`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
+- La fiecare update de joc: Claude schimbă `const V` din `sw.js` (următorul: `te-v16-11`), testează live și urcă pe GitHub. Pentru schimbări de joc **nu** trebuie pachet nou în Play.
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.

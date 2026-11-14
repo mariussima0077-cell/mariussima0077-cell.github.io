@@ -1061,6 +1061,13 @@ const FORM=[[.36,.22],[.33,.62],[.22,.42],[.14,.14],[.13,.8]];
 function formation(){const hs=B.heroes;const melee=hs.filter(u=>u.rng<80*S),rng=hs.filter(u=>u.rng>=80*S);
   const order=[...melee,...rng];order.forEach((u,i)=>{u.fx=W*FORM[i][0];u.fd=FORM[i][1];});}
 
+// v16-10: a tester's battle never started (FIGHT → back to the stages). If starting fails, retry without the new effects;
+// if it still fails, show the error so he can send a screenshot.
+function safeStart(si,team){try{startBattle(si,team);return;}catch(e){console.error(e);window.__BERR=e;}
+  try{FX2=false;startBattle(si,team);TE().toast('⚠️ Battle started in safe mode',2500);return;}catch(e2){console.error(e2);
+    $('bt').classList.remove('open');window.__BATTLE_ON=false;
+    const e=window.__BERR||e2,msg=String(e&&e.message||e).slice(0,160),st=String(e&&e.stack||'').split('\n').slice(0,3).join(' | ').slice(0,300);
+    pop(`<div class="pT">Battle could not start</div><div class="pD">Please send a screenshot of this to the developer:</div><div class="pD" style="font-family:monospace;font-size:11px;word-break:break-all;text-align:left">${msg.replace(/</g,'&lt;')}<br>${st.replace(/</g,'&lt;')}<br>${navigator.userAgent.replace(/</g,'&lt;')}</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}}
 function startBattle(si,team){
   B={si,stage:STAGES[si],wave:0,heroes:[],mons:[],proj:[],fx:[],parts:[],nums:[],tele:[],t:0,real:0,ts:1,slowT:0,spd:spdOK(TE().G.cp.spd),auto:TE().G.cp.auto!==false,
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
@@ -1677,7 +1684,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);const T=TE(
       <div class="cpRow"><button class="cpGo" data-a="retry">RETRY</button><button class="cpGo alt" data-a="team">TEAM</button></div><div class="cpRow"><button class="cpGo alt" data-a="gear">${IMGI(glyphURL('bag','#ffd9b0'))} GEAR</button><button class="cpGo alt" data-a="map">CAMPAIGN</button></div>`;}
   $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
-    if(a==='next'){G.cp.ch=STAGES[si+1].c;showMap();openCard(si+1);}else if(a==='retry'){startBattle(si,teamHeroes());}else if(a==='team'){showMap();openTeam(si);}
+    if(a==='next'){G.cp.ch=STAGES[si+1].c;showMap();openCard(si+1);}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openTeam(si);}
     else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();openGSum();}else showMap();};}
 
 // ---------------------------------------------------------------- campaign map (5 chapters × 20 stages)
@@ -1859,7 +1866,7 @@ function openTeam(si){const T=TE(),G=T.G;tsi=si;cleanGear();tsel=curTeamList().m
     if(a==='back'){$('cpTeam').classList.remove('open');return;}
     if(a==='best'){popAutoBest();return;}
     if(a==='gear'){openGear(tsel.find(i=>!i.startsWith('crew')));return;}
-    if(a==='go'){if(!tsel.length){T.toast('Pick at least 1 mechanic',2000);return;}G.cp.team=tsel.slice();T.save();$('cpTeam').classList.remove('open');startBattle(si,teamHeroes());return;}
+    if(a==='go'){if(!tsel.length){T.toast('Pick at least 1 mechanic',2000);return;}G.cp.team=tsel.slice();T.save();$('cpTeam').classList.remove('open');safeStart(si,teamHeroes());return;}
     if(sk!=null){popReplace(+sk);return;}
     if(id){const k=tsel.indexOf(id);if(k>=0)popReplace(k);else if(tsel.length<5){tsel.push(id);G.cp.team=tsel.slice();render();}else popWhoLeaves(id);}};}
 

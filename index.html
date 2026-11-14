@@ -17,12 +17,12 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #hud{justify-content:center;padding:3px 4px}
 #hudBar{position:relative;height:100%;aspect-ratio:1086/145;max-width:100%;background:url(img/hud.webp) center/100% 100% no-repeat;container-type:size}
 #hudBar>*{position:absolute;font-weight:900;line-height:1;white-space:nowrap;text-shadow:0 2px 0 #000,0 0 6px #000}
-#money{left:11.6%;top:50%;transform:translateY(-55%);font-size:33cqh;color:#ffd54a}
+#money{left:11.6%;width:12.6%;overflow:hidden;top:50%;transform:translateY(-55%);font-size:33cqh;color:#ffd54a}
 #repPill{pointer-events:auto;left:27%;width:39.5%;top:6%;height:76%}
-#rep{position:absolute;left:24%;top:50%;transform:translateY(-50%);font-size:31cqh;color:#fff2c4}
+#rep{position:absolute;left:24%;width:33%;overflow:hidden;white-space:nowrap;top:50%;transform:translateY(-50%);font-size:31cqh;color:#fff2c4}
 .rb{position:absolute;left:59%;width:34%;top:37%;height:21%;border-radius:999px;overflow:hidden}
 .rb i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(#ffe066,#ffa000 60%,#e65100);box-shadow:inset 0 2px 0 rgba(255,255,255,.4)}
-#sold{left:78.2%;top:50%;transform:translateY(-55%);font-size:40cqh;color:#fff}
+#sold{left:78.2%;width:6.6%;overflow:hidden;top:50%;transform:translateY(-55%);font-size:40cqh;color:#fff}
 #shopBtn{pointer-events:auto;left:85.5%;width:13%;top:8%;height:72%;border-radius:999px}
 #sheet{position:fixed;left:0;right:0;bottom:0;max-height:72vh;overflow-y:auto;background:#121a23;border-top:3px solid #ffb300;border-radius:20px 20px 0 0;padding:16px 18px 22px;transform:translateY(110%);transition:transform .25s ease;z-index:6;box-shadow:0 -10px 30px rgba(0,0,0,.5);touch-action:pan-y}
 #sheet.open{transform:none}
@@ -677,6 +677,9 @@ function ell(x,y,rx,ry){X.beginPath();X.ellipse(x,y,Math.max(.1,rx),Math.max(.1,
 function circ(x,y,r){X.beginPath();X.arc(x,y,r,0,Math.PI*2);X.fill();}
 function lerpA(a,b,t){let d=((b-a+Math.PI*3)%(Math.PI*2))-Math.PI;return a+d*t;}
 function angDiff(a,b){return Math.abs(((b-a+Math.PI*3)%(Math.PI*2))-Math.PI);}
+// v16-10: HUD numbers shrink to stay inside their box
+function fitT(el){el.style.fontSize='';const w=el.clientWidth,sw=el.scrollWidth;if(w>0&&sw>w)el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*w/sw*.97)+'px';}
+addEventListener('resize',()=>setTimeout(()=>['money','rep','sold'].forEach(i=>fitT($(i))),60));
 function fmt(n){n=Math.round(n);if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(n>=1e4)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toLocaleString('en-US');}
 function float(x,y,txt,col){floats.push({x,y,txt,col:col||'#fff',t:0});}
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -2867,8 +2870,8 @@ let lastTk=-1,lastIdle=-1;
 let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(G.h.tk!==lastTk){lastTk=G.h.tk;const t=$('tkDot');t.style.display=G.h.tk?'flex':'none';t.textContent=G.h.tk>99?'99+':G.h.tk;}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0);if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×1.3</b>':'');}
-  const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold;}
-  if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
+  const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
+  if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
 // =================== LOOP ===================
 let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=99,goodT=0,capDPR=9,capHold=0;
