@@ -671,7 +671,9 @@ const SPRD={
  // v16-22: Uncommon drivers (tools/atlas_drivers.py keeps the dark-emerald accents; Gina rows 4-5 rescaled by tools/fix_d1_2_gina.py)
  d1_0:{w:384,a:[196,248],m:[300,150]},d1_1:{w:384,a:[181,248],m:[300,150]},d1_2:{w:384,a:[192,248],m:[300,150]},d1_3:{w:384,a:[185,248],m:[300,150]},d1_4:{w:384,a:[186,248],m:[300,150]},d1_5:{w:384,a:[195,248],m:[300,150]},
  // v16-23: Rare drivers (tools/atlas_rare.py: full green unmix; Fiona row 4 split pose | speed streak)
- d2_0:{w:384,a:[177,248],m:[300,150]},d2_1:{w:384,a:[192,248],m:[300,150]},d2_2:{w:384,a:[171,248],m:[300,150]},d2_3:{w:384,a:[175,248],m:[300,150]},d2_4:{w:384,a:[188,248],m:[300,150]}};
+ d2_0:{w:384,a:[177,248],m:[300,150]},d2_1:{w:384,a:[192,248],m:[300,150]},d2_2:{w:384,a:[171,248],m:[300,150]},d2_3:{w:384,a:[175,248],m:[300,150]},d2_4:{w:384,a:[188,248],m:[300,150]},
+ // v16-24: Epic drivers (atlas_rare.py + fix_closeup.py for close-up row 4, fade_cell.py for Nova's burst)
+ d3_0:{w:384,a:[173,248],m:[300,150]},d3_1:{w:384,a:[195,248],m:[300,150]},d3_2:{w:384,a:[172,248],m:[300,150]},d3_3:{w:384,a:[169,248],m:[300,150]},d3_4:{w:384,a:[170,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
