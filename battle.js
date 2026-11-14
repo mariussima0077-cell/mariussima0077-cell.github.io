@@ -174,14 +174,14 @@ css.textContent=`
 .node .pad{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 5px #000a)}
 .node .no{position:absolute;left:0;right:0;top:20%;text-align:center;font-size:34px;font-weight:900;color:#eceff1;text-shadow:0 3px 2px #000,0 0 6px #0008;font-family:system-ui;line-height:1}
 .node .ic{position:absolute;left:50%;top:44%;width:42%!important;height:auto!important;transform:translate(-50%,-50%);filter:drop-shadow(0 2px 2px #000)}
-.node.cur .pad{animation:padGlow 1.3s ease-in-out infinite}
+.node.cur .pad{filter:drop-shadow(0 6px 5px #000a) drop-shadow(0 0 10px #ffb300)}.node.cur::before{content:'';position:absolute;left:8%;right:8%;top:14%;bottom:8%;border-radius:50%;background:radial-gradient(#ffc40088,#ffab0000 70%);animation:padHalo 1.3s ease-in-out infinite;will-change:opacity,transform;pointer-events:none}@keyframes padHalo{0%,100%{opacity:.35;transform:scale(.9)}50%{opacity:1;transform:scale(1.15)}}
 .node.cur .no{color:#fff;text-shadow:0 3px 2px #6a3500,0 0 10px #fff6}
 @keyframes padGlow{0%,100%{filter:drop-shadow(0 6px 5px #000a) drop-shadow(0 0 6px #ffab00)}50%{filter:drop-shadow(0 6px 5px #000a) drop-shadow(0 0 20px #ffc400)}}
 .node.lock .pad{filter:brightness(.8) drop-shadow(0 6px 5px #000a)}.node.lock .no{color:#9ea4ab}
 .node .lk{position:absolute;right:16%;bottom:24%;width:18px;height:18px;border-radius:50%;background:#000c url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ffc93a" d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>') center/12px no-repeat;border:1px solid #d79b22}
 .node.boss{width:126px!important;height:108px!important;margin:-54px 0 0 -63px!important}.node.boss .pad{filter:sepia(1) saturate(5) hue-rotate(-38deg) brightness(.8) drop-shadow(0 0 12px #ff1744)}
 .node.mini{width:112px!important;height:96px!important;margin:-48px 0 0 -56px!important}.node.mini .pad{filter:sepia(1) saturate(3.5) hue-rotate(-14deg) brightness(.85) drop-shadow(0 0 9px #ff6d00)}
-.node.boss.cur .pad,.node.mini.cur .pad{animation:padGlow 1.3s ease-in-out infinite}
+.node.boss.cur .pad,.node.mini.cur .pad{filter:drop-shadow(0 6px 5px #000a) drop-shadow(0 0 10px #ffb300)}
 .node .nm{top:-21px!important;font-size:12px!important;font-weight:800;color:#fff!important;background:linear-gradient(#2a2e35,#0c0d10)!important;border:2px solid #8f969f;border-radius:7px!important;padding:2px 9px!important;box-shadow:0 2px 0 #000,inset 0 1px 0 #ffffff25;letter-spacing:.2px!important;font-family:system-ui}
 .node.cur .nm{border-color:#e0a82e;background:linear-gradient(#3a2a10,#140c02)!important;box-shadow:0 0 10px #ffb30088}
 .node .st{bottom:-12px!important;letter-spacing:0!important;font-size:0!important;background:#000b;border-radius:9px;padding:0 4px;border:1px solid #d79b2288}
@@ -1869,7 +1869,7 @@ function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
   if(B.flash>0){g.fillStyle='rgba(255,240,200,'+B.flash*.6+')';g.fillRect(0,0,W,H);}
   drawHUD(t);drawBanner(t);drawCenterText(t);drawCombo();
   if(B.paused){if(B.offer)drawOffer(t);else drawPause();}}
-function loop(now){if(!running)return;raf=requestAnimationFrame(loop);
+function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-lastT<14.5)return; // v16-27: max 60 fps (120 Hz phones drew twice as much)
   const raw=Math.min(.05,(now-lastT)/1000);lastT=now;
   if(!B.paused){B.real+=raw;B.shake=Math.max(0,B.shake-raw*40);if(B.zoom)B.zoom=Math.max(0,B.zoom-raw*(B.zoom*5+.02));if(B.combo){B.combo.t+=raw;if(B.combo.t>1.4)B.combo=null;}B.flash=Math.max(0,B.flash-raw*2.2);
     let ts=B.spd;if(B.slowT>0){B.slowT-=raw;ts*=.3;}if(B.hs>0){B.hs-=raw;ts*=.06;}
@@ -1991,7 +1991,8 @@ function drawPath(c){const C=CHAP[c],cv2=$('cpPathCv'),w=cv2.clientWidth||Math.m
     const j0=z*5,left=NODEX(j0)<50;zoneSign(x,left?w*.75:w*.25,NODEY(j0)+(j0===0?60:6),k,C.zones[z],C.col);}
   // vignette at the sides
   const vg=x.createLinearGradient(0,0,w,0);vg.addColorStop(0,'rgba(0,0,0,.35)');vg.addColorStop(.12,'rgba(0,0,0,0)');vg.addColorStop(.88,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=vg;x.fillRect(0,0,w,h);}
-function showMap(){const T=TE(),G=T.G;GR();$('cpTk').innerHTML=TKI+' '+G.h.tk;const c=curCh(),C=CHAP[c];
+function showMap(){const T=TE(),G=T.G;GR();try{teamHeroes().forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){} // v16-27: get the team's animations ready before the fight (only those, not all)
+$('cpTk').innerHTML=TKI+' '+G.h.tk;const c=curCh(),C=CHAP[c];
   $('cpT1').innerHTML=IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')+' CAMPAIGN';$('cpT2').textContent='CHAPTER '+(c+1)+' OF '+NCH;
   const done=Math.max(0,Math.min(SPC,G.cp.best-c*SPC));let stc=0;for(let j=0;j<SPC;j++)stc+=G.cp.stars[c*SPC+j]||0;
   $('cpChN').innerHTML=`<b style="color:${C.col}">${C.n}</b><small>${done}/${SPC} stages · ${stc}/${SPC*3} ⭐</small>`;

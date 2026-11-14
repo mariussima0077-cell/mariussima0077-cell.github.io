@@ -2926,13 +2926,20 @@ let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'
 let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=99,goodT=0,capDPR=9,capHold=0;
 // never go below this: on sharp phone screens 1x looked foggy when zoomed in
 const MINDPR=()=>Math.min(MAXDPR,(window.devicePixelRatio||1)>=2?1.5:1);
+// v16-27: less work for the phone – max 60 fps (120 Hz phones drew 120×/s), 30 fps when nobody touches the map,
+// ~6 fps behind see-through pages (Quests, Summon, Team…) and nothing behind the Campaign (it covers everything).
+const MAPCOV=['dq','sm','pop','team','idl','ros'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
+cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListener('pointermove',()=>{touchT=performance.now();},{passive:true});
+function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
 function frame(now){
+  if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle?31:14.5)){requestAnimationFrame(frame);return;}}
   const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);
   if(started){let left=dt*SPD;while(left>0){const s=Math.min(.05,left);update(s);left-=s;}}
   if(zAnim){zAnim.t=Math.min(1,zAnim.t+dt/.22);const e=1-Math.pow(1-zAnim.t,3);zoomAt(zAnim.from+(zAnim.to-zAnim.from)*e,VW/2,TOP+(VH-TOP)/2);if(zAnim.t>=1)zAnim=null;}
   if(!gest&&(Math.abs(vX)>2||Math.abs(vY)>2)){camX+=vX*dt;camY+=vY*dt;clampCam();const f=Math.exp(-dt/.32);vX*=f;vY*=f;}
   if(!started){last=now;requestAnimationFrame(frame);return;}
   if(window.__BATTLE_ON){requestAnimationFrame(frame);return;}
+  const cov=mapCover();if(cov){coverT+=raw;if(cov===1&&coverT>.16){coverT=0;render();}hud();perfT=0;perfN=0;perfSum=0;perfJS=0;perfMin=99;}else{coverT=0;
   const t0=performance.now();render();hud();
   // adaptive resolution keeps the map smooth on slower phones
   const js=performance.now()-t0;perfJS+=js;perfSum+=Math.max(js,raw*1000);perfN++;perfT+=raw;perfMin=Math.min(perfMin,raw*1000);
@@ -2942,7 +2949,7 @@ function frame(now){
     if(avg>(capped?40:26)&&DPR>MINDPR()){DPR=Math.max(MINDPR(),DPR-.25);capDPR=DPR;capHold=0;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;}
     else if(avg<(capped?24:19)&&DPR<MAXDPR){goodT+=perfT;capHold+=perfT;if(capHold>25)capDPR=9;
       if(goodT>4&&DPR<capDPR){DPR=Math.min(MAXDPR,DPR+.25);cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;}}
-    perfT=0;perfN=0;perfSum=0;perfJS=0;perfMin=99;}
+    perfT=0;perfN=0;perfSum=0;perfJS=0;perfMin=99;}}
   panelT+=dt;if(panelT>.25){panelT=0;renderPanel();if(dqEl.classList.contains('open'))renderDQ();renderSm();renderTeam();renderIdle();
     if((time|0)%5===0){dqCheck();if(VSUB!==subOn())vipRefresh();}}
   requestAnimationFrame(frame);
