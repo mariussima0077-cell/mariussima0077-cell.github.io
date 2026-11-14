@@ -72,6 +72,14 @@
 - **Aplicația creată** (13 nov): Torque Empire: Garage Tycoon · `com.torqueempire.game` · Jeu · Sans frais · en-US.
 
 ## ⏳ CE A MAI RĂMAS
+### 📌 NU UITA: APK „normal” (decis 14 nov 2026, de făcut când jocul e stabil)
+- [ ] **Trecem de la TWA (jocul rulează în Chrome) la APK cu Capacitor** – același pachet `com.torqueempire.game`, aceeași cheie de semnare (Drive), jucătorii primesc update obișnuit și nu pierd salvarea.
+  - Jocul e ÎN APK (pornește și fără internet, nu mai depinde de Chrome-ul jucătorului, fără bară de adresă).
+  - **Update-uri live**: la pornire aplicația verifică GitHub și descarcă singură versiunea nouă (HTML/JS – permis de Google). Pachet nou în Play Console doar rar (permisiuni, plăți, versiune Android).
+  - Claude construiește pachetul automat pe GitHub (GitHub Actions, fără calculator); Marius doar îl descarcă și îl urcă în Play Console de pe telefon.
+  - Plățile: de făcut cu Google Play Billing prin plugin Capacitor (în loc de varianta TWA).
+  - ⚠️ Nu în timpul celor 14 zile de test cu cei 12 testeri (să nu stricăm ceva și să plece testerii). Ca viteză e cam la fel (același motor) – câștigul e independența de Chrome + offline.
+
 ### Acum (cât așteptăm Google)
 - [ ] **Demo efecte noi în bătălii (FX v2)** – deschide jocul cu `?fx=2` la final de link, intră într-o bătălie și apasă butonul mov „FX: NEW / FX: OLD” ca să compari. Pentru jucători e OPRIT până aprobă Marius. Texturi gratuite CC0 (Kenney Particle Pack) în `img/fx/`. Dacă e aprobat: FX2 devine implicit și butonul de comparație dispare.
 - [ ] **Client ID pentru login Google** (Google Cloud Console, contul torqueempirehelp@gmail.com): proiect nou → OAuth consent screen (External, „Torque Empire”, publicat) → Credentials → OAuth client ID → *Web application* → Authorized JavaScript origins: `https://mariussima0077-cell.github.io` → copiezi Client ID-ul (`…apps.googleusercontent.com`) și i-l dai lui Claude.
