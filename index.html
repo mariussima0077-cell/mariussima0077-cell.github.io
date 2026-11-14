@@ -1080,7 +1080,7 @@ function spawnThief(){const L=theftTargets();if(!L.length)return false;
   if(c.prevState==='forsale'){st=[{x:Math.min(W-20,c.x+260),y:1335+DY},{x:c.x+rnd(-10,10),y:1325+DY}];}
   else if(c.x<AV){st=[{x:YXL-190,y:c.y+rnd(-40,40)},{x:YXL-14,y:c.y+rnd(-14,14)}];}
   else{st=[{x:PX_R+190,y:PY_B+40},{x:PX_R,y:PY_B+16},{x:YXR-6,y:c.y+rnd(-10,10)}];}
-  p.x=st[0].x;p.y=st[0].y;p.vis=true;p.pose='';thief.route=[...st.slice(1),side];thief.st='sneak';thief.t=0;return true;}
+  thief.sk='t'+Math.floor(Math.random()*6);p.x=st[0].x;p.y=st[0].y;p.vis=true;p.pose='';thief.route=[...st.slice(1),side];thief.st='sneak';thief.t=0;return true;}
 function alarmStart(){const c=thief.car;c.alarm=1;
   toast('🚨 A thief is breaking into a car! Your guard is running…',3500);float(c.x,c.y-34,'🚨 THIEF!','#ff5252');
   guards.forEach(g=>{if(!g.p.vis)return;const end=()=>nearThief(g.mode==='desk'?SOUT:g.p);
@@ -1092,7 +1092,7 @@ function guardHome(g){g.mode=g.k?'patrol':'back';g.p.pose='';
   if(g.k){let bi=0,bd=1e9;PATROL.forEach((q,i)=>{const d=dist(q,g.p);if(d<bd){bd=d;bi=i;}});g.pi=bi;g.route=[PATROL[bi]];}
   else g.route=[...(g.via||[]).slice().reverse(),{x:PX_R,y:SOUT.y},SOUT,SDOOR,CHAIR];}
 function mkCop(x,y,path,v,mode){const c={id:9000+Math.floor(Math.random()*999),type:POLICE_T,x,y,a:0,col:POLICE_T.col,siren:true,tune:{},jobs:[],dmg:[],dirt:0,lift:0,state:'police',path,v,mode,t:0,acc:'#fff',wrapCol:'#111'};police.push(c);return c;}
-function catchThief(){const T=thief,c=T.car;T.st='caught';T.p.pose='';c.state=c.prevState;c.alarm=0;
+function catchThief(){const T=thief,c=T.car;T.st='caught';T.ct=time;T.p.pose='';c.state=c.prevState;c.alarm=0;
   const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;G.sec.caught++;G.h.ct++;qAdd('thief',1);
   float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');toast('👮 Thief caught! Reward +'+fmt(rw)+' · '+CTI+' +1 · The police are coming',4000);
   const road=c.slot.road,lane=offsetPath(route(carG,{x:AV,y:170},road),LN);
@@ -1486,7 +1486,7 @@ function vipThumb(){try{const cv2=document.createElement('canvas');cv2.width=184
 // v16-21: a hero driver is drawn from his sprite sheet: walk · scooter · idle (signature move now and then) · tip
 const SPRD_OK=h=>h.cat==='d'&&!!HPIC[h.id]; // drivers that have a sprite sheet (tip animation pauses them 1 s)
 function drawDriver(d){const p=d.p;p.miniOK=false;
-  if(p.vis&&window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('d|'+d.pool+'|'+d.k);if(h){
+  if(p.vis&&window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('d|'+d.pool+'|'+d.k)||{id:'d0_0'};if(h){
     if(p.ph==null)p.ph=Math.random()*12;
     const riding=p.ride>=0;let an=0,t=time;
     if(p.tipT>0){an=5;t=1-p.tipT;}else if(riding)an=3;else if(p.moving)an=1;
@@ -1498,7 +1498,7 @@ function drawDriver(d){const p=d.p;p.miniOK=false;
   drawPerson(p);}
 // v16-30: guards from Marius' sheets. Rows: 0 idle · 1 walk · 2 run · 3 catch (whistle, stop, grab, cuffs) · 4 signature move · 5 reward coin
 function drawGuard(g){const p=g.p;p.miniOK=false;
-  if(window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('g|'+g.k);if(h){
+  if(window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('g|'+g.k)||{id:'g0_0'};if(h){
     if(p.ph==null)p.ph=Math.random()*12;
     let an=0,t=time;const run=g.mode==='run'&&g.delay<=0&&p.moving,walk=!run&&p.moving;
     if(g.mode==='hold'){const q=g.ht||0;if(q<2){an=3;t=q/3;}else if(q<3.2){an=5;t=q-2;}}
@@ -1803,10 +1803,19 @@ function drawCams(){const n=SEC_XCAMS[PLV('security')-1];for(let i=0;i<n;i++){co
 function drawAlarm(c){if(!onScreen(c.x,c.y,50))return;const on=(time*6|0)%2,L=c.type.L/2,Wd=c.type.W/2;
   X.save();X.translate(c.x,c.y);X.rotate(c.a);X.fillStyle=on?'rgba(255,170,0,.95)':'rgba(255,120,0,.3)';for(const [x,y] of[[L-2,-Wd+2],[L-2,Wd-2],[-L+2,-Wd+2],[-L+2,Wd-2]])circ(x,y,on?3.4:2.2);X.restore();
   X.strokeStyle='rgba(255,40,40,'+(.6-((time*1.6)%1)*.6)+')';X.lineWidth=2.5;X.beginPath();X.arc(c.x,c.y,18+((time*1.6)%1)*26,0,7);X.stroke();}
+// v16-35: 6 thieves from Marius' sheets (t0..t5, one picked at random each time). Rows: 0 idle · 1 sneak · 2 run · 3 break-in · 4 caught (surprise, hands up, cuffed) · 5 walk away cuffed
+function drawThief(T){const p=T.p;if(!(window.CAMPAIGN&&CAMPAIGN.mini))return false;
+  let an=0,t=time;const fr=f=>(f+.1)/5; // row 4 plays at 5 fps in mini()
+  if(T.st==='sneak')an=p.moving?1:0;else if(T.st==='break')an=3;
+  else if(T.st==='caught'){an=4;const q=time-(T.ct||time);t=fr(q<.7?0:q<1.6?1:q<2.2?2:3);}
+  else if(T.st==='toPolice')an=5;
+  const face=Math.cos(p.a)>=0?1:-1;
+  X.fillStyle='rgba(0,0,0,.28)';ell(p.x,p.y+6,7,2.6);
+  return CAMPAIGN.mini(X,T.sk||'t0',an,t,p.x,p.y+6,24,face,0);}
 function drawSecPeople(){
   for(const g of guards)if(g.p.vis&&onScreen(g.p.x,g.p.y,20)){drawGuard(g);if(DET&&g.mode==='run')tag(g.p.x,g.p.y-15,'👮','#1565c0');}
-  const T=thief;if(T.p.vis&&onScreen(T.p.x,T.p.y,24)){drawPerson(T.p);
-    if(T.st==='caught'||T.st==='toPolice')tag(T.p.x,T.p.y-15,'⛓ CAUGHT','#2e7d32');else if(DET)tag(T.p.x,T.p.y-15,'🦹 THIEF','#c62828');}
+  const T=thief;if(T.p.vis&&onScreen(T.p.x,T.p.y,24)){const ok=drawThief(T),ty=T.p.y-(ok?30:15);
+    if(T.st==='caught'||T.st==='toPolice')tag(T.p.x,ty,'⛓ CAUGHT','#2e7d32');else if(DET)tag(T.p.x,ty,'🦹 THIEF','#c62828');}
 }
 function drawArm(px,py,L,v){const len=Math.max(2,L*Math.cos(v*Math.PI/2*.94)),hh=L*21/176;
   X.fillStyle='rgba(0,0,0,'+(.22+v*.12)+')';X.fillRect(px-len+1,py-hh*.35+2+v*7,len,hh*.7);
@@ -2530,7 +2539,7 @@ function addTickets(n,why){G.h.tk+=n;save();if(why)toast(''+TKI+' +'+n+' Recruit
 const PCACHE={};
 function hashS(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 // v16-5: Marius' own pictures for these heroes (cut from his sprite sheets)
-const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1,g2_0:1,g2_1:1,g2_2:1,g2_3:1,g2_4:1,g3_0:1,g3_1:1,g3_2:1,g3_3:1,g3_4:1,g4_0:1,g4_1:1,g4_2:1,g4_3:1};
+const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1,g2_0:1,g2_1:1,g2_2:1,g2_3:1,g2_4:1,g3_0:1,g3_1:1,g3_2:1,g3_3:1,g3_4:1,g4_0:1,g4_1:1,g4_2:1,g4_3:1,g5_0:1,g5_1:1};
 function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/hero/'+key+'.webp';if(PCACHE[key])return PCACHE[key];
   const S=128,cv2=document.createElement('canvas');cv2.width=cv2.height=S;const g=cv2.getContext('2d');
   let sd=hashS(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};

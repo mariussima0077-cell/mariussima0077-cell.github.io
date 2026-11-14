@@ -690,7 +690,9 @@ const SPRD={
  // v16-33: Epic guards (atlas_rare.py + tools/fix_purple_halo.py: grey-blue halo around the purple glows -> purple)
  g3_0:{w:384,a:[207,248],m:[300,150]},g3_1:{w:384,a:[201,248],m:[300,150]},g3_2:{w:384,a:[206,248],m:[300,150]},g3_3:{w:384,a:[201,248],m:[300,150]},g3_4:{w:384,a:[205,248],m:[300,150]},
  // v16-34: Legendary guards (atlas_rare.py + tools/fix_gold_halo.py: lemon glow -> gold, Gabriel's ghost frame without the brown cloud)
- g4_0:{w:384,a:[209,248],m:[300,150]},g4_1:{w:384,a:[198,248],m:[300,150]},g4_2:{w:384,a:[213,248],m:[300,150]},g4_3:{w:384,a:[204,248],m:[300,150]}};
+ g4_0:{w:384,a:[209,248],m:[300,150]},g4_1:{w:384,a:[198,248],m:[300,150]},g4_2:{w:384,a:[213,248],m:[300,150]},g4_3:{w:384,a:[204,248],m:[300,150]},
+ // v16-35: Mythic guards (fix_red_tint.py rows 2-5, fade_cell.py The Wall hex wall) + 6 thieves t0..t5 (map only)
+ g5_0:{w:384,a:[195,248],m:[300,150]},g5_1:{w:384,a:[213,248],m:[300,150]},t0:{w:384,a:[197,248],m:[300,150]},t1:{w:384,a:[181,248],m:[300,150]},t2:{w:384,a:[195,248],m:[300,150]},t3:{w:384,a:[198,248],m:[300,150]},t4:{w:384,a:[195,248],m:[300,150]},t5:{w:384,a:[199,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
