@@ -2942,12 +2942,20 @@ function startLoader(){
 window.__TE={savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)window.CAMPAIGN.open();};
 makeGrass();resize();startLoader();requestAnimationFrame(frame);
-// v16-11: auto-update – when a new version is on GitHub, it is installed and the game reloads by itself (never in the middle of a battle)
+// v16-11: auto-update – a new version on GitHub is downloaded by itself; v16-17: the player confirms the restart with OK (never in the middle of a battle)
 if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!navigator.serviceWorker.controller;let upd=false;
   navigator.serviceWorker.register('sw.js').then(reg=>{const chk=()=>reg.update().catch(()=>{});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')chk();});setInterval(chk,15*60*1000);}).catch(()=>{});
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadSW||upd)return;upd=true;
-    const go=()=>{if(window.__BATTLE_ON){setTimeout(go,3000);return;}try{save();}catch(e){}toast('🔄 Update ready – restarting…',1500);setTimeout(()=>location.reload(),1500);};go();});}
+    // v16-17: no more automatic restart – the player taps OK (LATER hides it; the update is used at the next start)
+    const ask=()=>{if(window.__BATTLE_ON){setTimeout(ask,3000);return;}if(document.getElementById('updBox'))return;
+      const d=document.createElement('div');d.id='updBox';
+      d.style.cssText='position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99999;width:min(92vw,360px);background:linear-gradient(#2a1a10,#160d07);border:2px solid #ffb300;border-radius:16px;box-shadow:0 8px 30px #000c;padding:12px 14px;color:#fff;font:700 14px system-ui;text-align:center';
+      d.innerHTML='<div style="font-size:16px;font-weight:900;color:#ffd54a">🔄 New update ready</div><div style="margin:4px 0 10px;color:#e0c6ad;font-size:13px">Tap OK to restart and get it. Your progress is saved.</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center"><button data-u="later" style="flex:1;padding:10px;border-radius:12px;border:0;background:#4e342e;color:#fff;font:900 14px system-ui">LATER</button><button data-u="ok" style="flex:1;padding:10px;border-radius:12px;border:0;background:#66bb6a;color:#10240f;font:900 15px system-ui">OK</button></div>';
+      d.addEventListener('click',e=>{const b=e.target.closest('[data-u]');if(!b)return;
+        if(b.dataset.u==='ok'){try{save();}catch(er){}d.remove();setTimeout(()=>location.reload(),150);}else d.remove();});
+      document.body.appendChild(d);};ask();});}
 })();
 </script>
 <script src="battle.js"></script>
