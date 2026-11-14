@@ -87,6 +87,8 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #dq.open{display:flex}
 #dqBox{position:relative;background:url(img/dq.webp) center/100% 100% no-repeat;--u:.4px;font-size:calc(var(--u)*30)}
 #dqBox>*{position:absolute}
+.dqAll{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*14);border-radius:calc(var(--u)*20);background:linear-gradient(#ffe27a,#ffb300 55%,#e08a00);box-shadow:0 calc(var(--u)*6) 0 #8a4a00,0 0 calc(var(--u)*22) #ffb300aa,inset 0 1px 0 #fff8;color:#2a1600;font-weight:900;font-size:calc(var(--u)*36);letter-spacing:1px;animation:dqb .8s ease-in-out infinite}
+.dqAll small{min-width:calc(var(--u)*44);height:calc(var(--u)*44);border-radius:50%;background:#d32f2f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*26)}
 .dqI{display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*62)}
 .dqI.ok{filter:drop-shadow(0 0 calc(var(--u)*10) #ffd54a)}
 .dqN{color:#fff;font-weight:900;font-size:calc(var(--u)*31);line-height:1.15;text-shadow:0 2px 0 #000;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -2379,10 +2381,16 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
     h+='<div class="dqC'+(ok?' on':'')+'" style="'+box(x-25,1547,50,50)+'">'+g.need+'</div>';
     h+='<div class="dqP" style="'+box(x+8,1462,74,32)+'">+'+g.vip+'</div>';});
   h+='<div class="dqP" style="'+box(58,1572,140,34)+'background:#b71c1c;color:#fff">TODAY +'+today+'</div>';
-  h+='<div class="dqT" style="'+box(40,1640,842,40)+'color:#cfd8dc">👑 VIP '+VLV+' · '+G.vip+(VIP_PTS[VLV+1]?' / '+VIP_PTS[VLV+1]:'')+' points</div>';
+  // v16-25: CLAIM ALL (quests + gifts) – shown instead of the VIP line while something is ready
+  if(dqReady())h+='<div class="dqAll" data-all="1" style="'+box(281,1606,360,78)+'">CLAIM ALL<small>'+dqReady()+'</small></div>';
+  else h+='<div class="dqT" style="'+box(40,1640,842,40)+'color:#cfd8dc">👑 VIP '+VLV+' · '+G.vip+(VIP_PTS[VLV+1]?' / '+VIP_PTS[VLV+1]:'')+' points</div>';
   h+='<div data-close="1" style="'+box(820,0,102,90)+'"></div>';
   dqBox.innerHTML=h;}
 dqEl.addEventListener('click',e=>{if(e.target===dqEl||e.target.closest('[data-close]')){closeDQ();return;}
+  if(e.target.closest('[data-all]')){let vip=0,tk=0,ct=0,n=0;
+    G.dq.q.forEach(q=>{if(q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;tk++;vip+=q.vip;n++;}});
+    DQ_GIFTS.forEach((G2,i)=>{if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;tk+=G2.tk;ct+=G2.tk;vip+=G2.vip;n++;}});
+    if(n){addVip(vip);toast('✅ Claimed '+n+': +'+vip+' VIP points · '+TKI+' +'+tk+(ct?' · '+CTI+' +'+ct:''),3000);}dqKey='';renderDQ();return;}
   const c=e.target.closest('[data-claim]');if(c){const q=G.dq.q[+c.dataset.claim];if(q&&q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;addVip(q.vip);toast('👑 +'+q.vip+' VIP points · '+TKI+' +1',2500);}dqKey='';renderDQ();return;}
   const g=e.target.closest('[data-gift]');if(g){const i=+g.dataset.gift,G2=DQ_GIFTS[i];if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;addVip(G2.vip);toast('🎁 Gift opened: +'+G2.vip+' VIP points · '+TKI+' +'+G2.tk+' · '+CTI+' +'+G2.tk,2500);}
     else if(!G.dq.gifts[i])toast('🎁 Claim '+G2.need+' daily quests to open this gift',2500);dqKey='';renderDQ();}});

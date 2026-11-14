@@ -48,6 +48,9 @@ css.textContent=`
 .cpGo{display:block;width:100%;margin-top:14px;height:52px;border:0;border-radius:14px;font-size:20px;font-weight:900;color:#2a1000;background:linear-gradient(#ffe082,#ffa000 60%,#e65100);box-shadow:0 5px 0 #7a2e00;letter-spacing:1px}
 .cpGo.alt{background:linear-gradient(#5d4a3a,#3a2c22);color:#ffd9b0;box-shadow:0 5px 0 #1a120c}
 .cpRow{display:flex;gap:8px}.cpRow .cpGo{flex:1}
+.anx{display:flex;align-items:center;gap:8px;margin:12px 0 -4px;padding:8px 12px;border-radius:12px;border:1.5px solid #ffb30055;background:#1e140d;font-weight:900;font-size:13px;color:#ffd9b0;letter-spacing:.5px}
+.anx i{flex:1;text-align:right;font-style:normal;font-size:12px;color:#ffe082}.anx b{min-width:42px;text-align:center;padding:4px 0;border-radius:9px;background:#3a2c22;color:#a1887f;font-size:12px}
+.anx.on{border-color:#66bb6a;box-shadow:0 0 12px #66bb6a44}.anx.on b{background:linear-gradient(#81c784,#388e3c);color:#fff}
 .slots{display:flex;gap:6px;justify-content:center}
 .slot{width:62px;height:84px;border-radius:12px;border:2px dashed #ffb30088;background:#0007;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#ffb30099;font-size:26px;font-weight:900}
 .slot img,.pick img{width:100%;height:62px;object-fit:cover;display:block}
@@ -677,9 +680,11 @@ const SPRD={
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
-for(const id in SPRD){const d=SPRD[id];d.im=new Image();d.im.src='img/hero/sp_'+id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}}
+// v16-25: atlases load only when a hero/driver is actually drawn (before: ALL ~95 atlases were decoded at startup ≈ 290 MB of memory)
+for(const id in SPRD)SPRD[id].id=id;
+function sprLoad(d){if(!d.im){d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}}return d.im;}
 const sprOf=h=>h&&!h.crew&&SPRD[h.id]||null;
-const sprOK=d=>d&&d.im.complete&&d.im.naturalWidth>0;
+const sprOK=d=>{if(!d)return false;const im=sprLoad(d);return im.complete&&im.naturalWidth>0;};
 // muzzle: [x, y] on screen where a ranged attack / skill effect starts (continues the effect drawn in the picture)
 function muzzle(u,dx,dy){const d=u.spr,k=dsc(u.d);if(!sprOK(d))return[u.x+u.face*dx*S,fy(u.d)-(u.lift||0)-dy*k];
   return[u.x+u.face*(d.m[0]-d.a[0])*SPK*k,fy(u.d)-(u.lift||0)-(d.a[1]-d.m[1])*SPK*k];}
@@ -1131,12 +1136,14 @@ function drawMonster(g,u,t){
 
 // ---------------------------------------------------------------- battle state
 const cv=$('btcv');let g=cv.getContext('2d');
-let W=390,H=844,DPR=1,FY0=0,FY1=0,HOR=0,PANEL=0,S=1;
+let W=390,H=844,DPR=1,BDPR=1,FY0=0,FY1=0,HOR=0,PANEL=0,S=1;
 let B=null,raf=0,lastT=0,running=false;
 const fy=d=>FY0+d*(FY1-FY0);
 const dsc=d=>(.98+.36*d)*S;
-function bsize(){W=innerWidth;H=innerHeight;DPR=Math.min(2,window.devicePixelRatio||1)*(B&&B.lowRes?.75:1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
-  S=clamp(Math.min(W/390,H/800),.8,1.5);HOR=H*.36;FY0=H*.47;FY1=H*.77;PANEL=H-Math.min(150,H*.19);if(B)buildBG();}
+// v16-25: background pictures are soft → drawn at max 1.5× (less memory); the canvas is only re-made when the size really changes
+function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(2,window.devicePixelRatio||1)*(B&&B.lowRes?.75:1);
+  if(!force&&w===W&&h===H&&d===DPR&&cv.width===Math.round(w*d))return false;W=w;H=h;DPR=d;BDPR=Math.min(DPR,1.5);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+  S=clamp(Math.min(W/390,H/800),.8,1.5);HOR=H*.36;FY0=H*.47;FY1=H*.77;PANEL=H-Math.min(150,H*.19);if(B)buildBG();return true;}
 
 // v15: NEVER GIVE UP – stuck on your next stage? Your mechanics train: +7.5% HP & attack every 6 hours (max +60% after 2 days). Resets when you win it.
 function grit(si){const G=TE().G,st=G.cp.stuck;if(!st||st.si!==si||si!==G.cp.best)return 0;return Math.min(8,Math.floor((Date.now()-st.t)/216e5))*.075;}
@@ -1163,9 +1170,10 @@ function startBattle(si,team){
   B={si,stage:STAGES[si],wave:0,heroes:[],mons:[],proj:[],fx:[],parts:[],nums:[],tele:[],t:0,real:0,ts:1,slowT:0,spd:spdOK(TE().G.cp.spd),auto:TE().G.cp.auto!==false,
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
   B.grit=window.__SIM?0:grit(si);if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);
-  B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>portraitCv(u.h));
+  B.lowRes=LOWRES;if(!bsize())buildBG();
+  B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr)sprLoad(u.spr);});
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
-  bsize();buildBG();spawnWave();
+  spawnWave();
   $('bt').classList.add('open');window.__BATTLE_ON=true;if(!window.__SIM){let n=0;try{n=+localStorage.getItem('te_bhint')||0;localStorage.setItem('te_bhint',n+1);}catch(e){}if(n<3)setTimeout(()=>{if(B&&!B.res)TE().toast('🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',4200);},2600);}running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
 function spawnWave(){const w=B.stage.w[B.wave];
   w.forEach((t,i)=>{const m=mkMon(t,i);const n=w.length;
@@ -1209,7 +1217,7 @@ function drawFx2(ground){if(!FX2||!B.fx2||!B.fx2.length)return;g.save();
   for(const p of B.fx2){if(!!p.ground!==ground||p.t<0)continue;const c=fxTint(p.n,p.col);if(!c)continue;const k=Math.min(1,p.t/p.d);
     const e=p.ease?1-(1-k)*(1-k)*(1-k):k;const sz=lerp(p.s0,p.s1,e);if(sz<=.5)continue;
     g.globalCompositeOperation=p.add?'lighter':'source-over';g.globalAlpha=Math.max(0,p.a0*Math.min(1,k*12)*(1-k*k));
-    g.setTransform(DPR,0,0,DPR,0,0);g.translate(p.x+(B.sx||0),p.y+(B.sy||0));if(p.ground)g.scale(1,p.sy);g.rotate(p.rot);
+    camT();g.translate(p.x,p.y);if(p.ground)g.scale(1,p.sy);g.rotate(p.rot);
     const w=sz*p.sx,h=sz*(p.ground?1:p.sy);g.drawImage(c,-w/2,-h/2,w,h);}
   g.restore();}
 // building blocks
@@ -1244,10 +1252,11 @@ function heal(u,amt){if(u.dead)return;const a=Math.round(Math.min(amt,u.max-u.hp
 function kill(u){u.hp=0;u.dead=true;u.deadT=0;u.st='dead';u.act=null;
   const [x,y]=sxy(u);
   if(u.hero){B.deaths++;smoke(x,y-20,6);num(x,headY(u)-10,'K.O.','#ff5252',1);}
-  else{const s=u.boss?3:MON[u.t].big;debris(x,y-u.H*.4*dsc(u.d),Math.round(10*s),['#9ea7ad','#607d8b','#ffca28','#424242','#b0bec5']);smoke(x,y-u.H*.4*dsc(u.d),Math.round(6*s),'rgba(60,60,60,.55)',s);sparks(x,y-u.H*.5*dsc(u.d),Math.round(12*s),'#ffab00',220);
+  else{if(!B.sim){const n=B.t-(B.lastK||-9)<1.1?(B.kn||1)+1:1;B.kn=n;B.lastK=B.t;if(n>=2){B.combo={n,t:0};punch(.03+Math.min(3,n)*.01);}}
+    const s=u.boss?3:MON[u.t].big;debris(x,y-u.H*.4*dsc(u.d),Math.round(10*s),['#9ea7ad','#607d8b','#ffca28','#424242','#b0bec5']);smoke(x,y-u.H*.4*dsc(u.d),Math.round(6*s),'rgba(60,60,60,.55)',s);sparks(x,y-u.H*.5*dsc(u.d),Math.round(12*s),'#ffab00',220);
     B.fx.push({type:'boom',x,y:y-u.H*.4*dsc(u.d),t:0,d:.45,r:28*s*S});shake(u.boss?16:4);
     if(FX2){const yy=y-u.H*.4*dsc(u.d);fxs('fire_01','#ff9100',x,yy,{d:.5,s0:20*S,s1:70*s*S,rot:rnd(0,TAU),ease:1});fxBurst(x,yy,'#ffab00',26*s*S);fxSmoke(x,yy,'#4e4e4e',Math.round(3+s),26*s*S);fxScorch(x,y,'#2b1a10',22*s*S);if(u.boss)B.hs=.25;}
-    if(u.boss){B.flash=.8;}}}
+    if(u.boss){B.flash=.8;punch(.09);}}}
 
 // projectiles
 function shoot(src,tgt,type,mult,o){const [x,y]=sxy(src);const mz=src.hero&&sprOK(src.spr)?muzzle(src):null;B.proj.push(Object.assign({src,tgt,type,mult,x:mz?mz[0]:src.x+src.face*14*S,d:src.d,h:mz?fy(src.d)-mz[1]:(src.fly?44:34)*dsc(src.d),t:0,spd:type==='wrench'?420:type==='bomb'?300:360,rot:0},o||{}));}
@@ -1283,7 +1292,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
-function cast(u){if(!canCast(u))return;u.en=0;B.slowT=.45;B.flash=.35;if(FX2)fxAura(u);
+function cast(u){if(!canCast(u))return;u.en=0;B.slowT=.45;B.flash=.35;punch(.045);if(FX2)fxAura(u);
   B.banner={u,t:0,name:skOf(u.h).sk};
   const R=u.role,ms=alive(B.mons);
   if(SKF[u.h.id]){SKF[u.h.id](u,ms);return;}
@@ -1455,9 +1464,9 @@ function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelA
   const r={win:B.phase==='win',t:Math.round(t),deaths:B.deaths,wave:B.wave,left:B.mons.filter(m=>!m.dead).map(m=>m.t+':'+Math.round(m.hp/m.max*100)+'%')};return r;}
 function step(dt){B.t+=dt;B.phT+=dt;
   if(B.bossBar&&!B.bossBar.dead&&B.bossBar.b==='titan'&&!B.bossBar.enr&&B.bossBar.hp<B.bossBar.max*.5){const b=B.bossBar;b.enr=true;b.as*=.7;b.atk*=1.15;B.flash=.6;shake(16);B.banner={boss:b,t:0,name:'ENRAGED!'};}
-  if(B.phase==='intro'){for(const u of B.heroes){const dx=u.fx-u.x;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),150*S*dt);u.st=Math.abs(dx)>1?'walk':'idle';u.wph+=dt*11;u.face=1;}
+  if(B.phase==='intro'){for(const u of B.heroes){const dx=u.fx-u.x;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),250*S*dt);u.st=Math.abs(dx)>1?'walk':'idle';u.wph+=dt*11;u.face=1;}
     for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.6+.12*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=m.mv*dt*1.3;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*7;}else m.st='idle';}
-    B.scroll+=dt*60;if(B.phT>1.9){B.phase='fight';B.phT=0;}}
+    B.scroll+=dt*90;if(B.phT>1.25){B.phase='fight';B.phT=0;punch(.035);}}
   else if(B.phase==='fight'){
     for(const u of B.heroes)unitUpdate(u,dt,B.mons,B.heroes);
     for(const m of B.mons)unitUpdate(m,dt,B.heroes,B.mons);
@@ -1469,13 +1478,13 @@ function step(dt){B.t+=dt;B.phT+=dt;
     else if(!alive(B.mons).length&&!B.proj.length){if(B.wave<B.stage.w.length-1){B.phase='march';B.phT=0;B.wave++;B.bossBar=null;
         for(const h of alive(B.heroes)){heal(h,h.max*.15);h.act=null;h.lift=0;}formation();}
       else{B.phase='win';B.phT=0;for(const h of B.heroes)if(!h.dead)h.st='win';}}}
-  else if(B.phase==='march'){let done=true;for(const u of alive(B.heroes)){const dx=u.fx-u.x,ddp=u.fd-u.d;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),130*S*dt);u.d+=Math.sign(ddp)*Math.min(Math.abs(ddp),.5*dt);
+  else if(B.phase==='march'){let done=true;for(const u of alive(B.heroes)){const dx=u.fx-u.x,ddp=u.fd-u.d;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),210*S*dt);u.d+=Math.sign(ddp)*Math.min(Math.abs(ddp),.8*dt);
       u.face=1;u.st='walk';u.wph+=dt*11;u.stun=0;if(Math.abs(dx)>2||Math.abs(ddp)>.01)done=false;}
-    B.scroll+=dt*170*S;if(B.phT>.4&&!B.spawned){B.spawned=true;spawnWave();for(const m of B.mons)if(m.b!=='titan')m.x+=W*.4;}
-    for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.62+.1*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=(m.mv+170*S)*dt;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*9;}}
-    if(B.phT>1.6&&done){B.phase='fight';B.phT=0;B.spawned=false;}}
-  else if(B.phase==='win'){for(const u of B.heroes){if(!u.dead)u.st='win';u.flash=Math.max(0,u.flash-dt*6);if(u.dead)u.deadT+=dt;}if(B.phT>2.2&&!B.res){B.res=1;if(!B.sim)finish(true);}}
-  else if(B.phase==='lose'){for(const m of B.mons){if(!m.dead){m.st='idle';}}if(B.phT>1.8&&!B.res){B.res=1;if(!B.sim)finish(false);}}
+    B.scroll+=dt*240*S;if(B.phT>.3&&!B.spawned){B.spawned=true;spawnWave();for(const m of B.mons)if(m.b!=='titan')m.x+=W*.4;}
+    for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.62+.1*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=(m.mv+240*S)*dt;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*9;}}
+    if(B.phT>1.05&&done){B.phase='fight';B.phT=0;B.spawned=false;punch(.03);}}
+  else if(B.phase==='win'){for(const u of B.heroes){if(!u.dead)u.st='win';u.flash=Math.max(0,u.flash-dt*6);if(u.dead)u.deadT+=dt;}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim)finish(true);}}
+  else if(B.phase==='lose'){for(const m of B.mons){if(!m.dead){m.st='idle';}}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim)finish(false);}}
   for(let i=B.proj.length-1;i>=0;i--)if(projUpdate(B.proj[i],dt))B.proj.splice(i,1);
   for(const p of B.parts){p.life-=dt;p.vy+=p.g*dt;if(p.drag){p.vx*=1-p.drag*dt;p.vy*=1-p.drag*dt;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;
     if(p.floor&&p.y>p.floor){p.y=p.floor;p.vy*=-.35;p.vx*=.6;p.vr*=.6;}}
@@ -1513,8 +1522,10 @@ function fxUpdate(f,dt){
 }
 
 // ---------------------------------------------------------------- landscape (painted once per battle)
-function layer(w,h){const c=document.createElement('canvas');c.width=Math.ceil(w*DPR);c.height=Math.ceil(h*DPR);const x=c.getContext('2d');x.scale(DPR,DPR);return [c,x];}
-function buildBG(){const P=BIO[B.stage.bio],R=seeded(77+B.si*13);const LW=Math.round(W*1.7);B.LW=LW;B.bgP=P;B.bgo={stacks:[],fires:[],cranes:[]};
+// v16-25: the same few canvases are re-used for every battle (before: ~8 new big canvases per battle → memory kept growing on Android)
+const LPOOL=[];let LI=0;
+function layer(w,h){const c=LPOOL[LI]||(LPOOL[LI]=document.createElement('canvas'));LI++;c.width=Math.ceil(w*BDPR);c.height=Math.ceil(h*BDPR);const x=c.getContext('2d');x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.globalCompositeOperation='source-over';x.shadowBlur=0;x.scale(BDPR,BDPR);return [c,x];}
+function buildBG(){LI=0;B._cA=null;const P=BIO[B.stage.bio],R=seeded(77+B.si*13);const LW=Math.round(W*1.7);B.LW=LW;B.bgP=P;B.bgo={stacks:[],fires:[],cranes:[]};
   // sky
   let [c,x]=layer(W,HOR+40);let gr=x.createLinearGradient(0,0,0,HOR+40);gr.addColorStop(0,P.sky[0]);gr.addColorStop(.6,P.sky[1]);gr.addColorStop(1,P.sky[2]);x.fillStyle=gr;x.fillRect(0,0,W,HOR+40);
   if(P.night)for(let k=0;k<90;k++){x.fillStyle='rgba(255,255,255,'+(R()*.7+.2)+')';x.fillRect(R()*W,R()*HOR*.8,R()<.1?2:1,R()<.1?2:1);}
@@ -1594,14 +1605,15 @@ function buildBG(){const P=BIO[B.stage.bio],R=seeded(77+B.si*13);const LW=Math.r
       else if(t<.85){x.fillStyle='#8d959c';x.save();x.translate(X0,py);x.rotate(R()*3);x.fillRect(-3*s,-1*s,6*s,2*s);x.restore();}
       else{x.strokeStyle='#5a5f63';x.lineWidth=1.5*s;x.beginPath();x.arc(X0,py,3.5*s,0,TAU);x.stroke();}},px,30);}
   B.bgDet=c;B.bgp=[];}
+const BGC={};
 function tiled(c,par,y,h){const LW=B.LW,o=((B.scroll*par)%LW+LW)%LW;g.drawImage(c,-o,y,LW,h);if(LW-o<W)g.drawImage(c,LW-o,y,LW,h);}
 function drawBG(t){const P=B.bgP;
   // v15 speed-up: while the team stands still the background layers are merged into 2 cached pictures (2 copies per frame instead of 8)
-  const still=Math.abs(B.scrollV||0)<0.01;
-  if(still&&(B._cs!==B.scroll||B._cW!==W||B._cD!==DPR||!B._cA)){B._cs=B.scroll;B._cW=W;B._cD=DPR;
-    const mk=()=>{const c=document.createElement('canvas');c.width=Math.round(W*DPR);c.height=Math.round(H*DPR);return c;};B._cA=B._cA&&B._cA.width===Math.round(W*DPR)&&B._cA.height===Math.round(H*DPR)?B._cA:mk();B._cB=B._cB&&B._cB.width===B._cA.width&&B._cB.height===B._cA.height?B._cB:mk();
+  const still=B.phase!=='intro'&&B.phase!=='march'; // v16-25: before, the 2 full-screen caches were re-drawn EVERY frame while the background scrolled
+  if(still&&(B._cs!==B.scroll||B._cW!==W||B._cD!==BDPR||!B._cA)){B._cs=B.scroll;B._cW=W;B._cD=BDPR;
+    const mk=k=>{const c=BGC[k]||(BGC[k]=document.createElement('canvas'));const w=Math.round(W*BDPR),h=Math.round(H*BDPR);if(c.width!==w||c.height!==h){c.width=w;c.height=h;}return c;};B._cA=mk('a');B._cB=mk('b');
     const g0=g;for(const [cv0,f] of [[B._cA,()=>{g.drawImage(B.bgSky,0,0,W,HOR+40);tiled(B.bgFar,.15,0,HOR+30);}],[B._cB,()=>{tiled(B.bgMid,.4,B.midY,B.midH);g.drawImage(B.bgGround,0,HOR-10,W,H-HOR+10);tiled(B.bgDet,1,HOR-10,H-HOR+10);}]]){
-      const x2=cv0.getContext('2d');x2.setTransform(DPR,0,0,DPR,0,0);x2.clearRect(0,0,W,H);g=x2;try{f();}finally{g=g0;}}}
+      const x2=cv0.getContext('2d');x2.setTransform(BDPR,0,0,BDPR,0,0);x2.clearRect(0,0,W,H);g=x2;try{f();}finally{g=g0;}}}
   if(still&&B._cA){g.drawImage(B._cA,0,0,W,H);
   // smoke from stacks (behind mountains rim)
     const of=((B.scroll*.15)%B.LW+B.LW)%B.LW;
@@ -1815,8 +1827,11 @@ function drawBanner2(t,b){const k=b.t,a=k<.12?k/.12:k>1.05?Math.max(0,(1.3-k)/.2
   g.lineWidth=6;g.strokeStyle='#000';g.strokeText(b.name,tx,y+6);g.shadowColor=rc;g.shadowBlur=18;const ng=g.createLinearGradient(0,y-fs,0,y+6);ng.addColorStop(0,'#fffde7');ng.addColorStop(1,'#ffc400');g.fillStyle=ng;g.fillText(b.name,tx,y+6);g.shadowBlur=0;
   g.font='800 '+Math.round(12*S)+'px system-ui';g.fillStyle='#fff';g.fillText(b.u.h.n,tx,y+26*S);
   g.restore();}
+function drawCombo(){const c=B.combo;if(!c)return;const L=['','','DOUBLE KO!','TRIPLE KO!','QUAD KO!'],txt=L[c.n]||'MEGA KO ×'+c.n,k=c.t,s=k<.12?.6+k/.12*.6:1.2-Math.min(.2,(k-.12)*.6),a=k>1.1?Math.max(0,(1.4-k)/.3):1;
+  g.save();g.globalAlpha=a;g.translate(W*.5,H*.4);g.rotate(-.06);g.scale(s,s);g.textAlign='center';g.font='900 italic '+Math.round(28*S)+'px system-ui';g.lineJoin='round';g.lineWidth=7;g.strokeStyle='#2a0a00';g.strokeText(txt,0,0);
+  const gr=g.createLinearGradient(0,-24,0,4);gr.addColorStop(0,'#fffde7');gr.addColorStop(1,c.n>=4?'#ff1744':c.n===3?'#ff6d00':'#ffc400');g.fillStyle=gr;g.fillText(txt,0,0);g.restore();}
 function drawCenterText(t){let txt=null,sub=null;
-  if(B.phase==='intro'){txt=B.phT<1.3?'WAVE '+(B.wave+1)+'/'+B.stage.w.length:'FIGHT!';}
+  if(B.phase==='intro'){txt=B.phT<.8?'WAVE '+(B.wave+1)+'/'+B.stage.w.length:'FIGHT!';}
   else if(B.phase==='march'&&B.phT>.3){const boss=B.stage.w[B.wave].some(m=>MON[m].boss);txt=boss?'⚠ BOSS ⚠':'WAVE '+(B.wave+1)+'/'+B.stage.w.length;if(boss)sub=B.stage.w[B.wave].map(m=>MON[m]).find(m=>m.boss).n;}
   else if(B.phase==='win')txt='VICTORY!';else if(B.phase==='lose')txt='DEFEAT';
   if(!txt)return;const s=1+Math.max(0,.3-(B.phT%10))*1.2;g.save();g.translate(W/2,H*.27);g.scale(s,s);g.textAlign='center';g.font='900 '+Math.round(38*S)+'px system-ui';g.lineWidth=7;g.lineJoin='round';g.strokeStyle='#1a0800';g.strokeText(txt,0,0);
@@ -1833,26 +1848,32 @@ function drawPause(){g.fillStyle='rgba(0,0,0,.7)';g.fillRect(0,0,W,H);g.textAlig
   HIT=[];const bw=Math.min(260,W*.7);btn(W/2-bw/2,H*.44,bw,52,'▶  RESUME',true,'resume');btn(W/2-bw/2,H*.44+66,bw,52,'🏳  RETREAT',false,'retreat');}
 
 // ---------------------------------------------------------------- render
+// v16-25: camera = screen shake + a short zoom "punch" on skills, boss hits and multi-KOs (more dynamic battles)
+function camT(){const z=1+(B.zoom||0);g.setTransform(DPR*z,0,0,DPR*z,DPR*(W/2*(1-z)+(B.sx||0)*z),DPR*(H*.55*(1-z)+(B.sy||0)*z));}
+function punch(z){if(!B.sim)B.zoom=Math.max(B.zoom||0,z);}
 function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
   let sx=0,sy=0;if(B.shake>0){sx=rnd(-1,1)*B.shake;sy=rnd(-1,1)*B.shake*.6;}
-  B.sx=sx;B.sy=sy;g.save();g.translate(sx,sy);
+  B.sx=sx;B.sy=sy;g.save();camT();
   drawBG(t);drawTele(t);drawGroundFx();drawFx2(true);
   const all=[...B.heroes,...B.mons].sort((a,b)=>a.d-b.d||(a.dead?-1:1));
   for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?1:1.22);drawUnit(g,u,B.t);}
   for(const u of all)bars(u);
-  drawProj(t);drawFx(t);drawParts();drawFx2(false);g.setTransform(DPR,0,0,DPR,0,0);g.translate(sx,sy);drawNums();
+  drawProj(t);drawFx(t);drawParts();drawFx2(false);camT();drawNums();
   g.restore();
   drawAtmo(t);
   if(B.flash>0){g.fillStyle='rgba(255,240,200,'+B.flash*.6+')';g.fillRect(0,0,W,H);}
-  drawHUD(t);drawBanner(t);drawCenterText(t);
+  drawHUD(t);drawBanner(t);drawCenterText(t);drawCombo();
   if(B.paused){if(B.offer)drawOffer(t);else drawPause();}}
 function loop(now){if(!running)return;raf=requestAnimationFrame(loop);
   const raw=Math.min(.05,(now-lastT)/1000);lastT=now;
-  if(!B.paused){B.real+=raw;B.shake=Math.max(0,B.shake-raw*40);B.flash=Math.max(0,B.flash-raw*2.2);
+  if(!B.paused){B.real+=raw;B.shake=Math.max(0,B.shake-raw*40);if(B.zoom)B.zoom=Math.max(0,B.zoom-raw*(B.zoom*5+.02));if(B.combo){B.combo.t+=raw;if(B.combo.t>1.4)B.combo=null;}B.flash=Math.max(0,B.flash-raw*2.2);
     let ts=B.spd;if(B.slowT>0){B.slowT-=raw;ts*=.3;}if(B.hs>0){B.hs-=raw;ts*=.06;}
     let left=raw*ts;while(left>0){const s=Math.min(1/60,left);step(s);left-=s;}}
   const t0=performance.now();render();
-  B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>90){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes){B.lowRes=true;bsize();}}}
+  // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".
+  // Now: only the drawing time counts, the first 2 s are ignored, and lower quality starts at the next wave change (hidden by the march) or next battle.
+  if(B.real>2){B.perf.push(performance.now()-t0);if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>22&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}}}
+  if(LOWRES&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}}
 cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
   if(h.id==='fx'){FX2=!FX2;try{localStorage.setItem('te_fx2',FX2?'1':'0');}catch(e){}if(FX2)fxPre();B.fx2=[];}
   else if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
@@ -1865,9 +1886,11 @@ cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientR
 // v16-3: testers thought they had to tap to attack – explain that fights are automatic
 let hintT=0;function tapHint(card){const n=performance.now();if(n-hintT<3500)return;hintT=n;
   TE().toast(card?'⚡ Skill charging – tap the card when it shows TAP!':'🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',3200);}
-addEventListener('resize',()=>{if(running)bsize();});
+let LOWRES=false;try{LOWRES=sessionStorage.getItem('te_lowres')==='1';}catch(e){}
+let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(running)bsize();},180);});
 
 // ---------------------------------------------------------------- results
+const ANX={id:0,n:0};
 function finish(win,retreat){running=false;cancelAnimationFrame(raf);const T=TE(),G=T.G,si=B.si,S0=STAGES[si];
   if(!B.sim&&si===G.cp.best){if(win)delete G.cp.stuck;else if(!G.cp.stuck||G.cp.stuck.si!==si)G.cp.stuck={si,t:Date.now()};}
   let html='';const lab=sLabel(si);
@@ -1883,12 +1906,22 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);const T=TE(
       <div class="rw"><span>${IMGI(badge('coin','#ffb300'))} ${T.fmt(money)}</span>${tk?`<span>${TKI} +${tk}</span>`:''}${gtk?`<span>${GTKI} +${gtk}</span>`:''}</div>
       ${drops.length?`<div class="cpSec">${IMGI(glyphURL('bag','#ffb300'))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">Bag full (${GINV}) – sold for ${T.fmt(sold)}</div>`:''}`:''}
       <div class="sub" style="margin-top:10px">${st<3?'⭐⭐⭐ = finish with no mechanic knocked out':'Perfect! No mechanic was knocked out.'}</div>
+      ${si<NST-1?'<div class="anx" data-a="atog"><span>⟳ AUTO NEXT</span><i id="anxC"></i><b id="anxS"></b></div>':''}
       <div class="cpRow">${si<NST-1?'<button class="cpGo" data-a="next">NEXT ▶</button>':''}<button class="cpGo alt" data-a="map">CAMPAIGN</button></div>${gtk?'<button class="cpGo alt" data-a="gsum">'+GTKI+' GEAR SUMMON</button>':''}${drops.length?'<button class="cpGo alt" data-a="gear">'+IMGI(glyphURL('bag','#ffd9b0'))+' EQUIP GEAR</button>':''}`;}
   else{html=`<div class="big" style="color:#ff5252">${retreat?'RETREAT':'DEFEAT'}</div><div class="sub" style="margin:10px 0">STAGE ${lab} · ${S0.n.toUpperCase()}</div>
       <div class="cpSec">HOW TO GET STRONGER</div><div style="font-size:13px;line-height:1.6;color:#e0c6ad">${IMGI(glyphURL('bag','#ffb300'))} Equip and upgrade <b>gear</b> (works only in battles)<br>${TKI} Summon more mechanics (higher color = much stronger)<br>⭐ Duplicates give +1 (up to +50)<br>🧪 Fusion: 3 Legendary +5 → 1 Mythic<br>${IMGI(glyphURL('bolt','#ffb300'))} Tap the glowing cards to use skills at the right moment</div>
       <div class="cpRow"><button class="cpGo" data-a="retry">RETRY</button><button class="cpGo alt" data-a="team">TEAM</button></div><div class="cpRow"><button class="cpGo alt" data-a="gear">${IMGI(glyphURL('bag','#ffd9b0'))} GEAR</button><button class="cpGo alt" data-a="map">CAMPAIGN</button></div>`;}
-  $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');
-  $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
+  $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;
+  // v16-25: AUTO NEXT – after a victory the next stage starts by itself after a 3 s countdown (same team). Stops on defeat, on any tap, or with the switch.
+  clearInterval(ANX.id);const canAuto=win&&si<NST-1;
+  const anxShow=()=>{const on=G.cp.autoNext!==false,b=$('anxS'),c=$('anxC');if(!b)return;b.textContent=on?'ON':'OFF';b.parentNode.classList.toggle('on',on);c.textContent=on&&ANX.n>0?'next stage in '+ANX.n+'…':on?'':'tap to turn on';};
+  const anxGo=()=>{clearInterval(ANX.id);ANX.n=0;if(!canAuto||G.cp.autoNext===false)return anxShow();ANX.n=3;anxShow();
+    ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}ANX.n--;anxShow();if(ANX.n<=0){clearInterval(ANX.id);
+      $('cpRes').classList.remove('open');G.cp.ch=STAGES[si+1].c;safeStart(si+1,teamHeroes());}},1000);};
+  if(canAuto)anxGo();
+  $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;
+    if(a==='atog'){G.cp.autoNext=G.cp.autoNext===false;T.save();anxGo();return;}
+    clearInterval(ANX.id);ANX.n=0;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
     if(a==='next'){G.cp.ch=STAGES[si+1].c;showMap();openCard(si+1);}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openTeam(si);}
     else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();openGSum();}else showMap();};}
 
