@@ -616,9 +616,9 @@ const SKINS=['#f1c27d','#e0ac69','#c68642','#8d5524','#ffdbac'], HAIRS=['#2b1d14
 
 // =================== STATE ===================
 const SAVE_KEY='torqueEmpire_v15';
-const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
+const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,ct:5,ctInit:1,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0},c:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
-function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;G.rep=repFor(G.xp);}}catch(e){}}
+function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;G.rep=repFor(G.xp);}}catch(e){}}
 function save(){if(window.__noSave)return;try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
 load();
 let time=0, started=false, SPD=1;
@@ -642,7 +642,7 @@ function benAt(b,l,sub){return Math.max(0,l-b.from+1)*(b.per||.01)*(sub?SUB_MULT
 const VB=k=>VBC[k]||0;
 const pctT=(v,neg)=>(neg?'−':'+')+(Math.round(v*1000)/10)+'%';
 function addVip(n){const l0=VLV;G.vip+=n;vipRefresh();save();
-  if(VLV>l0){G.h.tk+=5*(VLV-l0);save();toast('👑 VIP '+VLV+'! Your benefits went up · '+TKI+' +'+5*(VLV-l0),5000);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');
+  if(VLV>l0){G.h.tk+=5*(VLV-l0);G.h.ct+=3*(VLV-l0);save();toast('👑 VIP '+VLV+'! Your benefits went up · '+TKI+' +'+5*(VLV-l0)+' · '+CTI+' +'+3*(VLV-l0),5000);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#b388ff'])});}}
 vipRefresh();
 
@@ -811,7 +811,7 @@ function ensureStaff(){
     while(arr.length<lv){const k=arr.length,h=loc.homes[k];
       const col=ST[id]?ST[id].color:DRV_VEST[id];
       arr.push({pool:id,k,loc,busy:false,car:null,p:mkPerson({x:h.x,y:h.y,a:loc.homeA,suit:'#263238',vest:'#ffd600',cap:col,spd:1+drvBonus(id,k).spd})});}}
-  STIDS.forEach(id=>{const lv=PLV(id),S=ST[id];bays[id].forEach((b,j)=>{if(j<lv&&!b.mech)b.mech=mkPerson({x:b.idle.x,y:b.idle.y,a:b.idleA,suit:S.suit,cap:S.cap,pants:shade(S.suit,-.35),u:0,tool:id==='paint'?'#9e9e9e':'#cfd8dc',st:id,mode:'idle',cel:0,ph:Math.random()*4});if(b.mech&&j===0)b.mech.vip=PK.vip;});});
+  STIDS.forEach(id=>{const lv=PLV(id),S=ST[id];bays[id].forEach((b,j)=>{if(j<lv&&!b.mech)b.mech=mkPerson({x:b.idle.x,y:b.idle.y,a:b.idleA,suit:S.suit,cap:S.cap,pants:shade(S.suit,-.35),u:0,tool:id==='paint'?'#9e9e9e':'#cfd8dc',st:id,bj:j,mode:'idle',cel:0,ph:Math.random()*4});if(b.mech&&j===0)b.mech.vip=PK.vip;});});
 }
 const tierOf=pool=>G.lv[pool]-1; // scooter model follows the real level (1-10)
 const carSide=c=>{const o=c.type.W/2+7;return{x:c.x+Math.sin(c.a)*o,y:c.y-Math.cos(c.a)*o};};
@@ -970,7 +970,7 @@ function driveAway(c){const s=c.slot;c.state='leaving';c.siren=!!c.type.liv&&c.t
   c.onArrive=()=>{c.gone=true;};
   float(c.x,c.y-40,c.type.vip?'👑 SEE YOU SOON!':'🚨 BACK ON DUTY','#ffd54a');}
 function addXP(n){const r0=G.rep;G.xp+=n;G.rep=repFor(G.xp);
-  if(G.rep>r0){G.h.tk+=5;toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +5 · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
+  if(G.rep>r0){G.h.tk+=5;G.h.ct+=3;toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +5 · '+CTI+' +3 · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
     const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'REPUTATION '+G.rep+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#ff9800'])});}}
 
@@ -1090,8 +1090,8 @@ function guardHome(g){g.mode=g.k?'patrol':'back';g.p.pose='';
   else g.route=[...(g.via||[]).slice().reverse(),{x:PX_R,y:SOUT.y},SOUT,SDOOR,CHAIR];}
 function mkCop(x,y,path,v,mode){const c={id:9000+Math.floor(Math.random()*999),type:POLICE_T,x,y,a:0,col:POLICE_T.col,siren:true,tune:{},jobs:[],dmg:[],dirt:0,lift:0,state:'police',path,v,mode,t:0,acc:'#fff',wrapCol:'#111'};police.push(c);return c;}
 function catchThief(){const T=thief,c=T.car;T.st='caught';T.p.pose='';c.state=c.prevState;c.alarm=0;
-  const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;G.sec.caught++;G.h.tk++;qAdd('thief',1);
-  float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');toast('👮 Thief caught! Reward +'+fmt(rw)+' · '+TKI+' +1 · The police are coming',4000);
+  const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;G.sec.caught++;G.h.ct++;qAdd('thief',1);
+  float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');toast('👮 Thief caught! Reward +'+fmt(rw)+' · '+CTI+' +1 · The police are coming',4000);
   const road=c.slot.road,lane=offsetPath(route(carG,{x:AV,y:170},road),LN);
   const cop=mkCop(-90,96,roundPath([{x:-90,y:96},{x:lane[0].x,y:96},...lane],18).slice(1),240,'arrest');cop.road=road;T.cop=cop;save();}
 function stealCar(){const T=thief,c=T.car;c.alarm=0;T.p.vis=false;T.st='driving';
@@ -1192,8 +1192,12 @@ function loopPt(c,u){const a=c.type.L/2+9,b=c.type.W/2+9,P=4*a+4*b;let s=((u%P)+
   if(s<2*a){lx=-a+s;ly=-b;}else if((s-=2*a)<2*b){lx=a;ly=-b+s;}else if((s-=2*b)<2*a){lx=a-s;ly=b;}else{s-=2*a;lx=-a;ly=b-s;}
   const ca=Math.cos(c.a),sa=Math.sin(c.a);return[c.x+lx*ca-ly*sa,c.y+lx*sa+ly*ca];}
 function updateMechs(dt){
-  STIDS.forEach(id=>{bays[id].forEach(b=>{const m=b.mech;if(!m)return;let tx=b.idle.x,ty=b.idle.y,mode='idle';const c=b.car;
-    if(c&&c.slot===b&&!c.path.length&&c.state==='work'){mode='work';m.u+=dt*(id==='paint'?15:id==='inspect'?22:12);[tx,ty]=loopPt(c,m.u);}
+  STIDS.forEach(id=>{bays[id].forEach(b=>{const m=b.mech;if(!m)return;let tx=b.idle.x,ty=b.idle.y,mode='idle';const c=b.car;m.hero=!!(window.CAMPAIGN&&CAMPAIGN.mini&&heroIn('m|'+id+'|'+b.j));
+    if(c&&c.slot===b&&!c.path.length&&c.state==='work'){mode='work';m.u+=dt*(id==='paint'?15:id==='inspect'?22:12);
+      if(m.hero){ // v16-20: a hero works on ONE side of the car (front wheel ↔ back wheel), stops 2-3 s at each spot – never walks over the car
+        if(m.side==null||m.sideCar!==c){const ca=Math.cos(c.a),sa=Math.sin(c.a);m.side=((b.idle.x-c.x)*-sa+(b.idle.y-c.y)*ca)>=0?1:-1;m.sideCar=c;}
+        const f=Math.floor(m.u/32)%2?.24:-.24,lx=f*c.type.L,ly=m.side*(c.type.W/2+7),ca=Math.cos(c.a),sa=Math.sin(c.a);tx=c.x+lx*ca-ly*sa;ty=c.y+lx*sa+ly*ca;}
+      else[tx,ty]=loopPt(c,m.u);}
     else if(c&&c.slot===b&&!c.path.length&&c.state==='parts'){mode='wait';[tx,ty]=loopPt(c,c.type.L+c.type.W+18);}
     const dx=tx-m.x,dy=ty-m.y,d=Math.hypot(dx,dy);
     if(d>.8){const mv=Math.min(d,(mode==='work'?50:58)*dt);m.x+=dx/d*mv;m.y+=dy/d*mv;m.a=lerpA(m.a,Math.atan2(dy,dx),Math.min(1,dt*10));m.walk+=dt*11;m.moving=true;}
@@ -1403,6 +1407,11 @@ function drawScooter(t){
   else{X.fillStyle='#111';ell(-11,0,3.4,2);ell(12,0,3.4,2);X.fillStyle='#fbc02d';X.beginPath();X.moveTo(15,0);X.lineTo(6,-5);X.lineTo(-11,-4);X.lineTo(-13,0);X.lineTo(-11,4);X.lineTo(6,5);X.closePath();X.fill();X.fillStyle='#212121';rr(-9,-2.8,11,5.6,2);X.fill();X.fillStyle='#4fc3f7';X.fillRect(7,-3.5,2.5,7);X.fillStyle='#263238';X.fillRect(8,-7.2,1.6,14.4);}
 }
 function drawMech(m){
+  if(m.st&&m.bj!=null&&window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('m|'+m.st+'|'+m.bj);if(h){ // v16-20: the hero assigned here works on the map
+    const an=m.cel>0&&!m.moving?'cel':m.moving?'walk':m.mode==='work'?'work':'idle';
+    X.fillStyle='rgba(0,0,0,.28)';ell(m.x,m.y+6,7,2.6);
+    if(CAMPAIGN.mini(X,h.id,an,time,m.x,m.y+6,24,Math.cos(m.a)>=0?1:-1,m.ph)){m.miniOK=true;return;}}}
+  m.miniOK=false;
   const I=m.vip?IMG.vip:IMG.mech;if(!I.ok){drawPerson(m);return;}
   const A=m.vip?IM.vip:IM.mech,ca=Math.cos(m.a),sa=Math.sin(m.a);
   const dir=Math.abs(ca)>Math.abs(sa)?(ca>0?3:2):(sa>0?0:1);
@@ -2362,7 +2371,7 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   dqBox.innerHTML=h;}
 dqEl.addEventListener('click',e=>{if(e.target===dqEl||e.target.closest('[data-close]')){closeDQ();return;}
   const c=e.target.closest('[data-claim]');if(c){const q=G.dq.q[+c.dataset.claim];if(q&&q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;addVip(q.vip);toast('👑 +'+q.vip+' VIP points · '+TKI+' +1',2500);}dqKey='';renderDQ();return;}
-  const g=e.target.closest('[data-gift]');if(g){const i=+g.dataset.gift,G2=DQ_GIFTS[i];if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;addVip(G2.vip);toast('🎁 Gift opened: +'+G2.vip+' VIP points · '+TKI+' +'+G2.tk,2500);}
+  const g=e.target.closest('[data-gift]');if(g){const i=+g.dataset.gift,G2=DQ_GIFTS[i];if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;addVip(G2.vip);toast('🎁 Gift opened: +'+G2.vip+' VIP points · '+TKI+' +'+G2.tk+' · '+CTI+' +'+G2.tk,2500);}
     else if(!G.dq.gifts[i])toast('🎁 Claim '+G2.need+' daily quests to open this gift',2500);dqKey='';renderDQ();}});
 addEventListener('resize',()=>{if(dqEl.classList.contains('open'))dqSize();});
 
@@ -2382,6 +2391,13 @@ const CATS={
  g:{n:'Guards',one:'Guard',ic:'🛡️',title:'GUARD',sub:'Hire tough Guards to stop the car thieves!'},
  d:{n:'Drivers',one:'Driver',ic:'🛵',title:'DRIVER',sub:'Recruit fast Drivers to move your cars!'}};
 const CATK=['m','g','d'];
+CATS.c={n:'Crew',one:'Crew member',ic:'🎖️',title:'CREW',sub:'Drivers and Guards in one summon!'};
+const SMK=['m','c']; // v16-20: summon pages – Mechanics · Crew (Drivers + Guards mixed)
+const inCat=(h,cat)=>cat==='c'?(h.cat==='g'||h.cat==='d'):h.cat===cat;
+const smOf=c=>c==='g'||c==='d'?'c':c;
+const CTI='<img class="tki" src="img/cticket.webp">';
+const TIK=c=>c==='c'?CTI:TKI;
+const tkN=c=>c==='c'?G.h.ct:G.h.tk;
 // name : specialty (mechanics only) : f = woman
 const ROSTER={
  m:[
@@ -2411,7 +2427,7 @@ const ROSTER={
 const HEROES=[], HB={};
 CATK.forEach(cat=>ROSTER[cat].forEach((list,gr)=>list.forEach((s,i)=>{const p=s.split(':');
   const h={id:cat+gr+'_'+i,cat,gr,n:gr===6?'Coming soon':p[0],sp:cat==='m'?(p[1]||'all'):'',f:p.includes('f'),soon:gr===6,i};HEROES.push(h);HB[h.id]=h;})));
-const heroesOf=(cat,gr)=>HEROES.filter(h=>h.cat===cat&&(gr===undefined||h.gr===gr));
+const heroesOf=(cat,gr)=>HEROES.filter(h=>inCat(h,cat)&&(gr===undefined||h.gr===gr));
 // stats at +0; every star adds +20% of the base (+5 = double)
 const HS={
  m:{spd:[.05,.09,.14,.21,.30,.45],inc:[.03,.06,.10,.15,.22,.34],crit:[0,0,.04,.07,.10,.15]},
@@ -2444,7 +2460,7 @@ function slotsOf(cat){const o=[];
   return o;}
 function whereIs(id){for(const k in G.h.as)if(G.h.as[k]===id)return k;return null;}
 const heroIn=key=>{const id=G.h.as[key];return id&&own(id)?HB[id]:null;};
-const discCount=cat=>HEROES.filter(h=>h.cat===cat&&!h.soon&&G.h.disc[h.id]).length;
+const discCount=cat=>HEROES.filter(h=>inCat(h,cat)&&!h.soon&&G.h.disc[h.id]).length;
 const setDone=(cat,gr)=>heroesOf(cat,gr).every(h=>G.h.disc[h.id]);
 // cached bonuses
 const SB={m:{},g:{},d:{}};
@@ -2553,47 +2569,49 @@ const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon 
 // ---------- DOM: summon page (my picture) ----------
 const smEl=$('sm'),smBox=$('smBox');(new Image()).src='img/summon.webp';let smCat='m',smKey='';
 function smSize(){const k=Math.min(innerWidth/921,innerHeight/1707);smBox.style.width=921*k+'px';smBox.style.height=1707*k+'px';smBox.style.setProperty('--u',k+'px');}
-function openSummon(cat){if(cat)smCat=cat;smSize();smKey='';smEl.classList.add('open');renderSm();}
+function openSummon(cat){if(cat)smCat=smOf(cat);smSize();smKey='';smEl.classList.add('open');renderSm();}
 function closeSummon(){smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
 function img(h,sil,cls){return '<img class="'+(cls||'')+'" src="'+portrait(h,sil)+'">';}
 function renderSm(){if(!smEl.classList.contains('open'))return;
-  const P=G.h.pity[smCat],free=freeOK(),key=smCat+G.h.tk+P.e+P.l+free+HVER;if(key===smKey){const mE=$('smMoney');if(mE)mE.textContent=fmt(G.money);return;}smKey=key;const C=CATS[smCat];
+  const P=G.h.pity[smCat],free=freeOK(),key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+free+HVER;if(key===smKey){const mE=$('smMoney');if(mE)mE.textContent=fmt(G.money);return;}smKey=key;const C=CATS[smCat];
   let h='';
-  if(smCat!=='m'){const top=HEROES.filter(x=>x.cat===smCat&&(x.gr===4||x.gr===3)).slice(-5).reverse();
+  if(smCat!=='m'){const top=[...HEROES.filter(x=>x.cat==='g'&&(x.gr===4||x.gr===3)).slice(-3),...HEROES.filter(x=>x.cat==='d'&&(x.gr===4||x.gr===3)).slice(-2)].reverse();
     h+='<div class="smBan" style="'+box(0,92,921,846)+'"><div class="smT" style="'+box(0,40,921,130)+'">'+C.title+' <span>SUMMON</span></div>'+
       '<div class="smS" style="'+box(0,182,921,50)+'">'+C.sub+'</div>';
     const pos=[[316,250,290],[140,320,210],[571,320,210],[14,410,170],[737,410,170]];
     [3,4,1,2,0].forEach(i=>{const x=top[i];if(!x)return;const p=pos[i];h+='<div class="smP" style="'+box(p[0],p[1],p[2],p[2])+'border-color:'+GRADES[x.gr].c+'">'+img(x)+'</div>';});
     h+='<div class="smS" style="'+box(0,620,921,60)+'font-size:'+U(34)+'">Get '+C.n+' from Common to <b style="color:#29b6f6">Rare</b>, <b style="color:#d05cff">Epic</b>, <b style="color:#ffd21a">Legendary</b>!</div></div>';
     h+='<div class="smAv" style="'+box(292,956,340,50)+'">Available '+C.n+'</div>';}
-  h+='<div class="smN" style="'+box(470,18,110,40)+'">'+G.h.tk+'</div>';
+  h+='<div class="smN" style="'+box(470,18,110,40)+'">'+tkN(smCat)+'</div>';
+  if(smCat==='c')h+='<img src="img/cticket.webp" style="'+box(405,10,72,62)+'object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 4px #000)">'; // crew ticket over the red one
   h+='<div class="smN" id="smMoney" style="'+box(735,18,118,40)+'">'+fmt(G.money)+'</div>';
   h+='<div data-a="back" style="'+box(10,6,88,76)+'"></div><div data-a="tkinfo" style="'+box(582,12,54,54)+'"></div><div data-a="tkinfo" style="'+box(408,12,170,54)+'"></div>';
   h+='<div data-a="arrow" data-d="-1" class="smA" style="'+box(4,470,64,110)+'">‹</div><div data-a="arrow" data-d="1" class="smA" style="'+box(853,470,64,110)+'">›</div>';
   TILE_X.forEach((x,i)=>h+='<div data-a="tier" data-g="'+(i<5?i:6)+'" style="'+box(x-66,1035,132,170)+'"></div>');
   h+='<div data-a="rates" style="'+box(812,950,64,60)+'"></div><div data-a="rates" style="'+box(20,1264,196,60)+'"></div><div data-a="hist" style="'+box(672,1264,230,60)+'"></div>';
-  h+='<div class="smDots" style="'+box(330,1276,260,36)+'">'+CATK.map(c=>'<i data-a="cat" data-c="'+c+'" class="'+(c===smCat?'on':'')+'">'+CATS[c].ic+'</i>').join('')+'</div>';
+  h+='<div class="smDots" style="'+box(330,1276,260,36)+'">'+SMK.map(c=>'<i data-a="cat" data-c="'+c+'" class="'+(c===smCat?'on':'')+'">'+CATS[c].ic+'</i>').join('')+'</div>';
   if(free)h+='<div class="smFree" style="'+box(150,1420,190,56)+'">FREE 👑</div>';
   h+='<div data-a="sum" data-n="1" style="'+box(35,1352,415,145)+'"></div><div data-a="sum" data-n="10" style="'+box(468,1340,430,157)+'"></div>';
+  if(smCat==='c')[[180,1422],[615,1422]].forEach(([x,y])=>h+='<img src="img/cticket.webp" style="'+box(x,y,64,58)+'object-fit:contain;pointer-events:none">');
   h+='<div class="smPity" style="'+box(20,1497,881,36)+'">💜 Epic+ guaranteed in <b>'+(PITY_E-P.e)+'</b> · 💛 Legendary guaranteed in <b>'+(PITY_L-P.l)+'</b></div>';
   h+='<div data-a="coll" style="'+box(85,1535,755,125)+'"></div>';
-  h+='<div class="smCnt" style="'+box(330,1614,360,30)+'">'+discCount(smCat)+' / '+HEROES.filter(x=>x.cat===smCat&&!x.soon).length+' collected</div>';
+  h+='<div class="smCnt" style="'+box(330,1614,360,30)+'">'+discCount(smCat)+' / '+HEROES.filter(x=>inCat(x,smCat)&&!x.soon).length+' collected</div>';
   smBox.innerHTML=h;}
 smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
   if(a==='back')closeSummon();
   else if(a==='tkinfo')popTickets();
-  else if(a==='arrow'){const i=(CATK.indexOf(smCat)+(+t.dataset.d)+3)%3;smCat=CATK[i];smKey='';renderSm();}
+  else if(a==='arrow'){const i=(SMK.indexOf(smCat)+(+t.dataset.d)+SMK.length)%SMK.length;smCat=SMK[i];smKey='';renderSm();}
   else if(a==='cat'){smCat=t.dataset.c;smKey='';renderSm();}
   else if(a==='tier'){const g=+t.dataset.g;if(g===6){toast('🔴 Red heroes are COMING SOON',2500);return;}popTier(smCat,g);}
   else if(a==='rates')popRates();
   else if(a==='hist')popHist();
-  else if(a==='coll'||a==='team'){openTeam(smCat);}
+  else if(a==='coll'||a==='team'){openTeam(smCat==='c'?'d':smCat);}
   else if(a==='sum')doSummon(+t.dataset.n);});
 function doSummon(n){
   if(n===1&&freeOK()){G.h.free=dayKey();showResults(summon(smCat,1),smCat,n);smKey='';renderSm();return;}
-  if(G.h.tk<n){toast(''+TKI+' Not enough Recruit Tickets ('+G.h.tk+' / '+n+')',2800);popTickets();return;}
-  G.h.tk-=n;showResults(summon(smCat,n===10?11:1),smCat,n);smKey='';renderSm();}
+  if(tkN(smCat)<n){toast(''+TIK(smCat)+' Not enough '+(smCat==='c'?'Crew':'Recruit')+' Tickets ('+tkN(smCat)+' / '+n+')',2800);popTickets();return;}
+  if(smCat==='c')G.h.ct-=n;else G.h.tk-=n;showResults(summon(smCat,n===10?11:1),smCat,n);smKey='';renderSm();}
 
 // ---------- results ----------
 const resEl=$('res');
@@ -2614,10 +2632,10 @@ function showResults(res,cat,n){
     const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?'<i class="up">+'+o.s+' ★</i>':'<i class="mx">MAX · +'+fmt(r.money)+'</i>';
     h+='<div class="rc g'+H.gr+'" style="animation-delay:'+(i*.16)+'s">'+card(H,o,tagT)+'</div>';});
   const best=Math.max(...res.map(r=>HB[r.id].gr));
-  h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TKI+'1</button><button data-r="10" class="gold">Summon ×10 · '+TKI+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TKI+' '+G.h.tk+' tickets left</div>';
-  resEl.innerHTML=h;resEl.className='open best'+best;
+  h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TIK(cat)+'1</button><button data-r="10" class="gold">Summon ×10 · '+TIK(cat)+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TIK(cat)+' '+tkN(cat)+' tickets left</div>';
+  resEl.innerHTML=h;resEl.dataset.first=res[0]?res[0].id:'';resEl.className='open best'+best;
   if(best>=5)toast('🔥 MYTHIC '+CATS[cat].one.toUpperCase()+'!',3000);else if(best>=4)toast('💛 LEGENDARY '+CATS[cat].one.toUpperCase()+'!',3000);}
-resEl.addEventListener('click',e=>{const c=e.target.closest('[data-crew]');if(c){openRoster(c.dataset.crew);return;}const b=e.target.closest('[data-r]');if(b){doSummon(+b.dataset.r);return;}if(!e.target.closest('.rc'))resEl.className='';});
+resEl.addEventListener('click',e=>{const c=e.target.closest('[data-crew]');if(c){const f=HB[resEl.dataset.first];openRoster(c.dataset.crew==='c'?(f?f.cat:'d'):c.dataset.crew);return;}const b=e.target.closest('[data-r]');if(b){doSummon(+b.dataset.r);return;}if(!e.target.closest('.rc'))resEl.className='';});
 
 
 // ---------- v15: MY CREW – every hero you own, where he works, who is better (garage only, not battle) ----------
@@ -2686,13 +2704,13 @@ rosEl.addEventListener('click',e=>{const t=e.target.closest('[data-ro]');if(!t)r
 const popEl=$('pop'),popBox=$('popBox');let popCtx=null;
 function pop(html,ctx){popCtx=ctx||null;popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+html;popEl.classList.add('open');}
 function closePop(){popEl.classList.remove('open');popCtx=null;}
-function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets</div><div class="pD">One ticket type for Mechanics, Guards and Drivers. You have <b>'+G.h.tk+'</b>.</div>'+
-  ['📋 Every claimed Daily Quest: +1','🎁 Daily Quest gifts: +1 / +2 / +2 / +3','👮 Every thief caught: +1','⭐ Every new Reputation level: +5','👑 Every new VIP level: +5','🧰 Idle Rewards: +1 every 2 hours (4h storage + 30 min per VIP level)'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
+function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets · '+CTI+' Crew Tickets</div><div class="pD">'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.<br>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.<br>Both are earned only by playing.</div>'+
+  [TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign rewards'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*1000)/10)+'%';
   const row=(i,pct,right)=>'<div class="rRow" style="--gc:'+GRADES[i].c+'"><span><i class="gear"></i>'+GRADES[i].n+'</span><b>'+pct+'</b><em>'+right+'</em></div>';
-  pop('<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">'+CATS[smCat].n.toUpperCase()+'</span>'+RATES.map((r,i)=>row(i,pc(r),'👤 '+heroesOf(smCat,i).length+' heroes')).join('')+
+  pop('<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</span>'+RATES.map((r,i)=>row(i,pc(r),'👤 '+heroesOf(smCat,i).length+' heroes')).join('')+
   row(5,'0%','👤 only from Fusion')+'<div class="rRow lockd"><span>🔒 ???</span><b>—</b><em>coming soon</em></div>'+
-  '<div class="rInfo"><div>💜 An <b>Epic or better</b> is guaranteed every <b>'+PITY_E+'</b> summons (now: '+P.e+'/'+PITY_E+').</div><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+').</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div><div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
+  '<div class="rInfo"><div>💜 An <b>Epic or better</b> is guaranteed every <b>'+PITY_E+'</b> summons (now: '+P.e+'/'+PITY_E+').</div><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+').</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
 function popHist(){const L=G.h.hist;pop('<div class="pT pic"><img src="img/ui/t_hist.webp" alt="SUMMON HISTORY"></div><span class="pSub blue">Last '+L.length+' summons</span>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
   return '<div class="pR"><span>'+CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b></span><em>'+(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')+'</em></div>';}).join(''):'<div class="pD">No summons yet.</div>'));}
 function popTier(cat,gr){const L=heroesOf(cat,gr);
@@ -2829,7 +2847,7 @@ const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*IDLE_REP[G.rep-1];} // v15: high levels also earn well while you are away
 function idleRate(){return Math.round(idleBase()*(1+VB('idle')));}
-function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),full:hrs>=idleMax()};}
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),ct:Math.floor(hrs/(IDLE_TK_H*2)),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}
@@ -2847,16 +2865,16 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   idlBox.innerHTML=h;}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
-function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.idle=SEC.now();save();closeIdle();
-  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
+function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;G.idle=SEC.now();save();closeIdle();
+  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
 addEventListener('resize',()=>{if(smEl.classList.contains('open'))smSize();if(teamEl.classList.contains('open'))fit(tmBox,1024,1536);if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
 // ---------- map: grade badge over heroes ----------
-function heroBadge(p,h,s){if(!DET||!onScreen(p.x,p.y,20))return;const g=GRADES[h.gr],y=p.y-17;
+function heroBadge(p,h,s){if(!DET||!onScreen(p.x,p.y,20))return;const g=GRADES[h.gr],y=p.y-(p.miniOK?27:17);
   X.fillStyle='rgba(0,0,0,.55)';rr(p.x-11,y-5,22,10,5);X.fill();X.fillStyle=g.c;X.beginPath();X.moveTo(p.x-7,y-3.5);X.lineTo(p.x-3.5,y);X.lineTo(p.x-7,y+3.5);X.lineTo(p.x-10.5,y);X.fill();
   X.font='900 7px system-ui';X.textAlign='center';X.textBaseline='middle';X.fillStyle='#fff';X.fillText('+'+s,p.x+3.5,y+.5);X.textBaseline='alphabetic';
-  if(DET2){X.font='800 6px system-ui';const w=X.measureText(h.n).width+6;X.fillStyle='rgba(0,0,0,.6)';rr(p.x-w/2,y-14,w,8,4);X.fill();X.fillStyle=g.c;X.fillText(h.n,p.x,y-8);}}
+  if(DET2&&!(p.miniOK&&p.mode==='work')){X.font='800 6px system-ui';const w=X.measureText(h.n).width+6;X.fillStyle='rgba(0,0,0,.6)';rr(p.x-w/2,y-14,w,8,4);X.fill();X.fillStyle=g.c;X.fillText(h.n,p.x,y-8);}}
 function drawHeroBadges(){
   STIDS.forEach(st=>bays[st].forEach((b,j)=>{if(!b.mech)return;const h=heroIn('m|'+st+'|'+j);if(h)heroBadge(b.mech,h,own(h.id).s);}));
   for(const id in drivers)for(const d of drivers[id]){if(!d.p.vis)continue;const h=heroIn('d|'+id+'|'+d.k);if(h)heroBadge(d.p,h,own(h.id).s);}
@@ -2877,7 +2895,7 @@ heroRefresh();
 let lastM=-1,lastS=-1,lastX=-1;
 let lastV=-1,lastQ=-1;
 let lastTk=-1,lastIdle=-1;
-let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(G.h.tk!==lastTk){lastTk=G.h.tk;const t=$('tkDot');t.style.display=G.h.tk?'flex':'none';t.textContent=G.h.tk>99?'99+':G.h.tk;}
+let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0);if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×1.3</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}

@@ -2198,6 +2198,11 @@ $('cpChN').onclick=()=>chList();
 $('cpBack').onclick=close;$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
 // v15: GEAR title is the player's picture
 $('cpGearB').innerHTML=IMGI(glyphURL('bag','#ffd54a'),'1.25em','-.3em')+'<small>GEAR</small>';
-window.CAMPAIGN={open,close,openGear};
+// v16-20: mini hero on the garage map (same sprite sheet as in battle). an: idle · walk · work · cel. hgt = height on the map.
+function mini(X,id,an,t,x,y,hgt,face,ph){const d=SPRD[id];if(!sprOK(d))return false;const R=d.R||[0,1,2,3,4,5];
+  const row=an==='walk'?R[1]:an==='work'?R[2]:an==='cel'?R[5]:R[0],fps=an==='walk'?9:an==='work'?6:4,c=Math.floor(t*fps+(ph||0)*3)%4;
+  const k=hgt/215,w=d.w||256,cw=w*SPCELL/256;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
+  X.drawImage(d.im,c*cw,row*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);X.restore();return true;}
+window.CAMPAIGN={open,close,openGear,mini};
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));}};
 })();

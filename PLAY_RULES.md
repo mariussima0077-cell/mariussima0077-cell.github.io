@@ -12,7 +12,7 @@ Ultima actualizare: 13 noiembrie 2026 (v16-2).
 |---|---|---|
 | Cont dezvoltator | „Torque Studios”, cont **personal** | ✅ aprobat 13 nov |
 | Aplicația | Torque Empire: Garage Tycoon · `com.torqueempire.game` · **Jeu** · **Sans frais (gratuit)** · limba en-US | ✅ creată 13 nov |
-| Classification / éléments aléatoires | **Non** (summon doar cu bilete câștigate în joc, VIP Pass fără summon gratuit) | ✅ ales de Marius (v16-1) |
+| Classification / éléments aléatoires | **Non** (summon doar cu bilete câștigate în joc – Recruit Tickets pentru mecanici + Crew Tickets pentru șoferi/paznici din v16-20 –, VIP Pass fără summon gratuit; Crew Tickets nu se vând niciodată) | ✅ ales de Marius (v16-1) |
 | Data safety | vezi secțiunea 3 de mai jos | ⏳ de completat |
 | Content rating (IARC) | violență cartoon, fără sânge, achiziții în aplicație, fără jocuri de noroc | ⏳ de completat |
 | Target audience | **13+** (NU pentru copii) | ⏳ de completat |
