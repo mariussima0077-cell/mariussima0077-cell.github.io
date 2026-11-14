@@ -1124,8 +1124,8 @@ function updateSecurity(dt){
     else if(g.mode==='patrol'){if(goRoute(g,dt,30)){g.pi=(g.pi+1)%PATROL.length;g.route=[PATROL[g.pi]];}}
     else if(g.mode==='run'){if(g.delay>0){g.delay-=dt;p.a=lerpA(p.a,Math.PI/2,Math.min(1,dt*6));continue;}
       if(T.st==='break'&&g.route.length)g.route[g.route.length-1]=nearThief(g.route.length>1?g.route[g.route.length-2]:p);
-      if(goRoute(g,dt,gv*(1+gb.spd[g.k]))){if(T.st==='break'&&!T.win){catchThief();g.mode='hold';}else if(T.st==='caught'||T.st==='toPolice')g.mode='hold';else guardHome(g);}}
-    else if(g.mode==='hold'){p.moving=false;p.a=Math.atan2(T.p.y-p.y,T.p.x-p.x);}
+      if(goRoute(g,dt,gv*(1+gb.spd[g.k]))){if(T.st==='break'&&!T.win){catchThief();g.mode='hold';}else if(T.st==='caught'||T.st==='toPolice'){g.mode='hold';g.ht=0;}else guardHome(g);if(g.mode==='hold')g.ht=0;}}
+    else if(g.mode==='hold'){p.moving=false;g.ht=(g.ht||0)+dt;p.a=Math.atan2(T.p.y-p.y,T.p.x-p.x);}
     else if(g.mode==='back'){if(goRoute(g,dt,40)){g.mode='desk';}}}
   // police cars
   for(let i=police.length-1;i>=0;i--){const c=police[i],done=stepCop(c,dt);
@@ -1493,6 +1493,19 @@ function drawDriver(d){const p=d.p;p.miniOK=false;
     p.mode=riding||p.moving||p.tipT>0?'':'work'; // standing at home: grade badge only, no name (like working mechanics)
     if(CAMPAIGN.mini(X,h.id,an,t,p.x,p.y+6,riding?27:24,face,0)){p.miniOK=true;return;}}}
   drawPerson(p);}
+// v16-30: guards from Marius' sheets. Rows: 0 idle · 1 walk · 2 run · 3 catch (whistle, stop, grab, cuffs) · 4 signature move · 5 reward coin
+function drawGuard(g){const p=g.p;p.miniOK=false;
+  if(window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('g|'+g.k);if(h){
+    if(p.ph==null)p.ph=Math.random()*12;
+    let an=0,t=time;const run=g.mode==='run'&&g.delay<=0&&p.moving,walk=!run&&p.moving;
+    if(g.mode==='hold'){const q=g.ht||0;if(q<2){an=3;t=q/3;}else if(q<3.2){an=5;t=q-2;}}
+    else if(run)an=2;else if(walk)an=1;
+    else{const q=(time+p.ph)%12;if(q<1.6){an=4;t=q;}}
+    const face=p.moving||g.mode==='hold'?(Math.cos(p.a)>=0?1:-1):(p.face||1);if(p.moving||g.mode==='hold')p.face=face;
+    X.fillStyle='rgba(0,0,0,.28)';ell(p.x,p.y+6,7,2.6);
+    p.mode=p.moving||g.mode==='hold'?'':'work'; // at the desk: grade badge only, no name
+    if(CAMPAIGN.mini(X,h.id,an,t,p.x,p.y+6,24,face,0)){p.miniOK=true;return;}}}
+  drawPerson(p);}
 function drawPerson(p){
   if(!p.vis)return;
   X.save();X.translate(p.x,p.y);X.rotate(p.a);
@@ -1788,7 +1801,7 @@ function drawAlarm(c){if(!onScreen(c.x,c.y,50))return;const on=(time*6|0)%2,L=c.
   X.save();X.translate(c.x,c.y);X.rotate(c.a);X.fillStyle=on?'rgba(255,170,0,.95)':'rgba(255,120,0,.3)';for(const [x,y] of[[L-2,-Wd+2],[L-2,Wd-2],[-L+2,-Wd+2],[-L+2,Wd-2]])circ(x,y,on?3.4:2.2);X.restore();
   X.strokeStyle='rgba(255,40,40,'+(.6-((time*1.6)%1)*.6)+')';X.lineWidth=2.5;X.beginPath();X.arc(c.x,c.y,18+((time*1.6)%1)*26,0,7);X.stroke();}
 function drawSecPeople(){
-  for(const g of guards)if(g.p.vis&&onScreen(g.p.x,g.p.y,20)){drawPerson(g.p);if(DET&&g.mode==='run')tag(g.p.x,g.p.y-15,'👮','#1565c0');}
+  for(const g of guards)if(g.p.vis&&onScreen(g.p.x,g.p.y,20)){drawGuard(g);if(DET&&g.mode==='run')tag(g.p.x,g.p.y-15,'👮','#1565c0');}
   const T=thief;if(T.p.vis&&onScreen(T.p.x,T.p.y,24)){drawPerson(T.p);
     if(T.st==='caught'||T.st==='toPolice')tag(T.p.x,T.p.y-15,'⛓ CAUGHT','#2e7d32');else if(DET)tag(T.p.x,T.p.y-15,'🦹 THIEF','#c62828');}
 }
@@ -2514,7 +2527,7 @@ function addTickets(n,why){G.h.tk+=n;save();if(why)toast(''+TKI+' +'+n+' Recruit
 const PCACHE={};
 function hashS(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 // v16-5: Marius' own pictures for these heroes (cut from his sprite sheets)
-const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1};
+const HPIC={m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1};
 function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/hero/'+key+'.webp';if(PCACHE[key])return PCACHE[key];
   const S=128,cv2=document.createElement('canvas');cv2.width=cv2.height=S;const g=cv2.getContext('2d');
   let sd=hashS(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
