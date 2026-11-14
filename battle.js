@@ -1245,9 +1245,7 @@ function debris(x,y,n,cols){for(let k=0;k<n;k++){const a=rnd(-Math.PI,0),v=rnd(8
 function shake(n){B.shake=Math.max(B.shake,n);}
 // ---------------------------------------------------------------- FX v2 (demo) · CC0 particle textures by Kenney (kenney.nl), see img/fx/LICENSE-Kenney-CC0.txt
 // Off by default. ?fx=2 turns it on (and shows the OLD/NEW toggle in battle), ?fx=1 turns it off.
-let FX2=false,FXDEMO=false;
-try{const q=location.search.match(/[?&]fx=(\d)/);if(q){localStorage.setItem('te_fx2',q[1]==='2'?'1':'0');localStorage.setItem('te_fxdemo','1');}
-  FX2=localStorage.getItem('te_fx2')==='1';FXDEMO=localStorage.getItem('te_fxdemo')==='1';}catch(e){}
+let FX2=true; // v16-41: only the new effects (Marius) – the FX NEW / FX OLD switch is gone; safe mode can still turn them off if a battle cannot start
 const FXN=['circle_05','flare_01','spark_05','smoke_04','magic_02','star_07','trace_01','slash_02','twirl_02','scorch_02','fire_01','flame_04','light_02','muzzle_02','circle_03','spark_02','dirt_02','star_04'];
 const FXI={},FXK={};
 function fxImg(n){let i=FXI[n];if(!i){i=FXI[n]=new Image();i.src='img/fx/'+n+'.webp';}return i;}
@@ -1338,7 +1336,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
-function cast(u){if(!canCast(u))return;u.en=0;B.slowT=.45;B.flash=.35;punch(.045);if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
+function cast(u){if(!canCast(u))return;u.en=0;B.slowT=Math.max(B.slowT,1.3);B.flash=.35;punch(.045);if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
   B.banner={u,t:0,name:skOf(u.h).sk};
   const R=u.role,ms=alive(B.mons);
   if(SKF[u.h.id]){SKF[u.h.id](u,ms);return;}
@@ -1390,7 +1388,7 @@ const SKF={
  m4_3(u,ms){castAct(u,.85,()=>{const cx=ms.reduce((a,m)=>a+m.x,0)/ms.length,top=FY0-120*S;B.fx.push({type:'imgfx',k:'cloud',x:cx,y:top+40*S,w:Math.min(W*.9,300*S),t:0,d:1.6,cloud:1});
    for(let k=0;k<8;k++)B.fx.push({type:'strike',t:-.25-k*.13,d:.3,src:u,top});
    teamBuff({aspd:6,aspdK:.25,col:'#ffd54a',txt:'SPEED UP'});});},
- m4_4(u,ms){castAct(u,1,()=>{B.flash=.45;B.slowT=.6;
+ m4_4(u,ms){castAct(u,1,()=>{B.flash=.45;B.slowT=Math.max(B.slowT,1.3);
    for(const m of alive(B.mons)){m.slow=Math.max(m.slow,6);m.mark=Math.max(m.mark,6);m.tw=6;imgFx('hglass',m.x,headY(m)-8*S,30*S,1.4,{float:1,u:m});damage(u,m,.6,{skill:1,noCrit:1});}
    teamBuff({aspd:6,aspdK:.4,col:'#80d8ff',txt:'SPEED UP'});});},
  m4_5(u){u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,mult:2.8};u.st='dash';},
@@ -1502,8 +1500,9 @@ function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
   else{const m=u.charge?2:1;u.charge=0;damage(u,tg,m);sparks(x,y,u.b==='titan'?14:6,'#ffab40');if(u.b){shake(u.b==='titan'?8:4);tg.x-=8*S;}
     if(u.b==='titan')for(const h of alive(B.heroes))if(h!==tg&&dist(h,tg)<45*S)damage(u,h,.6,{noCrit:1});
     B.fx.push({type:'slash',x,y,t:0,d:.2,f:u.face,col:'#ff8a65'});}}
+// v16-41: mechanics keep a bigger gap (their pictures are wider) and two on the same spot are pushed apart too
 function sep(list){for(let i=0;i<list.length;i++){const a=list[i];if(a.dead||a.act)continue;for(let j=i+1;j<list.length;j++){const b=list[j];if(b.dead||b.act)continue;
-  const dx=b.x-a.x,dd=(b.d-a.d)*(FY1-FY0);const L=Math.hypot(dx,dd),min=(a.boss||b.boss?48:30)*S;if(L<min&&L>0.01){const p=(min-L)/2;const ux=dx/L,uy=dd/L;
+  let dx=b.x-a.x,dd=(b.d-a.d)*(FY1-FY0);if(Math.abs(dx)+Math.abs(dd)<.01){dd=(j%2?1:-1)*.5;dx=.3;}const hh=a.hero&&b.hero,kd=hh?.72:1,L=Math.hypot(dx,dd*kd),min=(a.boss||b.boss?48:hh?56:30)*S;if(L<min){const p=(min-L)/2*(hh?1.6:1);const ux=dx/L,uy=dd*kd/L/kd;
     if(!a.boss){a.x-=ux*p*.5;a.d-=uy*p/(FY1-FY0);}if(!b.boss){b.x+=ux*p*.5;b.d+=uy*p/(FY1-FY0);}a.d=clamp(a.d,.02,.98);b.d=clamp(b.d,.02,.98);}}}}
 
 function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelAnimationFrame(raf);B.auto=true;let t=0;while(t<(maxT||400)&&!B.res){step(1/30);t+=1/30;}
@@ -1794,7 +1793,6 @@ function btn(x,y,w,h,label,on,id,col){g.fillStyle=on?(col||'#ffb300'):'rgba(20,1
   g.fillStyle=on?'#2a1000':'#ffd54a';g.font='900 '+Math.round(14*Math.min(1.2,S))+'px system-ui';g.textAlign='center';g.textBaseline='middle';g.fillText(label,x+w/2,y+h/2+1);g.textBaseline='alphabetic';HIT.push({x,y,w,h,id});}
 function drawHUD(t){HIT=[];const top=10,bh=38;
   btn(10,top,44,bh,'',false,'pause');g.drawImage(badgeCv('pause','#ffb300',64),10+22-13,top+bh/2-13,26,26);
-  if(FXDEMO)btn(10,top+bh+8,96,32,FX2?'FX: NEW':'FX: OLD',FX2,'fx','#7c4dff');
   g.textAlign='center';const tt=sLabel(B.si)+' · '+B.stage.n.toUpperCase();let fs=Math.round(15*S);g.font='900 '+fs+'px system-ui';while(fs>9&&g.measureText(tt).width>W-250){fs--;g.font='900 '+fs+'px system-ui';}g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(tt,W/2,top+17);g.fillStyle='#ffe0b2';g.fillText(tt,W/2,top+17);
   const nw=B.stage.w.length;for(let i=0;i<nw;i++){const x=W/2+(i-(nw-1)/2)*22,y=top+33;const boss=B.stage.w[i].some(m=>MON[m].boss);g.fillStyle=i<B.wave?'#66bb6a':i===B.wave?'#ffb300':'rgba(255,255,255,.25)';
     if(boss){g.font='900 13px system-ui';g.fillText('💀',x,y+5);}else{rr(g,x-7,y-3,14,7,3);g.fill();}}
@@ -1920,7 +1918,7 @@ function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
 function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-lastT<14.5)return; // v16-27: max 60 fps (120 Hz phones drew twice as much)
   const raw=Math.min(.05,(now-lastT)/1000);lastT=now;
   if(!B.paused){B.real+=raw;B.shake=Math.max(0,B.shake-raw*40);if(B.zoom)B.zoom=Math.max(0,B.zoom-raw*(B.zoom*5+.02));if(B.combo){B.combo.t+=raw;if(B.combo.t>1.4)B.combo=null;}B.flash=Math.max(0,B.flash-raw*2.2);
-    let ts=B.spd;if(B.slowT>0){B.slowT-=raw;ts*=.3;}if(B.hs>0){B.hs-=raw;ts*=.06;}
+    let ts=B.spd;if(B.slowT>0){B.slowT-=raw;ts=.38;} // v16-41: skills in slow motion (same at ×1, ×1.5, ×2) so you can see themif(B.hs>0){B.hs-=raw;ts*=.06;}
     let left=raw*ts;while(left>0){const s=Math.min(1/60,left);step(s);left-=s;}}
   const t0=performance.now();render();
   // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".
@@ -1928,8 +1926,7 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-las
   if(B.real>2){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}}}
   if(LOWRES&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}}
 cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
-  if(h.id==='fx'){FX2=!FX2;try{localStorage.setItem('te_fx2',FX2?'1':'0');}catch(e){}if(FX2)fxPre();B.fx2=[];}
-  else if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
+  if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
   else if(h.id==='spd'){if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(TE().PK.spd2)B.spd=2;else{B.offer=true;B.paused=true;}}else B.spd=1;TE().G.cp.spd=B.spd;}
   else if(h.id==='buy'){const T=TE();T.PK.spd2=true;T.savePacks();B.spd=2;T.G.cp.spd=2;B.offer=false;B.paused=false;lastT=performance.now();T.toast('⏩ Battle Speed ×2 unlocked forever!',3000);}
   else if(h.id==='nobuy'){B.offer=false;B.paused=false;B.spd=1;TE().G.cp.spd=1;lastT=performance.now();}else if(h.id==='auto'){B.auto=!B.auto;TE().G.cp.auto=B.auto;}
