@@ -678,7 +678,9 @@ const SPRD={
  // v16-24: Epic drivers (atlas_rare.py + fix_closeup.py for close-up row 4, fade_cell.py for Nova's burst)
  d3_0:{w:384,a:[173,248],m:[300,150]},d3_1:{w:384,a:[195,248],m:[300,150]},d3_2:{w:384,a:[172,248],m:[300,150]},d3_3:{w:384,a:[169,248],m:[300,150]},d3_4:{w:384,a:[170,248],m:[300,150]},
  // v16-28: Legendary drivers (atlas_rare.py; Clutch row 4 = rebuild_row.py, 5 glued poses -> 4; fix_closeup.py; fix_d4_3_phantom.py; clean_bits.py)
- d4_0:{w:384,a:[178,248],m:[300,150]},d4_1:{w:384,a:[195,248],m:[300,150]},d4_2:{w:384,a:[188,248],m:[300,150]},d4_3:{w:384,a:[171,248],m:[300,150]}};
+ d4_0:{w:384,a:[178,248],m:[300,150]},d4_1:{w:384,a:[195,248],m:[300,150]},d4_2:{w:384,a:[188,248],m:[300,150]},d4_3:{w:384,a:[171,248],m:[300,150]},
+ // v16-29: Mythic drivers (rebuild_row.py + fix_closeup.py --blend for row 4, fade_cell.py, fix_red_tint.py)
+ d5_0:{w:384,a:[176,248],m:[300,150]},d5_1:{w:384,a:[193,248],m:[300,150]}};
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
