@@ -1,18 +1,19 @@
 """fix_closeup.py – v16-24: a row drawn closer (legs cut by the sheet) -> scale the pose down to idle size
 (head tops aligned) and put the idle legs under it. Frames listed in J are only scaled (full body, e.g. a jump)
 and stand on the ground. Works on out/full_<id>.png, rewrites out/sp_<id>.webp.
-usage: python3 fix_closeup.py <id> <row> <scale> [jump frames, e.g. 3]
+usage: python3 fix_closeup.py <id> <row> <scale> [jump frames, e.g. 3 or -] [only these frames, e.g. 0]
 """
 from PIL import Image; import numpy as np, sys
 hid = sys.argv[1]; R = int(sys.argv[2]); s = float(sys.argv[3])
-J = [int(x) for x in sys.argv[4].split(',')] if len(sys.argv) > 4 else []
+J = [int(x) for x in sys.argv[4].split(',')] if len(sys.argv) > 4 and sys.argv[4] != '-' else []
+ONLY = [int(x) for x in sys.argv[5].split(',')] if len(sys.argv) > 5 else [0, 1, 2, 3]   # v16-28
 F = Image.open(f'out/full_{hid}.png'); CW = 384
 def box(im):
     a = np.asarray(im)[..., 3] > 128; ys, xs = np.where(a); return ys.min(), ys.max()
 def cx(im, y0, y1):
     a = np.asarray(im)[y0:y1, :, 3] > 128; xs = np.where(a.any(0))[0]; return (xs.min() + xs.max()) / 2
 idle = F.crop((0, 0, CW, 256)); it, ib = box(idle)
-for c in range(4):
+for c in ONLY:
     fr = F.crop((c * CW, R * 256, (c + 1) * CW, (R + 1) * 256)); ft, fb = box(fr)
     t = fr.resize((round(CW * s), round(256 * s)), Image.LANCZOS)
     out = Image.new('RGBA', (CW, 256))
