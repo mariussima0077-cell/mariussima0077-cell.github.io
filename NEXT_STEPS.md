@@ -113,6 +113,7 @@
 - [ ] **Data safety**, **Content rating** (IARC), **Target audience 13+**, **Ads: No** – răspunsurile sunt în `PLAY_RULES.md` (s-au schimbat cu login-ul Google: + „User IDs”, opțional, + ștergere cont).
 
 ### Testul închis – 12 testeri × 14 zile
+- **Decizie Marius (15 nov)**: testerii lipsă (7/12 la 15 nov) îi va lua printr-un serviciu plătit de testeri – DUPĂ ce jocul e terminat/stabil. Acum ne axăm pe joc (update-urile sunt mai greu de făcut după). Data safety actualizat și trimis la examen (15 nov).
 - [ ] groups.google.com → grup „torque-empire-testers”.
 - [ ] Closed testing → Testers: adresa grupului → **linkul de înscriere**.
 - [ ] Testerii rămân înscriși **14 zile la rând** și joacă puțin.
