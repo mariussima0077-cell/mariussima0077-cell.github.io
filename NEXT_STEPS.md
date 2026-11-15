@@ -100,7 +100,7 @@
 
 ### Acum (cât așteptăm Google)
 - [ ] **Demo efecte noi în bătălii (FX v2)** – deschide jocul cu `?fx=2` la final de link, intră într-o bătălie și apasă butonul mov „FX: NEW / FX: OLD” ca să compari. Pentru jucători e OPRIT până aprobă Marius. Texturi gratuite CC0 (Kenney Particle Pack) în `img/fx/`. Dacă e aprobat: FX2 devine implicit și butonul de comparație dispare.
-- [x] **Client ID pentru login Google** (15 nov): proiect Google Cloud „TorqueEmpire” (cont torqueempirehelp@gmail.com), client *Web* „Torque Empire Web”, origine `https://mariussima0077-cell.github.io`. ID: `1041720099519-ogooa4hblh8d4s96ieervv9rp7bqh2k5.apps.googleusercontent.com` – pus în `cloud.js` și `server/wrangler.toml` (v16-43). De verificat de Marius pe telefon: Shop → Cloud save → Sign in. Dacă dă eroare „origin”: așteaptă 5 min–câteva ore (Google aplică setările încet).
+- [x] **Client ID pentru login Google** (15 nov): proiect Google Cloud „TorqueEmpire” (cont torqueempirehelp@gmail.com), client *Web* „Torque Empire Web”, origine `https://mariussima0077-cell.github.io`. ID: `1041720099519-ogooa4hblh8d4s96ieervv9rp7bqh2k5.apps.googleusercontent.com` – pus în `cloud.js` și `server/wrangler.toml` (v16-43). ✅ **Testat de Marius pe telefon (15 nov): login Google funcționează.**
 - [ ] Verifică dacă `ADMIN_KEY` e pus în Cloudflare (torque-guard → Settings → Variables and Secrets → Secret). Test: linkul de admin din Drive trebuie să arate pagina „🛡️ Torque Guard” (nu „no”).
 - [ ] Urcă `.aab`-ul în Google Drive (folderul cu cheia).
 - [ ] **Strânge 12 testeri** (adrese Gmail: prieteni, familie, sau r/AndroidClosedTesting). Claude poate scrie mesajul de invitație.
