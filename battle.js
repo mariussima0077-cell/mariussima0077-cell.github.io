@@ -353,6 +353,27 @@ for(const k in SKP)HSK[k]={sk:SKP[k].sk,skd:SKP[k].skd};
 const skp=u=>u&&u.h&&SKP[u.h.id]?SKP[u.h.id].p:{};
 const hexA=(c,a)=>{const n=parseInt(c.slice(1),16);return 'rgba('+(n>>16)+','+(n>>8&255)+','+(n&255)+','+a+')';};
 const skOf=h=>h&&!h.crew&&HSK[h.id]||ROLE[h?(h.crew?'crew':(h.sp||'all')):'all'];
+// v16-46: PASSIVE skills – work on their own in battle. Common/Uncommon/Rare = 1 passive, Epic/Legendary/Mythic = 2. Numbers grow with the grade.
+const PASV={
+ engine:[{n:'IRON SKIN',ic:'🛡️',v:[8,10,12,14,17,20],d:v=>`Takes −${v}% damage from every hit.`},
+         {n:'LAST STAND',ic:'💢',v:[0,0,0,25,30,35],d:v=>`Once per battle, under 35% HP: gains a shield of ${v}% HP and taunts enemies for 3s.`}],
+ tuning:[{n:'ADRENALINE',ic:'🔥',v:[15,18,21,25,30,35],d:v=>`Every enemy he knocks out: +${v}% attack speed for 4s.`},
+         {n:'QUICK STEP',ic:'💨',v:[0,0,0,12,15,18],d:v=>`${v}% chance to dodge an enemy hit.`}],
+ service:[{n:'FIELD CARE',ic:'💚',v:[4,5,6,7,8,10],d:v=>`Every 6s heals the weakest mechanic for ${v}% of his HP.`},
+          {n:'EMERGENCY KIT',ic:'🚑',v:[0,0,0,18,22,26],d:v=>`When a mechanic drops under 30% HP: instant heal of ${v}% HP (15s cooldown).`}],
+ paint:[{n:'STICKY PAINT',ic:'🎨',v:[1,1.2,1.5,1.8,2.1,2.5],d:v=>`Every shot slows the enemy 50% for ${v}s.`},
+        {n:'THINNER',ic:'🧪',v:[0,0,0,15,20,25],d:v=>`+${v}% damage to slowed enemies.`}],
+ elec:[{n:'STATIC',ic:'⚡',v:[20,24,28,33,39,45],d:v=>`${v}% chance that a shot jumps to a second enemy (60% damage).`},
+       {n:'SHORT CIRCUIT',ic:'💫',v:[0,0,0,10,14,18],d:v=>`${v}% chance that a shot stuns the enemy 0.6s.`}],
+ inspect:[{n:'WEAK SPOT',ic:'🎯',v:[5,5,4,4,3,3],d:v=>`Every ${v}${v===3?'rd':'th'} shot marks the target for 3s (+35% damage taken).`},
+          {n:'PRECISION',ic:'🔍',v:[0,0,0,15,20,25],d:v=>`+${v}% damage to marked enemies.`}],
+ all:[{n:'LEADER',ic:'👑',v:[4,5,6,7,8,10],d:v=>`All mechanics deal +${v}% damage while this hero stands.`},
+      {n:'SECOND WIND',ic:'❤️',v:[0,0,0,2,2.5,3],d:v=>`Under 50% HP: regenerates ${v}% HP every second.`}]};
+const pasN=h=>!h||h.crew||!PASV[roleOf(h)]?0:h.gr>=3?2:1;
+function pasOf(h){const n=pasN(h),o=[];for(let i=0;i<n;i++){const p=PASV[roleOf(h)][i];o.push({n:p.n,ic:p.ic,d:p.d(p.v[h.gr])});}return o;}
+// in battle: pv(u,'engine',0) → the number of that passive if this unit has it, else 0
+const pv=(u,role,i)=>u&&u.hero&&u.role===role&&u.pn>i?PASV[role][i].v[u.h.gr]:0;
+function pasTxt(u,i,txt){if(B.sim)return;const p=PASV[u.role][i];num(u.x,headY(u)-14*S,txt||p.n,'#ffe082',0);}
 const CREW_NAMES=['Rookie Rob','Rookie Dan','Rookie Max','Rookie Ivo','Rookie Sam'];
 
 // monsters (stats at stage scale 1) · dr = drawing, b = special behaviour, at = attack type
@@ -1219,7 +1240,7 @@ const GRIT_N=24,gritK=n=>n<=8?n*.075:.6+(n-8)*.15,gritStep=n=>n<8?.075:.15;
 function grit(si){const G=TE().G,st=G.cp.stuck;if(!st||st.si!==si||si!==G.cp.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
 function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=1+(B.grit||0);
   return {hero:1,h,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,eg:s.eg,
-    x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i};}
+    x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),shots:0,fcT:3,ekCd:0,swT:0};}
 function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);const m=stageMul(B.si)*stEase(B.si);
   return {hero:0,t,k:rnd(0,9),name:M.n,boss:!!M.boss,hp:M.hp*m*1.25,max:M.hp*m*1.25,atk:M.atk*m,def:M.def*(1+Math.min(B.si,19)*.06),mv:M.mv*S,rng:M.rng*S,as:M.as,crit:.05,H:M.h,fly:!!M.fly,
     x:0,d:0,face:-1,st:'walk',ap:0,cd:rnd(.3,1),wph:rnd(0,6),roll:0,stun:0,slow:0,mark:0,weak:0,burn:0,burnT:0,ice:0,tw:0,flash:0,hurt:0,dot:0,dead:false,deadT:0,act:null,
@@ -1302,8 +1323,12 @@ function fxAura(u){const col=ROLECOL[u.role]||'#ffb300',x=u.x,y=fy(u.d),h=dsc(u.
 
 
 function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
+  if(tgt.hero&&!o.sure){const dg=pv(tgt,'tuning',1);if(dg&&!tgt.stun&&Math.random()*100<dg){pasTxt(tgt,1,'DODGE');return 0;}}
   let a=src.atk*mult*(src.buff>0?1.3:1)*rnd(.9,1.1);
   a*=100/(100+tgt.def*3);if(tgt.mark>0)a*=1.35;
+  if(src.hero){let ld=0;for(const h of B.heroes)if(!h.dead)ld=Math.max(ld,pv(h,'all',0));if(ld)a*=1+ld/100;
+    const th=pv(src,'paint',1);if(th&&tgt.slow>0)a*=1+th/100;const pr=pv(src,'inspect',1);if(pr&&tgt.mark>0)a*=1+pr/100;}
+  else if(tgt.hero){const ir=pv(tgt,'engine',0);if(ir)a*=1-ir/100;}
   if(tgt.defB>0)a*=.8;if(src.weak>0)a*=.7;
   const crit=o.crit||(!o.noCrit&&Math.random()<src.crit+(src.critB>0?.15:0));if(crit)a*=1.8;
   a=Math.max(1,Math.round(a));let left=a;
@@ -1314,10 +1339,12 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   num(x,y,(crit?'💥':'')+a,tgt.hero?'#ff8a80':crit?'#ffd54a':'#ffffff',crit?1:0);
   if(tgt.hero)tgt.en=Math.min(100,tgt.en+a/tgt.max*55*tgt.eg);
   if(src.hero)src.en=Math.min(100,src.en+(o.skill?0:11*src.eg));
-  if(tgt.hp<=0)kill(tgt);
+  if(tgt.hp<=0){kill(tgt);const ad=pv(src,'tuning',0);if(ad&&!tgt.hero){src.aspdK=Math.max(src.aspd>0?(src.aspdK||0):0,ad/100);src.aspd=Math.max(src.aspd,4);pasTxt(src,0);}}
+  else if(tgt.hero){const ls=pv(tgt,'engine',1);if(ls&&!tgt.ls&&tgt.hp<tgt.max*.35){tgt.ls=1;tgt.shield=Math.max(tgt.shield,tgt.max*ls/100);tgt.taunt=Math.max(tgt.taunt,3);pasTxt(tgt,1,'LAST STAND!');if(!B.sim)B.fx.push({type:'ring',x:tgt.x,y:fy(tgt.d),t:0,d:.5,r:60*S,col:'#ffd54a',ground:1});}
+    if(tgt.hp<tgt.max*.3)for(const h of B.heroes){const ek=pv(h,'service',1);if(ek&&!h.dead&&h.ekCd<=0){h.ekCd=15;heal(tgt,tgt.max*ek/100);pasTxt(h,1);if(!B.sim)B.fx.push({type:'plus',u:tgt,t:0,d:.7});break;}}}
   return a;}
 function heal(u,amt){if(u.dead)return;const a=Math.round(Math.min(amt,u.max-u.hp));u.hp+=a;if(a>0)num(u.x,headY(u),'+'+a,'#69f0ae');}
-function kill(u){u.hp=0;u.dead=true;u.deadT=0;u.st='dead';u.act=null;
+function kill(u){u.hp=0;u.dead=true;u.deadT=0;u.st='dead';u.act=null;u.sP=null;u.sT=null;
   const [x,y]=sxy(u);
   if(u.hero){B.deaths++;smoke(x,y-20,6);num(x,headY(u)-10,'K.O.','#ff5252',1);}
   else{if(!B.sim){const n=B.t-(B.lastK||-9)<1.1?(B.kn||1)+1:1;B.kn=n;B.lastK=B.t;if(n>=2){B.combo={n,t:0};punch(.03+Math.min(3,n)*.01);}}
@@ -1345,7 +1372,7 @@ function projUpdate(p,dt){
 function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
   if(p.type==='bolt'||p.type==='wrench'){damage(s,p.tgt,p.mult,{skill:p.type==='wrench'});sparks(x,y,8,'#ffe082');if(p.type==='wrench'){shake(5);B.fx.push({type:'ring',x,y,t:0,d:.3,r:30*S,col:'#ffd54a'});fxBurst(x,y,'#ffd54a',44*S);fxSpark(x,y,'#ffd54a',6,24*S);}else if(FX2)fxs('flare_01','#e0f7fa',x,y,{d:.18,s0:14*S,s1:46*S});
     if(s.role==='service'&&++s.hits%3===0){const w=alive(B.heroes).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];if(w){heal(w,w.max*.06);B.fx.push({type:'plus',u:w,t:0,d:.7});}}}
-  else if(p.type==='paint'){damage(s,p.tgt,p.mult);for(const m of alive(B.mons))if(m!==p.tgt&&Math.abs(m.x-x)<35*S&&Math.abs(m.d-p.d)<.12)damage(s,m,p.mult*.6,{noCrit:1});
+  else if(p.type==='paint'){damage(s,p.tgt,p.mult);const sp=pv(s,'paint',0);if(sp&&p.tgt&&!p.tgt.dead)p.tgt.slow=Math.max(p.tgt.slow,sp);for(const m of alive(B.mons))if(m!==p.tgt&&Math.abs(m.x-x)<35*S&&Math.abs(m.d-p.d)<.12)damage(s,m,p.mult*.6,{noCrit:1});
     for(let k=0;k<10;k++)part({x,y,vx:rnd(-90,90),vy:rnd(-120,10),g:380,life:.5,r:rnd(1.5,3),col:p.col,type:'spark'});}
   else if(p.type==='smoke'){damage(s,p.tgt,p.mult);smoke(x,y,5,'rgba(80,80,80,.5)');}
   else if(p.type==='acid'){damage(s,p.tgt,p.mult);for(const h of alive(B.heroes))if(h!==p.tgt&&Math.hypot(h.x-x,(h.d-p.d)*(FY1-FY0)*1.25)<38*S)damage(s,h,p.mult*.45,{noCrit:1});
@@ -1459,7 +1486,10 @@ function unitUpdate(u,dt,foes,friends){
   if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
     if(u.burnT>=.5){u.burnT=0;if(u.burnSrc)damage(u.burnSrc,u,.22,{noCrit:1,skill:1});if(u.dead)return;}}}
   if(u.hero){u.buff=Math.max(0,u.buff-dt);u.aspd=Math.max(0,u.aspd-dt);u.defB=Math.max(0,u.defB-dt);u.critB=Math.max(0,u.critB-dt);u.taunt=Math.max(0,u.taunt-dt);if(u.shield>0)u.shield=Math.max(0,u.shield-u.max*.04*dt);
-    if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;heal(u,u.hotA);}}}
+    if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;heal(u,u.hotA);}}
+    if(u.pn){u.ekCd=Math.max(0,u.ekCd-dt);
+      const fc=pv(u,'service',0);if(fc){u.fcT=Math.min(6,u.fcT+dt);if(u.fcT>=6){const w=alive(B.heroes).filter(h=>h.hp<h.max*.97).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];if(w){u.fcT=0;heal(w,w.max*fc/100);if(!B.sim)B.fx.push({type:'plus',u:w,t:0,d:.7});}}}
+      const sw=pv(u,'all',1);if(sw&&u.hp<u.max*.5){u.swT+=dt;if(u.swT>=1){u.swT=0;heal(u,u.max*sw/100);}}}}
   if(u.stun>0){u.st='idle';u.act=u.act&&u.act.k==='return'?u.act:null;return;}
   // hero actions
   if(u.act&&u.hero){const a=u.act;a.t+=dt;
@@ -1488,25 +1518,39 @@ function unitUpdate(u,dt,foes,friends){
   let tg=null;
   if(!u.hero){const tn=alive(foes).find(h=>h.taunt>0);tg=tn||nearest(u,foes);}else tg=nearest(u,foes);
   if(!tg){u.st=B.phase==='win'?'win':'idle';return;}
-  u.face=tg.x>=u.x?1:-1;
+  if(!u.hero||u.st!=='atk'||Math.abs(tg.x-u.x)>8*S)u.face=tg.x>=u.x?1:-1;
   const dd=dist(u,tg),range=u.rng+(tg.boss?(tg.b==='titan'?60:20)*S:0);
+  const spot=u.hero&&u.rng<80*S?meleeSpot(u,tg,range):null;
   if(u.st==='atk'){const prev=u.ap;u.ap+=dt/(u.hero?.42/(u.aspd>0?1+u.aspdK:1):Math.min(.6,u.as*.45));
     if(prev<.55&&u.ap>=.55)doHit(u,tg);
     if(u.ap>=1){u.st='idle';u.ap=0;u.cd=u.as/(u.aspd>0?1+u.aspdK:1);}return;}
   u.cd-=dt;
   // spider pounce
   if(u.pounce&&dd<140*S&&dd>u.rng*1.5){u.pounce=0;u.act=null;B.fx.push({type:'dust',x:u.x,y:fy(u.d)});u.x=tg.x-u.face*24*S;u.d=tg.d;damage(u,tg,1.5);shake(4);sparks(tg.x,headY(tg)+20,8);return;}
-  if(dd<=range){if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
+  if(dd<=range||(spot&&Math.abs(u.x-spot[0])<=18*S&&Math.abs(u.d-spot[1])*(FY1-FY0)<=18*S)){if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
   // move
-  const sp=u.mv*(u.slow>0?.5:1)*(u.charge?2.2:1)*dt;
-  const tx=tg.x-u.face*range*.85,dx=tx-u.x,ddp=(tg.d-u.d)*(FY1-FY0);const L=Math.hypot(dx,ddp)||1;
-  u.x+=dx/L*Math.min(sp,L);u.d+=ddp/L*Math.min(sp,L)/(FY1-FY0)*.8;u.d=clamp(u.d,.02,.98);
+  const sp=u.mv*(u.slow>0?.5:1)*(u.charge?2.2:1)*(spot&&dd<130*S?1.7:1)*dt;
+  const tx=spot?spot[0]:tg.x-u.face*range*.85,dx=tx-u.x,ddp=((spot?spot[1]:tg.d)-u.d)*(FY1-FY0);const L=Math.hypot(dx,ddp)||1;
+  u.x+=dx/L*Math.min(sp,L);u.d+=ddp/L*Math.min(sp,L)/(FY1-FY0)*(spot?1:.8);u.d=clamp(u.d,.02,.98);
   u.st='walk';u.wph+=dt*(u.hero?11:9)*(u.charge?2:1);if(u.t==='tire')u.roll+=dt*(u.charge?14:7)*u.face;
 }
+// v16-46: melee mechanics no longer fight for the same spot. Each one takes his own place around the monster
+// (in front, a bit above, a bit below…), far enough from the other mechanics' places (sep() keeps 56 between heroes),
+// and attacks from that place. Before, two mechanics on one monster pushed each other out of range and just stood there.
+function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
+  if(u.sT!==tg){u.sT=tg;u.sK=null;}
+  const at=k=>[clamp(tg.x-u.face*(range*.85+Math.abs(k)*30*S),26*S,W-26*S),tg.d+k*st/F];
+  const gap=k=>{const p=at(k);if(p[1]<.03||p[1]>.97)return -1;let g=1e9;for(const h of B.heroes){if(h===u||h.dead||!h.sP||h.rng>=80*S)continue;g=Math.min(g,Math.hypot(p[0]-h.sP[0],(p[1]-h.sP[1])*F*KD));}return g;};
+  if(u.sK==null||gap(u.sK)<44*S){const cur=(u.d-tg.d)*F/st;let best=0,bs=-1e9;
+    for(const k of [0,1,-1,2,-2,3,-3]){const g=gap(k);if(g<0)continue;const sc=Math.min(g,56*S)/S-Math.abs(k-cur)*9-Math.abs(k)*4;if(sc>bs){bs=sc;best=k;}}u.sK=best;}
+  const p=at(u.sK);p[1]=clamp(p[1],.02,.98);u.sP=p;return p;}
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
   if(u.hero){const R=u.role;
-    if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');}
-    else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');}
+    if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
+    else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
+      const sc=pv(u,'elec',1);if(sc&&!tg.dead&&Math.random()*100<sc){tg.stun=Math.max(tg.stun,.6);pasTxt(u,1);}
+      const stc=pv(u,'elec',0);if(stc&&Math.random()*100<stc){let o=null,bd=170*S;for(const m of B.mons){if(m.dead||m===tg)continue;const d2=dist(tg,m);if(d2<bd){bd=d2;o=m;}}
+        if(o){const oy=headY(o)+16*dsc(o.d);if(!B.sim){B.fx.push({type:'bolt',x0:x,y0:y,x1:o.x,y1:oy,t:0,d:.22,col:ec});if(FX2)fxBolt(x,y,o.x,oy,ec||'#40c4ff',26);}damage(u,o,.6,{noCrit:1});}}}
     else if(R==='service')shoot(u,tg,'bolt',1,u.spr&&u.spr.look?{look:u.spr.look}:null);
     else if(R==='paint'){const pc=['#e0457b','#29b6f6','#ffd21a','#76ff03'][u.hits++%4];shoot(u,tg,'paint',1,{col:pc});
       if(sprOK(u.spr)){const [px,py]=muzzle(u);B.fx.push({type:'beam',x0:px,y0:py,x1:x,y1:y,t:0,d:.2,col:u.spr.col||'#ff4fd8',w:5});}}
@@ -1529,6 +1573,7 @@ function sep(list){for(let i=0;i<list.length;i++){const a=list[i];if(a.dead||a.a
   let dx=b.x-a.x,dd=(b.d-a.d)*(FY1-FY0);if(Math.abs(dx)+Math.abs(dd)<.01){dd=(j%2?1:-1)*.5;dx=.3;}const hh=a.hero&&b.hero,kd=hh?.72:1,L=Math.hypot(dx,dd*kd),min=(a.boss||b.boss?48:hh?56:30)*S;if(L<min){const p=(min-L)/2*(hh?1.6:1);const ux=dx/L,uy=dd*kd/L/kd;
     if(!a.boss){a.x-=ux*p*.5;a.d-=uy*p/(FY1-FY0);}if(!b.boss){b.x+=ux*p*.5;b.d+=uy*p/(FY1-FY0);}a.d=clamp(a.d,.02,.98);b.d=clamp(b.d,.02,.98);}}}}
 
+function keepIn(){for(const m of B.mons){if(m.dead||m.b==='titan')continue;const xm=W-(m.boss?64:40)*S;if(m.x<=xm)m.in=1;else if(m.in)m.x=xm;if(m.in&&!m.act)m.x=Math.max(m.x,30*S);}}
 function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelAnimationFrame(raf);B.auto=true;let t=0;while(t<(maxT||400)&&!B.res){step(1/30);t+=1/30;}
   const r={win:B.phase==='win',t:Math.round(t),deaths:B.deaths,wave:B.wave,left:B.mons.filter(m=>!m.dead).map(m=>m.t+':'+Math.round(m.hp/m.max*100)+'%')};return r;}
 function step(dt){B.t+=dt;B.phT+=dt;
@@ -1540,12 +1585,14 @@ function step(dt){B.t+=dt;B.phT+=dt;
     for(const u of B.heroes)unitUpdate(u,dt,B.mons,B.heroes);
     for(const m of B.mons)unitUpdate(m,dt,B.heroes,B.mons);
     sep(B.heroes);sep(B.mons);
-    for(const u of B.heroes)if(!u.dead){u.x=clamp(u.x,8*S,W-8*S);}
+    for(const u of B.heroes)if(!u.dead){u.x=clamp(u.x,u.act?8*S:26*S,W-(u.act?8:26)*S);}
+    // v16-46: monsters can no longer be pushed out of the picture (knock-backs + crowding moved them past the right edge)
+    keepIn();
     if(B.auto)for(const u of B.heroes)if(canCast(u)){if(u.role==='service'){const low=alive(B.heroes).some(h=>h.hp/h.max<.6)||(u.h.id==='m4_1'&&!u.rev&&B.heroes.some(h=>h.dead));if(!low&&(u.waitT=(u.waitT||0)+dt)<4)continue;u.waitT=0;}cast(u);break;}
     B.mons=B.mons.filter(m=>!(m.dead&&m.deadT>1.2));
     if(!alive(B.heroes).length){B.phase='lose';B.phT=0;}
     else if(!alive(B.mons).length&&!B.proj.length){if(B.wave<B.stage.w.length-1){B.phase='march';B.phT=0;B.wave++;B.bossBar=null;
-        for(const h of alive(B.heroes)){heal(h,h.max*.15);h.act=null;h.lift=0;}formation();}
+        for(const h of alive(B.heroes)){heal(h,h.max*.15);h.act=null;h.lift=0;h.sP=null;h.sT=null;}formation();}
       else{B.phase='win';B.phT=0;for(const h of B.heroes)if(!h.dead)h.st='win';}}}
   else if(B.phase==='march'){let done=true;for(const u of alive(B.heroes)){const dx=u.fx-u.x,ddp=u.fd-u.d;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),210*S*dt);u.d+=Math.sign(ddp)*Math.min(Math.abs(ddp),.8*dt);
       u.face=1;u.st='walk';u.wph+=dt*11;u.stun=0;if(Math.abs(dx)>2||Math.abs(ddp)>.01)done=false;}
@@ -1562,6 +1609,7 @@ function step(dt){B.t+=dt;B.phT+=dt;
   for(const tl of B.tele)tl.t+=dt;B.tele=B.tele.filter(tl=>tl.t<tl.dur);
   for(const f of B.fx){f.t+=dt;fxUpdate(f,dt);}B.fx=B.fx.filter(f=>f.t<f.d);
   if(B.fx2)fx2Update(dt);
+  if(B.phase==='fight')keepIn(); // skills that push are applied after the first check
   if(B.banner){B.banner.t+=dt;if(B.banner.t>1.3)B.banner=null;}
 }
 function fxUpdateGear(f){f.done=true;const x=f.tgt?f.tgt.x:f.x;const y=f.tgt?fy(f.tgt.d):fy(rnd(.1,.9));
@@ -2135,6 +2183,8 @@ function popTeamCmp(k,newId){const T=TE(),si=tsi,ep=enemyPower(si);const Lb=tsel
   const td=teamDiff(Lb,La);const ro=oldH&&roleOf(oldH),rn=newH&&roleOf(newH);
   const xp=[...td.pros],xc=[...td.cons];
   if(oldH&&newH&&skOf(oldH).sk!==skOf(newH).sk){xp.push(`New skill: <b>${skOf(newH).sk}</b> – ${skOf(newH).skd}`);xc.push(`Loses skill: <b>${skOf(oldH).sk}</b>`);}
+  if(newH)pasOf(newH).forEach(p=>{if(!oldH||!pasOf(oldH).some(q=>q.n===p.n&&q.d===p.d))xp.push(`Passive: <b>${p.ic} ${p.n}</b> – ${p.d}`);});
+  if(oldH)pasOf(oldH).forEach(p=>{if(!newH||!pasOf(newH).some(q=>q.n===p.n))xc.push(`Loses passive: <b>${p.ic} ${p.n}</b>`);});
   if(oldH&&newH&&(ROLE[ro].rng>=80)!==(ROLE[rn].rng>=80))(ROLE[rn].rng>=80?xp:xc).push(ROLE[rn].rng>=80?'Attacks from far away (safer)':'Fights up close (takes more hits)');
   if(!newH)xc.push('Team has only '+La.length+' mechanics');
   if(oldH&&!oldH.crew&&heroGear(oldH.id).length)xc.push(`${oldH.n}'s gear stays with ${oldH.n}`);
@@ -2199,7 +2249,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon mechanics first – the Rookie Crew can't use gear.</div>`;$m('gStats').innerHTML='';$m('gInv').innerHTML='';$m('gFil').innerHTML='';$m('gBtns').innerHTML='';return;}
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl" data-s="${sl.k}">${it?itemCard(it):`<div class="gse"><img src="${glyphURL(sl.ic,'rgba(255,220,170,.35)')}"></div>`}<small>${sl.n}</small></div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
-  $m('gMain').innerHTML=`<div class="gCol">${GSLOT.slice(0,3).map(slotBox).join('')}</div><div class="gMid"><div class="gPor">${T.fbox(h,0,stars(h))}</div><b style="color:${gcol(h)}">${h.n}</b><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${ROLE[roleOf(h)].n} · ${skOf(h).sk}</small>${HSK[h.id]?`<small style="display:block;opacity:.8;font-size:.7em;max-width:170px;margin:3px auto 0;line-height:1.25">${HSK[h.id].skd}</small>`:''}<div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div></div><div class="gCol">${GSLOT.slice(3).map(slotBox).join('')}</div>`;
+  $m('gMain').innerHTML=`<div class="gCol">${GSLOT.slice(0,3).map(slotBox).join('')}</div><div class="gMid"><div class="gPor">${T.fbox(h,0,stars(h))}</div><b style="color:${gcol(h)}">${h.n}</b><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${ROLE[roleOf(h)].n} · ${skOf(h).sk}</small>${HSK[h.id]?`<small style="display:block;opacity:.8;font-size:.7em;max-width:170px;margin:3px auto 0;line-height:1.25">${HSK[h.id].skd}</small>`:''}${pasOf(h).map(p=>`<small style="display:block;font-size:.66em;max-width:170px;margin:3px auto 0;line-height:1.22;color:#ffe082"><b>${p.ic} ${p.n}</b> <span style="color:#cfd8dc">${p.d}</span></small>`).join('')}<div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div></div><div class="gCol">${GSLOT.slice(3).map(slotBox).join('')}</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+fmt(d).replace('+',''):''}</em></div>`;}).join('')+`<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage)</div>`;
   $m('gBtns').innerHTML=`<button class="cpGo" data-g="auto">${IMGI(glyphURL('bolt','#2a1000'))} AUTO EQUIP</button><button class="cpGo alt" data-g="none">REMOVE ALL</button>`;
   $m('gFil').innerHTML=[['all','ALL','bag'],...GSLOT.map(s=>[s.k,s.n,s.ic])].map(([k,n,ic])=>`<button class="gf${gfil===k?' on':''}" data-f="${k}"><img src="${glyphURL(ic,gfil===k?'#2a1000':'#ffd54a')}"><span>${n}</span></button>`).join('');
@@ -2360,6 +2410,6 @@ function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return fal
   if(ps==='ko'&&d.noKO)X.rotate(-Math.min(1,k*2.2)*Math.PI/2*.92);
   X.drawImage(d.im,f[1]*cw,f[0]*SPCELL,cw,SPCELL,-d.a[0]*kk,-d.a[1]*kk,w*kk,256*kk);X.restore();return true;}
 const hasSpr=id=>!!SPRD[id];
-window.CAMPAIGN={open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));}};
+window.CAMPAIGN={passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
