@@ -4,7 +4,7 @@
 (function(){
 'use strict';
 // OAuth "Web application" client ID from Google Cloud Console (public, not a secret). Empty = sign-in hidden for players.
-const CLIENT_ID = '';
+const CLIENT_ID = '1041720099519-ogooa4hblh8d4s96ieervv9rp7bqh2k5.apps.googleusercontent.com';
 const SAVE_KEY = 'torqueEmpire_v15';
 const T = () => window.__TE;
 const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){ return null; } };
