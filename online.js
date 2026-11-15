@@ -1,0 +1,631 @@
+// Torque Empire v16-45 – ONLINE: live battle ranking · world chat (auto-translated) · ARENA PvP · TORQUE CUP · player profile.
+// Everything is decided by the Torque Guard bot (server/online.js). Here: the pages, the polling and the arena fight animation.
+(function(){
+'use strict';
+const T=()=>window.__TE, C=()=>window.CAMPAIGN, $=id=>document.getElementById(id);
+const API=()=>window.SEC&&SEC.api(), PID=()=>window.SEC&&SEC.PID;
+const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}};
+const LANG=(navigator.language||'en');
+const esc=s=>String(s??'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+const flag=cc=>cc&&/^[A-Z]{2}$/.test(cc)?String.fromCodePoint(...[...cc].map(c=>127397+c.charCodeAt(0))):'';
+const fmtN=n=>n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+'M':n>=1e4?Math.round(n/1e3)+'K':String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const toast=(m,d)=>{const t=T();if(t&&t.toast)t.toast(m,d||2600);};
+const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
+const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
+const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
+async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),...b})});return await r.json();}catch(e){return {err:'network'};}}
+
+// ------------------------------------------------------------------ titles, frames, leagues
+const TT={king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
+ boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game']};
+const TORD=['king','cup','leg','glad','boss','gear','speed','chat','wr','rook'];
+const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
+const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win']];
+const LG=[['BRONZE','#ffd8b0','#d0864a','#5a2a08','#e07a3a'],['SILVER','#ffffff','#b8c4d2','#4a5462','#7fd0ff'],['GOLD','#fffbe6','#ffc23a','#6a3a00','#ff3b3b'],['PLATINUM','#e8fffb','#5fe0c8','#0a4a44','#3fa7ff'],['DIAMOND','#e8f4ff','#5aa8ff','#0a2a6a','#c35cff'],['LEGEND','#fff1d0','#ff5a3c','#5a0a0a','#ffd54a']];
+let bid=0;
+function badge(i,num){i=Math.max(0,Math.min(5,i|0));const[,c1,c2,c3,gem]=LG[i];const id='olb'+(bid++);
+ const wings=i>=3?`<path d="M18 44C6 40 0 26 2 14c6 9 10 12 17 14M82 44c12-4 18-18 16-30-6 9-10 12-17 14" fill="${c2}" stroke="${c3}" stroke-width="2.5"/>`:'';
+ const crown=i>=5?`<path d="M34 12l6 6 10-13 10 13 6-6-3 12H37z" fill="#ffd54a" stroke="${c3}" stroke-width="2"/>`:'';
+ const stars=num==null&&i>=1?Array.from({length:Math.min(i,3)},(_,k)=>`<circle cx="${50+(k-(Math.min(i,3)-1)/2)*10}" cy="74" r="3" fill="#fff"/>`).join(''):'';
+ return `<svg viewBox="0 0 100 112"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></linearGradient></defs>${wings}<path d="M50 16l34 12v30c0 24-16 40-34 48C32 98 16 82 16 58V28z" fill="url(#${id})" stroke="${c3}" stroke-width="3.5"/><path d="M50 26l24 9v23c0 17-11 29-24 35-13-6-24-18-24-35V35z" fill="#0004" stroke="#fff6" stroke-width="1.5"/><path d="M50 36l10 13-10 15-10-15z" fill="${gem}" stroke="#fff" stroke-width="2"/><path d="M50 36l4 9-4 5-4-5z" fill="#fff8"/>${stars}${crown}${num?`<text x="50" y="90" text-anchor="middle" font-family="system-ui" font-weight="900" font-size="16" fill="#fff" stroke="${c3}" stroke-width="3" paint-order="stroke">${num}</text>`:''}</svg>`;}
+const medal=n=>{const g=['url(#olGold)','url(#olSilv)','url(#olBron)'][n-1];return `<svg class="md" viewBox="0 0 40 40"><path d="M12 0h7l1 14-6 2zM28 0h-7l-1 14 6 2z" fill="${['#ff3b3b','#3fa7ff','#4cd964'][n-1]}"/><circle cx="20" cy="24" r="14" fill="${g}" stroke="#3a1d00" stroke-width="2.5"/><text x="20" y="30" text-anchor="middle" font-family="system-ui" font-weight="900" font-size="16" fill="#3a1d00">${n}</text></svg>`;};
+const ring=(id,extra='')=>`<div class="ring r${gradeOf(id)} ${extra}" style="background-image:url(${HI(id)})"></div>`;
+const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p" style="background-image:url(${HI(id)})"></div>`;
+const stLab=b=>C()&&C().sLabel?C().sLabel(b):String(b);
+const ICON={trophy:'<svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg>',chat:'<svg viewBox="0 0 64 64"><use href="#olChat"/></svg>',arena:'<svg viewBox="0 0 64 64"><use href="#olSwords"/></svg>',cup:'<svg viewBox="0 0 64 64"><use href="#olCup"/></svg>',user:'<svg viewBox="0 0 64 64"><use href="#olUser"/></svg>'};
+
+// ------------------------------------------------------------------ CSS
+const css=`
+#onl{position:fixed;inset:0;z-index:13;display:none;background:#05060a;color:#fff;font-family:system-ui,-apple-system,Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+#onl.open{display:block}
+#onl *{box-sizing:border-box}
+#onl .scr{position:absolute;top:0;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));display:none;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top)}
+#onl .scr.on{display:flex;animation:olIn .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes olIn{from{opacity:0;transform:translateY(12px)}}
+#onl .scr:before{content:"";position:absolute;inset:-40%;z-index:-1;background:conic-gradient(from 0deg,transparent 0 8%,var(--ray) 10% 13%,transparent 15% 25%,var(--ray) 27% 30%,transparent 32% 45%,var(--ray) 47% 50%,transparent 52% 64%,var(--ray) 66% 69%,transparent 71% 83%,var(--ray) 85% 88%,transparent 90%);animation:olSpin 40s linear infinite;-webkit-mask:radial-gradient(circle at 50% 30%,#000 0,transparent 55%);mask:radial-gradient(circle at 50% 30%,#000 0,transparent 55%)}
+#onl .scr:after{content:"";position:absolute;inset:0;z-index:-2;background:var(--bg)}
+@keyframes olSpin{to{transform:rotate(360deg)}}
+#onl #olRank{--bg:radial-gradient(ellipse at 50% -10%,#5a3d0c,#1a1206 45%,#06070a);--ray:#ffc23a14}
+#onl #olChat{--bg:radial-gradient(ellipse at 50% -10%,#0c3a5a,#071420 45%,#05070b);--ray:#3ac8ff10}
+#onl #olArena{--bg:radial-gradient(ellipse at 50% -10%,#4b1c78,#160a26 45%,#06050b);--ray:#b77cff18}
+#onl #olCupS{--bg:radial-gradient(ellipse at 50% -10%,#6a1414,#200808 45%,#070505);--ray:#ff5a3c16}
+#onl #olProf{--bg:radial-gradient(ellipse at 50% -10%,#3a2a10,#14100a 45%,#06070a);--ray:#ffc23a14}
+#onl .top{position:relative;display:flex;align-items:center;gap:7px;padding:10px 10px 9px;background:linear-gradient(#0009,#0000)}
+#onl .top:after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#ffd54a,#fff6c8,#ffd54a,transparent);box-shadow:0 0 10px #ffc23a}
+#onl .ttl{flex:1;display:flex;align-items:center;gap:7px;min-width:0}
+#onl .ttl svg{width:32px;height:32px;flex:none;filter:drop-shadow(0 2px 3px #000)}
+#onl .ttl h1{margin:0;white-space:nowrap;font:900 19px/1 system-ui;letter-spacing:1px;background:linear-gradient(#fffbe6,#ffd54a 45%,#e08a00 60%,#ffcf5a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #3a2200)}
+#onl .ttl h1 small{display:block;font:800 9px system-ui;letter-spacing:2px;-webkit-text-fill-color:#9fe3ff;margin-top:3px}
+#onl .x{width:34px;height:34px;flex:none;border-radius:11px;border:0;background:linear-gradient(#ff7b6b,#c4180a 60%,#8a0c02);color:#fff;font:900 15px system-ui;box-shadow:0 0 0 2px #0a0f15,0 0 0 3.5px #e0aa25,0 3px 6px #000,inset 0 1.5px 0 #fff6}
+#onl .srv{font:900 10px system-ui;color:#bff0ff;background:linear-gradient(#123a52,#0a1b28);border:1px solid #3fa7d6;border-radius:9px;padding:4px 7px;white-space:nowrap}
+#onl .o-gift{position:relative;width:34px;height:34px;flex:none;border-radius:11px;border:0;background:linear-gradient(#fff1a8,#ffb300);box-shadow:0 0 0 2px #0a0f15,0 0 0 3.5px #e0aa25;font-size:18px;display:none;animation:olPulse 1.4s infinite}
+#onl .o-gift.on{display:block}
+#onl .o-gift i{position:absolute;right:-6px;top:-6px;min-width:17px;height:17px;border-radius:9px;background:#e53935;font:900 10px/17px system-ui;color:#fff;font-style:normal;box-shadow:0 0 0 1.5px #fff}
+#onl .tabs{display:flex;gap:6px;padding:9px 10px 6px}
+#onl .tabs b{flex:1;position:relative;text-align:center;padding:8px 0;border-radius:11px;font:900 11px system-ui;letter-spacing:.4px;background:linear-gradient(#25303f,#141b25);color:#8fa0b4;box-shadow:0 0 0 1px #33404f,inset 0 1px 0 #fff1;overflow:hidden;white-space:nowrap}
+#onl .tabs b.on{background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);color:#3a1d00;box-shadow:0 0 0 1.5px #7a4a00,0 0 12px #ffb30066,inset 0 1.5px 0 #fff9}
+#onl .tabs b.on:after,#onl .shine:after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,#fff8,transparent);animation:olSh 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes olSh{0%,55%{left:-60%}100%{left:130%}}
+#onl .body{flex:1;overflow:auto;padding:0 10px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#onl .body::-webkit-scrollbar{display:none}
+#onl .live{display:inline-flex;align-items:center;gap:5px;font:900 10px system-ui;color:#7dff8a;letter-spacing:1px}
+#onl .live:before{content:"";width:8px;height:8px;border-radius:50%;background:#3dff5a;box-shadow:0 0 8px #3dff5a;animation:olPl 1.2s infinite}
+@keyframes olPl{50%{opacity:.25;transform:scale(.7)}}
+#onl .o-sub{white-space:nowrap;letter-spacing:0;display:flex;justify-content:space-between;align-items:center;padding:0 12px 2px;font:700 10px system-ui;color:#8fa0b4}
+#onl .av{position:relative;flex:none}
+#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}
+#onl .av .f{position:absolute;inset:0;background:center/100% 100% no-repeat}
+#onl .ring{position:relative;flex:none;border-radius:11px;background:#111 center/cover;box-shadow:0 0 0 2px var(--c,#555),0 0 8px var(--c,#0000)}
+#onl .ring.r5{--c:#ff3b3b}#onl .ring.r4{--c:#ffc23a}#onl .ring.r3{--c:#c35cff}#onl .ring.r2{--c:#3fa7ff}#onl .ring.r1{--c:#4cd964}#onl .ring.r0{--c:#8a96a5}
+#onl .ring.r5,#onl .ring.r4{animation:olRg 2s ease-in-out infinite}
+@keyframes olRg{50%{box-shadow:0 0 0 2px var(--c),0 0 14px var(--c)}}
+#onl .tt{display:inline-block;position:relative;overflow:hidden;font:900 8.5px/1 system-ui;font-style:normal;letter-spacing:.8px;padding:3px 6px;border-radius:5px;color:#fff;text-shadow:0 1px 0 #0008;vertical-align:middle;white-space:nowrap}
+#onl .tt:after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,#fff9,transparent);animation:olSh 2.6s ease-in-out infinite}
+#onl .t5{background:linear-gradient(90deg,#7a0000,#ff3b3b,#ff9a3b);box-shadow:0 0 6px #ff3b3b88}
+#onl .t4{background:linear-gradient(90deg,#7a4a00,#ffc23a,#fff1a8);color:#3a1d00;text-shadow:none;box-shadow:0 0 6px #ffc23a88}
+#onl .t3{background:linear-gradient(90deg,#4a0a7a,#c35cff,#f0b8ff);box-shadow:0 0 6px #c35cff66}
+#onl .t2{background:linear-gradient(90deg,#0a3a7a,#3fa7ff,#b8e4ff)}
+#onl .t1{background:linear-gradient(90deg,#14532a,#4cd964)}
+#onl .t0{background:linear-gradient(90deg,#3a4452,#7d8b9c)}
+#onl .vip{font:900 8.5px system-ui;color:#3a1d00;background:linear-gradient(#fff1a8,#ffb300);border-radius:4px;padding:1px 4px;vertical-align:middle}
+#onl .ai{font:900 8.5px system-ui;color:#fff;background:#56657a;border-radius:4px;padding:1px 4px;vertical-align:middle}
+#onl .pod{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:42px 0 10px}
+#onl .pod>.g{position:relative;width:32%;text-align:center;border-radius:16px 16px 8px 8px;padding:6px 4px 8px;animation:olPod .7s cubic-bezier(.2,1.4,.4,1) both}
+#onl .pod>.g1{animation-delay:.2s}#onl .pod>.g3{animation-delay:.35s}
+@keyframes olPod{from{transform:translateY(60px) scale(.6);opacity:0}}
+#onl .pod .av{width:90px;height:96px;margin:0 auto -4px}
+#onl .pod .o-n{font:900 11.5px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 3px}
+#onl .pod .o-st{font:900 20px system-ui;background:linear-gradient(#fffbe6,#ffd54a 50%,#e08a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #000);margin-top:2px}
+#onl .pod .ps{font:800 9.5px system-ui;color:#c9b88a}
+#onl .g1{height:218px;background:linear-gradient(#7a5200,#3a2705 60%,#1a1205);box-shadow:0 0 0 2px #ffd54a,0 0 26px #ffc23a88,inset 0 2px 0 #fff6}
+#onl .g2{height:196px;background:linear-gradient(#5e6a7a,#262c35 60%,#13171c);box-shadow:0 0 0 2px #dfe8f2,0 0 14px #cfd8e355,inset 0 2px 0 #fff6}
+#onl .g3{height:188px;background:linear-gradient(#7a4520,#2e1a0c 60%,#170d06);box-shadow:0 0 0 2px #e09a5a,0 0 14px #d08a4a55,inset 0 2px 0 #fff5}
+#onl .pod .md{position:absolute;top:-18px;left:-6px;width:34px;height:34px;z-index:3;filter:drop-shadow(0 3px 3px #000)}
+#onl .crown{position:absolute;top:-38px;left:50%;width:46px;margin-left:-23px;z-index:4;animation:olBob 1.8s ease-in-out infinite;filter:drop-shadow(0 0 8px #ffc23a)}
+@keyframes olBob{50%{transform:translateY(-6px) rotate(-4deg)}}
+#onl .rays{position:absolute;left:50%;top:70px;width:320px;height:320px;margin:-160px 0 0 -160px;background:repeating-conic-gradient(#ffd54a33 0 6deg,transparent 6deg 18deg);border-radius:50%;-webkit-mask:radial-gradient(#000 10%,transparent 65%);mask:radial-gradient(#000 10%,transparent 65%);animation:olSpin 14s linear infinite;pointer-events:none}
+#onl .o-row{position:relative;display:flex;align-items:center;gap:9px;padding:7px 9px;margin-bottom:7px;border-radius:14px;background:linear-gradient(90deg,#1f2937e6,#111820e6);box-shadow:0 0 0 1px #2f3b4b,inset 0 1px 0 #fff1;overflow:hidden}
+#onl .o-row.in{animation:olRow .45s both}
+@keyframes olRow{from{transform:translateX(40px);opacity:0}}
+#onl .o-row .k{width:30px;text-align:center;font:italic 900 15px system-ui;color:#c9d4e2}
+#onl .o-row .ring{width:42px;height:42px}
+#onl .o-row .o-nm{flex:1;min-width:0}
+#onl .o-row .o-nm b{display:block;font:800 13px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#onl .o-row .o-nm small{display:block;font:700 10px system-ui;color:#8fa0b4;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#onl .o-row .v{text-align:right;font:900 16px system-ui;color:#ffe27a;text-shadow:0 0 8px #ffb30055;white-space:nowrap}
+#onl .o-row .v small{display:block;font:800 9.5px system-ui;color:#8fa0b4;text-shadow:none}
+#onl .o-row.me{background:linear-gradient(90deg,#4a3406,#1c1408);box-shadow:0 0 0 1.5px #ffc23a,0 0 14px #ffb30044,inset 0 1px 0 #fff3}
+#onl .o-row.flash{animation:olFl 1.4s}
+@keyframes olFl{0%{box-shadow:0 0 0 2px #3dff5a,0 0 22px #3dff5a}100%{box-shadow:0 0 0 1px #2f3b4b}}
+#onl .o-up{color:#3dff5a}
+#onl .pin{padding:6px 10px 8px;background:linear-gradient(#0000,#000c 30%)}
+#onl .pin .o-row{margin:0}
+#onl .o-note{font:700 10.5px/1.45 system-ui;color:#8fa0b4;text-align:center;padding:6px 4px 8px}
+#onl .empty{font:800 13px/1.5 system-ui;color:#c9b88a;text-align:center;padding:30px 16px}
+#onl .msgs{flex:1;overflow:auto;padding:8px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#onl .m{display:flex;gap:8px;margin-bottom:11px;animation:olM .4s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes olM{from{transform:translateY(14px) scale(.92);opacity:0}}
+#onl .m .ring{width:38px;height:38px}
+#onl .bub{position:relative;max-width:78%;background:linear-gradient(#223042,#151e2a);box-shadow:0 0 0 1px #33465c,inset 0 1px 0 #fff2;border-radius:4px 15px 15px 15px;padding:6px 10px}
+#onl .bub .h{font:800 11px system-ui;color:#9fe3ff;display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+#onl .bub p{margin:3px 0 2px;font:500 14px/1.35 system-ui;word-wrap:break-word;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+#onl .bub .tr{font:700 9.5px system-ui;color:#7d8b9c}
+#onl .bub .tr u{color:#9fe3ff;text-decoration:none}
+#onl .bub .tm{font:700 9px system-ui;color:#6e7c8c;margin-left:auto}
+#onl .m.me{flex-direction:row-reverse}
+#onl .m.me .bub{background:linear-gradient(#5a3f08,#2a1d08);box-shadow:0 0 0 1px #e0aa25,inset 0 1px 0 #fff3;border-radius:15px 4px 15px 15px}
+#onl .sys{text-align:center;margin:4px 0 12px;animation:olM .4s both}
+#onl .sys span{display:inline-block;position:relative;overflow:hidden;font:900 10.5px system-ui;color:#3a1d00;background:linear-gradient(90deg,#ffb300,#fff1a8,#ffb300);border-radius:10px;padding:4px 10px;box-shadow:0 0 12px #ffb30077}
+#onl .inp{display:flex;gap:7px;padding:8px 10px 10px;background:#000a}
+#onl .inp input{flex:1;min-width:0;background:#141c27;box-shadow:0 0 0 1px #33465c;border:0;border-radius:13px;padding:11px;font:500 15px system-ui;color:#fff;outline:none;user-select:text;-webkit-user-select:text}
+#onl .btn{position:relative;overflow:hidden;border:0;border-radius:13px;padding:0 15px;font:900 13px system-ui;background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);color:#3a1d00;box-shadow:0 3px 0 #7a4a00,inset 0 1.5px 0 #fff9}
+#onl .btn:active,#onl .fight:active,#onl .btns>div:active{transform:scale(.95)}
+#onl .btn.gray{background:linear-gradient(#56657a,#334);color:#fff;box-shadow:0 3px 0 #111}
+#onl .menu{position:absolute;background:linear-gradient(#18222e,#0b1118);border:1.5px solid #e0aa25;border-radius:13px;overflow:hidden;box-shadow:0 10px 24px #000d;z-index:5;animation:olPop .25s cubic-bezier(.2,1.5,.4,1)}
+@keyframes olPop{from{transform:scale(.6);opacity:0}}
+#onl .menu div{padding:10px 18px;font:800 13px system-ui;border-bottom:1px solid #2a3442}
+#onl .menu div:last-child{border:0;color:#ff6b5b}
+#onl .ahero{position:relative;margin:4px 0 10px;border-radius:18px;padding:12px;background:linear-gradient(135deg,#4a2280,#1a0f30 60%,#120a22);box-shadow:0 0 0 2px #c79bff,0 0 24px #8a3cff77,inset 0 2px 0 #fff3;display:flex;gap:12px;align-items:center;overflow:hidden}
+#onl .ahero:before{content:"";position:absolute;inset:-50%;background:repeating-conic-gradient(#ffffff08 0 8deg,transparent 8deg 20deg);animation:olSpin 30s linear infinite}
+#onl .badge{position:relative;width:84px;height:94px;flex:none;animation:olBob 2.4s ease-in-out infinite}
+#onl .badge svg{width:100%;height:100%;filter:drop-shadow(0 0 10px #ffc23a99) drop-shadow(0 4px 4px #000)}
+#onl .ahero .t{position:relative;flex:1;min-width:0}
+#onl .ahero .t b{display:block;font:900 21px system-ui;background:linear-gradient(#fffbe6,#ffd54a 55%,#e08a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+#onl .ahero .t small{display:block;font:700 11px system-ui;color:#e2d4ff;margin-top:2px}
+#onl .o-bar{position:relative;height:10px;border-radius:6px;background:#0008;margin-top:7px;overflow:hidden;box-shadow:inset 0 1px 2px #000}
+#onl .o-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#9a4cff,#ff7af0,#ffe27a);transition:width 1.2s cubic-bezier(.2,.9,.3,1)}
+#onl .o-bar i:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,#fff3 0 6px,transparent 6px 12px)}
+#onl .tk{display:flex;justify-content:space-between;font:800 11px system-ui;color:#d8cdf0;margin:0 2px 9px}
+#onl .opp{position:relative;display:flex;align-items:center;gap:6px;padding:9px;margin-bottom:9px;border-radius:16px;background:linear-gradient(90deg,#2a1e40e6,#141022e6);box-shadow:0 0 0 1px #4a3a6a,inset 0 1px 0 #fff2;animation:olRow .45s both}
+#onl .opp .bd{width:32px;flex:none}
+#onl .opp .tm{display:flex;flex:none}
+#onl .opp .tm .ring{width:26px;height:26px;margin-right:-5px;border-radius:7px}
+#onl .opp .o-nm{flex:1;min-width:0;padding-left:8px}
+#onl .opp .o-nm b{display:block;font:800 12.5px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#onl .opp .o-nm small{display:block;font:700 10px system-ui;color:#a99cc4;margin-top:2px}
+#onl .fight{position:relative;overflow:hidden;flex:none;border:0;border-radius:12px;padding:8px 11px;font:900 13px system-ui;background:linear-gradient(#ffb070,#ff5a1a 50%,#c22a00);color:#fff;box-shadow:0 3px 0 #6a1a00,0 0 14px #ff5a1a66,inset 0 1.5px 0 #fff8;text-align:center;text-shadow:0 1px 0 #0006;animation:olPulse 1.6s ease-in-out infinite}
+#onl .fight.off{filter:grayscale(1);animation:none;opacity:.6}
+@keyframes olPulse{50%{transform:scale(1.06)}}
+#onl .fight small{display:block;font:900 9px system-ui;color:#fff1a8}
+#onl .btns{display:flex;gap:8px;margin-top:4px}
+#onl .btns>div{position:relative;overflow:hidden;flex:1;text-align:center;padding:11px 0;border-radius:13px;font:900 12px system-ui;background:linear-gradient(#26313f,#141b25);box-shadow:0 0 0 1.5px #e0aa25,inset 0 1px 0 #fff2;color:#ffe27a}
+#onl .leag{display:flex;gap:3px;margin:14px 0 4px}
+#onl .leag>div{flex:1;text-align:center;font:800 7.5px system-ui;color:#8fa0b4;opacity:.5}
+#onl .leag>div svg{width:100%;height:40px}
+#onl .leag>div.on{opacity:1;color:#ffe27a;transform:scale(1.15)}
+#onl .hrow{display:flex;align-items:center;gap:8px;padding:9px;margin-bottom:7px;border-radius:13px;background:linear-gradient(90deg,#1f2937e6,#111820e6);box-shadow:0 0 0 1px #2f3b4b;font:700 12px system-ui}
+#onl .hrow .w{font:900 12px system-ui;padding:3px 7px;border-radius:7px}
+#onl .hrow .w.o-y{background:#1f5a2a;color:#9dffb0}#onl .hrow .w.o-n{background:#5a1f1f;color:#ffb0a8}
+#onl .hrow span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#onl .hrow small{color:#8fa0b4;font-size:10px}
+#onl .play{border:0;border-radius:10px;padding:6px 10px;font:900 11px system-ui;background:linear-gradient(#3fa7ff,#0a5ab0);color:#fff;box-shadow:0 2px 0 #052a52}
+#onl .tw{position:relative;margin:4px 0 10px;border-radius:18px;padding:12px 12px 12px 92px;min-height:108px;background:linear-gradient(135deg,#7a1a1a,#2a0b0b 65%);box-shadow:0 0 0 2px #ff8a7a,0 0 24px #ff3c3c66,inset 0 2px 0 #fff3;overflow:hidden}
+#onl .tw .tro{position:absolute;left:8px;top:10px;width:80px;height:88px;animation:olBob 2.2s ease-in-out infinite;filter:drop-shadow(0 0 12px #ffc23a)}
+#onl .tw b{display:block;font:900 19px system-ui;background:linear-gradient(#fffbe6,#ffd54a 55%,#e08a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+#onl .tw small{display:block;font:700 10.5px/1.4 system-ui;color:#ffd0c8;margin-top:2px}
+#onl .cd{display:inline-flex;gap:4px;margin-top:7px}
+#onl .cd span{font:900 15px system-ui;background:#000a;border-radius:7px;padding:4px 7px;box-shadow:inset 0 0 0 1px #ff8a7a66}
+#onl .mt{position:relative;margin-bottom:8px;background:linear-gradient(#1f2937,#111820);box-shadow:0 0 0 1px #3a4656;border-radius:12px;overflow:hidden;display:flex;align-items:stretch;animation:olPop .35s both}
+#onl .mt .sd{flex:1;min-width:0}
+#onl .mt .sd div{display:flex;align-items:center;gap:6px;padding:5px 8px;font:800 12px system-ui;white-space:nowrap;overflow:hidden;height:34px}
+#onl .mt .sd div .ring{width:24px;height:24px;border-radius:6px}
+#onl .mt .sd div.w{background:linear-gradient(90deg,#1f4a1f,#14301400);color:#c8ffc8}
+#onl .mt .sd div.l{color:#6e7a88;text-decoration:line-through}
+#onl .mt .sd div.me{color:#ffe27a}
+#onl .mt.me{box-shadow:0 0 0 1.5px #ffc23a,0 0 10px #ffb30088}
+#onl .mt .wb{display:flex;align-items:center;padding:0 8px}
+#onl .o-rw{display:grid;grid-template-columns:auto 1fr;gap:7px 8px;align-items:center;font:800 11.5px system-ui;background:linear-gradient(#1f2937,#111820);box-shadow:0 0 0 1px #3a4656;border-radius:14px;padding:10px}
+#onl .o-rw span:nth-child(even){color:#ffe27a;text-align:right}
+#onl .pcard{position:relative;margin:4px 0 10px;border-radius:20px;padding:14px 12px 12px;text-align:center;background:linear-gradient(#3a2a10,#16110a);box-shadow:0 0 0 2px #ffd54a,0 0 22px #ffb30055,inset 0 2px 0 #fff3;overflow:hidden}
+#onl .pcard .rays{top:84px}
+#onl .pcard .av{width:132px;height:141px;margin:0 auto}
+#onl .pname{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px}
+#onl .pname b{font:900 22px system-ui;text-shadow:0 2px 0 #000}
+#onl .edit{width:30px;height:30px;border-radius:9px;border:0;background:linear-gradient(#fff1a8,#ffb300);box-shadow:0 2px 0 #7a4a00;font-size:14px}
+#onl .pid{position:relative;font:700 10px system-ui;color:#c9b88a;margin-top:5px}
+#onl .stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:6px}
+#onl .stats div{background:linear-gradient(#1f2937,#111820);box-shadow:0 0 0 1px #3a4656;border-radius:12px;padding:8px 10px;font:700 10px system-ui;color:#8fa0b4}
+#onl .stats div b{display:block;font:900 16px system-ui;color:#ffe27a;margin-top:2px}
+#onl h3{margin:14px 2px 8px;font:900 12px system-ui;letter-spacing:1.5px;color:#ffd54a;display:flex;align-items:center;gap:6px}
+#onl h3:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#ffd54a88,transparent)}
+#onl .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:2px}
+#onl .grid .ring{aspect-ratio:1;width:100%}
+#onl .grid .ring.sel{box-shadow:0 0 0 2.5px #fff,0 0 0 4.5px #ffc23a,0 0 14px #ffc23a}
+#onl .frames{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#onl .frames .av{width:100%;aspect-ratio:220/235;height:auto}
+#onl .frames .sel .av{filter:drop-shadow(0 0 8px #ffc23a)}
+#onl .frames .o-lock .av{filter:grayscale(1) brightness(.45)}
+#onl .frames small{display:block;text-align:center;font:800 9px/1.3 system-ui;color:#8fa0b4;margin-top:2px}
+#onl .tlist{display:flex;flex-direction:column;gap:6px}
+#onl .tlist div{display:flex;align-items:center;gap:8px;background:linear-gradient(#1f2937,#111820);box-shadow:0 0 0 1px #3a4656;border-radius:11px;padding:8px 9px;font:700 10.5px system-ui;color:#8fa0b4}
+#onl .tlist div .tt{font-size:10px;padding:4px 8px}
+#onl .tlist div span{flex:1}
+#onl .tlist div.sel{box-shadow:0 0 0 1.5px #ffc23a,0 0 10px #ffb30055}
+#onl .tlist div.o-lock .tt{filter:grayscale(1) brightness(.6)}
+#onl .modal{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:#000b}
+#onl .modal .box{width:88%;max-height:84%;overflow:auto;border-radius:18px;padding:16px;background:linear-gradient(#2a2010,#120e08);box-shadow:0 0 0 2px #ffd54a,0 0 30px #ffb30066;text-align:center;animation:olPop .3s cubic-bezier(.2,1.5,.4,1)}
+#onl .modal h4{margin:0 0 10px;font:900 17px system-ui;color:#ffe27a}
+#onl .modal input{width:100%;background:#0b0f15;box-shadow:0 0 0 1.5px #e0aa25;border:0;border-radius:12px;padding:12px;font:800 16px system-ui;color:#fff;outline:none;user-select:text;-webkit-user-select:text}
+#onl .modal p{font:700 11.5px/1.5 system-ui;color:#c9b88a;margin:10px 0;text-align:left}
+#onl .modal .ok{display:flex;gap:8px;margin-top:10px}#onl .modal .ok .btn{flex:1;padding:11px 0}
+#onl .ib{display:flex;gap:9px;align-items:center;text-align:left;background:#0007;border:1px solid #e0aa2566;border-radius:12px;padding:9px;margin-bottom:7px}
+#onl .ib .o-ic{font-size:24px}
+#onl .ib div{flex:1;min-width:0;font:700 11px/1.35 system-ui;color:#c9b88a}
+#onl .ib div b{display:block;color:#fff;font-size:13px}
+#onl .ib .rw2{color:#ffe27a;font-weight:900}
+#onl .nav{position:absolute;left:0;right:0;bottom:0;height:calc(52px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;background:linear-gradient(#1a1406,#000);z-index:10;box-shadow:0 -2px 0 #e0aa25,0 -6px 14px #000}
+#onl .nav b{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:900 9px system-ui;color:#8fa0b4;letter-spacing:.3px}
+#onl .nav b svg{width:24px;height:24px;transition:transform .2s}
+#onl .nav b.on{color:#ffe27a;background:radial-gradient(ellipse at 50% 100%,#ffb30044,transparent 70%)}
+#onl .nav b.on svg{transform:translateY(-3px) scale(1.18);filter:drop-shadow(0 0 6px #ffb300)}
+#onl .nav b i{position:absolute;top:5px;right:calc(50% - 20px);width:9px;height:9px;border-radius:50%;background:#e53935;box-shadow:0 0 0 1.5px #fff;display:none}
+#onl .nav b i.on{display:block}
+#olFx{position:absolute;inset:0;z-index:30;display:none;background:#000}
+#olFx.on{display:block}
+#olFx canvas{position:absolute;inset:0;width:100%;height:100%}
+#olFx .vs{position:absolute;inset:0;display:flex;flex-direction:column;pointer-events:none}
+#olFx .vs .side{flex:1;display:flex;align-items:center;gap:10px;padding:0 16px;font:900 17px system-ui;color:#fff;text-shadow:0 2px 4px #000}
+#olFx .vs .a{background:linear-gradient(100deg,#0a3a8a,#1e6bff 60%,#1e6bff00);clip-path:polygon(0 0,100% 0,82% 100%,0 100%);animation:olSl .5s cubic-bezier(.2,1.2,.4,1) both}
+#olFx .vs .b{background:linear-gradient(-100deg,#8a0a0a,#ff2a1e 60%,#ff2a1e00);clip-path:polygon(18% 0,100% 0,100% 100%,0 100%);justify-content:flex-end;text-align:right;animation:olSr .5s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes olSl{from{transform:translateX(-100%)}}@keyframes olSr{from{transform:translateX(100%)}}
+#olFx .vs .side .av{width:80px;height:86px}
+#olFx .vs .side small{display:block;font:800 11px system-ui;opacity:.9;margin-top:3px}
+#olFx .vs .mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:italic 900 92px/1 system-ui;background:linear-gradient(#fff,#ffe27a 50%,#ff8a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px #ffb300) drop-shadow(0 4px 0 #6a3a00);animation:olVs .6s .35s cubic-bezier(.2,1.8,.4,1) both}
+@keyframes olVs{from{transform:translate(-50%,-50%) scale(4);opacity:0}}
+#olFx .ctl{position:absolute;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px;z-index:4}
+#olFx .ctl button{border:0;border-radius:11px;padding:8px 12px;font:900 12px system-ui;background:#000a;color:#ffe27a;box-shadow:0 0 0 1.5px #e0aa25}
+#olFx .res{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(#0008,#000d);z-index:5;overflow:hidden;color:#fff}
+#olFx .res.on{display:flex}
+#olFx .res .rr{position:absolute;width:560px;height:560px;background:repeating-conic-gradient(#ffd54a40 0 7deg,transparent 7deg 20deg);border-radius:50%;-webkit-mask:radial-gradient(#000 5%,transparent 62%);mask:radial-gradient(#000 5%,transparent 62%);animation:olSpin 10s linear infinite}
+#olFx .res.lose .rr{background:repeating-conic-gradient(#7a8aa030 0 7deg,transparent 7deg 20deg)}
+#olFx .res h2{position:relative;margin:0;font:italic 900 52px/1 system-ui;letter-spacing:2px;background:linear-gradient(#fffbe6,#ffd54a 50%,#e07a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #5a2f00) drop-shadow(0 0 20px #ffb300);animation:olPopB .7s cubic-bezier(.2,1.8,.4,1) both}
+#olFx .res.lose h2{background:linear-gradient(#fff,#b8c4d2 50%,#5a6472);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 4px 0 #222)}
+@keyframes olPopB{from{transform:scale(3);opacity:0}}
+#olFx .res .o-rb{position:relative;width:120px;height:134px;margin-bottom:6px;animation:olPopB .7s .2s cubic-bezier(.2,1.8,.4,1) both}
+#olFx .res .o-rb svg{width:100%;height:100%;filter:drop-shadow(0 0 16px #ffc23a)}
+#olFx .res .pts{position:relative;margin-top:12px;font:900 30px system-ui;color:#7dff8a;text-shadow:0 0 14px #3dff5a}
+#olFx .res.lose .pts{color:#ff8a7a;text-shadow:0 0 14px #ff3b3b}
+#olFx .res .lg{position:relative;width:230px;margin-top:10px}
+#olFx .res .lg small{display:block;text-align:center;font:800 11px system-ui;color:#e2d4ff;margin-top:5px}
+#olFx .res .o-bar{position:relative;height:10px;border-radius:6px;background:#0008;overflow:hidden}
+#olFx .res .o-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#9a4cff,#ff7af0,#ffe27a);transition:width 1.2s}
+#olFx .res .rw2{position:relative;display:flex;gap:10px;margin-top:14px}
+#olFx .res .rw2 div{background:#0009;border:1px solid #e0aa25;border-radius:12px;padding:8px 12px;font:900 13px system-ui;color:#ffe27a;animation:olPop .4s 1s both}
+#olFx .res .btn{position:relative;margin-top:20px;padding:12px 40px;font:900 15px system-ui;border:0;border-radius:13px;background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);color:#3a1d00;box-shadow:0 3px 0 #7a4a00}
+#side2 #rkBtn svg,#side2 #chBtn svg{width:34px;height:34px}
+`;
+
+// ------------------------------------------------------------------ DOM
+const SVGDEFS=`<svg width="0" height="0" style="position:absolute"><defs>
+ <linearGradient id="olGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe6"/><stop offset=".45" stop-color="#ffd54a"/><stop offset=".7" stop-color="#e08a00"/><stop offset="1" stop-color="#ffcf5a"/></linearGradient>
+ <linearGradient id="olSilv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#c8d2de"/><stop offset="1" stop-color="#7a8696"/></linearGradient>
+ <linearGradient id="olBron" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd8b0"/><stop offset=".5" stop-color="#d0864a"/><stop offset="1" stop-color="#7a4018"/></linearGradient>
+ <symbol id="olTrophy" viewBox="0 0 64 64"><path d="M18 8h28v14c0 10-6 17-14 17S18 32 18 22z" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2.5"/><path d="M18 13H8c0 10 5 15 11 15M46 13h10c0 10-5 15-11 15" fill="none" stroke="#ffc23a" stroke-width="4"/><rect x="28" y="38" width="8" height="10" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2"/><rect x="19" y="48" width="26" height="9" rx="2" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2.5"/><path d="M32 15l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="#fff8"/></symbol>
+ <symbol id="olChat" viewBox="0 0 64 64"><path d="M8 8h40a6 6 0 016 6v20a6 6 0 01-6 6H26l-12 10v-10H8a6 6 0 01-6-6V14a6 6 0 016-6z" fill="#3fa7ff" stroke="#062a52" stroke-width="2.5"/><circle cx="16" cy="24" r="3.5" fill="#fff"/><circle cx="28" cy="24" r="3.5" fill="#fff"/><circle cx="40" cy="24" r="3.5" fill="#fff"/><circle cx="50" cy="48" r="12" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2.5"/><path d="M39 48h22M50 37c-4 5-4 17 0 22M50 37c4 5 4 17 0 22" stroke="#6a3a00" stroke-width="2" fill="none"/></symbol>
+ <symbol id="olSwords" viewBox="0 0 64 64"><g stroke="#3a1d00" stroke-width="2.5" stroke-linejoin="round"><path d="M8 4l32 30-6 6L4 8z" fill="url(#olSilv)"/><path d="M56 4L24 34l6 6 30-32z" fill="url(#olSilv)"/></g><path d="M22 34l10 10M42 34L32 44" stroke="#3a1d00" stroke-width="8" stroke-linecap="round"/><path d="M22 34l10 10M42 34L32 44" stroke="#ffc23a" stroke-width="5" stroke-linecap="round"/><path d="M27 43l-11 11M37 43l11 11" stroke="#3a1d00" stroke-width="7" stroke-linecap="round"/><path d="M27 43l-11 11M37 43l11 11" stroke="#8a4a1a" stroke-width="4" stroke-linecap="round"/><circle cx="14" cy="56" r="5" fill="#ff3b3b" stroke="#3a1d00" stroke-width="2"/><circle cx="50" cy="56" r="5" fill="#3fa7ff" stroke="#3a1d00" stroke-width="2"/></symbol>
+ <symbol id="olCup" viewBox="0 0 64 64"><path d="M14 6h36v8c0 14-8 24-18 24S14 28 14 14z" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2.5"/><path d="M14 10H4c0 12 6 18 13 18M50 10h10c0 12-6 18-13 18" fill="none" stroke="#ffc23a" stroke-width="4.5"/><path d="M27 37h10l3 12H24z" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2"/><rect x="14" y="49" width="36" height="10" rx="3" fill="#7a1a1a" stroke="#ffd54a" stroke-width="2.5"/><circle cx="32" cy="19" r="7" fill="#ff3b3b" stroke="#6a3a00" stroke-width="2"/><circle cx="30" cy="17" r="2" fill="#fff9"/></symbol>
+ <symbol id="olUser" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="#1f2937" stroke="#ffc23a" stroke-width="5"/><circle cx="32" cy="25" r="10" fill="url(#olGold)"/><path d="M14 50c3-10 10-14 18-14s15 4 18 14" fill="url(#olGold)"/></symbol>
+ <symbol id="olCrown" viewBox="0 0 64 48"><path d="M4 14l14 12L32 4l14 22 14-12-6 30H10z" fill="url(#olGold)" stroke="#6a3a00" stroke-width="2.5" stroke-linejoin="round"/><circle cx="32" cy="30" r="5" fill="#ff3b3b" stroke="#6a3a00" stroke-width="1.5"/><circle cx="18" cy="34" r="3.5" fill="#3fa7ff"/><circle cx="46" cy="34" r="3.5" fill="#3fa7ff"/><circle cx="4" cy="14" r="3" fill="#ffd54a"/><circle cx="60" cy="14" r="3" fill="#ffd54a"/><circle cx="32" cy="4" r="3" fill="#ffd54a"/></symbol>
+</defs></svg>`;
+const top=(ic,t,sub)=>`<div class="top"><div class="ttl">${ICON[ic]}<h1>${t}<small>${sub}</small></h1></div><span class="srv" data-srv></span><button class="o-gift" data-gift>🎁<i></i></button><button class="x" data-x>✕</button></div>`;
+const root=document.createElement('div');root.id='onl';
+root.innerHTML=SVGDEFS+`
+<section class="scr" id="olRank">${top('trophy','BATTLE RANKING','LIVE · YOUR SERVER')}
+  <div class="tabs" id="olRkT"><b data-by="best" class="on">CAMPAIGN</b><b data-by="pow">POWER</b><b data-by="lv">GARAGE</b></div>
+  <div class="o-sub"><span class="live">LIVE</span><span id="olUpd"></span></div>
+  <div class="body" id="olRkB"></div><div class="pin" id="olRkMe"></div></section>
+<section class="scr" id="olChat">${top('chat','WORLD CHAT','AUTO-TRANSLATE')}
+  <div class="tabs" id="olChT"><b data-ch="w" class="on">WORLD</b><b data-ch="a">ARENA</b><b data-tr="1" id="olTrB"></b></div>
+  <div class="msgs" id="olMsgs"></div>
+  <div class="inp"><input id="olIn" maxlength="200" enterkeyhint="send" placeholder="Write a message…" autocomplete="off"><button class="btn shine" id="olSend">SEND</button></div></section>
+<section class="scr" id="olArena">${top('arena','ARENA','PVP · WEEKLY SEASON')}
+  <div class="tabs" id="olArT"><b data-t="fight" class="on">FIGHT</b><b data-t="top">ARENA TOP</b><b data-t="hist">HISTORY</b></div>
+  <div class="body" id="olArB"></div></section>
+<section class="scr" id="olCupS">${top('cup','TORQUE CUP','WEEKEND TOURNAMENT')}
+  <div class="body" id="olCupB"></div></section>
+<section class="scr" id="olProf">${top('user','MY PROFILE','NAME · ICON · FRAME · TITLE')}
+  <div class="body" id="olPrB"></div></section>
+<div class="nav" id="olNav"><b data-s="olRank">${ICON.trophy}RANKING</b><b data-s="olChat">${ICON.chat}CHAT<i id="olChDot"></i></b><b data-s="olArena">${ICON.arena}ARENA<i id="olArDot"></i></b><b data-s="olCupS">${ICON.cup}CUP</b><b data-s="olProf">${ICON.user}PROFILE</b></div>
+<div id="olFx"><canvas id="olFc"></canvas><div class="vs" id="olVs"></div><div class="ctl"><button id="olSpd">×2 ⏩</button><button id="olSkip">SKIP ⏭</button></div><div class="res" id="olRes"></div></div>`;
+const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.appendChild(root);
+
+// ------------------------------------------------------------------ state
+let ME=null,inboxN=0,chatLast=+(LS('te_chat_seen')||0),chatSrvLast=0,cur='',open_=false,polls={},rkBy='best',rkPrev={},chCh='w',chSince=0,chList=[],arTab='fight',arData=null;
+let autoTr=LS('te_tr')!=='0';const mutes=new Set(JSON.parse(LS('te_mutes')||'[]'));
+function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.cp.best:0;if(b>=40)o.push('wr');if(b>=80)o.push('boss');if((G.rep||0)>=10)o.push('speed');if((G.rep||0)>=5)o.push('f1');
+  if(G.gear&&(G.gear.inv||[]).some(it=>it.r>=4))o.push('gear');return o;}
+async function sync(){
+  const t=T(),c=C();if(!t||!t.G||!c||!c.arenaTeam||!PID())return;
+  let team=[];try{team=c.arenaTeam();}catch(e){}
+  const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0);
+  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:G.vip||0,rep:G.rep||0,lv},team,unl:unlocksLocal(),icon:LS('te_icon')||undefined});
+  if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;dots();if(open_)hdr();}
+  return r;}
+let arenaTk=0;
+function dots(){const ch=chatSrvLast>chatLast;const a=$('chDot');if(a)a.classList.toggle('on',ch||inboxN>0);$('olChDot').classList.toggle('on',ch);
+  const ad=$('arDot');if(ad)ad.classList.toggle('on',arenaTk>0);$('olArDot').classList.toggle('on',arenaTk>0);}
+function hdr(){root.querySelectorAll('[data-srv]').forEach(e=>e.textContent='🌍 S'+(window.CLOUD?CLOUD.srv():1));
+  root.querySelectorAll('[data-gift]').forEach(e=>{e.classList.toggle('on',inboxN>0);e.querySelector('i').textContent=inboxN;});}
+setInterval(()=>{if(document.visibilityState==='visible')sync();},5*60e3);
+setTimeout(sync,12000);
+
+// ------------------------------------------------------------------ open / close / tabs
+function openHub(s){if(!API()){toast('📶 Online features need an internet connection');return;}
+  root.classList.add('open');open_=true;window.__ONLINE_ON=true;show(s||'olRank');sync().then(()=>{if(cur==='olProf')renderProf();});}
+function closeHub(){root.classList.remove('open');open_=false;window.__ONLINE_ON=false;stopPolls();closeMenu();}
+function stopPolls(){for(const k in polls){clearInterval(polls[k]);delete polls[k];}}
+function show(s){cur=s;stopPolls();closeMenu();
+  root.querySelectorAll('.nav b').forEach(x=>x.classList.toggle('on',x.dataset.s===s));root.querySelectorAll('.scr').forEach(x=>x.classList.toggle('on',x.id===s));hdr();
+  if(s==='olRank'){loadRank(true);polls.r=setInterval(()=>loadRank(false),10000);}
+  if(s==='olChat'){chatOpen();}
+  if(s==='olArena'){loadArena();polls.a=setInterval(arenaTick,1000);}
+  if(s==='olCupS'){loadCup();polls.c=setInterval(cupTick,1000);}
+  if(s==='olProf'){renderProf();}}
+root.addEventListener('click',e=>{
+  const nb=e.target.closest('.nav b');if(nb){show(nb.dataset.s);return;}
+  if(e.target.closest('[data-x]')){closeHub();return;}
+  if(e.target.closest('[data-gift]')){openInbox();return;}
+  const pv=e.target.closest('[data-uid]');if(pv&&!e.target.closest('.fight,.play,.menu')&&!e.target.closest('#olMsgs')){const u=+pv.dataset.uid;if(u>0)viewProfile(u);}
+});
+
+// ------------------------------------------------------------------ RANKING
+async function loadRank(first){
+  const r=await call('rank',{by:rkBy});const B=$('olRkB');
+  if(!r.ok){if(first)B.innerHTML=`<div class="empty">📶 Could not reach the server.<br>Check your internet and try again.</div>`;return;}
+  $('olUpd').textContent=`${r.total} player${r.total===1?'':'s'} · ${new Date(r.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  const val=p=>rkBy==='best'?stLab(p.best):rkBy==='pow'?'⚡ '+fmtN(p.pow):'🏗️ '+p.lv;
+  const subv=p=>rkBy==='best'?'⚡ '+fmtN(p.pow):'⚔️ '+stLab(p.best);
+  const L=r.list;
+  if(first||!B.querySelector('.pod')){
+    const pod=[1,0,2].map(i=>{const p=L[i];if(!p)return `<div class="g g${i+1}" style="opacity:.25">${medal(i+1)}<div class="av">${avf('m0_0',0)}</div><div class="o-n">—</div></div>`;
+      return `<div class="g g${i+1}" data-uid="${p.uid}">${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}${medal(i+1)}<div class="av">${avf(p.icon,p.frame)}</div><div class="o-n">${flag(p.cc)} ${esc(p.name)}</div>${tt(p.title)}<div class="o-st" data-v>${val(p)}</div><div class="ps">${subv(p)}</div></div>`;}).join('');
+    B.innerHTML=`<div class="pod"><div class="rays"></div>${pod}</div><div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
+  else{let re=false;[1,0,2].forEach(i=>{const p=L[i],el=B.querySelector('.pod .g'+(i+1));if(p&&el&&+el.dataset.uid===p.uid)el.querySelector('[data-v]').textContent=val(p);else if(p)re=true;});if(re){rkPrev={};return loadRank(true);}}
+  const rows=$('olRows');const html=L.slice(3).map((p,i)=>{const ch=rkPrev[p.uid]!==undefined&&rkPrev[p.uid]!==p[rkBy];
+    return `<div class="o-row ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${p.vip?`<span class="vip">VIP ${p.vip}</span>`:''}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
+  rows.innerHTML=html;
+  L.forEach(p=>rkPrev[p.uid]=p[rkBy]);
+  const m=r.me;$('olRkMe').innerHTML=`<div class="o-row me" data-uid="${m.uid}"><span class="k">${r.myRank}</span>${ring(m.icon)}<div class="o-nm"><b>⭐ ${esc(m.name)} ${m.vip?`<span class="vip">VIP ${m.vip}</span>`:''}</b><small>${tt(m.title)} ${subv(m)}</small></div><div class="v">${val(m)}<small>${rkBy==='best'&&m.today?`<span class="o-up">▲${m.today}</span> today`:''}</small></div></div>`;}
+$('olRkT').onclick=e=>{const b=e.target.closest('b');if(!b)return;rkBy=b.dataset.by;$('olRkT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));rkPrev={};loadRank(true);};
+
+// ------------------------------------------------------------------ CHAT
+const LNAME={en:'English',ro:'Română',fr:'Français',es:'Español',pt:'Português',de:'Deutsch',it:'Italiano',pl:'Polski',tr:'Türkçe',nl:'Nederlands',ru:'Русский',uk:'Українська',ar:'العربية',hi:'हिन्दी',id:'Indonesia',ja:'日本語',ko:'한국어',zh:'中文',vi:'Tiếng Việt',th:'ไทย',hu:'Magyar',cs:'Čeština',el:'Ελληνικά',sv:'Svenska'};
+function trBtn(){$('olTrB').textContent='🌐 '+(autoTr?'AUTO: ON':'AUTO: OFF');$('olTrB').classList.toggle('on',autoTr);}
+function chatOpen(){trBtn();
+  if(LS('te_chat_ok')!=='1'){modal(`<h4>💬 Chat rules</h4><p>Be nice – this chat is for everyone 13+.<br><br>❌ No insults, hate, bullying or adult content<br>❌ No spam, links or ads<br>❌ No personal info (phone, address, e-mail…)<br>❌ No selling or trading accounts<br><br>Bad words are hidden automatically. Long-press a message to <b>Mute</b> or <b>Report</b> a player. Players who break the rules are muted or banned.<br><br>Messages are translated automatically by our server (Cloudflare) and are deleted after 7 days.</p><div class="ok"><button class="btn gray" data-m="no">NOT NOW</button><button class="btn shine" data-m="ok">I AGREE</button></div>`,
+    b=>{if(b==='ok'){LS('te_chat_ok','1');chatOpen();}else show('olRank');});return;}
+  chSince=0;chList=[];$('olMsgs').innerHTML='<div class="empty">Loading…</div>';loadChat();polls.ch=setInterval(loadChat,5000);}
+let chBusy=false;
+async function loadChat(){if(chBusy)return;chBusy=true;const r=await call('chat',{ch:chCh,since:chSince,lang:LANG,tr:autoTr});chBusy=false;
+  const box=$('olMsgs');if(!r.ok){if(!chList.length)box.innerHTML=`<div class="empty">📶 Could not reach the chat.</div>`;return;}
+  if(!chList.length)box.innerHTML='';
+  const near=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+  for(const m of r.list){if(m.id<=chSince)continue;chSince=m.id;chList.push(m);if(m.uid&&mutes.has(m.uid))continue;box.insertAdjacentHTML('beforeend',msgHtml(m));}
+  if(!chList.length)box.innerHTML=`<div class="empty">No messages yet.<br>Say hi to your server! 👋</div>`;
+  if(near||r.list.length)box.scrollTop=1e6;
+  if(chCh==='w'&&chSince>chatLast){chatLast=chSince;LS('te_chat_seen',String(chatLast));dots();}}
+function msgHtml(m){const tm=new Date(m.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  if(m.sys)return `<div class="sys"><span class="shine">${esc(m.txt)}</span></div>`;
+  const txt=autoTr&&m.tr?m.tr:m.txt;const trl=autoTr&&m.tr?`<div class="tr">🌐 translated from ${LNAME[m.lang]||m.lang} · <u data-orig="${m.id}">show original</u></div>`:'';
+  if(m.me)return `<div class="m me" data-mid="${m.id}">${ring(m.icon)}<div class="bub"><div class="h" style="justify-content:flex-end"><span class="tm">${tm}</span>${tt(m.title)} You</div><p>${esc(m.txt)}</p></div></div>`;
+  return `<div class="m" data-mid="${m.id}" data-u="${m.uid}">${ring(m.icon)}<div class="bub"><div class="h">${flag(m.cc)} ${esc(m.name)} ${m.vip?`<span class="vip">VIP ${m.vip}</span>`:''} ${tt(m.title)}<span class="tm">${tm}</span></div><p>${esc(txt)}</p>${trl}</div></div>`;}
+$('olMsgs').addEventListener('click',e=>{const o=e.target.closest('[data-orig]');if(o){const m=chList.find(x=>x.id===+o.dataset.orig);if(m){const p=o.closest('.bub').querySelector('p');const sh=o.textContent==='show original';p.textContent=sh?m.txt:m.tr;o.textContent=sh?'show translation':'show original';}return;}
+  const mm=e.target.closest('.m[data-u]');if(mm&&!e.target.closest('.menu'))openMenu(mm);});
+let lpT=0;$('olMsgs').addEventListener('touchstart',e=>{const mm=e.target.closest('.m[data-u]');if(!mm)return;clearTimeout(lpT);lpT=setTimeout(()=>openMenu(mm),450);},{passive:true});
+$('olMsgs').addEventListener('touchend',()=>clearTimeout(lpT),{passive:true});$('olMsgs').addEventListener('touchmove',()=>clearTimeout(lpT),{passive:true});
+function closeMenu(){root.querySelectorAll('.menu').forEach(m=>m.remove());}
+function openMenu(mm){closeMenu();const mid=+mm.dataset.mid,uid=+mm.dataset.u,box=$('olMsgs');const m=chList.find(x=>x.id===mid);
+  const d=document.createElement('div');d.className='menu';d.innerHTML=`<div data-a="prof">👤 View profile</div><div data-a="copy">📋 Copy</div><div data-a="mute">🔇 ${mutes.has(uid)?'Unmute':'Mute'} player</div><div data-a="rep">🚩 Report</div>`;
+  d.style.left='56px';d.style.top=(mm.offsetTop+Math.min(40,mm.offsetHeight-10))+'px';box.appendChild(d);
+  d.onclick=async e=>{const a=e.target.closest('[data-a]');if(!a)return;e.stopPropagation();closeMenu();
+    if(a.dataset.a==='prof')viewProfile(uid);
+    if(a.dataset.a==='copy'){try{await navigator.clipboard.writeText(m?(autoTr&&m.tr?m.tr:m.txt):'');toast('📋 Copied');}catch(er){}}
+    if(a.dataset.a==='mute'){if(mutes.has(uid))mutes.delete(uid);else mutes.add(uid);LS('te_mutes',JSON.stringify([...mutes]));toast(mutes.has(uid)?'🔇 Player muted – you will not see his messages':'🔈 Player unmuted');chSince=0;chList=[];box.innerHTML='';loadChat();}
+    if(a.dataset.a==='rep'){modal(`<h4>🚩 Report this message?</h4><p>“${esc(m?m.txt:'')}”<br><br>Our team will check it. After 3 reports the message is hidden automatically.</p><div class="ok"><button class="btn gray" data-m="no">CANCEL</button><button class="btn" data-m="ok">REPORT</button></div>`,async b=>{if(b!=='ok')return;const r=await call('report',{mid});toast(r.ok?'🚩 Thank you – the message was reported':'⚠️ Could not report');});}};}
+document.addEventListener('click',e=>{if(!e.target.closest('.menu')&&!e.target.closest('.m[data-u]'))closeMenu();},true);
+$('olChT').onclick=e=>{const b=e.target.closest('b');if(!b)return;if(b.dataset.tr){autoTr=!autoTr;LS('te_tr',autoTr?'1':'0');trBtn();chSince=0;chList=[];$('olMsgs').innerHTML='';loadChat();return;}
+  chCh=b.dataset.ch;$('olChT').querySelectorAll('b[data-ch]').forEach(x=>x.classList.toggle('on',x===b));chSince=0;chList=[];$('olMsgs').innerHTML='';loadChat();};
+async function send(){const i=$('olIn'),txt=i.value.trim();if(!txt)return;
+  const r=await call('say',{ch:chCh,txt,lang:LANG});
+  if(r.ok){i.value='';loadChat();return;}
+  const E={need_name:'✏️ Choose your player name first (Profile)',slow:'⏳ Slow down – wait a few seconds',muted:'🔇 You are muted until '+(r.until?new Date(r.until).toLocaleString():''),banned:'🚫 Your account is blocked',network:'📶 No connection'};
+  toast(E[r.err]||'⚠️ Message not sent',3000);if(r.err==='need_name'){show('olProf');setTimeout(nameModal,300);}}
+$('olSend').onclick=send;$('olIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send();}});
+
+// ------------------------------------------------------------------ ARENA
+function tierPct(t,p){return t.next?Math.max(4,Math.min(100,(p-t.from)/(t.next-t.from)*100)):100;}
+async function loadArena(){const B=$('olArB');if(!arData)B.innerHTML='<div class="empty">Loading…</div>';
+  if(arTab==='top')return arTop();if(arTab==='hist')return arHist();
+  const r=await call('arena',{});if(r.banned){B.innerHTML='<div class="empty">🚫 Your account is blocked.</div>';return;}
+  if(!r.ok){B.innerHTML=`<div class="empty">📶 Could not reach the Arena.</div>`;return;}
+  arData=r;arenaTk=r.tk;dots();const t=r.tier;
+  B.innerHTML=`<div class="ahero"><div class="badge">${badge(t.lg,t.div||'★')}</div><div class="t"><b>${t.name}</b><small>🏅 ${r.pts} points · rank #${r.rank} · ${r.w}W / ${r.l}L</small><div class="o-bar"><i style="width:0"></i></div><small>${t.next?`${t.next-r.pts} pts to the next division`:'Top league!'} · season ${r.season} ends in <span id="olSeason">${dur(r.end-Date.now())}</span></small></div></div>
+   <div class="tk"><span>🎟️ Arena fights <b id="olTk">${r.tk}</b> / ${r.tkMax} <span id="olTkN"></span></span><span>🎁 daily reward 22:00</span></div>
+   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ⚡ ${fmtN(o.pow)}</small></div><button class="fight shine ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}">FIGHT<small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
+   <div class="btns"><div class="shine" data-a="def">🛡️ MY TEAM</div><div class="shine" data-a="ref">🔄 NEW RIVALS</div></div>
+   <div class="leag">${LG.map((l,i)=>`<div class="${i===t.lg?'on':''}">${badge(i)}${l[0]}</div>`).join('')}</div>
+   <div class="o-note">Fights are automatic: your <b>battle team</b> (with gear) against the other player's team – he does not need to be online. Win = up to +${win(r.pts,r.pts+400)} points. When others attack you, you lose a few points only if they win.<br>Rivals marked <span class="ai">AI</span> are training rivals while the server is still filling up.</div>
+   <h3>DAILY REWARD (22:00)</h3><div class="o-rw">${r.daily.map(d=>`<span>${d.lg}</span><span>💎 ${d.dm} · 🎟️ ${d.tk}</span>`).join('')}</div>`;
+  requestAnimationFrame(()=>{const i=B.querySelector('.ahero .o-bar i');if(i)i.style.width=tierPct(t,r.pts)+'%';});arenaTick();}
+const win=(a,b)=>{const E=1/(1+Math.pow(10,(b-a)/400));return Math.max(6,Math.round(32*(1-E))+4);};
+function arenaTick(){if(!arData||arTab!=='fight')return;const s=$('olSeason');if(s)s.textContent=dur(arData.end-Date.now());const n=$('olTkN');if(n)n.textContent=arData.tkNext?'· +1 in '+dur(arData.tkNext-Date.now()):'';
+  if(arData.tkNext&&Date.now()>arData.tkNext+1500){arData.tkNext=0;loadArena();}}
+async function arTop(){const B=$('olArB');const r=await call('atop',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not load.</div>';return;}
+  B.innerHTML=r.list.length?r.list.map((p,i)=>`<div class="o-row in ${ME&&p.uid===ME.uid?'me':''}" style="animation-delay:${Math.min(.6,i*.04)}s" data-uid="${p.uid}"><span class="k">${i<3?['🥇','🥈','🥉'][i]:i+1}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)}</b><small>${tt(p.title)} ${p.w}W / ${p.l}L</small></div><div style="width:30px">${badge(p.tier.lg)}</div><div class="v">${p.pts}<small>${p.tier.name}</small></div></div>`).join(''):'<div class="empty">Nobody in the Arena yet – be the first!</div>';}
+async function arHist(){const B=$('olArB');const r=await call('hist',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not load.</div>';return;}
+  B.innerHTML=r.list.length?r.list.map(h=>`<div class="hrow"><b class="w ${h.win?'o-y':'o-n'}">${h.win?'WIN':'LOSS'}</b><span>${h.kind==='cup'?'🏟️':h.atk?'⚔️ you attacked':'🛡️ attacked you:'} <b>${esc(h.other)}</b><br><small>${new Date(h.t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${h.d>0?'+':''}${h.d} pts</small></span><button class="play" data-replay="${h.id}">▶ WATCH</button></div>`).join(''):'<div class="empty">No fights yet.</div>';}
+$('olArT').onclick=e=>{const b=e.target.closest('b');if(!b)return;arTab=b.dataset.t;$('olArT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));arData=null;loadArena();};
+$('olArB').addEventListener('click',async e=>{
+  const f=e.target.closest('[data-fight]');if(f){e.stopPropagation();if(f.classList.contains('off')){toast('🎟️ No Arena fights left – +1 every 2 hours');return;}doFight(f.dataset.fight);return;}
+  const rp=e.target.closest('[data-replay]');if(rp){e.stopPropagation();const r=await call('replay',{id:+rp.dataset.replay});if(r.ok)playFight(r,true);else toast('⚠️ This fight is too old');return;}
+  const a=e.target.closest('[data-a]');if(!a)return;
+  if(a.dataset.a==='ref'){const r=await call('refresh',{});if(r.ok&&arData){arData.opp=r.opp;loadArena();}}
+  if(a.dataset.a==='def'){const c=C();const tm=c&&c.arenaTeam?c.arenaTeam():[];
+    modal(`<h4>🛡️ My Arena team</h4><p>Your Arena team is your <b>battle team</b> from the Campaign (with its gear). It attacks and it also defends you when others attack.</p><div style="display:flex;gap:6px;justify-content:center;margin:8px 0">${tm.map(h=>`<div style="width:54px">${ring(h.id)}<small style="display:block;font:800 9px system-ui;color:#c9b88a;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(h.n||'')}</small></div>`).join('')}</div><p style="text-align:center">⚡ Power <b style="color:#ffe27a">${fmtN(c&&c.teamPower?c.teamPower():0)}</b></p><div class="ok"><button class="btn gray" data-m="no">CLOSE</button><button class="btn" data-m="ok">CHANGE TEAM</button></div>`,
+      b=>{if(b==='ok'){closeHub();if(c)c.open();toast('⚔️ Choose your team in a stage – the Arena uses the same team',3500);}});}});
+async function doFight(key){if(fightBusy)return;fightBusy=true;await sync();const r=await call('fight',{key});fightBusy=false;
+  if(!r.ok){toast({no_tickets:'🎟️ No Arena fights left',old_opponents:'🔄 Rivals changed – try again',no_team:'⚔️ You need a battle team first',network:'📶 No connection',banned:'🚫 Account blocked'}[r.err]||'⚠️ Could not start the fight',3000);loadArena();return;}
+  if(r.rw){const t=T();if(t&&t.giveRw){t.giveRw(r.rw);t.save();}}
+  playFight(r,false);}
+let fightBusy=false;
+
+// ------------------------------------------------------------------ CUP
+let cupData=null;
+async function loadCup(){const B=$('olCupB');if(!cupData)B.innerHTML='<div class="empty">Loading…</div>';const r=await call('cup',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not reach the Cup.</div>';return;}cupData=r;renderCup();}
+const RW=r=>`<div class="o-rw">${[[1,'🏆 Champion'],[2,'🥈 Final'],[4,'🥉 Semi-final'],[8,'Quarter-final'],[16,'Round of 16'],[32,'Round of 32'],[64,'Round of 64']].map(([k,l])=>{const x=r[k];return `<span>${l}</span><span>💎 ${x.dm}${x.tk?' · 🎟️ '+x.tk:''}${x.gt?' · ⚙️ '+x.gt+' Gear':''}${k===1?' · <i class="tt t5">CUP CHAMPION</i>':''}</span>`;}).join('')}</div>`;
+const rName=(n,ri)=>{const left=n/Math.pow(2,ri);return left===2?'FINAL':left===4?'SEMI-FINAL':left===8?'QUARTER-FINAL':'ROUND OF '+left;};
+let cupR=-1;
+function renderCup(){const r=cupData,B=$('olCupB');
+  const head=(t,sub,cd)=>`<div class="tw"><svg class="tro" viewBox="0 0 64 64"><use href="#olCup"/></svg><b>${t}</b><small>${sub}</small>${cd?`<div class="cd" id="olCd"></div><small id="olCdL">${cd}</small>`:''}</div>`;
+  if(r.state==='wait'){
+    B.innerHTML=head(`WEEKEND CUP #${r.num}`,'The best 64 players of the Arena qualify on Friday 22:00 · knock-out · 1 round every 3 h · your battle team fights for you','until the qualification')+
+     (r.last&&r.last.done?`<h3>LAST CUP CHAMPION</h3><div class="o-row" ${r.last.P[r.last.champ].uid?`data-uid="${r.last.P[r.last.champ].uid}"`:''}><span class="k">🏆</span>${ring(r.last.P[r.last.champ].icon)}<div class="o-nm"><b>${esc(r.last.P[r.last.champ].name)}</b><small>Weekend Cup #${r.num-1}</small></div></div>`:'')+
+     `<h3>REWARDS</h3>${RW(r.rw)}<div class="o-note">Climb the Arena this week to qualify. Rewards are diamonds & tickets earned by playing.</div>`;
+    cupT=r.qual;cupTick();return;}
+  const ri=cupR<0||cupR>r.R.length-1?r.round:cupR, M=r.R[ri]||[];
+  const myM=M.find(m=>m.a===r.me||m.b===r.me);const out=r.me>=0&&r.R.some(rr=>rr.some(m=>(m.a===r.me||m.b===r.me)&&m.w>=0&&m.w!==r.me));
+  const sub=r.done?`🏆 Champion: <b>${esc(r.P[r.champ].name)}</b>`:`${r.n} players · ${rName(r.n,r.round)} ${r.me<0?'· you are not in this Cup':out?'· you are out – well played!':'· you are still in! 💪'}`;
+  B.innerHTML=head(`WEEKEND CUP #${r.num}`,sub,r.done?'':`until the ${rName(r.n,r.round)}`)+
+   `<div class="tabs" id="olCupT" style="padding:0 0 8px;overflow-x:auto">${r.R.map((x,i)=>`<b data-r="${i}" class="${i===ri?'on':''}" style="flex:none;padding:8px 10px">${rName(r.n,i).replace('ROUND OF ','R')}</b>`).join('')}</div>`+
+   M.map(m=>{const A=r.P[m.a],Bp=r.P[m.b],me=m.a===r.me||m.b===r.me;const cls=x=>m.w<0?'':m.w===x?'w':'l';
+     return `<div class="mt ${me?'me':''}"><div class="sd"><div class="${cls(m.a)} ${m.a===r.me?'me':''}">${ring(A.icon)}${esc(A.name)} ${A.bot?'<span class="ai">AI</span>':''}</div><div class="${cls(m.b)} ${m.b===r.me?'me':''}">${ring(Bp.icon)}${esc(Bp.name)} ${Bp.bot?'<span class="ai">AI</span>':''}</div></div><div class="wb">${m.f?`<button class="play" data-replay="${m.f}">▶</button>`:m.w<0?'<small style="color:#8fa0b4;font:800 10px system-ui">soon</small>':''}</div></div>`;}).join('')+
+   `<h3>REWARDS</h3>${RW(r.rw)}`;
+  cupT=r.done?r.nextWeek:r.next;cupTick();}
+let cupT=0;function cupTick(){const e=$('olCd');if(!e||!cupT)return;const ms=Math.max(0,cupT-Date.now()),h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);
+  e.innerHTML=(h>=24?`<span>${Math.floor(h/24)}d</span>`:'')+`<span>${String(h%24).padStart(2,'0')}</span><span>${String(m).padStart(2,'0')}</span><span>${String(s).padStart(2,'0')}</span>`;
+  if(ms<=0&&cupData&&!cupData._re){cupData._re=1;setTimeout(loadCup,60000);}}
+$('olCupB').addEventListener('click',async e=>{const b=e.target.closest('[data-r]');if(b){cupR=+b.dataset.r;renderCup();return;}
+  const rp=e.target.closest('[data-replay]');if(rp){e.stopPropagation();const r=await call('replay',{id:+rp.dataset.replay});if(r.ok)playFight(r,true);else toast('⚠️ This fight is too old');}});
+
+// ------------------------------------------------------------------ PROFILE
+function myHeroes(){const t=T();if(!t)return [];const G=t.G,o=[];for(const id in G.h.own){const h=t.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}o.sort((a,b)=>b.gr-a.gr||(G.h.own[b.id].s||0)-(G.h.own[a.id].s||0));return o;}
+function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty">Loading…</div>';return;}
+  const u=new Set(ME.unl||[]),G=T().G,vip=G.vip||0,rep=G.rep||0;
+  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')));
+  const tOk=k=>k==='rook'||u.has(k);
+  const H=myHeroes();
+  B.innerHTML=`<div class="pcard"><div class="rays"></div><div class="av">${avf(ME.icon,ME.frame)}</div>
+    <div class="pname"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div>
+    <div style="position:relative;margin-top:5px">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}${vip?' · VIP '+vip:''}</div></div>
+   ${/^Mechanic\d+$/.test(ME.name)?`<div class="btns" style="margin-bottom:10px"><div class="shine" data-a="name">✏️ CHOOSE YOUR PLAYER NAME (FREE)</div></div>`:''}
+   <div class="stats"><div>Campaign<b>⚔️ ${stLab(ME.best)}</b></div><div>Team power<b>⚡ ${fmtN(ME.pow)}</b></div><div>Garage<b>🏗️ LV ${ME.lv}</b></div><div>Cup wins<b>🏆 ${ME.cupw||0}</b></div></div>
+   <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
+   <h3>FRAME</h3><div class="frames">${FR.map(f=>`<div class="${f[0]===ME.frame?'sel':''} ${fOk(f[0])?'':'o-lock'}" data-fr="${f[0]}"><div class="av">${avf(ME.icon,f[0])}</div><small>${f[1]}<br>${fOk(f[0])?(f[0]===ME.frame?'✅ in use':'tap to use'):'🔒 '+f[2]}</small></div>`).join('')}</div>
+   <h3>TITLE</h3><div class="tlist">${TORD.map(k=>`<div class="${k===ME.title?'sel':''} ${tOk(k)?'':'o-lock'}" data-tt="${k}">${tt(k)}<span>${TT[k][2]}</span><b>${tOk(k)?(k===ME.title?'✅':''):'🔒'}</b></div>`).join('')}</div>
+   <div class="o-note">Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.<br>Player ID ${ME.uid} · <u data-a="mutes">muted players (${mutes.size})</u></div>`;}
+async function setProf(set,paid){const r=await call('prof',{set,paid});
+  if(r.ok){ME={...ME,...r.me};renderProf();return r;}
+  const E={name_rules:'✏️ 3–14 letters, numbers, _ . -',name_bad:'🚫 This name is not allowed',name_taken:'❌ This name is already used on your server',locked:'🔒 Not unlocked yet',network:'📶 No connection'};
+  if(r.err!=='pay')toast(E[r.err]||'⚠️ Could not save',3000);return r;}
+$('olPrB').addEventListener('click',async e=>{
+  const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
+  if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
+  const ic=e.target.closest('[data-ic]');if(ic){LS('te_icon',ic.dataset.ic);await setProf({icon:ic.dataset.ic});return;}
+  const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+FR[+fr.dataset.fr][2],2500);return;}await setProf({frame:+fr.dataset.fr});return;}
+  const tk=e.target.closest('[data-tt]');if(tk){if(tk.classList.contains('o-lock')){toast('🔒 '+TT[tk.dataset.tt][2],2500);return;}await setProf({title:tk.dataset.tt});}});
+function nameModal(){const free=!(ME&&ME.chg>0);
+  modal(`<h4>✏️ ${free?'CHOOSE YOUR NAME':'CHANGE NAME'}</h4><input id="olNm" maxlength="14" value="${esc(ME&&!/^Mechanic\d+$/.test(ME.name)?ME.name:'')}" placeholder="Your player name"><p>3–14 letters / numbers ( _ . - allowed) · no bad words · one name per server<br>${free?'<b style="color:#7dff8a">This change is FREE</b>':'This change costs <b style="color:#ffe27a">300 💎</b> (you have '+fmtN(T().G.dm||0)+')'}</p><div class="ok"><button class="btn gray" data-m="no">CANCEL</button><button class="btn shine" data-m="ok">SAVE</button></div>`,
+   async b=>{if(b!=='ok')return true;const n=$('olNm').value.trim();const G=T().G;
+     if(!free&&(G.dm||0)<300){toast('💎 You need 300 Diamonds',2500);return false;}
+     const r=await setProf({name:n},!free);
+     if(r.ok){if(!free){G.dm-=300;T().save();}toast('✅ Name saved: '+n,2500);return true;}
+     return false;});
+  setTimeout(()=>{const i=$('olNm');if(i)i.focus();},200);}
+async function viewProfile(uid){const r=await call('view',{uid});if(!r.ok){toast('⚠️ Could not load the profile');return;}const p=r.p;
+  modal(`<div class="av" style="width:110px;height:118px;margin:0 auto">${avf(p.icon,p.frame)}</div><h4 style="margin:4px 0">${flag(p.cc)} ${esc(p.name)}</h4><div>${tt(p.title)}</div>
+   <div class="stats" style="margin-top:10px;text-align:left"><div>Campaign<b>⚔️ ${stLab(p.best)}</b></div><div>Team power<b>⚡ ${fmtN(p.pow)}</b></div><div>Arena<b>${p.arena?p.arena.tier.name:'—'}</b></div><div>VIP · Cup wins<b>${p.vip} · 🏆 ${p.cupw}</b></div></div>
+   <h3>BATTLE TEAM</h3><div style="display:flex;gap:6px;justify-content:center">${(p.team||[]).map(h=>`<div style="width:52px">${ring(h.id)}<small style="display:block;font:800 9px system-ui;color:#c9b88a;margin-top:4px">${h.s?'+'+h.s:''}</small></div>`).join('')}</div>
+   <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,()=>true);}
+
+// ------------------------------------------------------------------ INBOX (Arena / Cup rewards)
+async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 No connection');return;}
+  const rwTxt=w=>[w.dm?'💎 '+w.dm:'',w.tk?'🎟️ '+w.tk+' Recruit':'',w.gt?'⚙️ '+w.gt+' Gear':'',w.ct?'🎫 '+w.ct+' Crew':''].filter(Boolean).join(' · ');
+  modal(`<h4>🎁 Rewards</h4>${r.list.length?r.list.map(m=>`<div class="ib"><span class="o-ic">${esc(m.ic)}</span><div><b>${esc(m.title)}</b>${esc(m.body)}${rwTxt(m.rw)?`<br><span class="rw2">${rwTxt(m.rw)}</span>`:''}</div></div>`).join(''):'<p style="text-align:center">Nothing new.</p>'}
+   <div class="ok"><button class="btn gray" data-m="no">CLOSE</button>${r.list.length?'<button class="btn shine" data-m="ok">CLAIM ALL</button>':''}</div>`,
+   async b=>{if(b!=='ok')return true;const tot={};for(const m of r.list){const c=await call('claim',{id:m.id});if(c.ok)for(const k in c.rw)tot[k]=(tot[k]||0)+c.rw[k];}
+     const t=T();if(t&&t.giveRw){t.giveRw(tot);t.save();}toast('🎁 '+(rwTxt(tot)||'Claimed'),3500);inboxN=0;hdr();dots();return true;});}
+
+// ------------------------------------------------------------------ modal helper
+function modal(html,cb){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="box">${html}</div>`;root.appendChild(d);
+  d.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b){if(e.target===d){d.remove();}return;}const k=await (cb?cb(b.dataset.m):true);if(k!==false)d.remove();});return d;}
+
+// ------------------------------------------------------------------ ARENA FIGHT – plays the fight decided by the server
+const fc=$('olFc'),g=fc.getContext('2d');let F=null,fRaf=0;
+const IMG={};const im=s=>{if(!IMG[s]){IMG[s]=new Image();IMG[s].src=s;}return IMG[s];};
+const FXN=['slash_02','flare_01','spark_05','star_07','magic_02','circle_05','fire_01','twirl_02','light_02'];const FX=n=>im('img/fx/'+n+'.webp');
+const SKFX={engine:'circle_05',tuning:'fire_01',inspect:'light_02',service:'magic_02',paint:'twirl_02',elec:'spark_05',all:'star_07',crew:'flare_01'};
+const LAY=[[.39,.64],[.27,.56],[.28,.75],[.16,.62],[.17,.81]];
+function playFight(r,replay){
+  const mk=(u,side,i)=>({...u,hp0:u.hp,side,slot:i,hp:100,mhp:100,dead:false,ps:'idle',pt:0,hx:0,fl:0,ko:0});
+  const ta=r.ta.map((u,i)=>mk(u,0,i)),td=r.td.map((u,i)=>mk(u,1,i)),U=[...ta,...td];
+  // real HP in % from the log (the server sent damage numbers; we scale with each unit's total damage taken + what is left)
+  const taken=U.map(()=>0),healed=U.map(()=>0);r.log.forEach(e=>e.h.forEach(h=>{if(h[1]>0)taken[h[0]]+=h[1];else healed[h[0]]-=h[1];}));
+  // total HP estimate per unit: units that died → exactly their damage taken minus heals; survivors get a 35% buffer
+  const kos=new Set();r.log.forEach(e=>e.h.forEach(h=>{if(h[3])kos.add(h[0]);}));
+  U.forEach((u,i)=>{u.mhp=u.hp0>0?u.hp0:Math.max(1,kos.has(i)?taken[i]-healed[i]:(taken[i]-healed[i])*1.35+1);u.hp=u.mhp;u.en=0;});
+  U.forEach(u=>{if(C()&&C().hasSpr&&C().hasSpr(u.id))C().pose(g,u.id,'idle',0,0,-999,-999,1,1);});
+  F={r,U,t:-2.0,i:0,pop:[],fx:[],shake:0,white:0,sk:null,spd:+(LS('te_aspd')||2),done:false,replay,proj:[]};
+  const me=r.me||{},th=r.them||{};
+  $('olVs').innerHTML=`<div class="side a"><div class="av">${avf(me.icon,me.frame)}</div><div>${flag(me.cc)} ${esc(me.name||'You')}<small>⚡ ${fmtN(me.pow||0)}</small></div></div><div class="side b"><div>${flag(th.cc)} ${esc(th.name||'Rival')} ${th.bot?'<span class="ai" style="font-size:10px">AI</span>':''}<small>⚡ ${fmtN(th.pow||0)}</small></div><div class="av">${avf(th.icon,th.frame)}</div></div><div class="mid">VS</div>`;
+  $('olVs').style.display='flex';$('olRes').classList.remove('on','lose');$('olFx').classList.add('on');$('olSpd').textContent='×'+F.spd+' ⏩';
+  const rs=()=>{const k=Math.min(1.5,devicePixelRatio||1);fc.width=Math.round(innerWidth*k);fc.height=Math.round(innerHeight*k);};rs();
+  setTimeout(()=>{if(F)$('olVs').style.display='none';},1900);
+  window.__BATTLE_ON=true;cancelAnimationFrame(fRaf);let last=performance.now();
+  const loop=now=>{if(!F)return;const dt=Math.min(.05,(now-last)/1000);last=now;stepF(dt);fRaf=requestAnimationFrame(loop);};fRaf=requestAnimationFrame(loop);}
+$('olSpd').onclick=()=>{if(!F)return;F.spd=F.spd===1?2:F.spd===2?3:1;LS('te_aspd',String(F.spd));$('olSpd').textContent='×'+F.spd+' ⏩';};
+$('olSkip').onclick=()=>{if(!F||F.done)return;while(F.i<F.r.log.length)applyEv(F.r.log[F.i++],true);F.t=F.r.dur;finish();};
+function upos(u,W,H){const l=LAY[u.slot]||LAY[0];return {x:(u.side?1-l[0]:l[0])*W+u.hx*(u.side?-1:1),y:l[1]*H};}
+function applyEv(e,instant){const U=F.U,a=U[e.a];if(!a)return;
+  if(!instant){a.ps=e.k==='sk'?'skill':'atk';a.pt=0;if(e.k==='m')a.lunge=1;if(e.k==='sk'){F.sk={u:a,t:0,r:e.r};if(e.r!=='service')F.white=.35;}}
+  const W=fc.width,H=fc.height;
+  e.h.forEach((h,j)=>{const t=U[h[0]];if(!t)return;const delay=instant?0:(e.k==='m'?.18:e.k==='r'?.3:.45)+j*.06;
+    const go=()=>{if(!F)return;if(h[1]<0){t.hp=Math.min(t.mhp,t.hp-h[1]);}else{t.hp=Math.max(0,t.hp-h[1]);t.fl=.25;if(!t.dead&&t.ps!=='skill'){t.ps='hurt';t.pt=0;}}
+      if(h[3]){t.dead=true;t.ps='ko';t.pt=0;F.shake=Math.max(F.shake,.35);}
+      if(!instant){const p=upos(t,W,H);F.pop.push({x:p.x,y:p.y-H*.16,v:Math.abs(h[1]),c:h[2],heal:h[1]<0,sk:e.k==='sk',t:0});
+        F.fx.push({x:p.x,y:p.y-H*.07,im:e.k==='sk'?FX(SKFX[e.r]||'flare_01'):h[1]<0?FX('magic_02'):FX('slash_02'),t:0,big:e.k==='sk',rot:Math.random()*6,heal:h[1]<0});
+        if(h[1]>0)F.fx.push({x:p.x,y:p.y-H*.07,im:FX('spark_05'),t:0,rot:0});if(e.k==='sk'&&h[1]>0)F.shake=Math.max(F.shake,.3);}};
+    if(e.k==='r'&&!instant){const pa=upos(a,W,H),pt=upos(t,W,H);F.proj.push({x0:pa.x,y0:pa.y-H*.08,x1:pt.x,y1:pt.y-H*.08,t:0,d:delay,c:a.side?'#ff8a7a':'#9fe3ff'});}
+    if(instant)go();else setTimeout(go,delay*1000/F.spd);});}
+function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u.dead&&u.side===(r.win?0:1)){u.ps='win';u.pt=0;u.hx=0;}});
+  setTimeout(()=>{if(!F)return;const R=$('olRes'),t=r.tier;R.classList.toggle('lose',!r.win);
+    R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
+     ${t&&!F.replay?`<div class="lg"><div class="o-bar"><i style="width:${tierPct(t,r.pts-r.da)}%"></i></div><small>${t.name} · ${r.pts} pts</small></div>`:''}
+     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>💎 +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>🎟️ +${r.rw.tk} Recruit</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
+    R.classList.add('on');if(!F.replay){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
+      setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
+    $('olCont').onclick=()=>{$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(cur==='olArena'){arData=null;loadArena();}};},1100);}
+let crowd=null;
+function arenaBg(W,H,t){let gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#12061f');gr.addColorStop(.42,'#3a1858');gr.addColorStop(.6,'#1a1030');gr.addColorStop(1,'#05030a');g.fillStyle=gr;g.fillRect(0,0,W,H);
+  if(!crowd){crowd=[];for(let i=0;i<140;i++)crowd.push([Math.random(),.3+Math.random()*.15,Math.random()*360,Math.random()*6]);}
+  for(const c of crowd){g.fillStyle=`hsl(${c[2]},35%,${16+c[1]*20}%)`;g.beginPath();g.arc(c[0]*W,c[1]*H-Math.abs(Math.sin(t*5+c[3]))*H*.006,W*.017,0,7);g.fill();}
+  if(Math.random()<.2){g.fillStyle='#fff';g.globalAlpha=.8;g.beginPath();g.arc(Math.random()*W,H*(.3+Math.random()*.15),W*.006,0,7);g.fill();g.globalAlpha=1;}
+  g.globalCompositeOperation='lighter';for(let k=0;k<4;k++){const sx=W*(.08+k*.28),a=Math.sin(t*.7+k*1.7)*.3;g.save();g.translate(sx,0);g.rotate(a);const lg=g.createLinearGradient(0,0,0,H*.75);lg.addColorStop(0,k%2?'#ff7af040':'#7ad8ff40');lg.addColorStop(1,'#0000');g.fillStyle=lg;g.beginPath();g.moveTo(-W*.015,0);g.lineTo(W*.015,0);g.lineTo(W*.13,H*.75);g.lineTo(-W*.13,H*.75);g.fill();g.restore();}g.globalCompositeOperation='source-over';
+  g.save();g.translate(W/2,H*.68);g.scale(1,.3);const fl=g.createRadialGradient(0,0,0,0,0,W*.62);fl.addColorStop(0,'#6a4a9a');fl.addColorStop(.6,'#2a1a40');fl.addColorStop(1,'#0a0612');g.fillStyle=fl;g.beginPath();g.arc(0,0,W*.62,0,7);g.fill();
+  g.lineWidth=W*.008;g.strokeStyle=`hsl(${280+Math.sin(t*2)*30},100%,70%)`;g.shadowColor='#c35cff';g.shadowBlur=W*.03;g.beginPath();g.arc(0,0,W*.5,0,7);g.stroke();g.strokeStyle='#ffd54a99';g.beginPath();g.arc(0,0,W*.18,0,7);g.stroke();
+  g.rotate(t*.3);g.strokeStyle='#ffd54a55';g.lineWidth=W*.004;g.shadowBlur=0;for(let k=0;k<12;k++){g.rotate(Math.PI/6);g.beginPath();g.moveTo(W*.2,0);g.lineTo(W*.48,0);g.stroke();}g.restore();
+  g.font=`italic 900 ${W*.06}px system-ui`;g.textAlign='center';const tg=g.createLinearGradient(0,H*.2,0,H*.26);tg.addColorStop(0,'#fffbe6');tg.addColorStop(1,'#e08a00');g.fillStyle=tg;g.shadowColor='#ffb300';g.shadowBlur=W*.03;g.fillText('TORQUE ARENA',W/2,H*.255);g.shadowBlur=0;}
+function drawU(u,W,H){const p=upos(u,W,H),S=H*.15,face=u.side?-1:1;const c=C();
+  g.fillStyle='#0009';g.beginPath();g.ellipse(p.x,p.y,S*.3,S*.07,0,0,7);g.fill();
+  if(u.ps==='skill'){g.globalCompositeOperation='lighter';const r=S*(.45+u.pt*.7);const rg=g.createRadialGradient(p.x,p.y-S*.4,0,p.x,p.y-S*.4,r);rg.addColorStop(0,'#ffd54a99');rg.addColorStop(1,'#ffd54a00');g.fillStyle=rg;g.beginPath();g.arc(p.x,p.y-S*.4,r,0,7);g.fill();g.globalCompositeOperation='source-over';}
+  const k=u.ps==='atk'?Math.min(1,u.pt/.45):u.ps==='skill'?Math.min(1,u.pt/.8):u.ps==='ko'?Math.min(1,u.pt/.6):0;
+  if(u.dead&&u.pt>1.2)g.globalAlpha=Math.max(.35,1-(u.pt-1.2));
+  let ok=c&&c.pose&&c.pose(g,u.id,u.ps,F.t,k,p.x,p.y,S,face);
+  if(!ok){const i=im(HI(u.id));if(i.complete&&i.naturalWidth){g.save();g.beginPath();g.arc(p.x,p.y-S*.45,S*.3,0,7);g.clip();g.drawImage(i,p.x-S*.3,p.y-S*.75,S*.6,S*.6);g.restore();}}
+  if(u.fl>0&&ok){g.globalCompositeOperation='lighter';g.globalAlpha=Math.min(1,u.fl*3);c.pose(g,u.id,u.ps,F.t,k,p.x,p.y,S,face);g.globalCompositeOperation='source-over';}
+  g.globalAlpha=1;
+  if(!u.dead){const bw=S*.55,bx=p.x-bw/2,by=p.y-S*1.02;g.fillStyle='#000c';g.fillRect(bx-3,by-3,bw+6,S*.1+4);g.fillStyle=u.side?'#ff4a3a':'#4cd964';g.fillRect(bx,by,bw*u.hp/u.mhp,S*.055);g.fillStyle='#ffc23a';g.fillRect(bx,by+S*.065,bw*Math.min(1,u.en),S*.03);
+    const gc=['#cfd8dc','#4cdc4c','#29b6f6','#d05cff','#ffd21a','#ff3b3b'][u.gr|0];g.fillStyle=gc;g.beginPath();g.arc(bx-S*.06,by+S*.04,S*.045,0,7);g.fill();}}
+function stepF(dt){const W=fc.width,H=fc.height,r=F.r;const sdt=dt*F.spd;F.t+=F.t<0?dt:sdt;
+  if(F.t>=0&&!F.done){while(F.i<r.log.length&&r.log[F.i].t<=F.t){const e=r.log[F.i++];applyEv(e,false);const a=F.U[e.a];if(a&&e.k!=='sk')a.en=Math.min(1,(a.en||0)+.25);if(a&&e.k==='sk')a.en=0;}
+    if(F.i>=r.log.length&&F.t>r.dur+.6)finish();}
+  F.U.forEach(u=>{u.pt+=sdt;u.fl=Math.max(0,u.fl-sdt);
+    if(u.lunge){u.hx=Math.min(W*.13,u.hx+sdt*W*1.4);if(u.pt>.3)u.lunge=0;}else if(u.hx>0&&!u.dead)u.hx=Math.max(0,u.hx-sdt*W*.9);
+    if(!u.dead&&((u.ps==='atk'&&u.pt>.5)||(u.ps==='skill'&&u.pt>.9)||(u.ps==='hurt'&&u.pt>.3))){u.ps='idle';u.pt=0;}
+  });
+  g.save();if(F.shake>0){F.shake-=dt;const s=W*.035*F.shake;g.translate((Math.random()-.5)*s,(Math.random()-.5)*s);}
+  arenaBg(W,H,F.t<0?F.t+2:F.t);
+  if(F.sk){F.sk.t+=sdt;if(F.sk.t<.9){g.fillStyle=`rgba(0,0,0,${Math.min(.4,F.sk.t*1.5)})`;g.fillRect(0,0,W,H);}else F.sk=null;}
+  F.U.slice().sort((a,b)=>upos(a,W,H).y-upos(b,W,H).y).forEach(u=>drawU(u,W,H));
+  F.proj=F.proj.filter(p=>{p.t+=sdt;const k=(p.t)/Math.max(.05,p.d);if(k>1)return false;const x=p.x0+(p.x1-p.x0)*k,y=p.y0+(p.y1-p.y0)*k-Math.sin(k*Math.PI)*H*.04;g.fillStyle=p.c;g.shadowColor=p.c;g.shadowBlur=W*.02;g.beginPath();g.arc(x,y,W*.009,0,7);g.fill();g.shadowBlur=0;return true;});
+  g.globalCompositeOperation='lighter';F.fx=F.fx.filter(f=>{f.t+=sdt;if(f.t>.5)return false;const s=(f.big?H*.3:H*.14)*(.6+f.t*1.6);g.save();g.globalAlpha=1-f.t/.5;g.translate(f.x,f.y);g.rotate(f.rot+f.t*3);if(f.im.complete&&f.im.naturalWidth)g.drawImage(f.im,-s/2,-s/2,s,s);g.restore();return true;});g.globalCompositeOperation='source-over';g.globalAlpha=1;
+  F.pop=F.pop.filter(p=>{p.t+=sdt*.8;if(p.t>1)return false;const s=W*(p.c?.075:p.sk?.068:.052)*(p.t<.15?1+(.15-p.t)*5:1);g.font=`italic 900 ${s}px system-ui`;g.textAlign='center';g.lineWidth=W*.009;g.strokeStyle='#000';g.globalAlpha=Math.min(1,(1-p.t)*2);const y=p.y-p.t*H*.07;const txt=(p.heal?'+':p.c?'CRIT ':'')+fmtN(p.v);g.strokeText(txt,p.x,y);g.fillStyle=p.heal?'#7dff8a':p.c?'#ffd54a':p.sk?'#ff9af0':'#fff';g.fillText(txt,p.x,y);g.globalAlpha=1;return true;});
+  g.restore();
+  if(F.sk&&F.sk.t<.9){const u=F.sk.u,k=Math.min(1,F.sk.t*6),y=H*.13;g.fillStyle=u.side?'#c4180acc':'#1e6bffcc';g.beginPath();g.moveTo(u.side?W:0,y);g.lineTo(u.side?W-W*.78*k:W*.78*k,y);g.lineTo(u.side?W-W*.72*k:W*.72*k,y+H*.06);g.lineTo(u.side?W:0,y+H*.06);g.fill();
+    g.font=`italic 900 ${W*.045}px system-ui`;g.textAlign=u.side?'right':'left';g.fillStyle='#fff';const nm=(u.n||'').toUpperCase();g.fillText('⚡ '+(nm?nm+' · ':'')+'SKILL!',u.side?W-W*.04:W*.04,y+H*.043);}
+  if(F.white>0){F.white-=dt*2;g.fillStyle=`rgba(255,240,200,${Math.max(0,F.white)*.6})`;g.fillRect(0,0,W,H);}
+  const hb=(side,x,c)=>{const L=F.U.filter(u=>u.side===side),tot=L.reduce((s,u)=>s+u.hp/u.mhp,0)/Math.max(1,L.length);g.fillStyle='#000b';g.fillRect(x,H*.05,W*.36,H*.016);g.fillStyle=c;g.fillRect(side?x+W*.36*(1-tot):x,H*.05,W*.36*tot,H*.016);};
+  g.fillStyle='#000a';g.fillRect(0,0,W,H*.08);g.font=`900 ${W*.035}px system-ui`;g.textAlign='left';g.fillStyle='#9ad0ff';g.fillText((r.me&&r.me.name)||'You',W*.03,H*.038);g.textAlign='right';g.fillStyle='#ff9a8a';g.fillText((r.them&&r.them.name)||'Rival',W*.97,H*.038);
+  hb(0,W*.03,'#4cd964');hb(1,W*.61,'#ff4a3a');g.textAlign='center';g.fillStyle='#ffd54a';g.font=`italic 900 ${W*.05}px system-ui`;g.fillText('VS',W/2,H*.065);
+  if(F.t>=0){g.font=`900 ${W*.032}px system-ui`;g.fillStyle='#fff';g.fillText(Math.max(0,Math.ceil(75-F.t))+'s',W/2,H*.11);}}
+
+// ------------------------------------------------------------------ buttons in the game
+function addButtons(){
+  const s2=$('side2');if(s2&&!$('rkBtn')){
+    s2.insertAdjacentHTML('afterbegin',`<button id="rkBtn"><svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg><small>RANK</small></button><button id="chBtn"><svg viewBox="0 0 64 64"><use href="#olChat"/></svg><small>CHAT</small><i id="chDot"></i></button>`);
+    $('rkBtn').onclick=()=>openHub('olRank');$('chBtn').onclick=()=>openHub('olChat');}
+  const sd=$('side');if(sd&&!$('arBtn')){const b=document.createElement('button');b.id='arBtn';b.innerHTML='<img src="img/ui/ic_arena.webp" alt="Arena"><i id="arDot"></i>';
+    const cp=$('cpBtn');if(cp&&cp.nextSibling)sd.insertBefore(b,cp.nextSibling);else sd.appendChild(b);b.onclick=()=>openHub('olArena');}
+  dots();}
+addButtons();
+window.ONLINE={open:openHub,close:closeHub,sync,play:playFight};
+})();

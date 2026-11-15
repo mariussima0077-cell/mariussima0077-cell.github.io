@@ -4,9 +4,13 @@
 //   • POST /api/purchase  – checks a Google Play purchase with Google and ACKNOWLEDGES it (needed, or Google refunds after 3 days)
 //   • cron every 10 min   – scans all players again over 24 h, bans cheaters, finds shared purchase tokens, cleans old data
 //   • GET  /admin?key=…   – your page (works on the phone): flagged / banned players, unban button
+//   • POST /api/on/*     – v16-45 ONLINE: profiles, live ranking, chat (auto-translated), Arena PvP, Torque Cup (server/online.js)
+//   • GET  /admin/chat?key=… – chat moderation (delete, mute, reset name)
 //   • POST /api/cloud/*   – Google sign-in + cloud save (login / save / load / delete). Only a HASH of the Google account ID
 //                           is stored – never the e-mail or the name. Table `accounts` is created by itself.
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
+
+import {online, onlineCron, onlineAdmin} from './online.js';
 
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20};
@@ -23,12 +27,14 @@ export default {
       if (url.pathname === '/api/report' && req.method === 'POST') return json(await report(await req.json(), env));
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
       if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') return json(await cloud(url.pathname.slice(11), await req.json(), env));
+      if (url.pathname.startsWith('/api/on/') && req.method === 'POST') return json(await online(url.pathname.slice(8), await req.json(), env));
+      if (url.pathname === '/admin/chat') return env.ADMIN_KEY && url.searchParams.get('key') === env.ADMIN_KEY ? onlineAdmin(url, env) : new Response('no', {status:403});
       if (url.pathname === '/admin') return admin(url, env);
       if (url.pathname === '/') return json({ok:true, name:'Torque Guard', time:Date.now()});
       return json({err:'not found'}, 404);
     } catch (e) { return json({err:String(e)}, 500); }
   },
-  async scheduled(ev, env, ctx) { ctx.waitUntil(scan(env)); }
+  async scheduled(ev, env, ctx) { ctx.waitUntil(scan(env)); ctx.waitUntil(onlineCron(env)); }
 };
 
 // ------------------------------------------------------------------ report
@@ -199,7 +205,8 @@ async function admin(url, env) {
   const del = url.searchParams.get('delete');          // "Delete my data" e-mail: /admin?key=…&delete=PLAYER_ID (first 8 characters are enough)
   if (del && del.length >= 8) { await ensureCloud(env); const like = del + '%';
     await db.prepare('DELETE FROM accounts WHERE pid LIKE ?').bind(like).run(); await db.prepare('DELETE FROM snaps WHERE pid LIKE ?').bind(like).run();
-    await db.prepare('DELETE FROM events WHERE pid LIKE ?').bind(like).run(); await db.prepare('DELETE FROM players WHERE pid LIKE ? AND banned=0').bind(like).run();
+    await db.prepare('DELETE FROM events WHERE pid LIKE ?').bind(like).run(); try { for (const r of (await db.prepare('SELECT uid FROM prof WHERE pid LIKE ?').bind(like).all()).results) for (const q of ['DELETE FROM chat WHERE uid=?','DELETE FROM arena WHERE uid=?','DELETE FROM inbox WHERE uid=?','DELETE FROM creps WHERE uid=?']) await db.prepare(q).bind(r.uid).run();
+    await db.prepare('DELETE FROM prof WHERE pid LIKE ?').bind(like).run(); } catch (e) {}   // v16-45: online profile, chat messages, Arena await db.prepare('DELETE FROM players WHERE pid LIKE ? AND banned=0').bind(like).run();
     return new Response('deleted ' + del, {headers:{'content-type':'text/plain'}}); }
   const ban = url.searchParams.get('ban');
   if (ban) { await db.prepare('UPDATE players SET banned=1, score=999, reason=? WHERE pid=?').bind('banned by admin', ban).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
@@ -211,7 +218,7 @@ async function admin(url, env) {
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
-<h1>🛡️ Torque Guard</h1><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b></div>
+<h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b></div>
 <h3>Flagged / banned</h3>${bad.map(p => `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b> · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>flags: ${esc(p.flags)} · money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br>${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`).join('') || '<div class=c>Nobody flagged 👍</div>'}
 <h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});

@@ -2343,6 +2343,23 @@ function mini(X,id,an,t,x,y,hgt,face,ph){const d=SPRD[id];if(!sprOK(d))return fa
   const num=typeof an==='number',row=num?R[an]:an==='walk'?R[1]:an==='work'?R[2]:an==='cel'?R[5]:R[0],fps=num?[4,9,11,6,5,4][an]:an==='walk'?9:an==='work'?6:4,c=Math.floor(t*fps+(ph||0)*3)%4;
   const k=hgt/215,w=d.w||256,cw=w*SPCELL/256;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
   X.drawImage(d.im,c*cw,row*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);X.restore();return true;}
-window.CAMPAIGN={open,close,openGear,mini};
+
+// v16-45: ARENA (online PvP) – the battle team as numbers for the server (stats incl. gear) + a pose drawer for the arena fight
+function arenaTeam(){return curTeamList().filter(Boolean).map(h=>{const s=unitStats(h),R=ROLE[roleOf(h)];
+  return {id:h.id,n:h.n,gr:h.gr||0,s:stars(h),role:roleOf(h),hp:s.hp,atk:Math.round(s.atk*10)/10,def:Math.round(s.def*10)/10,as:Math.round(s.as*1000)/1000,crit:Math.round(s.crit*1000)/1000,rng:s.rng,eg:Math.round(s.eg*100)/100,pw:powS(s,R)};});}
+// pose: idle · walk · atk · skill · hurt · ko · win ; k = 0..1 progress of one-shot poses
+function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return false;const R=d.R||[0,1,2,3,4,5];let f;
+  if(ps==='walk')f=[R[1],Math.floor(t*9)%4];
+  else if(ps==='atk')f=[R[2],Math.min(3,Math.floor(k*4))];
+  else if(ps==='skill'){const cs=d.cs,n=cs?cs.length:d.n||4,i=Math.min(n-1,Math.floor(k*n));f=cs?cs[i]:[R[3],i];}
+  else if(ps==='hurt')f=d.hk?d.hk.h:d.noKO?[R[0],0]:[R[4],0];
+  else if(ps==='ko'){if(d.hk){const q=d.hk.ko;f=q[Math.min(q.length-1,Math.floor(k*q.length))];}else f=d.noKO?[R[0],0]:[R[4],k<.4?2:3];}
+  else if(ps==='win')f=[R[5],Math.floor(t*5)%4];
+  else f=[R[0],Math.floor(t*4)%4];
+  const kk=hgt/215,w=d.w||256,cw=w*SPCELL/256;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
+  if(ps==='ko'&&d.noKO)X.rotate(-Math.min(1,k*2.2)*Math.PI/2*.92);
+  X.drawImage(d.im,f[1]*cw,f[0]*SPCELL,cw,SPCELL,-d.a[0]*kk,-d.a[1]*kk,w*kk,256*kk);X.restore();return true;}
+const hasSpr=id=>!!SPRD[id];
+window.CAMPAIGN={open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));}};
 })();
