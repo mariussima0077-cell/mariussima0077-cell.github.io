@@ -3,6 +3,8 @@
 
 > 📜 **Ce am declarat la Google Play și ce NU avem voie să schimbăm → `PLAY_RULES.md`** (Claude îl citește înainte de orice schimbare).
 
+> 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
+
 ## ✅ CE E GATA (12 noiembrie 2026, seara)
 ### Jocul
 - **Joc online (v15)**: https://mariussima0077-cell.github.io/
