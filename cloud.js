@@ -9,6 +9,13 @@ const SAVE_KEY = 'torqueEmpire_v15';
 const T = () => window.__TE;
 const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){ return null; } };
 const API = () => window.SEC && SEC.api();
+// v16-44: game servers. Only S1 is open now. Each server = its own game; the cloud keeps one save per Google account per server.
+// ⚠️ Before opening S2: give each server its own local save key (SAVE_KEY+'_s2') – see NEXT_STEPS.md.
+const SERVERS = [
+  {id:1, n:'S1 · Torque City', st:'open'},
+  {id:2, n:'S2 · Nitro Bay',   st:'soon'},
+];
+let srv = +(LS('te_srv')||1); if(!SERVERS.find(x=>x.id===srv && x.st==='open')) srv = 1;
 let sess = LS('te_sess'), syncedT = +(LS('te_cloud_t')||0), lastHash = '', lastOk = 0, busy = false, gisLoaded = false, delArm = 0, asking = false;
 
 async function call(op, body, keep){
@@ -74,7 +81,7 @@ function choose(cloudMeta, why){
 
 // ---------- Google sign-in ----------
 async function onCred(resp){
-  const r = await call('login',{cred:resp.credential, pid:SEC.PID});
+  const r = await call('login',{cred:resp.credential, pid:SEC.PID, srv});
   if(!r.ok){ toast(r.err==='network'||r.err==='offline'?'⚠️ No internet – try again.':'⚠️ Google sign-in failed. Try again.',3500); return; }
   setSess(r.sess); toast('✓ Signed in with Google',2500);
   if(r.t && r.sum) choose({t:r.t, sum:r.sum}); else { setSynced(0); await upload(true); }
@@ -89,10 +96,45 @@ function loadGis(cb){
   document.head.appendChild(s);
 }
 
+// ---------- v16-44: the box on the start screen (server + Google account) ----------
+let sbox = null;
+function mountStart(el){ sbox = el; el.addEventListener('click', e=>e.stopPropagation()); refreshStart(); }
+function refreshStart(){
+  if(!sbox) return;
+  const S = SERVERS.find(x=>x.id===srv)||SERVERS[0];
+  let acc;
+  if(!CLIENT_ID) acc = '';
+  else if(sess) acc = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:800;color:#7ee787">✓ Google account · ☁️ Cloud save ON</div><div style="font-size:11px;color:#b8c4d0;text-align:center;margin-top:2px">Last saved: '+when(syncedT)+'</div>';
+  else acc = '<div id="gsiStart" style="min-height:40px;display:flex;justify-content:center"></div><div style="font-size:11px;color:#c8d2dc;text-align:center;margin-top:5px">Optional · keeps your game safe on a new phone</div>';
+  sbox.innerHTML = '<div style="width:min(88vw,330px);margin:0 auto;background:#0b1420d9;border:2px solid #e0a82e;border-radius:16px;padding:10px 12px;box-shadow:0 6px 20px #000a;font-family:system-ui;color:#fff">'+
+   '<button data-sv="open" style="width:100%;display:flex;align-items:center;gap:8px;background:#162235;border:1px solid #2b3a52;border-radius:12px;padding:8px 10px;color:#fff;font:800 14px system-ui;margin-bottom:'+(acc?'9px':'0')+'">'+
+   '<span style="font-size:18px">🌍</span><span style="flex:1;text-align:left"><span style="font-size:10px;color:#9fb0c0;display:block;letter-spacing:.5px">SERVER</span>'+S.n+'</span><span style="color:#7ee787;font-size:11px">● ONLINE</span><span style="color:#ffd54a;font-size:13px">▾</span></button>'+acc+'</div>';
+  if(CLIENT_ID && !sess) loadGis(()=>{ const b=document.getElementById('gsiStart'); if(b) google.accounts.id.renderButton(b,{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:280}); });
+}
+function serverList(){
+  const d = document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;z-index:98;background:#05070cdd;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui;color:#fff';
+  d.innerHTML='<div style="max-width:360px;width:100%;background:#0e1520;border:2px solid #e0a82e;border-radius:18px;padding:14px">'+
+   '<div style="font-size:18px;font-weight:900;text-align:center;margin-bottom:10px">🌍 Choose a server</div>'+
+   SERVERS.map(x=>{ const on=x.st==='open', cur=x.id===srv;
+     return '<button data-sv="'+(on?'pick':'')+'" data-id="'+x.id+'" style="width:100%;display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:11px 12px;border-radius:12px;font:800 14px system-ui;color:'+(on?'#fff':'#7d8a99')+';background:'+(cur?'#2a2410':'#141c2b')+';border:2px solid '+(cur?'#ffb300':'#2b3a52')+'">'+
+       '<span style="flex:1;text-align:left">'+x.n+'</span>'+(cur?'<span style="color:#ffd54a;font-size:11px">YOUR GAME</span>':on?'<span style="color:#7ee787;font-size:11px">● ONLINE</span>':'<span style="font-size:11px">🔒 COMING SOON</span>')+'</button>'; }).join('')+
+   '<div style="font-size:11px;color:#9fb0c0;text-align:center;margin:2px 0 10px">Each server is a separate game. New servers open as more players join.</div>'+
+   '<button data-sv="close" style="width:100%;padding:10px;border:0;border-radius:999px;background:#2b3a52;color:#fff;font:900 14px system-ui">CLOSE</button></div>';
+  d.addEventListener('click', e=>{ e.stopPropagation();
+    const b=e.target.closest('[data-sv]'); if(!b){ if(e.target===d) d.remove(); return; }
+    if(b.dataset.sv==='close'){ d.remove(); return; }
+    if(b.dataset.sv==='pick'){ const id=+b.dataset.id; if(id!==srv){ srv=id; LS('te_srv',String(id)); } d.remove(); refreshStart(); }
+  });
+  document.body.appendChild(d);
+}
+document.addEventListener('click', e=>{ const b=e.target.closest('[data-sv="open"]'); if(b){ e.stopPropagation(); serverList(); } }, true);
+
 // ---------- the box at the bottom of the Shop ----------
 let box = null;
 function mount(el){ box = el; refresh(); }
 function refresh(){
+  refreshStart();
   if(!box || !document.body.contains(box)) return;
   const st = 'background:#141c2b;border:1px solid #e0a82e55;border-radius:14px;padding:12px;margin:10px 0;font-size:13px;line-height:1.45';
   if(!CLIENT_ID){ box.innerHTML = SEC.TEST_MODE ? '<div style="'+st+'">☁️ <b>Google sign-in</b> – waiting for the Client ID (see PLAY_RULES.md). Players don\'t see this box yet.</div>' : ''; return; }
@@ -131,5 +173,5 @@ if(CLIENT_ID && sess){
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') upload(false, true); });
 }
 
-window.CLOUD = {mount, refresh, on:()=>!!(CLIENT_ID&&sess)};
+window.CLOUD = {mount, mountStart, refresh, srv:()=>srv, on:()=>!!(CLIENT_ID&&sess)};
 })();

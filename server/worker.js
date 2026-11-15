@@ -121,7 +121,9 @@ async function googleUser(cred, env) {                // checks the Google ID to
 async function cloud(op, b, env) {
   await ensureCloud(env); const db = env.DB, now = Date.now();
   if (op === 'login') {
-    const uid = await googleUser(b.cred, env); if (!uid) return {err:'bad_token'};
+    const gid = await googleUser(b.cred, env); if (!gid) return {err:'bad_token'};
+    const srv = Math.max(1, Math.min(99, parseInt(b.srv) || 1));      // v16-44: one cloud save per Google account PER SERVER (S1 keeps the old key)
+    const uid = srv > 1 ? gid + '#s' + srv : gid;
     let a = await db.prepare('SELECT uid,sess,pid,t,sum FROM accounts WHERE uid=?').bind(uid).first();
     if (!a) { const sess = crypto.randomUUID() + crypto.randomUUID();
       await db.prepare('INSERT INTO accounts(uid,sess,pid,created,t) VALUES(?,?,?,?,0)').bind(uid, sess, String(b.pid || '').slice(0, 64), now).run();

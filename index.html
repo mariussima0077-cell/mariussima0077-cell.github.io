@@ -59,6 +59,7 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #toast{position:fixed;left:50%;top:62px;transform:translateX(-50%);background:rgba(13,20,27,.94);border:1px solid #ffb30088;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:700;z-index:30;opacity:0;transition:opacity .4s;pointer-events:none;text-align:center;max-width:88vw}
 #loader{position:fixed;inset:0;z-index:10;background:#0b1420;transition:opacity .5s}
 #loader.hide{opacity:0;pointer-events:none}
+#lpanel{position:absolute;left:0;right:0;bottom:calc(24% + env(safe-area-inset-bottom));display:none}#lpanel.on{display:block;animation:lpIn .4s ease-out}@keyframes lpIn{from{opacity:0;transform:translateY(12px)}}
 #lcv{position:absolute;inset:0;width:100%;height:100%;display:block}
 .pack{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #1f2a35}
 .pack .th{flex:none;width:92px;height:70px;border-radius:12px;background:#1d2935;border:1px solid #ffb30055;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -507,7 +508,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
   <div id="shStats"></div>
   <button id="shBtn"></button>
 </div>
-<div id="loader"><canvas id="lcv"></canvas></div>
+<div id="loader"><canvas id="lcv"></canvas><div id="lpanel"></div></div>
 <script>
 (()=>{
 "use strict";
@@ -3131,7 +3132,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
- {id:12,d:'Nov 15, 2026',ic:'☁️',t:'Google cloud save',l:['You can now <b>sign in with Google</b> (optional): Shop → <b>Cloud save</b>.','Your game is kept safe and comes back on a new phone or after reinstalling.','We keep only an anonymous ID – never your e-mail or name. You can delete it any time.']},
+ {id:12,d:'Nov 15, 2026',ic:'☁️',t:'Google cloud save',l:['You can now <b>sign in with Google</b> (optional) on the start screen or in Shop → <b>Cloud save</b>.','The start screen also shows your <b>server</b> – more servers will open as more players join.','Your game is kept safe and comes back on a new phone or after reinstalling.','We keep only an anonymous ID – never your e-mail or name. You can delete it any time.']},
  {id:11,d:'Nov 15, 2026',ic:'✨',t:'Gear upgrade animation',l:['Upgrading gear now plays an animation: <b>UPGRADE SUCCESS!</b> with the new level and the new bonus – you see the result right away.','The gear card flashes in the bag too, and the page no longer jumps to the top.','Pages no longer blink when they refresh (pictures stay on screen).']},
  {id:10,d:'Nov 14, 2026',ic:'🎬',t:'Better battles',l:['Skills now play in <b>slow motion</b> – you can see every special move (at ×1, ×1.5 and ×2).','Mechanics no longer stand on top of each other.','All battles use the new effects.']},
  {id:9,d:'Nov 14, 2026',ic:'⚖️',t:'Balance update',l:['<b>Legendary and Mythic</b> mechanics are stronger. Stars after +5 give a bit less on low grades, so a new Legendary now beats an Uncommon +50.','<b>Chapter bosses</b> from Chapter 5 on are easier.','<b>NEVER GIVE UP</b> keeps growing: after 2 days your mechanics train faster (+15% every 6 h, up to +300%). Nobody stays stuck for long.','Building levels 6-10 cost more. Your garage now grows over several months.','Battle cards now show every mechanic\'s face. Mechanics only show the effects from their own animation.']},
@@ -3237,7 +3238,7 @@ function startLoader(){
   sizeLoader();addEventListener('resize',sizeLoader);const t0=performance.now();
   const assetsDone=()=>Object.values(IMG).every(i=>i.ok||i.bad);
   (function lf(now){if(started)return;const t=(now-t0)/1000;
-    const cap=assetsDone()?100:88;lp=Math.min(cap,lp+.9);if(lp>=100)lready=true;
+    const cap=assetsDone()?100:88;lp=Math.min(cap,lp+.9);if(lp>=100&&!lready){lready=true;if(window.CLOUD){CLOUD.mountStart($('lpanel'));$('lpanel').classList.add('on');}}
     drawLoader(t);requestAnimationFrame(lf);})(t0);
   $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
