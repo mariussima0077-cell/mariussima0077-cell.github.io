@@ -2502,7 +2502,7 @@ function renderPanel(){
   if(SOON_IDS.includes(sel))h+='<div class="lock">🚧 Coming soon – nothing to do here yet.</div>';
   if(locked)h+='<div class="lock">🔒 Unlocks at Reputation '+need+'. Sell more cars to grow your reputation.</div>';
   if(!nu&&!locked&&lv>=4&&lv<MAXLV)h+='<div class="stepNote">⬆️ From LV 4, each level is built in <b>'+UPN+' steps</b>. A step costs only money – no items needed. Every step already adds part of the bonus; after step '+UPN+'/'+UPN+' the building reaches <b>LV '+(lv+1)+'</b>.</div>';
-  $('shStats').innerHTML=h;
+  morph($('shStats'),h);
   const b=$('shBtn');if(nu){b.style.display='none';return;}b.style.display='';
   if(lv>=MAXLV){b.textContent='MAX LEVEL';b.disabled=true;}else if(locked){b.textContent='🔒 REPUTATION '+need+' NEEDED';b.disabled=true;}
   else{b.textContent=lv>=4?'⬆️ STEP '+(UPP(sel)+1)+'/'+UPN+' · '+fmt(cost):(lv===0?'BUILD ':'UPGRADE ')+fmt(cost);b.disabled=!can;}
@@ -2514,6 +2514,16 @@ $('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(!sel||N
   if(g){const p=L2W(g,150,75);fx=p.x;fy=p.y;}else if(sel==='parts'){fx=PB.x+PB.w/2;fy=PB.y+40;}else if(sel==='trailer'){fx=200;fy=TRAIL_Y-30;}else if(sel==='parking'){fx=600;fy=AY;}else if(sel==='security'){fx=SO_X+SO_W/2;fy=SO_Y+50;}else if(XIDS.includes(sel)){const r=xRect(sel);fx=r.x+r.w/2;fy=r.y+r.h*.4;}
   float(fx,fy,lv===0?'BUILT!':'LEVEL '+(lv+1)+'!','#ffd54a');
   for(let i=0;i<30;i++)parts.push({x:fx,y:fy,vx:rnd(-80,80),vy:rnd(-80,80),life:.7,max:.7,r:rnd(1.5,3),col:pick(['#ffd54a','#fff','#ff9800'])});};
+// v16-42: refresh a page WITHOUT re-creating its pictures (a re-created <img> blinks for a frame on cheap phones)
+function morph(el,html){const t=document.createElement('template');t.innerHTML=html;mKids(el,t.content);}
+function mKids(a,b){const an=a.childNodes,bn=[...b.childNodes];
+  for(let i=0;i<bn.length;i++){const o=an[i],n=bn[i];if(!o){a.appendChild(n);continue;}
+    if(o.nodeType!==n.nodeType||o.nodeName!==n.nodeName){a.replaceChild(n,o);continue;}
+    if(o.nodeType!==1){if(o.nodeValue!==n.nodeValue)o.nodeValue=n.nodeValue;continue;}
+    for(const at of [...o.attributes])if(!n.hasAttribute(at.name))o.removeAttribute(at.name);
+    for(const at of n.attributes)if(o.getAttribute(at.name)!==at.value)o.setAttribute(at.name,at.value);
+    mKids(o,n);}
+  while(an.length>bn.length)a.removeChild(a.lastChild);}
 let toastTO=0;function toast(t,ms){const el=$('toast');el.innerHTML=t;el.style.opacity=1;clearTimeout(toastTO);toastTO=setTimeout(()=>el.style.opacity=0,ms||3500);}
 
 // =================== DAILY QUESTS PAGE ===================
@@ -2892,7 +2902,7 @@ function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=ro
       x+='<div class="rsC'+(b?' better':'')+'" data-ro="bench" data-id="'+id+'">'+card(HB[id],own(id),b?'<i class="bt">▲ BETTER</i>':'')+'<span class="hint'+(b?' up':'')+'">'+(b?'▲ '+pctS(b.d)+' '+SLOTL[cat][0].split(' ')[0]+'<br>'+(b.cur?'replaces '+HB[b.cur].n:'empty place'):'no better place')+'</span></div>';});
     x+='</div>';}
   x+='<div class="rsNote">ℹ️ This page is only for the <b>garage</b> (repairs, security, driving). The <b>battle team</b> is chosen in ⚔️ Battle. Before any change you see <b>Before / After</b>.</div>';
-  rsBody.innerHTML=x;}
+  morph(rsBody,x);}
 rosEl.addEventListener('click',e=>{const t=e.target.closest('[data-ro]');if(!t)return;const a=t.dataset.ro;
   if(a==='back')closeRoster();else if(a==='cat'){rosCat=t.dataset.c;rosKey='';renderRoster();}
   else if(a==='auto')popAutoBest();else if(a==='coll'){closeRoster();openTeam(rosCat);}else if(a==='sum'){closeRoster();openSummon(rosCat);}
@@ -3022,7 +3032,7 @@ function renderTeam(){if(!teamEl.classList.contains('open'))return;const key=tea
     h+='<div class="fzList" style="'+box(46,1334,932,158)+'">'+(Y.length?Y.map(id=>'<div class="fzL'+(fuseSel.includes(id)?' picked':'')+'" data-t="fsel" data-id="'+id+'">'+fbox(HB[id],0,own(id).s)+'<b>'+HB[id].n+'</b></div>').join('')
       :'<div class="fzNone">None yet · summon Legendary '+C.n.toLowerCase()+' and get each one to +'+FUSE_S+'</div>')+'</div>';
   }
-  tmBox.innerHTML=h;}
+  morph(tmBox,h);}
 teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}const t=e.target.closest('[data-t]');if(!t)return;const a=t.dataset.t;
   if(a==='x')closeTeam();
   else if(a==='tk')popTickets();
@@ -3060,7 +3070,7 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV grn" style="'+box(860,836,265,70)+'">1 every '+IDLE_TK_H+'h</div>';
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
   h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+'</span></div>';
-  idlBox.innerHTML=h;}
+  morph(idlBox,h);}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
 function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;G.idle=SEC.now();save();closeIdle();
@@ -3121,6 +3131,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:11,d:'Nov 15, 2026',ic:'✨',t:'Gear upgrade animation',l:['Upgrading gear now plays an animation: <b>UPGRADE SUCCESS!</b> with the new level and the new bonus – you see the result right away.','The gear card flashes in the bag too, and the page no longer jumps to the top.','Pages no longer blink when they refresh (pictures stay on screen).']},
  {id:10,d:'Nov 14, 2026',ic:'🎬',t:'Better battles',l:['Skills now play in <b>slow motion</b> – you can see every special move (at ×1, ×1.5 and ×2).','Mechanics no longer stand on top of each other.','All battles use the new effects.']},
  {id:9,d:'Nov 14, 2026',ic:'⚖️',t:'Balance update',l:['<b>Legendary and Mythic</b> mechanics are stronger. Stars after +5 give a bit less on low grades, so a new Legendary now beats an Uncommon +50.','<b>Chapter bosses</b> from Chapter 5 on are easier.','<b>NEVER GIVE UP</b> keeps growing: after 2 days your mechanics train faster (+15% every 6 h, up to +300%). Nobody stays stuck for long.','Building levels 6-10 cost more. Your garage now grows over several months.','Battle cards now show every mechanic\'s face. Mechanics only show the effects from their own animation.']},
  {id:8,d:'Nov 14, 2026',ic:'👾',t:'New monster art in the campaign',l:['10 monsters are fully redrawn and animated: <b>Piston Imp, Tire Rat, Exhaust Snake, Bolt Crawler, Scrap Hound, Crankshaft Brute</b>.','New mini-boss: the <b>Turbo Wasp</b> (a different colour in every world).','New chapter bosses: <b>Junkyard Titan</b>, <b>Nitro Dragon</b> and the <b>Tow King</b>.','Every monster now walks, attacks, uses its skill, gets hit and falls apart with its own animation.']},
