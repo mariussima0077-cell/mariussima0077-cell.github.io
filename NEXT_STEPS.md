@@ -110,7 +110,8 @@
 - [ ] (Idee, nu e cerută încă) Ferestrele de info vechi (cartonaș erou, Rate Info, Summon History, Tickets, ferestrele din paginile online) încă au stilul vechi – se pot muta pe rama nouă de confirmare (`dlg_f`) fără poze noi.
 - [ ] Nefolosite încă (păstrate pentru mai târziu): `n_upg`, `g_mech/g_guard/g_driver/g_book/g_swap/g_edit`, `rk1-3`, `sp_chest/sp_dm`, `v_dm/v_gift/v_timer/v_ticket`, `q_trophy`.
 ### ⚔️ Conținut nou în bătălii – IDEI propuse (16 nov 2026, așteaptă alegerea lui Marius)
-- [ ] **Torque Tower** (turn, 300 etaje, o luptă pe etaj, recompense FIXE, boss la fiecare 10 etaje, modificatori pe etaj, clasament „cel mai sus etaj”).
+- [x] **Torque Tower – ALES de Marius (16 nov)** (turn, 300 etaje, o luptă pe etaj, recompense FIXE, boss la fiecare 10 etaje, modificatori pe etaj, clasament „cel mai sus etaj”).
+  - ⏳ Poze cerute (prompturi date lui Marius, 16 nov): 1) fundal pagină TOWER 9:16 · 2) titlu „TORQUE TOWER” · 3) iconiță TOWER (ca ARENA/CREW) · 4) kit etaje (normal / curent / boss / terminat / blocat) · 5) fundal de bătălie în turn 9:16 · 6) 6 iconițe de modificatori. Când vin: tăiere + machetă înainte/după, apoi integrare.
 - [ ] **Class Towers** (câte un turn pe clasă, deschise în anumite zile, doar eroii clasei respective).
 - [ ] **Boss zilnic / World Boss** (3 încercări pe zi, recompense după daunele făcute, clasament de daune).
 - [ ] **Trials zilnice** (Gear / Diamond / Ticket – farm pentru seturile pe clase).
