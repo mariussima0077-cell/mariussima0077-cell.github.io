@@ -2058,16 +2058,23 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);const T=TE(
     const ct=first?R.ct:0,dmw=first?R.dm:0;if(ct)G.h.ct+=ct;if(dmw)G.dm=(G.dm||0)+dmw; // v16-37: bosses give Crew Tickets + Diamonds
     T.save();if(tk)T.addTickets(tk,'Campaign '+lab);
     const chDone=first&&S0.boss&&S0.c<NCH-1;
-    html=`<div class="big" style="color:#ffd54a">VICTORY!</div><div class="stars">${'⭐'.repeat(st)}${'<span style="opacity:.25">⭐</span>'.repeat(3-st)}</div>
-      <div class="sub">STAGE ${lab} · ${S0.n.toUpperCase()}</div>${chDone?`<div class="chUn">CHAPTER ${S0.c+1} CLEARED!<br><small>Chapter ${S0.c+2} · ${CHAP[S0.c+1].n} is now open</small></div>`:''}<div class="cpSec">${first?'FIRST CLEAR REWARDS':'REPLAY REWARD'}</div>
-      <div class="rw"><span>${IMGI(badge('coin','#ffb300'))} ${T.fmt(money)}</span>${tk?`<span>${TKI} +${tk}</span>`:''}${gtk?`<span>${GTKI} +${gtk}</span>`:''}${ct?`<span><img class="tki" src="img/cticket.webp" style="height:1.15em;vertical-align:-.25em"> +${ct}</span>`:''}${dmw?`<span>${T.DMI} +${dmw}</span>`:''}</div>
+    // v16-47: Marius' VICTORY page – stars on the emblem (missing ones greyed), rewards in the 4 slots
+    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(money)]];if(tk)rws.push([TKI,'+'+tk]);if(gtk)rws.push([GTKI,'+'+gtk]);if(ct)rws.push(['<img src="img/cticket.webp">','+'+ct]);if(dmw)rws.push([T.DMI,'+'+dmw]);
+    html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY">${[0,1,2].map(k=>k<st?'':`<i class="stx s${k}"></i>`).join('')}
+      <div class="rsL">STAGE ${lab} · ${S0.n.toUpperCase()}<small>${first?'FIRST CLEAR REWARDS':'REPLAY REWARD'}</small></div>
+      ${rws.slice(0,4).map((r,k)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][k]}%">${r[0]}<b>${r[1]}</b></div>`).join('')}
+      <div class="rsU">${rws.length>4?rws.slice(4).map(r=>r[0]+' '+r[1]).join(' · ')+' · ':''}${st<3?'⭐⭐⭐ = no mechanic knocked out':'Perfect! No mechanic was knocked out.'}</div></div>
+      <div class="rsM">${chDone?`<div class="chUn">CHAPTER ${S0.c+1} CLEARED!<br><small>Chapter ${S0.c+2} · ${CHAP[S0.c+1].n} is now open</small></div>`:''}
       ${drops.length?`<div class="cpSec">${IMGI(glyphURL('bag','#ffb300'))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">Bag full (${GINV}) – sold for ${T.fmt(sold)}</div>`:''}`:''}
-      <div class="sub" style="margin-top:10px">${st<3?'⭐⭐⭐ = finish with no mechanic knocked out':'Perfect! No mechanic was knocked out.'}</div>
       ${si<NST-1?'<div class="anx" data-a="atog"><span>⟳ AUTO NEXT</span><i id="anxC"></i><b id="anxS"></b></div>':''}
-      <div class="cpRow">${si<NST-1?'<button class="cpGo" data-a="next">NEXT ▶</button>':''}<button class="cpGo alt" data-a="map">CAMPAIGN</button></div>${gtk?'<button class="cpGo alt" data-a="gsum">'+GTKI+' GEAR SUMMON</button>':''}${drops.length?'<button class="cpGo alt" data-a="gear">'+IMGI(glyphURL('bag','#ffd9b0'))+' EQUIP GEAR</button>':''}`;}
-  else{html=`<div class="big" style="color:#ff5252">${retreat?'RETREAT':'DEFEAT'}</div><div class="sub" style="margin:10px 0">STAGE ${lab} · ${S0.n.toUpperCase()}</div>
-      <div class="cpSec">HOW TO GET STRONGER</div><div style="font-size:13px;line-height:1.6;color:#e0c6ad">${IMGI(glyphURL('bag','#ffb300'))} Equip and upgrade <b>gear</b> (works only in battles)<br>${TKI} Summon more mechanics (higher color = much stronger)<br>⭐ Duplicates give +1 (up to +50)<br>🧪 Fusion: 3 Legendary +5 → 1 Mythic<br>${IMGI(glyphURL('bolt','#ffb300'))} Tap the glowing cards to use skills at the right moment</div>
-      <div class="cpRow"><button class="cpGo" data-a="retry">RETRY</button><button class="cpGo alt" data-a="team">TEAM</button></div><div class="cpRow"><button class="cpGo alt" data-a="gear">${IMGI(glyphURL('bag','#ffd9b0'))} GEAR</button><button class="cpGo alt" data-a="map">CAMPAIGN</button></div>`;}
+      <div class="cpRow">${si<NST-1?'<button class="cpGo" data-a="next">NEXT ▶</button>':''}<button class="cpGo alt" data-a="map">CAMPAIGN</button></div>${gtk?'<button class="cpGo alt" data-a="gsum">'+GTKI+' GEAR SUMMON</button>':''}${drops.length?'<button class="cpGo alt" data-a="gear">'+IMGI(glyphURL('bag','#ffd9b0'))+' EQUIP GEAR</button>':''}</div>`;}
+  else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">STAGE ${lab} · ${S0.n.toUpperCase()}<small>HOW TO GET STRONGER – tap one</small></div>
+      <div class="rsB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>works only in battles</span></div>
+      <div class="rsB b1" data-a="hsum">${TKI}<span><b>Summon more mechanics</b>higher color = much stronger · duplicates +1 star</span></div>
+      <div class="rsB b2" data-a="team"><img src="img/ui2/i_star1.webp"><span><b>Better team & skills</b>Fusion: 3 Legendary +5 → Mythic · tap TAP! cards</span></div>
+      <button class="rsGo" data-a="retry">RETRY</button></div>
+      <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="map">CAMPAIGN</button></div></div>`;}
+  $('cpResBox').classList.add('rsSk');
   $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;
   // v16-25: AUTO NEXT – after a victory the next stage starts by itself after a 3 s countdown (same team). Stops on defeat, on any tap, or with the switch.
   clearInterval(ANX.id);const canAuto=win&&si<NST-1;
@@ -2080,7 +2087,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);const T=TE(
     if(a==='atog'){G.cp.autoNext=G.cp.autoNext===false;T.save();anxGo();return;}
     clearInterval(ANX.id);ANX.n=0;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
     if(a==='next'){G.cp.ch=STAGES[si+1].c;showMap();openCard(si+1);}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openGear(null,si);}
-    else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();openGSum();}else showMap();};}
+    else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();openGSum();}else if(a==='hsum'){showMap();openGear(null,si);const T2=TE();if(T2.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T2.openSummon('m');}}else showMap();};}
 
 // ---------------------------------------------------------------- campaign map (5 chapters × 20 stages)
 const PH=2280;
