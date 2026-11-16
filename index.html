@@ -132,6 +132,7 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #smBox>*{position:absolute}
 .smN{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:calc(var(--u)*34);text-shadow:0 2px 0 #000;white-space:nowrap}
 .smA{display:flex;align-items:center;justify-content:center;color:#ffd54a;font-size:calc(var(--u)*90);font-weight:900;text-shadow:0 0 calc(var(--u)*12) #000,0 3px 0 #000;background:rgba(0,0,0,.35);border-radius:calc(var(--u)*20)}
+.smMy{position:absolute;left:4%;top:3%;width:92%;height:66%;border-radius:calc(var(--u)*14);background:radial-gradient(circle at 50% 35%,#ff5a5a,#8a0012 60%,#2a0006);box-shadow:inset 0 0 0 calc(var(--u)*3) #ff8a8a,0 0 calc(var(--u)*16) #ff1744;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}.smMy b{font:900 calc(var(--u)*25) system-ui;color:#fff;text-shadow:0 calc(var(--u)*2) 0 #5a0008;letter-spacing:calc(var(--u)*.5)}.smMy small{font:900 calc(var(--u)*18) system-ui;color:#ffd0d0;letter-spacing:calc(var(--u)*1.5)}
 .smDots{display:flex;gap:calc(var(--u)*22);align-items:center;justify-content:center}
 .smDots i{font-style:normal;width:calc(var(--u)*58);height:calc(var(--u)*36);border-radius:calc(var(--u)*18);display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*22);background:#33414f;opacity:.7}
 .smDots i.on{background:linear-gradient(#ffe066,#ffb300);opacity:1;box-shadow:0 0 calc(var(--u)*12) #ffb300}
@@ -587,7 +588,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #sheet.bldP .shtop{position:absolute;left:0;top:0;width:100%;height:calc(var(--bw)*392/1113);display:block}
 #sheet.bldP .shtop>div:first-child{position:absolute;left:8.5%;top:39.5%;width:44.5%;height:28%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
 #sheet.bldP #shTitle{font-size:min(4.6vw,19px);line-height:1.1;color:#ffe27a;text-shadow:0 2px 0 #000,0 0 8px #000}
-#sheet.bldP #shDots{position:absolute;left:0;top:calc(var(--bw)*307/1113);width:var(--bw);height:calc(var(--bw)*62/1113);margin:0;display:block}
+#sheet.bldP #shDots{position:absolute;left:calc(var(--bw)*-94.6/1113);top:calc(var(--bw)*152.2/1113);width:var(--bw);height:calc(var(--bw)*62/1113);margin:0;display:block}
 #sheet.bldP #shDots span{position:absolute;left:auto;right:calc(var(--bw)*-80/1113);top:-200%;display:none}
 #sheet.bldP .shtop>div:first-child::after{content:attr(data-lv);font:900 9.5px system-ui;color:#9fd3ff;letter-spacing:1px;margin-top:2px;text-shadow:0 1px 0 #000}
 #sheet.bldP #shDots i{position:absolute;top:0;width:calc(var(--bw)*62/1113);height:calc(var(--bw)*62/1113);margin:0;border-radius:50%;background:none;box-shadow:none}
@@ -662,9 +663,9 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .gSk b{display:block;color:#ffe27a;font-size:13px}.gSk.ps{border-color:#4aa3ff88}.gSk.ps b{color:#ffe082}
 #gInfo .gNote{background:linear-gradient(90deg,#0b2a5a,#123a7a,#0b2a5a);border:1px solid #4aa3ff88;border-radius:10px;color:#9fd3ff;padding:6px;font-size:11px;text-align:center}
 #gHero #gBtns{padding:8px 10px 24px;margin:0}
-#gFil{position:absolute;left:7.7%;width:84.8%;top:81.8%;height:14.6%;display:grid!important;grid-template-columns:repeat(7,1fr);gap:0 1.3%;padding:0!important;overflow:visible!important}
-#gFil .gf{height:100%;border:0;border-radius:9px;background:none;padding:0;justify-content:center}
-#gFil .gf img{width:auto;height:62%}
+#gFil{position:absolute;left:7.7%;width:84.8%;top:81.8%;height:14.6%;display:grid!important;grid-template-columns:repeat(7,1fr);grid-template-rows:100%;gap:0 1.3%;padding:0!important;overflow:visible!important}
+#gFil .gf{position:relative;height:100%!important;min-height:0!important;border:0;border-radius:9px;background:none;padding:0;justify-content:center;overflow:hidden}
+#gFil .gf img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:auto!important;height:62%!important}
 #gFil .gf.on{background:linear-gradient(#ffe27acc,#ffb300cc);box-shadow:0 0 10px #ffb300}
 #gBagFor{position:absolute;left:50%;transform:translateX(-50%);top:72.5%;font:800 9.5px system-ui;color:#fff;background:#000b;border-radius:6px;padding:1px 6px;white-space:nowrap}#gBagFor:empty{display:none}
 #gInv{padding:4px 4px 6px!important}
@@ -2944,7 +2945,7 @@ const HS={
  g:{cat:[.02,.04,.06,.09,.13,.18],spd:[.05,.10,.15,.22,.30,.42],rew:[.02,.04,.06,.09,.12,.18],shield:[0,0,0,.20,.35,.50]},
  d:{spd:[.05,.10,.16,.24,.34,.50],tip:[0,0,.10,.15,.22,.30]}};
 const SETB={
- m:[['inc',.02],['spd',.03],['inc',.04],['spd',.05],['inc',.08],['spd',.10]],
+ m:[['inc',0],['spd',0],['inc',0],['spd',0],['inc',0],['spd',0]], // v16-51: Marius – no garage bonus for the Mechanics collection any more; it is now the HERO COLLECTION battle bonus (battle.js CBON)
  g:[['cat',.02],['spd',.05],['cat',.03],['rew',.05],['cat',.05],['rew',.10]],
  d:[['spd',.04],['spd',.05],['tip',.05],['spd',.08],['tip',.08],['spd',.15]]};
 const SETN={inc:'💰 Job income',spd:{m:'⚡ Work speed',g:'🏃 Guard run speed',d:'🛵 Driver speed'},cat:'🛡️ Thief catch chance',rew:'💰 Thief reward',tip:'💵 Tip chance'};
@@ -3103,7 +3104,7 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   h+='<div style="'+box(664,6,72,70)+'background:radial-gradient(#1a2a3a 55%,transparent 72%);pointer-events:none"></div><img src="img/ui/diamond.svg" style="'+box(670,10,62,62)+'pointer-events:none;filter:drop-shadow(0 0 4px #000)"><div class="smN" id="smMoney" style="'+box(735,18,118,40)+'">'+(G.dm||0).toLocaleString()+'</div>';
   h+='<div data-a="back" style="'+box(10,6,88,76)+'"></div><div data-a="tkinfo" style="'+box(582,12,54,54)+'"></div><div data-a="tkinfo" style="'+box(408,12,170,54)+'"></div>';
   h+='<div data-a="arrow" data-d="-1" class="smA" style="'+box(4,470,64,110)+'">‹</div><div data-a="arrow" data-d="1" class="smA" style="'+box(853,470,64,110)+'">›</div>';
-  TILE_X.forEach((x,i)=>h+='<div data-a="tier" data-g="'+(i<5?i:6)+'" style="'+box(x-66,1035,132,170)+'"></div>');
+  TILE_X.forEach((x,i)=>h+='<div data-a="tier" data-g="'+i+'" style="'+box(x-66,1035,132,170)+'">'+(i===5?'<div class="smMy"><b>MYTHIC</b><small>FUSION</small></div>':'')+'</div>');
   h+='<div data-a="rates" style="'+box(812,950,64,60)+'"></div><div data-a="rates" style="'+box(20,1264,196,60)+'"></div><div data-a="hist" style="'+box(672,1264,230,60)+'"></div>';
   h+='<div class="smDots" style="'+box(330,1276,260,36)+'">'+SMK.map(c=>'<i data-a="cat" data-c="'+c+'" class="'+(c===smCat?'on':'')+'">'+CATS[c].ic+'</i>').join('')+'</div>';
   if(free)h+='<div class="smFree" style="'+box(150,1420,190,56)+'">FREE 👑</div>';
@@ -3317,7 +3318,9 @@ popEl.addEventListener('click',e=>{if(e.target===popEl){closePop();return;}const
 const teamEl=$('team'),tmBox=$('tmBox');let teamCat='m',teamTab='coll',teamKey='',fuseSel=[];
 ['img/team.webp','img/fusion.webp','img/idle.webp','img/ticket.webp'].forEach(s=>{(new Image()).src=s;});
 function fit(el,W,H){const k=Math.min(innerWidth/W,innerHeight/H);el.style.width=W*k+'px';el.style.height=H*k+'px';el.style.setProperty('--u',k+'px');}
-function openTeam(cat){if(cat)teamCat=cat;teamTab='coll';fuseSel=[];teamKey='';fit(tmBox,1024,1536);teamEl.classList.add('open');renderTeam();}
+// v16-51: the Mechanics collection moved to HEROES → HERO COLLECTION (battle bonus)
+function heroColl(){closeTeam();closeSummon();if(window.CAMPAIGN&&CAMPAIGN.openColl)CAMPAIGN.openColl();}
+function openTeam(cat,keep){if(!keep&&(cat||teamCat)==='m'){heroColl();return;}if(cat)teamCat=cat;teamTab='coll';fuseSel=[];teamKey='';fit(tmBox,1024,1536);teamEl.classList.add('open');renderTeam();}
 function closeTeam(){teamEl.classList.remove('open');}
 const TROWY=[597,659,720,782,843,906];
 const TABS=[[18,182,250,70],[285,182,225,70],[530,182,228,70],[776,182,230,70]];
@@ -3363,7 +3366,7 @@ function renderTeam(){if(!teamEl.classList.contains('open'))return;const key=tea
 teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}const t=e.target.closest('[data-t]');if(!t)return;const a=t.dataset.t;
   if(a==='x')closeTeam();
   else if(a==='tk')popTickets();
-  else if(a==='cat'){teamCat=t.dataset.c;teamTab='coll';teamKey='';renderTeam();}
+  else if(a==='cat'){if(t.dataset.c==='m'){heroColl();return;}teamCat=t.dataset.c;teamTab='coll';teamKey='';renderTeam();}
   else if(a==='fuse'){teamTab='fuse';fuseSel=[];teamKey='';renderTeam();}
   else if(a==='fcat'){teamCat=t.dataset.c;fuseSel=[];teamKey='';renderTeam();}
   else if(a==='tier')popTier(teamCat,+t.dataset.g);
@@ -3458,6 +3461,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:17,d:'Nov 16, 2026',ic:'🛡️',t:'Hero Sets & Hero Collection',l:['New <b>HERO SETS</b>: 7 sets (Iron Piston, Nitro Rush, Laser Scope, Field Medic, Color Storm, Thunder Coil, Torque King). Set pieces drop from <b>Rare</b> up in the campaign and in Gear Summon.','Every set belongs to one class – put it on a hero of that class: every piece from <b>2 to 6</b> unlocks a new battle bonus.','New <b>HERO COLLECTION</b> in HEROES: complete a color to give <b>all battle heroes</b> HP, Attack or Defense. It replaces the old Mechanics collection garage bonus.','Mythic heroes are now shown on the Summon page (they come only from Fusion).','Fixed: building level lights, Bag tabs and the Gear Summon subtitle.']},
  {id:16,d:'Nov 16, 2026',ic:'✨',t:'New look: buildings, campaign, crew & arena',l:['New <b>building window</b>: 10 level lights, every bonus with its next level, your crew and the upgrade button.','New <b>Campaign</b> header and a new <b>stage card</b>: enemies, VS power bar, rewards and your team before the fight.','New battle buttons: <b>pause</b>, <b>×1 / ×1.5 / ×2</b> and <b>AUTO</b>.','New <b>MY CREW</b>, <b>CHOOSE MECHANIC</b>, <b>AUTO BEST</b> and <b>GEAR SUMMON</b> pages.','<b>Arena</b>: new league shields, rival cards, FIGHT buttons, rankings and Cup frames.','New icons for Daily Quests, VIP, Shop, the left menu and the right menu (Rank, Chat, Check-in, News, Mail).','New <b>CREW SUMMON</b> header, new confirm windows and new message bar.']},
  {id:15,d:'Nov 16, 2026',ic:'🎨',t:'Brand-new look for the menus',l:['New top bar with your <b>💎 Diamonds</b> always visible.','New <b>Shop</b>, <b>VIP</b>, <b>News</b>, <b>Mail</b> and <b>Check-in</b> pages.','<b>HEROES</b>: your battle team now stands on the pedestals. Tap a hero to open his <b>gear page</b> – 6 slots around him and his stats below.','New <b>VICTORY</b> and <b>DEFEAT</b> screens after every battle.','New <b>BAG</b> page and a new <b>SALVAGE</b> page: salvage up to 20 items at once (worn gear is never salvaged).','New item card with <b>EQUIP</b> / <b>UPGRADE</b> / <b>SALVAGE</b>.','Online: new Ranking podium, Chat, Arena, Cup bracket (final 8) and Profile.','<b>Fixed</b>: the top bar of the <b>MY CREW</b> page was covered by an empty box.','<b>Fixed</b>: the hero gear page could stop working after equipping some gear.']},
  {id:14,d:'Nov 16, 2026',ic:'🦸',t:'New HEROES page – everything in one place',l:['Tap <b>HEROES</b> in the Campaign: your <b>battle team</b>, <b>all your heroes</b>, their <b>skills</b>, <b>gear</b> and <b>stars</b> – all on one page.','Tap a hero to see his skill and equip gear right there, then <b>➕ ADD TO BATTLE TEAM</b> (you always see before / after).','Stage card: <b>FIGHT!</b> starts right away with your team, or tap <b>✏️ HEROES</b> to change it.','The same team fights for you in the <b>Arena</b> and the <b>Torque Cup</b>.']},
@@ -3573,7 +3577,7 @@ function startLoader(){
     drawLoader(t);requestAnimationFrame(lf);})(t0);
   $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
-window.__TE={giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m');teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
+window.__TE={giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)window.CAMPAIGN.open();};

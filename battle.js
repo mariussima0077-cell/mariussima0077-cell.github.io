@@ -339,7 +339,35 @@ const css3=document.createElement('style');css3.textContent=`
 #gSum .gTop [data-gs=back]{position:absolute!important;left:2.93%;top:18.23%;width:10.27%;height:24.05%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:50%!important;color:transparent!important;font-size:1px!important;width:auto!important;height:auto!important}
 #gSum #gsTk{position:absolute!important;left:78.43%;top:23.29%;width:19.16%;height:13.42%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:30px!important;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding-right:6%!important;font:900 min(4.2vw,19px) system-ui!important;color:#fff!important;text-shadow:0 1px 0 #000}
 #gSum #gsTk img{position:absolute;left:1%;top:-6%;height:112%!important;width:auto;filter:drop-shadow(0 2px 2px #000)}
-#gSum .gsSub{position:absolute!important;left:31.07%;top:38.48%;width:37.49%;height:12.15%;display:flex;white-space:nowrap;align-items:center;justify-content:center;font:900 min(2.6vw,12px) system-ui;color:#9fd3ff;letter-spacing:1px;text-shadow:0 1px 0 #000}
+#gSum .gsSub{position:absolute!important;left:31.07%;top:38.48%;width:37.49%;height:12.15%;display:flex;white-space:nowrap;overflow:hidden;align-items:center;justify-content:center;font:900 min(2.7vw,12px) system-ui;color:#9fd3ff;letter-spacing:.5px;text-shadow:0 1px 0 #000}
+/* v16-51 sets + hero collection */
+.fc .setB{position:absolute;left:4%;top:5%;width:30%;height:auto;filter:drop-shadow(0 1px 2px #000);z-index:2;pointer-events:none}
+.itSet{display:block;color:#ffd54a!important;font-weight:900;letter-spacing:.3px;font-size:8.5px!important;line-height:1.1;margin-top:1px;white-space:nowrap}
+.setBl{display:flex;flex-direction:column;gap:3px;margin:4px 0 2px}
+.setBl>div{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:9px;background:#0b1424;box-shadow:inset 0 0 0 1px #34465f;color:#7f8fa3;font:800 11.5px system-ui}
+.setBl>div b{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1c2738;color:#9fb0c0;font-size:11px}
+.setBl>div span{flex:1}.setBl>div i{font-style:normal}
+.setBl>div.on{background:linear-gradient(90deg,#3a2a05,#122033);box-shadow:inset 0 0 0 1px #ffb300;color:#ffe9a8}.setBl>div.on b{background:linear-gradient(#ffe27a,#e08a00);color:#2a1000}
+.gSumRow2{display:flex;padding:7px 10px 0}
+.gsGo.col{flex:1;margin:0!important;height:auto!important;min-height:44px;display:flex!important;align-items:center;justify-content:center;gap:8px;background:linear-gradient(#a45cff,#5b1fb8 55%,#33106e)!important;box-shadow:0 0 0 2px #ffc23a,0 4px 0 #1a0638,0 0 16px #a45cff66!important;font-size:15px!important}
+.gsGo.col img{height:34px;width:auto;margin:-6px 0}.gsGo.col span{color:#ffe27a!important;font-size:12px!important}
+#gColl>.skBg{background:radial-gradient(ellipse at 50% 0,#1d3566,#070c18 70%)!important;filter:none}
+.gcW{position:relative;max-width:560px;margin:0 auto;padding:0 10px 30px}
+.gcTop{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:10px 0 8px;background:linear-gradient(#070c18 75%,#070c1800)}
+.gcTop .cpB{flex:none}
+.gcT{flex:1;text-align:center;font:900 22px system-ui;letter-spacing:1.5px;color:#ffe27a;text-shadow:0 2px 0 #6a3a00,0 0 10px #ffb30088;font-style:italic}
+.gcN{flex:none;min-width:64px;padding:4px 10px;border-radius:10px;background:#0b1424;box-shadow:inset 0 0 0 2px #e0a82e;font:900 15px system-ui;color:#fff;text-align:center}
+.gcSub{text-align:center;font:900 11.5px system-ui;letter-spacing:1.5px;color:#9fd3ff;margin:4px 0 6px}
+.gcBar{height:14px;border-radius:8px;background:#0b1424;box-shadow:inset 0 0 0 2px #e0a82e;overflow:hidden;margin:0 6px 12px}.gcBar i{display:block;height:100%;background:linear-gradient(90deg,#9e9e9e,#43c463,#29b6f6,#b04dff,#ffc400,#ff1744)}
+.gcRow{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 8px;margin:0 0 9px;padding:9px 12px;border-radius:14px;background:linear-gradient(90deg,var(--c3),#0b1424 70%);box-shadow:inset 0 0 0 2px var(--c),0 3px 0 #000a}
+.gcRow .gn{font:900 15px system-ui;color:var(--c);text-shadow:0 1px 0 #000;letter-spacing:.5px}
+.gcRow .gk{font:900 14px system-ui;color:#fff;text-align:right}
+.gcRow .gb{grid-column:1/-1;font:800 12px system-ui;color:#c9d6e2}.gcRow .gb b{color:#7CFC9A}
+.gcRow.ok{box-shadow:inset 0 0 0 2px var(--c),0 0 14px var(--c),0 3px 0 #000a}.gcRow.ok .gk::after{content:' ✓';color:#7CFC9A}
+.gcHs{grid-column:1/-1;display:flex;gap:5px;flex-wrap:wrap}
+.gcHs img{width:40px;height:40px;border-radius:8px;border:2px solid var(--c);object-fit:cover;background:#000}.gcHs img.no{filter:grayscale(1) brightness(.25);border-color:#333}
+.gcTot{margin:12px 4px 0;padding:10px 12px;border-radius:12px;background:#0b1424;box-shadow:inset 0 0 0 2px #ffb300;font:800 12.5px system-ui;color:#ffe9a8;text-align:center}
+.gcTot b{color:#7CFC9A}
 /*UI3MORE*/
 `;document.head.appendChild(css3);
 
@@ -355,12 +383,13 @@ root.innerHTML=`
 <div id="cpRes"><div class="cpBox" id="cpResBox"></div></div>
 <div id="cpGear" class="skP sk-heroes"><div class="skBg"></div>
 <div class="skH"><img class="hi" src="img/ui2/heroes_h.webp" alt=""><canvas id="gPedCv"></canvas><div id="gPeds"></div><div class="gTop2"><button class="cpB" data-g="back">↩</button><img class="gTi" src="img/ui/t_heroes.webp" alt="HEROES"><div id="gMoney"></div></div></div>
-<div class="skB" id="gBody"><div class="gSumRow"><button class="gsGo hs" id="gHSB" data-g="hsum"></button><button class="gsGo" id="gGSB"></button><button class="gsGo bag" data-g="bag"><img src="img/ui2/i_scrap.webp" alt=""><b>BAG</b><span id="gBagS"></span></button></div>
+<div class="skB" id="gBody"><div class="gSumRow"><button class="gsGo hs" id="gHSB" data-g="hsum"></button><button class="gsGo" id="gGSB"></button><button class="gsGo bag" data-g="bag"><img src="img/ui2/i_scrap.webp" alt=""><b>BAG</b><span id="gBagS"></span></button></div><div class="gSumRow2"><button class="gsGo col" data-g="coll"><img src="img/ui3/g_book.webp" alt=""><b>HERO COLLECTION</b><span id="gColS"></span></button></div>
 <div id="gTeam"></div><div class="gSecH">ALL HEROES <span id="gCnt"></span><span class="gSort" id="gSort"></span></div><div id="gHeroes"></div></div>
 <div id="gHero" class="gPg"><div class="skBg" style="background-image:url(img/ui2/equip_f.webp)"></div><div class="eqW"><img class="hi" src="img/ui2/equip_f.webp" alt=""><canvas id="gHeroCv"></canvas><div id="gHName"></div><div id="gMain"></div><div id="gStats"></div><button class="cpB gBk" data-g="hback">↩</button></div><div id="gInfo"></div><div id="gBtns"></div></div>
 <div id="gBag" class="skP sk-bag"><div class="skBg"></div><div class="skH"><img class="hi" src="img/ui2/bag_h.webp" alt=""><div id="gFil"></div><button class="cpB gBk" data-g="bback">↩</button><div id="gBagFor"></div></div><div class="skB" id="gInv"></div><div class="gBagBar"><span id="gBagN"></span><button data-g="salvP"><img src="img/ui2/i_scrap.webp" alt="">SALVAGE</button></div></div>
 <div id="gSalv" class="gPg"><div class="skBg" style="background-image:url(img/ui2/salvage_f.webp)"></div><div class="eqW sv"><img class="hi" src="img/ui2/salvage_f.webp" alt=""><button class="cpB gBk" data-g="sback">↩</button><div id="svSlots"></div><div id="svInfo"></div><button id="svGo" data-g="salvGo"></button></div><div id="svHelp"></div></div>
-<div id="gSum"><div class="gTop"><button class="cpB" data-gs="back">↩</button><div class="gTitle pic"><img src="img/ui/t_gsum.webp" alt="GEAR SUMMON"></div><div id="gsTk" class="gsTkP"></div><div class="gsSub">GEAR WORKS ONLY IN BATTLES</div></div>
+<div id="gColl" class="gPg"><div class="skBg"></div><div class="gcW" id="gcW"></div></div>
+<div id="gSum"><div class="gTop"><button class="cpB" data-gs="back">↩</button><div class="gTitle pic"><img src="img/ui/t_gsum.webp" alt="GEAR SUMMON"></div><div id="gsTk" class="gsTkP"></div><div class="gsSub">FOR BATTLES ONLY</div></div>
 <canvas id="gsHeroCv"></canvas><div id="gsTiles"></div><div id="gsPity"></div>
 <div class="gsBtns"><button id="gsB1" class="gsBtn" data-gs="1"><b>SUMMON x1</b><span>${GTKI0} 1</span></button><button id="gsB10" class="gsBtn big" data-gs="10"><b>SUMMON x10</b><span>${GTKI0} 10 · <i>+1 BONUS</i></span></button></div>
 <div class="gsLinks"><button class="cpB sm" data-gs="rates"><i class="ii">i</i> Rate Info</button><button class="cpB sm" data-gs="hist">📋 Summon History</button><button class="cpB sm" data-gs="gear" id="gsBag">BAG</button></div></div>
@@ -617,22 +646,45 @@ const GMAXLV=10,GSUBN=[0,0,1,1,2,2],GINV=150;
 const GDROP=[[60,30,9,1,0,0],[30,40,22,7,1,0],[10,30,38,18,4,0],[0,15,35,35,14,1],[0,0,25,42,28,5]];
 function GR(){const G=TE().G;if(!G.gear)G.gear={inv:[],eq:{},nid:1,kit:0};const g=G.gear;
   if(!g.kit){g.kit=1;['tool','helm','vest'].forEach(s=>g.inv.push(newItem(s,0)));}return g;}
-function newItem(s,r){const g=TE().G.gear;const st=GS[s].st,others=Object.keys(GSTAT).filter(k=>k!==st),sub=[];
+function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.keys(GSTAT).filter(k=>k!==st),sub=[];
   for(let i=0;i<GSUBN[r];i++){const k=others.splice(Math.floor(Math.random()*others.length),1)[0];sub.push([k,Math.round(GSTAT[k].v[r]*.4*10)/10]);}
-  return {id:g.nid++,s,r,lv:1,sub};}
+  const it={id:g.nid++,s,r,lv:1,sub};if(set)it.set=set;return it;}
 // v14: from chapter 6 on the chances keep improving until chapter 50
 function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,5,30,45,20];return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
 const GMAXR=[10,15,20,30,40,50],gMax=it=>GMAXR[it.r];
 function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;return Math.min(5,k);}
-function dropItem(c,bump){const g=GR();const it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rollR(c,bump));if(g.inv.length>=GINV){return {it,sold:salvageV(it)};}g.inv.push(it);return {it};}
+function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(g.inv.length>=GINV){return {it,sold:salvageV(it)};}g.inv.push(it);return {it};}
 const itemById=id=>id?GR().inv.find(i=>i.id===id):null;
 const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(1+.12*(it.lv-1))*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
-const itemName=it=>GNAMES[it.s][it.r];
+const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
 const salvageV=it=>Math.round(40*Math.pow(it.r+1,1.8)*(1+.5*(it.lv-1))/10)*10;
 function ownerOf(it){const eq=GR().eq;for(const hid in eq)for(const s in eq[hid])if(eq[hid][s]===it.id)return hid;return null;}
 function heroGear(hid,ov){const eq=GR().eq[hid]||{},o=[];for(const sl of GSLOT){const it=ov&&(sl.k in ov)?ov[sl.k]:itemById(eq[sl.k]);if(it)o.push(it);}return o;}
 const ZB={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};
+// ---------------------------------------------------------------- v16-51: HERO SETS (Marius: 6 special pieces per class; every extra piece unlocks a bonus, battle only)
+// a set piece is a normal item (any grade from Rare up) with it.set = class key; the bonus counts only on a hero of THAT class
+const SETS={
+ engine:{n:'Iron Piston',p:['Piston Hammer','Piston Helm','Piston Plate','Hydraulic Fists','Piston Boots','Engine Core'],t:[[['hp',8]],[['def',10]],[['atk',8]],[['hp',10]],[['def',15],['en',15]]]},
+ tuning:{n:'Nitro Rush',p:['Nitro Impact Gun','Nitro Racing Helmet','Nitro Racing Vest','Nitro Gloves','Nitro Jet Boots','Nitro Race ECU'],t:[[['atk',8]],[['crit',4]],[['aspd',8]],[['atk',10]],[['crit',6],['aspd',10]]]},
+ inspect:{n:'Laser Scope',p:['Laser Scanner','Scope Helmet','Circuit Vest','Laser Gloves','Light-Strip Boots','Scan Crystal'],t:[[['atk',8]],[['crit',4]],[['en',10]],[['atk',10]],[['crit',6],['en',15]]]},
+ service:{n:'Field Medic',p:['Healing Wrench','Medic Helmet','Medic Vest','Healing Gloves','Medic Boots','Heart Chip'],t:[[['hp',8]],[['en',10]],[['def',8]],[['hp',10]],[['en',20],['hp',8]]]},
+ paint:{n:'Color Storm',p:['Rainbow Spray Gun','Painter Mask','Splash Vest','Dripping Gloves','Splash Boots','Palette Chip'],t:[[['atk',8]],[['en',10]],[['hp',8]],[['atk',10]],[['en',15],['aspd',10]]]},
+ elec:{n:'Thunder Coil',p:['Tesla Wrench','Coil Helmet','Battery Vest','Arc Gloves','Spark Boots','Thunder Cell'],t:[[['atk',8]],[['aspd',8]],[['en',10]],[['atk',10]],[['aspd',10],['crit',6]]]},
+ all:{n:'Torque King',p:['Royal Scepter','Gear Crown','Royal Armor','Ruby Gauntlets','Gear-Wing Boots','Ruby Core'],t:[[['atk',6]],[['hp',6]],[['def',8]],[['atk',8]],[['hp',10],['en',10]]]}};
+const SETK=Object.keys(SETS),SET_MINR=2,SET_CH=.3; // Rare+ items: 30% are set pieces
+const rollSet=r=>r>=SET_MINR&&Math.random()<SET_CH?SETK[Math.floor(Math.random()*SETK.length)]:undefined;
+function setCount(h,items){const k=roleOf(h);return items.filter(it=>it.set===k).length;}
+function setBon(h,items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0},S=SETS[roleOf(h)];if(!S)return b;const n=setCount(h,items);
+  S.t.forEach((t,i)=>{if(n>=i+2)t.forEach(([k,v])=>b[k]+=v);});return b;}
+const setTierTxt=t=>t.map(([k,v])=>GSTAT[k].n+' +'+v+'%').join(' · ');
+function setBlock(k,n){return '<div class="setBl">'+SETS[k].t.map((t,i)=>`<div class="${n>=i+2?'on':''}"><b>${i+2}</b><span>${setTierTxt(t)}</span><i>${n>=i+2?'✓':'🔒'}</i></div>`).join('')+'</div>';}
+// v16-51: HERO COLLECTION = battle bonus (replaces the old Mechanics collection income bonus). Complete a color → all battle heroes get it
+const CBON=[[['hp',3]],[['atk',3]],[['def',5]],[['hp',5]],[['atk',6]],[['hp',5],['atk',5],['def',5]]];
+let cbK='',cbV=null;
+function collInfo(){const T=TE(),L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon);return [0,1,2,3,4,5].map(gr=>{const a=L.filter(h=>h.gr===gr);return {gr,tot:a.length,n:a.filter(h=>T.G.h.disc[h.id]).length};});}
+function collBon(){const T=TE(),k=Object.keys(T.G.h.disc).length;if(k===cbK&&cbV)return cbV;const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};
+  collInfo().forEach(c=>{if(c.tot&&c.n>=c.tot)CBON[c.gr].forEach(([s,v])=>b[s]+=v);});cbK=k;cbV=b;return b;}
 function gearBon(items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};for(const it of items){b[GS[it.s].st]+=mainV(it);for(const [k,v] of it.sub)b[k]+=v;}return b;}
 // item picture: rarity glow + drawn glyph
 // ---------------------------------------------------------------- v14: item pictures – every grade has its own drawing (36 items)
@@ -751,7 +803,7 @@ function itemIconURL(s,r){const key='it'+s+r;if(ICC[key])return ICC[key];const o
   x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r),0,0);x.restore();
   const u=c.toDataURL();if(ok)ICC[key]=u;return u;}
 function itemCard(it,extra,cls){const T=TE(),i=Math.min(5,it.r),r=T.FIN[i],p=T.FPL[i];
-  return `<div class="gi ${cls||''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp"><img class="fp" src="${itemIconURL(it.s,it.r)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span></div>${extra||''}</div>`;}
+  return `<div class="gi ${cls||''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp"><img class="fp" src="${itemIconURL(it.s,it.r)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
 
 // ---------------------------------------------------------------- team helpers
 function myMechs(){const T=TE(),o=[];
@@ -759,7 +811,7 @@ function myMechs(){const T=TE(),o=[];
   o.sort((a,b)=>pow(b)-pow(a));return o;}
 function stars(h){const o=TE().G.h.own[h.id];return o?o.s:0;}
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
-function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h));const b=h.crew?ZB:gearBon(heroGear(h.id,ov));
+function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h));let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];}
   return {hp:Math.round(R.hp*m*(1+b.hp/100)),atk:R.atk*m*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100),mv:R.mv,rng:R.rng,as:R.as/(1+b.aspd/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+b.en/100,b};}
 function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+(s.crit-R.crit)*.8)*(1+(s.eg-1)*.25)+s.def*4);}
 function pow(h,ov){return powS(unitStats(h,ov),ROLE[roleOf(h)]);}
@@ -2353,21 +2405,22 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gTeam').innerHTML=`<div class="gtH">⚔️ BATTLE TEAM <span style="color:#c9b88a;font-size:10px;letter-spacing:0">tap a pedestal · also for the Arena</span><button data-g="best">${IMGI(glyphURL('bolt','#2a1000'))} AUTO BEST</button></div>
     <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`;
   $m('gBagS').textContent=g.inv.length+'/'+GINV;
+  {const C=collInfo();$m('gColS').textContent=C.reduce((a,c)=>a+c.n,0)+' / '+C.reduce((a,c)=>a+c.tot,0);}
   $m('gCnt').textContent=L.length+' heroes';
   $m('gSort').innerHTML=[['pow','POWER'],['gr','GRADE']].map(([k,n])=>`<b data-sort="${k}" class="${gsort===k?'on':''}">${n}</b>`).join('');
   const fz=T.canFuse?T.canFuse:()=>false;
   $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">+${stars(m)}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
   $m('gHSB').innerHTML='🎟️ <b>HERO SUMMON</b><span>'+T.G.h.tk+' tickets</span>';
-  if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon mechanics first – the Rookie Crew can't use gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');return;}
+  if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon mechanics first – the Rookie Crew can't use gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`);
   $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
-  $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
+  $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setBlock(roleOf(h),n)}</div>`;})()}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
   const inT=team.includes(h.id);
   $m('gBtns').innerHTML=`<button class="cpGo ${inT?'tmo':'tm'}" data-g="${inT?'tout':'tin'}">${inT?'✖ REMOVE FROM TEAM':'➕ ADD TO BATTLE TEAM'}</button><button class="cpGo" data-g="fuse">${IMGI('img/ui2/i_star1.webp','1.5em','-.45em')} STARS +${stars(h)} ${fz(h.id)?'▲':''}</button><button class="cpGo" data-g="auto">${IMGI('img/ui2/i_energy.webp','1.5em','-.45em')} AUTO EQUIP</button><button class="cpGo alt" data-g="none">REMOVE ALL GEAR</button>`;
-  renderBag(h);if(gpg==='salv')renderSalv();}
+  renderBag(h);if(gpg==='salv')renderSalv();if(gpg==='coll')renderColl();}
 function renderBag(h){const T=TE(),g=GR();
   $m('gFil').innerHTML=[['all','ALL','bag'],...GSLOT.map(s=>[s.k,s.n,s.ic])].map(([k,n,ic])=>`<button class="gf${gfil===k?' on':''}" data-f="${k}"><img src="${glyphURL(ic,gfil===k?'#2a1000':'#ffd54a')}" alt="${n}"></button>`).join('');
   $m('gBagFor').innerHTML=h?`for <b style="color:${gcol(h)}">${h.n}</b> · ${gfil==='all'?'ALL GEAR':GS[gfil].n.toUpperCase()}`:'';
@@ -2384,7 +2437,19 @@ function pedLoop(t){pedRaf=0;const cg=$('cpGear');if(!cg.classList.contains('ope
   else if(gpg==='hero'){const h=gHero(),cv=$('gHeroCv'),r=cv.getBoundingClientRect();if(!h||!r.width)return;const dpr=Math.min(2,devicePixelRatio||1),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
     const X=cv.getContext('2d');X.clearRect(0,0,W,H);if(hasSpr(h.id))pose(X,h.id,'idle',s,0,W*.5,H*.93,H*.62,1);}}
 function pedGo(){if(!pedRaf)pedRaf=requestAnimationFrame(pedLoop);}
-function gPage(p){gpg=p;['gHero','gBag','gSalv'].forEach(id=>$(id).classList.toggle('open',id==={hero:'gHero',bag:'gBag',salv:'gSalv'}[p]));if(p==='bag')$('gInv').scrollTop=0;if(p==='hero')$('gHero').scrollTop=0;if(p==='salv'){svPick=null;renderSalv();}renderPeds(pedList);pedGo();}
+// v16-51: HERO COLLECTION page (battle bonus). Until Marius' picture arrives it is drawn with CSS.
+function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n=C.reduce((a,c)=>a+c.n,0),b=collBon();
+  let x=`<div class="gcTop"><button class="cpB" data-g="cback">↩</button><div class="gcT">HERO COLLECTION</div><div class="gcN">${n} / ${tot}</div></div>
+   <div class="gcSub">⚔️ BATTLE BONUS · COMPLETE A COLOR</div><div class="gcBar"><i style="width:${tot?Math.round(n/tot*100):0}%"></i></div>`;
+  C.forEach(c=>{const g=T.GRADES[c.gr],ok=c.tot&&c.n>=c.tot,L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon&&h.gr===c.gr);
+    x+=`<div class="gcRow${ok?' ok':''}" style="--c:${g.c};--c3:${g.c}33"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}</span>
+     <span class="gb">${ok?'<b>ACTIVE</b> · ':'🔒 '}All battle heroes: ${setTierTxt(CBON[c.gr])}${c.gr===5?' <small>(Mythic = Fusion)</small>':''}</span>
+     <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${d?portraitURL(h):T.portrait(h,1)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:''} alt="">`;}).join('')}</div></div>`;});
+  const act=Object.keys(b).filter(k=>b[k]).map(k=>GSTAT[k].n+' +'+b[k]+'%');
+  x+=`<div class="gcTot">${act.length?'Your collection bonus in every battle: <b>'+act.join(' · ')+'</b>':'Complete a whole color to get its bonus in every battle.'}<br><small style="color:#9fb0c0">Works in the campaign and in the Arena. Summon new heroes to fill the collection.</small></div>
+   <button class="cpGo" data-g="hsum" style="margin-top:12px;width:100%">🎟️ HERO SUMMON</button>`;
+  morph($('gcW'),x);}
+function gPage(p){gpg=p;['gHero','gBag','gSalv','gColl'].forEach(id=>$(id).classList.toggle('open',id==={hero:'gHero',bag:'gBag',salv:'gSalv',coll:'gColl'}[p]));if(p==='coll'){renderColl();$('gColl').scrollTop=0;}if(p==='bag')$('gInv').scrollTop=0;if(p==='hero')$('gHero').scrollTop=0;if(p==='salv'){svPick=null;renderSalv();}renderPeds(pedList);pedGo();}
 // v16-47: SALVAGE page – up to 20 free (not worn) items at once, auto-picked by grade; tap an item to keep it
 let svG=[1,1,0,0,0,0],svPick=null,svSkip=new Set();
 function svList(){const g=GR();return g.inv.filter(it=>!ownerOf(it)&&svG[Math.min(5,it.r)]&&!svSkip.has(it.id)).sort((a,b)=>a.r-b.r||a.lv-b.lv).slice(0,20);}
@@ -2403,7 +2468,7 @@ function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)retur
   const mx=it.lv>=gMax(it),c=mx?0:upCost(it);
   let b1='';if(h){b1=o===h.id?`<button class="b1" data-p="ueq" data-it="${it.id}">UNEQUIP</button>`:`<button class="b1" data-p="eq" data-it="${it.id}">EQUIP<small>on ${h.n}</small></button>`;}else b1='<button class="b1 dis">EQUIP</button>';
   let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itIc">${itemCard(it)}</div>
-   <div class="itNm"><b style="color:${T.GRADES[it.r].c}">${itemName(it)}</b><small>${T.GRADES[it.r].n} ${sl.n} · Lv ${it.lv}/${gMax(it)}</small></div>
+   <div class="itNm"><b style="color:${T.GRADES[it.r].c}">${itemName(it)}</b><small>${T.GRADES[it.r].n} ${sl.n} · Lv ${it.lv}/${gMax(it)}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
    <div class="itSt">${rows.slice(0,4).join('')}</div>
    <div class="itBt">${b1}<button class="b2${mx||G.money<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?'MAX LEVEL':`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${T.fmt(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${T.fmt(salvageV(it))}</small></button></div></div><div class="itMore">`;
   if(h){const cur=itemById((g.eq[h.id]||{})[it.s]);
@@ -2411,6 +2476,7 @@ function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)retur
     else{const xc=[],xp=[];if(cur)xc.push(`Replaces <b style="color:${T.GRADES[cur.r].c}">${itemName(cur)}</b> Lv ${cur.lv} (goes back to the bag)`);
       if(oh){const d=pow(oh)-pow(oh,{[it.s]:null});xc.push(`Taken from <b>${oh.n}</b> (his power −${d.toLocaleString()})`);}
       x+=`<div class="cpSec">BEFORE / AFTER ON ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:it},xp,xc);}}
+  if(it.set){const n=h&&roleOf(h)===it.set?setCount(h,heroGear(h.id)):0;x+=`<div class="cpSec">${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n.toUpperCase()} ONLY</div>`+setBlock(it.set,n);}
   if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(Lv ${it.lv} ➜ ${it.lv+1})</small></div>`;}
   x+='</div>';
   if(keep)morph($('cpPopBox'),x);else pop(x);$('cpPopBox').classList.add('itPop');}
@@ -2444,12 +2510,13 @@ function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
 $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts]');if(!el)return;
-  if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
+  if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
   if(el.dataset.g==='auto'){popAuto();return;}if(el.dataset.g==='none'){popNone();return;}
   if(el.dataset.g==='best'){popAutoBest();return;}
   if(el.dataset.g==='hback'||el.dataset.g==='bback'){gPage(el.dataset.g==='bback'&&gpgFrom==='hero'?'hero':'');return;}
   if(el.dataset.g==='bag'){gpgFrom='';gfil='all';renderGear();gPage('bag');return;}
   if(el.dataset.g==='salvP'){gPage('salv');return;}
+  if(el.dataset.g==='coll'){gPage('coll');return;}if(el.dataset.g==='cback'){gPage('');if(collHome){collHome=0;$('cpGear').classList.remove('open');close();}return;}
   if(el.dataset.g==='sback'){gPage('bag');return;}
   if(el.dataset.g==='svReset'){svSkip.clear();renderSalv();return;}
   if(el.dataset.g==='salvGo'){const L=svPick||[];if(!L.length)return;let sum=0;L.forEach(it=>sum+=salvageV(it));
@@ -2496,7 +2563,7 @@ function gsRoll(){const g=GSD(),p=g.pity;p.e++;p.l++;p.m++;let x=Math.random()*1
 function gsummon(n,paid){const T=TE(),g=GSD();
   if(!paid&&g.tk<n){const have=g.tk;T.payAsk(have,n,GTKI,'Gear Tickets',()=>{g.tk-=have;T.G.dm-=(n-have)*T.DM_SUM;gsummon(n,1);},pop);return;}
   if(!paid)g.tk-=n;const cnt=n===10?11:1,res=[];let sold=0;
-  for(let k=0;k<cnt;k++){const r=gsRoll(),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,r);g.sum++;
+  for(let k=0;k<cnt;k++){const r=gsRoll(),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,r,rollSet(r));g.sum++;
     g.hist.unshift({s:it.s,r,t:Date.now()});if(g.inv.length>=GINV){sold+=salvageV(it);res.push({it,sold:1});}else{g.inv.push(it);res.push({it});}}
   g.hist.length=Math.min(g.hist.length,60);if(sold)T.G.money+=sold;T.save();gsBadge();renderGSum();gsResults(res,n,sold);}
 function gsBadge(){const b=$('cpGSB');if(b)b.innerHTML='<span>'+GTKI.replace('1.15em','1.3em')+' <b>'+GSD().tk+'</b></span><small>SUMMON</small>';}
@@ -2570,6 +2637,7 @@ function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return fal
   if(ps==='ko'&&d.noKO)X.rotate(-Math.min(1,k*2.2)*Math.PI/2*.92);
   X.drawImage(d.im,f[1]*cw,f[0]*SPCELL,cw,SPCELL,-d.a[0]*kk,-d.a[1]*kk,w*kk,256*kk);X.restore();return true;}
 const hasSpr=id=>!!SPRD[id];
-window.CAMPAIGN={passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
+let collHome=0;
+window.CAMPAIGN={openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
