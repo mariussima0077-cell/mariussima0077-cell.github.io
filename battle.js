@@ -341,8 +341,9 @@ const css3=document.createElement('style');css3.textContent=`
 #gSum #gsTk img{position:absolute;left:1%;top:-6%;height:112%!important;width:auto;filter:drop-shadow(0 2px 2px #000)}
 #gSum .gsSub{position:absolute!important;left:31.07%;top:38.48%;width:37.49%;height:12.15%;display:flex;white-space:nowrap;overflow:hidden;align-items:center;justify-content:center;font:900 min(2.7vw,12px) system-ui;color:#9fd3ff;letter-spacing:.5px;text-shadow:0 1px 0 #000}
 /* v16-51 sets + hero collection */
-.fc .setB{position:absolute;left:4%;top:5%;width:30%;height:auto;filter:drop-shadow(0 1px 2px #000);z-index:2;pointer-events:none}
+.fc .setB{position:absolute;left:3%;top:3%;width:34%;height:auto;filter:drop-shadow(0 1px 2px #000);z-index:2;pointer-events:none}
 .itSet{display:block;color:#ffd54a!important;font-weight:900;letter-spacing:.3px;font-size:8.5px!important;line-height:1.1;margin-top:1px;white-space:nowrap}
+.setPc{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:5px 0 3px}.setPc>div{display:flex;flex-direction:column;align-items:center;border-radius:9px;background:#0b1424;box-shadow:inset 0 0 0 1px #34465f;padding:2px 1px 3px}.setPc img{width:100%;aspect-ratio:1;object-fit:contain;filter:grayscale(1) brightness(.45)}.setPc small{font:800 7.5px/1.1 system-ui;color:#6f7f93;text-align:center;min-height:2.2em}.setPc>div.on{background:linear-gradient(#3a2a05,#122033);box-shadow:inset 0 0 0 1px #ffb300}.setPc>div.on img{filter:drop-shadow(0 0 4px #ffb30088)}.setPc>div.on small{color:#ffe9a8}
 .setBl{display:flex;flex-direction:column;gap:3px;margin:4px 0 2px}
 .setBl>div{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:9px;background:#0b1424;box-shadow:inset 0 0 0 1px #34465f;color:#7f8fa3;font:800 11.5px system-ui}
 .setBl>div b{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1c2738;color:#9fb0c0;font-size:11px}
@@ -353,6 +354,20 @@ const css3=document.createElement('style');css3.textContent=`
 .gsGo.col img{height:34px;width:auto;margin:-6px 0}.gsGo.col span{color:#ffe27a!important;font-size:12px!important}
 #gColl>.skBg{background:radial-gradient(ellipse at 50% 0,#1d3566,#070c18 70%)!important;filter:none}
 .gcW{position:relative;max-width:560px;margin:0 auto;padding:0 10px 30px}
+.gcPic{position:relative;width:min(100%,calc((100vh - 10px)*.6667));margin:0 auto;container-type:inline-size}
+.gcPic>*{position:absolute}.gcPic>.gcBg{position:relative;display:block;width:100%;height:auto;pointer-events:none}
+.gcL{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;font:900 4.4cqw/1.05 system-ui;text-shadow:0 .3cqw 0 #000,0 0 1cqw #000;pointer-events:none}
+.gcN2{font-size:3.6cqw;white-space:nowrap}
+.gcBar2{border-radius:3cqw;overflow:hidden;pointer-events:none}.gcBar2 i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#9e9e9e,#43c463,#29b6f6,#b04dff,#ffc400,#ff1744);opacity:.85}
+.gcBar2 span{position:relative;display:flex;height:100%;align-items:center;justify-content:center;color:#fff;font:900 2.6cqw system-ui;letter-spacing:.15cqw;text-shadow:0 .25cqw 0 #000,0 0 .8cqw #000;white-space:nowrap}
+.gcK{font-size:3.6cqw;color:#cfd8dc;white-space:nowrap}.gcK.ok{color:#7CFC9A}
+.gcB b{font-size:3.3cqw;color:#ffe9a8;white-space:nowrap}.gcB small{font:900 1.9cqw system-ui;color:#8fa3b8;letter-spacing:.1cqw;margin-top:.5cqw}.gcB.ok b{color:#7CFC9A}.gcB.ok small{color:#7CFC9A}
+.gcCh{pointer-events:none;border-radius:2cqw}.gcCh:not(.ok){background:radial-gradient(#0000 40%,#0006 75%)}
+.gcCh.ok{box-shadow:0 0 3cqw #7CFC9A88;animation:gcGl 1.6s ease-in-out infinite alternate}@keyframes gcGl{to{box-shadow:0 0 1cqw #7CFC9A44}}
+.gcCh i{position:absolute;right:-1cqw;top:-1cqw;width:5cqw;height:5cqw;border-radius:50%;background:#2e7d32;color:#fff;font:900 3.4cqw/5cqw system-ui;text-align:center;font-style:normal;box-shadow:0 0 0 .4cqw #fff}
+.gcGo{font-size:6.4cqw;color:#3a1d00;text-shadow:0 .3cqw 0 #fff8;letter-spacing:.3cqw;pointer-events:auto;cursor:pointer}
+.gcA{cursor:pointer}
+
 .gcTop{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:10px 0 8px;background:linear-gradient(#070c18 75%,#070c1800)}
 .gcTop .cpB{flex:none}
 .gcT{flex:1;text-align:center;font:900 22px system-ui;letter-spacing:1.5px;color:#ffe27a;text-shadow:0 2px 0 #6a3a00,0 0 10px #ffb30088;font-style:italic}
@@ -678,6 +693,7 @@ function setCount(h,items){const k=roleOf(h);return items.filter(it=>it.set===k)
 function setBon(h,items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0},S=SETS[roleOf(h)];if(!S)return b;const n=setCount(h,items);
   S.t.forEach((t,i)=>{if(n>=i+2)t.forEach(([k,v])=>b[k]+=v);});return b;}
 const setTierTxt=t=>t.map(([k,v])=>GSTAT[k].n+' +'+v+'%').join(' · ');
+function setPcs(k,items){return '<div class="setPc">'+GSLOT.map((sl,i)=>{const on=(items||[]).some(it=>it.set===k&&it.s===sl.k);return `<div class="${on?'on':''}"><img src="img/ui4/st_${k}_${sl.k}.webp" alt=""><small>${SETS[k].p[i]}</small></div>`;}).join('')+'</div>';}
 function setBlock(k,n){return '<div class="setBl">'+SETS[k].t.map((t,i)=>`<div class="${n>=i+2?'on':''}"><b>${i+2}</b><span>${setTierTxt(t)}</span><i>${n>=i+2?'✓':'🔒'}</i></div>`).join('')+'</div>';}
 // v16-51: HERO COLLECTION = battle bonus (replaces the old Mechanics collection income bonus). Complete a color → all battle heroes get it
 const CBON=[[['hp',3]],[['atk',3]],[['def',5]],[['hp',5]],[['atk',6]],[['hp',5],['atk',5],['def',5]]];
@@ -795,15 +811,21 @@ const IDRAW={
 // v15: the 6 gear pictures from the player (same picture for every grade – the grade shows in the frame and the glow)
 const ITIMG={};['tool','helm','vest','glove','boots','chip'].forEach(k=>{const i=new Image();i.src='img/ui/it_'+k+'.webp';ITIMG[k]=i;});
 const itOK=s=>ITIMG[s]&&ITIMG[s].complete&&ITIMG[s].naturalWidth>0;
-function itemArtCv(s,r){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.lineJoin='round';x.lineCap='round';
+// v16-52: Marius' set pictures (7 classes × 6 pieces, img/ui4/st_<class>_<slot>.webp) – a set piece shows its own picture
+let stT=0;const stRe=()=>{clearTimeout(stT);stT=setTimeout(()=>{try{if($('cpGear').classList.contains('open'))renderGear();}catch(e){}},150);}; // a set picture arrived → redraw the open HEROES / BAG page once
+const STIMG={};function stImg(set,s){const k=set+'_'+s;if(!STIMG[k]){const i=new Image();i.onload=stRe;i.src='img/ui4/st_'+k+'.webp';STIMG[k]=i;}return STIMG[k];}
+const stOK=(set,s)=>{const i=stImg(set,s);return i.complete&&i.naturalWidth>0;};
+function itemArtCv(s,r,set){if(set&&stOK(set,s)){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');if(r>=3){x.save();x.shadowColor=['','','','#d070ff','#ffd54a','#ff3d3d'][r];x.shadowBlur=r>=5?18:12;x.drawImage(STIMG[set+'_'+s],6,6,116,116);x.restore();}x.drawImage(STIMG[set+'_'+s],6,6,116,116);return c;}
+  return itemArtCv0(s,r);}
+function itemArtCv0(s,r){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.lineJoin='round';x.lineCap='round';
   if(itOK(s)){if(r>=3){x.save();x.shadowColor=['','','','#d070ff','#ffd54a','#ff3d3d'][r];x.shadowBlur=r>=5?18:12;x.drawImage(ITIMG[s],10,10,108,108);x.restore();}x.drawImage(ITIMG[s],10,10,108,108);}else IDRAW[s](x,r);return c;}
-function itemIconURL(s,r){const key='it'+s+r;if(ICC[key])return ICC[key];const ok=itOK(s);const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+function itemIconURL(s,r,set){const key='it'+s+r+(set||'');if(ICC[key])return ICC[key];const ok=set?stOK(set,s):itOK(s);const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
   const col=TE().GRADES[r].c,dk=TE().GRADES[r].d;const bg=x.createRadialGradient(64,58,6,64,64,96);bg.addColorStop(0,hexC(col,-.15));bg.addColorStop(.45,dk);bg.addColorStop(1,'#07090c');x.fillStyle=bg;x.fillRect(0,0,128,128);
   x.globalAlpha=.18;x.strokeStyle='#fff';x.lineWidth=10;for(let i=0;i<8;i++){x.save();x.translate(64,64);x.rotate(i/8*TAU+.2);x.beginPath();x.moveTo(0,0);x.lineTo(0,-100);x.stroke();x.restore();}x.globalAlpha=1;
-  x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r),0,0);x.restore();
+  x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r,set),0,0);x.restore();
   const u=c.toDataURL();if(ok)ICC[key]=u;return u;}
 function itemCard(it,extra,cls){const T=TE(),i=Math.min(5,it.r),r=T.FIN[i],p=T.FPL[i];
-  return `<div class="gi ${cls||''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp"><img class="fp" src="${itemIconURL(it.s,it.r)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
+  return `<div class="gi ${cls||''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp"><img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
 
 // ---------------------------------------------------------------- team helpers
 function myMechs(){const T=TE(),o=[];
@@ -977,7 +999,10 @@ function glyphURL(k,col,sz){sz=sz||64;const key='g'+k+col+sz;if(ICC[key])return 
 const IMGI=(src,h,va)=>`<img src="${src}" style="height:${h||'1.2em'};vertical-align:${va||'-.28em'}">`;
 const ROLECOL={engine:'#ff7043',tuning:'#29b6f6',inspect:'#3d7cf0',service:'#00a58e',paint:'#e0457b',elec:'#18b26b',all:'#ffb300',crew:'#ef6c00'};
 const ROLEGL={engine:'cog',tuning:'flag',inspect:'scan',service:'wrench',paint:'brush',elec:'bolt',all:'star',crew:'nut'};
-const roleBadge=(r,sz)=>badge(ROLEGL[r],ROLECOL[r],sz||64);
+// v16-52: Marius' class icons with the English name (img/ui4/cls_<class>.webp); Crew keeps the drawn badge
+const CLSI={};['engine','tuning','inspect','service','paint','elec','all'].forEach(k=>{const i=new Image();i.src='img/ui4/cls_'+k+'.webp';CLSI[k]=i;});
+const roleBadge=(r,sz)=>CLSI[r]?'img/ui4/cls_'+r+'.webp':badge(ROLEGL[r],ROLECOL[r],sz||64);
+const roleBadgeCv=r=>CLSI[r]&&CLSI[r].complete&&CLSI[r].naturalWidth?CLSI[r]:badgeCv(ROLEGL[r],ROLECOL[r],64);
 
 // ---------------------------------------------------------------- hero look
 function lookOf(h){const T=TE();let sd=hash(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
@@ -2057,7 +2082,7 @@ function drawFCard(u,x,y,cw,ch,ready,t){const h=u.h,i=h.crew?0:Math.min(5,h.gr|0
   if(ready){g.fillStyle='rgba(255,179,0,'+(.18+.15*Math.sin(t*8))+')';g.fillRect(wx,wy,ww,wh);}
   g.restore();
   // role badge (top-left of the window) · +stars on the bottom plate
-  const rb=Math.min(18,ww*.34);g.drawImage(badgeCv(ROLEGL[u.role],ROLECOL[u.role],64),wx+2,wy+2,rb,rb);
+  const rb=Math.min(18,ww*.34);g.drawImage(roleBadgeCv(u.role),wx+1,wy+1,rb*1.25,rb*1.25);
   const P=FPLT[i],py=Y((P[0]+P[1]/2)/100*ih),st=h.crew?'CREW':'+'+stars(h);
   g.font='900 '+Math.max(7,Math.min(10,fw/7))+'px system-ui';g.textAlign='center';g.lineWidth=2.5;g.strokeStyle='#000';g.strokeText(st,fx+fw/2,py+3.5);g.fillStyle=GR.c;g.fillText(st,fx+fw/2,py+3.5);
   if(ready){g.font='900 '+Math.round(cw/4.6)+'px system-ui';g.lineWidth=3;g.strokeStyle='#000';g.strokeText('TAP!',x+cw/2,wy+wh*.42);g.fillStyle='#fff3c4';g.fillText('TAP!',x+cw/2,wy+wh*.42);}
@@ -2416,7 +2441,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`);
   $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
-  $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setBlock(roleOf(h),n)}</div>`;})()}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
+  $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setPcs(roleOf(h),heroGear(h.id))}${setBlock(roleOf(h),n)}</div>`;})()}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
   const inT=team.includes(h.id);
   $m('gBtns').innerHTML=`<button class="cpGo ${inT?'tmo':'tm'}" data-g="${inT?'tout':'tin'}">${inT?'✖ REMOVE FROM TEAM':'➕ ADD TO BATTLE TEAM'}</button><button class="cpGo" data-g="fuse">${IMGI('img/ui2/i_star1.webp','1.5em','-.45em')} STARS +${stars(h)} ${fz(h.id)?'▲':''}</button><button class="cpGo" data-g="auto">${IMGI('img/ui2/i_energy.webp','1.5em','-.45em')} AUTO EQUIP</button><button class="cpGo alt" data-g="none">REMOVE ALL GEAR</button>`;
@@ -2438,16 +2463,27 @@ function pedLoop(t){pedRaf=0;const cg=$('cpGear');if(!cg.classList.contains('ope
     const X=cv.getContext('2d');X.clearRect(0,0,W,H);if(hasSpr(h.id))pose(X,h.id,'idle',s,0,W*.5,H*.93,H*.62,1);}}
 function pedGo(){if(!pedRaf)pedRaf=requestAnimationFrame(pedLoop);}
 // v16-51: HERO COLLECTION page (battle bonus). Until Marius' picture arrives it is drawn with CSS.
+// v16-52: HERO COLLECTION on Marius' picture (img/ui4/coll.webp, 1024×1536) – positions in % of the picture
+const cP=(x,y,w,h)=>`left:${x/10.24}%;top:${y/15.36}%;width:${w/10.24}%;height:${h/15.36}%;`;
+const CROWY=[610,742,870,998,1122,1247],GSH={hp:'HP',atk:'ATK',def:'DEF',crit:'CRIT',aspd:'SPEED',en:'ENERGY'};
+const cbTxt=t=>t.every(([,v])=>v===t[0][1])?t.map(([k])=>GSH[k]).join(' · ')+' +'+t[0][1]+'%':t.map(([k,v])=>GSH[k]+' +'+v+'%').join(' ');
 function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n=C.reduce((a,c)=>a+c.n,0),b=collBon();
-  let x=`<div class="gcTop"><button class="cpB" data-g="cback">↩</button><div class="gcT">HERO COLLECTION</div><div class="gcN">${n} / ${tot}</div></div>
-   <div class="gcSub">⚔️ BATTLE BONUS · COMPLETE A COLOR</div><div class="gcBar"><i style="width:${tot?Math.round(n/tot*100):0}%"></i></div>`;
-  C.forEach(c=>{const g=T.GRADES[c.gr],ok=c.tot&&c.n>=c.tot,L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon&&h.gr===c.gr);
-    x+=`<div class="gcRow${ok?' ok':''}" style="--c:${g.c};--c3:${g.c}33"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}</span>
-     <span class="gb">${ok?'<b>ACTIVE</b> · ':'🔒 '}All battle heroes: ${setTierTxt(CBON[c.gr])}${c.gr===5?' <small>(Mythic = Fusion)</small>':''}</span>
-     <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${d?portraitURL(h):T.portrait(h,1)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:''} alt="">`;}).join('')}</div></div>`;});
   const act=Object.keys(b).filter(k=>b[k]).map(k=>GSTAT[k].n+' +'+b[k]+'%');
-  x+=`<div class="gcTot">${act.length?'Your collection bonus in every battle: <b>'+act.join(' · ')+'</b>':'Complete a whole color to get its bonus in every battle.'}<br><small style="color:#9fb0c0">Works in the campaign and in the Arena. Summon new heroes to fill the collection.</small></div>
-   <button class="cpGo" data-g="hsum" style="margin-top:12px;width:100%">🎟️ HERO SUMMON</button>`;
+  let x=`<div class="gcPic"><img class="gcBg" src="img/ui4/coll.webp" alt="HERO COLLECTION">
+   <div class="gcA" data-g="cback" style="${cP(13,33,112,112)}border-radius:50%"></div>
+   <div class="gcL gcN2" style="${cP(858,64,150,54)}">${n} / ${tot}</div>
+   <div class="gcBar2" style="${cP(101,491,823,34)}"><i style="width:${tot?Math.round(n/tot*100):0}%"></i><span>${act.length?'ACTIVE: '+act.join(' · '):'COMPLETE A COLOR = BONUS FOR ALL HEROES'}</span></div>`;
+  C.forEach(c=>{const g=T.GRADES[c.gr],ok=c.tot&&c.n>=c.tot,y=CROWY[c.gr];
+    x+=`<div class="gcA" data-gcr="${c.gr}" style="${cP(20,y-58,970,116)}"></div>
+     <div class="gcL gcK${ok?' ok':''}" style="${cP(381,y-31,96,62)}">${c.n}/${c.tot}</div>
+     <div class="gcL gcB${ok?' ok':''}" style="${cP(500,y-31,308,62)}"><b>${cbTxt(CBON[c.gr])}</b><small>${ok?'✓ ACTIVE · ALL HEROES':c.gr===5?'LOCKED · MYTHIC = FUSION':'LOCKED · ALL HEROES'}</small></div>
+     <div class="gcCh${ok?' ok':''}" style="${cP(835,y-52,138,104)}">${ok?'<i>✓</i>':''}</div>`;});
+  x+=`<div class="gcL gcGo" data-g="hsum" style="${cP(200,1352,624,92)}">HERO SUMMON</div></div>
+   <div class="gcSub">YOUR HEROES · tap a color above to jump to it</div>`;
+  C.forEach(c=>{const g=T.GRADES[c.gr],L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon&&h.gr===c.gr);
+    x+=`<div class="gcRow${c.tot&&c.n>=c.tot?' ok':''}" id="gcr${c.gr}" style="--c:${g.c};--c3:${g.c}33"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}</span>
+     <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${d?portraitURL(h):T.portrait(h,1)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:''} alt="">`;}).join('')}</div></div>`;});
+  x+=`<div class="gcTot"><small style="color:#9fb0c0">The bonus works in the campaign and in the Arena. Summon new heroes to fill the collection.</small></div>`;
   morph($('gcW'),x);}
 function gPage(p){gpg=p;['gHero','gBag','gSalv','gColl'].forEach(id=>$(id).classList.toggle('open',id==={hero:'gHero',bag:'gBag',salv:'gSalv',coll:'gColl'}[p]));if(p==='coll'){renderColl();$('gColl').scrollTop=0;}if(p==='bag')$('gInv').scrollTop=0;if(p==='hero')$('gHero').scrollTop=0;if(p==='salv'){svPick=null;renderSalv();}renderPeds(pedList);pedGo();}
 // v16-47: SALVAGE page – up to 20 free (not worn) items at once, auto-picked by grade; tap an item to keep it
@@ -2488,7 +2524,7 @@ function upFx(it,v0,p0){const T=TE(),st=GSTAT[GS[it.s].st],col=T.GRADES[it.r].c,
   const bx=$('cpPopBox');let o=$('upFx');if(o)o.remove();o=document.createElement('div');o.id='upFx';o.style.setProperty('--c',col);
   const dp=h&&ownerOf(it)===h.id?pow(h)-p0:0;
   let sp='';for(let i=0;i<16;i++){const a=i/16*6.283+Math.random()*.3,d=70+Math.random()*60;sp+=`<i style="--x:${Math.cos(a)*d|0}px;--y:${Math.sin(a)*d|0}px;--d:${(Math.random()*.15).toFixed(2)}s"></i>`;}
-  o.innerHTML=`<div class="ufRays"></div><div class="ufSp">${sp}</div><div class="ufIc"><img src="${itemIconURL(it.s,it.r)}"></div>
+  o.innerHTML=`<div class="ufRays"></div><div class="ufSp">${sp}</div><div class="ufIc"><img src="${itemIconURL(it.s,it.r,it.set)}"></div>
     <div class="ufT">${mx?'MAX LEVEL!':'UPGRADE SUCCESS!'}</div><div class="ufL">Lv ${it.lv-1} <b>➜</b> <span>Lv ${it.lv}</span></div>
     <div class="ufS">${IMGI(glyphURL(st.ic,st.col),'1.1em','-.22em')} ${st.n} +${v0}% <b>➜</b> <span>+${mainV(it)}%</span></div>${dp>0?`<div class="ufP">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.15em')} Power +${dp.toLocaleString()}</div>`:''}`;
   const P=$('cpPop').getBoundingClientRect(),cd=bx.querySelector('.iTop>.gi,.itIc>.gi'),cr=cd&&cd.getBoundingClientRect();let cy=cr&&cr.bottom>40&&cr.top<P.height-40?cr.top+cr.height/2:P.height*.42;o.style.top=Math.max(0,Math.min(P.height-300,cy-P.top-130))+'px';
@@ -2509,13 +2545,14 @@ function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(
   x+=cmpForHero(h,ov,[],[])+`<button class="cpGo" data-p="aok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`;pop(x);}
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
-$('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts]');if(!el)return;
+$('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr]');if(!el)return;
   if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
   if(el.dataset.g==='auto'){popAuto();return;}if(el.dataset.g==='none'){popNone();return;}
   if(el.dataset.g==='best'){popAutoBest();return;}
   if(el.dataset.g==='hback'||el.dataset.g==='bback'){gPage(el.dataset.g==='bback'&&gpgFrom==='hero'?'hero':'');return;}
   if(el.dataset.g==='bag'){gpgFrom='';gfil='all';renderGear();gPage('bag');return;}
   if(el.dataset.g==='salvP'){gPage('salv');return;}
+  if(el.dataset.gcr!=null){const r=$('gcr'+el.dataset.gcr);if(r)r.scrollIntoView({behavior:'smooth',block:'center'});return;}
   if(el.dataset.g==='coll'){gPage('coll');return;}if(el.dataset.g==='cback'){gPage('');if(collHome){collHome=0;$('cpGear').classList.remove('open');close();}return;}
   if(el.dataset.g==='sback'){gPage('bag');return;}
   if(el.dataset.g==='svReset'){svSkip.clear();renderSalv();return;}
@@ -2639,5 +2676,5 @@ function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return fal
 const hasSpr=id=>!!SPRD[id];
 let collHome=0;
 window.CAMPAIGN={openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
