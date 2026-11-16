@@ -104,10 +104,13 @@
 ### 🎨 Poze UI
 - [x] Toate pozele cerute pe 16 nov au venit și sunt în joc (v16-49 + v16-50). **Nu mai lipsește nicio imagine cerută.**
 - [x] **Cele 11 poze cerute pe 16 nov (v16-51) au venit și sunt în joc (v16-52)**: HERO SUMMON header, fundal SUMMON, HERO COLLECTION, iconițele celor 7 clase, cele 7 seturi.
-- [ ] **Opționale (propuse lui Marius 16 nov, nu sunt obligatorii – jocul merge fără ele):**
-  1. Iconiță de clasă **CREW / ROOKIE** în același stil (cerc auriu + panglică) – acum eroii crew din bătălie au încă insigna desenată.
-  2. **GEAR SUMMON** – fundal ca cel nou de la Hero Summon, dar cu loc pentru echipament (acum pagina Gear Summon are doar antetul nou, corpul e din CSS).
-  3. **Fereastră de info** (Rate Info / Summon History / Tickets / cartonașul eroului) – se pot pune și pe rama de confirmare `dlg_f` existentă, fără poze noi.
+- [ ] **DE FĂCUT (Marius: „ține minte”, 16 nov; prompturi date în chat, vin în alt chat):**
+  1. Iconiță de clasă **CREW** (cerc auriu + panglică CREW) → înlocuiește insigna desenată (`roleBadge('crew')`).
+  2. **GEAR SUMMON** – fundal 2:3 ca `sum_bg`, cu forjă/nicovală și 6 dale de grad → corpul paginii `#gSum` (acum CSS).
+  3. **INFO WINDOW kit** – ramă de fereastră + 6 rânduri în culorile gradelor + rând neutru → Rate Info, Summon History, Tickets, lista de grad (popTier), cartonașul eroului; și lista „YOUR HEROES” de sub HERO COLLECTION.
+  4. **SMALL UI kit** – plăcuță monedă (diamante), ramă de bară + umplere aurie + umplere curcubeu, bifă verde, lacăt, etichetă roșie FUSION → summon (diamante, pity, FUSION) + collection (bara, ✓ pe cufere).
+  5. **SET PANEL kit** – slot mic de piesă (gol / aprins) + rând de bonus (blocat / activ) cu medalion rotund → secțiunea SET de pe pagina eroului (acum CSS).
+  ⚠️ Textele cu numere/nume (bilete, diamante, 26/42, bonusuri, nume eroi) rămân scrise din cod – se schimbă în joc. Doar ramele devin poze.
 - [ ] (Idee, nu e cerută încă) Ferestrele de info vechi (cartonaș erou, Rate Info, Summon History, Tickets, ferestrele din paginile online) încă au stilul vechi – se pot muta pe rama nouă de confirmare (`dlg_f`) fără poze noi.
 - [ ] Nefolosite încă (păstrate pentru mai târziu): `n_upg`, `g_mech/g_guard/g_driver/g_book/g_swap/g_edit`, `rk1-3`, `sp_chest/sp_dm`, `v_dm/v_gift/v_timer/v_ticket`, `q_trophy`.
 ### 📌 NU UITA: APK „normal” (decis 14 nov 2026, de făcut când jocul e stabil)
