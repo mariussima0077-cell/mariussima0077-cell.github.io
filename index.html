@@ -317,7 +317,7 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 #team{position:fixed;inset:0;z-index:9;background:rgba(5,8,12,.9)!important;display:none;align-items:center;justify-content:center;flex-direction:row!important}
 #team.open{display:flex}
 #tmBox,#idlBox{position:relative;--u:.4px;background:url(img/team.webp) center/100% 100% no-repeat}
-#tmBox.fz{background-image:url(img/fusion.webp)}
+#tmBox{background:#0b1220}#tmBox.tall{border-radius:0}
 #idlBox{background-image:url(img/idle.webp)}
 #tmBox>*,#idlBox>*{position:absolute;box-sizing:border-box}
 #idl{position:fixed;inset:0;z-index:12;background:rgba(5,8,12,.8);display:none;align-items:center;justify-content:center}
@@ -3388,7 +3388,8 @@ const SETI={inc:'💰',spd:'⚡',cat:'🛡️',rew:'💰',tip:'💵'};
 function tkCnt(){return '<div class="tmTk" data-t="tk" style="'+box(870,26,126,48)+'"><img src="img/ticket.webp"><span>'+G.h.tk+'</span></div>';}
 function renderTeam(){if(!teamEl.classList.contains('open'))return;const key=teamCat+teamTab+HVER+fuseSel.join()+G.h.tk;if(key===teamKey)return;teamKey=key;
   const C=CATS[teamCat],ci=CATK.indexOf(teamCat);let h='';
-  tmBox.className=teamTab==='fuse'?'fz':'';
+  tmBox.className=teamTab==='fuse'?'fz':'';const fz=teamTab==='fuse',M=TALL.map(1024,1536,fz?[[1118,.5],[1249,.5]]:[[565,.35],[950,.65]]);
+  TALL.size(tmBox,M);BXM=M;h+=TALL.bg(M,fz?'img/fusion.webp':'img/team.webp',0,0,1024,1536);
   h+='<div data-t="x" style="'+box(26,12,104,70)+'"></div>'+tkCnt();
   if(teamTab==='coll'){
     TABS.forEach((r,i)=>h+='<div data-t="'+(i<3?'cat':'fuse')+'" data-c="'+(CATK[i]||'')+'" class="tmTab'+(i===ci?' on':'')+'" style="'+box(r[0],r[1],r[2],r[3])+'"></div>');
@@ -3422,7 +3423,7 @@ function renderTeam(){if(!teamEl.classList.contains('open'))return;const key=tea
     h+='<div class="fzList" style="'+box(46,1334,932,158)+'">'+(Y.length?Y.map(id=>'<div class="fzL'+(fuseSel.includes(id)?' picked':'')+'" data-t="fsel" data-id="'+id+'">'+fbox(HB[id],0,own(id).s)+'<b>'+HB[id].n+'</b></div>').join('')
       :'<div class="fzNone">None yet · summon Legendary '+C.n.toLowerCase()+' and get each one to +'+FUSE_S+'</div>')+'</div>';
   }
-  morph(tmBox,h);}
+  BXM=null;morph(tmBox,h);}
 teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}const t=e.target.closest('[data-t]');if(!t)return;const a=t.dataset.t;
   if(a==='x')closeTeam();
   else if(a==='tk')popTickets();
@@ -3466,7 +3467,7 @@ idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}cons
 function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;G.idle=SEC.now();save();closeIdle();
   toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
-addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open'))fit(tmBox,1024,1536);if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
+addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open')){teamKey='';renderTeam();}if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
 // ---------- map: grade badge over heroes ----------
 function heroBadge(p,h,s){if(!DET||!onScreen(p.x,p.y,20))return;const g=GRADES[h.gr],y=p.y-(p.miniOK?27:17);
