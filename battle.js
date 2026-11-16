@@ -2679,13 +2679,14 @@ function openGSum(){$('gSum').classList.add('open');renderGSum();}
 function closeGSum(){$('gSum').classList.remove('open');cancelAnimationFrame(gsRaf);if($('cpGear').classList.contains('open'))renderGear();}
 // v16-53: GEAR SUMMON on Marius' background (img/ui5/gsum_bg.webp, 1024x1536) under the GEAR SUMMON header (img/ui3/gsum_h.webp);
 // box 1024 x 1836 units, background from y=300. Same idea as the HERO SUMMON page.
-const GSU=n=>'calc(var(--u)*'+n+')',gbx=(x,y,w,h)=>'left:'+GSU(x)+';top:'+GSU(y)+';width:'+GSU(w)+';height:'+GSU(h)+';';
+let GYM=null;const GSU=n=>'calc(var(--u)*'+n+')',gbx=(x,y,w,h)=>{if(GYM){const t=GYM.top(y);h=GYM.end(y+h)-t;y=t;}return 'left:'+GSU(x)+';top:'+GSU(y)+';width:'+GSU(w)+';height:'+GSU(h)+';';};
 const GEMX=[143,296,446,596,744,894];
-function gsSize(){const b=$('gsBox');if(!b)return;const k=Math.min(innerWidth/1024,innerHeight/1836);b.style.width=1024*k+'px';b.style.height=1836*k+'px';b.style.setProperty('--u',k+'px');}
-addEventListener('resize',()=>{if($('gSum').classList.contains('open'))gsSize();});
+const gsMap=()=>TALL.map(1024,1836,[[958,.25],[1272,.2],[1390,.15],[1546,.15],[1642,.25]]);
+function gsSize(){const b=$('gsBox');if(!b)return;TALL.size(b,gsMap());}
+addEventListener('resize',()=>{if($('gSum').classList.contains('open'))renderGSum();});
 function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
   const pc=Math.min(100,p.l/GS_PITY.l*100);
-  let h='<img class="gsBg" src="img/ui5/gsum_bg.webp" alt="" style="'+gbx(0,300,1024,1536)+'"><img class="gsHd" src="img/ui3/gsum_h.webp" alt="GEAR SUMMON" style="'+gbx(0,0,1024,415)+'">';
+  const M=gsMap();GYM=M;let h=TALL.bg(M,'img/ui5/gsum_bg.webp',0,300,1024,1536,'gsBg')+'<img class="gsHd" src="img/ui3/gsum_h.webp" alt="GEAR SUMMON" style="'+gbx(0,0,1024,415)+'">';
   h+='<div data-gs="back" style="'+gbx(26,62,112,108)+'border-radius:50%"></div>';
   h+='<div class="gsL gsTkN" data-gs="rates" style="'+gbx(803,97,196,56)+'">'+GTKI+' '+g.tk+'</div>';
   h+='<div class="gsL" style="'+gbx(318,160,384,50)+'font-size:'+GSU(26)+';color:#9fd3ff">FOR BATTLES ONLY</div>';
@@ -2701,7 +2702,7 @@ function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
   h+='<i class="gsFill" style="'+gbx(99,1570,Math.max(pc?54:0,832*pc/100).toFixed(1),47)+'"></i>';
   h+='<div class="gsL" style="'+gbx(90,1562,850,63)+'font-size:'+GSU(28)+'">LEGENDARY PITY&nbsp;<b style="color:#ffd54a">'+p.l+' / '+GS_PITY.l+'</b></div>';
   h+='<div class="gsL gsCol" data-gs="gear" style="'+gbx(150,1660,725,135)+'">BAG '+g.inv.length+' / '+GINV+'<small>EQUIP YOUR HEROES</small></div>';
-  $('gsBox').innerHTML=h;}
+  GYM=null;$('gsBox').innerHTML=h;}
 function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r));
   let x=`<h2 style="color:${T.GRADES[best].c}">${best>=5?'MYTHIC GEAR!':best>=4?'LEGENDARY GEAR!':'GEAR SUMMONED'}</h2><div class="sub">${res.length} item${res.length>1?'s':''}${n===10?' · +1 BONUS':''}</div>
    <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${T.GRADES[o.it.r].c}">${GS_NAMES[o.it.r]}</i><i>${itemName(o.it)}</i>${o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
@@ -2748,11 +2749,12 @@ const twOK=()=>TE().G.cp.best>=TW_UNLOCK;
 const TWA={};function twArenaImg(){if(!TWA.im){TWA.im=new Image();TWA.im.decoding='async';TWA.im.src='img/ui6/tw_arena.webp';}return TWA.im;}
 function twPower(f){const F=twFloor(f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 function twRewHtml(r,big){const T=TE(),a=[];if(r.dm)a.push(T.DMI+' '+r.dm);if(r.gtk)a.push(GTKI+' '+r.gtk);if(r.tk)a.push(TKI+' '+r.tk);if(r.ct)a.push('<img src="img/cticket.webp" alt=""> '+r.ct);if(big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
-function twSize(){const b=$('twBox');if(!b)return;const k=Math.min(innerWidth/1024,innerHeight/1786);b.style.width=1024*k+'px';b.style.height=1786*k+'px';b.style.setProperty('--u',k+'px');}
-addEventListener('resize',()=>{if($('tw').classList.contains('open'))twSize();});
+const twMap=()=>TALL.map(1024,1786,[[1100,1]]);
+function twSize(){const b=$('twBox');if(!b)return;TALL.size(b,twMap());}
+addEventListener('resize',()=>{if($('tw').classList.contains('open'))twRender();});
 // box 1024 x 1786 units: title 0-346, background from y=250 (panel inside = 56..970 x 852..1334)
 function twRender(){const T=TE(),t=twG(),cur=Math.min(TW_N,t.b+1),done=t.b>=TW_N;twSize();
-  let h='<img class="gsBg" src="img/ui6/tw_bg.webp" alt="" style="'+gbx(0,250,1024,1536)+'"><img class="gsHd" src="img/ui6/tw_h.webp" alt="TORQUE TOWER" style="'+gbx(0,0,1024,346)+'">';
+  const M=twMap();GYM=M;let h=TALL.bg(M,'img/ui6/tw_bg.webp',0,250,1024,1536,'gsBg')+'<img class="gsHd" src="img/ui6/tw_h.webp" alt="TORQUE TOWER" style="'+gbx(0,0,1024,346)+'">';
   h+='<button class="cpB twBk" data-tw="back" style="'+gbx(18,18,96,96)+'">↩</button>';
   h+='<div class="gsL twRec" style="'+gbx(262,712,500,70)+'">RECORD&nbsp;<b>'+t.b+'</b>&nbsp;/ '+TW_N+'</div>';
   h+='<div class="twList" id="twList" style="'+gbx(56,858,914,470)+'">';
@@ -2767,7 +2769,7 @@ function twRender(){const T=TE(),t=twG(),cur=Math.min(TW_N,t.b+1),done=t.b>=TW_N
   h+='<div class="gsL twB" data-tw="rew" style="'+gbx(70,1418,410,120)+'">REWARDS</div>';
   h+='<div class="gsL twB gold" data-tw="team" style="'+gbx(550,1418,410,120)+'">HEROES</div>';
   h+='<div class="gsL gsBig gold twGo'+(done?' dis':'')+'" data-tw="go" style="'+gbx(170,1585,684,124)+'">'+(done?'TOWER CLEARED!':'CHALLENGE · FLOOR '+cur)+(done?'':'<span style="color:'+(my>=pw*1.15?'#7CFC9A':my>=pw*.85?'#ffd54a':'#ff8a80')+'">⚡ '+my.toLocaleString()+' vs '+pw.toLocaleString()+(my>=pw*1.15?' · EASY':my>=pw*.85?' · EVEN':' · HARD')+'</span>')+'</div>';
-  $('twBox').innerHTML=h;
+  GYM=null;$('twBox').innerHTML=h;
   const L=$('twList'),c=L.querySelector('.cur');if(c)L.scrollTop=c.offsetTop-L.clientHeight/2+c.offsetHeight/2;}
 function twOpen(){if(!twOK()){TE().toast('🔒 TORQUE TOWER opens after campaign stage 1-10',2600);return;}
   if(!root.classList.contains('open')){root.classList.add('open');window.__BATTLE_ON=true;showMap();}
@@ -2838,15 +2840,27 @@ const HUBS={from:0};
 const hubEl=document.createElement('div');hubEl.id='hub';hubEl.innerHTML='<div id="hubBox"></div>';root.appendChild(hubEl);
 const ctEl=document.createElement('div');ctEl.id='ct';ctEl.innerHTML='<div id="ctBox"></div>';root.appendChild(ctEl);
 function boxSize(id,w,h){const b=$(id);if(!b)return;const k=Math.min(innerWidth/w,innerHeight/h);b.style.width=w*k+'px';b.style.height=h*k+'px';b.style.setProperty('--u',k+'px');}
-addEventListener('resize',()=>{if(hubEl.classList.contains('open'))boxSize('hubBox',1024,1536);if(ctEl.classList.contains('open'))boxSize('ctBox',1024,1536);});
+// v16-56: the hub / class-tower pages fill the WHOLE phone screen. The pictures are 2:3 (ChatGPT's tallest size), a phone is ~9:20,
+// so the box is as wide as the screen and HX design-units taller than 1536: the empty asphalt in the middle of hub_bg is extended
+// with hub_mid.webp (a mirrored strip of it, repeats without a seam) and the buttons/cards are spread over the extra height.
+let HX=0;
+function tallBox(id){const b=$(id);if(!b)return 0;const k=innerWidth/1024,H=innerHeight/k;
+  if(H<1536){b.classList.remove('tall');boxSize(id,1024,1536);return HX=0;}
+  b.classList.add('tall');b.style.width=innerWidth+'px';b.style.height=innerHeight+'px';b.style.setProperty('--u',k+'px');return HX=H-1536;}
+function tallBg(){if(HX<=0)return '<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'">';
+  const S=760,bg='url(img/ui7/hub_bg.webp) 0 ';
+  return '<div class="hubBg" style="'+gbx(0,0,1024,S+2)+'background:'+bg+'0/'+GSU(1024)+' '+GSU(1536)+' no-repeat"></div>'+
+    '<div class="hubBg" style="'+gbx(0,S,1024,HX+4)+'background:url(img/ui7/hub_mid.webp) 0 0/'+GSU(1024)+' '+GSU(280)+' repeat-y"></div>'+
+    '<div class="hubBg hbF" style="'+gbx(0,S+HX,1024,1536-S)+'background:'+bg+GSU(-S)+'/'+GSU(1024)+' '+GSU(1536)+' no-repeat"></div>';}
+addEventListener('resize',()=>{if(hubEl.classList.contains('open'))hubRender();if(ctEl.classList.contains('open'))ctRender();});
 function rootOn(){if(!root.classList.contains('open')){root.classList.add('open');window.__BATTLE_ON=true;showMap();}}
 const HUBM=[
  {k:'camp',im:'m_camp',h:140},{k:'arena',im:'m_arena'},{k:'tower',im:'m_tower'},{k:'class',im:'m_class'},{k:'cup',im:'m_cup'},{k:'soon',im:'m_soon'}];
-function hubRender(){const T=TE(),G=T.G;boxSize('hubBox',1024,1536);
-  let h='<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'"><button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
+function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');
+  let h=tallBg()+'<button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
   const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:'PvP · ONLINE',tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
     class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:'EVERY WEEKEND',soon:''};
-  HUBM.forEach((m,i)=>{const y=300+i*152,lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK());
+  HUBM.forEach((m,i)=>{const y=300+HX*.1+i*(152+HX*.1),lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK());
     h+='<div class="hubM'+(lock?' lk':'')+'" data-hb="'+m.k+'" style="'+gbx(32,y,960,m.k==='camp'?140:125)+(m.k==='camp'?'margin-top:'+GSU(-15):'')+'"><img src="img/ui7/'+m.im+'.webp" alt="'+m.k+'">'+(st[m.k]?'<b class="hubS">'+st[m.k]+'</b>':'')+'</div>';});
   $('hubBox').innerHTML=h;}
 function hubOpen(){rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
@@ -2896,36 +2910,36 @@ function ctSetHtml(s){return '<img src="img/ui4/st_'+s.k+'_'+s.s+'.webp" alt="" 
 function ctRewHtml(k,r,big){const T=TE(),a=[];if(r.set)a.push(ctSetHtml({k,s:r.set.s,r:r.set.r}));if(r.dm)a.push(T.DMI+' '+r.dm);if(r.gtk)a.push(GTKI+' '+r.gtk);if(big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
 function ctDaysTxt(k){return CT_DAYS[k].map(d=>DAYN[d]).join(' · ')+' · SUN';}
 // list of the 6 towers
-function ctRenderList(){const t=ctG(),d=ctDay();boxSize('ctBox',1024,1536);
-  let h='<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'"><img src="img/ui7/ct_logo.webp" alt="CLASS TOWERS" style="'+gbx(0,4,1024,354)+'">';
+function ctRenderList(){const t=ctG(),d=ctDay();tallBox('ctBox');
+  let h=tallBg()+'<img src="img/ui7/ct_logo.webp" alt="CLASS TOWERS" style="'+gbx(0,4,1024,354)+'">';
   h+='<button class="cpB hubBk" data-ct="back" style="'+gbx(14,250,96,96)+'">↩</button>';
   h+='<div class="ctDay" style="'+gbx(62,366,900,126)+'"><img src="img/ui7/bar_long.webp" alt=""><b>TODAY · '+DAYL[d]+'</b><small>'+(d===0?'ALL TOWERS ARE OPEN':ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' & ')+' OPEN · SUNDAY ALL')+'</small></div>';
-  CT_K.forEach((k,i)=>{const op=ctOpenK(k),x=37+(i%3)*325,y=510+Math.floor(i/3)*425;
+  CT_K.forEach((k,i)=>{const op=ctOpenK(k),x=37+(i%3)*325,y=510+HX*.14+Math.floor(i/3)*(425+HX*.14);
     h+='<div class="ctC'+(op?'':' cl')+'" data-ck="'+k+'" style="'+gbx(x,y,300,404)+'"><img src="img/ui7/ct_'+(op?'c_':'l_')+k+'.webp" alt="">'+
       '<b class="ctN"><img src="img/ui4/cls_'+k+'.webp" alt="">'+ROLE[k].n.toUpperCase()+'</b><span class="ctF">'+(op?'FLOOR '+Math.min(CT_N,t[k]+1)+(t[k]>=CT_N?' ✓':''):ctDaysTxt(k))+'</span></div>';});
-  h+='<div class="ctBt" data-ct="rew" style="'+gbx(60,1372,430,140)+'"><img src="img/ui7/btn_grey.webp" alt=""><b>REWARDS</b></div>';
-  h+='<div class="ctBt" data-ct="heroes" style="'+gbx(534,1372,430,140)+'"><img src="img/ui7/btn_green.webp" alt=""><b>HEROES</b></div>';
+  h+='<div class="ctBt" data-ct="rew" style="'+gbx(60,1372+HX*.92,430,140)+'"><img src="img/ui7/btn_grey.webp" alt=""><b>REWARDS</b></div>';
+  h+='<div class="ctBt" data-ct="heroes" style="'+gbx(534,1372+HX*.92,430,140)+'"><img src="img/ui7/btn_green.webp" alt=""><b>HEROES</b></div>';
   $('ctBox').innerHTML=h;}
 // one tower
-function ctRenderTower(k){const T=TE(),t=ctG(),cur=Math.min(CT_N,t[k]+1),done=t[k]>=CT_N,op=ctOpenK(k);boxSize('ctBox',1024,1536);
-  let h='<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'">';
+function ctRenderTower(k){const T=TE(),t=ctG(),cur=Math.min(CT_N,t[k]+1),done=t[k]>=CT_N,op=ctOpenK(k);tallBox('ctBox');const Y=HX*.04;
+  let h=tallBg();
   h+='<div class="ctTi" style="'+gbx(12,10,1000,300)+'"><img src="img/ui7/bar_gold.webp" alt=""><b><img src="img/ui4/cls_'+k+'.webp" alt="">'+ROLE[k].n.toUpperCase()+' TOWER</b></div>';
   h+='<button class="cpB hubBk" data-ct="list" style="'+gbx(14,250,96,96)+'">↩</button>';
-  h+='<img class="ctTw" src="img/ui7/ct_'+k+'.webp" alt="" style="'+gbx(40,300,300,366)+(op?'':'filter:grayscale(1) brightness(.6)')+'">';
-  h+='<div class="ctRec" style="'+gbx(370,300,620,222)+'"><img src="img/ui7/bar_crown.webp" alt=""><span>RECORD</span><span><b>'+t[k]+'</b>/'+CT_N+'</span></div>';
+  h+='<img class="ctTw" src="img/ui7/ct_'+k+'.webp" alt="" style="'+gbx(40,300+Y,300,366)+(op?'':'filter:grayscale(1) brightness(.6)')+'">';
+  h+='<div class="ctRec" style="'+gbx(370,300+Y,620,222)+'"><img src="img/ui7/bar_crown.webp" alt=""><span>RECORD</span><span><b>'+t[k]+'</b>/'+CT_N+'</span></div>';
   const tm=ctTeam(k),my=teamPower(tm),pw=ctPower(k,cur);
-  h+='<div class="ctTeam" style="'+gbx(360,532,640,150)+'">'+(tm.length?tm.map(x=>'<img src="'+portraitURL(x)+'" alt="">').join(''):'<i>NO '+ROLE[k].n.toUpperCase()+' HEROES YET – summon some!</i>')+'</div>';
-  h+='<div class="ctRule" style="'+gbx(360,684,640,40)+'">ONLY '+ROLE[k].n.toUpperCase()+' + LEGEND HEROES · BEST 5 FIGHT</div>';
-  h+='<div class="twList" id="ctList" style="'+gbx(56,738,914,560)+'">';
+  h+='<div class="ctTeam" style="'+gbx(360,532+Y,640,150)+'">'+(tm.length?tm.map(x=>'<img src="'+portraitURL(x)+'" alt="">').join(''):'<i>NO '+ROLE[k].n.toUpperCase()+' HEROES YET – summon some!</i>')+'</div>';
+  h+='<div class="ctRule" style="'+gbx(360,684+Y,640,40)+'">ONLY '+ROLE[k].n.toUpperCase()+' + LEGEND HEROES · BEST 5 FIGHT</div>';
+  h+='<div class="twList" id="ctList" style="'+gbx(56,738+Y,914,560+HX*.86)+'">';
   const lo=Math.max(1,cur-10),hi=Math.min(CT_N,cur+10);
   for(let f=hi;f>=lo;f--){const F=ctFloor(k,f),r=ctRew(k,f),st=f<=t[k]?3:f===cur&&!done?1:F.boss||F.mini?2:4,boss=F.boss||F.mini;
     h+='<div class="twRow s'+st+(f===cur?' cur':'')+'" data-cf="'+f+'"><img class="twPl" src="img/ui6/tw_f'+(st===3?3:st===1?1:boss?2:st===4?4:0)+'.webp" alt="">'+
       (st===2&&boss?'':'<b class="twN">'+f+'</b>')+'<div class="twT"><b>'+(boss&&st!==3?'FLOOR '+f+' · <i>'+(F.boss?'BOSS':'MINI-BOSS')+'</i>':'FLOOR '+f)+'</b><span>'+(st===3?'CLEARED':ctRewHtml(k,r))+'</span></div>'+
       (F.mod>=0&&st!==3?'<img class="twMd" src="img/ui6/tw_m'+F.mod+'.webp" alt="'+TW_MOD[F.mod].n+'">':'')+'</div>';}
   h+='</div>';
-  h+='<div class="ctBt sm" data-ct="trew" style="'+gbx(40,1318,320,110)+'"><img src="img/ui7/btn_grey.webp" alt=""><b>REWARDS</b></div>';
+  h+='<div class="ctBt sm" data-ct="trew" style="'+gbx(40,1318+HX*.92,320,110)+'"><img src="img/ui7/btn_grey.webp" alt=""><b>REWARDS</b></div>';
   const can=op&&!done&&tm.length,col=my>=pw*1.15?'#7CFC9A':my>=pw*.85?'#ffd54a':'#ff8a80';
-  h+='<div class="ctBt go'+(can?'':' dis')+'" data-ct="go" style="'+gbx(380,1306,604,150)+'"><img src="img/ui7/'+(can?'btn_green':'btn_grey')+'.webp" alt=""><b>'+(done?'TOWER CLEARED!':!op?'CLOSED TODAY':'CHALLENGE · '+cur)+'</b>'+
+  h+='<div class="ctBt go'+(can?'':' dis')+'" data-ct="go" style="'+gbx(380,1306+HX*.92,604,150)+'"><img src="img/ui7/'+(can?'btn_green':'btn_grey')+'.webp" alt=""><b>'+(done?'TOWER CLEARED!':!op?'CLOSED TODAY':'CHALLENGE · '+cur)+'</b>'+
     (can?'<small style="color:'+col+'">⚡ '+my.toLocaleString()+' vs '+pw.toLocaleString()+'</small>':!op?'<small>OPEN: '+ctDaysTxt(k)+'</small>':'')+'</div>';
   $('ctBox').innerHTML=h;const L=$('ctList'),c=L.querySelector('.cur');if(c)L.scrollTop=c.offsetTop-L.clientHeight/2+c.offsetHeight/2;
   CT_K.length;tm.forEach(x=>{try{const d=sprOf(x);if(d)sprLoad(d);}catch(e){}});}
@@ -2975,7 +2989,7 @@ ctEl.addEventListener('click',e=>{const md=e.target.closest('.twMd');if(md&&CTS.
   const row=e.target.closest('[data-cf]');if(row&&CTS.k)ctFloorInfo(CTS.k,+row.dataset.cf);});
 const hubCss=document.createElement('style');hubCss.textContent=`
 #hub,#ct{position:fixed;inset:0;z-index:8;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#16264d,#05070c 75%)}#hub.open,#ct.open{display:flex}
-#hubBox,#ctBox{position:relative;--u:.35px;overflow:hidden;border-radius:calc(var(--u)*18);background:#0a1322}#hubBox>*,#ctBox>*{position:absolute}
+#hubBox,#ctBox{position:relative;--u:.35px;overflow:hidden;border-radius:calc(var(--u)*18);background:#0a1322}#hubBox>*,#ctBox>*{position:absolute}#hubBox.tall,#ctBox.tall{border-radius:0}.hbF{-webkit-mask-image:linear-gradient(transparent,#000 calc(var(--u)*90));mask-image:linear-gradient(transparent,#000 calc(var(--u)*90))}
 .hubBk{min-width:0;padding:0;border-radius:50%;font-size:calc(var(--u)*46);z-index:2}
 .hubM{cursor:pointer;filter:drop-shadow(0 calc(var(--u)*8) calc(var(--u)*10) #000c);transition:transform .12s}.hubM:active{transform:scale(.97)}
 .hubM>img{width:100%;height:100%;display:block}.hubM.lk>img{filter:grayscale(.8) brightness(.7)}

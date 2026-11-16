@@ -87,8 +87,8 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #dqDot{position:absolute;right:-2px;top:-2px;min-width:18px;height:18px;border-radius:9px;background:#ff1744;color:#fff;font-size:11px;font-weight:900;display:none;align-items:center;justify-content:center;font-style:normal;box-shadow:0 0 8px #ff1744}
 #dq{position:fixed;inset:0;z-index:8;background:rgba(5,8,12,.78);display:none;align-items:center;justify-content:center}
 #dq.open{display:flex}
-#dqBox{position:relative;background:url(img/dq.webp) center/100% 100% no-repeat;--u:.4px;font-size:calc(var(--u)*30)}
-#dqBox>*{position:absolute}
+#dqBox{position:relative;background:#0b1220;--u:.4px;font-size:calc(var(--u)*30)}
+#dqBox>*{position:absolute}#dqBox.tall,#smBox.tall,#gsBox.tall,#twBox.tall{border-radius:0}.tbP{pointer-events:none}
 .dqAll{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*14);border-radius:calc(var(--u)*20);background:linear-gradient(#ffe27a,#ffb300 55%,#e08a00);box-shadow:0 calc(var(--u)*6) 0 #8a4a00,0 0 calc(var(--u)*22) #ffb300aa,inset 0 1px 0 #fff8;color:#2a1600;font-weight:900;font-size:calc(var(--u)*36);letter-spacing:1px;animation:dqb .8s ease-in-out infinite}
 .dqAll small{min-width:calc(var(--u)*44);height:calc(var(--u)*44);border-radius:50%;background:#d32f2f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*26)}
 .dqI{display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*62)}
@@ -128,7 +128,7 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #smBtn{background:linear-gradient(#5a3d00,#1d1430)!important}
 #sm{position:fixed;inset:0;z-index:8;background:rgba(5,8,12,.86);display:none;align-items:center;justify-content:center}
 #sm.open{display:flex}
-#smBox{position:relative;background:#0a1322 url(img/ui4/sum_bg.webp) 0 calc(var(--u)*150)/100% auto no-repeat;--u:.4px;border-radius:calc(var(--u)*18);overflow:hidden}
+#smBox{position:relative;background:#0a1322;--u:.4px;border-radius:calc(var(--u)*18);overflow:hidden}
 /* v16-52: summon page on Marius' picture (header + background, common for HERO and CREW) */
 .smH{pointer-events:none;filter:drop-shadow(0 calc(var(--u)*6) calc(var(--u)*8) #000c)}
 .smL{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);color:#fff;font:900 italic calc(var(--u)*30) system-ui;letter-spacing:calc(var(--u)*1);text-shadow:0 calc(var(--u)*3) 0 #000a,0 0 calc(var(--u)*8) #000;white-space:nowrap;pointer-events:none}
@@ -2873,15 +2873,33 @@ const DQY=[575,758,945,1130,1315], DQGX=[330,490,648,805];
 const dqEl=$('dq'),dqBox=$('dqBox');let dqKey='';
 const U=n=>'calc(var(--u)*'+n+')';
 const TKI='<img class="tki" src="img/ticket.webp">';
-const box=(x,y,w,h)=>'left:'+U(x)+';top:'+U(y)+';width:'+U(w)+';height:'+U(h)+';';
-function dqSize(){const k=Math.min(innerWidth/922,innerHeight/1706);dqBox.style.width=922*k+'px';dqBox.style.height=1706*k+'px';dqBox.style.setProperty('--u',k+'px');}
+// v16-56 TALL PAGES: the pictures are 2:3 (ChatGPT's tallest), a phone is ~9:20. A page drawn on a W×H picture is made as wide
+// as the screen and EX design-units taller; the extra height is split between "cuts" (y, share) where the picture has only vertical
+// lines (frame rails, the dark gap between panels): that row of the picture is stretched, and everything below a cut moves down.
+// TALL.map(W,H,cuts) → map; while BXM is set, box()/gbx() move y (and stretch a box that crosses a cut). Wider screens: no change.
+window.TALL={
+  map(W,H,cuts){const k=innerWidth/W,EX=Math.max(0,innerHeight/k-H),g=cuts.map(c=>c[1]*EX),
+    sum=(y,lt)=>{let a=0;cuts.forEach((c,i)=>{if(lt?c[0]<y:c[0]<=y)a+=g[i];});return a;};
+    return {W,H,k,EX,cuts,g,top:y=>y+sum(y,0),end:y=>y+sum(y,1)};},
+  size(el,M){const k=M.EX>0?M.k:Math.min(innerWidth/M.W,innerHeight/M.H);el.style.width=M.W*k+'px';el.style.height=(M.H+M.EX)*k+'px';el.style.setProperty('--u',k+'px');el.classList.toggle('tall',M.EX>0);},
+  // picture src drawn at box rect (bx,by,bw,bh) → html pieces (cls = class of each piece)
+  bg(M,src,bx,by,bw,bh,cls){const u=n=>'calc(var(--u)*'+n+')',pc=(top,h,sy,sh)=>'<div class="'+(cls||'')+' tbP" style="position:absolute;left:'+u(bx)+';top:'+u(top)+';width:'+u(bw)+';height:'+u(h+.6)+
+      ';background:url('+src+') 0 '+u(-sy*h/sh)+'/'+u(bw)+' '+u(bh*h/sh)+' no-repeat"></div>';
+    if(M.EX<=0)return pc(by,bh,0,bh);
+    const cs=M.cuts.map((c,i)=>[c[0],M.g[i]]).filter(c=>c[0]>by&&c[0]<by+bh);let h='',a=by;
+    cs.forEach(c=>{h+=pc(M.top(a),c[0]-a,a-by,c[0]-a);h+=pc(M.end(c[0]),c[1],c[0]-by-1.5,3);a=c[0];});
+    return h+pc(M.top(a),by+bh-a,a-by,by+bh-a);}};
+let BXM=null;
+const box=(x,y,w,h)=>{if(BXM){const t=BXM.top(y);h=BXM.end(y+h)-t;y=t;}return 'left:'+U(x)+';top:'+U(y)+';width:'+U(w)+';height:'+U(h)+';';};
+const dqMap=()=>TALL.map(922,1706,[[665,.25],[851,.25],[1037,.25],[1222,.25]]);
+function dqSize(){TALL.size(dqBox,dqMap());dqKey='';}
 function openDQ(){dqCheck();dqSize();dqKey='';renderDQ();dqEl.classList.add('open');}
 function closeDQ(){dqEl.classList.remove('open');}
 function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   const ms=new Date();ms.setHours(24,0,0,0);const left=Math.max(0,ms-Date.now()),hh=Math.floor(left/36e5),mm=Math.floor(left%36e5/6e4);
   const key=JSON.stringify(G.dq)+hh+mm+G.vip;if(key===dqKey)return;dqKey=key;
   const cl=dqClaimed(),today=G.dq.q.filter(q=>q.cl).reduce((a,q)=>a+q.vip,0)+DQ_GIFTS.reduce((a,g,i)=>a+(G.dq.gifts[i]?g.vip:0),0);
-  let h='<div class="dqT" style="'+box(330,412,262,40)+'line-height:'+U(40)+';color:#fff">⏱ '+hh+'h '+mm+'m</div>';
+  const M=dqMap();BXM=M;let h=TALL.bg(M,'img/dq.webp',0,0,922,1706)+'<div class="dqT" style="'+box(330,412,262,40)+'line-height:'+U(40)+';color:#fff">⏱ '+hh+'h '+mm+'m</div>';
   G.dq.q.forEach((q,i)=>{const y=DQY[i],done=q.p>=q.g,f=q.p/q.g;
     h+='<div class="dqI'+(done?' ok':'')+'" style="'+box(62,y-65,130,130)+'">'+(DQ_IMG[q.id]?'<img src="img/ui3/'+DQ_IMG[q.id]+'.webp" alt="" style="width:78%;height:auto">':q.ic)+'</div>';
     h+='<div class="dqN" style="'+box(222,y-50,480,40)+'">'+q.n+'</div>';
@@ -2900,7 +2918,7 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   if(dqReady())h+='<div class="dqAll" data-all="1" style="'+box(281,1606,360,78)+'">CLAIM ALL<small>'+dqReady()+'</small></div>';
   else h+='<div class="dqT" style="'+box(40,1640,842,40)+'color:#cfd8dc">👑 VIP '+VLV+' · '+G.vip+(VIP_PTS[VLV+1]?' / '+VIP_PTS[VLV+1]:'')+' points</div>';
   h+='<div data-close="1" style="'+box(820,0,102,90)+'"></div>';
-  dqBox.innerHTML=h;}
+  BXM=null;dqBox.innerHTML=h;}
 dqEl.addEventListener('click',e=>{if(e.target===dqEl||e.target.closest('[data-close]')){closeDQ();return;}
   if(e.target.closest('[data-all]')){let vip=0,tk=0,ct=0,dm=0,n=0;
     G.dq.q.forEach(q=>{if(q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;tk++;vip+=q.vip;n++;}});
@@ -2909,7 +2927,7 @@ dqEl.addEventListener('click',e=>{if(e.target===dqEl||e.target.closest('[data-cl
   const c=e.target.closest('[data-claim]');if(c){const q=G.dq.q[+c.dataset.claim];if(q&&q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;addVip(q.vip);toast('👑 +'+q.vip+' VIP points · '+TKI+' +1',2500);}dqKey='';renderDQ();return;}
   const g=e.target.closest('[data-gift]');if(g){const i=+g.dataset.gift,G2=DQ_GIFTS[i];if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;G.dm=(G.dm||0)+G2.dm;addVip(G2.vip);toast('🎁 Gift opened: +'+G2.vip+' VIP points · '+TKI+' +'+G2.tk+' · '+CTI+' +'+G2.tk+' · '+DMI+' +'+G2.dm,2500);}
     else if(!G.dq.gifts[i])toast('🎁 Claim '+G2.need+' daily quests to open this gift',2500);dqKey='';renderDQ();}});
-addEventListener('resize',()=>{if(dqEl.classList.contains('open'))dqSize();});
+addEventListener('resize',()=>{if(dqEl.classList.contains('open')){dqSize();renderDQ();}});
 
 
 // =================== v9: HEROES (mechanics · guards · drivers) — SUMMON, STARS, FUSION, COLLECTION ===================
@@ -3109,7 +3127,8 @@ const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon 
 
 // ---------- DOM: summon page (my picture) ----------
 const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
-function smSize(){const k=Math.min(innerWidth/921,innerHeight/1532);smBox.style.width=921*k+'px';smBox.style.height=1532*k+'px';smBox.style.setProperty('--u',k+'px');}
+const smMap=()=>TALL.map(921,1532,[[764,.25],[1012,.2],[1097,.15],[1258,.15],[1324,.25]]);
+function smSize(){TALL.size(smBox,smMap());smKey='';}
 function openSummon(cat){if(cat)smCat=smOf(cat);smSize();smKey='';smEl.classList.add('open');renderSm();}
 function closeSummon(){smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
@@ -3119,7 +3138,7 @@ const TILE2=[112,255,394,531,670,811];
 const dmS=n=>n>=100000?Math.floor(n/1000)+'K':n.toLocaleString();
 function renderSm(){if(!smEl.classList.contains('open'))return;
   const P=G.h.pity[smCat],key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+(G.dm||0)+HVER;if(key===smKey)return;smKey=key;const C=CATS[smCat],cr=smCat==='c';
-  let h='';
+  const M=smMap();BXM=M;let h=TALL.bg(M,'img/ui4/sum_bg.webp',0,150,921,1381.5);
   // portraits standing on the portal of the background (best Mythic / Legendary of this summon)
   const pool=HEROES.filter(x=>inCat(x,smCat)&&!x.soon),top=[...pool.filter(x=>x.gr===5),...pool.filter(x=>x.gr===4),...pool.filter(x=>x.gr===3)].slice(0,5);
   const pos=[[350,322,220],[180,356,176],[565,356,176],[32,396,146],[743,396,146]];
@@ -3150,7 +3169,7 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
   h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="width:'+Math.min(100,P.l/PITY_L*100).toFixed(1)+'%"></i><span>LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
   h+='<div class="smL smCol" data-a="coll" style="'+box(150,1356,620,128)+'pointer-events:auto">'+(cr?'CREW':'HERO')+' COLLECTION<small>'+discCount(smCat)+' / '+pool.length+' collected</small></div>';
-  smBox.innerHTML=h;}
+  BXM=null;smBox.innerHTML=h;}
 smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
   if(a==='back')closeSummon();
   else if(a==='tkinfo')popTickets();
@@ -3447,7 +3466,7 @@ idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}cons
 function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;G.idle=SEC.now();save();closeIdle();
   toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
-addEventListener('resize',()=>{if(smEl.classList.contains('open'))smSize();if(teamEl.classList.contains('open'))fit(tmBox,1024,1536);if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
+addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open'))fit(tmBox,1024,1536);if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
 // ---------- map: grade badge over heroes ----------
 function heroBadge(p,h,s){if(!DET||!onScreen(p.x,p.y,20))return;const g=GRADES[h.gr],y=p.y-(p.miniOK?27:17);
