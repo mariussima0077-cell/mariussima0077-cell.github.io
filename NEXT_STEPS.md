@@ -109,6 +109,13 @@
 - [ ] (Opțional, fără poze noi) Cartonașul eroului (`popHero`) și ferestrele din paginile online au încă stilul vechi – se pot muta pe `popW` (INFO WINDOW).
 - [ ] (Idee, nu e cerută încă) Ferestrele de info vechi (cartonaș erou, Rate Info, Summon History, Tickets, ferestrele din paginile online) încă au stilul vechi – se pot muta pe rama nouă de confirmare (`dlg_f`) fără poze noi.
 - [ ] Nefolosite încă (păstrate pentru mai târziu): `n_upg`, `g_mech/g_guard/g_driver/g_book/g_swap/g_edit`, `rk1-3`, `sp_chest/sp_dm`, `v_dm/v_gift/v_timer/v_ticket`, `q_trophy`.
+### ⚔️ Conținut nou în bătălii – IDEI propuse (16 nov 2026, așteaptă alegerea lui Marius)
+- [ ] **Torque Tower** (turn, 300 etaje, o luptă pe etaj, recompense FIXE, boss la fiecare 10 etaje, modificatori pe etaj, clasament „cel mai sus etaj”).
+- [ ] **Class Towers** (câte un turn pe clasă, deschise în anumite zile, doar eroii clasei respective).
+- [ ] **Boss zilnic / World Boss** (3 încercări pe zi, recompense după daunele făcute, clasament de daune).
+- [ ] **Trials zilnice** (Gear / Diamond / Ticket – farm pentru seturile pe clase).
+- [ ] **Junkyard Survival** (valuri fără sfârșit, scor).
+- Regula: întâi machetă înainte/după, apoi integrare. Poze necesare (doar după alegere): fundal pagină turn, iconiță TOWER, rama etajului/boss-ului.
 ### 📌 NU UITA: APK „normal” (decis 14 nov 2026, de făcut când jocul e stabil)
 - [ ] **Trecem de la TWA (jocul rulează în Chrome) la APK cu Capacitor** – același pachet `com.torqueempire.game`, aceeași cheie de semnare (Drive), jucătorii primesc update obișnuit și nu pierd salvarea.
   - Jocul e ÎN APK (pornește și fără internet, nu mai depinde de Chrome-ul jucătorului, fără bară de adresă).
