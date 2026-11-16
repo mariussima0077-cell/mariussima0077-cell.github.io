@@ -140,7 +140,8 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 .smTi{border-radius:calc(var(--u)*12);overflow:hidden;pointer-events:none}.smTi img{width:100%;height:100%;object-fit:cover;display:block}.smTi img.sil{filter:brightness(.35)}
 .smTi i{position:absolute;left:0;right:0;bottom:0;font:900 calc(var(--u)*17) system-ui;font-style:normal;color:#fff;background:#8a0012cc;text-align:center;letter-spacing:calc(var(--u)*1)}
 .smPl{font-size:calc(var(--u)*22);pointer-events:auto}
-.smDm{border-radius:calc(var(--u)*20);background:#05101fcc;box-shadow:inset 0 0 0 calc(var(--u)*2) #e0a82e;font-size:calc(var(--u)*22)}
+.smDm{background:url(img/ui5/coin.webp) 0 0/100% 100% no-repeat;font-size:calc(var(--u)*24);font-style:normal}
+.smFu{pointer-events:none;filter:drop-shadow(0 calc(var(--u)*2) calc(var(--u)*3) #000)}
 .smCol{flex-direction:column;gap:calc(var(--u)*4);color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7;font-size:calc(var(--u)*40)}.smCol small{color:#5a3300;font-size:.6em;font-style:normal;letter-spacing:calc(var(--u)*1)}
 #smBox>*{position:absolute}
 .smN{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:calc(var(--u)*34);text-shadow:0 2px 0 #000;white-space:nowrap}
@@ -153,7 +154,7 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 .smPity{display:flex;align-items:center;justify-content:center;color:#cfd8dc;font-weight:800;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000;pointer-events:none}
 .smPity b{color:#ffd54a;margin:0 .3em}
 .pBar{position:relative;width:100%;height:100%;border-radius:calc(var(--u)*18);background:#0b1118;box-shadow:inset 0 0 0 calc(var(--u)*2) #6b5420;overflow:hidden}
-.pBar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#b8860b,#ffd54a);box-shadow:0 0 calc(var(--u)*12) #ffb300}
+.pBar i{position:absolute;left:0;top:0;bottom:0;border-image:url(img/ui5/fill_g.webp) 0 40 fill/0 calc(var(--u)*16) stretch;min-width:calc(var(--u)*32)}.pBar i[style^="width:0"]{display:none}
 .pBar span{position:relative;display:flex;height:100%;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000}
 .payBox{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 4px}.payBox div{background:#0d151e;border:1.5px solid #e0aa25;border-radius:12px;padding:6px 12px;text-align:center;font-size:18px;color:#fff}.payBox small{display:block;font-size:10px;color:#9fb0c0}.payBox span{font:900 22px system-ui;color:#ffd54a}
 .smCnt{color:#ffd54a;font-weight:900;font-size:calc(var(--u)*22);text-align:center;text-shadow:0 1px 2px #000;pointer-events:none}
@@ -519,6 +520,20 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 /* end skins */
 /* v16-50 confirm window + green/red buttons + message bar = Marius' pictures (img/ui3/dlg_*) */
 #popBox.dlgSk{--k:calc(min(100vw - 28px,400px)/871);max-width:400px;display:flex;flex-direction:column;overflow:visible;max-height:90vh;padding:0;background:none!important;box-shadow:none!important;border-radius:0;border-style:solid;border-width:calc(var(--k)*200) calc(var(--k)*58) calc(var(--k)*131);border-image:url(img/ui3/dlg_f.webp) 200 58 131 fill stretch;filter:drop-shadow(0 12px 30px #000)}
+/* v16-53 INFO WINDOW kit (Marius' picture img/ui5/win.webp + rows r0..r5 / rn) – used by #popBox and #cpPopBox */
+:is(#popBox,#cpPopBox).winSk{--k:calc(min(100vw - 16px,430px)/948);width:calc(var(--k)*948)!important;max-width:none!important;padding:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;border-style:solid!important;border-color:transparent!important;border-width:calc(var(--k)*185) calc(var(--k)*50) calc(var(--k)*95)!important;border-image:url(img/ui5/win.webp) 185 50 95 fill stretch!important;overflow:visible!important;max-height:none!important;filter:drop-shadow(0 12px 30px #000);box-sizing:border-box;position:relative!important;display:block!important}
+:is(#popBox,#cpPopBox).winSk>.pX{display:none!important}
+.winSk>.wIn{max-height:calc(84vh - var(--k)*280);overflow-y:auto;touch-action:pan-y;padding:0 calc(var(--k)*6) calc(var(--k)*6);margin-top:calc(var(--k)*-22);color:#e6eef7}
+.winSk>.wT{position:absolute;left:calc(var(--k)*240);width:calc(var(--k)*370);top:calc(var(--k)*-106);height:calc(var(--k)*78);display:flex;align-items:center;justify-content:center;gap:4px;font:900 italic min(3.9vw,16px) system-ui;color:#ffe27a;text-shadow:0 2px 0 #000;white-space:nowrap;overflow:hidden;pointer-events:none}
+.winSk>.wT img{height:1.25em;width:auto}
+.winSk>.wX{position:absolute;left:calc(var(--k)*782);top:calc(var(--k)*-112);width:calc(var(--k)*106);height:calc(var(--k)*106);border-radius:50%;background:none!important;border:0!important;box-shadow:none!important;padding:0;margin:0;color:transparent;z-index:2}
+.wR{display:flex;align-items:center;gap:6px;min-height:calc(var(--k)*108);box-sizing:border-box;margin:calc(var(--k)*5) 0;border-style:solid;border-color:transparent;border-width:0 calc(var(--k)*60);border-image:url(img/ui5/rn.webp) 0 60 fill/0 calc(var(--k)*60) stretch;padding:calc(var(--k)*8) calc(var(--k)*14);color:#fff;font:800 min(3.4vw,14px) system-ui;text-shadow:0 1px 2px #000}
+.wR.g0{border-image-source:url(img/ui5/r0.webp)}.wR.g1{border-image-source:url(img/ui5/r1.webp)}.wR.g2{border-image-source:url(img/ui5/r2.webp)}.wR.g3{border-image-source:url(img/ui5/r3.webp)}.wR.g4{border-image-source:url(img/ui5/r4.webp)}.wR.g5{border-image-source:url(img/ui5/r5.webp)}
+.wR b{font-weight:900}.wR>:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wR em{font-style:normal;color:#b8c7d9;font-size:.85em;white-space:nowrap}.wR .wV{font:900 1.1em system-ui;color:#fff;min-width:3.2em;text-align:right}
+.wTx>:first-child{white-space:normal;font-size:.95em;line-height:1.3}
+.wR img{height:1.7em;width:auto;vertical-align:middle}.wR .wLk{height:2em}
+.wP{font:700 min(3.2vw,13px)/1.45 system-ui;color:#cfe0f2;padding:4px 6px}.wP b{color:#ffd54a}.wP>div{margin:3px 0}
+.wS{text-align:center;font:900 italic min(3.4vw,14px) system-ui;color:#9fd3ff;letter-spacing:.5px;margin:2px 0 4px}
 #popBox.dlgSk .pX{display:none}
 #popBox.dlgSk .skIn{padding:0 calc(var(--k)*10) calc(var(--k)*4);margin-top:calc(var(--k)*-40)}
 #popBox.dlgSk .pT{position:absolute;left:calc(var(--k)*(185 - 58));width:calc(var(--k)*500);top:calc(var(--k)*-185);height:calc(var(--k)*110);margin:0;padding:0;display:flex;align-items:center;justify-content:center;font:900 min(4.2vw,17px) system-ui;color:#3a1d00!important;text-shadow:0 1px 0 #fff8!important;white-space:nowrap}
@@ -3093,7 +3108,7 @@ function summon(cat,n){const P=G.h.pity[cat],out=[];
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
 // ---------- DOM: summon page (my picture) ----------
-const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui4/hsum_h.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
+const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
 function smSize(){const k=Math.min(innerWidth/921,innerHeight/1532);smBox.style.width=921*k+'px';smBox.style.height=1532*k+'px';smBox.style.setProperty('--u',k+'px');}
 function openSummon(cat){if(cat)smCat=smOf(cat);smSize();smKey='';smEl.classList.add('open');renderSm();}
 function closeSummon(){smEl.classList.remove('open');}
@@ -3119,11 +3134,11 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
     h+='<div class="smL smTop" data-a="tkinfo" style="'+box(737,39,163,46)+'pointer-events:auto">'+TKI+tkN('m')+'</div>';
     h+='<div class="smL" style="'+box(329,97,263,34)+'"><small style="font-size:'+U(19)+'">HEROES FOR BATTLES</small></div>';}
   // diamonds: own chip under the ticket plate
-  h+='<div class="smL smTop smDm" style="'+box(745,cr?110:94,150,40)+'">'+DMI+dmS(G.dm||0)+'</div>';
+  h+='<div class="smL smTop smDm" style="'+box(738,cr?106:90,164,78)+'">'+DMI+dmS(G.dm||0)+'</div>';
   // grade panel
   h+='<div class="smL" style="'+box(256,690,410,55)+'">AVAILABLE '+(cr?'CREW':'HEROES')+'</div><div data-a="rates" style="'+box(805,684,68,68)+'border-radius:50%"></div>';
   TILE2.forEach((x,i)=>{const L=pool.filter(z=>z.gr===i),d=L.find(z=>G.h.disc[z.id]),hh=d||L[0];
-    h+='<div class="smTi" style="'+box(x-50,792,100,100)+'">'+(hh?img(hh,d?0:1):'')+(i===5&&!cr?'<i>FUSION</i>':'')+'</div><div data-a="tier" data-g="'+i+'" style="'+box(x-64,778,128,172)+'"></div>';});
+    h+='<div class="smTi" style="'+box(x-50,792,100,100)+'">'+(hh?img(hh,d?0:1):'')+'</div>'+(i===5&&!cr?'<img class="smFu" src="img/ui5/fusion.webp" alt="FUSION" style="'+box(x-62,860,124,47)+'">':'')+'<div data-a="tier" data-g="'+i+'" style="'+box(x-64,778,128,172)+'"></div>';});
   // 3 small plates: rates · switch HERO/CREW · history
   const other=SMK[(SMK.indexOf(smCat)+1)%SMK.length];
   h+='<div class="smL smPl" data-a="rates" style="'+box(47,1022,254,59)+'">RATE INFO</div>';
@@ -3254,18 +3269,22 @@ rosEl.addEventListener('click',e=>{const t=e.target.closest('[data-ro]');if(!t)r
 // ---------- generic popup ----------
 const popEl=$('pop'),popBox=$('popBox');let popCtx=null;
 function pop(html,ctx,sk){popCtx=ctx||null;popBox.className=sk||'';popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+(sk?'<div class="skIn">'+html+'</div>':html);popEl.classList.add('open');}
+// v16-53: info window (Marius' frame): title on the plate, red X closes, rows = wRow(grade or -1, left, value, right)
+function popW(title,html,ctx){popCtx=ctx||null;popBox.className='winSk';popBox.innerHTML='<div class="wT">'+title+'</div><button class="wX" data-p="x" aria-label="close"></button><div class="wIn">'+html+'</div>';popEl.classList.add('open');popBox.querySelector('.wIn').scrollTop=0;}
+const wRow=(g,a,v,e)=>'<div class="wR'+(g>=0?' g'+g:'')+'"><span>'+a+'</span>'+(v!=null?'<b class="wV">'+v+'</b>':'')+(e?'<em>'+e+'</em>':'')+'</div>';
+const LOCKI='<img class="wLk" src="img/ui5/lock.webp" alt="locked">',OKI='<img src="img/ui5/ok.webp" alt="done">';
 function closePop(){popEl.classList.remove('open');popCtx=null;}
-function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets · '+CTI+' Crew Tickets</div><div class="pD">'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.<br>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.<br>Both are earned only by playing.<br>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> – you have <b>'+(G.dm||0).toLocaleString()+'</b> (always asked first).</div>'+
-  ['📅 5000 FREE SUMMONS: every day '+TKI+' +10 · '+CTI+' +10 · Gear +10',TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign: +1 per stage · mini-boss +3 · boss +5 '+CTI+' +3 '+DMI+' +100'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
+function popTickets(){popW(TKI+' TICKETS','<div class="wP"><div>'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.</div><div>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.</div><div>Both are earned only by playing.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> – you have <b>'+(G.dm||0).toLocaleString()+'</b> (always asked first).</div></div><div class="wS">WHERE TO GET TICKETS</div>'+
+  ['📅 5000 FREE SUMMONS: every day '+TKI+' +10 · '+CTI+' +10 · Gear +10',TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign: +1 per stage · mini-boss +3 · boss +5 '+CTI+' +3 '+DMI+' +100'].map(t=>'<div class="wR wTx"><span>'+t+'</span></div>').join(''));}
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*1000)/10)+'%';
-  const row=(i,pct,right)=>'<div class="rRow" style="--gc:'+GRADES[i].c+'"><span><i class="gear"></i>'+GRADES[i].n+'</span><b>'+pct+'</b><em>'+right+'</em></div>';
-  pop('<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</span>'+RATES.map((r,i)=>row(i,pc(r),'👤 '+heroesOf(smCat,i).length+' heroes')).join('')+
-  row(5,'0%','👤 only from Fusion')+'<div class="rRow lockd"><span>🔒 ???</span><b>—</b><em>coming soon</em></div>'+
-  '<div class="rInfo"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
-function popHist(){const L=G.h.hist;pop('<div class="pT pic"><img src="img/ui/t_hist.webp" alt="SUMMON HISTORY"></div><span class="pSub blue">Last '+L.length+' summons</span>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
-  return '<div class="pR"><span>'+CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b></span><em>'+(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')+'</em></div>';}).join(''):'<div class="pD">No summons yet.</div>'));}
+  const row=(i,pct,right)=>wRow(i,'<b style="color:'+GRADES[i].c+'">'+GRADES[i].n+'</b>',pct,right);
+  popW('SUMMON RATES','<div class="wS">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</div>'+RATES.map((r,i)=>row(i,pc(r),heroesOf(smCat,i).length+' heroes')).join('')+
+  row(5,'0%','only from Fusion')+wRow(-1,LOCKI+' ???','—','coming soon')+
+  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
+function popHist(){const L=G.h.hist;popW('SUMMON HISTORY','<div class="wS">Last '+L.length+' summons</div>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
+  return wRow(H.gr,CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b>',null,(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'));}).join(''):'<div class="wP">No summons yet.</div>'));}
 function popTier(cat,gr){const L=heroesOf(cat,gr);
-  pop('<div class="pT" style="color:'+GRADES[gr].c+'">◆ '+GRADES[gr].n+' '+CATS[cat].n+(gr<5?' · '+(RATES[gr]*100)+'%':gr===5?' · only from Fusion':'')+'</div><div class="hg">'+L.map(h=>{const o=own(h.id),d=G.h.disc[h.id],w=o&&whereIs(h.id);
+  popW('<span style="color:'+GRADES[gr].c+'">'+GRADES[gr].n.toUpperCase()+'</span>',wRow(gr,'<b style="color:'+GRADES[gr].c+'">◆ '+GRADES[gr].n+' '+CATS[cat].n+'</b>',gr<5?(RATES[gr]*100)+'%':gr===5?'—':null,gr===5?'only from Fusion':L.length+' heroes')+'<div class="hg">'+L.map(h=>{const o=own(h.id),d=G.h.disc[h.id],w=o&&whereIs(h.id);
     return '<div data-p="hero" data-id="'+h.id+'" class="'+(d?'':'sil')+'">'+(d?card(h,o,(w?'<i class="wk">📍</i>':'')+(o?'':'<i class="gone">used</i>')):silCard(h))+'</div>';}).join('')+'</div>');}
 function silCard(h){const g=GRADES[h.gr];return '<div class="hc" style="--gc:'+g.c+';--gd:'+g.d+'">'+fbox(h,1,null)+'<b>'+(h.soon?'SOON':'???')+'</b></div>';}
 function popHero(id){const h=HB[id],o=own(id),G0=GRADES[h.gr],w=whereIs(id),s=o?o.s:0;
@@ -3483,6 +3502,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:19,d:'Nov 16, 2026',ic:'🔨',t:'New Gear Summon & info windows',l:['New <b>GEAR SUMMON</b> page: the forge with all 6 grades and their chances.','New <b>info windows</b> for Rate Info, Summon History and Tickets – every grade has its own colored row.','New <b>SET</b> panel on the hero page: lit pieces and bonus rows with ✓ / 🔒.','<b>HERO COLLECTION</b>: rainbow progress bar, ✓ and 🔒 on the chests.','<b>Crew</b> heroes now have their own class icon.']},
  {id:18,d:'Nov 16, 2026',ic:'🎨',t:'New Summon page, class icons & set pictures',l:['New <b>HERO SUMMON</b> and <b>CREW SUMMON</b> page: the best heroes stand on the portal, all 6 grades with a hero inside, bigger summon buttons.','New <b>class icons</b> (Bruiser, Racer, Scanner, Medic, Sprayer, Shocker, Legend) on every hero.','Every <b>set piece</b> now has its own picture – 42 new pieces! See the whole set on the hero page.','New <b>HERO COLLECTION</b> page with a chest for every color.']},
  {id:17,d:'Nov 16, 2026',ic:'🛡️',t:'Hero Sets & Hero Collection',l:['New <b>HERO SETS</b>: 7 sets (Iron Piston, Nitro Rush, Laser Scope, Field Medic, Color Storm, Thunder Coil, Torque King). Set pieces drop from <b>Rare</b> up in the campaign and in Gear Summon.','Every set belongs to one class – put it on a hero of that class: every piece from <b>2 to 6</b> unlocks a new battle bonus.','New <b>HERO COLLECTION</b> in HEROES: complete a color to give <b>all battle heroes</b> HP, Attack or Defense. It replaces the old Mechanics collection garage bonus.','Mythic heroes are now shown on the Summon page (they come only from Fusion).','Fixed: building level lights, Bag tabs and the Gear Summon subtitle.']},
  {id:16,d:'Nov 16, 2026',ic:'✨',t:'New look: buildings, campaign, crew & arena',l:['New <b>building window</b>: 10 level lights, every bonus with its next level, your crew and the upgrade button.','New <b>Campaign</b> header and a new <b>stage card</b>: enemies, VS power bar, rewards and your team before the fight.','New battle buttons: <b>pause</b>, <b>×1 / ×1.5 / ×2</b> and <b>AUTO</b>.','New <b>MY CREW</b>, <b>CHOOSE MECHANIC</b>, <b>AUTO BEST</b> and <b>GEAR SUMMON</b> pages.','<b>Arena</b>: new league shields, rival cards, FIGHT buttons, rankings and Cup frames.','New icons for Daily Quests, VIP, Shop, the left menu and the right menu (Rank, Chat, Check-in, News, Mail).','New <b>CREW SUMMON</b> header, new confirm windows and new message bar.']},

@@ -340,6 +340,38 @@ const css3=document.createElement('style');css3.textContent=`
 #gSum #gsTk{position:absolute!important;left:78.43%;top:23.29%;width:19.16%;height:13.42%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:30px!important;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding-right:6%!important;font:900 min(4.2vw,19px) system-ui!important;color:#fff!important;text-shadow:0 1px 0 #000}
 #gSum #gsTk img{position:absolute;left:1%;top:-6%;height:112%!important;width:auto;filter:drop-shadow(0 2px 2px #000)}
 #gSum .gsSub{position:absolute!important;left:31.07%;top:38.48%;width:37.49%;height:12.15%;display:flex;white-space:nowrap;overflow:hidden;align-items:center;justify-content:center;font:900 min(2.7vw,12px) system-ui;color:#9fd3ff;letter-spacing:.5px;text-shadow:0 1px 0 #000}
+/* v16-53 GEAR SUMMON on Marius' background */
+#gSum.open{position:fixed!important;z-index:8!important;display:flex!important;align-items:center;justify-content:center;background:rgba(5,8,12,.92)!important;padding:0!important;overflow:hidden!important}
+#gsBox{position:relative;--u:.35px;overflow:hidden;border-radius:calc(var(--u)*18);background:#0a1322}#gsBox>*{position:absolute}
+.gsHd,.gsBg{pointer-events:none;display:block}.gsHd{filter:drop-shadow(0 calc(var(--u)*6) calc(var(--u)*8) #000c)}
+.gsL{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);color:#fff;font:900 italic calc(var(--u)*32) system-ui;text-shadow:0 calc(var(--u)*3) 0 #000a,0 0 calc(var(--u)*8) #000;white-space:nowrap}
+.gsL img{height:1.25em!important;width:auto;vertical-align:middle}
+.gsTkN{justify-content:flex-end;padding-right:calc(var(--u)*14);box-sizing:border-box;font-size:calc(var(--u)*30)}
+.gsDm{background:url(img/ui5/coin.webp) 0 0/100% 100% no-repeat;font-size:calc(var(--u)*28);font-style:normal}
+.gsRt{font-size:calc(var(--u)*26);font-style:normal}
+.gsPl{font-size:calc(var(--u)*28)}
+.gsBig{flex-direction:column;gap:0;font-size:calc(var(--u)*42)}.gsBig span{display:flex;align-items:center;gap:calc(var(--u)*8);font-size:.72em;padding:calc(var(--u)*2) calc(var(--u)*22);border-radius:calc(var(--u)*30);background:#0008;margin-top:calc(var(--u)*6)}
+.gsBig.gold{color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7}.gsBig.gold span{color:#fff;text-shadow:0 2px 0 #000}.gsBig.dis{filter:grayscale(1) brightness(.7)}
+.gsRib{transform:rotate(43deg);font-size:calc(var(--u)*24);pointer-events:none}
+.gsFill{border-image:url(img/ui5/fill_g.webp) 0 40 fill/0 calc(var(--u)*27) stretch;pointer-events:none}
+.gsCol{flex-direction:column;gap:calc(var(--u)*4);color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7;font-size:calc(var(--u)*44)}.gsCol small{color:#5a3300;font-size:.55em;font-style:normal;letter-spacing:calc(var(--u)*1.5)}
+/* v16-53 SET PANEL kit (Marius' pictures img/ui5/slot0/1, srow0/1) */
+.setPc>div{background:url(img/ui5/slot0.webp) center/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;padding:3px 2px 4px!important}
+.setPc>div.on{background-image:url(img/ui5/slot1.webp)!important}
+.setPc img{width:78%!important;margin:9% auto 0}
+.setBl{gap:2px!important}
+.setBl>div{position:relative;height:46px;box-sizing:border-box;padding:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;border-style:solid;border-color:transparent;border-width:0 51px 0 60px;border-image:url(img/ui5/srow0.webp) 0 210 0 250 fill/0 51px 0 60px stretch;color:#8fa0b5!important}
+.setBl>div.on{border-width:0 46px 0 57px;border-image:url(img/ui5/srow1.webp) 0 210 0 260 fill/0 46px 0 57px stretch;color:#fff!important;text-shadow:0 1px 2px #000}
+.setBl>div b{position:absolute;left:-43px;top:50%;margin-top:-14px;width:28px!important;height:28px!important;background:none!important;color:#cfd8e3!important;font:900 15px system-ui!important;text-shadow:0 1px 2px #000}
+.setBl>div.on b{left:-40px;color:#3a1d00!important;text-shadow:0 1px 0 #fff8}
+.setBl>div i{display:none}.setBl>div span{padding:0 4px;font-size:11.5px;line-height:1.15}
+/* v16-53 HERO COLLECTION: rainbow fill, check / lock on the chests, grade rows from the INFO WINDOW kit */
+.gcBar2 i{background:none!important;opacity:1!important;border-image:url(img/ui5/fill_r.webp) 0 38 fill/0 1.6cqw stretch;min-width:3.2cqw}
+.gcCh .gcOk{position:absolute;right:-3%;bottom:-8%;width:44%;height:auto;filter:drop-shadow(0 .4cqw .6cqw #000)}.gcCh:not(.ok) .gcOk{width:34%;opacity:.95}
+.gcW{--k:calc(min(100vw - 20px,540px)/948)}
+.gcRow{background:linear-gradient(180deg,var(--c3),#0b142400 60%)!important;box-shadow:none!important;padding:0 4px 8px!important}
+.gcRow .gcHd{grid-column:1/-1;margin:0 0 6px}.gcRow .gcHd .gk{display:flex;align-items:center;gap:4px}.gcRow .gcHd .gk img{height:1.5em}
+.gcRow.ok .gk::after{content:''!important}
 /* v16-51 sets + hero collection */
 .fc .setB{position:absolute;left:3%;top:3%;width:34%;height:auto;filter:drop-shadow(0 1px 2px #000);z-index:2;pointer-events:none}
 .itSet{display:block;color:#ffd54a!important;font-weight:900;letter-spacing:.3px;font-size:8.5px!important;line-height:1.1;margin-top:1px;white-space:nowrap}
@@ -404,10 +436,7 @@ root.innerHTML=`
 <div id="gBag" class="skP sk-bag"><div class="skBg"></div><div class="skH"><img class="hi" src="img/ui2/bag_h.webp" alt=""><div id="gFil"></div><button class="cpB gBk" data-g="bback">↩</button><div id="gBagFor"></div></div><div class="skB" id="gInv"></div><div class="gBagBar"><span id="gBagN"></span><button data-g="salvP"><img src="img/ui2/i_scrap.webp" alt="">SALVAGE</button></div></div>
 <div id="gSalv" class="gPg"><div class="skBg" style="background-image:url(img/ui2/salvage_f.webp)"></div><div class="eqW sv"><img class="hi" src="img/ui2/salvage_f.webp" alt=""><button class="cpB gBk" data-g="sback">↩</button><div id="svSlots"></div><div id="svInfo"></div><button id="svGo" data-g="salvGo"></button></div><div id="svHelp"></div></div>
 <div id="gColl" class="gPg"><div class="skBg"></div><div class="gcW" id="gcW"></div></div>
-<div id="gSum"><div class="gTop"><button class="cpB" data-gs="back">↩</button><div class="gTitle pic"><img src="img/ui/t_gsum.webp" alt="GEAR SUMMON"></div><div id="gsTk" class="gsTkP"></div><div class="gsSub">FOR BATTLES ONLY</div></div>
-<canvas id="gsHeroCv"></canvas><div id="gsTiles"></div><div id="gsPity"></div>
-<div class="gsBtns"><button id="gsB1" class="gsBtn" data-gs="1"><b>SUMMON x1</b><span>${GTKI0} 1</span></button><button id="gsB10" class="gsBtn big" data-gs="10"><b>SUMMON x10</b><span>${GTKI0} 10 · <i>+1 BONUS</i></span></button></div>
-<div class="gsLinks"><button class="cpB sm" data-gs="rates"><i class="ii">i</i> Rate Info</button><button class="cpB sm" data-gs="hist">📋 Summon History</button><button class="cpB sm" data-gs="gear" id="gsBag">BAG</button></div></div>
+<div id="gSum"><div id="gsBox"></div></div>
 <div id="cpPop"><div class="cpBox" id="cpPopBox"></div></div>`;
 document.body.appendChild(root);
 
@@ -1000,8 +1029,10 @@ const IMGI=(src,h,va)=>`<img src="${src}" style="height:${h||'1.2em'};vertical-a
 const ROLECOL={engine:'#ff7043',tuning:'#29b6f6',inspect:'#3d7cf0',service:'#00a58e',paint:'#e0457b',elec:'#18b26b',all:'#ffb300',crew:'#ef6c00'};
 const ROLEGL={engine:'cog',tuning:'flag',inspect:'scan',service:'wrench',paint:'brush',elec:'bolt',all:'star',crew:'nut'};
 // v16-52: Marius' class icons with the English name (img/ui4/cls_<class>.webp); Crew keeps the drawn badge
-const CLSI={};['engine','tuning','inspect','service','paint','elec','all'].forEach(k=>{const i=new Image();i.src='img/ui4/cls_'+k+'.webp';CLSI[k]=i;});
-const roleBadge=(r,sz)=>CLSI[r]?'img/ui4/cls_'+r+'.webp':badge(ROLEGL[r],ROLECOL[r],sz||64);
+// v16-53: CREW (Rookie) has its own class icon too (img/ui5/cls_crew.webp)
+const CLSU=k=>k==='crew'?'img/ui5/cls_crew.webp':'img/ui4/cls_'+k+'.webp';
+const CLSI={};['engine','tuning','inspect','service','paint','elec','all','crew'].forEach(k=>{const i=new Image();i.src=CLSU(k);CLSI[k]=i;});
+const roleBadge=(r,sz)=>CLSI[r]?CLSU(r):badge(ROLEGL[r],ROLECOL[r],sz||64);
 const roleBadgeCv=r=>CLSI[r]&&CLSI[r].complete&&CLSI[r].naturalWidth?CLSI[r]:badgeCv(ROLEGL[r],ROLECOL[r],64);
 
 // ---------------------------------------------------------------- hero look
@@ -2326,7 +2357,10 @@ function openCard(i){const T=TE(),G=T.G,s=STAGES[i],C=CHAP[s.c],first=i>=G.cp.be
   $('cpCard').classList.add('open');$('cpCardBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;if(a==='close')$('cpCard').classList.remove('open');if(a==='heroes'||a==='team'){openGear(null,i);}if(a==='fight'){const T=TE();if(!T.G.cp.team||!T.G.cp.team.length){T.G.cp.team=curTeamList().map(h=>h.id);T.save();}$('cpCard').classList.remove('open');safeStart(i,teamHeroes());}};}
 
 // ---------------------------------------------------------------- shared popup + before/after helpers
-function pop(html){$('cpPopBox').classList.remove('itPop');$('cpPopBox').innerHTML=html;$('cpPop').classList.add('open');$('cpPopBox').scrollTop=0;}
+// v16-53: info window (Marius' frame, CSS .winSk in index.html)
+function popW(title,html){const b=$('cpPopBox');b.className='cpBox winSk';b.innerHTML='<div class="wT">'+title+'</div><button class="wX" data-p="x" aria-label="close"></button><div class="wIn">'+html+'</div>';$('cpPop').classList.add('open');b.querySelector('.wIn').scrollTop=0;}
+const wRowB=(g,a,v,e)=>'<div class="wR'+(g>=0?' g'+g:'')+'"><span>'+a+'</span>'+(v!=null?'<b class="wV">'+v+'</b>':'')+(e?'<em>'+e+'</em>':'')+'</div>';
+function pop(html){$('cpPopBox').className='cpBox';$('cpPopBox').innerHTML=html;$('cpPop').classList.add('open');$('cpPopBox').scrollTop=0;}
 function closePop(){$('cpPop').classList.remove('open');}
 const heroOf=id=>!id?null:id.startsWith('crew')?crewHero(+id.slice(4)):TE().HB[id];
 const gcol=h=>h.crew?'#8d6e63':TE().GRADES[h.gr].c;
@@ -2477,11 +2511,11 @@ function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n
     x+=`<div class="gcA" data-gcr="${c.gr}" style="${cP(20,y-58,970,116)}"></div>
      <div class="gcL gcK${ok?' ok':''}" style="${cP(381,y-31,96,62)}">${c.n}/${c.tot}</div>
      <div class="gcL gcB${ok?' ok':''}" style="${cP(500,y-31,308,62)}"><b>${cbTxt(CBON[c.gr])}</b><small>${ok?'✓ ACTIVE · ALL HEROES':c.gr===5?'LOCKED · MYTHIC = FUSION':'LOCKED · ALL HEROES'}</small></div>
-     <div class="gcCh${ok?' ok':''}" style="${cP(835,y-52,138,104)}">${ok?'<i>✓</i>':''}</div>`;});
+     <div class="gcCh${ok?' ok':''}" style="${cP(835,y-52,138,104)}"><img class="gcOk" src="img/ui5/${ok?'ok':'lock'}.webp" alt="${ok?'done':'locked'}"></div>`;});
   x+=`<div class="gcL gcGo" data-g="hsum" style="${cP(200,1352,624,92)}">HERO SUMMON</div></div>
    <div class="gcSub">YOUR HEROES · tap a color above to jump to it</div>`;
   C.forEach(c=>{const g=T.GRADES[c.gr],L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon&&h.gr===c.gr);
-    x+=`<div class="gcRow${c.tot&&c.n>=c.tot?' ok':''}" id="gcr${c.gr}" style="--c:${g.c};--c3:${g.c}33"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}</span>
+    x+=`<div class="gcRow${c.tot&&c.n>=c.tot?' ok':''}" id="gcr${c.gr}" style="--c:${g.c};--c3:${g.c}33"><div class="wR g${c.gr} gcHd"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}${c.tot&&c.n>=c.tot?' <img src="img/ui5/ok.webp" alt="">':''}</span></div>
      <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${d?portraitURL(h):T.portrait(h,1)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:''} alt="">`;}).join('')}</div></div>`;});
   x+=`<div class="gcTot"><small style="color:#9fb0c0">The bonus works in the campaign and in the Arena. Summon new heroes to fill the collection.</small></div>`;
   morph($('gcW'),x);}
@@ -2621,32 +2655,50 @@ function gsHero(){const c=$('gsHeroCv');if(!c)return;const w=c.clientWidth||360,
   for(let k=0;k<26;k++){const p=(t*.35+k*.083)%1,sx=ax+Math.sin(k*7.3)*80*kx*(1-p),sy=ay-20*ky-p*h*.55;x.fillStyle='rgba(255,'+(170+(k%3)*30)+',80,'+(1-p)+')';x.fillRect(sx,sy,2.6,2.6);}}
 const GSIMG={};function gsImg(s,r){const k=s+r;if(!GSIMG[k]||(!GSIMG[k].ok&&itOK(s))){const im=new Image();im.src=itemArtCv(s,r).toDataURL();im.ok=itOK(s);GSIMG[k]=im;}return GSIMG[k];}
 let gsRaf=0;function gsLoop(){if(!$('gSum').classList.contains('open'))return;gsHero();gsRaf=requestAnimationFrame(gsLoop);}
-function openGSum(){$('gSum').classList.add('open');renderGSum();cancelAnimationFrame(gsRaf);gsRaf=requestAnimationFrame(gsLoop);$('gSum').scrollTop=0;}
+function openGSum(){$('gSum').classList.add('open');renderGSum();}
 function closeGSum(){$('gSum').classList.remove('open');cancelAnimationFrame(gsRaf);if($('cpGear').classList.contains('open'))renderGear();}
-function renderGSum(){const T=TE(),g=GSD(),p=g.pity;
-  $('gsTk').innerHTML=GTKI+' '+g.tk;
-  $('gsTiles').innerHTML=gsTiles();
-  $('gsPity').innerHTML=`<div class="gpBar"><i style="width:${Math.min(100,p.l/GS_PITY.l*100).toFixed(1)}%"></i><span>💛 LEGENDARY PITY <b>${p.l} / ${GS_PITY.l}</b></span></div><div style="margin-top:4px">${T.DMI} ${(T.G.dm||0).toLocaleString()} · no tickets? ${T.DM_SUM} ${T.DMI} = 1 summon</div>`;
-  const dm=T.G.dm||0;$('gsB1').className='gsBtn'+(g.tk<1&&dm<T.DM_SUM?' dis':'');$('gsB10').className='gsBtn big'+(g.tk+Math.floor(dm/T.DM_SUM)<10?' dis':'');
-  $('gsBag').textContent='BAG '+g.inv.length+'/'+GINV;}
+// v16-53: GEAR SUMMON on Marius' background (img/ui5/gsum_bg.webp, 1024x1536) under the GEAR SUMMON header (img/ui3/gsum_h.webp);
+// box 1024 x 1836 units, background from y=300. Same idea as the HERO SUMMON page.
+const GSU=n=>'calc(var(--u)*'+n+')',gbx=(x,y,w,h)=>'left:'+GSU(x)+';top:'+GSU(y)+';width:'+GSU(w)+';height:'+GSU(h)+';';
+const GEMX=[143,296,446,596,744,894];
+function gsSize(){const b=$('gsBox');if(!b)return;const k=Math.min(innerWidth/1024,innerHeight/1836);b.style.width=1024*k+'px';b.style.height=1836*k+'px';b.style.setProperty('--u',k+'px');}
+addEventListener('resize',()=>{if($('gSum').classList.contains('open'))gsSize();});
+function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
+  const pc=Math.min(100,p.l/GS_PITY.l*100);
+  let h='<img class="gsBg" src="img/ui5/gsum_bg.webp" alt="" style="'+gbx(0,300,1024,1536)+'"><img class="gsHd" src="img/ui3/gsum_h.webp" alt="GEAR SUMMON" style="'+gbx(0,0,1024,415)+'">';
+  h+='<div data-gs="back" style="'+gbx(26,62,112,108)+'border-radius:50%"></div>';
+  h+='<div class="gsL gsTkN" data-gs="rates" style="'+gbx(803,97,196,56)+'">'+GTKI+' '+g.tk+'</div>';
+  h+='<div class="gsL" style="'+gbx(318,160,384,50)+'font-size:'+GSU(26)+';color:#9fd3ff">FOR BATTLES ONLY</div>';
+  h+='<div class="gsL gsDm" style="'+gbx(812,190,186,88)+'">'+T.DMI+' '+dm.toLocaleString()+'</div>';
+  h+='<div class="gsL" style="'+gbx(190,855,640,80)+'font-size:'+GSU(40)+'">AVAILABLE GEAR</div><div data-gs="rates" style="'+gbx(890,853,84,84)+'border-radius:50%"></div>';
+  GEMX.forEach((x,r)=>{h+='<div class="gsL gsRt" style="'+gbx(x-75,1176,150,34)+'color:'+T.GRADES[r].c+'">'+GS_RATE[r]+'%</div><div data-gs="rates" style="'+gbx(x-72,995,144,215)+'"></div>';});
+  h+='<div class="gsL gsPl" data-gs="rates" style="'+gbx(45,1285,280,90)+'">RATE INFO</div>';
+  h+='<div class="gsL gsPl" data-gs="hsum" style="'+gbx(365,1285,295,90)+'color:#ffd54a">HERO SUMMON ›</div>';
+  h+='<div class="gsL gsPl" data-gs="hist" style="'+gbx(700,1285,290,90)+'">HISTORY</div>';
+  h+='<div class="gsL gsBig'+(g.tk<1&&dm<T.DM_SUM?' dis':'')+'" data-gs="1" style="'+gbx(45,1405,445,125)+'">SUMMON ×1<span>'+GTKI+' 1</span></div>';
+  h+='<div class="gsL gsBig gold'+(g.tk+Math.floor(dm/T.DM_SUM)<10?' dis':'')+'" data-gs="10" style="'+gbx(530,1400,400,130)+'">SUMMON ×10<span>'+GTKI+' 10</span></div>';
+  h+='<div class="gsL gsRib" style="'+gbx(868,1412,72,40)+'">+1</div>';
+  h+='<i class="gsFill" style="'+gbx(99,1570,Math.max(pc?54:0,832*pc/100).toFixed(1),47)+'"></i>';
+  h+='<div class="gsL" style="'+gbx(90,1562,850,63)+'font-size:'+GSU(28)+'">LEGENDARY PITY&nbsp;<b style="color:#ffd54a">'+p.l+' / '+GS_PITY.l+'</b></div>';
+  h+='<div class="gsL gsCol" data-gs="gear" style="'+gbx(150,1660,725,135)+'">BAG '+g.inv.length+' / '+GINV+'<small>EQUIP YOUR HEROES</small></div>';
+  $('gsBox').innerHTML=h;}
 function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r));
   let x=`<h2 style="color:${T.GRADES[best].c}">${best>=5?'MYTHIC GEAR!':best>=4?'LEGENDARY GEAR!':'GEAR SUMMONED'}</h2><div class="sub">${res.length} item${res.length>1?'s':''}${n===10?' · +1 BONUS':''}</div>
    <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${T.GRADES[o.it.r].c}">${GS_NAMES[o.it.r]}</i><i>${itemName(o.it)}</i>${o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
    ${sold?`<div class="sub">Bag full (${GINV}) – extra gear sold for ${T.fmt(sold)}</div>`:''}
    <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}">AGAIN x${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
-function gsRates(){const T=TE();pop(`<div class="pT pic"><img src="img/ui/t_rates.webp" alt="SUMMON RATES"></div><span class="pSub">GEAR</span><div class="gsRates">${GS_RATE.map((p,r)=>`<div><b style="color:${T.GRADES[r].c}">${GS_NAMES[r]}</b><span>${p}%</span><small>max Lv ${GMAXR[r]} · ${GSUBN[r]} bonus stat${GSUBN[r]===1?'':'s'}</small></div>`).join('')}</div>
-  <div class="pD" style="margin-top:8px">Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).<br><b>Summon x10</b> gives <b>11</b> pieces.<br>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons (no other pity).<br>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div>
-  <div class="cpSec">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="pD">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}
-function gsHist(){const T=TE(),g=GSD();pop(`<div class="pT pic"><img src="img/ui/t_hist.webp" alt="SUMMON HISTORY"></div><span class="pSub blue">Last ${g.hist.length} of ${g.sum} gear summons</span><div class="gsHist">${g.hist.length?g.hist.map(o=>`<div><img src="${itemIconURL(o.s,o.r)}"><b style="color:${T.GRADES[o.r].c}">${GNAMES[o.s][o.r]}</b><small style="color:${T.GRADES[o.r].c}">${GS_NAMES[o.r]}</small></div>`).join(''):'<div class="pD">Nothing yet.</div>'}</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}
+function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+T.GRADES[r].c+'">'+GS_NAMES[r]+'</b>',p+'%','max Lv '+GMAXR[r]+' · '+GSUBN[r]+' bonus stat'+(GSUBN[r]===1?'':'s'))).join('')+
+  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons (no other pity).</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
+  <div class="wS">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="wP">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div>`);}
+function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">Last '+g.hist.length+' of '+g.sum+' gear summons</div>'+(g.hist.length?g.hist.map(o=>wRowB(o.r,'<img src="'+itemIconURL(o.s,o.r)+'" alt=""> <b style="color:'+T.GRADES[o.r].c+'">'+GNAMES[o.s][o.r]+'</b>',null,GS_NAMES[o.r])).join(''):'<div class="wP">Nothing yet.</div>'));}
 
 // ---------------------------------------------------------------- open / close
 function open(){root.classList.add('open');window.__BATTLE_ON=true;showMap();gsBadge();}
 function close(){running=false;cancelAnimationFrame(raf);cancelAnimationFrame(gsRaf);root.classList.remove('open');['cpCard','cpTeam','cpRes','bt','cpGear','cpPop','gSum'].forEach(id=>$(id).classList.remove('open'));window.__BATTLE_ON=false;}
-$('gSum').addEventListener('click',e=>{const el=e.target.closest('[data-gs]');if(!el)return;const a=el.dataset.gs;
-  if(a==='back')closeGSum();else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
+$('gSum').addEventListener('click',e=>{if(e.target.id==='gSum'){closeGSum();return;}const el=e.target.closest('[data-gs]');if(!el)return;const a=el.dataset.gs;
+  if(a==='back')closeGSum();else if(a==='hsum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon('m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
   else{const t=e.target.closest('.gsT');if(t)gsRates();}});
-$('gsTiles').addEventListener('click',()=>gsRates());
 $('cpGSB').onclick=()=>openGSum();$('gGSB').onclick=()=>openGSum();
 $('cpChN').onclick=()=>chList();
 $('cpBack').onclick=close;$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
@@ -2676,5 +2728,5 @@ function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return fal
 const hasSpr=id=>!!SPRD[id];
 let collHome=0;
 window.CAMPAIGN={openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
