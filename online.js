@@ -290,21 +290,21 @@ const SVGDEFS=`<svg width="0" height="0" style="position:absolute"><defs>
 const top=(ic,t,sub)=>`<div class="top"><div class="ttl">${ICON[ic]}<h1>${t}<small>${sub}</small></h1></div><span class="srv" data-srv></span><button class="o-gift" data-gift>🎁<i></i></button><button class="x" data-x>✕</button></div>`;
 const root=document.createElement('div');root.id='onl';
 root.innerHTML=SVGDEFS+`
-<section class="scr" id="olRank">${top('trophy','BATTLE RANKING','LIVE · YOUR SERVER')}
+<section class="scr skn sk-rank" id="olRank"><div class="skH"><img class="hi" src="img/ui2/rank_h.webp" alt=""><div id="olPod"></div>${top('trophy','BATTLE RANKING','LIVE · YOUR SERVER')}</div><div class="skB">
   <div class="tabs" id="olRkT"><b data-by="best" class="on">CAMPAIGN</b><b data-by="pow">POWER</b><b data-by="lv">GARAGE</b></div>
   <div class="o-sub"><span class="live">LIVE</span><span id="olUpd"></span></div>
-  <div class="body" id="olRkB"></div><div class="pin" id="olRkMe"></div></section>
-<section class="scr" id="olChat">${top('chat','WORLD CHAT','AUTO-TRANSLATE')}
+  <div class="body" id="olRkB"></div><div class="pin" id="olRkMe"></div></div></section>
+<section class="scr skn sk-chat" id="olChat"><div class="skH"><img class="hi" src="img/ui2/chat_h.webp" alt="">${top('chat','WORLD CHAT','AUTO-TRANSLATE')}</div><div class="skB">
   <div class="tabs" id="olChT"><b data-ch="w" class="on">WORLD</b><b data-ch="a">ARENA</b><b data-tr="1" id="olTrB"></b></div>
-  <div class="msgs" id="olMsgs"></div>
+  <div class="msgs" id="olMsgs"></div></div>
   <div class="inp"><input id="olIn" maxlength="200" enterkeyhint="send" placeholder="Write a message…" autocomplete="off"><button class="btn shine" id="olSend">SEND</button></div></section>
-<section class="scr" id="olArena">${top('arena','ARENA','PVP · WEEKLY SEASON')}
+<section class="scr sk-arena" id="olArena">${top('arena','ARENA','PVP · WEEKLY SEASON')}
   <div class="tabs" id="olArT"><b data-t="fight" class="on">FIGHT</b><b data-t="top">ARENA TOP</b><b data-t="hist">HISTORY</b></div>
   <div class="body" id="olArB"></div></section>
-<section class="scr" id="olCupS">${top('cup','TORQUE CUP','WEEKEND TOURNAMENT')}
-  <div class="body" id="olCupB"></div></section>
-<section class="scr" id="olProf">${top('user','MY PROFILE','NAME · ICON · FRAME · TITLE')}
-  <div class="body" id="olPrB"></div></section>
+<section class="scr skn sk-cup" id="olCupS"><div class="skH"><img class="hi" src="img/ui2/cup_h.webp" alt="">${top('cup','TORQUE CUP','WEEKEND TOURNAMENT')}</div><div class="skB">
+  <div class="body" id="olCupB"></div></div></section>
+<section class="scr skn sk-profile" id="olProf"><div class="skH"><img class="hi" src="img/ui2/profile_h.webp" alt=""><div id="olPrH"></div>${top('user','MY PROFILE','NAME · ICON · FRAME · TITLE')}</div><div class="skB">
+  <div class="body" id="olPrB"></div></div></section>
 <div class="nav" id="olNav"><b data-s="olRank">${ICON.trophy}RANKING</b><b data-s="olChat">${ICON.chat}CHAT<i id="olChDot"></i></b><b data-s="olArena">${ICON.arena}ARENA<i id="olArDot"></i></b><b data-s="olCupS">${ICON.cup}CUP</b><b data-s="olProf">${ICON.user}PROFILE</b></div>
 <div id="olFx"><canvas id="olFc"></canvas><div class="vs" id="olVs"></div><div class="ctl"><button id="olSpd">×2 ⏩</button><button id="olSkip">SKIP ⏭</button></div><div class="res" id="olRes"></div></div>`;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.appendChild(root);
@@ -356,11 +356,13 @@ async function loadRank(first){
   const val=p=>rkBy==='best'?stLab(p.best):rkBy==='pow'?'⚡ '+fmtN(p.pow):'🏗️ '+p.lv;
   const subv=p=>rkBy==='best'?'⚡ '+fmtN(p.pow):'⚔️ '+stLab(p.best);
   const L=r.list;
-  if(first||!B.querySelector('.pod')){
+  // v16-47: top 3 stand on the podium of Marius' ranking page (header)
+  {const P=$('olPod');P.innerHTML=[1,0,2].map(i=>{const p=L[i];return `<div class="pd p${i+1}" ${p?`data-uid="${p.uid}"`:''}>${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}<div class="av">${p?avf(p.icon,p.frame):''}</div><div class="pn"><b>${p?flag(p.cc)+' '+esc(p.name):'—'}</b><small>${p?val(p):''}</small></div></div>`;}).join('');}
+  if(first||!B.querySelector('#olRows')){
     const pod=[1,0,2].map(i=>{const p=L[i];if(!p)return `<div class="g g${i+1}" style="opacity:.25">${medal(i+1)}<div class="av">${avf('m0_0',0)}</div><div class="o-n">—</div></div>`;
       return `<div class="g g${i+1}" data-uid="${p.uid}">${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}${medal(i+1)}<div class="av">${avf(p.icon,p.frame)}</div><div class="o-n">${flag(p.cc)} ${esc(p.name)}</div>${tt(p.title)}<div class="o-st" data-v>${val(p)}</div><div class="ps">${subv(p)}</div></div>`;}).join('');
-    B.innerHTML=`<div class="pod"><div class="rays"></div>${pod}</div><div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
-  else{let re=false;[1,0,2].forEach(i=>{const p=L[i],el=B.querySelector('.pod .g'+(i+1));if(p&&el&&+el.dataset.uid===p.uid)el.querySelector('[data-v]').textContent=val(p);else if(p)re=true;});if(re){rkPrev={};return loadRank(true);}}
+    B.innerHTML=`<div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
+
   const rows=$('olRows');const html=L.slice(3).map((p,i)=>{const ch=rkPrev[p.uid]!==undefined&&rkPrev[p.uid]!==p[rkBy];
     return `<div class="o-row ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${p.vip?`<span class="vip">VIP ${p.vip}</span>`:''}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
   rows.innerHTML=html;
@@ -455,12 +457,23 @@ async function loadCup(){const B=$('olCupB');if(!cupData)B.innerHTML='<div class
 const RW=r=>`<div class="o-rw">${[[1,'🏆 Champion'],[2,'🥈 Final'],[4,'🥉 Semi-final'],[8,'Quarter-final'],[16,'Round of 16'],[32,'Round of 32'],[64,'Round of 64']].map(([k,l])=>{const x=r[k];return `<span>${l}</span><span>💎 ${x.dm}${x.tk?' · 🎟️ '+x.tk:''}${x.gt?' · ⚙️ '+x.gt+' Gear':''}${k===1?' · <i class="tt t5">CUP CHAMPION</i>':''}</span>`;}).join('')}</div>`;
 const rName=(n,ri)=>{const left=n/Math.pow(2,ri);return left===2?'FINAL':left===4?'SEMI-FINAL':left===8?'QUARTER-FINAL':'ROUND OF '+left;};
 let cupR=-1;
+// v16-47: the last 8 on Marius' bracket (quarter-final → champion); '?' until known
+function bracket(r){const W=905,H=620,bx=(x0,x1,y0,y1,t,cl)=>`<div class="bx ${cl||''}" style="left:${x0/W*100}%;width:${(x1-x0)/W*100}%;top:${y0/H*100}%;height:${(y1-y0)/H*100}%">${t}</div>`;
+  const R=r&&r.R||[],n=r&&r.n||0;let qi=-1;for(let i=0;i<R.length;i++)if(n/Math.pow(2,i)===8)qi=i;
+  const nm=k=>{if(k==null||k<0||!r.P[k])return '?';const P=r.P[k];return `<span class="${k===r.me?'me':''}">${esc(P.name)}</span>`;};
+  const Q=qi>=0?R[qi]||[]:[],S=qi>=0?R[qi+1]||[]:[],F=qi>=0?R[qi+2]||[]:[];
+  const QY=[[35,89],[203,257],[343,397],[505,559]],SY=[[125,177],[411,465]];let h='';
+  for(let m=0;m<4;m++){const M=Q[m]||{},L=m<2,x=L?[18,166]:[740,887],y0=QY[(m%2)*2],y1=QY[(m%2)*2+1];
+    h+=bx(x[0],x[1],y0[0],y0[1],nm(M.a),M.w>=0&&M.w!==M.a&&M.w!=null?'l':'')+bx(x[0],x[1],y1[0],y1[1],nm(M.b),M.w>=0&&M.w!==M.b&&M.w!=null?'l':'');}
+  for(let m=0;m<2;m++){const M=S[m]||{},x=m===0?[214,336]:[570,692];h+=bx(x[0],x[1],SY[0][0],SY[0][1],nm(M.a))+bx(x[0],x[1],SY[1][0],SY[1][1],nm(M.b));}
+  const fm=F[0]||{};h+=bx(345,560,491,567,fm.w>=0&&fm.w!=null?'🏆 '+nm(fm.w):fm.a!=null?nm(fm.a)+' <i>vs</i> '+nm(fm.b):'🏆 ?','fin');
+  return `<h3>FINAL 8</h3><div class="brk">${h}</div>`;}
 function renderCup(){const r=cupData,B=$('olCupB');
   const head=(t,sub,cd)=>`<div class="tw"><svg class="tro" viewBox="0 0 64 64"><use href="#olCup"/></svg><b>${t}</b><small>${sub}</small>${cd?`<div class="cd" id="olCd"></div><small id="olCdL">${cd}</small>`:''}</div>`;
   if(r.state==='wait'){
     B.innerHTML=head(`WEEKEND CUP #${r.num}`,'The best 64 players of the Arena qualify on Friday 22:00 · knock-out · 1 round every 3 h · your battle team fights for you','until the qualification')+
      (r.last&&r.last.done?`<h3>LAST CUP CHAMPION</h3><div class="o-row" ${r.last.P[r.last.champ].uid?`data-uid="${r.last.P[r.last.champ].uid}"`:''}><span class="k">🏆</span>${ring(r.last.P[r.last.champ].icon)}<div class="o-nm"><b>${esc(r.last.P[r.last.champ].name)}</b><small>Weekend Cup #${r.num-1}</small></div></div>`:'')+
-     `<h3>REWARDS</h3>${RW(r.rw)}<div class="o-note">Climb the Arena this week to qualify. Rewards are diamonds & tickets earned by playing.</div>`;
+     bracket(null)+`<h3>REWARDS</h3>${RW(r.rw)}<div class="o-note">Climb the Arena this week to qualify. Rewards are diamonds & tickets earned by playing.</div>`;
     cupT=r.qual;cupTick();return;}
   const ri=cupR<0||cupR>r.R.length-1?r.round:cupR, M=r.R[ri]||[];
   const myM=M.find(m=>m.a===r.me||m.b===r.me);const out=r.me>=0&&r.R.some(rr=>rr.some(m=>(m.a===r.me||m.b===r.me)&&m.w>=0&&m.w!==r.me));
@@ -469,7 +482,7 @@ function renderCup(){const r=cupData,B=$('olCupB');
    `<div class="tabs" id="olCupT" style="padding:0 0 8px;overflow-x:auto">${r.R.map((x,i)=>`<b data-r="${i}" class="${i===ri?'on':''}" style="flex:none;padding:8px 10px">${rName(r.n,i).replace('ROUND OF ','R')}</b>`).join('')}</div>`+
    M.map(m=>{const A=r.P[m.a],Bp=r.P[m.b],me=m.a===r.me||m.b===r.me;const cls=x=>m.w<0?'':m.w===x?'w':'l';
      return `<div class="mt ${me?'me':''}"><div class="sd"><div class="${cls(m.a)} ${m.a===r.me?'me':''}">${ring(A.icon)}${esc(A.name)} ${A.bot?'<span class="ai">AI</span>':''}</div><div class="${cls(m.b)} ${m.b===r.me?'me':''}">${ring(Bp.icon)}${esc(Bp.name)} ${Bp.bot?'<span class="ai">AI</span>':''}</div></div><div class="wb">${m.f?`<button class="play" data-replay="${m.f}">▶</button>`:m.w<0?'<small style="color:#8fa0b4;font:800 10px system-ui">soon</small>':''}</div></div>`;}).join('')+
-   `<h3>REWARDS</h3>${RW(r.rw)}`;
+   bracket(r)+`<h3>REWARDS</h3>${RW(r.rw)}`;
   cupT=r.done?r.nextWeek:r.next;cupTick();}
 let cupT=0;function cupTick(){const e=$('olCd');if(!e||!cupT)return;const ms=Math.max(0,cupT-Date.now()),h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);
   e.innerHTML=(h>=24?`<span>${Math.floor(h/24)}d</span>`:'')+`<span>${String(h%24).padStart(2,'0')}</span><span>${String(m).padStart(2,'0')}</span><span>${String(s).padStart(2,'0')}</span>`;
@@ -484,11 +497,9 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
   const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')));
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
-  B.innerHTML=`<div class="pcard"><div class="rays"></div><div class="av">${avf(ME.icon,ME.frame)}</div>
-    <div class="pname"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div>
-    <div style="position:relative;margin-top:5px">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}${vip?' · VIP '+vip:''}</div></div>
-   ${/^Mechanic\d+$/.test(ME.name)?`<div class="btns" style="margin-bottom:10px"><div class="shine" data-a="name">✏️ CHOOSE YOUR PLAYER NAME (FREE)</div></div>`:''}
-   <div class="stats"><div>Campaign<b>⚔️ ${stLab(ME.best)}</b></div><div>Team power<b>⚡ ${fmtN(ME.pow)}</b></div><div>Garage<b>🏗️ LV ${ME.lv}</b></div><div>Cup wins<b>🏆 ${ME.cupw||0}</b></div></div>
+  $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}${vip?' · VIP '+vip:''}</div>
+    <div class="pst s1">CAMPAIGN<b>⚔️ ${stLab(ME.best)}</b></div><div class="pst s2">TEAM POWER<b>⚡ ${fmtN(ME.pow)}</b></div><div class="pst s3">GARAGE · CUP<b>🏗️ ${ME.lv} · 🏆 ${ME.cupw||0}</b></div>`;
+  B.innerHTML=`   ${/^Mechanic\d+$/.test(ME.name)?`<div class="btns" style="margin-bottom:10px"><div class="shine" data-a="name">✏️ CHOOSE YOUR PLAYER NAME (FREE)</div></div>`:''}
    <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
    <h3>FRAME</h3><div class="frames">${FR.map(f=>`<div class="${f[0]===ME.frame?'sel':''} ${fOk(f[0])?'':'o-lock'}" data-fr="${f[0]}"><div class="av">${avf(ME.icon,f[0])}</div><small>${f[1]}<br>${fOk(f[0])?(f[0]===ME.frame?'✅ in use':'tap to use'):'🔒 '+f[2]}</small></div>`).join('')}</div>
    <h3>TITLE</h3><div class="tlist">${TORD.map(k=>`<div class="${k===ME.title?'sel':''} ${tOk(k)?'':'o-lock'}" data-tt="${k}">${tt(k)}<span>${TT[k][2]}</span><b>${tOk(k)?(k===ME.title?'✅':''):'🔒'}</b></div>`).join('')}</div>
@@ -497,6 +508,7 @@ async function setProf(set,paid){const r=await call('prof',{set,paid});
   if(r.ok){ME={...ME,...r.me};renderProf();return r;}
   const E={name_rules:'✏️ 3–14 letters, numbers, _ . -',name_bad:'🚫 This name is not allowed',name_taken:'❌ This name is already used on your server',locked:'🔒 Not unlocked yet',network:'📶 No connection'};
   if(r.err!=='pay')toast(E[r.err]||'⚠️ Could not save',3000);return r;}
+$('olPrH').addEventListener('click',e=>{if(e.target.closest('[data-a="name"]'))nameModal();});
 $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
