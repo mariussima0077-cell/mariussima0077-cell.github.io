@@ -5,3 +5,4 @@
 - Când se completează ceva nou în Play Console sau se ia o decizie de publicare, actualizează `PLAY_RULES.md` (tabelul din secțiunea 1).
 - La fiecare update: schimbă `const V` din `sw.js`, rulează `python3 tools/sw_hash.py` (altfel pozele schimbate nu ajung la jucători), testează live, rulează și `python3 tools/budget_phone.py` (telefon de buget simulat – cere Marius la fiecare test), urcă pe `main`. Nu reseta salvarea (`torqueEmpire_v15`).
 - Marius vorbește română; are doar telefon. Secretele stau doar în Google Drive, niciodată aici (repository public).
+- **Regula lui Marius (16 nov 2026): la sfârșitul FIECĂRUI răspuns lasă o notiță scurtă** – ce am făcut acum, ce urmează și ce imagini / iconițe / pagini mai lipsesc (sau „nu lipsește nimic”). Aceeași listă trebuie să fie și în `NEXT_STEPS.md`, ca să poată continua într-un chat nou.

@@ -233,6 +233,7 @@ const css=`
 #onl .nav b{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:900 9px system-ui;color:#8fa0b4;letter-spacing:.3px}
 #onl .nav b svg{width:24px;height:24px;transition:transform .2s}
 #onl .nav b.on{color:#ffe27a;background:radial-gradient(ellipse at 50% 100%,#ffb30044,transparent 70%)}
+#onl .nav b img{width:30px;height:30px;object-fit:contain;transition:transform .2s;filter:drop-shadow(0 2px 2px #000)}#onl .nav b.on img{transform:translateY(-4px) scale(1.2);filter:drop-shadow(0 0 6px #ffb300)}
 #onl .nav b.on svg{transform:translateY(-3px) scale(1.18);filter:drop-shadow(0 0 6px #ffb300)}
 #onl .nav b i{position:absolute;top:5px;right:calc(50% - 20px);width:9px;height:9px;border-radius:50%;background:#e53935;box-shadow:0 0 0 1.5px #fff;display:none}
 #onl .nav b i.on{display:block}
@@ -352,7 +353,7 @@ root.innerHTML=SVGDEFS+`
   <div class="body" id="olCupB"></div></div></section>
 <section class="scr skn sk-profile" id="olProf"><div class="skH"><img class="hi" src="img/ui2/profile_h.webp" alt=""><div id="olPrH"></div>${top('user','MY PROFILE','NAME · ICON · FRAME · TITLE')}</div><div class="skB">
   <div class="body" id="olPrB"></div></div></section>
-<div class="nav" id="olNav"><b data-s="olRank">${ICON.trophy}RANKING</b><b data-s="olChat">${ICON.chat}CHAT<i id="olChDot"></i></b><b data-s="olArena">${ICON.arena}ARENA<i id="olArDot"></i></b><b data-s="olCupS">${ICON.cup}CUP</b><b data-s="olProf">${ICON.user}PROFILE</b></div>
+<div class="nav" id="olNav"><b data-s="olRank"><img src="img/ui3/on_rank.webp" alt="">RANKING</b><b data-s="olChat"><img src="img/ui3/on_chat.webp" alt="">CHAT<i id="olChDot"></i></b><b data-s="olArena"><img src="img/ui3/on_arena.webp" alt="">ARENA<i id="olArDot"></i></b><b data-s="olCupS"><img src="img/ui3/on_cup.webp" alt="">CUP</b><b data-s="olProf"><img src="img/ui3/on_prof.webp" alt="">PROFILE</b></div>
 <div id="olFx"><canvas id="olFc"></canvas><div class="vs" id="olVs"></div><div class="ctl"><button id="olSpd">×2 ⏩</button><button id="olSkip">SKIP ⏭</button></div><div class="res" id="olRes"></div></div>`;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.appendChild(root);
 

@@ -503,6 +503,27 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .sk-profile .skB{border-width:calc(var(--pw)*60/1024) calc(var(--pw)*45/1024) calc(var(--pw)*96/1024) calc(var(--pw)*45/1024);border-image:url(img/ui2/profile_b.webp) 60 45 96 45 round;background:url(img/ui2/profile_i.webp) 0 0/100% 100% no-repeat;background-origin:padding-box;background-clip:padding-box}
 .sk-profile>.skBg{background-image:url(img/ui2/profile_bl.webp)}
 /* end skins */
+/* v16-50 confirm window + green/red buttons + message bar = Marius' pictures (img/ui3/dlg_*) */
+#popBox.dlgSk{--k:calc(min(100vw - 28px,400px)/871);max-width:400px;display:flex;flex-direction:column;overflow:visible;max-height:90vh;padding:0;background:none!important;box-shadow:none!important;border-radius:0;border-style:solid;border-width:calc(var(--k)*200) calc(var(--k)*58) calc(var(--k)*131);border-image:url(img/ui3/dlg_f.webp) 200 58 131 fill stretch;filter:drop-shadow(0 12px 30px #000)}
+#popBox.dlgSk .pX{display:none}
+#popBox.dlgSk .skIn{padding:0 calc(var(--k)*10) calc(var(--k)*4);margin-top:calc(var(--k)*-40)}
+#popBox.dlgSk .pT{position:absolute;left:calc(var(--k)*(185 - 58));width:calc(var(--k)*500);top:calc(var(--k)*-185);height:calc(var(--k)*110);margin:0;padding:0;display:flex;align-items:center;justify-content:center;font:900 min(4.2vw,17px) system-ui;color:#3a1d00!important;text-shadow:0 1px 0 #fff8!important;white-space:nowrap}
+#popBox.dlgSk .pT img{height:1.2em!important}
+#popBox.dlgSk .pD{background:none!important;border:0!important;color:#e6eef7;font-size:13px;text-align:center}
+#popBox.dlgSk .pB{display:block;width:100%;aspect-ratio:684/197;height:auto;margin:4px 0;padding:0;border:0;border-radius:0;background:url(img/ui3/dlg_g.webp) center/100% 100% no-repeat!important;box-shadow:none!important;color:#fff!important;font:900 min(4vw,16px) system-ui;text-shadow:0 2px 0 #063!important}
+#popBox.dlgSk .pB.grey{background-image:url(img/ui3/dlg_r.webp)!important;text-shadow:0 2px 0 #600!important}
+#popBox.dlgSk .pB.grey:only-of-type{background-image:url(img/ui3/dlg_g.webp)!important}
+#popBox.dlgSk .skIn:has(.pB+.pB){display:block}
+#toast{border-style:solid!important;border-width:0 16px 0 46px!important;border-image:url(img/ui3/dlg_bar.webp) 0 50 0 150 fill stretch!important;border-image-width:0 16px 0 46px!important;background:none!important;border-radius:0!important;box-shadow:none!important;min-height:46px;width:max-content;min-width:min(300px,90vw);max-width:92vw;box-sizing:border-box;padding:8px 6px 8px 8px!important;font-size:13px!important;line-height:1.25;display:flex;align-items:center;color:#fff!important;text-shadow:0 1px 0 #000;filter:drop-shadow(0 6px 12px #000a)}
+
+/* v16-50 right side buttons = Marius' round pictures (img/ui3/s_*) */
+#side2{gap:4px!important}
+#side2 button{width:52px!important;height:58px!important;background:none center/contain no-repeat!important;box-shadow:none!important;border-radius:0!important;filter:drop-shadow(0 3px 4px #0009)}
+#side2 button>svg,#side2 button>small{display:none!important}
+#side2 #rkBtn{background-image:url(img/ui3/s_rank.webp)!important}#side2 #chBtn{background-image:url(img/ui3/s_chat.webp)!important}#side2 #ciBtn{background-image:url(img/ui3/s_ci.webp)!important}#side2 #nwBtn{background-image:url(img/ui3/s_news.webp)!important}#side2 #mlBtn{background-image:url(img/ui3/s_mail.webp)!important}
+#side2 i{right:-2px!important;top:-2px!important}
+@media (max-height:700px){#side2 button{width:46px!important;height:51px!important}}
+
 /* v16-49 CHECK-IN (5000 free summons) day tiles = Marius' pictures (img/ui3/ci_*) */
 .c5Grid{gap:3px!important;grid-template-columns:repeat(6,minmax(0,1fr))!important}
 .c5D{min-width:0;background:url(img/ui3/ci_n.webp) center/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;padding:9px 1px 4px!important;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -3068,9 +3089,12 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   const P=G.h.pity[smCat],free=freeOK(),key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+free+HVER;if(key===smKey){const mE=$('smMoney');if(mE)mE.textContent=(G.dm||0).toLocaleString();return;}smKey=key;const C=CATS[smCat];
   let h='';
   if(smCat!=='m'){const top=[...HEROES.filter(x=>x.cat==='g'&&(x.gr===4||x.gr===3)).slice(-3),...HEROES.filter(x=>x.cat==='d'&&(x.gr===4||x.gr===3)).slice(-2)].reverse();
-    h+='<div class="smBan" style="'+box(0,92,921,846)+'"><div class="smT" style="'+box(0,40,921,130)+'">'+C.title+' <span>SUMMON</span></div>'+
-      '<div class="smS" style="'+box(0,182,921,50)+'">'+C.sub+'</div>';
-    const pos=[[316,250,290],[140,320,210],[571,320,210],[14,410,170],[737,410,170]];
+    // v16-50: Marius' CREW SUMMON header picture (img/ui3/csum_h.webp) on top of the banner
+    h+='<div class="smBan" style="'+box(0,92,921,846)+'"><img src="img/ui3/csum_h.webp" alt="CREW SUMMON" style="'+box(0,4,921,306)+'filter:drop-shadow(0 4px 8px #000a)">'+
+      '<div data-a="back" style="'+box(20,40,95,95)+'border-radius:50%"></div>'+
+      '<div class="smS" style="'+box(735,58,165,50)+'display:flex;align-items:center;justify-content:center;gap:'+U(6)+';font-size:'+U(30)+';color:#fff"><img src="img/cticket.webp" style="height:'+U(44)+'">'+G.h.ct+'</div>'+
+      '<div class="smS" style="'+box(300,252,320,48)+'display:flex;align-items:center;justify-content:center;font-size:'+U(20)+';color:#9fd3ff;letter-spacing:'+U(1)+'">DRIVERS + GUARDS</div>';
+    const pos=[[336,330,250],[166,385,190],[565,385,190],[30,450,160],[731,450,160]];
     [3,4,1,2,0].forEach(i=>{const x=top[i];if(!x)return;const p=pos[i];h+='<div class="smP" style="'+box(p[0],p[1],p[2],p[2])+'border-color:'+GRADES[x.gr].c+'">'+img(x)+'</div>';});
     h+='<div class="smS" style="'+box(0,620,921,60)+'font-size:'+U(34)+'">Get '+C.n+' from Common to <b style="color:#29b6f6">Rare</b>, <b style="color:#d05cff">Epic</b>, <b style="color:#ffd21a">Legendary</b>!</div></div>';
     h+='<div class="smAv" style="'+box(292,956,340,50)+'">Available '+C.n+'</div>';}
@@ -3105,7 +3129,7 @@ function doSummon(n){
   if(!need){go();return;}
   payAsk(have,n,TIK(smCat),(smCat==='c'?'Crew':'Recruit')+' Tickets',go);}
 // v16-37: missing tickets are paid with diamonds – ONLY after the player says yes
-function payAsk(have,n,ic,name,go,popFn){const need=(n-have)*DM_SUM,dm=G.dm||0,P=popFn||pop;
+function payAsk(have,n,ic,name,go,popFn){const need=(n-have)*DM_SUM,dm=G.dm||0,P=popFn||(h=>pop(h,null,'dlgSk'));
   if(dm<need){P('<div class="pT">'+DMI+' Not enough</div><div class="pD">Summon ×'+n+' needs <b>'+n+'</b> '+ic+' '+name+'. You have <b>'+have+'</b>.<br>The missing '+(n-have)+' cost <b>'+need.toLocaleString()+'</b> '+DMI+' – you have <b>'+dm.toLocaleString()+'</b>.</div><div class="pD">'+DMI+' Diamonds come from campaign stages (bosses give the most), Daily Quest gifts, new Reputation and VIP levels.</div><button class="pB grey" data-p="x">OK</button>');return;}
   P('<div class="pT">'+DMI+' Use Diamonds?</div><div class="pD">You have <b>'+have+'</b> '+ic+' '+name+' – Summon ×'+n+' needs <b>'+n+'</b>.<br>Do you agree to pay the missing <b>'+(n-have)+'</b> with Diamonds?</div>'+
     '<div class="payBox"><div>'+ic+' <b>'+have+'</b><small>tickets</small></div><span>+</span><div>'+DMI+' <b>'+need.toLocaleString()+'</b><small>diamonds</small></div></div><div class="pD" style="text-align:center">You have '+DMI+' '+dm.toLocaleString()+' → '+(dm-need).toLocaleString()+' after</div>'+
@@ -3434,7 +3458,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
- {id:16,d:'Nov 16, 2026',ic:'✨',t:'New look: buildings, campaign, crew & arena',l:['New <b>building window</b>: 10 level lights, every bonus with its next level, your crew and the upgrade button.','New <b>Campaign</b> header and a new <b>stage card</b>: enemies, VS power bar, rewards and your team before the fight.','New battle buttons: <b>pause</b>, <b>×1 / ×1.5 / ×2</b> and <b>AUTO</b>.','New <b>MY CREW</b>, <b>CHOOSE MECHANIC</b>, <b>AUTO BEST</b> and <b>GEAR SUMMON</b> pages.','<b>Arena</b>: new league shields, rival cards, FIGHT buttons, rankings and Cup frames.','New icons for Daily Quests, VIP, Shop and the left menu.']},
+ {id:16,d:'Nov 16, 2026',ic:'✨',t:'New look: buildings, campaign, crew & arena',l:['New <b>building window</b>: 10 level lights, every bonus with its next level, your crew and the upgrade button.','New <b>Campaign</b> header and a new <b>stage card</b>: enemies, VS power bar, rewards and your team before the fight.','New battle buttons: <b>pause</b>, <b>×1 / ×1.5 / ×2</b> and <b>AUTO</b>.','New <b>MY CREW</b>, <b>CHOOSE MECHANIC</b>, <b>AUTO BEST</b> and <b>GEAR SUMMON</b> pages.','<b>Arena</b>: new league shields, rival cards, FIGHT buttons, rankings and Cup frames.','New icons for Daily Quests, VIP, Shop, the left menu and the right menu (Rank, Chat, Check-in, News, Mail).','New <b>CREW SUMMON</b> header, new confirm windows and new message bar.']},
  {id:15,d:'Nov 16, 2026',ic:'🎨',t:'Brand-new look for the menus',l:['New top bar with your <b>💎 Diamonds</b> always visible.','New <b>Shop</b>, <b>VIP</b>, <b>News</b>, <b>Mail</b> and <b>Check-in</b> pages.','<b>HEROES</b>: your battle team now stands on the pedestals. Tap a hero to open his <b>gear page</b> – 6 slots around him and his stats below.','New <b>VICTORY</b> and <b>DEFEAT</b> screens after every battle.','New <b>BAG</b> page and a new <b>SALVAGE</b> page: salvage up to 20 items at once (worn gear is never salvaged).','New item card with <b>EQUIP</b> / <b>UPGRADE</b> / <b>SALVAGE</b>.','Online: new Ranking podium, Chat, Arena, Cup bracket (final 8) and Profile.','<b>Fixed</b>: the top bar of the <b>MY CREW</b> page was covered by an empty box.','<b>Fixed</b>: the hero gear page could stop working after equipping some gear.']},
  {id:14,d:'Nov 16, 2026',ic:'🦸',t:'New HEROES page – everything in one place',l:['Tap <b>HEROES</b> in the Campaign: your <b>battle team</b>, <b>all your heroes</b>, their <b>skills</b>, <b>gear</b> and <b>stars</b> – all on one page.','Tap a hero to see his skill and equip gear right there, then <b>➕ ADD TO BATTLE TEAM</b> (you always see before / after).','Stage card: <b>FIGHT!</b> starts right away with your team, or tap <b>✏️ HEROES</b> to change it.','The same team fights for you in the <b>Arena</b> and the <b>Torque Cup</b>.']},
  {id:14,d:'Nov 15, 2026',ic:'🛡️',t:'Passive skills + battle fixes',l:['<b>PASSIVE SKILLS</b>: every mechanic now has a passive skill that works on its own in battle – Epic, Legendary and Mythic have <b>two</b>. Medics heal by themselves, Bruisers take less damage, Racers speed up after a knock-out, Shockers chain lightning… Tap a mechanic (Team page or Gear page) to read his passives.','<b>Fixed</b>: monsters can no longer be pushed out of the screen.','<b>Fixed</b>: mechanics who fight up close no longer stand next to a monster without attacking – each one takes his own place around it.']},
