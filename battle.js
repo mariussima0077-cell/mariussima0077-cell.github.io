@@ -2772,7 +2772,7 @@ function twRender(){const T=TE(),t=twG(),cur=Math.min(TW_N,t.b+1),done=t.b>=TW_N
 function twOpen(){if(!twOK()){TE().toast('🔒 TORQUE TOWER opens after campaign stage 1-10',2600);return;}
   if(!root.classList.contains('open')){root.classList.add('open');window.__BATTLE_ON=true;showMap();}
   twArenaImg();$('tw').classList.add('open');twRender();}
-function twClose(){$('tw').classList.remove('open');close();}
+function twClose(){$('tw').classList.remove('open');if(!backToHub())close();}
 function twMilestones(){const T=TE(),t=twG();let x='<div class="wS">FIXED REWARDS · FIRST CLEAR OF EACH FLOOR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>5</b> + coins</div><div>Every 5th floor: + '+TKI+' <b>2</b></div><div>Every 10th floor (boss): '+T.DMI+' <b>100</b> · '+GTKI+' <b>3</b> · <img src="img/cticket.webp" alt="" style="height:1.2em;vertical-align:-.28em"> <b>1</b></div><div>Every 50th floor: + '+T.DMI+' <b>400</b></div><div>Nothing is random. Each floor gives its reward only once.</div></div><div class="wS">NEXT BIG FLOORS</div>';
   for(let f=Math.ceil((t.b+1)/10)*10,k=0;f<=TW_N&&k<6;f+=10,k++)x+=wRowB(f%50===0?5:f%20===0?4:3,'<b>FLOOR '+f+'</b> '+(f%20===0?'BOSS':'MINI-BOSS'),null,twRewHtml(twRew(f)));
   x+='<div class="wS">MODIFIERS</div>'+TW_MOD.map((m,i)=>'<div class="wP twMP"><img src="img/ui6/tw_m'+i+'.webp" alt=""><span><b>'+m.n+'</b><br>'+m.d+'</span></div>').join('');
@@ -2784,7 +2784,7 @@ function twFloorInfo(f){const T=TE(),F=twFloor(f),t=twG(),types=[...new Set(F.w.
   popW('FLOOR '+f,x);}
 function twGo(){const t=twG();if(t.b>=TW_N)return;let team=teamHeroes();if(!team.length)team=bestTeam().map(heroOf);
   const F=twFloor(t.b+1);$('tw').classList.remove('open');try{teamHeroes().forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}safeStart(F.eq,team,F);}
-function twFinish(win,retreat){const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
+function twFinish(win,retreat){if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
   if(win&&f===t.b+1){const r=twRew(f);t.b=f;G.money+=r.money;if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;if(r.ct)G.h.ct+=r.ct;T.save();if(r.tk)T.addTickets(r.tk,'Tower floor '+f);
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">TORQUE TOWER · FLOOR ${f}<small>${f>=TW_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
@@ -2831,15 +2831,185 @@ function twBtn(){const sd=$('side');if(!sd||$('twBtn'))return;const b=document.c
   const ar=$('arBtn'),cp=$('cpBtn'),ref=ar||cp;if(ref&&ref.nextSibling)sd.insertBefore(b,ref.nextSibling);else sd.appendChild(b);}
 setTimeout(twBtn,0);setTimeout(()=>{const b=$('twBtn'),ar=$('arBtn');if(b&&ar&&ar.nextSibling!==b)ar.parentNode.insertBefore(b,ar.nextSibling);else twBtn();},1500);
 
+// ---------------------------------------------------------------- v16-55: BATTLE HUB + CLASS TOWERS (Marius' pictures in img/ui7/)
+// BATTLE button on the map → one page with all battle modes (Campaign · Arena · Torque Tower · Class Towers · Torque Cup · Coming soon).
+// The separate ARENA / TOWER buttons on the map are gone (fewer icons on the main page).
+const HUBS={from:0};
+const hubEl=document.createElement('div');hubEl.id='hub';hubEl.innerHTML='<div id="hubBox"></div>';root.appendChild(hubEl);
+const ctEl=document.createElement('div');ctEl.id='ct';ctEl.innerHTML='<div id="ctBox"></div>';root.appendChild(ctEl);
+function boxSize(id,w,h){const b=$(id);if(!b)return;const k=Math.min(innerWidth/w,innerHeight/h);b.style.width=w*k+'px';b.style.height=h*k+'px';b.style.setProperty('--u',k+'px');}
+addEventListener('resize',()=>{if(hubEl.classList.contains('open'))boxSize('hubBox',1024,1536);if(ctEl.classList.contains('open'))boxSize('ctBox',1024,1536);});
+function rootOn(){if(!root.classList.contains('open')){root.classList.add('open');window.__BATTLE_ON=true;showMap();}}
+const HUBM=[
+ {k:'camp',im:'m_camp',h:140},{k:'arena',im:'m_arena'},{k:'tower',im:'m_tower'},{k:'class',im:'m_class'},{k:'cup',im:'m_cup'},{k:'soon',im:'m_soon'}];
+function hubRender(){const T=TE(),G=T.G;boxSize('hubBox',1024,1536);
+  let h='<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'"><button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
+  const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:'PvP · ONLINE',tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
+    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:'EVERY WEEKEND',soon:''};
+  HUBM.forEach((m,i)=>{const y=300+i*152,lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK());
+    h+='<div class="hubM'+(lock?' lk':'')+'" data-hb="'+m.k+'" style="'+gbx(32,y,960,m.k==='camp'?140:125)+(m.k==='camp'?'margin-top:'+GSU(-15):'')+'"><img src="img/ui7/'+m.im+'.webp" alt="'+m.k+'">'+(st[m.k]?'<b class="hubS">'+st[m.k]+'</b>':'')+'</div>';});
+  $('hubBox').innerHTML=h;}
+function hubOpen(){rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
+function hubClose(){hubEl.classList.remove('open');close();}
+function hubGo(k){if(k==='back'){hubClose();return;}
+  if(k==='soon'){TE().toast('🔒 New battle modes are coming soon!',2200);return;}
+  if(k==='tower'&&!twOK()){TE().toast('🔒 TORQUE TOWER opens after campaign stage '+sLabel(TW_UNLOCK),2600);return;}
+  if(k==='class'&&!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign stage '+sLabel(CT_UNLOCK),2600);return;}
+  hubEl.classList.remove('open');HUBS.from=1;
+  if(k==='camp')return;                       // the campaign map is already under the hub
+  if(k==='tower'){twOpen();return;}
+  if(k==='class'){ctOpen();return;}
+  if(k==='arena'||k==='cup'){close();HUBS.from=0;if(window.ONLINE)ONLINE.open(k==='arena'?'olArena':'olCupS');}}
+hubEl.addEventListener('click',e=>{const el=e.target.closest('[data-hb]');if(el)hubGo(el.dataset.hb);});
+// back from a mode that was opened from the hub → the hub again
+function backToHub(){if(HUBS.from){HUBS.from=0;hubEl.classList.add('open');hubRender();return true;}return false;}
+
+// ---- CLASS TOWERS: one tower per class (Bruiser · Racer · Scanner · Medic · Sprayer · Shocker), 100 floors each,
+// only heroes of that class (+ Legend heroes) may fight. Each tower is open on 2 days a week, Sunday all are open.
+// FIXED rewards on the first clear (nothing random): 💎 + coins every floor, a SET PIECE of that class every 5th floor
+// (slot in a fixed order, grade Rare → Epic → Legendary → Mythic), 💎 + gear ticket every 10th. Saved in G.ct = {class: floors cleared}.
+const CT_K=['engine','tuning','inspect','service','paint','elec'],CT_N=100,CT_UNLOCK=20;
+const CT_DAYS={engine:[1,4],tuning:[1,4],inspect:[2,5],service:[2,5],paint:[3,6],elec:[3,6]};
+const DAYN=['SUN','MON','TUE','WED','THU','FRI','SAT'],DAYL=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+const ctOK=()=>TE().G.cp.best>=CT_UNLOCK;
+const ctDay=()=>new Date().getDay();
+const ctOpenK=k=>ctDay()===0||CT_DAYS[k].includes(ctDay());
+const ctToday=()=>CT_K.filter(ctOpenK);
+const ctG=()=>{const G=TE().G;if(!G.ct)G.ct={};CT_K.forEach(k=>{if(!G.ct[k])G.ct[k]=0;});return G.ct;};
+const CTS={k:null};
+function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=>a[Math.floor(R()*a.length)],act=Math.min(9,Math.floor((f-1)/10)),cl=m=>act?monClone(m,act):m;
+  const pool=[];while(pool.length<4){const m=pk(TW_REG);if(!pool.includes(m))pool.push(m);}
+  const n=Math.min(5,3+Math.floor(f/30)),one=()=>cl(pk(pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
+  const boss=f%20===0,mini=f%20===10;let w;
+  if(boss)w=[mk(n),[cl(TW_BOSS[(f/20-1+ci)%5])]];else if(mini)w=[mk(n),[cl(TW_MINI[((f-10)/20+ci)%5]),one(),one()]];
+  else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
+  const mod=f<=10?-1:(boss||mini||R()<.4)?Math.floor(R()*6):-1;
+  const eq=Math.min(NST-1,Math.round(2+f*2.4)),mul=stageMul(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85;
+  return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
+const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;
+function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/10)*10,dm:3,gtk:0,set:null};
+  if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;return r;}
+function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
+function ctTeam(k){return myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';}).slice(0,5);}
+const GRC=['#b0bec5','#66bb6a','#42a5f5','#ab47bc','#ffb300','#ff3d3d'];
+function ctSetHtml(s){return '<img src="img/ui4/st_'+s.k+'_'+s.s+'.webp" alt="" style="border-radius:4px;background:'+GRC[s.r]+'55;box-shadow:0 0 0 2px '+GRC[s.r]+'">';}
+function ctRewHtml(k,r,big){const T=TE(),a=[];if(r.set)a.push(ctSetHtml({k,s:r.set.s,r:r.set.r}));if(r.dm)a.push(T.DMI+' '+r.dm);if(r.gtk)a.push(GTKI+' '+r.gtk);if(big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
+function ctDaysTxt(k){return CT_DAYS[k].map(d=>DAYN[d]).join(' · ')+' · SUN';}
+// list of the 6 towers
+function ctRenderList(){const t=ctG(),d=ctDay();boxSize('ctBox',1024,1536);
+  let h='<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'"><img src="img/ui7/ct_logo.webp" alt="CLASS TOWERS" style="'+gbx(0,4,1024,354)+'">';
+  h+='<button class="cpB hubBk" data-ct="back" style="'+gbx(14,250,96,96)+'">↩</button>';
+  h+='<div class="ctDay" style="'+gbx(62,366,900,126)+'"><img src="img/ui7/bar_long.webp" alt=""><b>TODAY · '+DAYL[d]+'</b><small>'+(d===0?'ALL TOWERS ARE OPEN':ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' & ')+' OPEN · SUNDAY ALL')+'</small></div>';
+  CT_K.forEach((k,i)=>{const op=ctOpenK(k),x=37+(i%3)*325,y=510+Math.floor(i/3)*425;
+    h+='<div class="ctC'+(op?'':' cl')+'" data-ck="'+k+'" style="'+gbx(x,y,300,404)+'"><img src="img/ui7/ct_'+(op?'c_':'l_')+k+'.webp" alt="">'+
+      '<b class="ctN"><img src="img/ui4/cls_'+k+'.webp" alt="">'+ROLE[k].n.toUpperCase()+'</b><span class="ctF">'+(op?'FLOOR '+Math.min(CT_N,t[k]+1)+(t[k]>=CT_N?' ✓':''):ctDaysTxt(k))+'</span></div>';});
+  h+='<div class="ctBt" data-ct="rew" style="'+gbx(60,1372,430,140)+'"><img src="img/ui7/btn_grey.webp" alt=""><b>REWARDS</b></div>';
+  h+='<div class="ctBt" data-ct="heroes" style="'+gbx(534,1372,430,140)+'"><img src="img/ui7/btn_green.webp" alt=""><b>HEROES</b></div>';
+  $('ctBox').innerHTML=h;}
+// one tower
+function ctRenderTower(k){const T=TE(),t=ctG(),cur=Math.min(CT_N,t[k]+1),done=t[k]>=CT_N,op=ctOpenK(k);boxSize('ctBox',1024,1536);
+  let h='<img class="hubBg" src="img/ui7/hub_bg.webp" alt="" style="'+gbx(0,0,1024,1536)+'">';
+  h+='<div class="ctTi" style="'+gbx(12,10,1000,300)+'"><img src="img/ui7/bar_gold.webp" alt=""><b><img src="img/ui4/cls_'+k+'.webp" alt="">'+ROLE[k].n.toUpperCase()+' TOWER</b></div>';
+  h+='<button class="cpB hubBk" data-ct="list" style="'+gbx(14,250,96,96)+'">↩</button>';
+  h+='<img class="ctTw" src="img/ui7/ct_'+k+'.webp" alt="" style="'+gbx(40,300,300,366)+(op?'':'filter:grayscale(1) brightness(.6)')+'">';
+  h+='<div class="ctRec" style="'+gbx(370,300,620,222)+'"><img src="img/ui7/bar_crown.webp" alt=""><span>RECORD</span><span><b>'+t[k]+'</b>/'+CT_N+'</span></div>';
+  const tm=ctTeam(k),my=teamPower(tm),pw=ctPower(k,cur);
+  h+='<div class="ctTeam" style="'+gbx(360,532,640,150)+'">'+(tm.length?tm.map(x=>'<img src="'+portraitURL(x)+'" alt="">').join(''):'<i>NO '+ROLE[k].n.toUpperCase()+' HEROES YET – summon some!</i>')+'</div>';
+  h+='<div class="ctRule" style="'+gbx(360,684,640,40)+'">ONLY '+ROLE[k].n.toUpperCase()+' + LEGEND HEROES · BEST 5 FIGHT</div>';
+  h+='<div class="twList" id="ctList" style="'+gbx(56,738,914,560)+'">';
+  const lo=Math.max(1,cur-10),hi=Math.min(CT_N,cur+10);
+  for(let f=hi;f>=lo;f--){const F=ctFloor(k,f),r=ctRew(k,f),st=f<=t[k]?3:f===cur&&!done?1:F.boss||F.mini?2:4,boss=F.boss||F.mini;
+    h+='<div class="twRow s'+st+(f===cur?' cur':'')+'" data-cf="'+f+'"><img class="twPl" src="img/ui6/tw_f'+(st===3?3:st===1?1:boss?2:st===4?4:0)+'.webp" alt="">'+
+      (st===2&&boss?'':'<b class="twN">'+f+'</b>')+'<div class="twT"><b>'+(boss&&st!==3?'FLOOR '+f+' · <i>'+(F.boss?'BOSS':'MINI-BOSS')+'</i>':'FLOOR '+f)+'</b><span>'+(st===3?'CLEARED':ctRewHtml(k,r))+'</span></div>'+
+      (F.mod>=0&&st!==3?'<img class="twMd" src="img/ui6/tw_m'+F.mod+'.webp" alt="'+TW_MOD[F.mod].n+'">':'')+'</div>';}
+  h+='</div>';
+  h+='<div class="ctBt sm" data-ct="trew" style="'+gbx(40,1318,320,110)+'"><img src="img/ui7/btn_grey.webp" alt=""><b>REWARDS</b></div>';
+  const can=op&&!done&&tm.length,col=my>=pw*1.15?'#7CFC9A':my>=pw*.85?'#ffd54a':'#ff8a80';
+  h+='<div class="ctBt go'+(can?'':' dis')+'" data-ct="go" style="'+gbx(380,1306,604,150)+'"><img src="img/ui7/'+(can?'btn_green':'btn_grey')+'.webp" alt=""><b>'+(done?'TOWER CLEARED!':!op?'CLOSED TODAY':'CHALLENGE · '+cur)+'</b>'+
+    (can?'<small style="color:'+col+'">⚡ '+my.toLocaleString()+' vs '+pw.toLocaleString()+'</small>':!op?'<small>OPEN: '+ctDaysTxt(k)+'</small>':'')+'</div>';
+  $('ctBox').innerHTML=h;const L=$('ctList'),c=L.querySelector('.cur');if(c)L.scrollTop=c.offsetTop-L.clientHeight/2+c.offsetHeight/2;
+  CT_K.length;tm.forEach(x=>{try{const d=sprOf(x);if(d)sprLoad(d);}catch(e){}});}
+function ctRender(){if(CTS.k)ctRenderTower(CTS.k);else ctRenderList();}
+function ctOpen(k){if(!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign stage '+sLabel(CT_UNLOCK),2600);return;}rootOn();twArenaImg();CTS.k=k||null;ctEl.classList.add('open');ctRender();}
+function ctClose(){ctEl.classList.remove('open');if(!backToHub())close();}
+function ctRules(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>6 towers, one per class · <b>'+CT_N+' floors</b> each.</div><div>Only heroes of that class + <b>Legend</b> heroes fight (your best 5).</div><div>Each tower is open on 2 days a week · <b>SUNDAY all towers are open</b>.</div></div><div class="wS">SCHEDULE</div>';
+  CT_K.forEach(k=>x+=wRowB(CT_K.indexOf(k)%6,'<b>'+ROLE[k].n.toUpperCase()+'</b>',null,ctDaysTxt(k)));
+  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Every 10th floor (boss): '+T.DMI+' <b>50</b> · '+GTKI+' <b>1</b></div><div>Every 50th floor: + '+T.DMI+' <b>200</b></div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
+  popW('CLASS TOWERS',x);}
+function ctTRew(k){const t=ctG();let x='<div class="wS">'+ROLE[k].n.toUpperCase()+' TOWER · NEXT SET PIECES</div>';
+  for(let f=Math.ceil((t[k]+1)/5)*5,n=0;f<=CT_N&&n<8;f+=5,n++){const r=ctRew(k,f),it=SETS[k].p[GSLOT.findIndex(s=>s.k===r.set.s)];
+    x+=wRowB(r.set.r,'<b>FLOOR '+f+'</b> '+it,null,ctRewHtml(k,r));}
+  x+='<div class="wS">SET · '+SETS[k].n.toUpperCase()+'</div><div class="wP">'+SETS[k].t.map((q,i)=>'<div>'+(i+2)+' pieces: '+setTierTxt(q)+'</div>').join('')+'<div>The bonus works only on '+ROLE[k].n+' heroes.</div></div>';
+  popW(ROLE[k].n.toUpperCase()+' TOWER',x);}
+function ctFloorInfo(k,f){const T=TE(),F=ctFloor(k,f),t=ctG(),types=[...new Set(F.w.flat())];
+  let x='<div class="wS">FLOOR '+f+' · '+F.w.length+' WAVES</div><div class="wP">'+types.map(q=>MON[q].n).join(' · ')+'</div>';
+  if(F.mod>=0)x+='<div class="wS">MODIFIER</div><div class="wP twMP"><img src="img/ui6/tw_m'+F.mod+'.webp" alt=""><span><b>'+TW_MOD[F.mod].n+'</b><br>'+TW_MOD[F.mod].d+'</span></div>';
+  x+='<div class="wS">'+(f<=t[k]?'CLEARED':'FIRST CLEAR REWARD')+'</div><div class="wP">'+ctRewHtml(k,ctRew(k,f),1)+'</div><div class="wP">Enemy power ⚡ '+ctPower(k,f).toLocaleString()+'</div>';
+  popW('FLOOR '+f,x);}
+function ctGo(k){const t=ctG();if(t[k]>=CT_N)return;if(!ctOpenK(k)){TE().toast('🔒 This tower is closed today · open: '+ctDaysTxt(k),2600);return;}
+  const team=ctTeam(k);if(!team.length){TE().toast('You have no '+ROLE[k].n+' heroes yet – summon some!',2600);return;}
+  CTS.k=k;const F=ctFloor(k,t[k]+1);ctEl.classList.remove('open');safeStart(F.eq,team,F);}
+function ctFinish(win,retreat){const T=TE(),G=T.G,t=ctG(),F=B.tw,k=F.ct,f=F.f;let html;
+  if(win&&f===t[k]+1){const r=ctRew(k,f);t[k]=f;G.money+=r.money;if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;
+    let setTxt='';if(r.set){const g=GR(),it=newItem(r.set.s,r.set.r,k);if(g.inv.length>=GINV){const v=salvageV(it);G.money+=v;setTxt='BAG FULL → '+T.fmt(v);}else{g.inv.push(it);setTxt=itemName(it);}}
+    T.save();
+    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.set)rws.push([ctSetHtml({k,s:r.set.s,r:r.set.r}),'SET']);
+    html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${ROLE[k].n.toUpperCase()} TOWER · FLOOR ${f}<small>${f>=CT_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
+      ${rws.slice(0,4).map((q,i)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][i]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
+      <div class="rsU">${setTxt?'New set piece: <b>'+setTxt+'</b> · ':''}Record: floor ${t[k]} / ${CT_N}</div></div>
+      <div class="rsM"><div class="cpRow">${f<CT_N&&ctOpenK(k)?'<button class="cpGo" data-a="ctnext">NEXT FLOOR ▶</button>':''}<button class="cpGo alt" data-a="ct">TOWER</button></div></div>`;}
+  else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">${ROLE[k].n.toUpperCase()} TOWER · FLOOR ${f}<small>HOW TO GET STRONGER – tap one</small></div>
+      <div class="rsDB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>set pieces of this class help a lot</span></div>
+      <div class="rsDB b1" data-a="hsum">${TKI}<span><b>Summon more ${ROLE[k].n} heroes</b>only this class (+ Legend) fights here</span></div>
+      <div class="rsDB b2" data-a="gear"><img src="img/ui2/i_star1.webp"><span><b>Stars & fusion</b>${F.mod>=0?'this floor: '+TW_MOD[F.mod].n:'duplicates +1 star'}</span></div>
+      <button class="rsGo" data-a="ctnext">RETRY</button></div>
+      <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="gear">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="ct">TOWER</button></div></div>`;}
+  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;clearInterval(ANX.id);
+  $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
+    if(a==='ctnext')ctGo(k);else if(a==='gear'){showMap();CTS.ret=1;openGear();}
+    else if(a==='hsum'){showMap();CTS.ret=1;openGear();const T2=TE();if(T2.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T2.openSummon('m');}}else{showMap();ctOpen(k);}};}
+ctEl.addEventListener('click',e=>{const md=e.target.closest('.twMd');if(md&&CTS.k){ctRules();return;}const el=e.target.closest('[data-ct]');
+  if(el){const a=el.dataset.ct;if(a==='back')ctClose();else if(a==='list'){CTS.k=null;ctRender();}else if(a==='rew')ctRules();else if(a==='trew')ctTRew(CTS.k);
+    else if(a==='heroes'){ctEl.classList.remove('open');CTS.ret=1;openGear();}else if(a==='go')ctGo(CTS.k);return;}
+  const c=e.target.closest('[data-ck]');if(c){CTS.k=c.dataset.ck;ctRender();return;}
+  const row=e.target.closest('[data-cf]');if(row&&CTS.k)ctFloorInfo(CTS.k,+row.dataset.cf);});
+const hubCss=document.createElement('style');hubCss.textContent=`
+#hub,#ct{position:fixed;inset:0;z-index:8;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#16264d,#05070c 75%)}#hub.open,#ct.open{display:flex}
+#hubBox,#ctBox{position:relative;--u:.35px;overflow:hidden;border-radius:calc(var(--u)*18);background:#0a1322}#hubBox>*,#ctBox>*{position:absolute}
+.hubBk{min-width:0;padding:0;border-radius:50%;font-size:calc(var(--u)*46);z-index:2}
+.hubM{cursor:pointer;filter:drop-shadow(0 calc(var(--u)*8) calc(var(--u)*10) #000c);transition:transform .12s}.hubM:active{transform:scale(.97)}
+.hubM>img{width:100%;height:100%;display:block}.hubM.lk>img{filter:grayscale(.8) brightness(.7)}
+.hubS{position:absolute;right:calc(var(--u)*46);bottom:calc(var(--u)*16);font:900 italic calc(var(--u)*24) system-ui;color:#ffe082;background:#000c;padding:calc(var(--u)*3) calc(var(--u)*16);border-radius:calc(var(--u)*20);box-shadow:0 0 0 calc(var(--u)*2) #e0aa2588;text-shadow:0 2px 0 #000;white-space:nowrap}
+.hubM[data-hb=camp] .hubS{bottom:calc(var(--u)*22)}
+.ctDay img,.ctBt>img,.ctRec>img,.ctTi>img,.ctC>img{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.ctDay{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.ctDay b,.ctDay small{position:relative;font:900 italic calc(var(--u)*36) system-ui;color:#ffd54a;text-shadow:0 calc(var(--u)*3) 0 #000}.ctDay small{font-size:calc(var(--u)*24);color:#fff}
+.ctC{cursor:pointer;filter:drop-shadow(0 calc(var(--u)*8) calc(var(--u)*10) #000c);transition:transform .12s}.ctC:active{transform:scale(.96)}
+.ctN{position:absolute;left:calc(var(--u)*56);right:calc(var(--u)*56);top:calc(var(--u)*45);height:calc(var(--u)*50);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*6);font:900 italic calc(var(--u)*30) system-ui;color:#fff;text-shadow:0 calc(var(--u)*3) 0 #000}
+.ctN img{height:calc(var(--u)*40);width:auto}.ctC.cl .ctN{color:#cfd8dc}
+.ctF{position:absolute;left:calc(var(--u)*44);right:calc(var(--u)*44);top:calc(var(--u)*326);height:calc(var(--u)*48);display:flex;align-items:center;justify-content:center;font:900 italic calc(var(--u)*27) system-ui;color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7;white-space:nowrap}
+.ctC.cl .ctF{color:#e8eef3;text-shadow:0 calc(var(--u)*2) 0 #000;font-size:calc(var(--u)*22)}
+.ctBt{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}.ctBt b,.ctBt small{position:relative;font:900 italic calc(var(--u)*40) system-ui;color:#fff;text-shadow:0 calc(var(--u)*3) 0 #000}
+.ctBt.sm b{font-size:calc(var(--u)*32)}.ctBt small{font-size:calc(var(--u)*24);margin-top:calc(var(--u)*-2);background:#0009;padding:0 calc(var(--u)*14);border-radius:calc(var(--u)*16)}.ctBt.dis b{color:#cfd8dc}
+.ctTi{display:flex;align-items:center;justify-content:center}.ctTi b{position:relative;display:flex;align-items:center;gap:calc(var(--u)*12);font:900 italic calc(var(--u)*58) system-ui;color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff8;margin-top:calc(var(--u)*-14)}.ctTi b img{height:calc(var(--u)*76);width:auto}
+.ctTw{object-fit:contain;filter:drop-shadow(0 0 calc(var(--u)*20) #000)}
+.ctRec{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 calc(var(--u)*74) 0 calc(var(--u)*80)}.ctRec span{position:relative;font:900 italic calc(var(--u)*30) system-ui;color:#fff;text-shadow:0 calc(var(--u)*3) 0 #000}.ctRec b{color:#ffd54a;font-size:1.5em}
+.ctTeam{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*10);background:#000a;border-radius:calc(var(--u)*24);box-shadow:0 0 0 calc(var(--u)*3) #e0aa2566}
+.ctTeam img{width:calc(var(--u)*112);height:calc(var(--u)*112);border-radius:calc(var(--u)*16);object-fit:cover;box-shadow:0 0 0 calc(var(--u)*3) #ffd54a}
+.ctTeam i{font:900 calc(var(--u)*26) system-ui;color:#ff8a80;text-align:center}
+.ctRule{display:flex;align-items:center;justify-content:center;font:900 calc(var(--u)*22) system-ui;color:#b3e5fc;text-shadow:0 2px 0 #000}
+.twRw img[src*="st_"]{height:1.5em!important}
+#cpBtn,#arBtn,#twBtn{}#arBtn,#twBtn{display:none!important}
+`;document.head.appendChild(hubCss);
+
 // ---------------------------------------------------------------- open / close
 function open(){root.classList.add('open');window.__BATTLE_ON=true;showMap();gsBadge();}
-function close(){running=false;cancelAnimationFrame(raf);cancelAnimationFrame(gsRaf);root.classList.remove('open');['cpCard','cpTeam','cpRes','bt','cpGear','cpPop','gSum','tw'].forEach(id=>$(id).classList.remove('open'));window.__BATTLE_ON=false;}
+function close(){running=false;cancelAnimationFrame(raf);cancelAnimationFrame(gsRaf);root.classList.remove('open');['cpCard','cpTeam','cpRes','bt','cpGear','cpPop','gSum','tw','hub','ct'].forEach(id=>$(id).classList.remove('open'));window.__BATTLE_ON=false;}
 $('gSum').addEventListener('click',e=>{if(e.target.id==='gSum'){closeGSum();return;}const el=e.target.closest('[data-gs]');if(!el)return;const a=el.dataset.gs;
   if(a==='back')closeGSum();else if(a==='hsum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon('m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
   else{const t=e.target.closest('.gsT');if(t)gsRates();}});
 $('cpGSB').onclick=()=>openGSum();$('gGSB').onclick=()=>openGSum();
 $('cpChN').onclick=()=>chList();
-$('cpBack').onclick=close;$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
+$('cpBack').onclick=()=>{if(!backToHub())close();};$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
 // v15: GEAR title is the player's picture
 $('cpGearB').innerHTML=IMGI(glyphURL('bag','#ffd54a'),'1.25em','-.3em')+'<small>HEROES</small>';
 // v16-20: mini hero on the garage map (same sprite sheet as in battle). an: idle · walk · work · cel, or a row number (drivers). hgt = height on the map.
@@ -2865,6 +3035,6 @@ function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return fal
   X.drawImage(d.im,f[1]*cw,f[0]*SPCELL,cw,SPCELL,-d.a[0]*kk,-d.a[1]*kk,w*kk,256*kk);X.restore();return true;}
 const hasSpr=id=>!!SPRD[id];
 let collHome=0;
-window.CAMPAIGN={openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen()};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+window.CAMPAIGN={openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k)};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
