@@ -23,11 +23,7 @@ const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;}
 const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win']];
 const LG=[['BRONZE','#ffd8b0','#d0864a','#5a2a08','#e07a3a'],['SILVER','#ffffff','#b8c4d2','#4a5462','#7fd0ff'],['GOLD','#fffbe6','#ffc23a','#6a3a00','#ff3b3b'],['PLATINUM','#e8fffb','#5fe0c8','#0a4a44','#3fa7ff'],['DIAMOND','#e8f4ff','#5aa8ff','#0a2a6a','#c35cff'],['LEGEND','#fff1d0','#ff5a3c','#5a0a0a','#ffd54a']];
 let bid=0;
-function badge(i,num){i=Math.max(0,Math.min(5,i|0));const[,c1,c2,c3,gem]=LG[i];const id='olb'+(bid++);
- const wings=i>=3?`<path d="M18 44C6 40 0 26 2 14c6 9 10 12 17 14M82 44c12-4 18-18 16-30-6 9-10 12-17 14" fill="${c2}" stroke="${c3}" stroke-width="2.5"/>`:'';
- const crown=i>=5?`<path d="M34 12l6 6 10-13 10 13 6-6-3 12H37z" fill="#ffd54a" stroke="${c3}" stroke-width="2"/>`:'';
- const stars=num==null&&i>=1?Array.from({length:Math.min(i,3)},(_,k)=>`<circle cx="${50+(k-(Math.min(i,3)-1)/2)*10}" cy="74" r="3" fill="#fff"/>`).join(''):'';
- return `<svg viewBox="0 0 100 112"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></linearGradient></defs>${wings}<path d="M50 16l34 12v30c0 24-16 40-34 48C32 98 16 82 16 58V28z" fill="url(#${id})" stroke="${c3}" stroke-width="3.5"/><path d="M50 26l24 9v23c0 17-11 29-24 35-13-6-24-18-24-35V35z" fill="#0004" stroke="#fff6" stroke-width="1.5"/><path d="M50 36l10 13-10 15-10-15z" fill="${gem}" stroke="#fff" stroke-width="2"/><path d="M50 36l4 9-4 5-4-5z" fill="#fff8"/>${stars}${crown}${num?`<text x="50" y="90" text-anchor="middle" font-family="system-ui" font-weight="900" font-size="16" fill="#fff" stroke="${c3}" stroke-width="3" paint-order="stroke">${num}</text>`:''}</svg>`;}
+function badge(i,num){i=Math.max(0,Math.min(5,i|0));return `<span class="lgb"><img src="img/ui3/lg${i}.webp" alt="${LG[i][0]}">${num!=null?`<b>${num}</b>`:''}</span>`;} // v16-49: Marius' league shields (img/ui3/lg0-5)
 const medal=n=>{const g=['url(#olGold)','url(#olSilv)','url(#olBron)'][n-1];return `<svg class="md" viewBox="0 0 40 40"><path d="M12 0h7l1 14-6 2zM28 0h-7l-1 14 6 2z" fill="${['#ff3b3b','#3fa7ff','#4cd964'][n-1]}"/><circle cx="20" cy="24" r="14" fill="${g}" stroke="#3a1d00" stroke-width="2.5"/><text x="20" y="30" text-anchor="middle" font-family="system-ui" font-weight="900" font-size="16" fill="#3a1d00">${n}</text></svg>`;};
 const ring=(id,extra='')=>`<div class="ring r${gradeOf(id)} ${extra}" style="background-image:url(${HI(id)})"></div>`;
 const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p" style="background-image:url(${HI(id)})"></div>`;
@@ -273,6 +269,57 @@ const css=`
 #olFx .res .rw2 div{background:#0009;border:1px solid #e0aa25;border-radius:12px;padding:8px 12px;font:900 13px system-ui;color:#ffe27a;animation:olPop .4s 1s both}
 #olFx .res .btn{position:relative;margin-top:20px;padding:12px 40px;font:900 15px system-ui;border:0;border-radius:13px;background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);color:#3a1d00;box-shadow:0 3px 0 #7a4a00}
 #side2 #rkBtn svg,#side2 #chBtn svg{width:34px;height:34px}
+/* v16-49: Marius' Arena / Ranking / Cup pictures (img/ui3) */
+#onl .lgb{position:relative;display:block;width:100%;height:100%}#onl .lgb img{display:block;width:100%;height:100%;object-fit:contain}
+#onl .lgb b{position:absolute;left:0;right:0;top:71%;height:17%;display:flex;align-items:center;justify-content:center;font:900 11px system-ui;color:#fff;text-shadow:0 1px 0 #000}
+#onl .badge .lgb b{font-size:16px}
+#onl .leag>div .lgb{height:44px}
+#onl .opp .bd .lgb{height:100%}
+#onl .tabs b{background:url(img/ui3/tab_off.webp) center/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;color:#cfe3ff!important;padding:10px 0!important;text-shadow:0 1px 0 #000}
+#onl .tabs b.on{background-image:url(img/ui3/tab_on.webp)!important;color:#3a1d00!important;text-shadow:0 1px 0 #fff8}#onl .tabs b.on:after{display:none}
+#onl .ahero.ah3{aspect-ratio:720/249;padding:0;border-radius:0;background:url(img/ui3/ar_me.webp) 0 0/100% 100% no-repeat;box-shadow:none;overflow:visible;filter:drop-shadow(0 6px 12px #000a)}
+#onl .ahero.ah3:before{display:none}
+#onl .ah3 .badge{position:absolute;left:7.6%;top:19%;width:21%;height:63%;animation:none}
+#onl .ah3 .t{position:absolute;left:34%;top:24%;width:61%;height:66%}
+#onl .ah3 .t b{font-size:min(5vw,21px)}#onl .ah3 .t small{font-size:min(2.6vw,10.5px)}
+#onl .ah3 .o-bar{position:absolute;left:-.5%;top:66%;width:96.5%;height:16%;margin:0;border-radius:20px;background:#140a26;box-shadow:inset 0 0 0 1px #000}
+#onl .ah3 .o-bar i{border-radius:20px;background:linear-gradient(#ff9bff,#d23cff 55%,#9a1ad8)}
+#onl .ah3 .t small:last-child{position:absolute;top:84%;left:0;right:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#onl .opp{display:block;aspect-ratio:720/166;padding:0;margin-bottom:22px;border-radius:0;background:url(img/ui3/ar_row.webp) 0 0/100% 100% no-repeat;box-shadow:none}
+#onl .opp .bd{position:absolute;left:7.4%;top:26%;width:14%;height:62%}
+#onl .opp .tm{position:absolute;left:28.7%;top:33%;width:64.6%;height:45%;display:flex;justify-content:space-between}
+#onl .opp .tm .ring{width:17.2%;height:100%;margin:0;border-radius:6px}
+#onl .opp .o-nm{position:absolute;left:36.5%;top:5%;width:48%;height:21%;padding:0;display:flex;align-items:center;gap:6px}
+#onl .opp .o-nm b{font-size:min(2.9vw,12px);flex:1;min-width:0}#onl .opp .o-nm small{margin:0;font-size:9.5px;color:#e2d4ff;white-space:nowrap}
+#onl .fight.f3{position:absolute;right:2%;bottom:-17%;width:34%;aspect-ratio:910/240;height:auto;padding:0;border:0;border-radius:0;background:url(img/ui3/ar_fight.webp) center/100% 100% no-repeat;box-shadow:none;font-size:0;z-index:2}
+#onl .fight.f3.off{background-image:url(img/ui3/ar_fightg.webp)}
+#onl .fight.f3 small{position:absolute;left:-58%;bottom:12%;font:900 10px system-ui;color:#ffe27a;text-shadow:0 1px 0 #000;white-space:nowrap}
+#onl .btns>div{background:url(img/ui3/ar_b1.webp) center/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;padding:14px 0!important;color:#fff;text-shadow:0 1px 0 #000}
+#onl .o-row.ar3{aspect-ratio:720/100;padding:0 3% 0 0;gap:0;border-radius:0;background:url(img/ui3/ar_r.webp) 0 0/100% 100% no-repeat;box-shadow:none}
+#onl .o-row.ar3.me{background-image:url(img/ui3/ar_rme.webp);filter:drop-shadow(0 0 6px #ffb300aa)}
+#onl .o-row.ar3 .k{position:absolute;left:5.5%;width:9%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;color:#ffe27a;font-size:14px}
+#onl .o-row.ar3 .ring{position:absolute;left:20.3%;top:12%;height:76%;width:auto;aspect-ratio:1}
+#onl .o-row.ar3 .o-nm{margin-left:34%}
+#onl .o-row.ar3>div:has(.lgb){height:70%}
+#onl .o-row.rk3{aspect-ratio:720/108;padding:0 4% 0 0;gap:6px;border-radius:0;background:url(img/ui3/rk4.webp) 0 0/100% 100% no-repeat;box-shadow:none}
+#onl .o-row.rk3.me{filter:drop-shadow(0 0 7px #ffb300)}
+#onl .o-row.rk3 .k{position:absolute;left:6%;width:14%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;color:#ffe27a;font-size:14px;text-shadow:0 1px 0 #000}
+#onl .o-row.rk3 .ring{margin-left:22%;height:62%;width:auto;aspect-ratio:1}
+#onl .hrow.hw,#onl .hrow.hl{background:url(img/ui3/ar_rup.webp) 0 0/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;aspect-ratio:720/100;padding:0 22% 0 4%!important;position:relative}
+#onl .hrow.hl{background-image:url(img/ui3/ar_rdn.webp)!important}
+#onl .hrow .play{position:absolute;right:3.5%;top:22%;height:56%;width:14%;opacity:0}
+#onl .hrow.hw,#onl .hrow.hl{padding-left:34%!important;display:flex;align-items:center}
+#onl .hrow.hw>b.w,#onl .hrow.hl>b.w{position:absolute;left:5.6%;width:8.8%;top:20%;height:60%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border-radius:50%;font-size:8px;background:none;box-shadow:none}
+#onl .hrow.hw>span,#onl .hrow.hl>span{font-size:11px;min-width:0}
+#onl .mt.me{box-shadow:none!important;background:none!important;border:0!important}
+#onl .mt{background:none;box-shadow:none;border-radius:0;overflow:visible}
+#onl .mt .sd div.cf{height:auto;aspect-ratio:720/159;margin-bottom:2px;padding:0 5% 0 7%;background:url(img/ui3/cup_op.webp) 0 0/100% 100% no-repeat;color:#e8f0ff;gap:10%}
+#onl .mt .sd div.cf.me{aspect-ratio:720/200;background-image:url(img/ui3/cup_me.webp);color:#ffe27a}
+#onl .mt .sd div.cf .ring{width:15%;height:auto;aspect-ratio:1;border-radius:50%}
+#onl .mt .sd div.cf.me .ring{border-radius:8px;width:16%}
+#onl .mt .sd div.cf.w{background-color:transparent}#onl .mt .sd div.cf.w:after{content:'WIN';margin-left:auto;font:900 11px system-ui;color:#7CFC9A}
+#onl #olCupT b{background:url(img/ui3/cup_pb.webp) center/100% 100% no-repeat!important;padding:9px 16px!important}#onl #olCupT b.on{background-image:url(img/ui3/cup_po.webp)!important;color:#fff!important;text-shadow:0 1px 0 #6a2a00}
+
 `;
 
 // ------------------------------------------------------------------ DOM
@@ -364,10 +411,10 @@ async function loadRank(first){
     B.innerHTML=`<div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
 
   const rows=$('olRows');const html=L.slice(3).map((p,i)=>{const ch=rkPrev[p.uid]!==undefined&&rkPrev[p.uid]!==p[rkBy];
-    return `<div class="o-row ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${p.vip?`<span class="vip">VIP ${p.vip}</span>`:''}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
+    return `<div class="o-row rk3 ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${p.vip?`<span class="vip">VIP ${p.vip}</span>`:''}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
   rows.innerHTML=html;
   L.forEach(p=>rkPrev[p.uid]=p[rkBy]);
-  const m=r.me;$('olRkMe').innerHTML=`<div class="o-row me" data-uid="${m.uid}"><span class="k">${r.myRank}</span>${ring(m.icon)}<div class="o-nm"><b>⭐ ${esc(m.name)} ${m.vip?`<span class="vip">VIP ${m.vip}</span>`:''}</b><small>${tt(m.title)} ${subv(m)}</small></div><div class="v">${val(m)}<small>${rkBy==='best'&&m.today?`<span class="o-up">▲${m.today}</span> today`:''}</small></div></div>`;}
+  const m=r.me;$('olRkMe').innerHTML=`<div class="o-row rk3 me" data-uid="${m.uid}"><span class="k">${r.myRank}</span>${ring(m.icon)}<div class="o-nm"><b>⭐ ${esc(m.name)} ${m.vip?`<span class="vip">VIP ${m.vip}</span>`:''}</b><small>${tt(m.title)} ${subv(m)}</small></div><div class="v">${val(m)}<small>${rkBy==='best'&&m.today?`<span class="o-up">▲${m.today}</span> today`:''}</small></div></div>`;}
 $('olRkT').onclick=e=>{const b=e.target.closest('b');if(!b)return;rkBy=b.dataset.by;$('olRkT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));rkPrev={};loadRank(true);};
 
 // ------------------------------------------------------------------ CHAT
@@ -421,9 +468,9 @@ async function loadArena(){const B=$('olArB');if(!arData)B.innerHTML='<div class
   const r=await call('arena',{});if(r.banned){B.innerHTML='<div class="empty">🚫 Your account is blocked.</div>';return;}
   if(!r.ok){B.innerHTML=`<div class="empty">📶 Could not reach the Arena.</div>`;return;}
   arData=r;arenaTk=r.tk;dots();const t=r.tier;
-  B.innerHTML=`<div class="ahero"><div class="badge">${badge(t.lg,t.div||'★')}</div><div class="t"><b>${t.name}</b><small>🏅 ${r.pts} points · rank #${r.rank} · ${r.w}W / ${r.l}L</small><div class="o-bar"><i style="width:0"></i></div><small>${t.next?`${t.next-r.pts} pts to the next division`:'Top league!'} · season ${r.season} ends in <span id="olSeason">${dur(r.end-Date.now())}</span></small></div></div>
+  B.innerHTML=`<div class="ahero ah3"><div class="badge">${badge(t.lg,t.div||'★')}</div><div class="t"><b>${t.name}</b><small>🏅 ${r.pts} points · rank #${r.rank} · ${r.w}W / ${r.l}L</small><div class="o-bar"><i style="width:0"></i></div><small>${t.next?`${t.next-r.pts} pts to the next division`:'Top league!'} · season ${r.season} ends in <span id="olSeason">${dur(r.end-Date.now())}</span></small></div></div>
    <div class="tk"><span>🎟️ Arena fights <b id="olTk">${r.tk}</b> / ${r.tkMax} <span id="olTkN"></span></span><span>🎁 daily reward 22:00</span></div>
-   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ⚡ ${fmtN(o.pow)}</small></div><button class="fight shine ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}">FIGHT<small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
+   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ⚡ ${fmtN(o.pow)}</small></div><button class="fight f3 ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}"><small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
    <div class="btns"><div class="shine" data-a="def">🛡️ MY TEAM</div><div class="shine" data-a="ref">🔄 NEW RIVALS</div></div>
    <div class="leag">${LG.map((l,i)=>`<div class="${i===t.lg?'on':''}">${badge(i)}${l[0]}</div>`).join('')}</div>
    <div class="o-note">Fights are automatic: your <b>battle team</b> (with gear) against the other player's team – he does not need to be online. Win = up to +${win(r.pts,r.pts+400)} points. When others attack you, you lose a few points only if they win.<br>Rivals marked <span class="ai">AI</span> are training rivals while the server is still filling up.</div>
@@ -433,9 +480,9 @@ const win=(a,b)=>{const E=1/(1+Math.pow(10,(b-a)/400));return Math.max(6,Math.ro
 function arenaTick(){if(!arData||arTab!=='fight')return;const s=$('olSeason');if(s)s.textContent=dur(arData.end-Date.now());const n=$('olTkN');if(n)n.textContent=arData.tkNext?'· +1 in '+dur(arData.tkNext-Date.now()):'';
   if(arData.tkNext&&Date.now()>arData.tkNext+1500){arData.tkNext=0;loadArena();}}
 async function arTop(){const B=$('olArB');const r=await call('atop',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not load.</div>';return;}
-  B.innerHTML=r.list.length?r.list.map((p,i)=>`<div class="o-row in ${ME&&p.uid===ME.uid?'me':''}" style="animation-delay:${Math.min(.6,i*.04)}s" data-uid="${p.uid}"><span class="k">${i<3?['🥇','🥈','🥉'][i]:i+1}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)}</b><small>${tt(p.title)} ${p.w}W / ${p.l}L</small></div><div style="width:30px">${badge(p.tier.lg)}</div><div class="v">${p.pts}<small>${p.tier.name}</small></div></div>`).join(''):'<div class="empty">Nobody in the Arena yet – be the first!</div>';}
+  B.innerHTML=r.list.length?r.list.map((p,i)=>`<div class="o-row ar3 in ${ME&&p.uid===ME.uid?'me':''}" style="animation-delay:${Math.min(.6,i*.04)}s" data-uid="${p.uid}"><span class="k">${i+1}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)}</b><small>${tt(p.title)} ${p.w}W / ${p.l}L</small></div><div style="width:30px">${badge(p.tier.lg)}</div><div class="v">${p.pts}<small>${p.tier.name}</small></div></div>`).join(''):'<div class="empty">Nobody in the Arena yet – be the first!</div>';}
 async function arHist(){const B=$('olArB');const r=await call('hist',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not load.</div>';return;}
-  B.innerHTML=r.list.length?r.list.map(h=>`<div class="hrow"><b class="w ${h.win?'o-y':'o-n'}">${h.win?'WIN':'LOSS'}</b><span>${h.kind==='cup'?'🏟️':h.atk?'⚔️ you attacked':'🛡️ attacked you:'} <b>${esc(h.other)}</b><br><small>${new Date(h.t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${h.d>0?'+':''}${h.d} pts</small></span><button class="play" data-replay="${h.id}">▶ WATCH</button></div>`).join(''):'<div class="empty">No fights yet.</div>';}
+  B.innerHTML=r.list.length?r.list.map(h=>`<div class="hrow ${h.win?'hw':'hl'}"><b class="w ${h.win?'o-y':'o-n'}">${h.win?'WIN':'LOSS'}</b><span>${h.kind==='cup'?'🏟️':h.atk?'⚔️ you attacked':'🛡️ attacked you:'} <b>${esc(h.other)}</b><br><small>${new Date(h.t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${h.d>0?'+':''}${h.d} pts</small></span><button class="play" data-replay="${h.id}">▶ WATCH</button></div>`).join(''):'<div class="empty">No fights yet.</div>';}
 $('olArT').onclick=e=>{const b=e.target.closest('b');if(!b)return;arTab=b.dataset.t;$('olArT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));arData=null;loadArena();};
 $('olArB').addEventListener('click',async e=>{
   const f=e.target.closest('[data-fight]');if(f){e.stopPropagation();if(f.classList.contains('off')){toast('🎟️ No Arena fights left – +1 every 2 hours');return;}doFight(f.dataset.fight);return;}
@@ -481,7 +528,7 @@ function renderCup(){const r=cupData,B=$('olCupB');
   B.innerHTML=head(`WEEKEND CUP #${r.num}`,sub,r.done?'':`until the ${rName(r.n,r.round)}`)+
    `<div class="tabs" id="olCupT" style="padding:0 0 8px;overflow-x:auto">${r.R.map((x,i)=>`<b data-r="${i}" class="${i===ri?'on':''}" style="flex:none;padding:8px 10px">${rName(r.n,i).replace('ROUND OF ','R')}</b>`).join('')}</div>`+
    M.map(m=>{const A=r.P[m.a],Bp=r.P[m.b],me=m.a===r.me||m.b===r.me;const cls=x=>m.w<0?'':m.w===x?'w':'l';
-     return `<div class="mt ${me?'me':''}"><div class="sd"><div class="${cls(m.a)} ${m.a===r.me?'me':''}">${ring(A.icon)}${esc(A.name)} ${A.bot?'<span class="ai">AI</span>':''}</div><div class="${cls(m.b)} ${m.b===r.me?'me':''}">${ring(Bp.icon)}${esc(Bp.name)} ${Bp.bot?'<span class="ai">AI</span>':''}</div></div><div class="wb">${m.f?`<button class="play" data-replay="${m.f}">▶</button>`:m.w<0?'<small style="color:#8fa0b4;font:800 10px system-ui">soon</small>':''}</div></div>`;}).join('')+
+     return `<div class="mt ${me?'me':''}"><div class="sd"><div class="cf ${cls(m.a)} ${m.a===r.me?'me':''}">${ring(A.icon)}${esc(A.name)} ${A.bot?'<span class="ai">AI</span>':''}</div><div class="cf ${cls(m.b)} ${m.b===r.me?'me':''}">${ring(Bp.icon)}${esc(Bp.name)} ${Bp.bot?'<span class="ai">AI</span>':''}</div></div><div class="wb">${m.f?`<button class="play" data-replay="${m.f}">▶</button>`:m.w<0?'<small style="color:#8fa0b4;font:800 10px system-ui">soon</small>':''}</div></div>`;}).join('')+
    bracket(r)+`<h3>REWARDS</h3>${RW(r.rw)}`;
   cupT=r.done?r.nextWeek:r.next;cupTick();}
 let cupT=0;function cupTick(){const e=$('olCd');if(!e||!cupT)return;const ms=Math.max(0,cupT-Date.now()),h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);

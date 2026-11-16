@@ -503,6 +503,94 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .sk-profile .skB{border-width:calc(var(--pw)*60/1024) calc(var(--pw)*45/1024) calc(var(--pw)*96/1024) calc(var(--pw)*45/1024);border-image:url(img/ui2/profile_b.webp) 60 45 96 45 round;background:url(img/ui2/profile_i.webp) 0 0/100% 100% no-repeat;background-origin:padding-box;background-clip:padding-box}
 .sk-profile>.skBg{background-image:url(img/ui2/profile_bl.webp)}
 /* end skins */
+/* v16-49 CHECK-IN (5000 free summons) day tiles = Marius' pictures (img/ui3/ci_*) */
+.c5Grid{gap:3px!important;grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.c5D{min-width:0;background:url(img/ui3/ci_n.webp) center/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;padding:9px 1px 4px!important;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.c5D.now{background-image:url(img/ui3/ci_c.webp)!important;box-shadow:none!important;filter:drop-shadow(0 0 5px #ffb300)}
+.c5D.done{opacity:1!important;background-image:url(img/ui3/ci_d.webp)!important}.c5D.done>*{opacity:0}
+.c5D.big{background-image:url(img/ui3/ci_g.webp)!important}.c5D.big>*{text-shadow:0 1px 0 #000,0 0 4px #000}
+.c5D b{font-size:7px!important;color:#ffe27a!important;text-shadow:0 1px 0 #000}.c5D span{font-size:13px!important;text-shadow:0 1px 0 #000}
+
+/* v16-49 CHOOSE MECHANIC + AUTO BEST popups = Marius' pictures (img/ui3/ch_*, ab_*) */
+#popBox.chSk,#popBox.abSk{--k:calc(min(100vw - 28px,440px)/1024);display:flex;flex-direction:column;overflow:visible;max-height:94vh;padding:0;background:none!important;box-shadow:none!important;border-radius:0;border-style:solid;filter:drop-shadow(0 12px 30px #000)}
+#popBox.chSk{border-width:calc(var(--k)*282) calc(var(--k)*46) calc(var(--k)*204);border-image:url(img/ui3/ch_f.webp) 282 46 204 fill stretch}
+#popBox.abSk{border-width:calc(var(--k)*368) calc(var(--k)*52) calc(var(--k)*294);border-image:url(img/ui3/ab_f.webp) 368 52 294 fill stretch}
+#popBox .skIn{flex:1;min-height:0;overflow-y:auto;touch-action:pan-y;padding:0 calc(var(--k)*14)}
+#popBox.chSk .pX{position:absolute;right:calc(var(--k)*-32);top:calc(var(--k)*-222);width:calc(var(--k)*104);height:calc(var(--k)*104);background:none;border:0;box-shadow:none;color:transparent;z-index:2}
+#popBox.abSk .pX{display:none}
+#popBox .kpT{text-align:center;font:900 13px system-ui;color:#ffe27a;text-shadow:0 1px 0 #000;margin:2px 0 0}
+#popBox .kpD,#popBox .abD{margin:2px 0 6px!important;font-size:11px!important;background:none!important;border:0!important;padding:0!important;text-align:center;color:#9fd3ff!important}
+#popBox .kpR{position:relative;aspect-ratio:896/164;background:url(img/ui3/ch_row.webp) 0 0/100% 100% no-repeat;margin:0 0 4px;cursor:pointer}
+#popBox .kpR.on{background-image:url(img/ui3/ch_rowon.webp)}
+#popBox .kpR:active{filter:brightness(1.2)}
+#popBox .kpP{position:absolute;left:4%;top:13%;width:12.4%;height:74%;object-fit:cover;border-radius:6px;background:#000}
+#popBox .kpI{position:absolute;left:20%;right:21%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;line-height:1.15;overflow:hidden}
+#popBox .kpI b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+#popBox .kpI small{display:block;font-size:10.5px;color:#c9d6e2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+#popBox .kpR:not(:has(img)) .kpI{left:6%;align-items:center}#popBox .kpR:not(:has(img)) .kpI b{color:#ffb4b4}
+#popBox .kpS{position:absolute;left:82%;top:14%;width:13.5%;height:72%;display:flex;align-items:center;justify-content:center;font:900 14px system-ui;color:#ffe27a;text-shadow:0 1px 0 #000,0 0 6px #000}
+#popBox .pB.kpB{position:absolute;left:calc(var(--k)*204);width:calc(var(--k)*525);bottom:calc(var(--k)*-123);height:calc(var(--k)*105);margin:0;padding:0;background:none!important;box-shadow:none!important;border:0;color:#fff!important;font:900 min(4.2vw,18px) system-ui;font-style:italic;text-shadow:0 2px 0 #7a2c00}
+#popBox .abL2 .abR{position:relative;aspect-ratio:871/107;background:url(img/ui3/ab_row.webp) 0 0/100% 100% no-repeat;margin:0 0 3px}
+#popBox .abR .abB{position:absolute;left:3%;width:41%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;line-height:1.1;overflow:hidden}
+#popBox .abR .abA{position:absolute;left:53%;width:26%;top:0;bottom:0;display:flex;align-items:center;overflow:hidden}
+#popBox .abR b,#popBox .abR i{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}#popBox .abR i{color:#8a99a8}
+#popBox .abR small{font-size:9.5px;color:#9fb0c0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#popBox .abR em{position:absolute;left:80.3%;width:18%;top:12%;height:74%;display:flex;align-items:center;justify-content:center;font:900 12px system-ui;font-style:normal;color:#fff;text-shadow:0 1px 0 #063,0 0 4px #063}
+#popBox .abR em.dn{color:#ffd0d0;text-shadow:0 1px 0 #600}
+#popBox.abSk .abT{margin:8px 0 6px}
+#popBox .pB.abOK,#popBox .pB.abNo{position:absolute;bottom:calc(var(--k)*-193);height:calc(var(--k)*145);margin:0;padding:0;background:none!important;box-shadow:none!important;border:0;font:900 min(4vw,17px) system-ui;font-style:italic}
+#popBox .pB.abNo{left:calc(var(--k)*30);width:calc(var(--k)*368);color:#1d232c!important;text-shadow:0 1px 0 #fff8}
+#popBox .pB.abOK{left:calc(var(--k)*433);width:calc(var(--k)*455);color:#3a1c00!important;text-shadow:0 1px 0 #fff8}
+
+/* v16-49 MY CREW header = Marius' picture img/ui3/crew_h.webp */
+#ros .rsTop{position:relative;display:block;padding:0;aspect-ratio:900/354;width:100%;max-width:560px;margin:0 auto;flex:none;background:url(img/ui3/crew_h.webp) 0 0/100% 100% no-repeat;border:0;box-shadow:none;filter:drop-shadow(0 6px 10px #000c)}
+#ros .rsTi{display:none}
+#ros .rsB{position:absolute!important;left:3.59%;top:22.66%;width:9.78%;height:24.87%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:50%!important;color:transparent!important;width:auto;height:auto}
+#ros .rsTk{position:absolute!important;left:76.84%;top:27.21%;width:19.77%;height:14.45%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:40px!important;display:flex;align-items:center;justify-content:flex-end;padding-right:7%!important;font:900 min(4vw,18px) system-ui;color:#fff!important;text-shadow:0 1px 0 #000}
+#ros .rsTk img{position:absolute;left:0;top:-8%;height:116%!important;width:auto;filter:drop-shadow(0 2px 2px #000)}
+#rsTabsH{display:contents}
+#ros .rsTm{position:absolute!important;left:5.12%;top:69.53%;width:30.02%;height:20.96%;}
+#ros .rsTg{position:absolute!important;left:36.63%;top:69.53%;width:27.46%;height:20.96%;}
+#ros .rsTd{position:absolute!important;left:65.83%;top:69.53%;width:28.74%;height:20.96%;}
+#ros .rsTab{height:auto;border:0;border-radius:12px;background:none;box-shadow:none;color:#fff;display:flex;align-items:flex-end;justify-content:center;padding:0 0 2px;font:900 min(2.6vw,11px) system-ui;text-shadow:0 1px 0 #000,0 0 4px #000}
+#ros .rsTab span{background:#000a;border-radius:8px;padding:0 6px}#ros .rsTab small{color:#ffd54a}
+#ros .rsTab:not(.on){background:linear-gradient(#0b1a3300,#0b1a33)}#ros .rsTm:not(.on){background:#0d1d38c8}
+#ros .rsTab.on{box-shadow:0 0 0 2px #ffe27a,0 0 14px #ffb300cc;background:#ffd54a30}#ros .rsTm.on{background:none;box-shadow:0 0 12px #ffb300aa}
+#ros .rsTab i{right:2px;top:2px}
+/* v16-49 BUILDING POPUP (img/ui3/bld_*, 1113 px wide picture) */
+#sheet.bldP{--bw:min(96vw,440px);left:50%;right:auto;top:50%;bottom:auto;width:var(--bw);max-height:94vh;height:auto;transform:translate(-50%,-46%) scale(.92);opacity:0;pointer-events:none;transition:transform .18s ease,opacity .18s;display:flex;flex-direction:column;background:none;border:0;border-radius:0;padding:0;box-shadow:none;overflow:visible;filter:drop-shadow(0 10px 24px #000c)}
+#sheet.bldP.open{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+#sheet.bldP::before{display:none}
+#sheet.bldP>#shSkH{display:block}
+#sheet.bldP #shBody{position:static;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;border-style:solid;border-width:calc(var(--bw)*8/1113) calc(var(--bw)*62/1113) calc(var(--bw)*213/1113);border-image:url(img/ui3/bld_b.webp) 8 62 213 fill stretch;padding:4px 2px 6px;margin-top:-1px}
+#sheet.bldP .shtop{position:absolute;left:0;top:0;width:100%;height:calc(var(--bw)*392/1113);display:block}
+#sheet.bldP .shtop>div:first-child{position:absolute;left:8.5%;top:39.5%;width:44.5%;height:28%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+#sheet.bldP #shTitle{font-size:min(4.6vw,19px);line-height:1.1;color:#ffe27a;text-shadow:0 2px 0 #000,0 0 8px #000}
+#sheet.bldP #shDots{position:absolute;left:0;top:calc(var(--bw)*307/1113);width:var(--bw);height:calc(var(--bw)*62/1113);margin:0;display:block}
+#sheet.bldP #shDots span{position:absolute;left:auto;right:calc(var(--bw)*-80/1113);top:-200%;display:none}
+#sheet.bldP .shtop>div:first-child::after{content:attr(data-lv);font:900 9.5px system-ui;color:#9fd3ff;letter-spacing:1px;margin-top:2px;text-shadow:0 1px 0 #000}
+#sheet.bldP #shDots i{position:absolute;top:0;width:calc(var(--bw)*62/1113);height:calc(var(--bw)*62/1113);margin:0;border-radius:50%;background:none;box-shadow:none}
+#sheet.bldP #shDots i.on{background:url(img/ui3/bld_dot.webp) center/100% 100%;box-shadow:0 0 calc(var(--bw)*.02) #ffb300}
+#sheet.bldP #shDots i.gd{box-shadow:0 0 calc(var(--bw)*.03) #fff3a0}
+#sheet.bldP #shDots i:nth-child(1){left:calc(var(--bw)*217/1113)}#sheet.bldP #shDots i:nth-child(2){left:calc(var(--bw)*286/1113)}#sheet.bldP #shDots i:nth-child(3){left:calc(var(--bw)*354/1113)}#sheet.bldP #shDots i:nth-child(4){left:calc(var(--bw)*423/1113)}#sheet.bldP #shDots i:nth-child(5){left:calc(var(--bw)*491/1113)}#sheet.bldP #shDots i:nth-child(6){left:calc(var(--bw)*560/1113)}#sheet.bldP #shDots i:nth-child(7){left:calc(var(--bw)*629/1113)}#sheet.bldP #shDots i:nth-child(8){left:calc(var(--bw)*698/1113)}#sheet.bldP #shDots i:nth-child(9){left:calc(var(--bw)*767/1113)}#sheet.bldP #shDots i:nth-child(10){left:calc(var(--bw)*836/1113)}
+#sheet.bldP #shClose{position:absolute;right:calc(var(--bw)*15/1113);top:calc(var(--bw)*62/1113);width:calc(var(--bw)*128/1113);height:calc(var(--bw)*128/1113);border-radius:50%;background:none;border:0;box-shadow:none;color:transparent;font-size:1px;z-index:3}
+#sheet.bldP #shDesc{color:#c9d6e2;font-size:12.5px;margin:2px 4px 6px;line-height:1.3}
+#sheet.bldP .row{position:relative;border:0;margin:0 0 3px;padding:0 34.5% 0 calc(var(--bw)*.035);gap:4px;height:calc((var(--bw)*989/1113)*90/950);min-height:30px;background:url(img/ui3/bld_row.webp) 0 0/100% 100% no-repeat;font-size:12.5px;font-weight:800;color:#e8f0f8;box-sizing:border-box}
+#sheet.bldP .row>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000}
+#sheet.bldP .row>b{margin:0;flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;text-align:right;font-size:12.5px;color:#fff;white-space:nowrap}
+#sheet.bldP .row>em{position:absolute;right:2%;width:22.5%;text-overflow:ellipsis;margin:0;text-align:center;min-width:0;color:#b9ff7a;font-size:12.5px;text-shadow:0 1px 0 #000,0 0 6px #3c0;white-space:nowrap;overflow:hidden}
+#sheet.bldP .row:not(:has(em))::after{content:'MAX';position:absolute;right:2.5%;width:21%;text-align:center;color:#ffe27a;font-size:11px;text-shadow:0 1px 0 #000}
+#sheet.bldP .tmRow>b{width:auto;flex:none;display:flex;align-items:center;gap:4px;font-size:11.5px}
+#sheet.bldP .tmRow .mini{width:22px;height:22px}
+#sheet.bldP .sec{margin:8px 2px 4px;font-size:11px;letter-spacing:1.5px}
+#sheet.bldP .sec.tmSec{height:calc(var(--bw)*112/1113);margin:8px calc(var(--bw)*-6/1113) 2px;background:url(img/ui3/bld_crew.webp) center/100% 100% no-repeat;color:transparent;text-shadow:none;font-size:0}
+#sheet.bldP .job{border:0;margin:0 0 3px;padding:6px 10px;border-radius:10px;background:linear-gradient(#0d1b33e6,#081226e6);box-shadow:inset 0 0 0 1px #e0a82e88;font-size:12.5px}
+#sheet.bldP .upParts{margin:0 0 6px;justify-content:center}
+#sheet.bldP .lock,#sheet.bldP .stepNote,#sheet.bldP .note{font-size:11.5px}
+#sheet.bldP #shBtn{position:absolute;left:calc(var(--bw)*282/1113);width:calc(var(--bw)*546/1113);bottom:calc(var(--bw)*38/1113);height:calc(var(--bw)*156/1113);margin:0;padding:0 0 0 calc(var(--bw)*150/1113);background:none;border:0;border-radius:calc(var(--bw)*.03);box-shadow:none;color:#fff;font-size:min(3.9vw,16px);letter-spacing:.3px;text-shadow:0 2px 0 #6a2a00,0 0 6px #6a2a00}
+#sheet.bldP #shBtn:disabled{background:#0d1118a8;color:#c9d0d8;text-shadow:0 1px 0 #000}
+#sheet.bldP #shBtn:active{transform:scale(.97)}
+
 #xp .rsTop{position:absolute;inset:0;border:0;box-shadow:none;background:none;padding:0}
 #xp .rsB{position:absolute;left:1.5%;top:calc(4px + env(safe-area-inset-top));width:40px;height:36px;font-size:18px;z-index:2;box-shadow:0 2px 0 #5e3d00,0 0 8px #000}
 #xp .rsTi{position:absolute;left:23.5%;width:53%;top:39%;height:41%;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -685,7 +773,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 </div></div>
 <div id="toast"></div>
 <div id="zoom"><button id="zin">+</button><button id="zout">−</button></div>
-<div id="side"><button id="cpBtn"><img src="img/ui/ic_battle.webp" alt="Battle"></button><button id="smBtn"><img src="img/ui/ic_ticket.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/ui/ic_team.webp" alt="Team"><i id="rosDot"></i></button><button id="idBtn"><img src="img/ui/ic_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/ui/ic_dq.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small></button></div>
+<div id="side"><button id="cpBtn"><img src="img/ui/ic_battle.webp" alt="Battle"></button><button id="smBtn"><img src="img/ui3/n_summon.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/ui3/n_crew.webp" alt="Crew"><i id="rosDot"></i></button><button id="idBtn"><img src="img/ui3/n_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/ui3/n_quests.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small></button></div>
 <div id="side2"><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button></div>
 <div id="xp" class="skP sk-mail"><div class="skBg"></div><div class="skH"><img class="hi" src="img/ui2/mail_h.webp" alt=""><div class="rsTop"><button class="rsB" id="xpBack">↩</button><div class="rsTi"><b id="xpT"></b><small id="xpS"></small></div><div class="rsTk" id="xpTk"></div></div></div><div id="xpBody" class="skB"></div></div>
 <div id="dq"><div id="dqBox"></div></div>
@@ -693,7 +781,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 <div id="team"><div id="tmBox"></div></div>
 <div id="idl"><div id="idlBox"></div></div>
 <div id="res"></div>
-<div id="ros"><div class="rsTop"><button class="rsB" data-ro="back">↩</button><div class="rsTi"><b>MY CREW</b><small>WHO WORKS IN THE GARAGE · not the battle team</small></div><div class="rsTk" id="rsTk"></div></div><div id="rsBody"></div></div>
+<div id="ros"><div class="rsTop"><button class="rsB" data-ro="back">↩</button><div class="rsTi"><b>MY CREW</b><small>WHO WORKS IN THE GARAGE · not the battle team</small></div><div class="rsTk" id="rsTk"></div><div id="rsTabsH"></div></div><div id="rsBody"></div></div>
 <div id="pop"><div id="popBox"></div></div>
 <div id="sheet"><div class="skBg"></div><div class="skH" id="shSkH"><img class="hi" alt=""><div id="shSkT"></div></div><div id="shBody">
   <div class="shtop">
@@ -702,8 +790,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
   </div>
   <div id="shDesc"></div>
   <div id="shStats"></div>
-  <button id="shBtn"></button>
-</div></div>
+</div><button id="shBtn"></button></div>
 <div id="loader"><canvas id="lcv"></canvas><div id="lpanel"></div></div>
 <script>
 (()=>{
@@ -890,6 +977,10 @@ let time=0, started=false, SPD=1;
 const VIP_MAX=20, SUB_MULT=1.5, SUB_DAYS=30, SUB_PRICE='€5.99';
 // v8: VIP 20 = 28,000 points ≈ 6 months of daily quests (max ~155 points/day)
 const VIP_PTS=[0];for(let n=1;n<=VIP_MAX;n++)VIP_PTS.push(n===VIP_MAX?28000:Math.round(50*Math.pow(n,Math.log(560)/Math.log(20))/10)*10);
+// v16-49: one picture per thing (Marius' icon sheets in img/ui3)
+const U3=(f,h)=>'<img src="img/ui3/'+f+'.webp" alt="" style="height:'+(h||'1.35em')+';width:auto;vertical-align:-.35em">';
+const VIP_IMG={income:'v_coins',thief:'v_sec',speed:'v_fast',sale:'q_sell',disc:'v_disc',cust:'v_garage',idle:'n_idle'};
+const DQ_IMG={sell:'q_sell',earn:'q_money',inspect:'g_inspect',service:'g_service',paint:'g_paint',elec:'g_elec',engine:'g_engine',tuning:'g_tuning',upgrade:'q_upg',thief:'v_sec',fleet:'q_police'};
 const VIP_BEN=[
  {k:'income',ic:'💰',n:'Job income',from:1},
  {k:'thief',ic:'🛡️',n:'Thief catch chance',from:2},
@@ -2630,16 +2721,18 @@ const UPN=5,UPM=2.5,LATE=[1,1,1,1,1,1.15,1.35,1.6,1.9,2.25];for(const id in BLD)
 const UPP=id=>(G.up&&G.up[id])||0;
 const costOf=(id,lv)=>Math.round(BLD[id].cost[lv]*(1-VB('disc'))/(lv>=4?UPN:1));
 const payB=id=>{const l=(G.lv[id]||1);return PAYB[l-1]+(l<10&&l>=4?(PAYB[l]-PAYB[l-1])*UPP(id)/UPN:0);};
-function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');renderPanel();sheet.classList.add('open');}
+function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');bldSkin(id!=='shop'&&id!=='vip'&&id!=='rep'&&id!=='car');renderPanel();sheet.classList.add('open');}
 // v16-47: Shop + VIP use Marius' full-screen pages (img/ui2) – other panels stay bottom sheets
 function skinSheet(n){sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/g,'').trim();const b=$('shBody');b.className='';if(n){sheet.classList.add('skn','skP','sk-'+n);b.className='skB';const im=$('shSkH').querySelector('img');if(!im.src.endsWith(n+'_h.webp'))im.src='img/ui2/'+n+'_h.webp';}}
+// v16-49: building popup = Marius' picture (img/ui3/bld_*): title plate, 10 level lights, rows with the green "next" part, crew bar, orange coin button
+function bldSkin(on){sheet.classList.toggle('bldP',on);const im=$('shSkH').querySelector('img');if(on&&!im.src.endsWith('bld_h.webp'))im.src='img/ui3/bld_h.webp';}
 function closePanel(){sel=null;selCar=null;sheet.classList.remove('open');}
 $('shClose').onclick=closePanel;$('vipBtn').onclick=()=>openPanel('vip');$('dqBtn').onclick=openDQ;$('repPill').onclick=()=>openPanel('rep');$('shopBtn').onclick=()=>openPanel('shop');$('dmH').onclick=()=>toast('💎 Diamonds – earned by playing (campaign, bosses, quests). 100 💎 = 1 summon.');
 const PACKS=[
- {id:'car',name:'VIP Truck · Rich Clients',price:'€5.99',img:'vipcar',cw:110,ch:36,thumb:1,desc:'Forever: a golden car carrier arrives at random times and unloads 3-4 luxury cars of rich clients (supercars, limousines, the Royal Hypercar). They get PRIORITY in every garage and pay ×2.'},
- {id:'sub',name:'VIP Pass · 30 days',price:SUB_PRICE,emoji:'👑',desc:'All your VIP level benefits are ×'+SUB_MULT+' stronger for 30 days. VIP points still come from Daily Quests – for everyone.'},
- {id:'spd2',name:'Battle Speed ×2',price:'€4.99',emoji:'⏩',desc:'Battles can run at ×2 speed. ×1.5 is free for everyone. Yours forever – every chapter, every stage.'},
- {id:'vip',name:'VIP Crew Boost',price:'€3.99',emoji:'👑',desc:'Forever: EVERY mechanic in every workshop works 25% faster and earns 25% more money. Works together with your heroes.'},
+ {id:'car',u3:'sp_truck',name:'VIP Truck · Rich Clients',price:'€5.99',img:'vipcar',cw:110,ch:36,thumb:1,desc:'Forever: a golden car carrier arrives at random times and unloads 3-4 luxury cars of rich clients (supercars, limousines, the Royal Hypercar). They get PRIORITY in every garage and pay ×2.'},
+ {id:'sub',u3:'sp_vip',name:'VIP Pass · 30 days',price:SUB_PRICE,emoji:'👑',desc:'All your VIP level benefits are ×'+SUB_MULT+' stronger for 30 days. VIP points still come from Daily Quests – for everyone.'},
+ {id:'spd2',u3:'sp_speed',name:'Battle Speed ×2',price:'€4.99',emoji:'⏩',desc:'Battles can run at ×2 speed. ×1.5 is free for everyone. Yours forever – every chapter, every stage.'},
+ {id:'vip',u3:'sp_crew',name:'VIP Crew Boost',price:'€3.99',emoji:'👑',desc:'Forever: EVERY mechanic in every workshop works 25% faster and earns 25% more money. Works together with your heroes.'},
 ];
 $('shStats').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){popPicker(pk.dataset.pick);return;}if(e.target.closest('[data-dq]')){closePanel();openDQ();return;}const b=e.target.closest('[data-buy]');if(!b)return;const id=b.dataset.buy;
   if(b.dataset.busy)return;b.dataset.busy=1;
@@ -2662,7 +2755,7 @@ function renderPanel(){
     $('shStats').innerHTML=h;$('shBtn').style.display='none';return;}
   if(sel==='shop'){if(!window.__pr&&SEC.STORE_BUILD){window.__pr=1;SEC.prices().then(o=>{if(!o)return;PACKS.forEach(p=>{if(o[p.id])p.price=o[p.id];});lastPanelKey='';});}const key='shop'+PK.car+PK.vip+PK.spd2+subOn();if(key===lastPanelKey)return;lastPanelKey=key;
     $('shTitle').textContent='🛒 Shop';$('shDots').innerHTML='<span>Packs stay forever – every chapter, every stage</span>';$('shDesc').textContent='';
-    $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th"><i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vtThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i></div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
+    $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th">'+(p.u3?'<img src="img/ui3/'+p.u3+'.webp" alt="" style="width:74px;height:74px;object-fit:contain;filter:drop-shadow(0 2px 4px #000)">':'<i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vtThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i>')+'</div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
       (p.id==='sub'?(subOn()?'<button class="buy own">ACTIVE<br>'+Math.ceil((PK.sub-Date.now())/864e5)+'d</button>':'<button class="buy" data-buy="sub">'+p.price+'</button>'):PK[p.id]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-buy="'+p.id+'">'+p.price+'</button>')+'</div>').join('')+
       (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div id="cloudBox"></div><div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
     if(window.CLOUD)CLOUD.mount($('cloudBox'));$('shBtn').style.display='none';return;}
@@ -2672,13 +2765,13 @@ function renderPanel(){
     $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. With the VIP Pass all benefits are ×'+SUB_MULT+'.';
     const a=VIP_PTS[VLV],fr=nx?(G.vip-a)/(nx-a):1;
     let h='<div class="vbar"><i style="width:'+Math.round(fr*100)+'%"></i></div>';
-    h+='<div class="subcard"><div style="font-size:38px">👑</div><div class="tx"><b>VIP Pass · '+SUB_PRICE+' / 30 days</b>'+(sub?'Active – '+Math.ceil((PK.sub-Date.now())/864e5)+' days left. All benefits ×'+SUB_MULT+'.':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.')+'</div>'+
+    h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>VIP Pass · '+SUB_PRICE+' / 30 days</b>'+(sub?'Active – '+Math.ceil((PK.sub-Date.now())/864e5)+' days left. All benefits ×'+SUB_MULT+'.':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.')+'</div>'+
       (sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
     h+='<div class="sec">YOUR BENEFITS · VIP '+VLV+(sub?'':' <span style="color:#9fb0c0;letter-spacing:0">(👑 = with VIP Pass)</span>')+'</div>'+VIP_BEN.map(b=>{const v=benAt(b,VLV,sub),on=VLV>=b.from;
-      return '<div class="row"><span>'+b.ic+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a">'+pctT(benAt(b,VLV,true),b.neg)+' 👑</em>':'')+'</div>';}).join('');
+      return '<div class="row"><span>'+(VIP_IMG[b.k]?U3(VIP_IMG[b.k]):b.ic)+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a">'+pctT(benAt(b,VLV,true),b.neg)+' 👑</em>':'')+'</div>';}).join('');
     h+='<div class="sec">ALL VIP LEVELS'+(sub?' (with VIP Pass)':'')+'</div>';
     for(let n=1;n<=VIP_MAX;n++){const nw=VIP_BEN.filter(b=>b.from===n);
-      h+='<div class="vlv'+(n===VLV?' cur':n>VLV?' off':'')+'"><b>'+(n<=VLV?'👑':'🔒')+' VIP '+n+'</b><span>'+VIP_PTS[n]+' pts · '+VIP_BEN.filter(b=>n>=b.from).map(b=>b.ic+' '+pctT(benAt(b,n,sub),b.neg)).join(' · ')+(nw.length?'<br><span style="color:#ffd54a">NEW: '+nw.map(b=>b.n).join(', ')+'</span>':'')+'</span></div>';}
+      h+='<div class="vlv'+(n===VLV?' cur':n>VLV?' off':'')+'"><b>'+(n<=VLV?U3('v_crown','1.25em'):'🔒')+' VIP '+n+'</b><span>'+VIP_PTS[n]+' pts · '+VIP_BEN.filter(b=>n>=b.from).map(b=>U3(VIP_IMG[b.k],'1.15em')+' '+pctT(benAt(b,n,sub),b.neg)).join(' · ')+(nw.length?'<br><span style="color:#ffd54a">NEW: '+nw.map(b=>b.n).join(', ')+'</span>':'')+'</span></div>';}
     if(SEC.TEST_MODE)h+='<div class="note">🧪 TEST MODE (owner): tapping the price activates the VIP Pass without payment.</div>';
     $('shStats').innerHTML=h;const b=$('shBtn');b.style.display='';b.disabled=false;b.textContent='📋 DAILY QUESTS';return;}
   if(sel==='rep'){const key='rep'+G.xp;if(key===lastPanelKey)return;lastPanelKey=key;
@@ -2690,9 +2783,9 @@ function renderPanel(){
   const cost=(!nu&&lv<MAXLV)?costOf(sel,lv):0,can=G.money>=cost&&!locked;
   const key=sel+lv+'p'+UPP(sel)+can+locked+G.rep+VLV+VSUB+'h'+HVER+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
   $('shTitle').textContent=inf.title;
-  $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lv?'Level '+lv+' / '+MAXLV:'Not built')+'</span>'+(lv>=4&&lv<MAXLV?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'');
+  $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lv?'Level '+lv+' / '+MAXLV:'Not built')+'</span>'+(lv>=4&&lv<MAXLV&&!sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'');
   $('shDesc').textContent=inf.desc;
-  let h=inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](lv)+'</b>'+(!nu&&lv<MAXLV?'<em>→ '+r[1](lv+1)+'</em>':'')+'</div>').join('');
+  let h=(lv>=4&&lv<MAXLV&&!nu&&sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'')+inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](lv)+'</b>'+(!nu&&lv<MAXLV?'<em>'+(sheet.classList.contains('bldP')?'':'→ ')+r[1](lv+1)+'</em>':'')+'</div>').join('');
   h+=teamRows(sel);
   if(ST[sel]&&sel!=='inspect'){h+='<div class="sec">JOBS</div>'+JOBS.filter(j=>j.st===sel).map(j=>{const ok=G.rep>=j.rep&&(!j.parts||G.lv.parts>0);
     return '<div class="job'+(ok?'':' off')+'"><span class="ic">'+(ok?'✓':'🔒')+'</span><span>'+j.n+(j.parts?' 📦':'')+'</span><span class="st">'+fmt(j.pay)+' · '+j.t+'s'+(ok?'':'<br>'+(G.rep<j.rep?'Rep '+j.rep:'needs Parts Office'))+'</span></div>';}).join('');}
@@ -2702,11 +2795,11 @@ function renderPanel(){
   if(locked)h+='<div class="lock">🔒 Unlocks at Reputation '+need+'. Sell more cars to grow your reputation.</div>';
   if(!nu&&!locked&&lv>=4&&lv<MAXLV)h+='<div class="stepNote">⬆️ From LV 4, each level is built in <b>'+UPN+' steps</b>. A step costs only money – no items needed. Every step already adds part of the bonus; after step '+UPN+'/'+UPN+' the building reaches <b>LV '+(lv+1)+'</b>.</div>';
   morph($('shStats'),h);
-  const b=$('shBtn');if(nu){b.style.display='none';return;}b.style.display='';
+  const b=$('shBtn');$('shTitle').parentNode.dataset.lv=nu?'':lv?'LEVEL '+lv+' / '+MAXLV:'NOT BUILT';if(nu){if(sheet.classList.contains('bldP')){b.style.display='';b.disabled=false;b.textContent='OK';}else b.style.display='none';return;}b.style.display='';
   if(lv>=MAXLV){b.textContent='MAX LEVEL';b.disabled=true;}else if(locked){b.textContent='🔒 REPUTATION '+need+' NEEDED';b.disabled=true;}
   else{b.textContent=lv>=4?'⬆️ STEP '+(UPP(sel)+1)+'/'+UPN+' · '+fmt(cost):(lv===0?'BUILD ':'UPGRADE ')+fmt(cost);b.disabled=!can;}
 }
-$('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(!sel||NOUP(sel))return;const lv=G.lv[sel];if(lv>=MAXLV||G.rep<BLD[sel].rep)return;const cost=costOf(sel,lv);if(G.money<cost)return;
+$('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(sel&&NOUP(sel)&&sheet.classList.contains('bldP')){closePanel();return;}if(!sel||NOUP(sel))return;const lv=G.lv[sel];if(lv>=MAXLV||G.rep<BLD[sel].rep)return;const cost=costOf(sel,lv);if(G.money<cost)return;
   G.money-=cost;if(lv>=4){G.up=G.up||{};G.up[sel]=UPP(sel)+1;if(G.up[sel]<UPN){qAdd('upgrade',1);save();lastPanelKey='';renderPanel();toast('⬆️ Step '+G.up[sel]+'/'+UPN+' done · LV '+(lv+1)+' after step '+UPN+'/'+UPN,1800);return;}G.up[sel]=0;}
   G.lv[sel]++;qAdd('upgrade',1);relayoutAfterUpgrade(sel);if(sel==='security')secLayout(true);if(sel==='parts')partsLayout();save();lastPanelKey='';renderPanel();
   let fx=AV,fy=300;const g=GAR[sel];
@@ -2740,7 +2833,7 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   const cl=dqClaimed(),today=G.dq.q.filter(q=>q.cl).reduce((a,q)=>a+q.vip,0)+DQ_GIFTS.reduce((a,g,i)=>a+(G.dq.gifts[i]?g.vip:0),0);
   let h='<div class="dqT" style="'+box(330,412,262,40)+'line-height:'+U(40)+';color:#fff">⏱ '+hh+'h '+mm+'m</div>';
   G.dq.q.forEach((q,i)=>{const y=DQY[i],done=q.p>=q.g,f=q.p/q.g;
-    h+='<div class="dqI'+(done?' ok':'')+'" style="'+box(62,y-65,130,130)+'">'+q.ic+'</div>';
+    h+='<div class="dqI'+(done?' ok':'')+'" style="'+box(62,y-65,130,130)+'">'+(DQ_IMG[q.id]?'<img src="img/ui3/'+DQ_IMG[q.id]+'.webp" alt="" style="width:78%;height:auto">':q.ic)+'</div>';
     h+='<div class="dqN" style="'+box(222,y-50,480,40)+'">'+q.n+'</div>';
     h+='<div class="dqB" style="'+box(222,y+6,478,36)+'"><i style="width:'+Math.round(f*100)+'%"></i><span>'+(q.t==='earn'?fmt(q.p)+' / '+fmt(q.g):q.p+' / '+q.g)+'</span></div>';
     h+=q.cl?'<div class="dqR done" style="'+box(728,y-60,118,120)+'">✓</div>'
@@ -3063,15 +3156,17 @@ function popAutoBest(){const cat=rosCat,plan=autoPlan(cat),keys=slotsOf(cat);let
   for(const k of keys){const b=curIn(k),a=plan[k]||null;sb+=slotStats(k,b)[0];sa+=slotStats(k,a)[0];if(b!==a)ch.push([k,b,a]);}
   if(!ch.length){toast('★ Your '+CATS[cat].n.toLowerCase()+' are already in the best places',2600);return;}
   const L=SLOTL[cat][0];
-  let x='<div class="pT">⚡ AUTO BEST · Before / After</div><div class="pD" style="margin-top:0">Puts every '+CATS[cat].one.toLowerCase()+' where he helps most. Nothing changes until you confirm.</div><div class="abL">';
+  // v16-49: Marius' AUTO BEST picture – one row per change: before | ➜ | after | gain in the green box
+  let x='<div class="pD abD">Puts every '+CATS[cat].one.toLowerCase()+' where he helps most. Nothing changes until you confirm.</div><div class="abL2">';
+  const nm=id=>id?'<b style="color:'+GRADES[HB[id].gr].c+'">'+HB[id].n+'</b>':'<i>empty</i>';
   ch.forEach(([k,b,a])=>{const d=slotStats(k,a)[0]-slotStats(k,b)[0];
-    x+='<div><small>'+slotName(k)+'</small><span>'+(b?'<b style="color:'+GRADES[HB[b].gr].c+'">'+HB[b].n+'</b>':'<i>empty</i>')+' ➜ '+(a?'<b style="color:'+GRADES[HB[a].gr].c+'">'+HB[a].n+'</b>':'<i>empty</i>')+'</span><em class="'+(d>0.0005?'up':d<-0.0005?'dn':'')+'">'+(Math.abs(d)<0.0005?'=':pctS(d))+'</em></div>';});
+    x+='<div class="abR"><span class="abB">'+nm(b)+'<small>'+slotName(k)+'</small></span><span class="abA">'+nm(a)+'</span><em class="'+(d>0.0005?'up':d<-0.0005?'dn':'')+'">'+(Math.abs(d)<0.0005?'=':pctS(d))+'</em></div>';});
   x+='</div><div class="abT">'+L+' (all places together)<br><b>'+pctS(sb)+'</b> ➜ <b class="up">'+pctS(sa)+'</b> <span class="'+(sa-sb>=0?'up':'dn')+'">('+(sa-sb>=0?'▲ ':'▼ ')+pctS(sa-sb)+')</span></div>';
   const pros=[],cons=[];if(sa>sb)pros.push('More '+L.replace(/^\S+ /,'').toLowerCase()+' in total');const emp=ch.filter(c=>!c[1]&&c[2]).length;if(emp)pros.push(emp+' empty place'+(emp>1?'s':'')+' filled');
   const out=ch.filter(c=>c[1]&&!Object.values(plan).includes(c[1])).map(c=>HB[c[1]].n);if(out.length)cons.push('Back to the bench: '+out.join(', '));
   const half=ch.filter(c=>c[2]&&cat==='m'&&HB[c[2]].sp!=='all'&&HB[c[2]].sp!==c[0].split('|')[1]).length;if(half)cons.push(half+' work outside their speciality (½ bonus)');
   x+='<div class="abPC"><div class="pro"><h4>✅ ADVANTAGES</h4>'+(pros.length?pros.map(p=>'<p>'+p+'</p>').join(''):'<p class="no">—</p>')+'</div><div class="con"><h4>❌ DISADVANTAGES</h4>'+(cons.length?cons.map(p=>'<p>'+p+'</p>').join(''):'<p class="no">none</p>')+'</div></div>';
-  x+='<button class="pB" data-p="abOK">✓ CONFIRM</button><button class="pB grey" data-p="x">CANCEL</button>';pop(x);popCtx={plan,cat};}
+  pop(x,{plan,cat},'abSk');popBox.insertAdjacentHTML('beforeend','<button class="pB abOK" data-p="abOK">✓ CONFIRM</button><button class="pB grey abNo" data-p="x">CANCEL</button>');}
 $('pop').addEventListener('click',e=>{const t=e.target.closest('[data-p="abOK"]');if(!t||!popCtx||!popCtx.plan)return;const {plan,cat}=popCtx;
   for(const k of slotsOf(cat))delete G.h.as[k];for(const k in plan)G.h.as[k]=plan[k];save();heroRefresh();closePop();toast('✓ Best '+CATS[cat].n.toLowerCase()+' placed',2500);});
 function openRoster(cat){if(cat)rosCat=cat;closeSummon();resEl.className='';rosEl.classList.add('open');renderRoster();rsBody.scrollTop=0;}
@@ -3080,7 +3175,9 @@ let rosKey='';
 function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=rosCat,mine=Object.keys(G.h.own).filter(id=>HB[id].cat===cat);
   const key=cat+HVER+'|'+JSON.stringify(G.h.as)+'|'+Object.values(G.lv).join(',')+'|'+mine.length+'|'+G.h.tk;if(key===rosKey)return;rosKey=key;
   $('rsTk').innerHTML=TKI+' '+G.h.tk;
-  let x='<div class="rsTabs">'+CATK.map(c=>{const n=Object.keys(G.h.own).filter(id=>HB[id].cat===c).length;return '<button class="rsTab'+(c===cat?' on':'')+'" data-ro="cat" data-c="'+c+'">'+CATS[c].ic+' '+CATS[c].n+' <small>'+n+'</small>'+(rosHint(c)?'<i></i>':'')+'</button>';}).join('')+'</div>';
+  // v16-49: the 3 tabs are on Marius' MY CREW picture (wrench · shield · scooter)
+  $('rsTabsH').innerHTML=CATK.map(c=>{const n=Object.keys(G.h.own).filter(id=>HB[id].cat===c).length;return '<button class="rsTab rsT'+c+(c===cat?' on':'')+'" data-ro="cat" data-c="'+c+'"><span>'+CATS[c].n+' <small>'+n+'</small></span>'+(rosHint(c)?'<i></i>':'')+'</button>';}).join('');
+  let x='';
   x+='<div class="rsAct"><button class="rsA gold" data-ro="auto">⚡ AUTO BEST</button><button class="rsA" data-ro="coll">📖 Collection</button><button class="rsA blue" data-ro="sum">'+TKI+' Summon</button></div>';
   const bonusTxt=(k,id)=>{const v=slotStats(k,id);return SLOTL[k[0]][0].split(' ')[0]+' '+pctS(v[0]);};
   // working now
@@ -3109,7 +3206,7 @@ rosEl.addEventListener('click',e=>{const t=e.target.closest('[data-ro]');if(!t)r
   else if(a==='bench'){const id=t.dataset.id,b=rosBetter(id);if(b)popCompare(b.k,id,'s');else popSlots(id);}});
 // ---------- generic popup ----------
 const popEl=$('pop'),popBox=$('popBox');let popCtx=null;
-function pop(html,ctx){popCtx=ctx||null;popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+html;popEl.classList.add('open');}
+function pop(html,ctx,sk){popCtx=ctx||null;popBox.className=sk||'';popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+(sk?'<div class="skIn">'+html+'</div>':html);popEl.classList.add('open');}
 function closePop(){popEl.classList.remove('open');popCtx=null;}
 function popTickets(){pop('<div class="pT">'+TKI+' Recruit Tickets · '+CTI+' Crew Tickets</div><div class="pD">'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.<br>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.<br>Both are earned only by playing.<br>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> – you have <b>'+(G.dm||0).toLocaleString()+'</b> (always asked first).</div>'+
   ['📅 5000 FREE SUMMONS: every day '+TKI+' +10 · '+CTI+' +10 · Gear +10',TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign: +1 per stage · mini-boss +3 · boss +5 '+CTI+' +3 '+DMI+' +100'].map(t=>'<div class="pR">'+t+'</div>').join(''));}
@@ -3171,6 +3268,12 @@ function popSlots(id){const h=HB[id],L=slotsOf(h.cat);
     return '<div class="pR pk" data-p="cmp" data-f="s" data-k="'+k+'" data-id="'+id+'"><span>'+slotName(k)+(h.cat==='m'?(m?' <b style="color:#7CFC9A">✓ full</b>':' <b style="color:#ffb74d">½</b>'):'')+'<br>'+(cur&&cur.id===id?'':cmpHint(k,id))+'</span><em>'+(cur?(cur.id===id?'★ here':'<span style="color:'+GRADES[cur.gr].c+'">'+cur.n+'</span>'):'empty')+'</em></div>';}).join(''):'<div class="pD">No free places yet. Build or upgrade buildings to unlock more.</div>'));}
 function popPicker(key){const cat=key[0],cur=heroIn(key),st=cat==='m'?key.split('|')[1]:'';
   const L=Object.keys(G.h.own).filter(id=>HB[id].cat===cat).sort((a,b)=>slotStats(key,b)[0]-slotStats(key,a)[0]||pw(b)-pw(a));
+  if(cat==='m'){ // v16-49: Marius' CHOOSE MECHANIC picture (portrait window · info · shield with the +)
+    let x='<div class="kpT">'+slotName(key)+'</div><div class="pD kpD">Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="kpR" data-p="put" data-k="'+key+'" data-id=""><div class="kpI"><b>— Remove '+cur.n+' —</b></div></div>':'');
+    x+=L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=h.sp==='all'||h.sp===st;
+      return '<div class="kpR'+(w===key?' on':'')+'" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><img class="kpP" src="'+portrait(h)+'" style="box-shadow:0 0 0 2px '+GRADES[h.gr].c+'"><div class="kpI"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b><small>'+spName(h.sp)+(m?' ✓':' · ½ here')+'</small>'+(w===key?'<small style="color:#eaffd0">★ works here</small>':(w?'<small>at '+slotName(w)+'</small>':'')+cmpHint(key,id))+'</div><div class="kpS">+'+o.s+'</div></div>';}).join('')
+     :'<div class="pD">You have no mechanics yet.</div>';
+    pop(x,null,'chSk');popBox.insertAdjacentHTML('beforeend',L.length?'<button class="pB kpB" data-p="x">CLOSE</button>':'<button class="pB kpB" data-p="gosum" data-c="m">'+TKI+' GO TO SUMMON</button>');return;}
   pop('<div class="pT">'+slotName(key)+'</div><div class="pD">Choose a '+CATS[cat].one.toLowerCase()+'. Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="pR pk" data-p="put" data-k="'+key+'" data-id=""><span>— Remove '+cur.n+' —</span></div>':'')+
     (L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=cat==='m'?(h.sp==='all'||h.sp===st):true;
       return '<div class="pR pk" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><span><img class="mini" src="'+portrait(h)+'" style="border-color:'+GRADES[h.gr].c+'"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b> '+stars(o.s)+(cat==='m'?'<br><small>'+spName(h.sp)+(m?' ✓':' · ½ bonus here')+'</small>':'')+'<br>'+(w===key?'':cmpHint(key,id))+'</span><em>'+(w===key?'★ here':w?'<small>at '+slotName(w)+'</small>':'')+'</em></div>';}).join('')
@@ -3293,7 +3396,7 @@ function teamRows(id){let keys=[];const T=[];
   if(id==='security')for(let k=0;k<SEC_GUARDS[PLV('security')-1];k++)keys.push('g|'+k);
   if(drivers[id])for(let k=0;k<PLV(id);k++)keys.push('d|'+id+'|'+k);
   if(!keys.length)return '';
-  return '<div class="sec">👥 TEAM</div>'+keys.map(k=>{const h=heroIn(k);
+  return '<div class="sec tmSec">👥 TEAM</div>'+keys.map(k=>{const h=heroIn(k);
     return '<div class="row tmRow" data-pick="'+k+'"><span>'+slotName(k).replace(/^\S+ /,'')+'</span><b>'+(h?'<img class="mini" src="'+portrait(h)+'" style="border-color:'+GRADES[h.gr].c+'"><span style="color:'+GRADES[h.gr].c+'">'+h.n+' +'+own(h.id).s+'</span>':'<span style="color:#5f6f7f">empty</span>')+'</b><em>'+(h?'CHANGE':'+ ADD')+'</em></div>';}).join('');}
 
 function bayMB(c){return c.slot&&c.slot.kind==='bay'?mechBonus(c.slot.st,c.slot.j):{spd:0,inc:0,crit:0};}
@@ -3331,6 +3434,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:16,d:'Nov 16, 2026',ic:'✨',t:'New look: buildings, campaign, crew & arena',l:['New <b>building window</b>: 10 level lights, every bonus with its next level, your crew and the upgrade button.','New <b>Campaign</b> header and a new <b>stage card</b>: enemies, VS power bar, rewards and your team before the fight.','New battle buttons: <b>pause</b>, <b>×1 / ×1.5 / ×2</b> and <b>AUTO</b>.','New <b>MY CREW</b>, <b>CHOOSE MECHANIC</b>, <b>AUTO BEST</b> and <b>GEAR SUMMON</b> pages.','<b>Arena</b>: new league shields, rival cards, FIGHT buttons, rankings and Cup frames.','New icons for Daily Quests, VIP, Shop and the left menu.']},
  {id:15,d:'Nov 16, 2026',ic:'🎨',t:'Brand-new look for the menus',l:['New top bar with your <b>💎 Diamonds</b> always visible.','New <b>Shop</b>, <b>VIP</b>, <b>News</b>, <b>Mail</b> and <b>Check-in</b> pages.','<b>HEROES</b>: your battle team now stands on the pedestals. Tap a hero to open his <b>gear page</b> – 6 slots around him and his stats below.','New <b>VICTORY</b> and <b>DEFEAT</b> screens after every battle.','New <b>BAG</b> page and a new <b>SALVAGE</b> page: salvage up to 20 items at once (worn gear is never salvaged).','New item card with <b>EQUIP</b> / <b>UPGRADE</b> / <b>SALVAGE</b>.','Online: new Ranking podium, Chat, Arena, Cup bracket (final 8) and Profile.','<b>Fixed</b>: the top bar of the <b>MY CREW</b> page was covered by an empty box.','<b>Fixed</b>: the hero gear page could stop working after equipping some gear.']},
  {id:14,d:'Nov 16, 2026',ic:'🦸',t:'New HEROES page – everything in one place',l:['Tap <b>HEROES</b> in the Campaign: your <b>battle team</b>, <b>all your heroes</b>, their <b>skills</b>, <b>gear</b> and <b>stars</b> – all on one page.','Tap a hero to see his skill and equip gear right there, then <b>➕ ADD TO BATTLE TEAM</b> (you always see before / after).','Stage card: <b>FIGHT!</b> starts right away with your team, or tap <b>✏️ HEROES</b> to change it.','The same team fights for you in the <b>Arena</b> and the <b>Torque Cup</b>.']},
  {id:14,d:'Nov 15, 2026',ic:'🛡️',t:'Passive skills + battle fixes',l:['<b>PASSIVE SKILLS</b>: every mechanic now has a passive skill that works on its own in battle – Epic, Legendary and Mythic have <b>two</b>. Medics heal by themselves, Bruisers take less damage, Racers speed up after a knock-out, Shockers chain lightning… Tap a mechanic (Team page or Gear page) to read his passives.','<b>Fixed</b>: monsters can no longer be pushed out of the screen.','<b>Fixed</b>: mechanics who fight up close no longer stand next to a monster without attacking – each one takes his own place around it.']},
