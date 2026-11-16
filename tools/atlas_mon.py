@@ -5,6 +5,7 @@ Every picture part goes to the cell holding most of its pixels; a part spread ov
 (effect glued to the next pose) is split pixel by pixel at the cell border, with a soft edge.
 All frames are re-placed in equal cells (feet on one line, centre = cell centre) -> img/mon/<id>.webp + <id>.json
 usage: python3 atlas_mon.py <sheet.png> <id> <scale> [fix]
+fix may contain "g8" (v16-54): sheet of 6 rows x 8 frames (no separate hurt/death rows)
 """
 import sys, json, os, numpy as np
 from PIL import Image
@@ -47,6 +48,8 @@ def col_bounds(m, n, cw):
 
 
 def cut(src, mid, scale, fix=''):
+    global NF
+    NF = [8] * 6 if 'g8' in fix else [6, 8, 8, 8, 4, 6]
     im = np.asarray(Image.open(src).convert('RGB')).astype(float)
     H, W = im.shape[:2]
     rgba = AR.unmix_all(im)

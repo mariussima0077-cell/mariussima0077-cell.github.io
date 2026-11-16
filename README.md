@@ -18,6 +18,10 @@
 - Vedere strict de sus, o hartă mare (1500 × ~1830) care se mișcă cu degetul, zoom cu 2 degete sau butoane + / −.
 - Salvare în browser (localStorage, cheia `torqueEmpire_v14`). Pachetele cumpărate și VIP Pass au cheia lor separată `torqueEmpire_packs`, care **nu se resetează** la versiune/capitol nou.
 
+## Nou în v16-54 – TORQUE TOWER · 13 monștri noi
+- **TORQUE TOWER** (butonul TOWER sub ARENA, se deschide după etapa 1-10): 300 de etaje, o luptă pe etaj, boss la fiecare 10 etaje, modificatori (Rage, Iron Plating, Overdrive, Hot Floor, No Repairs, Sharp Edges), recompense fixe la prima trecere. Pozele mele: `img/ui6/`.
+- Monștrii mei (sprite sheet-uri ChatGPT) pentru Battery Golem, Headlight Drone, Fuel Can, Wiper Mantis, Hubcap Saw, Gearbox Golem, Exhaust Bat, Horn Howler, ACID TANKER, OMEGA ENGINE + 3 noi: Spark Wraith, Brake Beast, Airbag Blob (în campanie și în turn).
+
 ## Nou în v15 – pozele noi · MY CREW · pregătire Google Play · bot anti-cheat
 ### 🎨 Paginile refăcute după pozele mele (folder `img/ui/`)
 - **Coloana din stânga** = iconițele mele (BATTLE, bilet, echipă, cutie de scule, clipboard, VIP). La VIP, nivelul se scrie din cod peste plăcuța galbenă.
