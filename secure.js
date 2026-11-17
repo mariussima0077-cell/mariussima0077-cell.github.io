@@ -6,7 +6,7 @@
 const API = 'https://torque-guard.torqueempirehelp.workers.dev';            // e.g. 'https://torque-guard.YOURNAME.workers.dev'
 const SALT = 'tE-v15-9c41f7';  // also set the same value as SAVE_SALT in the server
 // SKUs = product IDs you create in Play Console (Monetize → Products)
-const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly'};
+const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', dg:'dungeon_pass_30d'}; // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
 const PLAY = 'https://play.google.com/billing';
 
 const T = () => window.__TE;
@@ -128,6 +128,7 @@ async function buy(pack){
     await res.complete(v.valid?'success':'fail');
     if(!v.valid){ t.toast('⚠️ Payment could not be verified. You were not charged twice – try again later.',4000); return false; }
     if(pack==='sub' && v.expiry) t.PK.sub = v.expiry;
+    if(pack==='dg' && s.consume){ try{ await s.consume(token); }catch(e){} } // consumable → can be bought again
     return true;
   }catch(e){ return false; }
 }
@@ -142,7 +143,7 @@ async function prices(){
 async function restore(){
   const s = await billing(); const t=T(); if(!s||!t) return;
   try{ const L = await s.listPurchases(); let ch=false;
-    for(const p of L){ const k=Object.keys(SKU).find(k=>SKU[k]===p.itemId); if(!k) continue;
+    for(const p of L){ const k=Object.keys(SKU).find(k=>SKU[k]===p.itemId); if(!k||k==='dg') continue;
       if(k==='sub'){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK.sub||t.PK.sub<v.expiry)){ t.PK.sub=v.expiry; ch=true; } }
       else if(!t.PK[k]){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid){ t.PK[k]=true; ch=true; } } }
     if(ch){ t.savePacks(); t.toast('✓ Purchases restored',2500); }
