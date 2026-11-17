@@ -2430,8 +2430,10 @@ function drawCollection(){
   X.fillStyle='rgba(30,40,30,.18)';X.fillRect(fx0,fy0,fx1-fx0,fy1-fy0);
   fenceBox(fx0,fy0,fx1,fy1,[COL_RX-RW-6,COL_RX+RW+6]);
   if(IMG.b_collection.ok){X.fillStyle='rgba(0,0,0,.3)';X.fillRect(x+5,y+6,w,h);X.drawImage(IMG.b_collection.el,x,y,w,h);}
-  X.fillStyle='rgba(10,14,20,.42)';X.fillRect(x+8,y+42,w-16,h-90);
-  soonTape(x,y+40,w,h-110,-1.05,15);
+  // v16-59: CLASSIC COLLECTION (classic.js) – open garage = parked classic cars, closed = dark + "tap to open" plate
+  if(!(window.CC&&CC.drawMap(X,x,y,w,h,time))){X.fillStyle='rgba(10,14,20,.5)';X.fillRect(x+8,y+42,w-16,h-90);
+    const cy=y+h/2-20,ok=G.rep>=6;X.fillStyle='rgba(13,20,27,.92)';rr(x+20,cy-24,w-40,48,10);X.fill();X.strokeStyle='#ffd54a';X.lineWidth=2;X.stroke();
+    X.textAlign='center';X.fillStyle='#ffd54a';X.font='900 13px system-ui';X.fillText(ok?'🏆 TAP TO OPEN':'🔒 REP 6',x+w/2,cy-3);X.fillStyle='#fff';X.font='800 9px system-ui';X.fillText('CLASSIC CAR SHOWROOM',x+w/2,cy+13);}
   // laser gate + barrier + bollards
   for(const ly of[fy1-26,fy1-14]){X.fillStyle='#263238';X.fillRect(COL_RX-RW-5,ly-2,4,4);X.fillRect(COL_RX+RW+1,ly-2,4,4);X.strokeStyle='rgba(255,23,68,.85)';X.lineWidth=1;X.beginPath();X.moveTo(COL_RX-RW-1,ly);X.lineTo(COL_RX+RW+1,ly);X.stroke();X.strokeStyle='rgba(255,23,68,.25)';X.lineWidth=3;X.stroke();}
   X.fillStyle='#455a64';X.fillRect(COL_RX-RW-8,fy1-4,6,8);X.fillStyle='#e53935';X.fillRect(COL_RX-RW-2,fy1-1.5,RW*2-2,3);X.fillStyle='#fff';for(let k=0;k<RW*2;k+=8)X.fillRect(COL_RX-RW+k,fy1-1.5,4,3);
@@ -2625,7 +2627,7 @@ function bgDraw(L,sc,budget,onlyHave,count){
     else{const x0=Math.round(ox+i*TP*k),y0=Math.round(oy+j*TP*k),x1=Math.round(ox+(i+1)*TP*k),y1=Math.round(oy+(j+1)*TP*k);X.drawImage(c,x0,y0,x1-x0,y1-y0);}}
   return miss;}
 function drawBG(){
-  const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+Object.values(IMG).filter(i=>i.ok).length;
+  const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+Object.values(IMG).filter(i=>i.ok).length+'|'+(window.CC?CC.sig():'');
   if(BG.lvP!==sig||!OV.c){BG.lv.clear();BG.cur=null;BG.lvP=sig;ovBuild();}
   const sc=Z*DPR,det=DET,now=performance.now();
   if(sc!==BG.lastSc){BG.lastSc=sc;BG.stableT=now;}
@@ -2734,7 +2736,7 @@ function tap(sx,sy){
   if(inR(x,y,SO_X,SO_Y,SO_W,SO_HH+16))return openPanel('security');
   if(inR(x,y,YX0-10,YT-30,YX1-YX0+20,YB-YT+40))return openPanel('yard');
   if(inR(x,y,-3000,TRAIL_Y-30,W+6000,60))return openPanel('trailer');
-  if(inR(x,y,1290,COL.y-40,W-1290,Y2-RW-COL.y+40))return openPanel('collection');
+  if(inR(x,y,1290,COL.y-40,W-1290,Y2-RW-COL.y+40)){closePanel();return window.CC?CC.open():openPanel('collection');}
   for(const k of XIDS){const r=xRect(k);if(inR(x,y,r.x,r.y,r.w,r.h+14))return openPanel(k);}
   {const r=SOON.rail;if(inR(x,y,r.x,r.y,r.w,r.h))return openPanel('rail');}
   if(inR(x,y,-3000,SOON.railY-22,W+6000,44))return openPanel('rail');
@@ -3448,12 +3450,13 @@ const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV;
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
-function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')));}
-function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H),ct:Math.floor(hrs/(IDLE_TK_H*2)),full:hrs>=idleMax()};}
+const ccR=()=>window.CC?CC.rates():{dm:0,tk:0,ct:0,gt:0,mon:0};
+function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')+ccR().mon));}
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}
-function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNow(),key=hm(I.hrs)+I.money+I.tk+VLV+VSUB;if(key===idlKey)return;idlKey=key;
+function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNow(),key=hm(I.hrs)+I.money+I.tk+VLV+VSUB+'|'+I.dm+'|'+I.gt;if(key===idlKey)return;idlKey=key;
   const vb=VB('idle');let h='';
   h+='<div data-i="x" style="'+box(1078,38,100,100)+'"></div>';
   h+='<div class="idBar" style="'+box(114,624,968,28)+'"><i style="width:'+Math.max(3,I.hrs/idleMax()*100)+'%"></i></div>';
@@ -3463,12 +3466,13 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV" style="'+box(560,836,270,70)+'">'+I.tk+'</div>';
   h+='<div class="idV grn" style="'+box(860,836,265,70)+'">1 every '+IDLE_TK_H+'h</div>';
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
-  h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+'</span></div>';
+  const cc=(I.dm||I.gt||ccR().dm)?'<br>🏆 <b>Classic cars</b>: '+DMI+' +'+(I.dm||0)+(I.gt?' · '+GTI+' +'+I.gt:'')+' (tickets above include them)':'';
+  h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+cc+'</span></div>';
   morph(idlBox,h);}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
-function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;G.idle=SEC.now();save();closeIdle();
-  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
+function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.idle=SEC.now();save();closeIdle();
+  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
 addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open')){teamKey='';renderTeam();}if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
@@ -3589,7 +3593,7 @@ function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTM
 $('xpBody').addEventListener('click',e=>{const m=e.target.closest('[data-ml]');if(!m)return;xpMail=m.dataset.ml;if(!G.ml.r.includes(xpMail)){G.ml.r.push(xpMail);save();}renderXP();updX();});
 function updX(){$('ciDot').classList.toggle('on',ciReady());$('nwDot').classList.toggle('on',G.nw<NEWS[0].id);const u=mlUnread(),d=$('mlDot');d.textContent=u;d.classList.toggle('on',u>0);}
 updX();setInterval(updX,5000);
-const MAPCOV=['dq','sm','pop','team','idl','ros','xp'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
+const MAPCOV=['dq','sm','pop','team','idl','ros','xp','ccP'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
 cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListener('pointermove',()=>{touchT=performance.now();},{passive:true});
 function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;const o=document.getElementById('onl');if(o&&o.classList.contains('open'))return 2;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
 function frame(now){
@@ -3674,5 +3678,6 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 <script src="battle.js"></script>
 <script src="cloud.js"></script>
 <script src="online.js"></script>
+<script src="classic.js"></script>
 </body>
 </html>
