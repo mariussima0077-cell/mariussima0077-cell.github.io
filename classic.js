@@ -195,8 +195,8 @@ function thumb(id,w,hh){const key=id+'|'+w;if(TH[key])return TH[key];const c=doc
   const g=c.getContext('2d');g.scale(d,d);g.translate(w/2,hh/2);const sc=Math.min(w/54,hh/26)*.95;g.scale(sc,sc);drawCar(g,BY[id],46,20,.6);return TH[key]=c.toDataURL();}
 
 // ---------------------------------------------------------------- page: MY COLLECTION · DEALER
-const el=document.createElement('div');el.id='ccP';el.innerHTML='<div id="ccBox"><div class="ccHd"><button class="ccX" data-cc="x">↩</button><div class="ccT">CLASSIC COLLECTION</div><div class="ccMon" id="ccMon"></div></div>'+
-  '<div class="ccTabs"><button data-cc="tab:g">🏛️ MY GARAGE</button><button data-cc="tab:d">🚘 DEALER</button></div><div id="ccBody"></div></div><div id="ccPop"></div>';
+const el=document.createElement('div');el.id='ccP';el.innerHTML='<div id="ccBox"><div class="ccHd"><button class="ccX" data-cc="x">↩</button><img class="ccT" src="img/cc/head.webp" alt="CLASSIC COLLECTION"><div class="ccMon" id="ccMon"></div></div>'+
+  '<div class="ccTabs"><button data-cc="tab:g"><img class="i1" src="img/cc/tg1.webp" alt="MY GARAGE"><img class="i0" src="img/cc/tg0.webp" alt="MY GARAGE"></button><button data-cc="tab:d"><img class="i1" src="img/cc/td1.webp" alt="DEALER"><img class="i0" src="img/cc/td0.webp" alt="DEALER"></button></div><div id="ccBody"></div></div><div id="ccPop"></div>';
 document.body.appendChild(el);let tab='g';
 const GN=['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC'];
 function gc(gr){const G=T().GRADES;return G&&G[gr]?G[gr].c:'#999';}
@@ -216,9 +216,9 @@ function render(){const T0=T(),G=T0.G,s=st();document.getElementById('ccMon').in
     h+='<div class="ccSum"><b>IDLE BONUS FROM YOUR CARS</b><div>'+(n?rwLine(R):'Park a car to get diamonds and tickets')+'</div>'+
       '<small>'+n+' / '+SPOTS+' cars'+(R.mon?' · <i>FULL SHOWROOM: idle money +'+Math.round(FULL_BONUS*100)+'%</i>':' · fill all '+SPOTS+' spots: idle money +'+Math.round(FULL_BONUS*100)+'%')+'</small></div><div class="ccGrid">';
     for(let i=0;i<SPOTS;i++){const m=BY[s.p[i]];
-      if(i>=s.sp){const can=i===s.sp;h+='<div class="ccSp lock" data-cc="'+(can?'spot':'')+'"><span>🔒 SPOT '+(i+1)+'</span>'+(can?'<button class="ccBuy'+(G.money>=SPOT_COST[i]?'':' off')+'">UNLOCK · '+T0.fmt(SPOT_COST[i])+'</button>':'<em>unlock spot '+(i)+' first</em>')+'</div>';continue;}
-      if(!m){h+='<div class="ccSp empty" data-cc="tab:d"><span>SPOT '+(i+1)+'</span><b>＋</b><em>EMPTY · BUY A CAR</em></div>';continue;}
-      h+='<div class="ccSp" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><img src="'+thumb(m.id,150,72)+'"><b>'+m.n+'</b><em>'+GN[m.gr]+'</em><small>'+rwLine(m.r)+'</small></div>';}
+      if(i>=s.sp){const can=i===s.sp;h+='<div class="ccSp lock'+(can?' nx':'')+'" data-cc="'+(can?'spot':'')+'"><div class="ccGl"><span>🔒</span>'+(can?'<button class="ccBuy'+(G.money>=SPOT_COST[i]?'':' off')+'">UNLOCK · '+T0.fmt(SPOT_COST[i])+'</button>':'<em>unlock spot '+(i)+' first</em>')+'</div><b class="ccPl">SPOT '+(i+1)+'</b></div>';continue;}
+      if(!m){h+='<div class="ccSp empty" data-cc="tab:d"><div class="ccGl"><span>＋</span><em>EMPTY · BUY A CAR</em></div><b class="ccPl">SPOT '+(i+1)+'</b></div>';continue;}
+      h+='<div class="ccSp" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><div class="ccGl"><em>'+GN[m.gr]+'</em><img src="'+thumb(m.id,150,72)+'"><small>'+rwLine(m.r)+'</small></div><b class="ccPl">'+m.n+'</b></div>';}
     h+='</div>';}
   else{h+='<div class="ccNote">Every car can be owned <b>once</b>. Rewards are fixed – nothing random. Sell a car back for '+Math.round(SELL_BACK*100)+'% to swap it.</div>';
     const free=s.p.slice(0,s.sp).some(x=>!x);
@@ -249,22 +249,26 @@ el.addEventListener('click',e=>{const b=e.target.closest('[data-cc]');if(b&&b.da
 setInterval(()=>{if(el.classList.contains('open')){const T0=T();if(T0)document.getElementById('ccMon').innerHTML=T0.fmt(T0.G.money);}},1000);
 
 const css=document.createElement('style');css.textContent=`
-#ccP{position:fixed;inset:0;z-index:40;display:none;background:radial-gradient(ellipse at 50% 0%,#2a2140,#0a0c14 70%);color:#fff;font-family:system-ui;overflow:hidden}#ccP.open{display:block}
+#ccP{position:fixed;inset:0;z-index:40;display:none;background:linear-gradient(#0000 0,#0000 18%,#0a0c1499 45%,#0a0c14cc),url(img/cc/bg.webp) center top/cover #0a0c14;color:#fff;font-family:system-ui;overflow:hidden}#ccP.open{display:block}
 #ccBox{position:absolute;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
-.ccHd{display:flex;align-items:center;gap:8px;padding:10px 10px 6px;background:linear-gradient(#1b1530,#0f0c1c);border-bottom:3px solid #c99a2e;box-shadow:0 4px 14px #000a}
+.ccHd{position:relative;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 6px) 8px 0}
+.ccHd .ccX{position:absolute;left:8px;top:calc(env(safe-area-inset-top) + 6px);z-index:1}.ccHd .ccMon{margin-top:-4px;z-index:1}
 .ccX{width:40px;height:40px;border-radius:50%;border:2px solid #e0aa25;background:#1d1a2e;color:#ffd54a;font:900 20px system-ui;flex:none}
-.ccT{flex:1;text-align:center;font:900 italic 21px system-ui;letter-spacing:.5px;background:linear-gradient(#fff6c8,#ffc107 55%,#b26a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #000)}
+.ccT{width:min(84%,440px);margin-top:6px;display:block;filter:drop-shadow(0 4px 8px #000c)}
 .ccMon{font:900 13px system-ui;color:#ffd54a;background:#0008;border:1px solid #e0aa2588;border-radius:12px;padding:4px 8px;flex:none}
-.ccTabs{display:flex;gap:6px;padding:8px 10px}.ccTabs button{flex:1;padding:10px 4px;border-radius:12px;border:2px solid #4a3e6a;background:#191428;color:#b7a9d6;font:900 13px system-ui}
-.ccTabs button.on{border-color:#e0aa25;background:linear-gradient(#5a3e0a,#2c1f05);color:#ffe082;box-shadow:0 0 10px #e0aa2566}
+.ccTabs{display:flex;gap:8px;padding:6px 10px 8px}.ccTabs button{flex:1;padding:0;border:0;background:none;aspect-ratio:420/100;position:relative}
+.ccTabs img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px #000a)}.ccTabs .i1{display:none}.ccTabs button.on .i1{display:block}.ccTabs button.on .i0{display:none}
 #ccBody{flex:1;overflow-y:auto;padding:4px 10px 18px;touch-action:pan-y}
-.ccSum{background:linear-gradient(#1f1a33,#120f20);border:2px solid #e0aa2588;border-radius:14px;padding:10px;text-align:center;margin-bottom:10px}.ccSum b{color:#ffd54a;font-size:12px;letter-spacing:.5px}.ccSum div{margin:6px 0;font:800 13px system-ui}.ccSum small{color:#9fb0c0}.ccSum i{color:#7CFC9A;font-style:normal}
+.ccSum{background:linear-gradient(#1f1a33ee,#120f20ee);border:2px solid #e0aa2588;border-radius:14px;padding:10px;text-align:center;margin-bottom:10px}.ccSum b{color:#ffd54a;font-size:12px;letter-spacing:.5px}.ccSum div{margin:6px 0;font:800 13px system-ui}.ccSum small{color:#9fb0c0}.ccSum i{color:#7CFC9A;font-style:normal}
 .ccGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.ccSp{position:relative;min-height:150px;border-radius:14px;border:2px solid var(--gc,#4a3e6a);background:radial-gradient(ellipse at 50% 40%,#2e3440,#15181f);padding:8px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:inset 0 0 18px #000a,0 0 8px color-mix(in srgb,var(--gc,#000) 40%,transparent)}
-.ccSp>img{width:100%;max-width:150px}.ccSp b{font:900 13px system-ui}.ccSp em{font:900 10px system-ui;color:var(--gc);font-style:normal}.ccSp small{font:700 10px system-ui;color:#d7e3ff}
-.ccSp span{font:900 11px system-ui;color:#9aa4b1}.ccSp.empty b{font-size:34px;color:#ffd54a;line-height:1}.ccSp.empty em{color:#ffd54a}.ccSp.lock{border-style:dashed;border-color:#555}.ccSp.lock em{color:#777}
+.ccSp{position:relative;aspect-ratio:420/539;background:url(img/cc/card.webp) center/100% 100% no-repeat;text-align:center;container-type:inline-size;filter:drop-shadow(0 4px 8px #000c)}
+.ccGl{position:absolute;left:8%;right:8%;top:12%;height:58%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,var(--gc,#000) 30%,transparent),transparent 70%)}
+.ccGl>img{width:100%}.ccGl em{font:900 7cqw system-ui;color:var(--gc);font-style:normal;text-shadow:0 1px 2px #000}.ccGl small{font:800 6.4cqw/1.3 system-ui;color:#d7e3ff;text-shadow:0 1px 2px #000}.ccGl .tki{height:1.25em;vertical-align:-.3em}
+.ccPl{position:absolute;left:17%;right:17%;top:77.5%;height:13%;display:flex;align-items:center;justify-content:center;font:900 italic 7.6cqw system-ui;color:#ffe9a8;text-shadow:0 2px 2px #000;white-space:nowrap;overflow:hidden}
+.ccSp.empty .ccGl span{font:300 30cqw/1 system-ui;color:#ffd54a;text-shadow:0 0 12px #e0aa25}.ccSp.empty .ccGl em{color:#ffd54a}.ccSp.lock{filter:grayscale(.85) brightness(.75) drop-shadow(0 4px 8px #000c)}.ccSp.lock.nx{filter:drop-shadow(0 4px 8px #000c)}.ccSp.lock .ccGl span{font-size:20cqw}.ccSp.lock .ccGl em{color:#aaa}.ccSp.lock .ccBuy{font-size:6.5cqw;padding:5px 7px;filter:none}
+.ccSp:not(.lock) .ccPl{color:#ffe082}
 .ccNote{font:700 12px system-ui;color:#c9b8ef;text-align:center;margin:0 0 8px}
-.ccRow{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px;border-radius:14px;border:2px solid var(--gc);background:linear-gradient(90deg,color-mix(in srgb,var(--gc) 22%,#120f20),#120f20 60%)}
+.ccRow{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px;border-radius:14px;border:2px solid var(--gc);background:linear-gradient(90deg,color-mix(in srgb,var(--gc) 22%,#120f20ee),#120f20e6 60%);box-shadow:0 3px 8px #000a}
 .ccImg{width:96px;flex:none;background:radial-gradient(ellipse,#2e3440,#15181f);border-radius:10px;padding:2px}.ccImg img{width:100%;display:block}
 .ccInf{flex:1;min-width:0;display:flex;flex-direction:column}.ccInf b{font:900 14px system-ui}.ccInf em{font:900 10px system-ui;color:var(--gc);font-style:normal}.ccInf small{font:700 10.5px system-ui;color:#d7e3ff;margin-top:2px}
 .ccBuy{flex:none;padding:9px 10px;border-radius:12px;border:2px solid #7a4a00;background:linear-gradient(#ffe066,#ffa000);color:#3a1d00;font:900 13px system-ui;box-shadow:0 3px 0 #7a4a00;white-space:nowrap}

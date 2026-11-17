@@ -1,4 +1,5 @@
 # CLASSIC COLLECTION – prompturi ChatGPT (17 nov 2026, opționale)
+✅ **Ambele poze sunt în joc (v16-61).**
 Pagina e acum desenată în cod. Cu pozele astea primește antet, fundal și butoane ca restul jocului. Pozele cu fond verde le decupează Claude.
 
 ## 1 · Antet + butoane (fond verde)

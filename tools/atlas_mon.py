@@ -50,6 +50,7 @@ def col_bounds(m, n, cw):
 def cut(src, mid, scale, fix=''):
     global NF
     NF = [8] * 6 if 'g8' in fix else [6, 8, 8, 8, 4, 6]
+    if 'i5' in fix: NF[0] = 5      # v16-61 INFERNO PISTON: the idle row has only 5 frames
     im = np.asarray(Image.open(src).convert('RGB')).astype(float)
     H, W = im.shape[:2]
     rgba = AR.unmix_all(im)

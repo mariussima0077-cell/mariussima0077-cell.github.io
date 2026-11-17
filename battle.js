@@ -1396,13 +1396,13 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
     if(u.st==='walk')return[L.w,Math.floor(u.wph/TAU*8+80)%8];
     return[L.i,Math.floor(t*7+u.k)%8];}
   if(u.dead)return[5,Math.min(5,Math.floor(u.deadT/.1))];
-  const SZ=id==='scrapzilla';
-  if(a&&a.k==='pound')return[SZ?2:3,Math.min(7,Math.floor(a.t/a.dur*8))];
+  const WBX=MSPR[id].wb,SZ=!!WBX; // v16-61: every WORLD BOSS sprite (SCRAPZILLA, CRUSHER KING, INFERNO PISTON)
+  if(a&&a.k==='pound')return[SZ?WBX.pr:3,Math.min(7,Math.floor(a.t/a.dur*8))];
   if(a&&a.k==='laser'){if(id==='ndragon'||SZ)return[3,a.t<a.dur?Math.min(2,Math.floor(a.t/a.dur*3)):2]; // dragon: open mouth, the game draws the nitro breath
     return[3,Math.min(7,Math.floor(a.t/(a.dur+.6)*8))];}
   if(a&&a.k==='charge'&&a.t<a.dur)return[3,Math.floor(a.t*8)%2+1];
   if(u.st==='atk')return[u.alt&&!SZ?3:2,Math.min(7,Math.floor(u.ap*8))];
-  if(SZ){if(u.hurtS>0)return[4,u.hurtS>.3?1:2];if(u.enr)return[5,Math.floor(t*8+u.k)%6];} // v16-60 SCRAPZILLA: hurt only on skills/crits (it is hit all the time), ENRAGE row while enraged
+  if(SZ){if(u.hurtS>0)return[4,u.hurtS>.3?1:2];if(u.enr)return[5,Math.floor(t*8+u.k)%6];if(u.st!=='walk')return[0,Math.floor(t*7+u.k)%WBX.ni];} // v16-60 SCRAPZILLA: hurt only on skills/crits (it is hit all the time), ENRAGE row while enraged
   if(u.stun>0)return[4,3];
   if(u.hurt>.35)return[4,u.hurt>.7?1:2];
   if(u.st==='walk')return[1,Math.floor(u.wph/TAU*8+80)%8];
@@ -1479,7 +1479,7 @@ function startBattle(si,team,tw){
 function spawnWave(){const w=B.stage.w[B.wave];
   w.forEach((t,i)=>{const m=mkMon(t,i);if(B.mod)twModMon(m);const n=w.length;
     if(m.b==='titan'){m.x=W*.78;m.d=.42;m.st='idle';}
-    if(B.tw&&B.tw.wb&&m.boss){m.x=W*.75;m.d=.4;m.max=m.hp=B.tw.L*WB_LAYERS;m.wbB=1;m.sp3=1e9;m.sp1=3;m.sp2=7;m.hurtS=0;B.wbB=m;B.wbD=0;B.wbT=WB_T;}
+    if(B.tw&&B.tw.wb&&m.boss){m.x=W*.75;m.d=.4;m.max=m.hp=B.tw.L*WB_LAYERS;m.wbB=1;m.sp3=1e9;m.sp1=3;m.sp2=MON[m.t].noLz?1e9:7;m.hurtS=0;B.wbB=m;B.wbD=0;B.wbT=WB_T;}
     else{m.x=W+30+i*(26*S)+rnd(0,20);m.d=n===1?.45:clamp(.1+(i/(n-1||1))*.8+rnd(-.06,.06),.05,.95);}
     B.mons.push(m);
     if(m.boss)B.bossBar=m;});
@@ -1666,7 +1666,7 @@ const SKF={
 // ---------------------------------------------------------------- monster specials
 function monSpecial(m,dt){const hs=alive(B.heroes);if(!hs.length)return false;
   if(m.b==='pound'||m.b==='crusher'||m.b==='titan'){m.sp1-=dt;if(m.sp1<=0&&!m.act){const tg=m.b==='titan'?(cluster(hs,110*S)||hs[0]):nearest(m,hs);
-      const r=(m.b==='titan'?115:m.b==='crusher'?85:72)*S;m.sp1=m.b==='titan'?(m.enr?5:7):m.b==='crusher'?6:8;
+      const r=(m.b==='titan'?115:m.b==='crusher'?85:72)*S;m.sp1=m.b==='titan'?(MON[m.t].noLz?(m.enr?3.5:4.5):m.enr?5:7):m.b==='crusher'?6:8;
       const tx=m.b==='titan'?tg.x:clamp(tg.x,m.x-140*S,m.x+140*S);
       B.tele.push({type:'circle',x:tx,d:tg.d,r,t:0,dur:1.05,col:'#ff1744'});
       m.act={k:'pound',t:0,dur:1.05,tx,td:tg.d,r};m.st='pound';m.ap=0;m.face=tx<m.x?-1:1;return true;}}
@@ -3084,18 +3084,27 @@ let collHome=0;
 // the first visit of the day; best heroes, not the current team → cannot be lowered on purpose). A normal team does ~2-4 bars per attack.
 // Saved in G.wb.
 const WB_UNLOCK=21,WB_KEYS=3,WB_T=60,WB_ENR=20,WB_LAYERS=100,WB_LK=.5;
-const WBOSS=[{k:'scrap',n:'SCRAPZILLA',weak:'elec',d:'A gigantic dinosaur made of crushed cars: claw swipes, ground slams and a wide fire breath. It ENRAGES in the last 20 seconds.'}];
+const WBOSS=[{k:'scrap',sp:'scrapzilla',n:'SCRAPZILLA',weak:'elec',d:'A gigantic dinosaur made of crushed cars: claw swipes, ground slams and a wide fire breath. It ENRAGES in the last 20 seconds.'},
+  {k:'crushk',sp:'crusher',n:'CRUSHER KING',weak:'inspect',d:'A giant golem built from a car-crusher press: huge hydraulic punches and frequent ground slams that hit everyone close to it. No ranged attack. It ENRAGES in the last 20 seconds.'},
+  {k:'infp',sp:'inferno',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 (TOW SERPENT = 4th, when its picture comes)
 const WB_TIER=[{b:1,dm:20},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:8,dm:40,tk:1},{b:12,dm:50,gt:1,ct:1},{b:18,dm:80,tk:2,gt:1}];
 const WB_RANK=[[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]]; // same table in server/online.js (WB_RW)
 MON.scrap={n:'SCRAPZILLA',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[58,155],dr:'spr_scrapzilla',dr0:'titan',sp:'scrapzilla',sc:1,desc:'World boss'};
-MSPR.scrapzilla={w:288,h:192,ax:144,ay:187.5,ih:157};MDRAW.spr_scrapzilla=(g,u,t)=>drawSprMon(g,u,t,'scrapzilla');
+MSPR.scrapzilla={w:288,h:192,ax:144,ay:187.5,ih:157,wb:{pr:2,ni:6}};MDRAW.spr_scrapzilla=(g,u,t)=>drawSprMon(g,u,t,'scrapzilla');
+// v16-61: CRUSHER KING (pound = the ground-slam SKILL row, no fire breath → slams more often) · INFERNO PISTON (pound = whip row,
+// fire = chest opening frames 1-3 + the fire cone drawn by the game, like SCRAPZILLA; its idle row has 5 frames)
+MON.crushk={n:'CRUSHER KING',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ffd740',lz:[40,120],dr:'spr_crusher',dr0:'titan',sp:'crusher',sc:1,noLz:1,desc:'World boss'};
+MSPR.crusher={w:304,h:180,ax:152,ay:175,ih:153,wb:{pr:3,ni:6}};MDRAW.spr_crusher=(g,u,t)=>drawSprMon(g,u,t,'crusher');
+MON.infp={n:'INFERNO PISTON',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[78,93],dr:'spr_inferno',dr0:'titan',sp:'inferno',sc:1,desc:'World boss'};
+MSPR.inferno={w:322,h:177,ax:161,ay:173,ih:150,wb:{pr:2,ni:5}};MDRAW.spr_inferno=(g,u,t)=>drawSprMon(g,u,t,'inferno');
 const WBS={ret:0,sending:0,rank:null,raf:0};
 const wbEl=document.createElement('div');wbEl.id='wb';wbEl.innerHTML='<div id="wbBox"></div>';root.appendChild(wbEl);
 const fmtD=n=>{n=Math.round(n||0);return n>=1e12?(n/1e12).toFixed(2)+'T':n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e3).toFixed(1)+'K':String(n);};
 const wbDay=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
 const wbWS=()=>{const d=new Date();d.setUTCHours(0,0,0,0);return d.getTime()-((d.getUTCDay()+6)%7)*864e5;};
 const wbWeek=()=>new Date(wbWS()).toISOString().slice(0,10);
-const wbCur=()=>Math.max(0,Math.floor((wbWS()-Date.UTC(2026,10,16))/6048e5))%WBOSS.length;
+let WBF=-1; // test mode only: force a boss (__DEV.wbSet)
+const wbCur=()=>WBF>=0?WBF%WBOSS.length:Math.max(0,Math.floor((wbWS()-Date.UTC(2026,10,16))/6048e5))%WBOSS.length;
 const wbOK=()=>TE().G.cp.best>=WB_UNLOCK;
 const wbEq=()=>Math.min(NST-1,Math.max(0,TE().G.cp.best));
 const wbLayer=()=>Math.max(500,Math.round(teamPower(bestTeam().map(heroOf).filter(Boolean))*WB_LK));
@@ -3135,10 +3144,10 @@ function wbRender(){const T=TE(),w=wbG(),Bo=WBOSS[wbCur()],M=wbMap(),bx=$('wbBox
   h+='<div class="wbWk" style="'+gbx(26,1470,500,52)+'">THIS WEEK '+fmtD(w.wd)+(WBS.rank&&WBS.rank.rank?' · #'+WBS.rank.rank:'')+'</div>';
   GYM=null;bx.innerHTML=h;wbAnim();}
 // the boss idles on the page (12 fps, only while the page is open)
-function wbAnim(){cancelAnimationFrame(WBS.raf);const d=msprLoad('scrapzilla');let last=0;
+function wbAnim(){cancelAnimationFrame(WBS.raf);const sp=WBOSS[wbCur()].sp,d=msprLoad(sp),ni=MSPR[sp].wb.ni;let last=0;
   const f=ts=>{if(!wbEl.classList.contains('open'))return;WBS.raf=requestAnimationFrame(f);if(ts-last<80)return;last=ts;const c=$('wbCv');if(!c||!d.im.complete||!d.im.naturalWidth)return;
     const r=c.getBoundingClientRect(),dp=Math.min(2,devicePixelRatio||1),cw=Math.round(r.width*dp),ch=Math.round(r.height*dp);if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch;}
-    const x=c.getContext('2d'),k=Math.min(cw/d.w,ch/d.h)*1.05,i=Math.floor(ts/110)%6;x.clearRect(0,0,cw,ch);
+    const x=c.getContext('2d'),k=Math.min(cw/d.w,ch/d.h)*1.05,i=Math.floor(ts/110)%ni;x.clearRect(0,0,cw,ch);
     x.drawImage(d.im,i*d.w,0,d.w,d.h,(cw-d.w*k)/2,ch-d.h*k,d.w*k,d.h*k);};
   WBS.raf=requestAnimationFrame(f);}
 function wbOpen(){if(!wbOK()){TE().toast('🔒 WORLD BOSS opens after campaign stage '+sLabel(WB_UNLOCK-1),2600);return;}
@@ -3156,7 +3165,7 @@ function wbClaim(i){const T=TE(),w=wbG();if(wbTierSt(i)!==1)return;const q=WB_TI
 function wbGo(){const w=wbG();if(w.n>=WB_KEYS){TE().toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
   let team=teamHeroes();if(!team.length)team=bestTeam().map(heroOf);
   w.n++;TE().save();wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);
-  try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad('scrapzilla');
+  try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad(WBOSS[wbCur()].sp);
   safeStart(wbEq(),team,wbFight());if(!(B&&B.wbB&&running)){w.n--;TE().save();}}
 async function wbSend(){const w=wbG();if(!w.pend.length||!window.ONLINE||!ONLINE.call||WBS.sending)return;WBS.sending=1;
   try{while(w.pend.length){const q=w.pend[0];if(q.t<wbWS()){w.pend.shift();continue;}const r=await ONLINE.call('wbhit',{dmg:q.d,t:q.t,boss:WBOSS[wbCur()].k});
@@ -3246,5 +3255,5 @@ const wbCss=document.createElement('style');wbCss.textContent=`
 .wbRes .cpRow{margin-top:10px}
 `;document.head.appendChild(wbCss);
 window.CAMPAIGN={openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
