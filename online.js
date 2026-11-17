@@ -687,5 +687,5 @@ function addButtons(){
     const cp=$('cpBtn');if(cp&&cp.nextSibling)sd.insertBefore(b,cp.nextSibling);else sd.appendChild(b);b.onclick=()=>openHub('olArena');}
   dots();}
 addButtons();
-window.ONLINE={open:openHub,close:closeHub,sync,play:playFight};
+window.ONLINE={open:openHub,close:closeHub,sync,play:playFight,call};
 })();

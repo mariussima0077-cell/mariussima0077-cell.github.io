@@ -15,6 +15,10 @@ export const tierOf = p => { let t = TIERS[0]; for (const x of TIERS) if (p >= x
   return {lg:t[1], div:t[2], name:LEAGUES[t[1]] + (t[2] ? ' ' + t[2] : ''), from:t[0], next:nx ? nx[0] : null}; };
 const START_PTS = 1000, ARENA_TK = 5, TK_EVERY = 2 * HOUR;
 const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena daily reward per league: [diamonds, recruit tickets]
+// v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
+const WB_RW = [[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]];
+const WB_DAY = 6;        // max hits per UTC day (3 keys per local day → up to 6 in one UTC day around midnight)
+const WB_CAP = 60;       // one 60 s hit can be at most WB_CAP × team power (normal play: ~1-5 ×)
 const SEASON_RW = [[150,3],[300,5],[500,8],[800,12],[1200,16],[2000,25]];
 const CUP_RW = {1:{dm:2000,tk:50,t:'Champion'}, 2:{dm:1200,tk:30,t:'Final'}, 4:{dm:800,tk:20,t:'Semi-final'}, 8:{dm:500,tk:15,t:'Quarter-final'}, 16:{dm:300,gt:10,t:'Round of 16'}, 32:{dm:150,gt:5,t:'Round of 32'}, 64:{dm:80,gt:3,t:'Round of 64'}};
 const BOTN = ['Rusty_Rick','GearGrinder','Lugnut_Lou','OilSlick','Sparky_88','TorqueTina','Wrenchy','PistonPete','Clutch_Kid','Turbo_Ted','NutBuster','RevLimit','BoltBaron','DieselDan','CamshaftCarl','Brake_Bea','Muffler_Max','HubcapHal','ChromeCleo','Axle_Ace'];
@@ -77,6 +81,8 @@ async function ensure(env) {
     db.prepare('CREATE INDEX IF NOT EXISTS inbox_uid ON inbox(uid, got)'),
     db.prepare('CREATE TABLE IF NOT EXISTS cup(srv INTEGER, wk TEXT, data TEXT, PRIMARY KEY(srv, wk))'),
     db.prepare('CREATE TABLE IF NOT EXISTS kv(k TEXT PRIMARY KEY, v TEXT)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS wboss(uid INTEGER, wk TEXT, srv INTEGER, dmg INTEGER DEFAULT 0, best INTEGER DEFAULT 0, hits INTEGER DEFAULT 0, day TEXT, nday INTEGER DEFAULT 0, t INTEGER, PRIMARY KEY(uid, wk))'),
+    db.prepare('CREATE INDEX IF NOT EXISTS wboss_rank ON wboss(srv, wk, dmg)'),
   ]);
   ready = true;
 }
@@ -315,6 +321,16 @@ async function rewardsTick(env) {
     await db.prepare('UPDATE arena SET peak=pts').run();
   }
   if (last !== season) await kvSet(env, 'season', season);
+  // WORLD BOSS: the week is over → mail the top 100 of each server
+  const wk = dayKey(weekStart(now)), wlast = await kvGet(env, 'wbwk');
+  if (wlast && wlast !== wk) {
+    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
+    let srv = -1, n = 0;
+    for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue;
+      const t = WB_RW.find(q => n >= q[0] && n <= q[1]); if (t) await mail(env, r.uid, '👹', 'World Boss – weekly ranking', `Your rank last week: #${n} (damage ${r.dmg.toLocaleString('en-US')}).`, t[2]); }
+    await db.prepare('DELETE FROM wboss WHERE wk<?').bind(dayKey(weekStart(now) - 21 * DAY)).run();
+  }
+  if (wlast !== wk) await kvSet(env, 'wbwk', wk);
   // TORQUE KING title: #1 of the campaign ranking on each server
   for (const r of (await db.prepare('SELECT srv, uid FROM prof p WHERE best=(SELECT MAX(best) FROM prof q WHERE q.srv=p.srv) GROUP BY srv').all()).results) await addUnl(env, r.uid, 'king');
   await db.prepare('DELETE FROM chat WHERE t<?').bind(now - 7 * DAY).run();
@@ -420,6 +436,25 @@ export async function online(op, b, env) {
     return {ok:true, list:rows.map(r => ({id:r.id, t:r.t, kind:r.kind, atk:r.a === p.uid, other:r.a === p.uid ? r.dn : r.an, otherUid:r.a === p.uid ? r.d : r.a, win:r.a === p.uid ? r.win : 1 - r.win, d:r.a === p.uid ? r.da : r.dd}))};
   }
   if (op === 'cup') return {ok:true, ...(await cupView(env, p))};
+  if (op === 'wbhit') { if (await isBanned(env, b.pid)) return {banned:1};
+    const ws = weekStart(now), wk = dayKey(ws), day = dayKey(now), t = +b.t || now;
+    if (t < ws || t > now + 6e4) return {err:'bad'};
+    let dmg = Math.round(num(b.dmg, 0, 1e15)); const cap = Math.max(2e5, (p.pow || 0) * WB_CAP); if (dmg > cap) dmg = cap;
+    const r = await db.prepare('SELECT * FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
+    const nday = r && r.day === day ? r.nday + 1 : 1; if (nday > WB_DAY) return {err:'limit'};
+    if (r) await db.prepare('UPDATE wboss SET srv=?, dmg=dmg+?, best=MAX(best,?), hits=hits+1, day=?, nday=?, t=? WHERE uid=? AND wk=?').bind(p.srv, dmg, dmg, day, nday, now, p.uid, wk).run();
+    else await db.prepare('INSERT INTO wboss(uid,wk,srv,dmg,best,hits,day,nday,t) VALUES(?,?,?,?,?,1,?,1,?)').bind(p.uid, wk, p.srv, dmg, dmg, day, now).run();
+    const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
+    const rank = (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1;
+    return {ok:true, dmg:me.dmg, rank};
+  }
+  if (op === 'wbrank') {
+    const ws = weekStart(now), wk = dayKey(ws);
+    const top = (await db.prepare('SELECT w.uid, w.dmg, p.name, p.icon, p.frame FROM wboss w JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.srv=? AND w.wk=? AND COALESCE(pl.banned,0)=0 ORDER BY w.dmg DESC LIMIT 100').bind(p.srv, wk).all()).results;
+    const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
+    const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1 : 0;
+    return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, icon:r.icon, frame:r.frame, dmg:r.dmg})), dmg:me ? me.dmg : 0, rank, name:p.name, end:ws + 7 * DAY, now};
+  }
   if (op === 'inbox') return {ok:true, list:(await db.prepare('SELECT id,t,ic,title,body,rw FROM inbox WHERE uid=? AND got=0 ORDER BY id DESC LIMIT 30').bind(p.uid).all()).results.map(r => ({...r, rw:JSON.parse(r.rw || '{}')}))};
   if (op === 'claim') {
     const r = await db.prepare('UPDATE inbox SET got=1 WHERE id=? AND uid=? AND got=0 RETURNING rw').bind(b.id | 0, p.uid).first();

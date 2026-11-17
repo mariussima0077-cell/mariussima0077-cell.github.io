@@ -1,4 +1,5 @@
 # WORLD BOSS – prompturi ChatGPT (17 nov 2026)
+✅ **Făcut în v16-60 (17 nov)** – toate cele 6 poze sunt în joc. Bossii 2-4: când vin pozele.
 Fiecare prompt are stilul inclus. Pozele cu fond verde = Claude le decupează. Ordinea: 1 → 6 (bossul 1 întâi; bossii 2-4 mai târziu).
 
 ## Cum va funcționa (propunere – Marius confirmă)

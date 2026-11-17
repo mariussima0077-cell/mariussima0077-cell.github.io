@@ -41,7 +41,7 @@ Ultima actualizare: 15 noiembrie 2026 (v16-45 – online: clasament, chat, aren�
 |---|---|---|
 | Scoți **Report / Mute / regulile chatului** sau pagina de moderare | Google cere pentru chat (conținut scris de jucători): reguli, raportare, blocare și moderare | Rămân mereu cât există chat |
 | Pui chat **privat** (1 la 1), poze, voce sau link-uri în chat | Risc mult mai mare (13+), IARC + Data safety se schimbă | Întâi întrebi Claude, se actualizează declarațiile |
-| Dai premii în Arenă / Cup pe **bani reali** sau vinzi bilete de Arenă | La fel ca summon pe bani → elemente aleatorii / „pay to win” la PvP | Premiile rămân doar diamante + bilete câștigate jucând |
+| Dai premii în Arenă / Cup / World Boss pe **bani reali** sau vinzi bilete de Arenă / BOSS KEYS (v16-60) | La fel ca summon pe bani → elemente aleatorii / „pay to win” la PvP | Premiile rămân doar diamante + bilete câștigate jucând |
 | Adaugi **reclame** (orice SDK de ads, video cu recompensă) | Am declarat „Ads: No” | Schimbi „Ads” în Play + Data safety + privacy policy, ÎNAINTE de update |
 | Vinzi **bilete de summon / diamante / cufere cu noroc** pe bani reali (direct sau prin altă monedă) | Am declarat „éléments aléatoires: Non”. Cu bani reali → rating 18+ în Brazilia, interzis în Belgia/Olanda | Refaci chestionarul IARC, schimbi Classification. **Recomandare: NU** – summon rămâne doar cu bilete câștigate jucând |
 | Aduni **date noi** (e-mail, nume, locație, analytics, crash reports, notificări cu token) | Data safety + privacy policy nu le menționează | Actualizezi Data safety + `privacy.html` ÎNAINTE de update |

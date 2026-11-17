@@ -101,6 +101,21 @@ def cut(src, mid, scale, fix=''):
             x1 = XB[r][c + 1]
             zone = np.zeros(fire.shape, bool); zone[:, x1 - 45:x1] = True
             b[..., 3] = np.where(fire & zone, 0, b[..., 3])
+    if fix == 'fire':
+        # v16-60 SCRAPZILLA skill row: the fire burst of frame c is drawn over frame c-1 -> remove the big fire clouds
+        # (bright orange/yellow parts > 500 px); the game draws the fire breath itself (like the Nitro Dragon)
+        r = 3; y0, y1 = rows[r], rows[r + 1]
+        b = rgba[y0:y1]
+        R, G, Bc = b[..., 0], b[..., 1], b[..., 2]
+        fire = (R > 185) & (G > 85) & (Bc < 150) & (R - Bc > 80) & (b[..., 3] > 20)
+        fire = nd.binary_closing(fire, iterations=2)
+        lb, nn = nd.label(fire)
+        if nn:
+            sz = nd.sum(fire, lb, range(1, nn + 1))
+            big = np.isin(lb, 1 + np.where(sz > 500)[0])
+            big = nd.binary_dilation(big, iterations=4)
+            soft = nd.binary_dilation(big, iterations=6) & ~big
+            b[..., 3] = np.where(big, 0, np.where(soft, b[..., 3] * .45, b[..., 3]))
     frames = {}
     A = rgba[..., 3]
     for r in range(6):
