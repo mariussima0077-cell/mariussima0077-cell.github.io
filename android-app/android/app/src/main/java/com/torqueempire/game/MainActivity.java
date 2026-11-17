@@ -11,6 +11,7 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(TEBilling.class);   // Google Play Billing (payments) – see TEBilling.java
         super.onCreate(savedInstanceState);
         hideBars();
     }
