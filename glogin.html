@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="robots" content="noindex">
+<title>Torque Empire – Sign in with Google</title>
+<style>
+html,body{margin:0;min-height:100%;background:#0b1420;font-family:system-ui,-apple-system,Roboto,sans-serif;color:#fff}
+.c{max-width:380px;margin:0 auto;padding:40px 18px;text-align:center}
+.box{background:linear-gradient(#152033,#0b1420);border:2px solid #e0a82e;border-radius:18px;padding:20px 16px;box-shadow:0 8px 30px #000}
+h1{font-size:21px;margin:8px 0;color:#ffd54a}
+p{font-size:14px;color:#c8d2dc;line-height:1.5;margin:6px 0}
+.i{font-size:46px;line-height:1}
+#g{min-height:46px;display:flex;justify-content:center;margin-top:16px}
+a.b{display:block;margin-top:16px;padding:14px;border-radius:999px;background:#2e7d32;color:#fff;font-weight:900;font-size:16px;text-decoration:none;box-shadow:0 3px 0 #0006}
+a.n{display:block;margin-top:10px;padding:11px;border-radius:999px;background:#2b3a52;color:#fff;font-weight:800;font-size:14px;text-decoration:none}
+small{display:block;font-size:11px;color:#8b9aab;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="c"><div class="box" id="m">
+  <div class="i">☁️</div><h1>Cloud save</h1>
+  <p>Sign in with Google to keep your Torque Empire game safe and play on another phone.</p>
+  <div id="g"></div>
+  <a class="n" id="cx" href="#">CANCEL</a>
+  <small>We only keep your game – not your e-mail or name.</small>
+</div></div>
+<script>
+// v16-67 – Google sign-in for the NEW app (Capacitor).
+// Google's web sign-in does not work inside the app (WebView), so the app opens this page in Chrome (Custom Tab).
+// Here the normal Google button works. The Google token goes to Torque Guard under the app's secret key
+// (same mailbox as transfer.html: kept max 30 min, downloaded once) → the app picks it up and signs in itself.
+(()=>{
+const CLIENT_ID='1041720099519-ogooa4hblh8d4s96ieervv9rp7bqh2k5.apps.googleusercontent.com';
+const API='https://torque-guard.torqueempirehelp.workers.dev';
+const m=document.getElementById('m');
+const k=new URLSearchParams(location.search).get('k')||'';
+const back='intent://login#Intent;scheme=torqueempire;package=com.torqueempire.game;end';
+const BTN='<a class="b" href="'+back+'">◀ RETURN TO GAME</a>';
+const show=h=>m.innerHTML=h;
+document.getElementById('cx').href=back;
+if(!/^[A-Za-z0-9]{24,64}$/.test(k)){show('<div class="i">⚠️</div><h1>Open this from the app</h1><p>Start Torque Empire and tap <b>Continue with Google</b>.</p>');return;}
+let sent=false;
+async function onCred(r){
+  if(sent||!r||!r.credential)return; sent=true;
+  show('<div class="i">⏳</div><h1>Signing in…</h1>');
+  for(let t=0;t<3;t++){
+    try{const x=await(await fetch(API+'/api/xfer/put',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({k,data:JSON.stringify({cred:r.credential})})})).json();
+      if(x&&x.ok){show('<div class="i">✅</div><h1>Signed in!</h1><p>Go back to Torque Empire – your cloud save is turning on.</p>'+BTN);
+        setTimeout(()=>{location.href=back;},900);return;}
+    }catch(e){}
+    await new Promise(z=>setTimeout(z,1500));
+  }
+  sent=false;
+  show('<div class="i">📶</div><h1>No internet</h1><p>Check your connection and try again.</p><a class="b" href="" onclick="location.reload();return false">TRY AGAIN</a>');
+}
+const s=document.createElement('script'); s.src='https://accounts.google.com/gsi/client'; s.async=true;
+s.onload=()=>{
+  google.accounts.id.initialize({client_id:CLIENT_ID,callback:onCred,ux_mode:'popup',auto_select:false,use_fedcm_for_button:true,use_fedcm_for_prompt:true});
+  google.accounts.id.renderButton(document.getElementById('g'),{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:280});
+  try{google.accounts.id.prompt();}catch(e){}            // the account list at the bottom (one tap)
+};
+s.onerror=()=>show('<div class="i">📶</div><h1>No internet</h1><p>Google could not be reached. Check your connection and try again.</p><a class="b" href="" onclick="location.reload();return false">TRY AGAIN</a>'+BTN);
+document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

@@ -118,7 +118,7 @@ function refreshStart(){
   const S = SERVERS.find(x=>x.id===srv)||SERVERS[0];
   let acc;
   const app = !!(window.XFER && XFER.isApp());
-  if(app && !sess) acc = '<button data-xfo="1" style="width:100%;padding:9px;border:0;border-radius:999px;background:#2e7d32;color:#fff;font:900 13px system-ui">📲 TRANSFER FROM OLD VERSION</button><div style="font-size:11px;color:#c8d2dc;text-align:center;margin-top:5px">Google sign-in in the app: coming soon</div>';
+  if(app && !sess) acc = '<button data-glo="1" style="width:100%;max-width:280px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 12px;border:1px solid #dadce0;border-radius:999px;background:#fff;color:#3c4043;font:600 14px system-ui"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:none"><path fill="#EA4335" d="M24 9.5c3.5 0 6.7 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.8 6.1C6.6 42.6 14.6 48 24 48z"/></svg>Continue with Google</button>'+'<div style="font-size:11px;color:#c8d2dc;text-align:center;margin-top:5px">Optional · keeps your game safe on a new phone</div><button data-xfo="1" style="width:100%;margin-top:7px;padding:7px;border:0;border-radius:999px;background:#2e7d32;color:#fff;font:900 12px system-ui">📲 TRANSFER FROM OLD VERSION</button>';
   else if(!CLIENT_ID) acc = '';
   else if(sess) acc = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:800;color:#7ee787">✓ Google account · ☁️ Cloud save ON</div><div style="font-size:11px;color:#b8c4d0;text-align:center;margin-top:2px">Last saved: '+when(syncedT)+'</div>';
   else acc = '<div id="gsiStart" style="min-height:40px;display:flex;justify-content:center"></div><div style="font-size:11px;color:#c8d2dc;text-align:center;margin-top:5px">Optional · keeps your game safe on a new phone</div>';
@@ -145,6 +145,7 @@ function serverList(){
   document.body.appendChild(d);
 }
 document.addEventListener('click', e=>{ if(e.target.closest('[data-xfo]')){ e.stopPropagation(); window.XFER && XFER.open(); } }, true);
+document.addEventListener('click', e=>{ if(e.target.closest('[data-glo]')){ e.stopPropagation(); window.XFER && XFER.login(); } }, true);   // v16-67: Google in the app → Chrome (glogin.html)
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-sv="open"]'); if(b){ e.stopPropagation(); serverList(); } }, true);
 
 // ---------- the box at the bottom of the Shop ----------
@@ -155,7 +156,8 @@ function refresh(){
   if(!box || !document.body.contains(box)) return;
   const st = 'background:#141c2b;border:1px solid #e0a82e55;border-radius:14px;padding:12px;margin:10px 0;font-size:13px;line-height:1.45';
   if(!CLIENT_ID){ box.innerHTML = SEC.TEST_MODE ? '<div style="'+st+'">☁️ <b>Google sign-in</b> – waiting for the Client ID (see PLAY_RULES.md). Players don\'t see this box yet.</div>' : ''; return; }
-  if(!sess && window.XFER && XFER.isApp()){ box.innerHTML = '<div style="'+st+'"><b style="font-size:15px">📲 Old version</b><br>Played before in the old (Chrome) version on this phone? Bring your progress here.<button data-xfo="1" style="width:100%;margin-top:10px;padding:10px;border:0;border-radius:999px;background:#2e7d32;color:#fff;font:900 13px system-ui">TRANSFER MY PROGRESS</button><div style="font-size:11px;color:#9fb0c0;margin-top:6px">Google sign-in in the app: coming soon.</div></div>'; return; }
+  if(!sess && window.XFER && XFER.isApp()){ box.innerHTML = '<div style="'+st+'"><b style="font-size:15px">📲 Old version</b><br>Played before in the old (Chrome) version on this phone? Bring your progress here.<button data-xfo="1" style="width:100%;margin-top:10px;padding:10px;border:0;border-radius:999px;background:#2e7d32;color:#fff;font:900 13px system-ui">TRANSFER MY PROGRESS</button></div>'+
+    '<div style="'+st+'"><b style="font-size:15px">☁️ Cloud save</b><br>Sign in with Google to keep your progress safe and play on another phone. We only keep your game – not your e-mail or name.<div style="margin-top:10px">'+'<button data-glo="1" style="width:100%;max-width:260px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 12px;border:1px solid #dadce0;border-radius:999px;background:#fff;color:#3c4043;font:600 14px system-ui"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:none"><path fill="#EA4335" d="M24 9.5c3.5 0 6.7 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.8 6.1C6.6 42.6 14.6 48 24 48z"/></svg>Continue with Google</button>'+'</div></div>'; return; }
   if(!sess){
     box.innerHTML = '<div style="'+st+'"><b style="font-size:15px">☁️ Cloud save</b><br>Sign in with Google to keep your progress safe and play on another phone. We only keep your game – not your e-mail or name.<div id="gsiBtn" style="margin-top:10px;min-height:44px;display:flex;justify-content:center"></div></div>';
     loadGis(()=>{ const b=document.getElementById('gsiBtn'); if(b) google.accounts.id.renderButton(b,{theme:'filled_black',size:'large',shape:'pill',text:'continue_with',width:260}); });
@@ -191,5 +193,5 @@ if(CLIENT_ID && sess){
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') upload(false, true); });
 }
 
-window.CLOUD = {mount, mountStart, refresh, srv:()=>srv, on:()=>!!(CLIENT_ID&&sess)};
+window.CLOUD = {mount, mountStart, refresh, srv:()=>srv, on:()=>!!(CLIENT_ID&&sess), cred:c=>onCred({credential:c})};
 })();

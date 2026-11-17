@@ -10,7 +10,7 @@ let hadSave = false; try{ hadSave = !!localStorage.getItem(SK); }catch(e){}
 const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };
 const api = () => (window.SEC && SEC.api && SEC.api()) || 'https://torque-guard.torqueempirehelp.workers.dev';
 const P = n => window.Capacitor && Capacitor.Plugins && Capacitor.Plugins[n];
-let key = null, poll = 0, box = null, until = 0;
+let key = null, poll = 0, box = null, until = 0, mode = 'xfer';   // v16-67: mode 'login' = Google sign-in through Chrome (glogin.html)
 
 const css = 'position:fixed;inset:0;z-index:2147483000;background:#05070ce6;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui;color:#fff';
 const card = h => '<div style="max-width:360px;width:100%;background:linear-gradient(#152033,#0b1420);border:2px solid #e0a82e;border-radius:18px;padding:16px 14px;box-shadow:0 8px 30px #000;text-align:center">'+h+'</div>';
@@ -35,15 +35,23 @@ function ask(){
 
 function rnd(){ const a = new Uint8Array(24); crypto.getRandomValues(a); return Array.from(a, b => 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'[b % 57]).join(''); }
 
-async function go(){
+async function go(m){
+  if(m) mode = m;
   const B = P('Browser');
   if(!B){ show('<div style="font:900 17px system-ui;color:#ff8a80">⚠️ Can\'t open Chrome</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Please update the app and try again.</div>'+btn('close','OK','#2b3a52')); return; }
   key = rnd(); until = Date.now() + 10*60e3;
   waiting();
-  try{ await B.open({url: location.origin + '/transfer.html?k=' + key, toolbarColor:'#0b1420'}); }catch(e){}
+  try{ await B.open({url: location.origin + (mode==='login' ? '/glogin.html?k=' : '/transfer.html?k=') + key, toolbarColor:'#0b1420'}); }catch(e){}
   stop(); poll = setInterval(check, 2500);
 }
 function waiting(){
+  if(mode === 'login'){
+    show('<div style="font-size:36px;line-height:1">☁️</div>'+
+      '<div style="font:900 17px system-ui;margin:6px 0 4px;color:#ffd54a">Signing in with Google…</div>'+
+      '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">Choose your Google account in Chrome.<br>Then tap <b>RETURN TO GAME</b> (or the ✕ at the top).</div>'+
+      btn('again','OPEN CHROME AGAIN','#1f5fa8')+btn('cancel','CANCEL','#2b3a52'));
+    return;
+  }
   show('<div style="font-size:36px;line-height:1">⏳</div>'+
     '<div style="font:900 17px system-ui;margin:6px 0 4px;color:#ffd54a">Waiting for your old game…</div>'+
     '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">Chrome opens and sends your progress here.<br>Then tap <b>RETURN TO GAME</b> (or the ✕ at the top).</div>'+
@@ -53,7 +61,7 @@ function waiting(){
 let busy = false;
 async function check(){
   if(!key || busy) return;
-  if(Date.now() > until){ stop(); show('<div style="font:900 17px system-ui;color:#ff8a80">⌛ Time is up</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Nothing arrived. Try again.</div>'+btn('go','TRY AGAIN','#2e7d32')+btn('cancel','CLOSE','#2b3a52')); return; }
+  if(Date.now() > until){ stop(); if(mode==='login'){ close(); return; } show('<div style="font:900 17px system-ui;color:#ff8a80">⌛ Time is up</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Nothing arrived. Try again.</div>'+btn('go','TRY AGAIN','#2e7d32')+btn('cancel','CLOSE','#2b3a52')); return; }
   busy = true;
   try{
     const r = await (await fetch(api() + '/api/xfer/get', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({k:key})})).json();
@@ -65,6 +73,11 @@ async function check(){
 function apply(data){
   stop(); key = null;
   let o; try{ o = JSON.parse(data); }catch(e){ o = null; }
+  if(mode === 'login' || (o && o.cred)){                 // Google sign-in → cloud.js does the rest (choose game, upload…)
+    close(); mode = 'xfer';
+    if(o && o.cred && window.CLOUD && CLOUD.cred) CLOUD.cred(o.cred);
+    return;
+  }
   if(!o || o.none){
     show('<div style="font-size:36px;line-height:1">🔍</div><div style="font:900 17px system-ui;margin:6px 0;color:#ffd54a">No old game found</div>'+
       '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">Chrome on this phone has no Torque Empire progress. If you signed in with Google in the old version, sign in here too – your cloud save comes back.</div>'+
@@ -84,9 +97,9 @@ function apply(data){
 function onClick(e){
   const b = e.target.closest('[data-xf]'); e.stopPropagation(); if(!b) return;
   const a = b.dataset.xf;
-  if(a === 'go' || a === 'again') go();
+  if(a === 'go' || a === 'again') go(a === 'go' ? 'xfer' : null);
   if(a === 'new'){ LS('te_xfer', 'new'); close(); }
-  if(a === 'cancel' || a === 'close'){ key = null; close(); }
+  if(a === 'cancel' || a === 'close'){ key = null; mode = 'xfer'; close(); }
 }
 
 // back in the app (RETURN TO GAME / ✕ in Chrome) → look right away
@@ -104,5 +117,5 @@ function start(){
 }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-window.XFER = {isApp, open:() => { if(isApp()) ask(); }};
+window.XFER = {isApp, open:() => { if(isApp()){ mode = 'xfer'; ask(); } }, login:() => { if(isApp()) go('login'); }};
 })();
