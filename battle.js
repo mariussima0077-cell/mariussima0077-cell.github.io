@@ -2854,14 +2854,25 @@ function tallBg(){if(HX<=0)return '<img class="hubBg" src="img/ui7/hub_bg.webp" 
     '<div class="hubBg hbF" style="'+gbx(0,S+HX,1024,1536-S)+'background:'+bg+GSU(-S)+'/'+GSU(1024)+' '+GSU(1536)+' no-repeat"></div>';}
 addEventListener('resize',()=>{if(hubEl.classList.contains('open'))hubRender();if(ctEl.classList.contains('open'))ctRender();});
 function rootOn(){if(!root.classList.contains('open')){root.classList.add('open');window.__BATTLE_ON=true;showMap();}}
+// v16-58: bigger tabs (Marius: "too small, too much empty space"). The banners are 1100×~143, already as wide as the page, so a
+// taller tab = the banner cut in 3: left title block + right frame end at the same scale, the middle art cropped around cx (no stretching).
 const HUBM=[
- {k:'camp',im:'m_camp',h:140},{k:'arena',im:'m_arena'},{k:'tower',im:'m_tower'},{k:'class',im:'m_class'},{k:'cup',im:'m_cup'},{k:'soon',im:'m_soon'}];
+ {k:'camp',im:'m_camp',sh:160,cx:600},{k:'arena',im:'m_arena',sh:143,cx:670},{k:'tower',im:'m_tower',sh:144,cx:600},
+ {k:'class',im:'m_class',sh:143,cx:735},{k:'cup',im:'m_cup',sh:144,cx:690},{k:'soon',im:'m_soon',sh:142,cx:610}];
+const HUB_L=395,HUB_R=46,HUB_W=1012;
+function hubTab(m,hh){const f=hh/m.sh,u='url(img/ui7/'+m.im+'.webp)',L=HUB_L*f,R=HUB_R*f,M=HUB_W-L-R,full=1100*f,
+    px=Math.min(-HUB_L*f,Math.max(M-(1100-HUB_R)*f,M/2-m.cx*f)); // background x of the middle part: src cx in its centre, never past the title or the frame end
+  return '<i class="hubP" style="left:0;width:'+GSU(L+1)+';background:'+u+' 0 0/'+GSU(full)+' 100% no-repeat"></i>'+
+    '<i class="hubP" style="left:'+GSU(L)+';width:'+GSU(M+1)+';background:'+u+' '+GSU(px)+' 0/'+GSU(full)+' 100% no-repeat"></i>'+
+    '<i class="hubP" style="right:0;width:'+GSU(R)+';background:'+u+' 100% 0/'+GSU(full)+' 100% no-repeat"></i>';}
 function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');
   let h=tallBg()+'<button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
   const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:'PvP · ONLINE',tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
     class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:'EVERY WEEKEND',soon:''};
-  HUBM.forEach((m,i)=>{const y=300+HX*.1+i*(152+HX*.1),lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK());
-    h+='<div class="hubM'+(lock?' lk':'')+'" data-hb="'+m.k+'" style="'+gbx(32,y,960,m.k==='camp'?140:125)+(m.k==='camp'?'margin-top:'+GSU(-15):'')+'"><img src="img/ui7/'+m.im+'.webp" alt="'+m.k+'">'+(st[m.k]?'<b class="hubS">'+st[m.k]+'</b>':'')+'</div>';});
+  const top=285,avail=1536+HX-(HX>0?250:20)-top,n=HUBM.length,hh=Math.max(125,Math.min(190,(avail-(n-1)*40)/n)),
+    gap=Math.max(14,Math.min(70,(avail-n*hh)/(n-1))),y0=top+Math.max(0,(avail-n*hh-(n-1)*gap)*.4);
+  HUBM.forEach((m,i)=>{const y=y0+i*(hh+gap),lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK()),th=m.k==='camp'?hh*1.08:hh;
+    h+='<div class="hubM'+(lock?' lk':'')+'" data-hb="'+m.k+'" style="'+gbx((1024-HUB_W)/2,y-(th-hh)/2,HUB_W,th)+'">'+hubTab(m,th)+(st[m.k]?'<b class="hubS">'+st[m.k]+'</b>':'')+'</div>';});
   $('hubBox').innerHTML=h;}
 function hubOpen(){rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
 function hubClose(){hubEl.classList.remove('open');close();}
@@ -2992,8 +3003,8 @@ const hubCss=document.createElement('style');hubCss.textContent=`
 #hubBox,#ctBox{position:relative;--u:.35px;overflow:hidden;border-radius:calc(var(--u)*18);background:#0a1322}#hubBox>*,#ctBox>*{position:absolute}#hubBox.tall,#ctBox.tall{border-radius:0}.hbF{-webkit-mask-image:linear-gradient(transparent,#000 calc(var(--u)*90));mask-image:linear-gradient(transparent,#000 calc(var(--u)*90))}
 .hubBk{min-width:0;padding:0;border-radius:50%;font-size:calc(var(--u)*46);z-index:2}
 .hubM{cursor:pointer;filter:drop-shadow(0 calc(var(--u)*8) calc(var(--u)*10) #000c);transition:transform .12s}.hubM:active{transform:scale(.97)}
-.hubM>img{width:100%;height:100%;display:block}.hubM.lk>img{filter:grayscale(.8) brightness(.7)}
-.hubS{position:absolute;right:calc(var(--u)*46);bottom:calc(var(--u)*16);font:900 italic calc(var(--u)*24) system-ui;color:#ffe082;background:#000c;padding:calc(var(--u)*3) calc(var(--u)*16);border-radius:calc(var(--u)*20);box-shadow:0 0 0 calc(var(--u)*2) #e0aa2588;text-shadow:0 2px 0 #000;white-space:nowrap}
+.hubM>img{width:100%;height:100%;display:block}.hubP{position:absolute;top:0;height:100%;display:block}.hubM.lk>.hubP{filter:grayscale(.8) brightness(.7)}
+.hubS{position:absolute;right:calc(var(--u)*50);bottom:calc(var(--u)*20);font:900 italic calc(var(--u)*30) system-ui;color:#ffe082;background:#000c;padding:calc(var(--u)*3) calc(var(--u)*16);border-radius:calc(var(--u)*20);box-shadow:0 0 0 calc(var(--u)*2) #e0aa2588;text-shadow:0 2px 0 #000;white-space:nowrap}
 .hubM[data-hb=camp] .hubS{bottom:calc(var(--u)*22)}
 .ctDay img,.ctBt>img,.ctRec>img,.ctTi>img,.ctC>img{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .ctDay{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.ctDay b,.ctDay small{position:relative;font:900 italic calc(var(--u)*36) system-ui;color:#ffd54a;text-shadow:0 calc(var(--u)*3) 0 #000}.ctDay small{font-size:calc(var(--u)*24);color:#fff}

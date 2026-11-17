@@ -2595,8 +2595,8 @@ const inView=(x,y,w,h)=>x+w>vx0&&x<vx1&&y+h>vy0&&y<vy1;
 // static background (ground, roads, race track, arrivals, export, yard) is drawn once into
 // 512px tiles at the exact screen scale and just copied every frame (no resampling).
 // While zooming, the previous tiles are stretched; sharp tiles are rebuilt a few per frame.
-const BG={lv:new Map(),cur:null,lvP:-1,lastSc:0,stableT:0},TP=512,BG_MAXT=34;
-function bgTile(L,i,j){
+const BG={lv:new Map(),cur:null,lvP:-1,lastSc:0,stableT:0,built:0},TP=512,BG_MAXT=48;
+function bgTile(L,i,j){BG.built++;
   const o=document.createElement('canvas');o.width=o.height=TP;const g=o.getContext('2d',{alpha:false});
   bgPaint(g,L.sc,L.det,i*TP,j*TP,TP,TP);return o;}
 function bgPaint(g,sc,det,px,py,pw,ph){
@@ -2645,6 +2645,9 @@ function drawBG(){
     if(miss){ovDraw(sc);if(C&&C!==L)bgDraw(C,sc,null,true,false);}
     bgDraw(L,sc,null,true,false);
     if(!miss)BG.cur=key;
+    // v16-58: tiles around the screen are built ahead while the map stands still → no blurry squares (flicker) when you drag
+    if(!miss&&!BG.built&&!gest&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>350){const a=vx0,b=vy0,c=vx1,d=vy1,mx=(c-a)*.7,my=(d-b)*.4;
+      vx0=a-mx;vy0=b-my;vx1=c+mx;vy1=d+my;bgDraw(L,sc,{n:1,until:now+3},false,true);vx0=a;vy0=b;vx1=c;vy1=d;}
   }
   // keep memory small on phones: drop other levels first, then the oldest tiles
   const keep=BG.cur;
@@ -3501,7 +3504,7 @@ let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'
   if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
 // =================== LOOP ===================
-let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=99,goodT=0,capDPR=9,capHold=0;
+let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=99,goodT=0,capDPR=9,capHold=0,dprDn=0,bldT=0;
 // never go below this: on sharp phone screens 1x looked foggy when zoomed in
 const MINDPR=()=>Math.min(MAXDPR,(window.devicePixelRatio||1)>=2?1.5:1);
 // v16-27: less work for the phone – max 60 fps (120 Hz phones drew 120×/s), 30 fps when nobody touches the map,
@@ -3522,6 +3525,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:22,d:'Nov 17, 2026',ic:'📱',t:'Smoother garage map & bigger Battle Hub',l:['The garage map is <b>smoother</b> on cheaper phones: the area around the screen is prepared in advance, so no more blinking squares when you drag between the garages.','The picture quality no longer jumps up and down by itself (that caused flicker and extra lag).','<b>BATTLE HUB</b>: bigger mode buttons, less empty space.']},
  {id:21,d:'Nov 16, 2026',ic:'⚔️',t:'BATTLE HUB & CLASS TOWERS',l:['The <b>BATTLE</b> button now opens one page with <b>all battle modes</b>: Campaign, Arena, Torque Tower, Class Towers and Torque Cup – fewer buttons on the garage map.','New <b>CLASS TOWERS</b> (open after stage 1-20): 6 towers – Bruiser, Racer, Scanner, Medic, Sprayer, Shocker – <b>100 floors</b> each.','Only heroes of that class (+ <b>Legend</b> heroes) can fight. Each tower is open 2 days a week, <b>Sunday all are open</b>.','<b>Fixed rewards</b>: 💎 every floor and a <b>SET PIECE</b> of that class every 5th floor (Rare → Epic → Legendary → Mythic).']},
  {id:20,d:'Nov 16, 2026',ic:'🗼',t:'TORQUE TOWER & 13 new monster looks',l:['New <b>TORQUE TOWER</b> (button under ARENA, opens after stage 1-10): <b>300 floors</b>, one fight per floor, a boss every 10 floors.','Most floors have a <b>modifier</b>: Rage, Iron Plating, Overdrive, Hot Floor, No Repairs or Sharp Edges – tap a floor to see it.','<b>Fixed rewards</b> (nothing random): 💎 on every floor, tickets every 5th floor, big boss rewards every 10th floor.','New animated looks for <b>Battery Golem, Headlight Drone, Fuel Can Bomber, Wiper Mantis, Hubcap Saw, Gearbox Golem, Exhaust Bat, Horn Howler, ACID TANKER</b> and <b>OMEGA ENGINE</b>.','3 brand-new monsters: <b>Spark Wraith</b>, <b>Brake Beast</b> and <b>Airbag Blob</b> – in the campaign and in the tower.']},
  {id:19,d:'Nov 16, 2026',ic:'🔨',t:'New Gear Summon & info windows',l:['New <b>GEAR SUMMON</b> page: the forge with all 6 grades and their chances.','New <b>info windows</b> for Rate Info, Summon History and Tickets – every grade has its own colored row.','New <b>SET</b> panel on the hero page: lit pieces and bonus rows with ✓ / 🔒.','<b>HERO COLLECTION</b>: rainbow progress bar, ✓ and 🔒 on the chests.','<b>Crew</b> heroes now have their own class icon.']},
@@ -3597,15 +3601,19 @@ function frame(now){
   if(!started){last=now;requestAnimationFrame(frame);return;}
   if(window.__BATTLE_ON){requestAnimationFrame(frame);return;}
   const cov=mapCover();if(cov){coverT+=raw;if(cov===1&&coverT>.16){coverT=0;render();}hud();perfT=0;perfN=0;perfSum=0;perfJS=0;perfMin=99;}else{coverT=0;
-  const t0=performance.now();render();hud();
+  const t0=performance.now();BG.built=0;render();hud();
   // adaptive resolution keeps the map smooth on slower phones
-  const js=performance.now()-t0;perfJS+=js;perfSum+=Math.max(js,raw*1000);perfN++;perfT+=raw;perfMin=Math.min(perfMin,raw*1000);
+  const js=performance.now()-t0;
+  // v16-58: a frame that built new map tiles is a one-off cost, not lag – it must not lower the resolution (that rebuilt every tile = flicker + more lag)
+  if(!BG.built&&!bldT){perfJS+=js;perfSum+=Math.max(js,raw*1000);perfN++;perfMin=Math.min(perfMin,raw*1000);}if(bldT)bldT--;if(BG.built)bldT=2;perfT+=raw;
   if(perfT>1.5){
     // if the phone itself caps the screen at 30 fps (battery saver), long frames are not lag: judge only our own work
     const capped=perfMin>26,avg=capped?perfJS/perfN*1.6:perfSum/perfN;
-    if(avg>(capped?40:26)&&DPR>MINDPR()){DPR=Math.max(MINDPR(),DPR-.25);capDPR=DPR;capHold=0;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;}
-    else if(avg<(capped?24:19)&&DPR<MAXDPR){goodT+=perfT;capHold+=perfT;if(capHold>25)capDPR=9;
-      if(goodT>4&&DPR<capDPR){DPR=Math.min(MAXDPR,DPR+.25);cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;}}
+    if(perfN<20){}
+    else if(avg>(capped?40:26)&&DPR>MINDPR()){DPR=Math.max(MINDPR(),DPR-.25);capDPR=DPR;capHold=0;dprDn++;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}
+    // going back up only after 15 s of smooth play, and never again after it had to go down twice (stops the up/down ping-pong)
+    else if(avg<(capped?24:19)&&DPR<MAXDPR&&dprDn<2){goodT+=perfT;capHold+=perfT;if(capHold>60)capDPR=9;
+      if(goodT>15&&DPR<capDPR){DPR=Math.min(MAXDPR,DPR+.25);cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}}
     perfT=0;perfN=0;perfSum=0;perfJS=0;perfMin=99;}}
   panelT+=dt;if(panelT>.25){panelT=0;renderPanel();if(dqEl.classList.contains('open'))renderDQ();renderSm();renderTeam();renderIdle();
     if((time|0)%5===0){dqCheck();if(VSUB!==subOn())vipRefresh();}}
