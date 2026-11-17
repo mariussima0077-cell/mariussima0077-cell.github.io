@@ -36,8 +36,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
-
+      # The GitHub runner already has the Android SDK (ANDROID_HOME); Gradle downloads missing parts itself.
       - name: Install + sync Capacitor
         run: |
           npm ci
