@@ -14,6 +14,8 @@
 
 import {online, onlineCron, onlineAdmin} from './online.js';
 
+// v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
+const GIFT_VIP = ['160672a2'];
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20};
 const json = (o, s=200) => new Response(JSON.stringify(o), {status:s, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-headers':'content-type'}});
@@ -60,7 +62,7 @@ async function report(b, env) {
     if (s.money - old.money > capMoney) { pts += 40; why.push(`money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`); }
     if (s.tk - old.tk > 100 + dt / 45) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
     if (s.gtk - old.gtk > 100 + dt / 45) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
-    if (s.vip - old.vip > 200 + dt * 160 / 86400) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
+    if (s.vip - old.vip > 200 + dt * 160 / 86400 && !GIFT_VIP.some(g => b.pid.startsWith(g))) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
     if (s.best - old.best > 30 + dt / 90) { pts += 30; why.push(`campaign +${s.best - old.best} stages`); }
     if (s.lv - old.lv > 12 + dt / 600) { pts += 30; why.push(`buildings +${s.lv - old.lv} levels`); }
     if (s.sold < old.sold || s.xp < old.xp) { /* new save / reinstall – allowed, just note it */ why.push('progress_reset'); }
