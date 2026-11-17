@@ -73,3 +73,47 @@ STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechani
 - **CRUSHER KING** – un golem uriaș făcut dintr-o presă de mașini, pumni hidraulici, coroană din jante aurii. Slab la: SCANNER.
 - **INFERNO PISTON** – un demon de foc dintr-un motor V12 uriaș, coarne din țevi de eșapament, lavă în cilindri. Slab la: SPRAYER.
 - **TOW SERPENT** – un șarpe gigant din lanțuri și cârlige de macara, cap de camion de tractare. Slab la: RACER.
+
+## Bossii 2-4 · prompturi complete (17 nov 2026, copiere directă)
+
+## 7 · Bossul 2 – CRUSHER KING (slab la SCANNER)
+```
+Create a sprite sheet for a 2D mobile-game BOSS, image 1536x1024, pure flat chroma-green background (#00FF00), no shadows on the green, no text, no grid lines.
+Character: "CRUSHER KING", a gigantic golem built from a car-crusher press: a steel body with hydraulic pistons, two huge hydraulic fists, a crown made of golden car rims, glowing yellow eyes in a press-plate face, steam venting from the joints, crushed car parts stuck to its armor. Seen from the side, FACING LEFT, the same size and position in every frame, feet on the same ground line.
+Layout: 6 rows, frames evenly spaced, each frame fully separated (no overlapping, nothing cut off), every effect must stay INSIDE its own frame and never reach the next frame:
+row 1 IDLE 6 frames (breathing, small movements),
+row 2 WALK 8 frames (heavy steps),
+row 3 ATTACK 8 frames (big melee hit forward),
+row 4 SKILL 8 frames (raises both fists and slams the ground, a short shockwave ring with flying debris around its feet – keep the effect short, inside its own frame),
+row 5 HURT 4 frames (recoils, sparks fly),
+row 6 ENRAGE 6 frames (roars, red glow and lightning around the body).
+STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechanic theme, glossy cartoon-realistic painted 3D look, bold silhouette, rich lighting, crisp clean edges, no watermark, no real brands or logos.
+```
+
+## 8 · Bossul 3 – INFERNO PISTON (slab la SPRAYER)
+```
+Create a sprite sheet for a 2D mobile-game BOSS, image 1536x1024, pure flat chroma-green background (#00FF00), no shadows on the green, no text, no grid lines.
+Character: "INFERNO PISTON", a fire demon made from a giant V12 engine block: horns made of chrome exhaust pipes, glowing lava inside the cylinders, a burning radiator-grille mouth, fan-belt whips on its arms, flames and orange embers rising from its back. Seen from the side, FACING LEFT, the same size and position in every frame, feet on the same ground line.
+Layout: 6 rows, frames evenly spaced, each frame fully separated (no overlapping, nothing cut off), every effect must stay INSIDE its own frame and never reach the next frame:
+row 1 IDLE 6 frames (breathing, small movements),
+row 2 WALK 8 frames (heavy steps),
+row 3 ATTACK 8 frames (big melee hit forward),
+row 4 SKILL 8 frames (opens its cylinder chest and blasts a short cone of fire forward – keep the effect short, inside its own frame),
+row 5 HURT 4 frames (recoils, sparks fly),
+row 6 ENRAGE 6 frames (roars, red glow and lightning around the body).
+STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechanic theme, glossy cartoon-realistic painted 3D look, bold silhouette, rich lighting, crisp clean edges, no watermark, no real brands or logos.
+```
+
+## 9 · Bossul 4 – TOW SERPENT (slab la RACER)
+```
+Create a sprite sheet for a 2D mobile-game BOSS, image 1536x1024, pure flat chroma-green background (#00FF00), no shadows on the green, no text, no grid lines.
+Character: "TOW SERPENT", a gigantic serpent made of heavy chains and crane hooks, its head is a battered tow-truck cab with glowing red headlights as eyes and a hook-shaped jaw, orange warning lights along its body, sparks where the chains rub. Seen from the side, FACING LEFT, the same size and position in every frame, feet on the same ground line.
+Layout: 6 rows, frames evenly spaced, each frame fully separated (no overlapping, nothing cut off), every effect must stay INSIDE its own frame and never reach the next frame:
+row 1 IDLE 6 frames (breathing, small movements),
+row 2 WALK 8 frames (heavy steps),
+row 3 ATTACK 8 frames (big melee hit forward),
+row 4 SKILL 8 frames (rears up and whips its tail forward with a short chain-lash and sparks – keep the effect short, inside its own frame),
+row 5 HURT 4 frames (recoils, sparks fly),
+row 6 ENRAGE 6 frames (roars, red glow and lightning around the body).
+STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechanic theme, glossy cartoon-realistic painted 3D look, bold silhouette, rich lighting, crisp clean edges, no watermark, no real brands or logos.
+```
