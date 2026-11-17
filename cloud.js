@@ -37,12 +37,26 @@ async function upload(force, keep){
   if(!sess || busy || asking) return;
   const {raw,sig} = local(); if(!raw) return;
   const hh = h32(raw); if(!force && hh===lastHash) return;
-  busy = true;
-  const r = await call('save',{sess, pid:SEC.PID, save:raw, sig, sum:sumOf(raw), base:syncedT}, keep);
+  busy = true; LS('te_cloud_pend', hh);                   // v16-64: remember what we sent (the answer can be lost when the app closes)
+  const r = await call('save',{sess, pid:SEC.PID, save:raw, sig, sum:Object.assign(sumOf(raw),{hh}), base:syncedT}, keep);
   busy = false;
   if(r.ok){ lastHash=hh; lastOk=Date.now(); setSynced(r.t); refresh(); }
-  else if(r.err==='conflict') choose({t:r.t, sum:r.sum}, 'Your game was saved on another phone after this one.');
+  else if(r.err==='conflict'){ if(sameGame({t:r.t, sum:r.sum})){ lastHash=''; upload(true); } else choose({t:r.t, sum:r.sum}, 'Your game was saved on another phone after this one.'); }
   else if(r.err==='signed_out'){ setSess(null); setSynced(0); refresh(); }
+}
+
+// v16-64: is the cloud save simply THIS phone's game? Then nothing is asked.
+// Why the window came back again and again: when the app goes to the background the game sends the save (keepalive),
+// the server stores it with a new time, but the phone closes the app before reading the answer → on the next start
+// the cloud looked "newer" although it was the same game (same money, cars, levels…).
+// Now: the save carries a fingerprint (hh). Same fingerprint / same progress / this phone further ahead → it's ours.
+function sameGame(meta){
+  const cs = (meta && meta.sum) || {}, raw = local().raw, ls = sumOf(raw);
+  let ours = !!cs.hh && (cs.hh === LS('te_cloud_pend') || cs.hh === h32(raw));
+  if(!ours){ const k = ['lv','cp','h','s','m'];               // the cloud is not ahead in anything → this phone has all of it
+    ours = k.every(x => (ls[x]||0) >= (cs[x]||0)); }
+  if(ours) setSynced(meta.t||0);
+  return ours;
 }
 
 // ---------- the choice: this phone or the cloud (always shown side by side, the player decides) ----------
@@ -84,7 +98,7 @@ async function onCred(resp){
   const r = await call('login',{cred:resp.credential, pid:SEC.PID, srv});
   if(!r.ok){ toast(r.err==='network'||r.err==='offline'?'⚠️ No internet – try again.':'⚠️ Google sign-in failed. Try again.',3500); return; }
   setSess(r.sess); toast('✓ Signed in with Google',2500);
-  if(r.t && r.sum) choose({t:r.t, sum:r.sum}); else { setSynced(0); await upload(true); }
+  if(r.t && r.sum && !sameGame({t:r.t, sum:r.sum})) choose({t:r.t, sum:r.sum}); else { if(!r.t) setSynced(0); lastHash=''; await upload(true); }
   refresh();
 }
 function loadGis(cb){
@@ -166,7 +180,7 @@ if(CLIENT_ID && sess){
   setTimeout(async ()=>{
     const r = await call('meta',{sess});
     if(r.err==='signed_out'){ setSess(null); setSynced(0); return; }
-    if(r.ok && r.t && r.t > syncedT + 1000) choose({t:r.t, sum:r.sum}, 'Your Google account has a newer game from another phone.');
+    if(r.ok && r.t && r.t > syncedT + 1000 && !sameGame({t:r.t, sum:r.sum})) choose({t:r.t, sum:r.sum}, 'Your Google account has a newer game from another phone.');
     else upload(false);
   }, 6000);
   setInterval(()=>upload(false), 3*60e3);

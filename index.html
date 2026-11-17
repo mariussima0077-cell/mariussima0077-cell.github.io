@@ -2621,15 +2621,15 @@ function bgDraw(L,sc,budget,onlyHave,count){
   const k=sc/L.sc,i0=Math.floor(vx0*L.sc/TP),j0=Math.floor(vy0*L.sc/TP),i1=Math.floor(vx1*L.sc/TP),j1=Math.floor(vy1*L.sc/TP);
   const ox=-camX*sc,oy=TOP*DPR-camY*sc;let miss=0;
   for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const key=i+','+j;let c=L.t.get(key);
-    if(!c){if(!onlyHave&&budget.n>0&&(budget.n>=99||performance.now()<budget.until)){c=bgTile(L,i,j);L.t.set(key,c);budget.n--;}else{miss++;continue;}}
-    if(count)continue;
+    if(!c){if(!onlyHave&&budget.n>0&&(budget.n>=99||performance.now()<budget.until)){c=bgTile(L,i,j);L.t.set(key,c);L.u.set(key,BG.pre?BG.now-8000:BG.now);budget.n--;}else{miss++;continue;}}
+    if(count)continue;L.u.set(key,BG.now);
     if(k===1)X.drawImage(c,Math.round(ox+i*TP),Math.round(oy+j*TP));
     else{const x0=Math.round(ox+i*TP*k),y0=Math.round(oy+j*TP*k),x1=Math.round(ox+(i+1)*TP*k),y1=Math.round(oy+(j+1)*TP*k);X.drawImage(c,x0,y0,x1-x0,y1-y0);}}
   return miss;}
 function drawBG(){
   const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+Object.values(IMG).filter(i=>i.ok).length+'|'+(window.CC?CC.sig():'');
   if(BG.lvP!==sig||!OV.c){BG.lv.clear();BG.cur=null;BG.lvP=sig;ovBuild();}
-  const sc=Z*DPR,det=DET,now=performance.now();
+  const sc=Z*DPR,det=DET,now=performance.now();BG.now=now;
   if(sc!==BG.lastSc){BG.lastSc=sc;BG.stableT=now;}
   const zooming=now-BG.stableT<250,C=BG.cur&&BG.lv.get(BG.cur);
   X.setTransform(1,0,0,1,0,0);
@@ -2641,21 +2641,23 @@ function drawBG(){
     if(!useC||bgDraw(C,sc,null,true,true))ovDraw(sc);else bgDraw(C,sc,null,true,false);
     X.imageSmoothingEnabled=true;
   }else{
-    const key=sc.toFixed(5)+'|'+det;let L=BG.lv.get(key);if(!L){L={sc,det,t:new Map()};BG.lv.set(key,L);}
+    const key=sc.toFixed(5)+'|'+det;let L=BG.lv.get(key);if(!L){L={sc,det,t:new Map(),u:new Map()};BG.lv.set(key,L);}
     // build missing sharp tiles a few per frame (max ~5 ms); until then the small map picture fills in
     const miss=bgDraw(L,sc,{n:C?2:99,until:now+4},false,true);
     if(miss){ovDraw(sc);if(C&&C!==L)bgDraw(C,sc,null,true,false);}
     bgDraw(L,sc,null,true,false);
     if(!miss)BG.cur=key;
     // v16-58: tiles around the screen are built ahead while the map stands still → no blurry squares (flicker) when you drag
-    if(!miss&&!BG.built&&!gest&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>350){const a=vx0,b=vy0,c=vx1,d=vy1,mx=(c-a)*.7,my=(d-b)*.4;
-      vx0=a-mx;vy0=b-my;vx1=c+mx;vy1=d+my;bgDraw(L,sc,{n:1,until:now+3},false,true);vx0=a;vy0=b;vx1=c;vy1=d;}
+    if(!miss&&!BG.built&&!gest&&bgCount()<BG_MAXT-4&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>350){const a=vx0,b=vy0,c=vx1,d=vy1,mx=(c-a)*.7,my=(d-b)*.4;
+      vx0=a-mx;vy0=b-my;vx1=c+mx;vy1=d+my;BG.pre=1;bgDraw(L,sc,{n:1,until:now+3},false,true);BG.pre=0;vx0=a;vy0=b;vx1=c;vy1=d;}
   }
-  // keep memory small on phones: drop other levels first, then the oldest tiles
-  const keep=BG.cur;
-  for(const [k,LL] of BG.lv)if(k!==keep&&!LL.t.size&&k!==(sc.toFixed(5)+'|'+det))BG.lv.delete(k);
-  if(bgCount()>BG_MAXT)for(const [k,LL] of BG.lv){if(k!==keep&&k!==(sc.toFixed(5)+'|'+det)){BG.lv.delete(k);if(bgCount()<=BG_MAXT)break;}}
-  if(bgCount()>BG_MAXT&&keep){const t=BG.lv.get(keep).t;for(const k of t.keys()){t.delete(k);if(t.size<=BG_MAXT*.7)break;}}
+  // keep memory small on phones. v16-64: the tiles not seen for the longest time go first (any zoom step) – the
+  // tiles you just looked at survive, so zooming back to the previous step is instant; tiles prepared ahead go before them
+  const keep=BG.cur,curK=sc.toFixed(5)+'|'+det;
+  for(const [k,LL] of BG.lv)if(k!==keep&&!LL.t.size&&k!==curK)BG.lv.delete(k);
+  let n=bgCount();if(n>BG_MAXT){const all=[];for(const LL of BG.lv.values())for(const [k,u] of LL.u)all.push([u,LL,k]);
+    all.sort((a,b)=>a[0]-b[0]);for(const [u,LL,k] of all){if(n<=BG_MAXT*.85||u>=now)break;LL.t.delete(k);LL.u.delete(k);n--;}
+    for(const [k,LL] of BG.lv)if(!LL.t.size&&k!==curK)BG.lv.delete(k);}
   X.setTransform(DPR*Z,0,0,DPR*Z,-camX*Z*DPR,(TOP-camY*Z)*DPR);
 }
 function render(){
@@ -2688,7 +2690,7 @@ function render(){
 }
 
 // =================== CAMERA & INPUT ===================
-let DPR=1,MAXDPR=Math.min(2,window.devicePixelRatio||1),VW=0,VH=0,Z=1,camX=0,camY=0,vX=0,vY=0,camInit=false,zAnim=null;
+let zAx=-1,zAy=-1,DPR=1,MAXDPR=Math.min(2,window.devicePixelRatio||1),VW=0,VH=0,Z=1,camX=0,camY=0,vX=0,vY=0,camInit=false,zAnim=null;
 const baseS=()=>VW/600;
 const minS=()=>Math.min(VW/W,(VH-TOP)/H)*.95;
 const maxS=()=>baseS()*3.2;
@@ -2706,7 +2708,7 @@ function resize(){
 addEventListener('resize',resize);
 const pts=new Map();let gest=null,tapOK=false;
 function panGest(x,y,moved){return{type:'pan',sx:x,sy:y,lx:x,ly:y,lt:performance.now(),vx:0,vy:0,moved};}
-function pinchGest(){const [a,b]=[...pts.values()];const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;return{type:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,S0:Z,wx:mx/Z+camX,wy:(my-TOP)/Z+camY};}
+function pinchGest(){const [a,b]=[...pts.values()];const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;zAx=mx;zAy=my;return{type:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,S0:Z,wx:mx/Z+camX,wy:(my-TOP)/Z+camY};}
 cv.addEventListener('pointerdown',e=>{try{cv.setPointerCapture(e.pointerId);}catch(_){}pts.set(e.pointerId,{x:e.clientX,y:e.clientY});vX=vY=0;zAnim=null;
   if(pts.size===1){gest=panGest(e.clientX,e.clientY,false);tapOK=true;}else if(pts.size===2){tapOK=false;gest=pinchGest();}});
 addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(!gest)return;
@@ -2715,14 +2717,18 @@ addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.poi
     if(gest.moved){camX-=dx/Z;camY-=dy/Z;clampCam();}
     const now=performance.now(),dm=Math.max(1,now-gest.lt),k=Math.min(1,dm/40);gest.vx=gest.vx*(1-k)+(dx/dm)*k;gest.vy=gest.vy*(1-k)+(dy/dm)*k;gest.lx=e.clientX;gest.ly=e.clientY;gest.lt=now;}
   else if(gest.type==='pinch'&&pts.size>=2){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y)||1,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-    Z=clampS(gest.S0*d/gest.d0);camX=gest.wx-mx/Z;camY=gest.wy-(my-TOP)/Z;clampCam();}});
+    zAx=mx;zAy=my;Z=clampS(gest.S0*d/gest.d0);camX=gest.wx-mx/Z;camY=gest.wy-(my-TOP)/Z;clampCam();}});
 function ptrUp(e){if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);if(!gest)return;
   if(gest.type==='pan'&&pts.size===0){if(tapOK&&e.type==='pointerup')tap(e.clientX,e.clientY);
     else if(gest.moved&&performance.now()-gest.lt<80){vX=-gest.vx*1000/Z;vY=-gest.vy*1000/Z;}gest=null;}
   else if(gest.type==='pinch'){if(pts.size===1){const [p]=[...pts.values()];gest=panGest(p.x,p.y,true);}else if(pts.size===0)gest=null;}}
 addEventListener('pointerup',ptrUp);addEventListener('pointercancel',ptrUp);
-cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(Z*Math.pow(1.0018,-e.deltaY),e.clientX,e.clientY);},{passive:false});
-function zoomBtn(f){zAnim={from:Z,to:clampS((zAnim?zAnim.to:Z)*f),t:0};vX=vY=0;}
+cv.addEventListener('wheel',e=>{e.preventDefault();zAx=e.clientX;zAy=e.clientY;zoomAt(Z*Math.pow(1.0018,-e.deltaY),e.clientX,e.clientY);},{passive:false});
+// v16-64: the zoom always comes to rest on fixed steps (×1.105) → the sharp map tiles of a step are reused when you zoom back
+// (before: every pinch ended on a new scale → all tiles of the screen were drawn again = lag after each zoom)
+const ZQ=Math.pow(1.35,1/3);
+function zSnap(z){const n=Math.round(Math.log(z/baseS())/Math.log(ZQ));return clampS(baseS()*Math.pow(ZQ,n));}
+function zoomBtn(f){zAnim={from:Z,to:zSnap((zAnim?zAnim.to:Z)*f),t:0};vX=vY=0;}
 function inR(x,y,x0,y0,w,h){return x>=x0&&x<=x0+w&&y>=y0&&y<=y0+h;}
 function tap(sx,sy){
   if(!started)return;const x=sx/Z+camX,y=(sy-TOP)/Z+camY;
@@ -3529,6 +3535,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:28,d:'Nov 17, 2026',ic:'✨',t:'Smoother pages & zoom',l:['Pages and windows now open with a short <b>fade-in</b>, only when all their pictures are ready – no more icons popping in late.','<b>Zoom</b> on the garage map is smoother: it settles on fixed steps, so zooming back is instant and the picture stays sharp.','<b>Cloud save</b>: the "Which game do you keep?" window no longer appears when the cloud holds the same game as your phone.']},
  {id:27,d:'Nov 17, 2026',ic:'🔑',t:'DUNGEONS are open!',l:['Open <b>BATTLE</b> → <b>DUNGEONS</b> (after campaign stage 1-16): <b>CASH VAULT</b>, <b>SCRAP MINE</b>, <b>GEAR FORGE</b> and <b>NITRO LAB</b> – 30 floors each.','<b>2 free keys a day</b> in every dungeon. A key is used <b>only when you win</b>.','Fixed rewards: <b>cash</b> (Vault), a <b>gear piece</b> (Mine), a <b>SET piece</b> (Forge), <b>NITRO BOOST</b> +HP & attack for 3 hours in Campaign and Towers (Lab).','<b>DUNGEON PASS</b> (30 days): +2 keys a day and <b>SWEEP</b>.']},
  {id:26,d:'Nov 17, 2026',ic:'🐍',t:'New World Boss: TOW SERPENT',l:['The fourth <b>WORLD BOSS</b> joins the weekly rotation: <b>TOW SERPENT</b>, a giant serpent of chains and crane hooks.','It is weak to <b>RACER</b> heroes: <b>+30%</b> damage. Its lunges hit everyone in front of it – many times!','Rotation every Monday: SCRAPZILLA → CRUSHER KING → INFERNO PISTON → TOW SERPENT.','The <b>WORLD BOSS</b> banner in the Battle Hub has a new look.']},
  {id:25,d:'Nov 17, 2026',ic:'🏆',t:'New World Bosses + Classic Collection makeover',l:['Two new <b>WORLD BOSSES</b> join the weekly rotation: <b>CRUSHER KING</b> (weak to <b>SCANNER</b>, many ground slams) and <b>INFERNO PISTON</b> (weak to <b>SPRAYER</b>, cone of fire).','A new boss comes every Monday: SCRAPZILLA → CRUSHER KING → INFERNO PISTON.','The <b>CLASSIC COLLECTION</b> has a new look: luxury showroom, golden tabs and a frame for every parked car.']},
@@ -3605,7 +3612,9 @@ function frame(now){
   if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle?31:14.5)){requestAnimationFrame(frame);return;}}
   const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);
   if(started){let left=dt*SPD;while(left>0){const s=Math.min(.05,left);update(s);left-=s;}}
-  if(zAnim){zAnim.t=Math.min(1,zAnim.t+dt/.22);const e=1-Math.pow(1-zAnim.t,3);zoomAt(zAnim.from+(zAnim.to-zAnim.from)*e,VW/2,TOP+(VH-TOP)/2);if(zAnim.t>=1)zAnim=null;}
+  if(zAnim){zAnim.t=Math.min(1,zAnim.t+dt/.22);const e=1-Math.pow(1-zAnim.t,3);zoomAt(zAnim.from+(zAnim.to-zAnim.from)*e,zAnim.ax!=null?zAnim.ax:VW/2,zAnim.ay!=null?zAnim.ay:TOP+(VH-TOP)/2);if(zAnim.t>=1)zAnim=null;}
+  // v16-64: fingers off after a pinch / wheel → glide (max ~5%) to the nearest zoom step, around the point you zoomed on
+  else if(started&&!gest&&!pts.size&&now-BG.stableT>120){const zt=zSnap(Z);if(Math.abs(zt/Z-1)>.002)zAnim={from:Z,to:zt,t:.35,ax:zAx>=0?zAx:null,ay:zAx>=0?zAy:null};}
   if(!gest&&(Math.abs(vX)>2||Math.abs(vY)>2)){camX+=vX*dt;camY+=vY*dt;clampCam();const f=Math.exp(-dt/.32);vX*=f;vY*=f;}
   if(!started){last=now;requestAnimationFrame(frame);return;}
   if(window.__BATTLE_ON){requestAnimationFrame(frame);return;}
@@ -3614,7 +3623,7 @@ function frame(now){
   // adaptive resolution keeps the map smooth on slower phones
   const js=performance.now()-t0;
   // v16-58: a frame that built new map tiles is a one-off cost, not lag – it must not lower the resolution (that rebuilt every tile = flicker + more lag)
-  if(!BG.built&&!bldT){perfJS+=js;perfSum+=Math.max(js,raw*1000);perfN++;perfMin=Math.min(perfMin,raw*1000);}if(bldT)bldT--;if(BG.built)bldT=2;perfT+=raw;
+  const zm=zAnim||gest&&gest.type==='pinch'||now-BG.stableT<700;if(!BG.built&&!bldT&&!zm){perfJS+=js;perfSum+=Math.max(js,raw*1000);perfN++;perfMin=Math.min(perfMin,raw*1000);}if(bldT)bldT--;if(BG.built)bldT=2;perfT+=raw;
   if(perfT>1.5){
     // if the phone itself caps the screen at 30 fps (battery saver), long frames are not lag: judge only our own work
     const capped=perfMin>26,avg=capped?perfJS/perfN*1.6:perfSum/perfN;
@@ -3680,6 +3689,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
       document.body.appendChild(d);};ask();});}
 })();
 </script>
+<script src="pagefx.js"></script>
 <script src="battle.js"></script>
 <script src="cloud.js"></script>
 <script src="online.js"></script>
