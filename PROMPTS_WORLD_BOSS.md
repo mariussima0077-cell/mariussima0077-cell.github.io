@@ -107,10 +107,10 @@ STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechani
 ## 9 · Bossul 4 – TOW SERPENT (slab la RACER)
 ```
 Create a sprite sheet for a 2D mobile-game BOSS, image 1536x1024, pure flat chroma-green background (#00FF00), no shadows on the green, no text, no grid lines.
-Character: "TOW SERPENT", a gigantic serpent made of heavy chains and crane hooks, its head is a battered tow-truck cab with glowing red headlights as eyes and a hook-shaped jaw, orange warning lights along its body, sparks where the chains rub. Seen from the side, FACING LEFT, the same size and position in every frame, feet on the same ground line.
+Character: "TOW SERPENT", a gigantic serpent made of heavy chains and crane hooks, its head is a battered tow-truck cab with glowing red headlights as eyes and a hook-shaped jaw, orange warning lights along its body, sparks where the chains rub. Seen from the side, FACING LEFT, the same size and position in every frame, its lower body resting on the same ground line.
 Layout: 6 rows, frames evenly spaced, each frame fully separated (no overlapping, nothing cut off), every effect must stay INSIDE its own frame and never reach the next frame:
 row 1 IDLE 6 frames (breathing, small movements),
-row 2 WALK 8 frames (heavy steps),
+row 2 MOVE 8 frames (slithering forward),
 row 3 ATTACK 8 frames (big melee hit forward),
 row 4 SKILL 8 frames (rears up and whips its tail forward with a short chain-lash and sparks – keep the effect short, inside its own frame),
 row 5 HURT 4 frames (recoils, sparks fly),
