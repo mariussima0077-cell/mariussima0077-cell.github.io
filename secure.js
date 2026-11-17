@@ -20,7 +20,10 @@ if(!PID){ PID = (crypto.randomUUID ? crypto.randomUUID() : 'p'+Math.random().toS
 // Inside the Google Play app (Trusted Web Activity) the page is opened with an android-app:// referrer.
 const fromApp = document.referrer.startsWith('android-app://') || LS('te_twa')==='1';
 if(document.referrer.startsWith('android-app://')) LS('te_twa','1');
-const STORE_BUILD = fromApp;            // real money only in the Play app
+// v16-68: the new native app (Capacitor) has its own payments plugin (TEBilling.java). Old test APKs without it → "update the app".
+const isCap = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+const NB = () => isCap && Capacitor.Plugins && Capacitor.Plugins.TEBilling;
+const STORE_BUILD = fromApp || isCap;   // real money only in the Play app
 // Test mode (packs free) ONLY for the owner: open the site once with ?dev=SECRET (?dev=off to turn it off).
 const DEV_H = '8c6657646a1b238565301291ff80b48909c3bffdf73b274812a13040a6eb6458';
 (function(){ const q = new URLSearchParams(location.search).get('dev'); if(q===null) return;
@@ -101,8 +104,16 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 
 // ---------- Google Play Billing ----------
 let svc = null;
+// the native plugin dressed like the Digital Goods service of the old (Chrome/TWA) version → the rest of the code stays the same
+const nativeSvc = () => { const P = NB(); return P && {
+  native:true,
+  getDetails: async ids => ((await P.details({skus:ids})).items||[]).filter(x=>x.currency).map(x=>({itemId:x.itemId, price:{currency:x.currency, value:x.value}})),
+  listPurchases: async () => ((await P.purchases()).items||[]).filter(x=>x.state===1),     // 1 = PURCHASED (2 = pending)
+  consume: async token => P.consume({token}),
+}; };
 async function billing(){
   if(svc) return svc;
+  if(isCap){ svc = nativeSvc(); return svc; }
   if(!('getDigitalGoodsService' in window)) return null;
   try{ svc = await window.getDigitalGoodsService(PLAY); }catch(e){ svc = null; }
   return svc;
@@ -119,7 +130,8 @@ async function buy(pack){
   if(TEST_MODE){ t.toast('🧪 TEST MODE (browser): unlocked for free. In the Google Play app this is a real payment.',3500); return true; }
   if(!STORE_BUILD){ t.toast('📱 Packs can be bought only in the Torque Empire app on Google Play.',3500); return false; }
   const s = await billing();
-  if(!s){ t.toast('⚠️ Google Play payments are not available on this device.',3500); return false; }
+  if(!s){ t.toast(isCap?'📲 Please update Torque Empire from Google Play to buy packs.':'⚠️ Google Play payments are not available on this device.',3500); return false; }
+  if(s.native) return buyNative(pack, sku, s);
   try{
     const req = new PaymentRequest([{supportedMethods:PLAY, data:{sku}}], {total:{label:'Total',amount:{currency:'EUR',value:'0'}}});
     const res = await req.show();
@@ -132,6 +144,21 @@ async function buy(pack){
     return true;
   }catch(e){ return false; }
 }
+async function buyNative(pack, sku, s){
+  const t=T(), type = pack==='sub'?'subs':'inapp';
+  let r; try{ r = await NB().buy({sku, type}); }catch(e){ t.toast('⚠️ Google Play payments are not available right now.',3500); return false; }
+  if(!r || r.cancelled) return false;
+  if(r.owned){ await restore(); return false; }
+  if(r.err){ t.toast('⚠️ Payment failed ('+r.err+'). You were not charged.',3500); return false; }
+  if(r.pending){ t.toast('⏳ Payment pending – the pack arrives as soon as Google confirms it.',4500); return false; }
+  const v = await verify(sku, r.token, type);
+  if(!v.valid){ t.toast('⚠️ Payment could not be verified yet – it will be added automatically when you restart the game.',4500); return false; }
+  if(pack==='sub' && v.expiry) t.PK.sub = v.expiry;
+  if(pack==='dg'){ dgUsed(r.token); try{ await s.consume(r.token); }catch(e){} }
+  return true;
+}
+// DUNGEON PASS tokens already given (so a pass whose "consume" failed is not given twice)
+const dgUsed = tok => { try{ const a=JSON.parse(LS('te_dgtok')||'[]'); if(tok){ a.push(tok); LS('te_dgtok',JSON.stringify(a.slice(-20))); } return a; }catch(e){ return []; } };
 // prices from Play (in the player's currency)
 async function prices(){
   const s = await billing(); if(!s) return null;
@@ -143,7 +170,12 @@ async function prices(){
 async function restore(){
   const s = await billing(); const t=T(); if(!s||!t) return;
   try{ const L = await s.listPurchases(); let ch=false;
-    for(const p of L){ const k=Object.keys(SKU).find(k=>SKU[k]===p.itemId); if(!k||k==='dg') continue;
+    for(const p of L){ const k=Object.keys(SKU).find(k=>SKU[k]===p.itemId); if(!k) continue;
+      if(k==='dg'){                                 // v16-68: a DUNGEON PASS that was pending / not finished → give it now
+        if(!s.native) continue;
+        if(!dgUsed().includes(p.purchaseToken)){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(!v.valid) continue;
+          t.PK.dg=Math.max(Date.now(),t.PK.dg||0)+30*864e5; dgUsed(p.purchaseToken); ch=true; }
+        try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
       if(k==='sub'){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK.sub||t.PK.sub<v.expiry)){ t.PK.sub=v.expiry; ch=true; } }
       else if(!t.PK[k]){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid){ t.PK[k]=true; ch=true; } } }
     if(ch){ t.savePacks(); t.toast('✓ Purchases restored',2500); }
