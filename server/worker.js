@@ -16,6 +16,9 @@ import {online, onlineCron, onlineAdmin} from './online.js';
 
 // v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
 const GIFT_VIP = ['160672a2'];
+const isGift = pid => GIFT_VIP.some(g => String(pid).startsWith(g));
+// v16-71: Alex was banned by mistake for the gift (VIP 20 jump) → unbanned automatically at his next check-in (only until this date)
+const GIFT_UNBAN_UNTIL = Date.parse('2026-11-24T00:00:00Z');
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20};
 const json = (o, s=200) => new Response(JSON.stringify(o), {status:s, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-headers':'content-type'}});
@@ -48,6 +51,11 @@ async function report(b, env) {
   if (!b || typeof b.pid !== 'string' || b.pid.length > 64 || !b.s) return {err:'bad'};
   const s = b.s, db = env.DB;
   const old = await db.prepare('SELECT * FROM players WHERE pid=?').bind(b.pid).first();
+  if (old && old.banned && isGift(b.pid) && now < GIFT_UNBAN_UNTIL && !/by admin/.test(old.reason || '')) {
+    await db.prepare('UPDATE players SET banned=0, score=0, reason=? WHERE pid=?').bind('unbanned: gift VIP (v16-71)', b.pid).run();
+    await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'unban', 'gift VIP – banned by mistake').run();
+    old.banned = 0; old.score = 0;
+  }
   let pts = 0; const why = [];
   // 1) warning signs found by the game itself
   const newFlags = (b.flags || []).filter(f => FLAG_PTS[f] && !(old && (old.flags || '').split(',').includes(f)));
@@ -62,7 +70,7 @@ async function report(b, env) {
     if (s.money - old.money > capMoney) { pts += 40; why.push(`money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`); }
     if (s.tk - old.tk > 100 + dt / 45) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
     if (s.gtk - old.gtk > 100 + dt / 45) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
-    if (s.vip - old.vip > 200 + dt * 160 / 86400 && !GIFT_VIP.some(g => b.pid.startsWith(g))) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
+    if (s.vip - old.vip > 200 + dt * 160 / 86400 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
     if (s.best - old.best > 30 + dt / 90) { pts += 30; why.push(`campaign +${s.best - old.best} stages`); }
     if (s.lv - old.lv > 12 + dt / 600) { pts += 30; why.push(`buildings +${s.lv - old.lv} levels`); }
     if (s.sold < old.sold || s.xp < old.xp) { /* new save / reinstall – allowed, just note it */ why.push('progress_reset'); }
@@ -89,7 +97,7 @@ async function scan(env) {
     if (!r || !r.t0) continue;
     const dt = (r.t1 - r.t0) / 1000, why = [];
     if (r.m1 - r.m0 > capPerSec(p.lv) * dt / 4 + 5e7) why.push('24h money too high');
-    if (r.v1 - r.v0 > 400) why.push('24h VIP points too high');
+    if (r.v1 - r.v0 > 400 && !isGift(p.pid)) why.push('24h VIP points too high');
     if (why.length) {
       const score = p.score + 50, ban = score >= BAN_AT ? 1 : 0;
       await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, why.join(' · '), p.pid).run();

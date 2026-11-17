@@ -69,7 +69,7 @@ function sane(){
     if(cur.m - last.m > capM) flag('money_jump');
     if(cur.tk - last.tk > 60 + dt/60) flag('ticket_jump');
     if(cur.gt - last.gt > 80 + dt/60) flag('gear_ticket_jump');
-    if(cur.vip - last.vip > 400) flag('vip_jump');
+    if(cur.vip - last.vip > 400 && !PID.startsWith('160672a2')) flag('vip_jump');   // v16-71: gift VIP 20 from Marius is not cheating
   }
   last = cur;
 }
