@@ -1726,7 +1726,11 @@ function unitUpdate(u,dt,foes,friends){
       else{u.face=-1;u.x-=v*.8;u.st='run';u.wph+=dt*22;const P=a.p||{};if(P.back){a.hit2=a.hit2||new Set();for(const m of alive(B.mons))if(!a.hit2.has(m)&&Math.abs(m.x-u.x)<26*S&&Math.abs(m.d-u.d)<(a.band||.2)){a.hit2.add(m);damage(u,m,P.back,{crit:1,skill:1});sparks(m.x,headY(m)+20,8,a.col||'#40c4ff');}}
         if(u.x<=a.x0){u.x=a.x0;u.face=1;u.act=null;u.st='idle';}}
       return;}}
-  if(!u.hero){if(u.act){monAct(u,dt);return;}if(monSpecial(u,dt))return;}
+  if(!u.hero){if(u.act){monAct(u,dt);return;}
+    // v16-65: a monster still outside the picture (march ended before it walked in) first walks in. Before, a ranged one
+    // (Exhaust Snake / Headlight Drone) shot from off-screen, the mechanics stood at the right edge unable to reach it → battle stuck.
+    if(!u.in&&u.b!=='titan'&&!u.wbB){const xm=W-(u.boss?64:40)*S;if(u.x<=xm)u.in=1;else{u.face=-1;u.st='walk';u.wph+=dt*9;u.x=Math.max(xm,u.x-(u.mv+180*S)*dt);if(u.x<=xm)u.in=1;return;}}
+    if(monSpecial(u,dt))return;}
   // pick target
   let tg=null;
   if(!u.hero){const tn=alive(foes).find(h=>h.taunt>0);tg=tn||nearest(u,foes);}else tg=nearest(u,foes);
