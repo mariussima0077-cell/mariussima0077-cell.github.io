@@ -140,12 +140,24 @@ def cut(src, mid, scale, fix=''):
     for r in range(6):
         b = [f['bot'] for k, f in frames.items() if f and f['row'] == r]
         base[r] = float(np.median(b))
+    # v16-62 'norm' (TOW SERPENT): ChatGPT drew some rows smaller/bigger -> every row scaled so its frame 0
+    # (neutral pose, solid body only) has the same body width as the idle frame 0
+    K = {r: 1.0 for r in range(6)}
+    if 'norm' in fix:
+        def bw(f):
+            xs = np.where((f['pic'][..., 3] > 200).sum(0) >= 8)[0]
+            return xs.max() - xs.min() + 1
+        for r in range(1, 6):
+            if frames.get(r * 8) and frames.get(0): K[r] = bw(frames[0]) / bw(frames[r * 8])
+        print('row scale', {r: round(v, 3) for r, v in K.items()})
+    for f in frames.values():
+        if f: f['k'] = K[f['row']]
     L = Rr = T = Bm = 0
     for f in frames.values():
         if not f: continue
-        top = f['y0'] - base[f['row']]
-        L = min(L, f['x0']); Rr = max(Rr, f['x0'] + f['pic'].shape[1])
-        T = min(T, top); Bm = max(Bm, top + f['pic'].shape[0])
+        k = f['k']; top = (f['y0'] - base[f['row']]) * k
+        L = min(L, f['x0'] * k); Rr = max(Rr, (f['x0'] + f['pic'].shape[1]) * k)
+        T = min(T, top); Bm = max(Bm, top + f['pic'].shape[0] * k)
     hw = int(np.ceil(max(-L, Rr))) + 2
     cwo, cho = int(np.ceil(2 * hw * scale)), int(np.ceil((Bm - T + 2) * scale))
     ay = (-T + 1) * scale
@@ -154,10 +166,11 @@ def cut(src, mid, scale, fix=''):
         if not f: continue
         r, c = divmod(k, 8)
         p = Image.fromarray(np.clip(f['pic'], 0, 255).astype(np.uint8), 'RGBA')
-        if scale != 1:
-            p = p.resize((max(1, round(p.width * scale)), max(1, round(p.height * scale))), Image.LANCZOS)
-        px = c * cwo + round(cwo / 2 + f['x0'] * scale)
-        py = r * cho + round(ay + (f['y0'] - base[r]) * scale)
+        sk = scale * f['k']
+        if sk != 1:
+            p = p.resize((max(1, round(p.width * sk)), max(1, round(p.height * sk))), Image.LANCZOS)
+        px = c * cwo + round(cwo / 2 + f['x0'] * sk)
+        py = r * cho + round(ay + (f['y0'] - base[r]) * sk)
         atlas.alpha_composite(p, (max(0, px), max(0, py)))
     # idle body height (for the game's size) = frame 0
     f0 = frames[0]

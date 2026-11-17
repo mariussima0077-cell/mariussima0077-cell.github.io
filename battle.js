@@ -1396,7 +1396,7 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
     if(u.st==='walk')return[L.w,Math.floor(u.wph/TAU*8+80)%8];
     return[L.i,Math.floor(t*7+u.k)%8];}
   if(u.dead)return[5,Math.min(5,Math.floor(u.deadT/.1))];
-  const WBX=MSPR[id].wb,SZ=!!WBX; // v16-61: every WORLD BOSS sprite (SCRAPZILLA, CRUSHER KING, INFERNO PISTON)
+  const WBX=MSPR[id].wb,SZ=!!WBX; // v16-61: every WORLD BOSS sprite (SCRAPZILLA, CRUSHER KING, INFERNO PISTON, TOW SERPENT)
   if(a&&a.k==='pound')return[SZ?WBX.pr:3,Math.min(7,Math.floor(a.t/a.dur*8))];
   if(a&&a.k==='laser'){if(id==='ndragon'||SZ)return[3,a.t<a.dur?Math.min(2,Math.floor(a.t/a.dur*3)):2]; // dragon: open mouth, the game draws the nitro breath
     return[3,Math.min(7,Math.floor(a.t/(a.dur+.6)*8))];}
@@ -2870,7 +2870,7 @@ function rootOn(){if(!root.classList.contains('open')){root.classList.add('open'
 // taller tab = the banner cut in 3: left title block + right frame end at the same scale, the middle art cropped around cx (no stretching).
 const HUBM=[
  {k:'camp',im:'m_camp',sh:160,cx:600},{k:'arena',im:'m_arena',sh:143,cx:670},{k:'tower',im:'m_tower',sh:144,cx:600},
- {k:'class',im:'m_class',sh:143,cx:735},{k:'cup',im:'m_cup',sh:144,cx:690},{k:'boss',full:'img/wb/m_boss.webp',ar:1100/263}]; // v16-60: WORLD BOSS in place of COMING SOON (Marius' banner, shown whole)
+ {k:'class',im:'m_class',sh:143,cx:735},{k:'cup',im:'m_cup',sh:144,cx:690},{k:'boss',full:'img/wb/m_boss.webp',ar:1100/250}]; // v16-60: WORLD BOSS in place of COMING SOON (Marius' banner, shown whole)
 const HUB_L=395,HUB_R=46,HUB_W=1012;
 function hubTab(m,hh){const f=hh/m.sh,u='url(img/ui7/'+m.im+'.webp)',L=HUB_L*f,R=HUB_R*f,M=HUB_W-L-R,full=1100*f,
     px=Math.min(-HUB_L*f,Math.max(M-(1100-HUB_R)*f,M/2-m.cx*f)); // background x of the middle part: src cx in its centre, never past the title or the frame end
@@ -3079,14 +3079,15 @@ let collHome=0;
 // ---------------------------------------------------------------- v16-60: WORLD BOSS (Marius' 6 pictures in img/wb/, cut by tools/wb_cut.py)
 // 3 attacks a day (BOSS KEY, new keys at midnight, phone time) · a 60 s fight with the battle team · the boss never dies (endless HP bars),
 // only the DAMAGE counts · FIXED daily rewards for the total damage of the day (6 tiers, nothing random) · weekly DAMAGE RANKING on the
-// server (week = Monday 00:00 UTC, top 100 rewarded by mail, server/online.js) · one boss a week in rotation (for now only SCRAPZILLA),
+// server (week = Monday 00:00 UTC, top 100 rewarded by mail, server/online.js) · one boss a week in rotation (SCRAPZILLA → CRUSHER KING → INFERNO PISTON → TOW SERPENT),
 // each boss has a weak class (+30% damage). One HP bar = WB_LK × the power of your 5 best heroes, fixed for the whole day (G.wb.L, taken at
 // the first visit of the day; best heroes, not the current team → cannot be lowered on purpose). A normal team does ~2-4 bars per attack.
 // Saved in G.wb.
 const WB_UNLOCK=21,WB_KEYS=3,WB_T=60,WB_ENR=20,WB_LAYERS=100,WB_LK=.5;
 const WBOSS=[{k:'scrap',sp:'scrapzilla',n:'SCRAPZILLA',weak:'elec',d:'A gigantic dinosaur made of crushed cars: claw swipes, ground slams and a wide fire breath. It ENRAGES in the last 20 seconds.'},
   {k:'crushk',sp:'crusher',n:'CRUSHER KING',weak:'inspect',d:'A giant golem built from a car-crusher press: huge hydraulic punches and frequent ground slams that hit everyone close to it. No ranged attack. It ENRAGES in the last 20 seconds.'},
-  {k:'infp',sp:'inferno',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 (TOW SERPENT = 4th, when its picture comes)
+  {k:'infp',sp:'inferno',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'},
+  {k:'tows',sp:'tow',n:'TOW SERPENT',weak:'tuning',d:'A giant serpent made of heavy chains and crane hooks with a tow-truck head: fast lunges along the ground that hit everyone in front of it, many times. No ranged attack. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 · v16-62 boss 4
 const WB_TIER=[{b:1,dm:20},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:8,dm:40,tk:1},{b:12,dm:50,gt:1,ct:1},{b:18,dm:80,tk:2,gt:1}];
 const WB_RANK=[[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]]; // same table in server/online.js (WB_RW)
 MON.scrap={n:'SCRAPZILLA',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[58,155],dr:'spr_scrapzilla',dr0:'titan',sp:'scrapzilla',sc:1,desc:'World boss'};
@@ -3097,6 +3098,10 @@ MON.crushk={n:'CRUSHER KING',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,b
 MSPR.crusher={w:304,h:180,ax:152,ay:175,ih:153,wb:{pr:3,ni:6}};MDRAW.spr_crusher=(g,u,t)=>drawSprMon(g,u,t,'crusher');
 MON.infp={n:'INFERNO PISTON',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[78,93],dr:'spr_inferno',dr0:'titan',sp:'inferno',sc:1,desc:'World boss'};
 MSPR.inferno={w:322,h:177,ax:161,ay:173,ih:150,wb:{pr:2,ni:5}};MDRAW.spr_inferno=(g,u,t)=>drawSprMon(g,u,t,'inferno');
+// v16-62: TOW SERPENT (weak to RACER) – its SKILL row whips the chain backwards (away from the heroes) → not used;
+// pound = the ATTACK row (lunge forward, sparks on the ground), no breath (like CRUSHER KING → pounds more often)
+MON.tows={n:'TOW SERPENT',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ffab00',lz:[40,120],dr:'spr_tow',dr0:'titan',sp:'tow',sc:1,noLz:1,desc:'World boss'};
+MSPR.tow={w:310,h:191,ax:155,ay:158,ih:151,wb:{pr:2,ni:6}};MDRAW.spr_tow=(g,u,t)=>drawSprMon(g,u,t,'tow');
 const WBS={ret:0,sending:0,rank:null,raf:0};
 const wbEl=document.createElement('div');wbEl.id='wb';wbEl.innerHTML='<div id="wbBox"></div>';root.appendChild(wbEl);
 const fmtD=n=>{n=Math.round(n||0);return n>=1e12?(n/1e12).toFixed(2)+'T':n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e3).toFixed(1)+'K':String(n);};

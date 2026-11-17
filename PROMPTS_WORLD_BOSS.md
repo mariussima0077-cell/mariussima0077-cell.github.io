@@ -1,5 +1,5 @@
 # WORLD BOSS – prompturi ChatGPT (17 nov 2026)
-✅ **Făcut în v16-60 (17 nov)** – toate cele 6 poze sunt în joc. ✅ v16-61: CRUSHER KING + INFERNO PISTON în joc. ⏳ Lipsește doar TOW SERPENT (nr. 9).
+✅ **Făcut în v16-60 (17 nov)** – toate cele 6 poze sunt în joc. ✅ v16-61: CRUSHER KING + INFERNO PISTON în joc. ✅ v16-62: TOW SERPENT + banner general în joc – World Boss complet.
 Fiecare prompt are stilul inclus. Pozele cu fond verde = Claude le decupează. Ordinea: 1 → 6 (bossul 1 întâi; bossii 2-4 mai târziu).
 
 ## Cum va funcționa (propunere – Marius confirmă)
