@@ -107,7 +107,7 @@
 - **Aplicația creată** (13 nov): Torque Empire: Garage Tycoon · `com.torqueempire.game` · Jeu · Sans frais · en-US.
 
 ## ⏳ CE A MAI RĂMAS
-- **Notița de la v16-58**: reparat lagul + licărirea din zona garajelor și taburile mai mari în Battle Hub. Următorul pas: Marius verifică pe telefonul lui dacă mai apare licărirea; dacă da, spune unde exact (ce garaj, la zoom mare/mic, când tragi sau când stă). Lipsesc imagini: nu lipsește nimic (opțional: bannere Battle Hub mai înalte, ~1100×200, ar arăta tot desenul fără decupaj).
+- **Notița (17 nov, după v16-58)**: (1) **WORLD BOSS** – prompturile pentru poze sunt în `PROMPTS_WORLD_BOSS.md` (banner hub, fundal pagină, titluri, kit UI, fundal bătălie, bossul 1 SCRAPZILLA; bossii 2-4 mai târziu) + propunerea de funcționare. Se face după ce vin pozele. (2) **CLASSIC COLLECTION** (Collection Garage deschis + dealer cu 12 mașini de epocă desenate de Claude, recompense idle 💎/bilete) – **MACHETĂ pe branch-ul `classic-preview`** (nu e pe `main`), așteaptă OK-ul lui Marius. La integrare: NEWS, `V` în sw.js, sw_hash, budget_phone. **Lipsesc imagini**: cele 6 poze World Boss (vezi fișierul). Opțional pentru Classic Collection: antet + fundal de pagină (acum e făcut în cod).
 ### 🎨 Poze UI
 - [x] Toate pozele cerute pe 16 nov au venit și sunt în joc (v16-49 + v16-50). **Nu mai lipsește nicio imagine cerută.**
 - [x] **Cele 11 poze cerute pe 16 nov (v16-51) au venit și sunt în joc (v16-52)**: HERO SUMMON header, fundal SUMMON, HERO COLLECTION, iconițele celor 7 clase, cele 7 seturi.
