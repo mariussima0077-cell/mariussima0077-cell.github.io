@@ -5,6 +5,8 @@
 //   • cron every 10 min   – scans all players again over 24 h, bans cheaters, finds shared purchase tokens, cleans old data
 //   • GET  /admin?key=…   – your page (works on the phone): flagged / banned players, unban button
 //   • POST /api/on/*     – v16-45 ONLINE: profiles, live ranking, chat (auto-translated), Arena PvP, Torque Cup (server/online.js)
+//   • POST /api/xfer/put|get – moving the game from the old Chrome (TWA) version into the new app: the app makes a secret
+//                           key, the Chrome page uploads the save under it, the app downloads it ONCE (kept max 30 min)
 //   • GET  /admin/chat?key=… – chat moderation (delete, mute, reset name)
 //   • POST /api/cloud/*   – Google sign-in + cloud save (login / save / load / delete). Only a HASH of the Google account ID
 //                           is stored – never the e-mail or the name. Table `accounts` is created by itself.
@@ -28,6 +30,7 @@ export default {
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
       if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') return json(await cloud(url.pathname.slice(11), await req.json(), env));
       if (url.pathname.startsWith('/api/on/') && req.method === 'POST') return json(await online(url.pathname.slice(8), await req.json(), env));
+      if (url.pathname.startsWith('/api/xfer/') && req.method === 'POST') return json(await xfer(url.pathname.slice(10), await req.json(), env));
       if (url.pathname === '/admin/chat') return env.ADMIN_KEY && url.searchParams.get('key') === env.ADMIN_KEY ? onlineAdmin(url, env) : new Response('no', {status:403});
       if (url.pathname === '/admin') return admin(url, env);
       if (url.pathname === '/') return json({ok:true, name:'Torque Guard', time:Date.now()});
@@ -148,6 +151,27 @@ async function cloud(op, b, env) {
     if (b.base !== undefined && b.base !== a.t && a.t) return {err:'conflict', t:a.t, sum:a.sum ? JSON.parse(a.sum) : null};  // another phone saved meanwhile
     await db.prepare('UPDATE accounts SET save=?, sig=?, pid=?, t=?, sum=? WHERE uid=?').bind(b.save, String(b.sig || '').slice(0, 64), b.pid, now, JSON.stringify(b.sum || {}).slice(0, 2000), a.uid).run();
     return {ok:true, t:now};
+  }
+  return {err:'not found'};
+}
+
+// ------------------------------------------------------------------ transfer from the Chrome (TWA) version to the app
+let xferReady = false;
+async function xfer(op, b, env) {
+  const db = env.DB, now = Date.now();
+  if (!xferReady) { await db.prepare('CREATE TABLE IF NOT EXISTS xfer(k TEXT PRIMARY KEY, data TEXT, t INTEGER)').run(); xferReady = true; }
+  if (!b || typeof b.k !== 'string' || !/^[A-Za-z0-9]{24,64}$/.test(b.k)) return {err:'bad'};
+  await db.prepare('DELETE FROM xfer WHERE t<?').bind(now - 30 * 60e3).run();
+  if (op === 'put') {
+    if (typeof b.data !== 'string' || b.data.length > 600000) return {err:'bad'};
+    await db.prepare('INSERT INTO xfer(k,data,t) VALUES(?,?,?) ON CONFLICT(k) DO UPDATE SET data=excluded.data, t=excluded.t').bind(b.k, b.data, now).run();
+    return {ok:true};
+  }
+  if (op === 'get') {
+    const r = await db.prepare('SELECT data FROM xfer WHERE k=?').bind(b.k).first();
+    if (!r) return {ok:true, wait:true};
+    await db.prepare('DELETE FROM xfer WHERE k=?').bind(b.k).run();
+    return {ok:true, data:r.data};
   }
   return {err:'not found'};
 }

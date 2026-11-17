@@ -117,13 +117,15 @@ function refreshStart(){
   if(!sbox) return;
   const S = SERVERS.find(x=>x.id===srv)||SERVERS[0];
   let acc;
-  if(!CLIENT_ID) acc = '';
+  const app = !!(window.XFER && XFER.isApp());
+  if(app && !sess) acc = '<button data-xfo="1" style="width:100%;padding:9px;border:0;border-radius:999px;background:#2e7d32;color:#fff;font:900 13px system-ui">📲 TRANSFER FROM OLD VERSION</button><div style="font-size:11px;color:#c8d2dc;text-align:center;margin-top:5px">Google sign-in in the app: coming soon</div>';
+  else if(!CLIENT_ID) acc = '';
   else if(sess) acc = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:800;color:#7ee787">✓ Google account · ☁️ Cloud save ON</div><div style="font-size:11px;color:#b8c4d0;text-align:center;margin-top:2px">Last saved: '+when(syncedT)+'</div>';
   else acc = '<div id="gsiStart" style="min-height:40px;display:flex;justify-content:center"></div><div style="font-size:11px;color:#c8d2dc;text-align:center;margin-top:5px">Optional · keeps your game safe on a new phone</div>';
   sbox.innerHTML = '<div style="width:min(88vw,330px);margin:0 auto;background:#0b1420d9;border:2px solid #e0a82e;border-radius:16px;padding:10px 12px;box-shadow:0 6px 20px #000a;font-family:system-ui;color:#fff">'+
    '<button data-sv="open" style="width:100%;display:flex;align-items:center;gap:8px;background:#162235;border:1px solid #2b3a52;border-radius:12px;padding:8px 10px;color:#fff;font:800 14px system-ui;margin-bottom:'+(acc?'9px':'0')+'">'+
    '<span style="font-size:18px">🌍</span><span style="flex:1;text-align:left"><span style="font-size:10px;color:#9fb0c0;display:block;letter-spacing:.5px">SERVER</span>'+S.n+'</span><span style="color:#7ee787;font-size:11px">● ONLINE</span><span style="color:#ffd54a;font-size:13px">▾</span></button>'+acc+'</div>';
-  if(CLIENT_ID && !sess) loadGis(()=>{ const b=document.getElementById('gsiStart'); if(b) google.accounts.id.renderButton(b,{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:280}); });
+  if(CLIENT_ID && !sess && !app) loadGis(()=>{ const b=document.getElementById('gsiStart'); if(b) google.accounts.id.renderButton(b,{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:280}); });
 }
 function serverList(){
   const d = document.createElement('div');
@@ -142,6 +144,7 @@ function serverList(){
   });
   document.body.appendChild(d);
 }
+document.addEventListener('click', e=>{ if(e.target.closest('[data-xfo]')){ e.stopPropagation(); window.XFER && XFER.open(); } }, true);
 document.addEventListener('click', e=>{ const b=e.target.closest('[data-sv="open"]'); if(b){ e.stopPropagation(); serverList(); } }, true);
 
 // ---------- the box at the bottom of the Shop ----------
@@ -152,6 +155,7 @@ function refresh(){
   if(!box || !document.body.contains(box)) return;
   const st = 'background:#141c2b;border:1px solid #e0a82e55;border-radius:14px;padding:12px;margin:10px 0;font-size:13px;line-height:1.45';
   if(!CLIENT_ID){ box.innerHTML = SEC.TEST_MODE ? '<div style="'+st+'">☁️ <b>Google sign-in</b> – waiting for the Client ID (see PLAY_RULES.md). Players don\'t see this box yet.</div>' : ''; return; }
+  if(!sess && window.XFER && XFER.isApp()){ box.innerHTML = '<div style="'+st+'"><b style="font-size:15px">📲 Old version</b><br>Played before in the old (Chrome) version on this phone? Bring your progress here.<button data-xfo="1" style="width:100%;margin-top:10px;padding:10px;border:0;border-radius:999px;background:#2e7d32;color:#fff;font:900 13px system-ui">TRANSFER MY PROGRESS</button><div style="font-size:11px;color:#9fb0c0;margin-top:6px">Google sign-in in the app: coming soon.</div></div>'; return; }
   if(!sess){
     box.innerHTML = '<div style="'+st+'"><b style="font-size:15px">☁️ Cloud save</b><br>Sign in with Google to keep your progress safe and play on another phone. We only keep your game – not your e-mail or name.<div id="gsiBtn" style="margin-top:10px;min-height:44px;display:flex;justify-content:center"></div></div>';
     loadGis(()=>{ const b=document.getElementById('gsiBtn'); if(b) google.accounts.id.renderButton(b,{theme:'filled_black',size:'large',shape:'pill',text:'continue_with',width:260}); });

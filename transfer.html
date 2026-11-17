@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="robots" content="noindex">
+<title>Torque Empire – Transfer progress</title>
+<style>
+html,body{margin:0;min-height:100%;background:#0b1420;font-family:system-ui,-apple-system,Roboto,sans-serif;color:#fff}
+.c{max-width:380px;margin:0 auto;padding:40px 18px;text-align:center}
+.box{background:linear-gradient(#152033,#0b1420);border:2px solid #e0a82e;border-radius:18px;padding:20px 16px;box-shadow:0 8px 30px #000}
+h1{font-size:21px;margin:8px 0;color:#ffd54a}
+p{font-size:14px;color:#c8d2dc;line-height:1.5;margin:6px 0}
+.i{font-size:46px;line-height:1}
+a.b{display:block;margin-top:16px;padding:14px;border-radius:999px;background:#2e7d32;color:#fff;font-weight:900;font-size:16px;text-decoration:none;box-shadow:0 3px 0 #0006}
+.s{display:flex;justify-content:center;gap:14px;margin-top:10px;font-size:13px;color:#ffd54a;font-weight:800}
+</style>
+</head>
+<body>
+<div class="c"><div class="box" id="m"><div class="i">⏳</div><h1>Looking for your game…</h1></div></div>
+<script>
+// Opened by the NEW Torque Empire app in Chrome (same storage as the old Chrome/Play version).
+// Sends the old game to Torque Guard under the app's secret key (kept max 30 min, downloaded once), then back to the app.
+(async()=>{
+const m=document.getElementById('m');
+const k=new URLSearchParams(location.search).get('k')||'';
+const API='https://torque-guard.torqueempirehelp.workers.dev';
+const back='intent://transfer#Intent;scheme=torqueempire;package=com.torqueempire.game;end';
+const BTN='<a class="b" href="'+back+'">◀ RETURN TO GAME</a>';
+const show=h=>m.innerHTML=h;
+if(!/^[A-Za-z0-9]{24,64}$/.test(k)){show('<div class="i">⚠️</div><h1>Open this from the app</h1><p>Start Torque Empire and tap <b>TRANSFER MY PROGRESS</b>.</p>');return;}
+const ls={};
+try{for(let i=0;i<localStorage.length;i++){const n=localStorage.key(i);
+  if((n.startsWith('torqueEmpire')||n.startsWith('te_'))&&n!=='te_twa'&&n!=='te_xfer')ls[n]=localStorage.getItem(n);}}catch(e){}
+const has=!!ls.torqueEmpire_v15;
+let sum='';
+if(has){try{const G=JSON.parse(ls.torqueEmpire_v15);const f=n=>n>=1e9?(n/1e9).toFixed(1)+'B':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.floor(n||0);
+  sum='<div class="s">'+(G.money!=null?'<span>💵 '+f(G.money)+'</span>':'')+(G.sold!=null?'<span>🚗 '+f(G.sold)+' sold</span>':'')+'</div>';}catch(e){}}
+const body=JSON.stringify(has?{ls}:{none:1});
+for(let t=0;t<3;t++){
+  try{const r=await(await fetch(API+'/api/xfer/put',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({k,data:body})})).json();
+    if(r&&r.ok){
+      if(has){show('<div class="i">✅</div><h1>Game sent to the app!</h1>'+sum+'<p>Go back to Torque Empire – your progress is waiting there.</p>'+BTN);
+        setTimeout(()=>{location.href=back;},1200);}
+      else show('<div class="i">🔍</div><h1>No game found here</h1><p>Chrome on this phone has no Torque Empire progress. If you used Google sign-in in the old version, sign in in the app.</p>'+BTN);
+      return;}
+  }catch(e){}
+  await new Promise(r=>setTimeout(r,1500));
+}
+show('<div class="i">📶</div><h1>No internet</h1><p>Check your connection and try again.</p><a class="b" href="" onclick="location.reload();return false">TRY AGAIN</a>');
+})();
+</script>
+</body>
+</html>
