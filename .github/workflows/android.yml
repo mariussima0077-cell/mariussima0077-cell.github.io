@@ -1,0 +1,94 @@
+# Builds the native Android app (Capacitor) for Torque Empire.
+# - Always: a test APK (debug) you can install directly on the phone.
+# - When the signing secrets exist (KS_BASE64, KS_PASS, KS_ALIAS, KS_KEY_PASS):
+#   also the release .aab for Play Console + a release APK.
+# The files appear on the GitHub "Releases" page (easy to download from the phone).
+name: Android app (Capacitor)
+
+on:
+  push:
+    branches: [capacitor]
+    paths: ['android-app/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+    inputs:
+      versionCode:
+        description: 'versionCode (must be higher than the last one in Play Console)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install + sync Capacitor
+        run: |
+          npm ci
+          npx cap sync android
+
+      - name: Version
+        id: ver
+        run: |
+          VC="${{ github.event.inputs.versionCode }}"
+          if [ -z "$VC" ]; then VC=$((100 + ${{ github.run_number }})); fi
+          echo "vc=$VC" >> "$GITHUB_OUTPUT"
+          echo "vn=2.0.$VC" >> "$GITHUB_OUTPUT"
+
+      - name: Test APK (debug)
+        working-directory: android-app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug -Pvc=${{ steps.ver.outputs.vc }} -Pvn=${{ steps.ver.outputs.vn }}
+          mkdir -p ../../out
+          cp app/build/outputs/apk/debug/app-debug.apk ../../out/TorqueEmpire-test-${{ steps.ver.outputs.vc }}.apk
+
+      - name: Release AAB + APK (signed with the upload key)
+        env:
+          KS_BASE64: ${{ secrets.KS_BASE64 }}
+          KS_PASS: ${{ secrets.KS_PASS }}
+          KS_ALIAS: ${{ secrets.KS_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.KS_KEY_PASS }}
+        if: env.KS_BASE64 != ''
+        working-directory: android-app/android
+        run: |
+          echo "$KS_BASE64" | base64 -d > "$RUNNER_TEMP/upload.keystore"
+          export KS_PATH="$RUNNER_TEMP/upload.keystore"
+          ./gradlew bundleRelease assembleRelease -Pvc=${{ steps.ver.outputs.vc }} -Pvn=${{ steps.ver.outputs.vn }}
+          cp app/build/outputs/bundle/release/app-release.aab ../../out/TorqueEmpire-${{ steps.ver.outputs.vc }}.aab
+          cp app/build/outputs/apk/release/app-release.apk ../../out/TorqueEmpire-${{ steps.ver.outputs.vc }}.apk
+          rm -f "$KS_PATH"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: torque-empire-android-${{ steps.ver.outputs.vc }}
+          path: out/*
+
+      - name: Publish on the Releases page
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-${{ steps.ver.outputs.vc }}
+          name: Android app ${{ steps.ver.outputs.vn }}
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          body: |
+            Native Android build (Capacitor) of Torque Empire.
+            - **TorqueEmpire-test-*.apk** – install directly on the phone (uninstall the Play version first).
+            - **TorqueEmpire-*.aab** (only when the signing key is set) – upload this one in Play Console.
+          files: out/*

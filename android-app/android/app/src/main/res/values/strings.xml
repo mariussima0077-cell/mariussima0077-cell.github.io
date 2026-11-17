@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Torque Empire</string>
+    <string name="title_activity_main">Torque Empire</string>
+    <string name="package_name">com.torqueempire.game</string>
+    <string name="custom_url_scheme">com.torqueempire.game</string>
+</resources>

@@ -1,0 +1,22 @@
+{
+  "appId": "com.torqueempire.game",
+  "appName": "Torque Empire",
+  "webDir": "www",
+  "server": {
+    "url": "https://mariussima0077-cell.github.io/index.html?src=capapp",
+    "errorPath": "offline.html",
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0b1420",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#0b1420",
+      "showSpinner": false
+    }
+  }
+}
