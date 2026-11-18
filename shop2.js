@@ -3,7 +3,7 @@
 // Until then only the owner's TEST MODE (browser, ?dev=…) sees it.
 (function(){
 'use strict';
-const LIVE = false;                        // ← true only after: Classification "random items" = Oui, IARC redone, Belgium removed, products created
+const LIVE = true;                         // ← true only after: Classification "random items" = Oui, IARC redone, Belgium removed, products created
 const T = () => window.__TE;
 const DAY = 864e5;
 const now = () => (window.SEC && SEC.now ? SEC.now() : Date.now());
