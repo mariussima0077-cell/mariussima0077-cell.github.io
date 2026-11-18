@@ -416,6 +416,13 @@ const css3=document.createElement('style');css3.textContent=`
 .gcTot{margin:12px 4px 0;padding:10px 12px;border-radius:12px;background:#0b1424;box-shadow:inset 0 0 0 2px #ffb300;font:800 12.5px system-ui;color:#ffe9a8;text-align:center}
 .gcTot b{color:#7CFC9A}
 /*UI3MORE*/
+#cpHM{position:absolute;left:50%;top:100%;transform:translate(-50%,6px);z-index:4;display:flex;padding:3px;border-radius:20px;border:2px solid #5e3d00;background:#120c07e8;box-shadow:0 3px 0 #000a,0 0 10px #000;font:900 13px system-ui;letter-spacing:.5px}
+#cpHM span{padding:6px 16px;border-radius:15px;color:#9a8a78}
+#cpHM .n{background:linear-gradient(#fff0a8,#ffcb3d 45%,#ee7a00);color:#2a1a00}
+#cpHM.on .n{background:none;color:#9a8a78}#cpHM.on .h{background:linear-gradient(#ff8a80,#e53935 50%,#8e0000);color:#fff;text-shadow:0 1px 0 #000;box-shadow:0 0 10px #ff1744}
+#cp.hm #cpMap{background:#2a1010!important}#cp.hm #cpPath{filter:saturate(.75) hue-rotate(-18deg) brightness(.85)}
+#cp.hm #cpPath .node{filter:hue-rotate(18deg) brightness(1.18) saturate(1.3)}
+
 `;document.head.appendChild(css3);
 
 const GTKI0='<img src="img/gticket.webp" style="height:1.2em;vertical-align:-.28em">';
@@ -679,11 +686,19 @@ CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911
   STAGES.push({n:C.names[j],c,j,bio:C.bios[z],w,boss:j===19,mini:j===9});}});
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
 const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345]]; // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
-const stageMul=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
+// v16-74: the campaign was ~4× faster than planned (2-month test: day 16 = stage 16-20) → chapters 2-12 climb to ×HK_MAX stronger, kept until ch 32, then back to ×1.3 at the end
+const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:HK_MAX-(HK_MAX-1.3)*(i-639)/360;
+// v16-74: HARD MODE – hard chapter N opens when normal chapter N is cleared (and hard N-1); monsters ×HARD_K, rewards ×HARD_RW
+const HARD_K=2.5,HARD_RW=1.5;let HM=0;
+const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{},ch:0};if(!G.cph.stars)G.cph.stars={};return G.cph;};
+const hardOK=()=>TE().G.cp.best>=SPC;
+const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K:1);
+const stageMul0=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
 // v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
 const CP_MON=.35;
+const REWARDX=i=>{const r=REWARD(i);if(!HM)return r;const o={};for(const k in r)o[k]=typeof r[k]==='number'?Math.round(r[k]*HARD_RW/(k==='money'?10:1))*(k==='money'?10:1):r[k];return o;};
 const REWARD=i=>{const s=STAGES[i];return {money:Math.round(CP_MON*(i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?5:s.mini?3:1,gtk:s.boss?5:s.mini?3:1,ct:s.boss?3:s.mini?1:0,dm:s.boss?100:s.mini?30:10};};
-const sLabel=i=>(STAGES[i].c+1)+'-'+(STAGES[i].j+1);
+const sLabel=i=>(HM?'H ':'')+(STAGES[i].c+1)+'-'+(STAGES[i].j+1);
 
 // ---------------------------------------------------------------- GEAR (works only in battles)
 const GSLOT=[
@@ -1449,7 +1464,7 @@ function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(2,window.devic
 // v15: NEVER GIVE UP – stuck on your next stage? Your mechanics train: +7.5% HP & attack every 6 hours for 2 days, then +15% every 6 hours (max +300%). Resets when you win it.
 // v16-40: no wall longer than ~2 days (Marius' rule) – after 2 days the training grows faster: +15% every 6 h, up to +300%
 const GRIT_N=24,gritK=n=>n<=8?n*.075:.6+(n-8)*.15,gritStep=n=>n<8?.075:.15;
-function grit(si){const G=TE().G,st=G.cp.stuck;if(!st||st.si!==si||si!==G.cp.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
+function grit(si){const P=CPX(),st=P.stuck;if(!st||st.si!==si||si!==P.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
 function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=1+(B.grit||0)+(B.nit||0);
   return {hero:1,h,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,eg:s.eg,
     x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),shots:0,fcT:3,ekCd:0,swT:0};}
@@ -2247,10 +2262,10 @@ let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{i
 // ---------------------------------------------------------------- results
 const ANX={id:0,n:0};
 function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)return twFinish(win,retreat);const T=TE(),G=T.G,si=B.si,S0=STAGES[si];
-  if(!B.sim&&si===G.cp.best){if(win)delete G.cp.stuck;else if(!G.cp.stuck||G.cp.stuck.si!==si)G.cp.stuck={si,t:Date.now()};}
+  const P=CPX();if(!B.sim&&si===P.best){if(win)delete P.stuck;else if(!P.stuck||P.stuck.si!==si)P.stuck={si,t:Date.now()};}
   let html='';const lab=sLabel(si);
-  if(win){const st=B.deaths===0?3:B.deaths<=2?2:1;const first=si>=G.cp.best;const R=REWARD(si);const money=first?R.money:Math.round(R.money*.25/10)*10,tk=first?R.tk:0;
-    G.money+=money;if(first)G.cp.best=si+1;G.cp.stars[si]=Math.max(G.cp.stars[si]||0,st);
+  if(win){const st=B.deaths===0?3:B.deaths<=2?2:1;const first=si>=P.best;const R=REWARDX(si);const money=first?R.money:Math.round(R.money*.25/10)*10,tk=first?R.tk:0;
+    G.money+=money;if(first)P.best=si+1;P.stars[si]=Math.max(P.stars[si]||0,st);
     const drops=[];const big=S0.boss||S0.mini;const n=first?(S0.boss?2:1):(big||Math.random()<.4?1:0);for(let k=0;k<n;k++)drops.push(dropItem(S0.c,big));
     let sold=0;drops.forEach(d=>{if(d.sold){sold+=d.sold;G.money+=d.sold;}});
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;
@@ -2276,24 +2291,24 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
   $('cpResBox').classList.add('rsSk');
   $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;
   // v16-25: AUTO NEXT – after a victory the next stage starts by itself after a 3 s countdown (same team). Stops on defeat, on any tap, or with the switch.
-  clearInterval(ANX.id);const canAuto=win&&si<NST-1;
+  clearInterval(ANX.id);const canAuto=win&&si<NST-1&&chOpen(STAGES[si+1].c);
   const anxShow=()=>{const on=G.cp.autoNext!==false,b=$('anxS'),c=$('anxC');if(!b)return;b.textContent=on?'ON':'OFF';b.parentNode.classList.toggle('on',on);c.textContent=on&&ANX.n>0?'next stage in '+ANX.n+'…':on?'':'tap to turn on';};
   const anxGo=()=>{clearInterval(ANX.id);ANX.n=0;if(!canAuto||G.cp.autoNext===false||window.__TUTON)return anxShow(); /* v16-72: no auto-next during the tutorial */ANX.n=3;anxShow();
     ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}ANX.n--;anxShow();if(ANX.n<=0){clearInterval(ANX.id);
-      $('cpRes').classList.remove('open');G.cp.ch=STAGES[si+1].c;safeStart(si+1,teamHeroes());}},1000);};
+      $('cpRes').classList.remove('open');CPX().ch=STAGES[si+1].c;safeStart(si+1,teamHeroes());}},1000);};
   if(canAuto)anxGo();
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;
     if(a==='atog'){G.cp.autoNext=G.cp.autoNext===false;T.save();anxGo();return;}
     clearInterval(ANX.id);ANX.n=0;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
-    if(a==='next'){G.cp.ch=STAGES[si+1].c;showMap();openCard(si+1);}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openGear(null,si);}
+    if(a==='next'){if(si<NST-1&&chOpen(STAGES[si+1].c)){CPX().ch=STAGES[si+1].c;showMap();openCard(si+1);}else showMap();}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openGear(null,si);}
     else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();openGSum();}else if(a==='hsum'){showMap();openGear(null,si);const T2=TE();if(T2.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T2.openSummon('m');}}else showMap();};}
 
 // ---------------------------------------------------------------- campaign map (5 chapters × 20 stages)
 const PH=2280;
 const NODEX=j=>j===19?50:(j%2?70:30)+(j%4===1?6:j%4===3?-6:0);
 const NODEY=j=>PH-110-j*106-(j===19?24:0);
-const chOpen=c=>TE().G.cp.best>=c*SPC;
-function curCh(){const G=TE().G;let c=G.cp.ch;if(c==null||c<0||c>=NCH||!chOpen(c))c=Math.min(NCH-1,Math.floor(Math.min(G.cp.best,NST-1)/SPC));G.cp.ch=c;return c;}
+const chOpen=c=>CPX().best>=c*SPC&&(!HM||TE().G.cp.best>=(c+1)*SPC);
+function curCh(){const P=CPX();let c=P.ch;if(c==null||c<0||c>=NCH||!chOpen(c)){c=Math.min(NCH-1,Math.floor(Math.min(P.best,NST-1)/SPC));while(c>0&&!chOpen(c))c--;}P.ch=c;return c;}
 // v15: new map look (from the player's picture) – dirt ground, junkyard props cut from the picture, metal road, metal stage pads
 const UIM={};function uim(n){if(UIM[n])return UIM[n];const i=new Image();i.onload=()=>{if(root.classList.contains('open')&&!$('bt').classList.contains('open')){clearTimeout(uim.t);uim.t=setTimeout(()=>drawPath(curCh()),60);}};i.src='img/ui/'+n+'.webp';return UIM[n]=i;}
 const PROPS_L=['pr_crane','pr_cars','pr_redcar','pr_fence','pr_barrierL'],PROPS_R=['pr_shed','pr_barrels','pr_tires'];
@@ -2351,30 +2366,37 @@ function drawPath(c){const C=CHAP[c],cv2=$('cpPathCv'),w=cv2.clientWidth||Math.m
   const vg=x.createLinearGradient(0,0,w,0);vg.addColorStop(0,'rgba(0,0,0,.35)');vg.addColorStop(.12,'rgba(0,0,0,0)');vg.addColorStop(.88,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=vg;x.fillRect(0,0,w,h);}
 function showMap(){const T=TE(),G=T.G;GR();try{teamHeroes().forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){} // v16-27: get the team's animations ready before the fight (only those, not all)
 $('cpTk').innerHTML=TKI+' '+G.h.tk;const c=curCh(),C=CHAP[c];
-  $('cpT1').innerHTML=IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')+' CAMPAIGN';$('cpT2').textContent='CHAPTER '+(c+1)+' OF '+NCH;
-  const done=Math.max(0,Math.min(SPC,G.cp.best-c*SPC));let stc=0;for(let j=0;j<SPC;j++)stc+=G.cp.stars[c*SPC+j]||0;
-  $('cpChN').innerHTML=`<b style="color:${C.col}">${C.n}</b><small>${done}/${SPC} stages · ${stc}/${SPC*3} ⭐</small>`;
+  const PX=CPX();
+  $('cpT1').innerHTML=IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')+(HM?' HARD':' CAMPAIGN');$('cpT2').textContent='CHAPTER '+(c+1)+' OF '+NCH;
+  const done=Math.max(0,Math.min(SPC,PX.best-c*SPC));let stc=0;for(let j=0;j<SPC;j++)stc+=PX.stars[c*SPC+j]||0;
+  $('cpChN').innerHTML=`<b style="color:${HM?'#ff5252':C.col}">${HM?'HARD · ':''}${C.n}</b><small>${done}/${SPC} stages · ${stc}/${SPC*3} ⭐</small>`;
+  hmBtn();root.classList.toggle('hm',!!HM);
   $('cpPrev').classList.toggle('off',c===0);$('cpNext').classList.toggle('off',c>=NCH-1||!chOpen(c+1));$('cpNext').innerHTML=c<NCH-1&&!chOpen(c+1)?IMGI(glyphURL('lock','#ffd54a'),'.8em','-.05em'):'›';
   const P=$('cpPath');P.querySelectorAll('.node').forEach(n=>n.remove());drawPath(c);
-  for(let j=0;j<SPC;j++){const i=c*SPC+j,s=STAGES[i];const d=document.createElement('div');const lock=i>G.cp.best,cur=i===G.cp.best;d.className='node'+(s.boss?' boss':s.mini?' mini':'')+(lock?' lock':'')+(cur?' cur':'');
+  for(let j=0;j<SPC;j++){const i=c*SPC+j,s=STAGES[i];const d=document.createElement('div');const lock=i>PX.best,cur=i===PX.best;d.className='node'+(s.boss?' boss':s.mini?' mini':'')+(lock?' lock':'')+(cur?' cur':'');
     d.style.left=NODEX(j)+'%';d.style.top=NODEY(j)+'px';
-    d.innerHTML=`<img class="pad" src="img/ui/${cur?'node_gold':'node_gray'}.webp">`+(s.boss?`<img class="ic" src="${glyphURL('skull','#ffe0d0')}">`:s.mini?`<img class="ic" src="${glyphURL('horns','#ffe0b2')}">`:`<b class="no">${j+1}</b>`)+`<span class="nm">${s.n}</span>`+(G.cp.stars[i]?`<span class="st">${[0,1,2].map(q=>`<em class="${q<G.cp.stars[i]?'on':''}">★</em>`).join('')}</span>`:'');
+    d.innerHTML=`<img class="pad" src="img/ui/${cur?'node_gold':'node_gray'}.webp">`+(s.boss?`<img class="ic" src="${glyphURL('skull','#ffe0d0')}">`:s.mini?`<img class="ic" src="${glyphURL('horns','#ffe0b2')}">`:`<b class="no">${j+1}</b>`)+`<span class="nm">${s.n}</span>`+(PX.stars[i]?`<span class="st">${[0,1,2].map(q=>`<em class="${q<PX.stars[i]?'on':''}">★</em>`).join('')}</span>`:'');
     d.onclick=()=>{if(lock){T.toast('🔒 Clear stage '+sLabel(i-1)+' first',2000);return;}openCard(i);};P.appendChild(d);}
-  requestAnimationFrame(()=>{const m=$('cpMap'),j=Math.max(0,Math.min(SPC-1,G.cp.best-c*SPC));m.scrollTop=Math.max(0,NODEY(j)-m.clientHeight*.55+60);});}
+  requestAnimationFrame(()=>{const m=$('cpMap'),j=Math.max(0,Math.min(SPC-1,PX.best-c*SPC));m.scrollTop=Math.max(0,NODEY(j)-m.clientHeight*.55+60);});}
 // v14: 50 chapters – tap the chapter name for the full list
+// v16-74: NORMAL / HARD switch on the campaign map (HARD opens after normal chapter 1)
+function hmBtn(){let b=$('cpHM');if(!b){b=document.createElement('button');b.id='cpHM';$('cpTop').appendChild(b);
+    b.onclick=()=>{const T=TE(),G=T.G;if(!hardOK()){T.toast('🔒 HARD MODE opens after NORMAL chapter 1 (stage 1-20)',2600);return;}
+      HM=HM?0:1;G.cp.hm=HM;T.save();showMap();if(HM&&!G.cp.hmSeen){G.cp.hmSeen=1;T.save();popW('HARD MODE','<div style="padding:4px 2px;line-height:1.45">The same chapters with <b style="color:#ff5252">much stronger monsters</b> – and <b style="color:#7CFC9A">×'+HARD_RW+' rewards</b> (money, tickets, diamonds).<br><br>HARD chapter N opens when you clear NORMAL chapter N.</div>');}};}
+  b.className=HM?'on':'';b.innerHTML='<span class="n">NORMAL</span><span class="h">'+(hardOK()?'':'🔒 ')+'HARD</span>';}
 function chList(){const T=TE(),G=T.G,cur=curCh();let h=`<div class="pT">${IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')} ALL CHAPTERS</div><div class="pD">10 acts × 5 worlds · ${NCH} chapters · ${NST} stages</div><div class="chL">`;
-  for(let c=0;c<NCH;c++){const C=CHAP[c],op=chOpen(c),done=Math.max(0,Math.min(SPC,G.cp.best-c*SPC));let st=0;for(let j=0;j<SPC;j++)st+=G.cp.stars[c*SPC+j]||0;
+  const PX=CPX();for(let c=0;c<NCH;c++){const C=CHAP[c],op=chOpen(c),done=Math.max(0,Math.min(SPC,PX.best-c*SPC));let st=0;for(let j=0;j<SPC;j++)st+=PX.stars[c*SPC+j]||0;
     if(c%5===0)h+=`<div class="chAct">ACT ${c/5+1}${c?' · '+ACTS[c/5].n.toUpperCase():' · ORIGINS'}</div>`;
-    h+=`<div class="chI${op?'':' lk'}${c===cur?' on':''}" data-ch="${c}" style="border-color:${C.col}"><b style="color:${C.col}">${c+1}</b><span>${C.n}<small>${op?done+'/'+SPC+' · '+st+'⭐':'🔒 beat '+MON[CHAP[Math.max(0,c-1)].boss].n}</small></span></div>`;}
+    h+=`<div class="chI${op?'':' lk'}${c===cur?' on':''}" data-ch="${c}" style="border-color:${C.col}"><b style="color:${C.col}">${c+1}</b><span>${C.n}<small>${op?done+'/'+SPC+' · '+st+'⭐':HM&&G.cp.best<(c+1)*SPC?'🔒 clear NORMAL chapter '+(c+1):'🔒 beat '+MON[CHAP[Math.max(0,c-1)].boss].n}</small></span></div>`;}
   pop(h+'</div><button class="cpGo alt" data-p="x">CLOSE</button>');
   requestAnimationFrame(()=>{const e=document.querySelector('.chI.on');if(e)e.scrollIntoView({block:'center'});});}
-function chGo(dl){const T=TE(),G=T.G,c=curCh()+dl;if(c<0||c>=NCH)return;if(!chOpen(c)){T.toast('🔒 Beat '+MON[CHAP[c-1].boss].n+' (stage '+c+'-20) to open Chapter '+(c+1),2600);return;}G.cp.ch=c;showMap();$('cpMap').scrollTop=PH;}
+function chGo(dl){const T=TE(),G=T.G,c=curCh()+dl;if(c<0||c>=NCH)return;if(!chOpen(c)){T.toast(HM&&G.cp.best<(c+1)*SPC?'🔒 Clear NORMAL chapter '+(c+1)+' first':'🔒 Beat '+MON[CHAP[c-1].boss].n+' (stage '+(HM?'H ':'')+c+'-20) to open Chapter '+(c+1),2600);return;}CPX().ch=c;showMap();$('cpMap').scrollTop=PH;}
 function monPreview(t){const c=document.createElement('canvas');c.width=136;c.height=116;const x=c.getContext('2d');const M=MON[t];const sc=Math.min(1.5,50/(M.b==='titan'?255:(M.h*M.sc+(M.fly?48:4))));
   x.setTransform(2,0,0,2,0,0);const u={t,b:M.b,sx:M.b==='titan'?36:34,sy:55,sc,face:-1,st:'idle',ap:0,wph:0,k:1,roll:0,d:.5,H:M.h,mark:0,slow:0,stun:0,flash:0,dead:false,enr:false};
   if(M.sp){const d=MSPR[M.sp],k=M.h/d.ih;u.sc=Math.min(50/(d.ay*k),64/(d.w*k));u.sx=34;u.sy=57;
     if(!msprOK(M.sp)){msprLoad(M.sp).im.addEventListener('load',()=>{x.clearRect(0,0,68,58);GA=1;drawMonster(x,u,1.3);},{once:true});}}
   GA=1;drawMonster(x,u,1.3);return c;}
-function openCard(i){const T=TE(),G=T.G,s=STAGES[i],C=CHAP[s.c],first=i>=G.cp.best,R=REWARD(i);const types=[...new Set(s.w.flat())];
+function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i>=PX.best,R=REWARDX(i);const types=[...new Set(s.w.flat())];
   const tp=teamPower(curTeamList()),ep=enemyPower(i);
   const col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';const big=s.boss||s.mini;
   // v16-49: stage card = Marius' battle-prep picture (img/ui3/prep.webp): title plate, 3 enemy windows, VS power bar, 4 reward boxes, 5 team boxes, BACK + FIGHT
@@ -2383,10 +2405,10 @@ function openCard(i){const T=TE(),G=T.G,s=STAGES[i],C=CHAP[s.c],first=i>=G.cp.be
   rws.push([IMGI(glyphURL('bag','#ffd54a'),'1.5em'),first?(s.boss?'2 ★':big?'1 ★':'×1'):(big?'×1':'40%')]);
   const tm=curTeamList();
   $('cpCardBox').classList.add('prepSk');
-  $('cpCardBox').innerHTML=`<div class="ppT"><b>${s.boss?IMGI(glyphURL('skull','#ff8a80'))+' ':s.mini?IMGI(glyphURL('horns','#ffb74d'))+' ':''}${sLabel(i)} · ${s.n}</b><small>CH ${s.c+1} · ${C.zones[Math.floor(s.j/5)].toUpperCase()} · ${s.w.length} WAVES${G.cp.stars[i]?' · '+'⭐'.repeat(G.cp.stars[i]):''}</small></div>
+  $('cpCardBox').innerHTML=`<div class="ppT"><b>${s.boss?IMGI(glyphURL('skull','#ff8a80'))+' ':s.mini?IMGI(glyphURL('horns','#ffb74d'))+' ':''}${sLabel(i)} · ${s.n}</b><small>CH ${s.c+1} · ${C.zones[Math.floor(s.j/5)].toUpperCase()} · ${s.w.length} WAVES${HM?' · HARD ×'+HARD_RW+' REWARDS':''}${PX.stars[i]?' · '+'⭐'.repeat(PX.stars[i]):''}</small></div>
    <div class="mons" id="cpMons"></div>
    <div class="ppE"><small>ENEMY</small>${ep.toLocaleString()}</div><div class="ppP" style="color:${col}"><small>YOUR TEAM</small>${tp.toLocaleString()}</div>
-   ${(()=>{const st=G.cp.stuck;if(i!==G.cp.best||!st||st.si!==i)return '';const gk=Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)),nx=gk<GRIT_N?Math.ceil((216e5-(Date.now()-st.t)%216e5)/36e5):0;return `<div class="grit">🔥 NEVER GIVE UP: <b>+${Math.round(gritK(gk)*100)}%</b> HP &amp; attack${gk<GRIT_N?` · next +${gritStep(gk)*100}% in ~${nx}h`:' (max)'}</div>`;})()}
+   ${(()=>{const st=PX.stuck;if(i!==PX.best||!st||st.si!==i)return '';const gk=Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)),nx=gk<GRIT_N?Math.ceil((216e5-(Date.now()-st.t)%216e5)/36e5):0;return `<div class="grit">🔥 NEVER GIVE UP: <b>+${Math.round(gritK(gk)*100)}%</b> HP &amp; attack${gk<GRIT_N?` · next +${gritStep(gk)*100}% in ~${nx}h`:' (max)'}</div>`;})()}
    <div class="ppRT">${first?'FIRST CLEAR':'REPLAY'}</div>${rws.slice(0,4).map((r,k)=>`<div class="ppR ppR${k}"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}
    <div class="ppG">${['Common','Uncommon','Rare','Epic','Legendary','Mythic'].map((n,k)=>gdrop(s.c)[k]?`<span style="color:${T.GRADES[k].c}">${n.slice(0,3).toUpperCase()} ${gdrop(s.c)[k]}%</span>`:'').filter(Boolean).join(' ')}</div>
    ${[0,1,2,3,4].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="heroes">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
@@ -2490,14 +2512,14 @@ function openTeam(si){const T=TE(),G=T.G;tsi=si;cleanGear();tsel=curTeamList().m
 let gsel=null,gfil='all',gsalv=0,gsort='pow',gpgFrom='';
 function cleanGear(){const T=TE(),g=GR();for(const hid in g.eq){if(!T.G.h.own[hid]){delete g.eq[hid];continue;}for(const s in g.eq[hid])if(!itemById(g.eq[hid][s]))delete g.eq[hid][s];}}
 function gHero(){const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=>h.id===gsel))gsel=L[0].id;return TE().HB[gsel];}
-function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(TE().G.cp.best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
+function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(CPX().best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
 function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gGSB').innerHTML=GTKI0+' <b>GEAR SUMMON</b> <span>'+GSD().tk+' tickets</span>';
   $m('gMoney').innerHTML=IMGI(badge('coin','#ffb300'))+' '+T.fmt(G.money);
   tsel=curTeamList().map(x=>x.id);const team=tsel;let L=myMechs();
   if(gsort==='pow')L=L.slice().sort((a,b)=>pow(b)-pow(a));else if(gsort==='gr')L=L.slice().sort((a,b)=>(b.gr||0)-(a.gr||0)||stars(b)-stars(a));
   // BATTLE TEAM (5 places) – tap a place to change it (before / after)
-  const tl=team.map(heroOf),tp=teamPower(tl),si=Math.max(0,Math.min(NST-1,tsi==null?G.cp.best:tsi)),ep=enemyPower(si),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
+  const tl=team.map(heroOf),tp=teamPower(tl),si=Math.max(0,Math.min(NST-1,tsi==null?CPX().best:tsi)),ep=enemyPower(si),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
   renderPeds(tl);
   $m('gTeam').innerHTML=`<div class="gtH">⚔️ BATTLE TEAM <span style="color:#c9b88a;font-size:10px;letter-spacing:0">tap a pedestal · also for the Arena</span><button data-g="best">${IMGI(glyphURL('bolt','#2a1000'))} AUTO BEST</button></div>
     <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`;
@@ -2642,7 +2664,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.it)popItem(+el.dataset.it);});
 // v16-46: coming back from Hero Summon / Fusion → refresh the HEROES page
 ['sm','team'].forEach(id=>{const el=document.getElementById(id);if(el)new MutationObserver(()=>{if(!el.classList.contains('open')&&$('cpGear').classList.contains('open'))renderGear();}).observe(el,{attributes:true,attributeFilter:['class']});});
-$('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}G.cp.ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
+$('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}CPX().ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
   if(a==='payOK'){const g=window.__payGo;window.__payGo=null;closePop();if(g)g();return;}
   if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsGear'){closePop();closeGSum();openGear();return;}
   if(a==='x'){closePop();return;}
@@ -2758,7 +2780,7 @@ function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],
   else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=5?-1:(boss||mini||R()<.6)?Math.floor(R()*6):-1;
   const eq=Math.min(NST-1,Math.round(3+f*3.2));
-  const mul=stageMul(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1);
+  const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1);
   return {f,w,mod,eq,mul,boss,mini,st:{n:'FLOOR '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 function twRew(f){const F=twFloor(f),r={money:REWARD(F.eq).money,dm:5,tk:0,gtk:0,ct:0};
   if(f%5===0)r.tk=2;if(f%10===0){r.dm=100;r.gtk=3;r.ct=1;}if(f%50===0)r.dm+=400;return r;}
@@ -2895,7 +2917,7 @@ function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');
   HUBM.forEach((m,i)=>{const th=ths[i],lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK())||(m.k==='boss'&&!wbOK())||(m.k==='dg'&&!dgOK()),bw=m.full?Math.min(HUB_W,th*m.ar):HUB_W;
     h+='<div class="hubM'+(lock?' lk':'')+'" data-hb="'+m.k+'" style="'+gbx((1024-bw)/2,y,bw,th)+'">'+(m.full?'<img src="'+m.full+'" alt="">':hubTab(m,th))+(st[m.k]?'<b class="hubS">'+st[m.k]+'</b>':'')+'</div>';y+=th+gap;});
   $('hubBox').innerHTML=h;}
-function hubOpen(){rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
+function hubOpen(){HM=0;rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
 function hubClose(){hubEl.classList.remove('open');close();}
 function hubGo(k){if(k==='back'){hubClose();return;}
   if(k==='soon'){TE().toast('🔒 New battle modes are coming soon!',2200);return;}
@@ -2934,7 +2956,7 @@ function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=
   if(boss)w=[mk(n),[cl(TW_BOSS[(f/20-1+ci)%5])]];else if(mini)w=[mk(n),[cl(TW_MINI[((f-10)/20+ci)%5]),one(),one()]];
   else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=10?-1:(boss||mini||R()<.4)?Math.floor(R()*6):-1;
-  const eq=Math.min(NST-1,Math.round(2+f*2.4)),mul=stageMul(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85;
+  const eq=Math.min(NST-1,Math.round(2+f*2.4)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85;
   return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;
 function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/10)*10,dm:3,gtk:0,set:null};
@@ -3052,8 +3074,8 @@ const hubCss=document.createElement('style');hubCss.textContent=`
 `;document.head.appendChild(hubCss);
 
 // ---------------------------------------------------------------- open / close
-function open(){root.classList.add('open');window.__BATTLE_ON=true;showMap();gsBadge();}
-function close(){running=false;cancelAnimationFrame(raf);cancelAnimationFrame(gsRaf);root.classList.remove('open');['cpCard','cpTeam','cpRes','bt','cpGear','cpPop','gSum','tw','hub','ct'].forEach(id=>$(id).classList.remove('open'));window.__BATTLE_ON=false;}
+function open(){HM=hardOK()&&TE().G.cp.hm?1:0;root.classList.add('open');window.__BATTLE_ON=true;showMap();gsBadge();}
+function close(){HM=0;running=false;cancelAnimationFrame(raf);cancelAnimationFrame(gsRaf);root.classList.remove('open');['cpCard','cpTeam','cpRes','bt','cpGear','cpPop','gSum','tw','hub','ct'].forEach(id=>$(id).classList.remove('open'));window.__BATTLE_ON=false;}
 $('gSum').addEventListener('click',e=>{if(e.target.id==='gSum'){closeGSum();return;}const el=e.target.closest('[data-gs]');if(!el)return;const a=el.dataset.gs;
   if(a==='back')closeGSum();else if(a==='hsum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon('m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
   else{const t=e.target.closest('.gsT');if(t)gsRates();}});
@@ -3133,7 +3155,7 @@ const wbReady=()=>wbOK()&&(wbKeys()>0||WB_TIER.some((q,i)=>wbTierSt(i)===1));
 const KEYI=h=>'<img src="img/wb/key.webp" alt="" style="height:'+(h||'1.3em')+';vertical-align:-.3em">';
 function wbRwHtml(r){const T=TE(),a=[];if(r.dm)a.push(T.DMI+' '+r.dm);if(r.tk)a.push(TKI+' '+r.tk);if(r.gt)a.push(GTKI+' '+r.gt);if(r.ct)a.push('<img src="img/cticket.webp" alt="" style="height:1.15em;vertical-align:-.25em"> '+r.ct);return a.join(' &nbsp;');}
 function wbFight(){const w=wbG(),Bo=WBOSS[wbCur()],eq=wbEq();
-  return {wb:1,f:0,eq,mod:-1,mul:stageMul(eq)*.6,L:w.L,weak:Bo.weak,boss:true,mini:false,w:[[Bo.k]],st:{n:Bo.n,bio:18,w:[[Bo.k]],boss:true,mini:false}};}
+  return {wb:1,f:0,eq,mod:-1,mul:stageMul0(eq)*.6,L:w.L,weak:Bo.weak,boss:true,mini:false,w:[[Bo.k]],st:{n:Bo.n,bio:18,w:[[Bo.k]],boss:true,mini:false}};}
 const wbMap=()=>TALL.map(1024,1536,[[1250,1]]),wbBgMap=()=>TALL.map(1024,1536,[[1000,1]]);
 addEventListener('resize',()=>{if(wbEl.classList.contains('open'))wbRender();});
 // box 1024 x 1536 units (taller phones: the asphalt row at y=1150 is stretched, the reward list grows)
@@ -3293,7 +3315,7 @@ function dgFloor(k,f){const D=DG[k],ki=DG_K.indexOf(k),R=seeded(9001+ki*1013+f*8
   const n=Math.min(5,3+Math.floor(f/12)),one=()=>cl(pk(D.pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
   const boss=f%10===0,mini=f%5===0&&!boss;let w;
   if(boss)w=[mk(n),[cl(D.boss)]];else if(mini)w=[mk(n),[cl(D.mini),one(),one()]];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
-  const eq=dgEq(f),mul=stageMul(eq)*(boss?.78:mini?.9:1)*.9;
+  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9;
   return {dg:k,f,w,mod:-1,eq,mul,boss,mini,st:{n:D.n+' · FLOOR '+f,bio:18,w,boss,mini}};}
 function dgRew(k,f){const m=REWARD(dgEq(f)).money,g=dgG(),r={money:Math.round(m*(k==='vault'?5:.6)/10)*10};
   if(k==='mine')r.gear={s:GSLOT[g.c.mine%6].k,r:DG_GR.mine(f)};
