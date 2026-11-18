@@ -22,6 +22,8 @@ Ultima actualizare: 15 noiembrie 2026 (v16-45 – online: clasament, chat, aren�
 | Ștergere date (URL) | https://mariussima0077-cell.github.io/delete-data.html | ✅ online |
 | Package Android | PWABuilder (TWA), **fără Play Billing** încă | ✅ făcut |
 | Test închis | 12 testeri × 14 zile | ⏳ |
+| Test intern – aplicația nativă (Capacitor) | release **106 (2.0.106)**, AAB semnat cu cheia de upload, publicat 18 nov 2026 de Claude; testeri: lista „Interni Marius” (torqueempirehelp@gmail.com); link: https://play.google.com/apps/internaltest/4701532344069203705 | ✅ 18 nov 2026 |
+| Cont de comerciant (Google Payments) | necesar pentru produsele din aplicație (date bancare/fiscale) – îl face DOAR Marius | ⏳ de făcut de Marius |
 | Produs DUNGEON PASS (v16-63) | `dungeon_pass_30d`, produs gestionat **consumabil**, €2.99, dă 30 zile: +2 chei/zi în Dungeons + SWEEP. Dungeons dau DOAR recompense fixe (bani, echipament cu statistici fixe, NITRO BOOST) – **niciodată diamante sau bilete** → rămâne „éléments aléatoires: Non” | ⏳ de creat în Play Console când pornește Play Billing |
 | Chat între jucători (UGC) | Marius a aprobat (15 nov): filtru de cuvinte, reguli acceptate la prima intrare, Mute + Report, ascundere automată la 3 raportări, pagina de moderare `/admin/chat` (șterge, mute, resetează numele), mesaje șterse după 7 zile | ✅ în joc din v16-45 |
 
