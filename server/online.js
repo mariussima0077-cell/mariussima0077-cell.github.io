@@ -13,6 +13,11 @@ const TIERS = [[0,0,'III'],[1050,0,'II'],[1100,0,'I'],[1150,1,'III'],[1250,1,'II
   [1720,3,'III'],[1820,3,'II'],[1920,3,'I'],[2020,4,'III'],[2140,4,'II'],[2260,4,'I'],[2400,5,'']];
 export const tierOf = p => { let t = TIERS[0]; for (const x of TIERS) if (p >= x[0]) t = x; const i = TIERS.indexOf(t), nx = TIERS[i + 1];
   return {lg:t[1], div:t[2], name:LEAGUES[t[1]] + (t[2] ? ' ' + t[2] : ''), from:t[0], next:nx ? nx[0] : null}; };
+// v16-85: VIP level is computed HERE from the VIP points the anti-cheat bot already has (players.vip),
+// never taken from the client (old app versions sent POINTS as the level → 'VIP 15' at stage 1-13).
+const VIP_PTS = [0, 50, 220, 510, 930, 1500, 2200, 3050, 4040, 5180, 6480, 7920, 9520, 11270, 13180, 15250, 17480, 19860, 22410, 25120, 28000];
+const vipLvOf = pts => { let n = 0; for (let i = 1; i < VIP_PTS.length; i++) if ((pts | 0) >= VIP_PTS[i]) n = i; return n; };
+const VIP_SQL = 'CASE ' + VIP_PTS.map((v, i) => [v, i]).reverse().map(([v, i]) => `WHEN pl.vip>=${v} THEN ${i}`).join(' ') + ' ELSE 0 END';
 const START_PTS = 1000, ARENA_TK = 5, TK_EVERY = 2 * HOUR;
 const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena daily reward per league: [diamonds, recruit tickets]
 // v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
@@ -337,7 +342,9 @@ async function rewardsTick(env) {
   await db.prepare('DELETE FROM ahist WHERE t<?').bind(now - 14 * DAY).run();
   await db.prepare('DELETE FROM inbox WHERE (got=1 AND t<?) OR t<?').bind(now - 7 * DAY, now - 60 * DAY).run();
 }
-export async function onlineCron(env) { await ensure(env); await rewardsTick(env); await cupTick(env); }
+export async function onlineCron(env) { await ensure(env);
+  try { await env.DB.prepare(`UPDATE prof SET vip=(SELECT ${VIP_SQL} FROM players pl WHERE pl.pid=prof.pid) WHERE pid IN (SELECT pid FROM players)`).run(); } catch (e) {}   // v16-85: fix every profile
+  await rewardsTick(env); await cupTick(env); }
 
 // ------------------------------------------------------------------ the API
 export async function online(op, b, env) {
@@ -351,7 +358,7 @@ export async function online(op, b, env) {
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
     const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, team = cleanTeam(b.team), lang = String(b.lang || 'en').slice(0, 12);
-    const best = num(s.best, 0, 1000) | 0, vip = num(s.vip, 0, 20) | 0, rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 200) | 0, pw = teamPow(team);
+    const best = num(s.best, 0, 1000) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 200) | 0, pw = teamPow(team);
     const cunl = (Array.isArray(b.unl) ? b.unl : []).filter(k => ['wr','boss','gear','speed','f1'].includes(k)).join(',');
     const icon = String(b.icon || (team[0] && team[0].id) || 'm0_0').replace(/[^a-z0-9_]/g, '').slice(0, 12), dk = dayKey(now);
     if (!p) {
