@@ -39,6 +39,7 @@ export default {
       if (url.pathname === '/admin/chat') return env.ADMIN_KEY && url.searchParams.get('key') === env.ADMIN_KEY ? onlineAdmin(url, env) : new Response('no', {status:403});
       if (url.pathname === '/admin') return admin(url, env);
       if (url.pathname === '/') return json({ok:true, name:'Torque Guard', time:Date.now()});
+      if (url.pathname === '/api/diag') return json(await diag(env));   // v16-82: is the Play API reachable? (no secrets in the answer)
       return json({err:'not found'}, 404);
     } catch (e) { return json({err:String(e)}, 500); }
   },
@@ -212,6 +213,18 @@ async function purchase(b, env) {
   await db.prepare('INSERT INTO purchases(token,pid,sku,type,t,state,expiry) VALUES(?,?,?,?,?,?,?) ON CONFLICT(token) DO UPDATE SET state=excluded.state, expiry=excluded.expiry')
     .bind(b.token, b.pid, b.sku, b.type, Date.now(), valid ? 'ok' : 'bad', expiry).run();
   return {valid, expiry: expiry || undefined};
+}
+
+// v16-82: checks the Google side of /api/purchase with a fake token → shows Google's error text
+// ("invalid token" = all good; "insufficient permissions" = the service account has no access yet)
+async function diag(env) {
+  const out = {pkg: env.PACKAGE_NAME || null, sa: !!env.GOOGLE_SA};
+  try { const at = await gToken(env); out.token = !!at;
+    const r = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${env.PACKAGE_NAME}/purchases/products/pack_starter/tokens/diag-fake-token`, {headers:{authorization:'Bearer ' + at}});
+    const j = await r.json().catch(() => ({})); out.status = r.status; out.google = (j.error && j.error.message) || 'ok';
+    const q = await env.DB.prepare("SELECT sku,type,state,t FROM purchases ORDER BY t DESC LIMIT 5").all(); out.last = (q.results || []).map(x => ({sku:x.sku, type:x.type, state:x.state, t:new Date(x.t).toISOString()}));
+  } catch (e) { out.err = String(e).slice(0, 200); }
+  return out;
 }
 
 // OAuth token for the Play Developer API, signed with the service-account key (RS256, WebCrypto)
