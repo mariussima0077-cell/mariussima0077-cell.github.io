@@ -1,5 +1,7 @@
 # TORQUE EMPIRE – Prompturi ChatGPT pentru TUTORIAL (18 nov 2026)
 
+> ✅ **FĂCUTE** – pozele sunt în joc din v16-80 (`img/shop/`).
+
 Ghidul din tutorial = **MAMA ROSA** (eroina Legendary care există deja în joc, `m4_1`). Acum folosește portretul ei mic; pozele de mai jos îl înlocuiesc.
 Fiecare prompt conține stilul complet – copiază blocul întreg în ChatGPT.
 

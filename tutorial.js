@@ -6,7 +6,8 @@
 'use strict';
 const Q=new URLSearchParams(location.search);
 let FORCE=Q.has('tut');
-const GUIDE={name:'MAMA ROSA',role:'CHIEF MECHANIC',img:'img/hero/m4_1.webp'}; // placeholder until the ChatGPT guide picture arrives
+const GUIDE={name:'MAMA ROSA',role:'CHIEF MECHANIC'}; // v16-80: Marius' pictures (img/shop/rosa_*, dlg_*, hand0/1)
+const POSE=k=>'img/shop/rosa_'+k+'.webp';
 
 // ---------- styles ----------
 const css=document.createElement('style');css.textContent=`
@@ -15,25 +16,27 @@ const css=document.createElement('style');css.textContent=`
 #tut .hole{position:absolute;border-radius:14px;box-shadow:0 0 0 9999px rgba(4,8,14,.68);transition:left .25s,top .25s,width .25s,height .25s,opacity .2s}
 #tut .ring{position:absolute;border-radius:16px;border:3px solid #ffd54a;box-shadow:0 0 14px #ffb300,inset 0 0 10px rgba(255,213,74,.5);animation:tutR 1.1s ease-in-out infinite}
 @keyframes tutR{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.07);opacity:.65}}
-#tut .hand{position:absolute;width:58px;height:58px;margin:-6px 0 0 -14px;animation:tutH 1.1s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.6))}
-@keyframes tutH{0%,100%{transform:translate(8px,14px) scale(1)}45%{transform:translate(0,0) scale(.9)}55%{transform:translate(0,0) scale(.9)}}
-#tut .bub{position:absolute;left:10px;right:10px;pointer-events:auto;display:flex;align-items:flex-end;gap:0;transition:top .3s,bottom .3s;animation:tutIn .35s ease-out}
+#tut .hand{position:absolute;width:66px;height:72px;margin:-4px 0 0 -6px;animation:tutH 1.1s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.6))}
+#tut .hand img{position:absolute;left:0;top:0;width:66px;height:auto}#tut .hand img.h1{left:-21px;top:-16px;width:79px}#tut .hand .h1{opacity:0;animation:tutP 1.1s steps(1) infinite}
+@keyframes tutP{0%,38%{opacity:0}40%,62%{opacity:1}64%,100%{opacity:0}}
+@keyframes tutH{0%,100%{transform:translate(10px,14px)}45%,55%{transform:translate(0,0)}}
+#tut .bub{position:absolute;left:6px;right:8px;pointer-events:auto;display:flex;align-items:flex-end;gap:0;transition:top .3s,bottom .3s;animation:tutIn .35s ease-out}
 @keyframes tutIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-#tut .bub .pt{flex:0 0 92px;height:92px;border-radius:50%;border:3px solid #ffd54a;background:#2a1a00 center/cover;box-shadow:0 0 0 3px #5e3d00,0 6px 14px rgba(0,0,0,.6);position:relative;z-index:2;margin-right:-18px}
-#tut .bub .bx{flex:1;min-height:92px;background:linear-gradient(#fff8e1,#ffe9b0);border:3px solid #5e3d00;border-radius:16px;padding:9px 12px 10px 28px;color:#2a1a00;box-shadow:0 6px 16px rgba(0,0,0,.55),inset 0 2px 0 #fff;position:relative}
-#tut .bub .nm{display:inline-block;margin:-22px 0 4px -4px;background:linear-gradient(#ffcb3d,#ee7a00);color:#2a1a00;border:2px solid #5e3d00;border-radius:9px;padding:1px 9px;font-weight:900;font-size:12px;letter-spacing:.5px}
-#tut .bub .nm small{font-weight:700;opacity:.75;font-size:10px;margin-left:4px}
+#tut .bub .pt{flex:0 0 104px;height:150px;background:none;position:relative;z-index:2;margin:0 -16px -6px -6px}
+#tut .bub .pt img{position:absolute;left:0;bottom:0;width:104px;height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+#tut .bub .bx{flex:1;min-width:0;min-height:96px;border:solid transparent;border-width:22px 22px 22px 26px;border-image:url(img/shop/dlg_box.webp) 74 74 74 80 fill / 22px 22px 22px 26px stretch;padding:4px 2px 0 12px;color:#2a1a00;filter:drop-shadow(0 6px 10px rgba(0,0,0,.55));position:relative}
+#tut .bub .nm{display:inline-block;margin:-36px 0 4px -10px;background:url(img/shop/dlg_name.webp) center/100% 100% no-repeat;color:#fff;text-shadow:0 1px 0 #5e3d00,0 0 3px #5e3d00;padding:7px 22px 9px;font-weight:900;font-size:12px;letter-spacing:.5px;white-space:nowrap}
+#tut .bub .nm small{font-weight:800;opacity:.9;font-size:9.5px;margin-left:4px}
 #tut .bub .tx{font-size:15px;line-height:1.3;font-weight:700}
 #tut .bub .tx b{color:#c62828}
-#tut .bub .bt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;min-height:30px}
+#tut .bub .bt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;min-height:30px;padding-right:14px}
 #tut .bub .sk{white-space:nowrap;font-size:12px;color:#7a5a20;font-weight:800;text-decoration:underline;padding:6px 4px;background:none;border:0}
-#tut .bub .nx{background:linear-gradient(180deg,#fff0a8 0,#ffcb3d 42%,#ff9d0d 56%,#ee7a00 100%);border:2px solid #5e3d00;border-radius:12px;padding:6px 18px;font-weight:900;font-size:15px;color:#2a1a00;box-shadow:0 3px 0 #8f4c00}
-#tut .bub .nx:active{transform:translateY(2px);box-shadow:0 1px 0 #8f4c00}
+#tut .bub .nx{background:url(img/shop/dlg_next.webp) center/100% 100% no-repeat;border:0;min-width:104px;padding:9px 40px 10px 14px;font-weight:900;font-size:13px;color:#fff;text-shadow:0 1px 0 #7a2e00,0 0 3px #7a2e00;margin:0 -6px -8px 0;white-space:nowrap}
+#tut .bub .nx:active{transform:translateY(2px) scale(.97)}
 #tut .bub .dots{white-space:nowrap;font-size:10px;color:#9a7a40;font-weight:900;letter-spacing:2px}
 #tut .gift{display:flex;gap:10px;justify-content:center;margin-top:6px;font-weight:900;font-size:16px}
 `;document.head.appendChild(css);
 
-const HAND='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M22 6c3 0 5 2 5 5v18l2-1c2-1 4 0 5 1l1 2 2-1c2-1 4 0 5 2l1 1 2-1c2-1 5 1 5 3v12c0 8-5 15-14 15h-4c-6 0-10-3-13-8l-8-13c-1-2 0-5 2-6 2-1 4 0 5 1l3 4V11c0-3 2-5 5-5z" fill="#fff3e0" stroke="#3e2723" stroke-width="3" stroke-linejoin="round"/><path d="M29 32v8M37 33v7M45 35v6" stroke="#3e2723" stroke-width="2.5" stroke-linecap="round"/></svg>');
 
 // ---------- helpers (game globals from index.html) ----------
 const $=id=>document.getElementById(id);
@@ -64,13 +67,13 @@ const S=[
  {el:()=>$('shBtn'),tap:1,enter:function(){lv0=G.lv.service||0;this.next=FORCE?'NEXT':'';if(!FORCE&&G.money<upCost()){G.money=upCost();try{save();}catch(e){}}},t:()=>`Tap <b>UPGRADE</b>: more mechanics, faster work and bigger pay.`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>(G.lv.service||0)>lv0},
  {el:()=>$('smBtn'),tap:1,enter:()=>{try{closePanel();}catch(e){}},t:`Your mechanics are also <b>HEROES</b>! Open <b>SUMMON</b> – you have free Recruit Tickets.`,done:()=>isOpen('sm')},
  {el:()=>document.querySelector('#smBox [data-a="sum"][data-n="10"]')||document.querySelector('#smBox [data-a="sum"]'),tap:1,enter:function(){tk0=G.h.tk;hc0=(G.h.hist||[]).length;this.next=FORCE?'NEXT':'';},t:()=>`Tap <b>×10</b> to recruit 11 heroes at once!`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>G.h.tk<tk0||(G.h.hist||[]).length!==hc0||isOpen('res')},
- {free:1,top:1,t:`Nice team! Heroes <b>work in your garage</b> and <b>fight in battles</b>. Now close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
+ {free:1,top:1,p:'thumb',t:`Nice team! Heroes <b>work in your garage</b> and <b>fight in battles</b>. Now close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
  {el:()=>$('cpBtn'),tap:1,t:`Monsters made of car parts are attacking the city! Tap <b>BATTLE</b>.`,done:()=>isOpen('hub')||isOpen('cp')},
  {el:()=>document.querySelector('#hub.open [data-hb="camp"]'),tap:1,t:`Open the <b>CAMPAIGN</b>.`,done:()=>vis(document.querySelector('#cpPath .node.cur'))&&!isOpen('hub')},
  {el:()=>document.querySelector('#cpPath .node.cur'),tap:1,enter:()=>{best0=G.cp.best;},t:`Tap your stage.`,done:()=>isOpen('cpCard')},
  {el:()=>document.querySelector('#cpCard.open .ppF'),tap:1,t:`Your best heroes are already in the team. Press <b>FIGHT!</b>`,done:()=>isOpen('bt')},
  {hide:1,done:()=>isOpen('cpRes')},
- {free:1,top:1,t:()=>G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear. Now go back to your garage with <b>↩</b>.`:`So close! Make your heroes stronger with gear and try again. Go back to your garage with <b>↩</b>.`,done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
+ {free:1,top:1,res:1,t:()=>G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear. Now go back to your garage with <b>↩</b>.`:`So close! Make your heroes stronger with gear and try again. Go back to your garage with <b>↩</b>.`,done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
  {el:()=>$('dqBtn'),t:`<b>DAILY QUESTS</b>: finish them every day for VIP points, diamonds and tickets.`,next:'NEXT'},
  {el:()=>$('idBtn'),t:`<b>IDLE REWARDS</b>: your garage keeps earning while you are offline. Collect it here!`,next:'NEXT'},
  {t:()=>`That's it, boss! Here is a welcome gift. Now build your <b>TORQUE EMPIRE</b>!<div class="gift"><span>${TE().DMI} 100</span><span>${X().TKI()} 2</span></div>`,next:'START',gift:1},
@@ -78,9 +81,9 @@ const S=[
 function upCost(){try{return X().upCost('service');}catch(e){return 0;}}
 
 // ---------- overlay ----------
-const root=document.createElement('div');root.id='tut';root.innerHTML='<div class="hole"></div><div class="ring"></div><img class="hand" alt=""><div class="tb" id="tbT"></div><div class="tb" id="tbB"></div><div class="tb" id="tbL"></div><div class="tb" id="tbR"></div><div class="bub"><div class="pt"></div><div class="bx"><div class="nm"></div><div class="tx"></div><div class="bt"><button class="sk">SKIP TUTORIAL</button><span class="dots"></span><button class="nx">NEXT</button></div></div></div>';
+const root=document.createElement('div');root.id='tut';root.innerHTML='<div class="hole"></div><div class="ring"></div><div class="hand"><img class="h0" src="img/shop/hand0.webp" alt=""><img class="h1" src="img/shop/hand1.webp" alt=""></div><div class="tb" id="tbT"></div><div class="tb" id="tbB"></div><div class="tb" id="tbL"></div><div class="tb" id="tbR"></div><div class="bub"><div class="pt"><img alt=""></div><div class="bx"><div class="nm"></div><div class="tx"></div><div class="bt"><button class="sk">SKIP TUTORIAL</button><span class="dots"></span><button class="nx">NEXT</button></div></div></div>';
 const hole=root.querySelector('.hole'),ring=root.querySelector('.ring'),hand=root.querySelector('.hand'),bub=root.querySelector('.bub'),tx=root.querySelector('.tx'),nx=root.querySelector('.nx'),sk=root.querySelector('.sk'),dots=root.querySelector('.dots');
-hand.src=HAND;root.querySelector('.pt').style.backgroundImage='url('+GUIDE.img+')';root.querySelector('.nm').innerHTML=GUIDE.name+'<small>'+GUIDE.role+'</small>';
+const ptI=root.querySelector('.pt img');let pose='';function setPose(k){if(k!==pose){pose=k;ptI.src=POSE(k);}}root.querySelector('.nm').innerHTML=GUIDE.name+'<small>'+GUIDE.role+'</small>';
 const tb={T:$('tbT')||root.querySelector('#tbT'),B:root.querySelector('#tbB'),L:root.querySelector('#tbL'),R:root.querySelector('#tbR')};
 let i=-1,cur=null,skipArm=0,lastTx='';
 function place(L,T,Wd,H){const s=(e,a,b,c,d)=>{e.style.left=a+'px';e.style.top=b+'px';e.style.width=Math.max(0,c)+'px';e.style.height=Math.max(0,d)+'px';};
@@ -88,6 +91,7 @@ function place(L,T,Wd,H){const s=(e,a,b,c,d)=>{e.style.left=a+'px';e.style.top=b
 let L=S,MINI=null;
 function go(n){i=n;cur=L[i];skipArm=0;lastTx='';if(!cur){end();return;}
   if(cur.enter)try{cur.enter();}catch(e){}
+  setPose(cur.p||(cur.gift?'cheer':i===0&&!MINI?'talk':(cur.el||cur.w)?'point':'talk'));
   if(cur.w){camTo(R[cur.w]());try{if(sel0()&&!cur.tap)closePanel();}catch(e){}}
   nx.textContent=cur.next||'';nx.style.display=cur.next?'':'none';
   dots.textContent=MINI?'':(i+1)+' / '+L.length;sk.style.visibility=cur.gift||MINI?'hidden':'';
@@ -105,6 +109,7 @@ function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;if
   camStep();
   if(cur.done){let ok=false;try{ok=cur.done();}catch(e){}if(ok){go(i+1);return;}}
   const t=typeof cur.t==='function'?cur.t():cur.t;if(t!==lastTx){tx.innerHTML=t||'';lastTx=t;}
+  if(cur.res)setPose(G.cp.best>best0?'thumb':'think');
   // target rectangle on screen
   let r=null;
   if(cur.w)r=worldRect(R[cur.w]());

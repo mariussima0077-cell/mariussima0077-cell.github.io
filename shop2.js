@@ -165,8 +165,11 @@ button{font-family:inherit;cursor:pointer}
 #s2 .dp .buy{min-width:0;width:92%;padding:7px 0;font-size:14px}
 #s2 .vp{--c:#9fb0c0;background:linear-gradient(135deg,#2c3542,#11161d 70%)}#s2 .vp.g{--c:#ffcf5a;background:linear-gradient(135deg,#5e430c,#1e1504 70%)}
 #s2 .vp.p{--c:#e9c8ff;background:linear-gradient(135deg,#43275e,#170d24 60%,#0d1a2a)}
-#s2 .vp .top{display:flex;gap:10px;align-items:center}#s2 .vp .top img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 3px 5px #000)}
-#s2 .vp.s .top img{filter:grayscale(1) brightness(1.3) drop-shadow(0 3px 5px #000)}#s2 .vp.p .top img{filter:hue-rotate(230deg) saturate(1.4) drop-shadow(0 0 8px #d9a6ff)}
+#s2 .card .top{display:flex;gap:10px;align-items:center}#s2 .card .top img{width:64px;height:64px;object-fit:contain;flex:none;filter:drop-shadow(0 3px 5px #000)}
+#s2 .fund .top img{width:72px;height:72px;margin:-4px 0 -2px}
+#s2 .bn{position:relative;margin:-12px -12px 8px;line-height:0}#s2 .bn>img{display:block;width:100%}
+#s2 .bn .hp{position:absolute;left:41%;bottom:6%;height:84%;width:auto;filter:drop-shadow(0 2px 4px #000)}
+#s2 .card.pk .rib{top:auto;bottom:-2px;right:6px;transform:none;padding:2px 8px;border-radius:8px 8px 0 0;font-size:10px}
 #s2 .bl{list-style:none;margin:8px 0 10px;padding:0;font-size:12.5px;line-height:1.35}
 #s2 .bl li{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.07)}
 #s2 .bl li img{width:20px;height:20px;object-fit:contain;flex:none}#s2 .bl li b{margin-left:auto;color:#7CFC9A;white-space:nowrap}
@@ -205,7 +208,7 @@ function render(){
     if(nxt>=0){
       h+='<div class="sec">SPECIAL OFFERS · ONE TIME ONLY</div><div class="chain">'+PACKS.map((p,i)=>'<i class="'+(i<=nxt?'on':'')+'"></i>').join('')+'</div>';
       PACKS.forEach((p,i)=>{ if(pk[p.k]) return; const lk=i>nxt, hb=t.HB[p.hero];
-        h+='<div class="card '+p.cls+(lk?' locked':'')+'">'+(p.rib&&!lk?'<div class="rib">'+p.rib+'</div>':'')+'<h3>'+p.n+'</h3><div class="sub">'+(lk?'🔒 Opens after the '+PACKS[i-1].n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):(i===3?'The last offer – buy it once.':'Buy it once – then the next pack opens.'))+'</div><div class="items">'+
+        h+='<div class="card pk '+p.cls+(lk?' locked':'')+'"><div class="bn"><img src="'+IMG('shop/pk_'+['starter','rookie','pro','elite'][i])+'" alt="'+p.n+'"><img class="hp" src="img/hero/'+p.hero+'.webp" alt="">'+(p.rib&&!lk?'<div class="rib">'+p.rib+'</div>':'')+'</div><div class="sub">'+(lk?'🔒 Opens after the '+PACKS[i-1].n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):(i===3?'The last offer – buy it once.':'Buy it once – then the next pack opens.'))+'</div><div class="items">'+
           item('img/hero/'+p.hero+'.webp', hb?hb.n.split(' ')[0]+(hb.n.split(' ')[1]&&hb.n.split(' ')[0].length<5?' '+hb.n.split(' ')[1]:''):'Hero', p.hero[1]==='4'?'hero lg':'hero ep')+
           item(IMG('ui3/v_dm'),p.dm.toLocaleString('en'))+item('img/ticket.webp','×'+p.tk)+(p.gt?item('img/gticket.webp','×'+p.gt):'')+(p.ct?item('img/cticket.webp','×'+p.ct):'')+(p.money?item(IMG('ui3/v_coins'),'$'+t.fmt(p.money)):'')+
           '</div><div class="foot"><span class="val"><b>×'+p.val+'</b>VALUE</span>'+(lk?'<button class="buy lock">🔒 '+P(p.k,p.price)+'</button>':'<button class="buy" data-b="'+p.k+'">'+P(p.k,p.price)+'</button>')+'</div></div>'; });
@@ -230,13 +233,13 @@ function render(){
       if(dm) return '<span class="tot">30 days · no renewal</span><button class="buy dm'+(conf==='sil'?' cf':'')+'" data-b="sil">'+(conf==='sil'?'CONFIRM?':IC.dm+PASS.sil.cost.toLocaleString('en'))+'</button>';
       return '<span class="tot">'+label+' / month · cancel anytime</span><button class="buy'+(tr&&tr!=='sil'?' lock':'')+'" data-b="'+key+'">'+P(key,label)+'</button>'; };
     h+='<div class="sec">VIP PASS · 30 DAYS'+(tr?' · <span style="color:#7CFC9A">'+PASS[tr].n+'</span>':'')+'</div>';
-    h+='<div class="card vp s"><div class="top"><img src="'+IMG('ui3/sp_vip')+'" alt=""><div><h3>SILVER PASS</h3><div class="sub">Free to play – paid with diamonds you earn</div></div></div><ul class="bl">'+
+    h+='<div class="card vp s"><div class="top"><img src="'+IMG('shop/vp_sil')+'" alt=""><div><h3>SILVER PASS</h3><div class="sub">Free to play – paid with diamonds you earn</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_crown'),'VIP benefits','×1.2')+row(IMG('ui3/v_idle'),'Idle Rewards','+1 h')+row('img/ticket.webp','Recruit Ticket every day','+1')+row(IMG('ui3/v_dm'),'Diamonds every day','–',1)+row(IMG('ui3/sp_speed'),'Battle Speed ×2','–',1)+
       '</ul><div class="foot">'+btn('sil','',1)+'</div></div>';
-    h+='<div class="card vp g"><div class="rib">POPULAR</div><div class="top"><img src="'+IMG('ui3/sp_vip')+'" alt=""><div><h3>GOLD PASS</h3><div class="sub">Monthly subscription</div></div></div><ul class="bl">'+
+    h+='<div class="card vp g"><div class="rib">POPULAR</div><div class="top"><img src="'+IMG('shop/vp_gold')+'" alt=""><div><h3>GOLD PASS</h3><div class="sub">Monthly subscription</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','300')+row(IMG('ui3/v_dm'),'Diamonds every day','+100')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×1.5')+row(IMG('ui3/v_idle'),'Idle Rewards','+2 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×2','✓')+
       '</ul><div class="tot">In 30 days: 3,300 💎 + 60 tickets ≈ 93 summons</div><div class="foot">'+btn('gold','€5.99')+'</div></div>';
-    h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('ui3/sp_vip')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
+    h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×2','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
       '</ul><div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
     h+='<div class="note">Only one VIP Pass is active at a time. The daily gift arrives the first time you open the game each day. To switch Gold ↔ Platinum, cancel in Google Play → Subscriptions and buy the new one when the old one ends. VIP points still come only from Daily Quests.</div>';
@@ -245,7 +248,7 @@ function render(){
     h+='<div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>';
     for(const k of ['fn','fh']){ const F=FUND[k], own=pk[k], done=chDone(F.hard), s=S()[k];
       const tot=F.ms.reduce((a,m)=>({dm:a.dm+m.dm,tk:a.tk+m.tk,gt:a.gt+(m.gt||0)}),{dm:0,tk:0,gt:0});
-      h+='<div class="card fund'+(F.hard?' h':'')+'">'+(F.hard?'<div class="rib">HARD ×1.5</div>':'')+'<h3>'+F.n+(own?'<span class="act">OWNED</span>':'')+'</h3><div class="sub">'+(F.hard?'Rewards at every 5th chapter of HARD MODE – bigger rewards.':'Rewards at every 5th chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward to claim it.':'')+'</div><div class="ms">'+
+      h+='<div class="card fund'+(F.hard?' h':'')+'">'+(F.hard?'<div class="rib">HARD ×1.5</div>':'')+'<div class="top"><img src="'+IMG('shop/fund_'+(F.hard?'h':'n'))+'" alt=""><div><h3>'+F.n+(own?'<span class="act">OWNED</span>':'')+'</h3><div class="sub">'+(F.hard?'Rewards at every 5th chapter of HARD MODE – bigger rewards.':'Rewards at every 5th chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward to claim it.':'')+'</div></div></div><div class="ms">'+
         F.ms.map((m,i)=>{ const rd=done>=(i+1)*5, dn=s.includes(i), cl=own&&rd&&!dn;
           return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'>'+(F.hard?'H ':'CH ')+((i+1)*5)+'<b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
         '</div><div class="tot">Total: '+tot.dm.toLocaleString('en')+' 💎 + '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · your progress: '+(F.hard?'H ':'CH ')+done+'</div><div class="foot"><span class="val"><b>×'+(F.hard?9:6)+'</b>VALUE</span>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }

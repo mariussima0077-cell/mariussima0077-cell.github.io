@@ -416,10 +416,9 @@ const css3=document.createElement('style');css3.textContent=`
 .gcTot{margin:12px 4px 0;padding:10px 12px;border-radius:12px;background:#0b1424;box-shadow:inset 0 0 0 2px #ffb300;font:800 12.5px system-ui;color:#ffe9a8;text-align:center}
 .gcTot b{color:#7CFC9A}
 /*UI3MORE*/
-#cpHM{position:absolute;left:50%;top:100%;transform:translate(-50%,6px);z-index:4;display:flex;padding:3px;border-radius:20px;border:2px solid #5e3d00;background:#120c07e8;box-shadow:0 3px 0 #000a,0 0 10px #000;font:900 13px system-ui;letter-spacing:.5px}
-#cpHM span{padding:6px 16px;border-radius:15px;color:#9a8a78}
-#cpHM .n{background:linear-gradient(#fff0a8,#ffcb3d 45%,#ee7a00);color:#2a1a00}
-#cpHM.on .n{background:none;color:#9a8a78}#cpHM.on .h{background:linear-gradient(#ff8a80,#e53935 50%,#8e0000);color:#fff;text-shadow:0 1px 0 #000;box-shadow:0 0 10px #ff1744}
+#cpHM{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);z-index:4;display:flex;gap:2px;align-items:center;padding:7px 13px 8px;border:0;background:url(img/shop/hm_box.webp) center/100% 100% no-repeat;filter:drop-shadow(0 3px 4px #000a)}
+#cpHM img{display:block;height:34px;width:auto}
+#cpHM img.off{filter:grayscale(.85) brightness(.62)}
 #cp.hm #cpMap{background:#2a1010!important}#cp.hm #cpPath{filter:saturate(.75) hue-rotate(-18deg) brightness(.85)}
 #cp.hm #cpPath .node{filter:hue-rotate(18deg) brightness(1.18) saturate(1.3)}
 
@@ -2384,7 +2383,8 @@ $('cpTk').innerHTML=TKI+' '+G.h.tk;const c=curCh(),C=CHAP[c];
 function hmBtn(){let b=$('cpHM');if(!b){b=document.createElement('button');b.id='cpHM';$('cpTop').appendChild(b);
     b.onclick=()=>{const T=TE(),G=T.G;if(!hardOK()){T.toast('🔒 HARD MODE opens after NORMAL chapter 1 (stage 1-20)',2600);return;}
       HM=HM?0:1;G.cp.hm=HM;T.save();showMap();if(HM&&!G.cp.hmSeen){G.cp.hmSeen=1;T.save();popW('HARD MODE','<div style="padding:4px 2px;line-height:1.45">The same chapters with <b style="color:#ff5252">much stronger monsters</b> – and <b style="color:#7CFC9A">×'+HARD_RW+' rewards</b> (money, tickets, diamonds).<br><br>HARD chapter N opens when you clear NORMAL chapter N.</div>');}};}
-  b.className=HM?'on':'';b.innerHTML='<span class="n">NORMAL</span><span class="h">'+(hardOK()?'':'🔒 ')+'HARD</span>';}
+  b.className=HM?'on':'';const ok=hardOK(),I=(f,c)=>'<img src="img/shop/'+f+'.webp" alt=""'+(c?' class="'+c+'"':'')+'>'; // v16-80: Marius' NORMAL / HARD tabs
+  b.innerHTML=I(HM?'hm_n0':'hm_n1')+(!ok?I('hm_h0'):I('hm_h1',HM?'':'off'));}
 function chList(){const T=TE(),G=T.G,cur=curCh();let h=`<div class="pT">${IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')} ALL CHAPTERS</div><div class="pD">10 acts × 5 worlds · ${NCH} chapters · ${NST} stages</div><div class="chL">`;
   const PX=CPX();for(let c=0;c<NCH;c++){const C=CHAP[c],op=chOpen(c),done=Math.max(0,Math.min(SPC,PX.best-c*SPC));let st=0;for(let j=0;j<SPC;j++)st+=PX.stars[c*SPC+j]||0;
     if(c%5===0)h+=`<div class="chAct">ACT ${c/5+1}${c?' · '+ACTS[c/5].n.toUpperCase():' · ORIGINS'}</div>`;

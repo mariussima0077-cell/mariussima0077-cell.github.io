@@ -1,4 +1,6 @@
 # TORQUE EMPIRE – Prompturi ChatGPT: SHOP nou + HARD MODE (18 nov 2026)
+
+> ✅ **FĂCUTE** – pozele sunt în joc din v16-80 (`img/shop/`).
 Imaginile care mai lipsesc (opționale – acum sunt desenate în cod / iconițe vechi).
 Fiecare prompt are stilul complet – se copiază blocul întreg. Fond verde = Claude decupează.
 Tutorialul (MAMA ROSA, dialog, mânuța) → `PROMPTS_TUTORIAL.md`.
