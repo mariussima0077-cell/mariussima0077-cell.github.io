@@ -2213,7 +2213,7 @@ function drawOffer(t){g.fillStyle='rgba(0,0,0,.78)';g.fillRect(0,0,W,H);HIT=[];c
   const gr=g.createLinearGradient(0,y,0,y+bh2);gr.addColorStop(0,'#3a2410');gr.addColorStop(1,'#150c06');g.fillStyle=gr;rr(g,x,y,bw,bh2,18);g.fill();g.strokeStyle='#ffb300';g.lineWidth=2.5;g.stroke();
   g.drawImage(badgeCv('aspd','#ff6d00',96),W/2-36,y+16,72,72);g.textAlign='center';g.fillStyle='#ffe082';g.font='900 '+Math.round(22*Math.min(1.2,S))+'px system-ui';g.fillText('BATTLE SPEED ×2',W/2,y+116);
   g.fillStyle='#e0c6ad';g.font='700 13px system-ui';g.fillText('×1.5 is free for everyone.',W/2,y+142);g.fillText('×2 is a pack – yours forever, every chapter.',W/2,y+161);
-  btn(x+20,y+182,bw-40,48,(window.SHOP2&&SHOP2.live?'€2.99':'€4.99')+' · UNLOCK ×2',true,'buy');btn(x+20,y+240,bw-40,40,'NO THANKS',false,'nobuy');
+  btn(x+20,y+182,bw-40,48,'€2.99'+' · UNLOCK ×2',true,'buy');btn(x+20,y+240,bw-40,40,'NO THANKS',false,'nobuy');
   if(window.SEC&&SEC.TEST_MODE){g.fillStyle='#9a8';g.font='700 10px system-ui';g.fillText('TEST MODE (owner): tapping the price unlocks without payment',W/2,y+bh2+18);}}
 function drawPause(){g.fillStyle='rgba(0,0,0,.7)';g.fillRect(0,0,W,H);g.textAlign='center';g.font='900 '+Math.round(30*S)+'px system-ui';g.fillStyle='#ffe082';g.fillText('PAUSED',W/2,H*.36);
   HIT=[];const bw=Math.min(260,W*.7);btn(W/2-bw/2,H*.44,bw,52,'▶  RESUME',true,'resume');btn(W/2-bw/2,H*.44+66,bw,52,'🏳  RETREAT',false,'retreat');}
