@@ -141,7 +141,9 @@ async function buy(pack){
   if(s.native) return buyNative(pack, sku, s);
   try{
     const req = new PaymentRequest([{supportedMethods:PLAY, data:{sku}}], {total:{label:'Total',amount:{currency:'EUR',value:'0'}}});
-    const res = await req.show();
+    t.toast('🛒 Opening Google Play…',2500);
+    // v16-79: the old Chrome (TWA) app has no Play Billing → Google shows an error and show() may never return
+    const res = await Promise.race([req.show(), new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),60e3))]);
     const token = res.details.purchaseToken || res.details.token;
     const v = await verify(sku, token, SUBS(pack)?'subs':'inapp');
     await res.complete(v.valid?'success':'fail');
@@ -149,7 +151,7 @@ async function buy(pack){
     if(SUBS(pack) && v.expiry) t.PK[pack] = v.expiry;
     if(CONS(pack) && s.consume){ dgUsed(token); try{ await s.consume(token); }catch(e){} } // consumable → can be bought again
     return true;
-  }catch(e){ return false; }
+  }catch(e){ const n=(e&&(e.name||e.message))||''; if(n!=='AbortError') t.toast('📲 Payments work only in the new Torque Empire app from Google Play (this is the old Chrome version). Install the update from the Play Store.',6000); return false; }
 }
 async function buyNative(pack, sku, s){
   const t=T(), type = SUBS(pack)?'subs':'inapp';
