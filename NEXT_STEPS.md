@@ -211,9 +211,12 @@
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.
 
-## 💰 DECIZIE ÎN AȘTEPTARE – MONETIZARE (18 nov 2026)
-Marius: „dacă vreau să primim și diamante sau tichete, nu contează că se schimbă politica puțin”. Claude a propus (încă NIMIC schimbat în joc sau în Play):
-- **Înainte de orice pachet cu 💎/bilete pe bani**: Play → Classification „éléments aléatoires” = **Oui**, refaci IARC, scoți **Belgia** din țări, accepți **18+ în Brazilia** (legea ECA Digital, din martie 2026), Rate Info + pity rămân, actualizezi `PLAY_RULES.md`.
-- **Schimbări la ce avem**: VIP Pass 5,99 €/lună → „lunar adevărat”: 300💎 la cumpărare + 100💎 și 2 Recruit pe zi + ×1,5 VIP + Battle ×2 inclus + Idle +4 h. Battle ×2: 4,99 → 2,99 €. VIP Truck, Crew Boost, Dungeon Pass rămân.
-- **Noi**: Starter Pack 0,99 € (o dată) · pachete de diamante 1,99–99,99 € (prima cumpărare ×2) · Torque Pass lunar (gratis + Premium 4,99 € + Elite 9,99 €) · Campaign Fund 9,99 € (diamante la capitolele 5…50). Pass-urile „pe viață” cu recompense zilnice: NU recomandat.
-- Așteaptă alegerea lui Marius → machetă → integrare.
+## 💰 MONETIZARE NOUĂ – ALEGERILE LUI MARIUS (18 nov 2026) – MACHETĂ, încă NU în joc
+Machetă: https://mariussima0077-cell.github.io/preview/shop.html (tab-uri PACKS / DIAMONDS / VIP PASS / FUNDS + „NOW (old Shop)”).
+Marius: acceptă schimbarea politicii (diamante/bilete pe bani). Ales:
+- **VIP Pass pe 3 niveluri** (30 zile, doar unul activ): SILVER = gratis, cu 💎 câștigate (1.500 💎: VIP ×1,2, Idle +1 h, +1 Recruit/zi) · GOLD 5,99 €/lună (= produsul existent `vip_pass_monthly`: 300💎 imediat + 100💎/zi + 2 Recruit/zi, VIP ×1,5, Idle +2 h, Battle ×2) · PLATINUM 9,99 €/lună (abonament NOU: 600💎 + 200💎/zi + 3 Recruit + 2 Gear/zi, VIP ×2, Idle +4 h, Battle ×2, auto-collect, nume auriu în chat).
+- **Pachete o singură dată, în lanț**: Starter 0,99 € (Big Mo Epic + 300💎 + 10 Recruit + $50K) → Rookie 2,99 € (Aria Neon Epic + 800💎 + 20 Recruit + 10 Gear) → Pro 5,99 € (Grigore Legendary + 1.500💎 + 30 + 20) → Elite 9,99 € (Rex Redline Legendary + 3.000💎 + 50 + 30 + 20 Crew) → gata.
+- **Diamante**: 1,99/4,99/9,99/19,99/49,99/99,99 € = 300/800/1.700/3.600/9.500/20.000 💎, ×2 la prima cumpărare din fiecare.
+- **Campaign Fund NORMAL 9,99 €** (CH 5…50: 11.200💎 + 55 Recruit) și **HARD 9,99 €** (H 5…50: 16.700💎 + 55 Recruit + 32 Gear).
+- Torque Pass: NU acum („vedem pe parcurs”). Battle ×2 → 2,99 € (propunerea lui Claude, de confirmat).
+- **ÎNAINTE de integrare (Play Console)**: Classification „éléments aléatoires” = Oui, refaci IARC, scoți Belgia, 18+ în Brazilia (ECA Digital), produse noi (4 pachete, 6 diamante, 2 fonduri, abonament Platinum), Rate Info + pity rămân; actualizezi `PLAY_RULES.md`.

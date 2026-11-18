@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Torque Empire – new Shop (mockup)</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#06090d;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#e8ecf2}
+#app{max-width:480px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#1e2a38 0,#111922 30%,#0b1118 100%);position:relative;padding-bottom:40px}
+.mock{background:#ffd54a;color:#2a1a00;font:800 12px system-ui;text-align:center;padding:6px 8px}
+.cmp{display:flex;gap:6px;padding:8px 10px 0}
+.cmp button{flex:1;border:0;border-radius:10px;padding:8px 0;font:900 13px system-ui;background:#1a232c;color:#9fb0c0;box-shadow:inset 0 0 0 1.5px #3d4a5e}
+.cmp button.on{background:linear-gradient(#ffcb3d,#ee7a00);color:#2a1400;box-shadow:0 3px 0 #8f4c00}
+.hd{position:relative;margin:8px 0 0}
+.hd img{display:block;width:100%}
+.bar{display:flex;justify-content:center;gap:10px;margin:-6px 10px 6px}
+.cur{display:flex;align-items:center;gap:6px;background:#0d151e;border:1.5px solid #e0aa25;border-radius:999px;padding:4px 12px 4px 6px;font:900 15px system-ui;color:#fff}
+.cur img{width:24px;height:24px;object-fit:contain}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:4px 10px 10px;position:sticky;top:0;z-index:5;background:#141d27ee;backdrop-filter:blur(4px)}
+.tabs button{border:0;border-radius:12px;padding:8px 2px 6px;font:900 11px system-ui;letter-spacing:.3px;color:#cfd8e3;background:linear-gradient(#2a3644,#141c26);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #5e4a20;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs button img{width:30px;height:30px;object-fit:contain}
+.tabs button.on{background:linear-gradient(#5a4210,#2a1c05);color:#ffd54a;box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #ffcf5a,0 0 12px #ffb30066}
+.pg{display:none;padding:0 12px}.pg.on{display:block}
+.sec{display:flex;align-items:center;gap:8px;margin:14px 2px 8px;font:900 12px system-ui;letter-spacing:1.5px;color:#ffd54a}
+.sec::after{content:'';flex:1;height:1.5px;background:linear-gradient(90deg,rgba(255,179,0,.55),transparent)}
+.note{font-size:11.5px;color:#9fd3ff;background:#0b2450aa;border:1px solid #4aa3ff66;border-radius:12px;padding:8px 10px;line-height:1.4;margin:10px 0}
+.warn{color:#ffd0a0;background:#3a1e0aaa;border-color:#ff9d0d66}
+.buy{border:0;border-radius:14px;min-width:84px;padding:10px 10px;font:900 15px system-ui;color:#3a1c00;background:linear-gradient(180deg,#fff0a8 0,#ffcb3d 42%,#ff9d0d 56%,#ee7a00 100%);box-shadow:0 4px 0 #8f4c00,0 8px 14px rgba(0,0,0,.5),inset 0 1.5px 0 rgba(255,255,255,.8)}
+.buy.dm{background:linear-gradient(180deg,#bfe9ff,#3fa9ff 55%,#1567d6);color:#fff;box-shadow:0 4px 0 #0d3c78,0 8px 14px rgba(0,0,0,.5);text-shadow:0 1px 0 #0a3a80;display:flex;align-items:center;gap:4px;justify-content:center}
+.buy.dm img{width:18px;height:18px}
+.buy.own{background:#1d3b25;color:#7CFC9A;box-shadow:inset 0 0 0 1.5px #3c7a4c}
+.buy.lock{background:#2a313a;color:#7d8996;box-shadow:inset 0 0 0 1.5px #3d4a5e;font-size:12px}
+/* old list */
+.pack{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #1f2a35}
+.pack .th{flex:none;width:74px;height:70px;border-radius:12px;background:#1d2935;border:1.5px solid #ffcf5a;display:flex;align-items:center;justify-content:center}
+.pack .th img{width:62px;height:62px;object-fit:contain}
+.pack .tx{flex:1;font-size:12.5px;color:#a9b8c6;line-height:1.3}.pack .tx b{display:block;color:#fff;font-size:15px;margin-bottom:3px}
+.pack .tx s{color:#ff8a80}.pack .tx ins{text-decoration:none;color:#7CFC9A;font-weight:800}
+/* cards */
+.card{position:relative;border-radius:18px;margin:0 0 12px;padding:12px;overflow:hidden;box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px var(--c,#e0aa25),0 8px 18px rgba(0,0,0,.55)}
+.card h3{margin:0;font:900 19px system-ui;letter-spacing:.5px;color:#fff;text-shadow:0 2px 0 #000}
+.card .sub{font-size:11.5px;color:#d7e2ee;opacity:.85;margin:2px 0 8px}
+.rib{position:absolute;right:-34px;top:14px;transform:rotate(35deg);background:#e53935;color:#fff;font:900 10.5px system-ui;padding:3px 40px;box-shadow:0 2px 6px #000}
+.items{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.it{position:relative;width:62px;height:66px;border-radius:12px;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 11.5px system-ui;color:#fff;text-shadow:0 1px 2px #000}
+.it img{width:38px;height:38px;object-fit:contain}
+.it.hero img{width:56px;height:56px;margin-top:-4px}
+.it .lbl{position:absolute;left:0;right:0;bottom:2px;text-align:center}
+.it.ep{box-shadow:inset 0 0 0 2px #b46cff,0 0 8px #b46cff88}.it.lg{box-shadow:inset 0 0 0 2px #ffb300,0 0 10px #ffb30099}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.val{font:900 12px system-ui;color:#ffe08a}.val b{font-size:18px;color:#ff5a5a;display:block;line-height:1}
+.st0{--c:#7CFC9A;background:linear-gradient(135deg,#17442a,#0d1c14 70%)}
+.st1{--c:#4aa3ff;background:linear-gradient(135deg,#123a66,#0b1626 70%)}
+.st2{--c:#b46cff;background:linear-gradient(135deg,#3d1d6b,#150c26 70%)}
+.st3{--c:#ffb300;background:linear-gradient(135deg,#6b4a0a,#231705 70%)}
+.locked{filter:grayscale(.75) brightness(.6)}
+.chain{display:flex;justify-content:center;gap:6px;margin:4px 0 10px}
+.chain i{width:30px;height:6px;border-radius:3px;background:#2a3644}.chain i.on{background:#ffd54a;box-shadow:0 0 6px #ffb300}
+/* diamonds */
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dp{position:relative;border-radius:16px;padding:10px 4px 8px;text-align:center;background:linear-gradient(#1b3150,#0c1626);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #3fa9ff,0 6px 12px rgba(0,0,0,.5)}
+.dp img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 3px 6px #000)}
+.dp.big img{width:66px;height:66px}
+.dp b{display:block;font:900 18px system-ui;color:#fff;margin:2px 0}
+.dp .x2{position:absolute;left:-4px;top:-6px;background:linear-gradient(#ff6b5b,#d01b0b);color:#fff;font:900 11px system-ui;border-radius:8px;padding:2px 6px;box-shadow:0 0 0 1.5px #fff}
+.dp small{display:block;font-size:10px;color:#9fd3ff;margin-bottom:6px}
+.dp .buy{min-width:0;width:92%;padding:7px 0;font-size:14px}
+/* vip */
+.vp{--c:#9fb0c0;background:linear-gradient(135deg,#2c3542,#11161d 70%)}
+.vp.g{--c:#ffcf5a;background:linear-gradient(135deg,#5e430c,#1e1504 70%)}
+.vp.p{--c:#e9c8ff;background:linear-gradient(135deg,#43275e,#170d24 60%,#0d1a2a)}
+.vp .top{display:flex;gap:10px;align-items:center}
+.vp .top img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 3px 5px #000)}
+.vp.s .top img{filter:grayscale(1) brightness(1.3) drop-shadow(0 3px 5px #000)}
+.vp.p .top img{filter:hue-rotate(230deg) saturate(1.4) drop-shadow(0 0 8px #d9a6ff)}
+.bl{list-style:none;margin:8px 0 10px;padding:0;font-size:12.5px;line-height:1.35}
+.bl li{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.bl li img{width:20px;height:20px;object-fit:contain;flex:none}
+.bl li b{margin-left:auto;color:#7CFC9A;white-space:nowrap}
+.bl li.no{opacity:.4}.bl li.no b{color:#9fb0c0}
+.tot{font:800 11.5px system-ui;color:#ffe08a;margin-bottom:8px}
+/* fund */
+.fund{--c:#4aa3ff;background:linear-gradient(135deg,#123a66,#0b1626 70%)}
+.fund.h{--c:#ff5a5a;background:linear-gradient(135deg,#5e1414,#1e0707 70%)}
+.ms{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px 0 10px}
+.ms div{border-radius:10px;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.15);text-align:center;padding:4px 1px;font:900 10px system-ui;color:#cfd8e3}
+.ms div b{display:block;font-size:12.5px;color:#fff}
+.ms div small{display:block;color:#9fd3ff;font-size:9.5px}
+.ms div.ok{box-shadow:inset 0 0 0 2px #7CFC9A;color:#7CFC9A}
+</style></head><body><div id="app">
+<div class="mock">MOCKUP – not in the game yet · prices &amp; amounts can change</div>
+<div class="cmp"><button data-v="old">NOW (old Shop)</button><button data-v="new" class="on">NEW Shop</button></div>
+<div class="hd"><img src="../img/ui2/shop_h.webp" alt=""></div>
+<div class="bar"><span class="cur"><img src="../img/ui3/v_dm.webp" alt="">2,450</span><span class="cur"><img src="../img/ticket.webp" alt="">36</span><span class="cur"><img src="../img/ui3/v_crown.webp" alt="">VIP 3</span></div>
+
+<!-- OLD -->
+<div id="old" class="pg">
+ <div class="sec">THE SHOP TODAY</div>
+ <div class="pack"><div class="th"><img src="../img/ui3/sp_truck.webp"></div><div class="tx"><b>VIP Truck · Rich Clients</b>Forever: rich clients, priority, pay ×2.</div><button class="buy">€5.99</button></div>
+ <div class="pack"><div class="th"><img src="../img/ui3/sp_vip.webp"></div><div class="tx"><b>VIP Pass · 30 days</b>VIP benefits ×1.5. <s>At VIP 0 it gives nothing.</s></div><button class="buy">€5.99</button></div>
+ <div class="pack"><div class="th"><img src="../img/ui3/sp_speed.webp"></div><div class="tx"><b>Battle Speed ×2</b>Forever.</div><button class="buy">€4.99</button></div>
+ <div class="pack"><div class="th"><img src="../img/ui3/sp_crew.webp"></div><div class="tx"><b>VIP Crew Boost</b>Forever: every mechanic +25%.</div><button class="buy">€3.99</button></div>
+ <div class="pack"><div class="th"><img src="../img/ui2/i_key.webp"></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day + SWEEP.</div><button class="buy">€2.99</button></div>
+ <div class="note">No diamonds, no tickets, no hero for money. One single monthly pass.</div>
+</div>
+
+<!-- NEW -->
+<div id="new" class="pg on">
+ <div class="tabs">
+  <button data-t="tp" class="on"><img src="../img/ui3/sp_chest.webp">PACKS</button>
+  <button data-t="td"><img src="../img/ui3/sp_dm.webp">DIAMONDS</button>
+  <button data-t="tv"><img src="../img/ui3/sp_vip.webp">VIP PASS</button>
+  <button data-t="tf"><img src="../img/ui3/v_gift.webp">FUNDS</button>
+ </div>
+
+ <!-- PACKS -->
+ <div id="tp" class="pg on">
+  <div class="sec">SPECIAL OFFERS · ONE TIME ONLY</div>
+  <div class="chain"><i class="on"></i><i></i><i></i><i></i></div>
+  <div class="card st0"><div class="rib">BEST START</div><h3>STARTER PACK</h3><div class="sub">Buy it once – then the next pack opens.</div>
+   <div class="items">
+    <div class="it hero ep"><img src="../img/hero/m3_1.webp"><span class="lbl">Big Mo</span></div>
+    <div class="it"><img src="../img/ui3/v_dm.webp"><span class="lbl">300</span></div>
+    <div class="it"><img src="../img/ticket.webp"><span class="lbl">×10</span></div>
+    <div class="it"><img src="../img/ui3/v_coins.webp"><span class="lbl">$50K</span></div>
+   </div>
+   <div class="foot"><span class="val"><b>×10</b>VALUE</span><button class="buy">€0.99</button></div></div>
+
+  <div class="card st1 locked"><h3>ROOKIE PACK</h3><div class="sub">🔒 Opens after the Starter Pack</div>
+   <div class="items">
+    <div class="it hero ep"><img src="../img/hero/m3_5.webp"><span class="lbl">Aria Neon</span></div>
+    <div class="it"><img src="../img/ui3/v_dm.webp"><span class="lbl">800</span></div>
+    <div class="it"><img src="../img/ticket.webp"><span class="lbl">×20</span></div>
+    <div class="it"><img src="../img/gticket.webp"><span class="lbl">×10</span></div>
+   </div>
+   <div class="foot"><span class="val"><b>×8</b>VALUE</span><button class="buy lock">🔒 €2.99</button></div></div>
+
+  <div class="card st2 locked"><h3>PRO PACK</h3><div class="sub">🔒 Opens after the Rookie Pack</div>
+   <div class="items">
+    <div class="it hero lg"><img src="../img/hero/m4_0.webp"><span class="lbl">Grigore</span></div>
+    <div class="it"><img src="../img/ui3/v_dm.webp"><span class="lbl">1500</span></div>
+    <div class="it"><img src="../img/ticket.webp"><span class="lbl">×30</span></div>
+    <div class="it"><img src="../img/gticket.webp"><span class="lbl">×20</span></div>
+   </div>
+   <div class="foot"><span class="val"><b>×7</b>VALUE</span><button class="buy lock">🔒 €5.99</button></div></div>
+
+  <div class="card st3 locked"><h3>ELITE PACK</h3><div class="sub">🔒 Opens after the Pro Pack · the last one</div>
+   <div class="items">
+    <div class="it hero lg"><img src="../img/hero/m4_5.webp"><span class="lbl">Rex Redline</span></div>
+    <div class="it"><img src="../img/ui3/v_dm.webp"><span class="lbl">3000</span></div>
+    <div class="it"><img src="../img/ticket.webp"><span class="lbl">×50</span></div>
+    <div class="it"><img src="../img/gticket.webp"><span class="lbl">×30</span></div>
+    <div class="it"><img src="../img/cticket.webp"><span class="lbl">×20</span></div>
+   </div>
+   <div class="foot"><span class="val"><b>×6</b>VALUE</span><button class="buy lock">🔒 €9.99</button></div></div>
+
+  <div class="sec">FOREVER PACKS</div>
+  <div class="pack"><div class="th"><img src="../img/ui3/sp_truck.webp"></div><div class="tx"><b>VIP Truck · Rich Clients</b>Forever: rich clients, priority, pay ×2.</div><button class="buy">€5.99</button></div>
+  <div class="pack"><div class="th"><img src="../img/ui3/sp_crew.webp"></div><div class="tx"><b>VIP Crew Boost</b>Forever: every mechanic +25%.</div><button class="buy">€3.99</button></div>
+  <div class="pack"><div class="th"><img src="../img/ui3/sp_speed.webp"></div><div class="tx"><b>Battle Speed ×2</b>Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins></div><button class="buy">€2.99</button></div>
+  <div class="pack"><div class="th"><img src="../img/ui2/i_key.webp"></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day + SWEEP.</div><button class="buy">€2.99</button></div>
+ </div>
+
+ <!-- DIAMONDS -->
+ <div id="td" class="pg">
+  <div class="sec">DIAMONDS</div>
+  <div class="dgrid">
+   <div class="dp"><span class="x2">×2</span><img src="../img/ui3/v_dm.webp"><b>300</b><small>first time: 600</small><button class="buy">€1.99</button></div>
+   <div class="dp"><span class="x2">×2</span><img src="../img/ui3/v_dm.webp"><b>800</b><small>first time: 1,600</small><button class="buy">€4.99</button></div>
+   <div class="dp"><span class="x2">×2</span><img src="../img/ui3/sp_dm.webp"><b>1,700</b><small>first time: 3,400</small><button class="buy">€9.99</button></div>
+   <div class="dp big"><span class="x2">×2</span><img src="../img/ui3/sp_dm.webp"><b>3,600</b><small>first time: 7,200</small><button class="buy">€19.99</button></div>
+   <div class="dp big"><span class="x2">×2</span><img src="../img/ui3/sp_dm.webp"><b>9,500</b><small>first time: 19,000</small><button class="buy">€49.99</button></div>
+   <div class="dp big"><span class="x2">×2</span><img src="../img/ui3/sp_chest.webp"><b>20,000</b><small>first time: 40,000</small><button class="buy">€99.99</button></div>
+  </div>
+  <div class="note">100 💎 = 1 summon. Rate Info and the Legendary pity (every 500 summons) stay the same.</div>
+ </div>
+
+ <!-- VIP -->
+ <div id="tv" class="pg">
+  <div class="sec">VIP PASS · 30 DAYS</div>
+  <div class="card vp s"><div class="top"><img src="../img/ui3/sp_vip.webp"><div><h3>SILVER PASS</h3><div class="sub">Free to play – paid with diamonds you earn</div></div></div>
+   <ul class="bl">
+    <li><img src="../img/ui3/v_crown.webp">VIP benefits<b>×1.2</b></li>
+    <li><img src="../img/ui3/v_idle.webp">Idle Rewards<b>+1 h</b></li>
+    <li><img src="../img/ticket.webp">Recruit Ticket every day<b>+1</b></li>
+    <li class="no"><img src="../img/ui3/v_dm.webp">Diamonds every day<b>–</b></li>
+    <li class="no"><img src="../img/ui3/sp_speed.webp">Battle Speed ×2<b>–</b></li>
+   </ul>
+   <div class="foot"><span class="tot">30 days · no renewal</span><button class="buy dm"><img src="../img/ui3/v_dm.webp">1,500</button></div></div>
+
+  <div class="card vp g"><div class="rib">POPULAR</div><div class="top"><img src="../img/ui3/sp_vip.webp"><div><h3>GOLD PASS</h3><div class="sub">Monthly subscription</div></div></div>
+   <ul class="bl">
+    <li><img src="../img/ui3/v_dm.webp">Diamonds right away<b>300</b></li>
+    <li><img src="../img/ui3/v_dm.webp">Diamonds every day<b>+100</b></li>
+    <li><img src="../img/ticket.webp">Recruit Tickets every day<b>+2</b></li>
+    <li><img src="../img/ui3/v_crown.webp">VIP benefits<b>×1.5</b></li>
+    <li><img src="../img/ui3/v_idle.webp">Idle Rewards<b>+2 h</b></li>
+    <li><img src="../img/ui3/sp_speed.webp">Battle Speed ×2<b>✓</b></li>
+   </ul>
+   <div class="tot">In 30 days: 3,300 💎 + 60 tickets ≈ 93 summons</div>
+   <div class="foot"><span class="tot">€5.99 / month · cancel anytime</span><button class="buy">€5.99</button></div></div>
+
+  <div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="../img/ui3/sp_vip.webp"><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div>
+   <ul class="bl">
+    <li><img src="../img/ui3/v_dm.webp">Diamonds right away<b>600</b></li>
+    <li><img src="../img/ui3/v_dm.webp">Diamonds every day<b>+200</b></li>
+    <li><img src="../img/ticket.webp">Recruit Tickets every day<b>+3</b></li>
+    <li><img src="../img/gticket.webp">Gear Tickets every day<b>+2</b></li>
+    <li><img src="../img/ui3/v_crown.webp">VIP benefits<b>×2</b></li>
+    <li><img src="../img/ui3/v_idle.webp">Idle Rewards<b>+4 h</b></li>
+    <li><img src="../img/ui3/sp_speed.webp">Battle Speed ×2<b>✓</b></li>
+    <li><img src="../img/ui3/v_garage.webp">Auto-collect + gold name in chat<b>✓</b></li>
+   </ul>
+   <div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div>
+   <div class="foot"><span class="tot">€9.99 / month · cancel anytime</span><button class="buy">€9.99</button></div></div>
+  <div class="note">Only one pass is active at a time. Gold → Platinum: you can upgrade anytime. VIP points still come only from Daily Quests.</div>
+ </div>
+
+ <!-- FUNDS -->
+ <div id="tf" class="pg">
+  <div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>
+  <div class="card fund"><h3>CAMPAIGN FUND · NORMAL</h3><div class="sub">Rewards at every 5th chapter of the NORMAL campaign. Already passed? Claim at once.</div>
+   <div class="ms">
+    <div class="ok">CH 5<b>800</b><small>💎 +5🎟</small></div><div class="ok">CH 10<b>800</b><small>💎 +5🎟</small></div><div>CH 15<b>1000</b><small>💎 +5🎟</small></div><div>CH 20<b>1000</b><small>💎 +5🎟</small></div><div>CH 25<b>1000</b><small>💎 +5🎟</small></div>
+    <div>CH 30<b>1200</b><small>💎 +5🎟</small></div><div>CH 35<b>1200</b><small>💎 +5🎟</small></div><div>CH 40<b>1200</b><small>💎 +5🎟</small></div><div>CH 45<b>1500</b><small>💎 +5🎟</small></div><div>CH 50<b>1500</b><small>💎 +10🎟</small></div>
+   </div>
+   <div class="tot">Total: 11,200 💎 + 55 Recruit</div>
+   <div class="foot"><span class="val"><b>×6</b>VALUE</span><button class="buy">€9.99</button></div></div>
+
+  <div class="card fund h"><div class="rib">HARD ×1.5</div><h3>CAMPAIGN FUND · HARD</h3><div class="sub">Rewards at every 5th chapter of HARD MODE – bigger rewards.</div>
+   <div class="ms">
+    <div>H 5<b>1200</b><small>💎 +5🎟 +3⚙</small></div><div>H 10<b>1200</b><small>💎 +5🎟 +3⚙</small></div><div>H 15<b>1500</b><small>💎 +5🎟 +3⚙</small></div><div>H 20<b>1500</b><small>💎 +5🎟 +3⚙</small></div><div>H 25<b>1500</b><small>💎 +5🎟 +3⚙</small></div>
+    <div>H 30<b>1800</b><small>💎 +5🎟 +3⚙</small></div><div>H 35<b>1800</b><small>💎 +5🎟 +3⚙</small></div><div>H 40<b>1800</b><small>💎 +5🎟 +3⚙</small></div><div>H 45<b>2200</b><small>💎 +5🎟 +3⚙</small></div><div>H 50<b>2200</b><small>💎 +10🎟 +5⚙</small></div>
+   </div>
+   <div class="tot">Total: 16,700 💎 + 55 Recruit + 32 Gear</div>
+   <div class="foot"><span class="val"><b>×9</b>VALUE</span><button class="buy">€9.99</button></div></div>
+  <div class="note warn">⚙ = Gear Ticket · 🎟 = Recruit Ticket. In the game the real ticket icons are used (one icon per item).</div>
+ </div>
+</div>
+</div>
+<script>
+document.querySelectorAll('.cmp button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cmp button').forEach(x=>x.classList.toggle('on',x===b));old.classList.toggle('on',b.dataset.v==='old');document.getElementById('new').classList.toggle('on',b.dataset.v==='new');});
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));['tp','td','tv','tf'].forEach(id=>document.getElementById(id).classList.toggle('on',id===b.dataset.t));scrollTo(0,0);});
+</script>
+</body></html>
