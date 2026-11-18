@@ -6,7 +6,13 @@
 const API = 'https://torque-guard.torqueempirehelp.workers.dev';            // e.g. 'https://torque-guard.YOURNAME.workers.dev'
 const SALT = 'tE-v15-9c41f7';  // also set the same value as SAVE_SALT in the server
 // SKUs = product IDs you create in Play Console (Monetize → Products)
-const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', dg:'dungeon_pass_30d'}; // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
+const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', dg:'dungeon_pass_30d',
+  // v16-75 new Shop (shop2.js): Platinum subscription, one-time packs, consumable diamonds, campaign funds
+  plat:'vip_pass_platinum', p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite',
+  d1:'diamonds_300', d2:'diamonds_800', d3:'diamonds_1700', d4:'diamonds_3600', d5:'diamonds_9500', d6:'diamonds_20000',
+  fn:'fund_normal', fh:'fund_hard'};
+const SUBS = k => k==='sub'||k==='plat';                    // subscriptions
+const CONS = k => k==='dg'||/^d\d$/.test(k);                // consumables (can be bought again) // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
 const PLAY = 'https://play.google.com/billing';
 
 const T = () => window.__TE;
@@ -58,6 +64,7 @@ clockCheck();
 
 // ---------- value sanity (money / tickets can't jump more than the game can pay) ----------
 let last = null;
+const rebase = () => { last = null; };   // v16-75: after a purchase the jump is allowed
 function sane(){
   const t=T(); if(!t||!t.G) return; const G=t.G;
   const lvSum = Object.values(G.lv).reduce((a,b)=>a+b,0);
@@ -136,16 +143,16 @@ async function buy(pack){
     const req = new PaymentRequest([{supportedMethods:PLAY, data:{sku}}], {total:{label:'Total',amount:{currency:'EUR',value:'0'}}});
     const res = await req.show();
     const token = res.details.purchaseToken || res.details.token;
-    const v = await verify(sku, token, pack==='sub'?'subs':'inapp');
+    const v = await verify(sku, token, SUBS(pack)?'subs':'inapp');
     await res.complete(v.valid?'success':'fail');
     if(!v.valid){ t.toast('⚠️ Payment could not be verified. You were not charged twice – try again later.',4000); return false; }
-    if(pack==='sub' && v.expiry) t.PK.sub = v.expiry;
-    if(pack==='dg' && s.consume){ try{ await s.consume(token); }catch(e){} } // consumable → can be bought again
+    if(SUBS(pack) && v.expiry) t.PK[pack] = v.expiry;
+    if(CONS(pack) && s.consume){ dgUsed(token); try{ await s.consume(token); }catch(e){} } // consumable → can be bought again
     return true;
   }catch(e){ return false; }
 }
 async function buyNative(pack, sku, s){
-  const t=T(), type = pack==='sub'?'subs':'inapp';
+  const t=T(), type = SUBS(pack)?'subs':'inapp';
   let r; try{ r = await NB().buy({sku, type}); }catch(e){ t.toast('⚠️ Google Play payments are not available right now.',3500); return false; }
   if(!r || r.cancelled) return false;
   if(r.owned){ await restore(); return false; }
@@ -153,12 +160,12 @@ async function buyNative(pack, sku, s){
   if(r.pending){ t.toast('⏳ Payment pending – the pack arrives as soon as Google confirms it.',4500); return false; }
   const v = await verify(sku, r.token, type);
   if(!v.valid){ t.toast('⚠️ Payment could not be verified yet – it will be added automatically when you restart the game.',4500); return false; }
-  if(pack==='sub' && v.expiry) t.PK.sub = v.expiry;
-  if(pack==='dg'){ dgUsed(r.token); try{ await s.consume(r.token); }catch(e){} }
+  if(SUBS(pack) && v.expiry) t.PK[pack] = v.expiry;
+  if(CONS(pack)){ dgUsed(r.token); try{ await s.consume(r.token); }catch(e){} }
   return true;
 }
 // DUNGEON PASS tokens already given (so a pass whose "consume" failed is not given twice)
-const dgUsed = tok => { try{ const a=JSON.parse(LS('te_dgtok')||'[]'); if(tok){ a.push(tok); LS('te_dgtok',JSON.stringify(a.slice(-20))); } return a; }catch(e){ return []; } };
+const dgUsed = tok => { try{ const a=JSON.parse(LS('te_dgtok')||'[]'); if(tok){ a.push(tok); LS('te_dgtok',JSON.stringify(a.slice(-60))); } return a; }catch(e){ return []; } };
 // prices from Play (in the player's currency)
 async function prices(){
   const s = await billing(); if(!s) return null;
@@ -176,12 +183,17 @@ async function restore(){
         if(!dgUsed().includes(p.purchaseToken)){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(!v.valid) continue;
           t.PK.dg=Math.max(Date.now(),t.PK.dg||0)+30*864e5; dgUsed(p.purchaseToken); ch=true; }
         try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
-      if(k==='sub'){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK.sub||t.PK.sub<v.expiry)){ t.PK.sub=v.expiry; ch=true; } }
-      else if(!t.PK[k]){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid){ t.PK[k]=true; ch=true; } } }
+      if(/^d\d$/.test(k)){                          // v16-75: diamonds paid but not given yet (app closed during payment)
+        if(!s.native) continue;
+        if(!dgUsed().includes(p.purchaseToken)){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(!v.valid) continue;
+          dgUsed(p.purchaseToken); if(window.SHOP2) SHOP2.grant(k); }
+        try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
+      if(SUBS(k)){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK[k]||t.PK[k]<v.expiry)){ t.PK[k]=v.expiry; ch=true; if(window.SHOP2) SHOP2.grant(k,1); } }
+      else if(!t.PK[k]){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid){ t.PK[k]=true; ch=true; if(window.SHOP2&&/^(p\d|fn|fh)$/.test(k)) SHOP2.grant(k,1); } } }
     if(ch){ t.savePacks(); t.toast('✓ Purchases restored',2500); }
   }catch(e){}
 }
 setTimeout(restore, 4000);
 
-window.SEC = {PID, TEST_MODE, STORE_BUILD, buy, prices, restore, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+window.SEC = {PID, TEST_MODE, STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

@@ -1025,7 +1025,7 @@ load();
 let time=0, started=false, SPD=1;
 
 // =================== VIP (levels 1-20) — points only from Daily Quests ===================
-const VIP_MAX=20, SUB_MULT=1.5, SUB_DAYS=30, SUB_PRICE='€5.99';
+const VIP_MAX=20;let SUB_MULT=1.5;const SUB_DAYS=30, SUB_PRICE='€5.99';
 // v8: VIP 20 = 28,000 points ≈ 6 months of daily quests (max ~155 points/day)
 const VIP_PTS=[0];for(let n=1;n<=VIP_MAX;n++)VIP_PTS.push(n===VIP_MAX?28000:Math.round(50*Math.pow(n,Math.log(560)/Math.log(20))/10)*10);
 // v16-49: one picture per thing (Marius' icon sheets in img/ui3)
@@ -1040,9 +1040,10 @@ const VIP_BEN=[
  {k:'disc',ic:'🔧',n:'Upgrade discount',from:8,neg:1},
  {k:'cust',ic:'🚗',n:'More customers',from:10},
  {k:'idle',ic:'🧰',n:'Idle Rewards money',from:1,per:.05}];
-const subOn=()=>PK.sub>Date.now();
+const S2=()=>window.SHOP2&&SHOP2.live; // v16-75: new Shop (Silver / Gold / Platinum) – only when live
+const subOn=()=>S2()?!!SHOP2.tier():PK.sub>Date.now();
 let VLV=0,VSUB=false;const VBC={};
-function vipRefresh(){VLV=0;for(let n=1;n<=VIP_MAX;n++)if(G.vip>=VIP_PTS[n])VLV=n;VSUB=subOn();VIP_BEN.forEach(b=>VBC[b.k]=benAt(b,VLV,VSUB));}
+function vipRefresh(){SUB_MULT=S2()?SHOP2.mult():1.5;VLV=0;for(let n=1;n<=VIP_MAX;n++)if(G.vip>=VIP_PTS[n])VLV=n;VSUB=subOn();VIP_BEN.forEach(b=>VBC[b.k]=benAt(b,VLV,VSUB));}
 function benAt(b,l,sub){return Math.max(0,l-b.from+1)*(b.per||.01)*(sub?SUB_MULT:1);}
 const VB=k=>VBC[k]||0;
 const pctT=(v,neg)=>(neg?'−':'+')+(Math.round(v*1000)/10)+'%';
@@ -2791,7 +2792,7 @@ function skinSheet(n){sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/
 // v16-49: building popup = Marius' picture (img/ui3/bld_*): title plate, 10 level lights, rows with the green "next" part, crew bar, orange coin button
 function bldSkin(on){sheet.classList.toggle('bldP',on);const im=$('shSkH').querySelector('img');if(on&&!im.src.endsWith('bld_h.webp'))im.src='img/ui3/bld_h.webp';}
 function closePanel(){sel=null;selCar=null;sheet.classList.remove('open');}
-$('shClose').onclick=closePanel;$('vipBtn').onclick=()=>openPanel('vip');$('dqBtn').onclick=openDQ;$('repPill').onclick=()=>openPanel('rep');$('shopBtn').onclick=()=>openPanel('shop');$('dmH').onclick=()=>toast('💎 Diamonds – earned by playing (campaign, bosses, quests). 100 💎 = 1 summon.');
+$('shClose').onclick=closePanel;$('vipBtn').onclick=()=>openPanel('vip');$('dqBtn').onclick=openDQ;$('repPill').onclick=()=>openPanel('rep');$('shopBtn').onclick=()=>S2()?SHOP2.open():openPanel('shop');$('dmH').onclick=()=>toast('💎 Diamonds – earned by playing (campaign, bosses, quests). 100 💎 = 1 summon.');
 const PACKS=[
  {id:'car',u3:'sp_truck',name:'VIP Truck · Rich Clients',price:'€5.99',img:'vipcar',cw:110,ch:36,thumb:1,desc:'Forever: a golden car carrier arrives at random times and unloads 3-4 luxury cars of rich clients (supercars, limousines, the Royal Hypercar). They get PRIORITY in every garage and pay ×2.'},
  {id:'sub',u3:'sp_vip',name:'VIP Pass · 30 days',price:SUB_PRICE,emoji:'👑',desc:'All your VIP level benefits are ×'+SUB_MULT+' stronger for 30 days. VIP points still come from Daily Quests – for everyone.'},
@@ -2800,6 +2801,7 @@ const PACKS=[
 ];
 $('shStats').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){popPicker(pk.dataset.pick);return;}if(e.target.closest('[data-dq]')){closePanel();openDQ();return;}const b=e.target.closest('[data-buy]');if(!b)return;const id=b.dataset.buy;
   if(b.dataset.busy)return;b.dataset.busy=1;
+  if(id==='sub'&&S2()){delete b.dataset.busy;closePanel();SHOP2.open('tv');return;}
   if(id==='sub'){if(subOn())return;SEC.buy('sub').then(ok=>{delete b.dataset.busy;if(!ok)return;if(!PK.sub||PK.sub<Date.now())PK.sub=Date.now()+SUB_DAYS*864e5;savePacks();vipRefresh();lastPanelKey='';renderPanel();toast('👑 VIP Pass active for 30 days! All VIP benefits ×'+SUB_MULT,4500);});return;}
   if(PK[id])return;
   SEC.buy(id).then(ok=>{delete b.dataset.busy;if(!ok)return;
@@ -2829,8 +2831,8 @@ function renderPanel(){
     $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. With the VIP Pass all benefits are ×'+SUB_MULT+'.';
     const a=VIP_PTS[VLV],fr=nx?(G.vip-a)/(nx-a):1;
     let h='<div class="vbar"><i style="width:'+Math.round(fr*100)+'%"></i></div>';
-    h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>VIP Pass · '+SUB_PRICE+' / 30 days</b>'+(sub?'Active – '+Math.ceil((PK.sub-Date.now())/864e5)+' days left. All benefits ×'+SUB_MULT+'.':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.')+'</div>'+
-      (sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
+    h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>'+(S2()?'VIP Pass':'VIP Pass · '+SUB_PRICE+' / 30 days')+'</b>'+(sub?'Active – '+(S2()?SHOP2.PASSN()+' · '+SHOP2.days():Math.ceil((PK.sub-Date.now())/864e5))+' days left. All benefits ×'+SUB_MULT+'.':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.')+'</div>'+
+      (S2()?'<button class="buy" data-buy="sub">'+(sub?'ACTIVE':'OPEN')+'</button>':sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
     h+='<div class="sec">YOUR BENEFITS · VIP '+VLV+(sub?'':' <span style="color:#9fb0c0;letter-spacing:0">(👑 = with VIP Pass)</span>')+'</div>'+VIP_BEN.map(b=>{const v=benAt(b,VLV,sub),on=VLV>=b.from;
       return '<div class="row"><span>'+(VIP_IMG[b.k]?U3(VIP_IMG[b.k]):b.ic)+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a">'+pctT(benAt(b,VLV,true),b.neg)+' 👑</em>':'')+'</div>';}).join('');
     h+='<div class="sec">ALL VIP LEVELS'+(sub?' (with VIP Pass)':'')+'</div>';
@@ -3455,7 +3457,7 @@ teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}co
 
 // ---------- idle rewards (my picture) — v11: also grows with the VIP level ----------
 const IDLE_BASE_H=4, IDLE_VIP_H=0.5, IDLE_TK_H=2; // v16: 4h standard + 30 min per VIP level (VIP 20 = 14h). VIP Pass does NOT boost hours
-const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV;
+const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV+(S2()?SHOP2.idleH():0); // v16-75: VIP Pass Silver +1h / Gold +2h / Platinum +4h
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
@@ -3679,7 +3681,7 @@ function startLoader(){
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},
   rect:id=>id==='parking'?{x:430,y:110,w:345,h:290}:id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:GAR[id]?{x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32}:null,
   sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>BLD[id].cost[G.lv[id]||0]||0,TKI:()=>TKI};
-window.__TE={giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
+window.__TE={giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};
@@ -3706,5 +3708,6 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 <script src="online.js"></script>
 <script src="classic.js"></script>
 <script src="tutorial.js"></script>
+<script src="shop2.js"></script>
 </body>
 </html>

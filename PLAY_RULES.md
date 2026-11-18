@@ -67,6 +67,10 @@ Ultima actualizare: 15 noiembrie 2026 (v16-45 – online: clasament, chat, aren�
 
 ---
 
+### ⚠️ DECIZIE NOUĂ (18 nov 2026, v16-75): Marius ACCEPTĂ diamante + bilete pe bani reali
+- Shop nou în `shop2.js` (pachete cu 💎/bilete/erou, diamante, VIP Pass Gold/Platinum cu 💎 zilnic, Campaign Funds). Ținut ascuns cu `LIVE=false` până se face în Play: Classification „éléments aléatoires” = **Oui**, IARC refăcut, **Belgia scoasă**, Brazilia 18+ (ECA Digital), produsele create. Abia apoi `LIVE=true`.
+- Rate Info și pity-ul (500) rămân obligatoriu afișate.
+
 ### Decizie în așteptare: pass-uri cu diamante/bilete (14 nov 2026, v16-37)
 - Marius a cerut pass-uri: Standard (pe diamante), Pass+ 2.99 €, Pro 5.99 €, Ultra 10.99 € – pe viață, cu diamante + bilete zilnice. Claude i-a spus: dacă un pass **plătit cu bani reali** dă diamante sau bilete (sau o monedă care cumpără bilete), Google și legile (Belgia, Brazilia din martie 2026 → 18+) le socotesc **summon pe bani = elemente aleatorii**.
 - Marius: „nu adăuga pass-urile încă”. **Nimic nu s-a schimbat în Play.** Standard Pass (pe diamante câștigate jucând) ar fi OK oricând.

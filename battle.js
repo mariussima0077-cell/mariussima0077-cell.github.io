@@ -2113,8 +2113,8 @@ function drawHUD(t){HIT=[];const top=10,bh=38;
   g.textAlign='center';const tt=(B.wbB?'WORLD BOSS':B.tw&&B.tw.dg?'DUNGEON':B.tw?'TOWER':sLabel(B.si))+' · '+B.stage.n.toUpperCase();let fs=Math.round(15*S);g.font='900 '+fs+'px system-ui';while(fs>9&&g.measureText(tt).width>W-250){fs--;g.font='900 '+fs+'px system-ui';}g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(tt,W/2,top+17);g.fillStyle='#ffe0b2';g.fillText(tt,W/2,top+17);
   const nw=B.wbB?0:B.stage.w.length;for(let i=0;i<nw;i++){const x=W/2+(i-(nw-1)/2)*22,y=top+33;const boss=B.stage.w[i].some(m=>MON[m].boss);g.fillStyle=i<B.wave?'#66bb6a':i===B.wave?'#ffb300':'rgba(255,255,255,.25)';
     if(boss){g.font='900 13px system-ui';g.fillText('💀',x,y+5);}else{rr(g,x-7,y-3,14,7,3);g.fill();}}
-  if(ibtn(W-104,top-2,44,B.spd===2?'x2':B.spd===1.5?'x15':'x1','spd')){if(B.spd===1.5&&!TE().PK.spd2)g.drawImage(badgeCv('lock','#8d6e63',64),W-104+32,top-6,16,16);}
-  else{btn(W-112,top,48,bh,'×'+B.spd,B.spd>1,'spd');if(B.spd===1.5&&!TE().PK.spd2){g.drawImage(badgeCv('lock','#8d6e63',64),W-112+36,top-4,16,16);}}
+  if(ibtn(W-104,top-2,44,B.spd===2?'x2':B.spd===1.5?'x15':'x1','spd')){if(B.spd===1.5&&!TE().spd2())g.drawImage(badgeCv('lock','#8d6e63',64),W-104+32,top-6,16,16);}
+  else{btn(W-112,top,48,bh,'×'+B.spd,B.spd>1,'spd');if(B.spd===1.5&&!TE().spd2()){g.drawImage(badgeCv('lock','#8d6e63',64),W-112+36,top-4,16,16);}}
   if(!ibtn(W-54,top-2,44,B.auto?'aon':'aoff','auto'))btn(W-58,top,48,bh,'AUTO',B.auto,'auto','#66bb6a');
   if(B.wbB)wbHUD(t,top);
   else if(B.bossBar&&!B.bossBar.dead){const b=B.bossBar,bw=W*.8,x=W*.1,y=top+50;g.fillStyle='rgba(0,0,0,.75)';rr(g,x-2,y-2,bw+4,16,8);g.fill();
@@ -2208,12 +2208,12 @@ function drawCenterText(t){let txt=null,sub=null;
   if(!txt)return;const s=1+Math.max(0,.3-(B.phT%10))*1.2;g.save();g.translate(W/2,H*.27);g.scale(s,s);g.textAlign='center';g.font='900 '+Math.round(38*S)+'px system-ui';g.lineWidth=7;g.lineJoin='round';g.strokeStyle='#1a0800';g.strokeText(txt,0,0);
   const gr=g.createLinearGradient(0,-30,0,6);gr.addColorStop(0,'#fff8e1');gr.addColorStop(1,B.phase==='lose'||txt.includes('BOSS')?'#ff5252':'#ffa000');g.fillStyle=gr;g.fillText(txt,0,0);
   if(sub){g.font='900 '+Math.round(16*S)+'px system-ui';g.lineWidth=4;g.strokeText(sub,0,26);g.fillStyle='#ffccbc';g.fillText(sub,0,26);}g.restore();}
-function spdOK(v){const own=TE().PK.spd2;if(v===2&&own)return 2;if(v===1.5||v===2||v===3)return 1.5;return 1;}
+function spdOK(v){const own=TE().spd2();if(v===2&&own)return 2;if(v===1.5||v===2||v===3)return 1.5;return 1;}
 function drawOffer(t){g.fillStyle='rgba(0,0,0,.78)';g.fillRect(0,0,W,H);HIT=[];const bw=Math.min(330,W*.86),bh2=300,x=W/2-bw/2,y=H*.22;
   const gr=g.createLinearGradient(0,y,0,y+bh2);gr.addColorStop(0,'#3a2410');gr.addColorStop(1,'#150c06');g.fillStyle=gr;rr(g,x,y,bw,bh2,18);g.fill();g.strokeStyle='#ffb300';g.lineWidth=2.5;g.stroke();
   g.drawImage(badgeCv('aspd','#ff6d00',96),W/2-36,y+16,72,72);g.textAlign='center';g.fillStyle='#ffe082';g.font='900 '+Math.round(22*Math.min(1.2,S))+'px system-ui';g.fillText('BATTLE SPEED ×2',W/2,y+116);
   g.fillStyle='#e0c6ad';g.font='700 13px system-ui';g.fillText('×1.5 is free for everyone.',W/2,y+142);g.fillText('×2 is a pack – yours forever, every chapter.',W/2,y+161);
-  btn(x+20,y+182,bw-40,48,'€4.99 · UNLOCK ×2',true,'buy');btn(x+20,y+240,bw-40,40,'NO THANKS',false,'nobuy');
+  btn(x+20,y+182,bw-40,48,(window.SHOP2&&SHOP2.live?'€2.99':'€4.99')+' · UNLOCK ×2',true,'buy');btn(x+20,y+240,bw-40,40,'NO THANKS',false,'nobuy');
   if(window.SEC&&SEC.TEST_MODE){g.fillStyle='#9a8';g.font='700 10px system-ui';g.fillText('TEST MODE (owner): tapping the price unlocks without payment',W/2,y+bh2+18);}}
 function drawPause(){g.fillStyle='rgba(0,0,0,.7)';g.fillRect(0,0,W,H);g.textAlign='center';g.font='900 '+Math.round(30*S)+'px system-ui';g.fillStyle='#ffe082';g.fillText('PAUSED',W/2,H*.36);
   HIT=[];const bw=Math.min(260,W*.7);btn(W/2-bw/2,H*.44,bw,52,'▶  RESUME',true,'resume');btn(W/2-bw/2,H*.44+66,bw,52,'🏳  RETREAT',false,'retreat');}
@@ -2247,8 +2247,9 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-las
   if(LOWRES&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}}
 cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
   if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
-  else if(h.id==='spd'){if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(TE().PK.spd2)B.spd=2;else{B.offer=true;B.paused=true;}}else B.spd=1;TE().G.cp.spd=B.spd;}
-  else if(h.id==='buy'){const T=TE();T.PK.spd2=true;T.savePacks();B.spd=2;T.G.cp.spd=2;B.offer=false;B.paused=false;lastT=performance.now();T.toast('⏩ Battle Speed ×2 unlocked forever!',3000);}
+  else if(h.id==='spd'){if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(TE().spd2())B.spd=2;else{B.offer=true;B.paused=true;}}else B.spd=1;TE().G.cp.spd=B.spd;}
+  else if(h.id==='buy'){if(B.buying)return;B.buying=1;const T=TE(); // v16-75: real payment (before: unlocked for free!)
+    SEC.buy('spd2').then(ok=>{B.buying=0;if(!ok)return;T.PK.spd2=true;T.savePacks();B.spd=2;T.G.cp.spd=2;B.offer=false;B.paused=false;lastT=performance.now();T.toast('⏩ Battle Speed ×2 unlocked forever!',3000);});}
   else if(h.id==='nobuy'){B.offer=false;B.paused=false;B.spd=1;TE().G.cp.spd=1;lastT=performance.now();}else if(h.id==='auto'){B.auto=!B.auto;TE().G.cp.auto=B.auto;}
   else if(h.id==='card'&&!B.paused){if(canCast(h.u))cast(h.u);else if(!h.u.dead&&B.phase==='fight')tapHint(1);}
   return;}}
