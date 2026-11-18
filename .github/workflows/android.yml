@@ -3,6 +3,7 @@
 # - When the signing secrets exist (KS_BASE64, KS_PASS, KS_ALIAS, KS_KEY_PASS):
 #   also the release .aab for Play Console + a release APK.
 # The files appear on the GitHub "Releases" page (easy to download from the phone).
+# Signing secrets added on GitHub: 18 Nov 2026.
 name: Android app (Capacitor)
 
 on:
