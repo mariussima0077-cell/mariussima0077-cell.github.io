@@ -90,7 +90,7 @@ async function buy(k){
       conf=''; G.dm-=c; PK().sil=now()+30*DAY; t_save(); T().save(); T().vipRefresh(); T().toast('🥈 Silver Pass active for 30 days!',3500); passTick(); render(); return;
     }
     if(k==='sub'||k==='plat'){ if(tier()&&tier()!=='sil'){ T().toast('A VIP Pass is already active. To switch, cancel it in Google Play → Subscriptions; buy the new one when it ends.',5000); return; } }
-    const ok = await SEC.buy(k);
+    const ok = await Promise.race([SEC.buy(k), new Promise(res=>setTimeout(()=>res(false),200e3))]);   // v16-78: the button never stays dead
     if(!ok) return;
     if((k==='sub'||k==='plat') && !(PK()[k]>now())) PK()[k]=now()+30*DAY;   // test mode / missing expiry
     t_save(); grant(k);

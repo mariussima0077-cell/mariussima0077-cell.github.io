@@ -153,10 +153,15 @@ async function buy(pack){
 }
 async function buyNative(pack, sku, s){
   const t=T(), type = SUBS(pack)?'subs':'inapp';
-  let r; try{ r = await NB().buy({sku, type}); }catch(e){ t.toast('⚠️ Google Play payments are not available right now.',3500); return false; }
-  if(!r || r.cancelled) return false;
-  if(r.owned){ await restore(); return false; }
-  if(r.err){ t.toast('⚠️ Payment failed ('+r.err+'). You were not charged.',3500); return false; }
+  t.toast('🛒 Opening Google Play…',2500);
+  // v16-78: never wait forever (a stuck call kept the Shop button dead – Marius 18 nov)
+  let r; try{ r = await Promise.race([NB().buy({sku, type}), new Promise(res=>setTimeout(()=>res({err:'timeout'}),180e3))]); }
+  catch(e){ t.toast('⚠️ Google Play payments are not available right now ('+((e&&(e.code||e.message))||'error')+').',4500); return false; }
+  if(!r){ t.toast('⚠️ No answer from Google Play. Try again.',3500); return false; }
+  if(r.cancelled) return false;
+  if(r.owned){ t.toast('✓ You already own this – restoring it…',3000); await restore(); return false; }
+  if(r.err){ const m={no_product:'product not found in Google Play',busy:'another payment is still open',timeout:'no answer from Google Play',no_offer:'no offer for this pass'};
+    t.toast('⚠️ Payment failed ('+(m[r.err]||('code '+r.err+(r.msg?' – '+r.msg:'')))+'). You were not charged.',5000); return false; }
   if(r.pending){ t.toast('⏳ Payment pending – the pack arrives as soon as Google confirms it.',4500); return false; }
   const v = await verify(sku, r.token, type);
   if(!v.valid){ t.toast('⚠️ Payment could not be verified yet – it will be added automatically when you restart the game.',4500); return false; }
