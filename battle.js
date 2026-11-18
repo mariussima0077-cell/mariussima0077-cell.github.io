@@ -680,7 +680,9 @@ CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
 const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345]]; // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
 const stageMul=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
-const REWARD=i=>{const s=STAGES[i];return {money:Math.round((i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?5:s.mini?3:1,gtk:s.boss?5:s.mini?3:1,ct:s.boss?3:s.mini?1:0,dm:s.boss?100:s.mini?30:10};};
+// v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
+const CP_MON=.35;
+const REWARD=i=>{const s=STAGES[i];return {money:Math.round(CP_MON*(i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?5:s.mini?3:1,gtk:s.boss?5:s.mini?3:1,ct:s.boss?3:s.mini?1:0,dm:s.boss?100:s.mini?30:10};};
 const sLabel=i=>(STAGES[i].c+1)+'-'+(STAGES[i].j+1);
 
 // ---------------------------------------------------------------- GEAR (works only in battles)

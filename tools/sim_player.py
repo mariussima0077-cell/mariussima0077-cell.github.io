@@ -12,8 +12,8 @@ DST = f'/tmp/te_sim_{MODE}'
 shutil.rmtree(DST, ignore_errors=True)
 shutil.copytree(SRC, DST, ignore=shutil.ignore_patterns('.git', 'sheets', 'preregister'))
 p = DST + '/battle.js'; s = open(p).read()
-s = s.replace("window.CAMPAIGN={open,close,openGear,mini};",
-  "window.CAMPAIGN={open,close,openGear,mini};window.__BT={roleOf,simRun,finish,bestTeam,myMechs,autoPlan,equip,GR,GSLOT,gsummon,GSD,STAGES,NST,REWARD,pow,teamPower,heroOf,cleanGear,upCost,gMax,itemById,getB:()=>B,sLabel,CHAP};")
+s = s.replace("window.CAMPAIGN={",
+  "window.__BT={roleOf,simRun,finish,bestTeam,myMechs,autoPlan,equip,GR,GSLOT,gsummon,GSD,STAGES,NST,REWARD,pow,teamPower,heroOf,cleanGear,upCost,gMax,itemById,getB:()=>B,sLabel,CHAP};window.CAMPAIGN={",1)
 open(p, 'w').write(s)
 p = DST + '/index.html'; s = open(p).read()
 i = s.rindex('})();\n</script>'); s = s[:i] + 'window.__EV=c=>eval(c);\n' + s[i:]; open(p, 'w').write(s)
@@ -40,7 +40,7 @@ window.__BOT={
    let best=null;for(const id in BLD){const B=BLD[id];if(!B.cost||NOUP(id))continue;const lv=G.lv[id];if(lv>=MAXLV||G.rep<(B.rep||0))continue;
      const c=costOf(id,lv);if(c<=G.money&&(!best||c<best.c))best={id,c};}
    return best;},
- buyAll(){let n=0,spent=0;for(let k=0;k<60;k++){const b=this.bestUpgrade();if(!b)break;sel=b.id;$('shBtn').onclick();n++;spent+=b.c;}sel=null;try{closePanel();}catch(e){}return n;},
+ buyAll(){let n=0,spent=0;for(let k=0;k<60;k++){const b=this.bestUpgrade();if(!b)break;sel=b.id;$('shBtn').onclick();n++;spent+=b.c;(this.up=this.up||[]).push([Math.round((Date.now()-1794812400000)/36e5*10)/10,b.id,G.lv[b.id],b.c]);}sel=null;try{closePanel();}catch(e){}return n;},
  gearUp(){ // balanced player: half of the money goes to gear levels of the battle team (cheapest step first)
    const T=__BT,g=T.GR();let budget=G.money*.5,n=0;
    for(let k=0;k<400;k++){let best=null;for(const id of G.cp.team||[]){const eq=g.eq[id];if(!eq)continue;for(const s in eq){const it=T.itemById(eq[s]);if(!it||it.lv>=T.gMax(it))continue;const c=T.upCost(it);if(!best||c<best.c)best={it,c};}}
@@ -151,7 +151,7 @@ async def main():
                 st.update(day=d, wins=wins, losses=losses, battle_min=round(bt_time / 60), summons={k: sm.get(k, 0) + sm2.get(k, 0) for k in set(sm) | set(sm2)})
                 days.append(st)
                 print(f"[{MODE}] day {d}: stage {st['label']} rep {st['rep']} vip {st['vip']} bld {st['bldSum']} money {st['money']} power {st['power']} mechs {st['mechs']} ({time.time()-t0:.0f}s)", flush=True)
-                json.dump(dict(mode=MODE, days=days, errors=errs[:20], log=await pg.evaluate('__BOT.log.slice(0,30)')), open(OUT, 'w'), indent=1)
+                json.dump(dict(mode=MODE, days=days, errors=errs[:20], log=await pg.evaluate('__BOT.log.slice(0,30)'), up=await pg.evaluate('__BOT.up||[]')), open(OUT, 'w'), indent=1)
                 # offline until tomorrow (22 h)
                 await pg.evaluate("__adv(22*3600*1000)")
             await b.close()

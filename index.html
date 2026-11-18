@@ -904,7 +904,7 @@ const PK={car:false,vip:false,sub:0,spd2:false};
 try{Object.assign(PK,JSON.parse(localStorage.getItem(PACK_KEY))||{});}catch(e){}
 function savePacks(){try{localStorage.setItem(PACK_KEY,JSON.stringify(PK));}catch(e){}}
 // v16-37: slower economy (Marius: "make money a bit harder") – income ×0.8, building costs ×1.2
-const ECO=.8, COST_M=1.2, BUYER_DRIVE=.45;
+const ECO=.6, COST_M=1.2, BUYER_DRIVE=.45;
 const VIP_BOOST=1.25, VIP_CAR_EVERY=40; // v16-37: VIP Crew Boost = every mechanic +25% speed & money
 
 // =================== CONFIG ===================
@@ -1384,7 +1384,8 @@ function driveAway(c,buyer){const s=c.slot;c.state='leaving';c.siren=!!c.type.li
   c.path=[...innR(s),{x:s.entry.x,y:s.entry.y,rev:true},{x:lane[0].x,y:lane[0].y,rev:true,old:s},...fwd.slice(1)];c.slot=null;
   c.onArrive=()=>{c.gone=true;};
   float(c.x,c.y-40,c.rich||c.type.vip?'💎 SEE YOU SOON!':c.type.fleet?'🚨 BACK ON DUTY':'🔑 NEW OWNER','#ffd54a');}
-function addXP(n){const r0=G.rep;G.xp+=n;G.rep=repFor(G.xp);
+const XP_M=.4; // v16-73: reputation grew too fast (Rep 16 after the first 2 hours) → every sale gives less reputation XP
+function addXP(n){const r0=G.rep;G.xp+=n*XP_M;G.rep=repFor(G.xp);
   if(G.rep>r0){const gb=repGift(G.rep);G.h.tk+=gb?15:5;G.h.ct+=gb?8:3;G.dm=(G.dm||0)+(gb?200:100);toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +'+(gb?15:5)+' · '+CTI+' +'+(gb?8:3)+' · '+DMI+' +'+(gb?200:100)+' · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
     const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'REPUTATION '+G.rep+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#ff9800'])});}}
@@ -2779,7 +2780,8 @@ const SOON_IDS=['collection','rail'];
 const NOUP=id=>SOON_IDS.includes(id)||id==='export'||id==='yard'||id==='race'||id==='car'||id==='rep'||id==='shop'||id==='vip';
 // v15 pacing (tested with a simulator): LV 5–10 cost ×2.5 but are paid in 5 PARTS – every part gives progress (garages: part of the next level's job bonus)
 // v16-40: LV 6-10 cost more and more (2-month test: everything was LV 10 after ~60 days at 2 h/day; target ≈ 3.5 months)
-const UPN=5,UPM=2.5,LATE=[1,1,1,1,1,1.15,1.35,1.6,1.9,2.25];for(const id in BLD){const c=BLD[id].cost;if(c)for(let i=0;i<c.length;i++){if(i>=4)c[i]=c[i]*UPM*LATE[i];c[i]=i>=4?Math.round(c[i]*COST_M/1000)*1000:Math.round(c[i]*COST_M/10)*10;}}
+const EARLY_M=[2,2,6,20]; // v16-73: open / LV2 / LV3 / LV4 cost more (the first hour bought every building up to LV4)
+const UPN=5,UPM=2.5,LATE=[1,1,1,1,1,1.15,1.35,1.6,1.9,2.25];for(const id in BLD){const c=BLD[id].cost;if(c)for(let i=0;i<c.length;i++){if(i>=4)c[i]=c[i]*UPM*LATE[i];c[i]=i>=4?Math.round(c[i]*COST_M/1000)*1000:Math.round(c[i]*COST_M*(c[0]?EARLY_M[i]:i?EARLY_M[i]:1)/10)*10;}}
 const UPP=id=>(G.up&&G.up[id])||0;
 const costOf=(id,lv)=>Math.round(BLD[id].cost[lv]*(1-VB('disc'))/(lv>=4?UPN:1));
 const payB=id=>{const l=(G.lv[id]||1);return PAYB[l-1]+(l<10&&l>=4?(PAYB[l]-PAYB[l-1])*UPP(id)/UPN:0);};
@@ -2819,7 +2821,7 @@ function renderPanel(){
     $('shTitle').textContent='🛒 Shop';$('shDots').innerHTML='<span>Packs stay forever – every chapter, every stage</span>';$('shDesc').textContent='';
     $('shStats').innerHTML=PACKS.map(p=>'<div class="pack"><div class="th">'+(p.u3?'<img src="img/ui3/'+p.u3+'.webp" alt="" style="width:74px;height:74px;object-fit:contain;filter:drop-shadow(0 2px 4px #000)">':'<i style="width:'+(p.cw||70)+'px;height:'+(p.ch||60)+'px;'+(p.emoji?'font-size:46px;line-height:'+(p.ch||60)+'px;text-align:center;font-style:normal':p.thumb?'background-image:url('+(VIPTH||(VIPTH=vtThumb()))+');background-size:contain;background-repeat:no-repeat;background-position:center':'background-image:url(img/'+p.img+'.webp);background-position:'+p.bp+';background-size:'+p.bs)+'">'+(p.emoji||'')+'</i>')+'</div><div class="tx"><b>'+p.name+'</b>'+p.desc+'</div>'+
       (p.id==='sub'?(subOn()?'<button class="buy own">ACTIVE<br>'+Math.ceil((PK.sub-Date.now())/864e5)+'d</button>':'<button class="buy" data-buy="sub">'+p.price+'</button>'):PK[p.id]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-buy="'+p.id+'">'+p.price+'</button>')+'</div>').join('')+
-      (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div id="cloudBox"></div><div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a></div>';
+      (SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>')+'<div id="cloudBox"></div><div class="note" style="opacity:.7">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#9fd3ff">Privacy policy</a> · <a href="#" onclick="event.preventDefault();window.__TUT&&__TUT.start()" style="color:#ffd54a">Replay tutorial</a></div>';
     if(window.CLOUD)CLOUD.mount($('cloudBox'));$('shBtn').style.display='none';return;}
   if(sel==='vip'){const sub=subOn(),key='vip'+G.vip+sub+(sub?Math.ceil((PK.sub-Date.now())/864e5):0);if(key===lastPanelKey)return;lastPanelKey=key;
     const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'');$('shSkT').innerHTML='VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'')+'<small>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL')+'</small>';
@@ -3536,6 +3538,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:29,d:'Nov 18, 2026',ic:'🎓',t:'Tutorial & a fairer economy',l:['New players now get a short <b>tutorial</b> with <b>Mama Rosa</b>, your chief mechanic – and a welcome gift at the end. Want to see it again? <b>Shop</b> → <b>Replay tutorial</b>.','The first time a new battle mode opens (Arena, Torque Tower, Dungeons, World Boss…) a short tip explains it.','<b>Economy</b>: money came in too fast, so upgrades were over too soon. Building levels 2-4 now cost more, the garage and campaign battles pay a bit less and reputation grows slower – your empire now grows step by step for months.']},
  {id:28,d:'Nov 17, 2026',ic:'✨',t:'Smoother pages & zoom',l:['Pages and windows now open with a short <b>fade-in</b>, only when all their pictures are ready – no more icons popping in late.','<b>Zoom</b> on the garage map is smoother: it settles on fixed steps, so zooming back is instant and the picture stays sharp.','<b>Cloud save</b>: the "Which game do you keep?" window no longer appears when the cloud holds the same game as your phone.']},
  {id:27,d:'Nov 17, 2026',ic:'🔑',t:'DUNGEONS are open!',l:['Open <b>BATTLE</b> → <b>DUNGEONS</b> (after campaign stage 1-16): <b>CASH VAULT</b>, <b>SCRAP MINE</b>, <b>GEAR FORGE</b> and <b>NITRO LAB</b> – 30 floors each.','<b>2 free keys a day</b> in every dungeon. A key is used <b>only when you win</b>.','Fixed rewards: <b>cash</b> (Vault), a <b>gear piece</b> (Mine), a <b>SET piece</b> (Forge), <b>NITRO BOOST</b> +HP & attack for 3 hours in Campaign and Towers (Lab).','<b>DUNGEON PASS</b> (30 days): +2 keys a day and <b>SWEEP</b>.']},
  {id:26,d:'Nov 17, 2026',ic:'🐍',t:'New World Boss: TOW SERPENT',l:['The fourth <b>WORLD BOSS</b> joins the weekly rotation: <b>TOW SERPENT</b>, a giant serpent of chains and crane hooks.','It is weak to <b>RACER</b> heroes: <b>+30%</b> damage. Its lunges hit everyone in front of it – many times!','Rotation every Monday: SCRAPZILLA → CRUSHER KING → INFERNO PISTON → TOW SERPENT.','The <b>WORLD BOSS</b> banner in the Battle Hub has a new look.']},

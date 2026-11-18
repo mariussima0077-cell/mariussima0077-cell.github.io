@@ -1,12 +1,11 @@
 // =================== TUTORIAL (v16-72 preview) ===================
 // Guided first minutes: a guide talks in a bubble, the screen dims, only the highlighted thing can be tapped,
-// an animated hand shows where. Runs ONLY with ?tut=1 in the address (preview for Marius) until he approves it.
-// Preview mode = no starter cash, no gift, nothing stored (G.tut is not written) → his real save is not touched.
+// an animated hand shows where. v16-73: starts by itself for NEW players (G.tut not set, no progress); players with
+// progress never get it automatically. Shop → "Replay tutorial" or ?tut=1 = replay (no starter cash, no gift).
 (function(){
 'use strict';
 const Q=new URLSearchParams(location.search);
-const FORCE=Q.has('tut');
-if(!FORCE)return; // ⚠️ preview only for now – new players get it after Marius says OK
+let FORCE=Q.has('tut');
 const GUIDE={name:'MAMA ROSA',role:'CHIEF MECHANIC',img:'img/hero/m4_1.webp'}; // placeholder until the ChatGPT guide picture arrives
 
 // ---------- styles ----------
@@ -47,6 +46,9 @@ let camT=null;
 function camTo(r){camT={x:r.x+r.w/2,y:r.y+r.h/2};}
 function camStep(){if(!camT)return;const c=X().cam(),T0=X().TOP,tx=camT.x-c.vw/c.z/2,ty=camT.y-(c.vh-T0)/c.z/2+(c.vh-T0)/c.z*.12;
   X().setCam(c.x+(tx-c.x)*.14,c.y+(ty-c.y)*.14);const d=X().cam();if(Math.abs(d.x-c.x)<.5&&Math.abs(d.y-c.y)<.5)camT=null;}
+const isNew=()=>!G.tut&&!G.sold&&!(G.cp&&G.cp.best)&&(G.lv.service||1)<=1&&(G.lv.inspect||1)<=1;
+// a save with progress came in (cloud / transfer) while the tutorial runs → stop it quietly
+const progressed=()=>!FORCE&&((G.cp&&G.cp.best>4)||G.sold>60||(G.lv.inspect||1)>2||G.rep>=6);
 const heroCount=()=>Object.keys(G.h.own||{}).length;
 const R=new Proxy({},{get:(o,k)=>()=>X().rect(k)});
 const sel0=()=>X().sel(),closePanel=()=>X().closePanel(),fmt=n=>TE().fmt(n),save=()=>TE().save(),toast=(a,b)=>TE().toast(a,b),TOP=52;
@@ -59,9 +61,9 @@ const S=[
  {w:'inspect',t:`<b>INSPECTION</b> checks every car and decides what must be repaired and which workshop it visits.`,next:'NEXT'},
  {w:'office',t:`When a car is fixed, the <b>SALES OFFICE</b> sells it and you get the money. It all runs by itself – even while you are away!`,next:'NEXT'},
  {w:'service',tap:1,t:`Upgrades make your garage faster and richer. <b>Tap the SERVICE workshop.</b>`,done:()=>isOpen('sheet')&&sel0()==='service'},
- {el:()=>$('shBtn'),tap:1,enter:()=>{lv0=G.lv.service||0;},t:()=>`Tap <b>UPGRADE</b>: more mechanics, faster work and bigger pay.`+(G.money<upCost()?` <small>(you need ${fmt(upCost())} – wait a little, cars are being sold!)</small>`:''),done:()=>(G.lv.service||0)>lv0},
+ {el:()=>$('shBtn'),tap:1,enter:function(){lv0=G.lv.service||0;this.next=FORCE?'NEXT':'';if(!FORCE&&G.money<upCost()){G.money=upCost();try{save();}catch(e){}}},t:()=>`Tap <b>UPGRADE</b>: more mechanics, faster work and bigger pay.`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>(G.lv.service||0)>lv0},
  {el:()=>$('smBtn'),tap:1,enter:()=>{try{closePanel();}catch(e){}},t:`Your mechanics are also <b>HEROES</b>! Open <b>SUMMON</b> – you have free Recruit Tickets.`,done:()=>isOpen('sm')},
- {el:()=>document.querySelector('#smBox [data-a="sum"][data-n="10"]')||document.querySelector('#smBox [data-a="sum"]'),tap:1,enter:()=>{tk0=G.h.tk;hc0=(G.h.hist||[]).length;},t:`Tap <b>×10</b> to recruit 11 heroes at once!`,done:()=>G.h.tk<tk0||(G.h.hist||[]).length!==hc0||isOpen('res')},
+ {el:()=>document.querySelector('#smBox [data-a="sum"][data-n="10"]')||document.querySelector('#smBox [data-a="sum"]'),tap:1,enter:function(){tk0=G.h.tk;hc0=(G.h.hist||[]).length;this.next=FORCE?'NEXT':'';},t:()=>`Tap <b>×10</b> to recruit 11 heroes at once!`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>G.h.tk<tk0||(G.h.hist||[]).length!==hc0||isOpen('res')},
  {free:1,top:1,t:`Nice team! Heroes <b>work in your garage</b> and <b>fight in battles</b>. Now close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
  {el:()=>$('cpBtn'),tap:1,t:`Monsters made of car parts are attacking the city! Tap <b>BATTLE</b>.`,done:()=>isOpen('hub')||isOpen('cp')},
  {el:()=>document.querySelector('#hub.open [data-hb="camp"]'),tap:1,t:`Open the <b>CAMPAIGN</b>.`,done:()=>vis(document.querySelector('#cpPath .node.cur'))&&!isOpen('hub')},
@@ -83,20 +85,23 @@ const tb={T:$('tbT')||root.querySelector('#tbT'),B:root.querySelector('#tbB'),L:
 let i=-1,cur=null,skipArm=0,lastTx='';
 function place(L,T,Wd,H){const s=(e,a,b,c,d)=>{e.style.left=a+'px';e.style.top=b+'px';e.style.width=Math.max(0,c)+'px';e.style.height=Math.max(0,d)+'px';};
   s(tb.T,0,0,innerWidth,T);s(tb.B,0,T+H,innerWidth,innerHeight-T-H);s(tb.L,0,T,L,H);s(tb.R,L+Wd,T,innerWidth-L-Wd,H);}
-function go(n){i=n;cur=S[i];skipArm=0;lastTx='';if(!cur){end();return;}
+let L=S,MINI=null;
+function go(n){i=n;cur=L[i];skipArm=0;lastTx='';if(!cur){end();return;}
   if(cur.enter)try{cur.enter();}catch(e){}
   if(cur.w){camTo(R[cur.w]());try{if(sel0()&&!cur.tap)closePanel();}catch(e){}}
   nx.textContent=cur.next||'';nx.style.display=cur.next?'':'none';
-  dots.textContent=(i+1)+' / '+S.length;sk.style.visibility=cur.gift?'hidden':'';
+  dots.textContent=MINI?'':(i+1)+' / '+L.length;sk.style.visibility=cur.gift||MINI?'hidden':'';
   bub.style.animation='none';void bub.offsetWidth;bub.style.animation='';}
 function end(){root.remove();running=false;window.__TUTON=false;
+  if(MINI){(G.tutM=G.tutM||[]).push(MINI);MINI=null;L=S;try{save();}catch(e){}return;}
+  if(!G.tutM&&!FORCE)G.tutM=[];
   if(!FORCE){G.tut=1;try{save();}catch(e){}}}
-nx.onclick=()=>{if(cur&&cur.gift&&!FORCE){G.dm=(G.dm||0)+100;G.h.tk+=2;try{save();toast('🎁 Welcome gift: 100 diamonds + 2 Recruit Tickets',3500);}catch(e){}}
+nx.onclick=()=>{if(FORCE&&cur&&!cur.gift&&isOpen('sm')&&cur.tap){const b=document.querySelector('#smBox [data-a="back"]');if(b)b.click();go(i+2);return;}if(cur&&cur.gift&&!FORCE){G.dm=(G.dm||0)+100;G.h.tk+=2;try{save();toast('🎁 Welcome gift: 100 diamonds + 2 Recruit Tickets',3500);}catch(e){}}
   if(cur&&cur.gift&&FORCE){try{toast('Preview: the gift is not given (test only)',2500);}catch(e){}}
   go(i+1);};
 sk.onclick=()=>{if(!skipArm){skipArm=1;sk.textContent='TAP AGAIN TO SKIP';setTimeout(()=>{skipArm=0;sk.textContent='SKIP TUTORIAL';},2500);return;}end();};
-let running=true;
-function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;
+let running=false;
+function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;if(!MINI&&progressed()){G.tut=1;try{save();}catch(e){}root.remove();running=false;window.__TUTON=false;return;}
   camStep();
   if(cur.done){let ok=false;try{ok=cur.done();}catch(e){}if(ok){go(i+1);return;}}
   const t=typeof cur.t==='function'?cur.t():cur.t;if(t!==lastTx){tx.innerHTML=t||'';lastTx=t;}
@@ -122,7 +127,24 @@ function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;
   }
 }
 // start after the loading screen
-const wait=setInterval(()=>{const ld=document.getElementById('loader');if(!ld||!ld.classList.contains('hide'))return;clearInterval(wait);
-  setTimeout(()=>{window.__TUTON=true;document.body.appendChild(root);go(0);loop();},700);},200);
-window.__TUT={go:n=>go(n),end};
+function start(replay){if(running)return;if(replay)FORCE=true;running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();
+  try{closePanel();}catch(e){}}
+const wait=setInterval(()=>{const ld=document.getElementById('loader');if(!ld||!ld.classList.contains('hide')||!window.__TE)return;clearInterval(wait);
+  // wait a moment: the cloud / transfer window may still bring an older save
+  setTimeout(()=>{if(FORCE||isNew())start();},1500);},200);
+// ---------- mini-guides: one bubble the first time a battle mode is open in the Battle Hub ----------
+const MG={arena:`<b>ARENA</b>: your battle team fights other players' teams. 5 fights a day – climb from BRONZE to LEGEND!`,
+  cup:`<b>TORQUE CUP</b>: every weekend the best Arena players fight in a tournament for big prizes.`,
+  tower:`<b>TORQUE TOWER</b> is open! Climb floor by floor – every floor is harder and gives better rewards.`,
+  class:`<b>CLASS TOWERS</b> are open: a tower for every hero class. Build strong teams for each one!`,
+  boss:`<b>WORLD BOSS</b> is open! 3 keys a day: hit the boss as hard as you can and climb the damage ranking.`,
+  dg:`<b>DUNGEONS</b> are open! 2 free keys a day in each dungeon: money, gear and NITRO BOOST.`};
+let hubDone=false; // max one mini-guide each time the Battle Hub is opened
+setInterval(()=>{if(!isOpen('hub')){hubDone=false;return;}if(running||hubDone||!window.__TE)return;
+  const open=Object.keys(MG).filter(k=>vis(document.querySelector('#hub.open .hubM[data-hb="'+k+'"]:not(.lk)')));
+  if(!G.tutM){G.tutM=open.slice();try{save();}catch(e){}return;} // players from before v16-73: what is already open counts as seen
+  const k=open.find(k=>!G.tutM.includes(k));if(!k)return;
+  hubDone=true;MINI=k;L=[{el:()=>document.querySelector('#hub.open .hubM[data-hb="'+k+'"]'),t:MG[k],next:'GOT IT'}];
+  running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},700);
+window.__TUT={start:()=>{MINI=null;L=S;start(true);},go:n=>go(n),end};
 })();
