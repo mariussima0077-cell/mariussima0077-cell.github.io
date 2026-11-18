@@ -3671,6 +3671,10 @@ function startLoader(){
     drawLoader(t);requestAnimationFrame(lf);})(t0);
   $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
+// v16-72: what the tutorial (tutorial.js) needs from the map – camera, building areas, panel
+window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},
+  rect:id=>id==='parking'?{x:430,y:110,w:345,h:290}:id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:GAR[id]?{x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32}:null,
+  sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>BLD[id].cost[G.lv[id]||0]||0,TKI:()=>TKI};
 window.__TE={giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
@@ -3697,5 +3701,6 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 <script src="cloud.js"></script>
 <script src="online.js"></script>
 <script src="classic.js"></script>
+<script src="tutorial.js"></script>
 </body>
 </html>

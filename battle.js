@@ -2276,7 +2276,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
   // v16-25: AUTO NEXT – after a victory the next stage starts by itself after a 3 s countdown (same team). Stops on defeat, on any tap, or with the switch.
   clearInterval(ANX.id);const canAuto=win&&si<NST-1;
   const anxShow=()=>{const on=G.cp.autoNext!==false,b=$('anxS'),c=$('anxC');if(!b)return;b.textContent=on?'ON':'OFF';b.parentNode.classList.toggle('on',on);c.textContent=on&&ANX.n>0?'next stage in '+ANX.n+'…':on?'':'tap to turn on';};
-  const anxGo=()=>{clearInterval(ANX.id);ANX.n=0;if(!canAuto||G.cp.autoNext===false)return anxShow();ANX.n=3;anxShow();
+  const anxGo=()=>{clearInterval(ANX.id);ANX.n=0;if(!canAuto||G.cp.autoNext===false||window.__TUTON)return anxShow(); /* v16-72: no auto-next during the tutorial */ANX.n=3;anxShow();
     ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}ANX.n--;anxShow();if(ANX.n<=0){clearInterval(ANX.id);
       $('cpRes').classList.remove('open');G.cp.ch=STAGES[si+1].c;safeStart(si+1,teamHeroes());}},1000);};
   if(canAuto)anxGo();
