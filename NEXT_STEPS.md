@@ -210,3 +210,10 @@
 - Pachet nou în Play (de ex. cu plăți) = semnat cu **aceeași cheie** din Drive și același Package ID `com.torqueempire.game`.
 - Secretele (cheie dev, ADMIN_KEY, parole) stau DOAR în Google Drive, niciodată pe GitHub.
 - Imaginile le alege mereu Marius; înainte de mecanici noi, Claude arată diferența înainte/după.
+
+## 💰 DECIZIE ÎN AȘTEPTARE – MONETIZARE (18 nov 2026)
+Marius: „dacă vreau să primim și diamante sau tichete, nu contează că se schimbă politica puțin”. Claude a propus (încă NIMIC schimbat în joc sau în Play):
+- **Înainte de orice pachet cu 💎/bilete pe bani**: Play → Classification „éléments aléatoires” = **Oui**, refaci IARC, scoți **Belgia** din țări, accepți **18+ în Brazilia** (legea ECA Digital, din martie 2026), Rate Info + pity rămân, actualizezi `PLAY_RULES.md`.
+- **Schimbări la ce avem**: VIP Pass 5,99 €/lună → „lunar adevărat”: 300💎 la cumpărare + 100💎 și 2 Recruit pe zi + ×1,5 VIP + Battle ×2 inclus + Idle +4 h. Battle ×2: 4,99 → 2,99 €. VIP Truck, Crew Boost, Dungeon Pass rămân.
+- **Noi**: Starter Pack 0,99 € (o dată) · pachete de diamante 1,99–99,99 € (prima cumpărare ×2) · Torque Pass lunar (gratis + Premium 4,99 € + Elite 9,99 €) · Campaign Fund 9,99 € (diamante la capitolele 5…50). Pass-urile „pe viață” cu recompense zilnice: NU recomandat.
+- Așteaptă alegerea lui Marius → machetă → integrare.
