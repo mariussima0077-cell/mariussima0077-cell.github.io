@@ -250,7 +250,8 @@ const css=`
 #olFx .vs .mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:italic 900 92px/1 system-ui;background:linear-gradient(#fff,#ffe27a 50%,#ff8a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px #ffb300) drop-shadow(0 4px 0 #6a3a00);animation:olVs .6s .35s cubic-bezier(.2,1.8,.4,1) both}
 @keyframes olVs{from{transform:translate(-50%,-50%) scale(4);opacity:0}}
 #olFx .ctl{position:absolute;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px;z-index:4}
-#olFx .ctl button{border:0;border-radius:11px;padding:8px 12px;font:900 12px system-ui;background:#000a;color:#ffe27a;box-shadow:0 0 0 1.5px #e0aa25}
+#olFx .ctl button{-webkit-appearance:none;appearance:none;border:0;border-radius:11px;padding:8px 12px;font:900 12px system-ui;background:rgba(0,0,0,.72);background-image:none;color:#ffe27a;opacity:1;box-shadow:0 0 0 1.5px #e0aa25}
+#olFx.end .ctl{display:none}
 #olFx .res{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(#0008,#000d);z-index:5;overflow:hidden;color:#fff}
 #olFx .res.on{display:flex}
 #olFx .res .rr{position:absolute;width:560px;height:560px;background:repeating-conic-gradient(#ffd54a40 0 7deg,transparent 7deg 20deg);border-radius:50%;-webkit-mask:radial-gradient(#000 5%,transparent 62%);mask:radial-gradient(#000 5%,transparent 62%);animation:olSpin 10s linear infinite}
@@ -607,7 +608,7 @@ function playFight(r,replay){
   F={r,U,t:-2.0,i:0,pop:[],fx:[],shake:0,white:0,sk:null,spd:+(LS('te_aspd')||2),done:false,replay,proj:[]};
   const me=r.me||{},th=r.them||{};
   $('olVs').innerHTML=`<div class="side a"><div class="av">${avf(me.icon,me.frame)}</div><div>${flag(me.cc)} ${esc(me.name||'You')}<small>⚡ ${fmtN(me.pow||0)}</small></div></div><div class="side b"><div>${flag(th.cc)} ${esc(th.name||'Rival')} ${th.bot?'<span class="ai" style="font-size:10px">AI</span>':''}<small>⚡ ${fmtN(th.pow||0)}</small></div><div class="av">${avf(th.icon,th.frame)}</div></div><div class="mid">VS</div>`;
-  $('olVs').style.display='flex';$('olRes').classList.remove('on','lose');$('olFx').classList.add('on');$('olSpd').textContent='×'+F.spd+' ⏩';
+  $('olVs').style.display='flex';$('olRes').classList.remove('on','lose');$('olFx').classList.remove('end');$('olFx').classList.add('on');$('olSpd').textContent='×'+F.spd+' ⏩';
   const rs=()=>{const k=Math.min(1.5,devicePixelRatio||1);fc.width=Math.round(innerWidth*k);fc.height=Math.round(innerHeight*k);};rs();
   setTimeout(()=>{if(F)$('olVs').style.display='none';},1900);
   window.__BATTLE_ON=true;cancelAnimationFrame(fRaf);let last=performance.now();
@@ -631,7 +632,7 @@ function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u
     R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
      ${t&&!F.replay?`<div class="lg"><div class="o-bar"><i style="width:${tierPct(t,r.pts-r.da)}%"></i></div><small>${t.name} · ${r.pts} pts</small></div>`:''}
      ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>💎 +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>🎟️ +${r.rw.tk} Recruit</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
-    R.classList.add('on');if(!F.replay){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
+    R.classList.add('on');$('olFx').classList.add('end');if(!F.replay){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
       setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
     $('olCont').onclick=()=>{$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(cur==='olArena'){arData=null;loadArena();}};},1100);}
 let crowd=null;
