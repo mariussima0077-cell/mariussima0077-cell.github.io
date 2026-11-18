@@ -21,7 +21,7 @@ Ultima actualizare: 15 noiembrie 2026 (v16-45 – online: clasament, chat, aren�
 | Privacy policy | https://mariussima0077-cell.github.io/privacy.html | ✅ online |
 | Ștergere date (URL) | https://mariussima0077-cell.github.io/delete-data.html | ✅ online |
 | Package Android | PWABuilder (TWA), **fără Play Billing** încă | ✅ făcut |
-| Test închis | 12 testeri × 14 zile | ⏳ |
+| Test închis | 12 testeri × 14 zile · 18 nov 2026: release **106 (Capacitor, cu Play Billing)** promovat din testul intern și trimis la examinare (înlocuiește TWA 1.0.0.0) | ⏳ |
 | Test intern – aplicația nativă (Capacitor) | release **106 (2.0.106)**, AAB semnat cu cheia de upload, publicat 18 nov 2026 de Claude; testeri: lista „Interni Marius” (torqueempirehelp@gmail.com); link: https://play.google.com/apps/internaltest/4701532344069203705 | ✅ 18 nov 2026 |
 | Cont de comerciant (Google Payments) | profil de plată creat de Marius (18 nov 2026), nume public „Torque Studios”, „Jouets, jeux et loisirs”, e-mail torqueempirehelp@gmail.com; confirmarea contului bancar (micro-depunere) în curs | ⏳ confirmare bancă |
 | Produse în Play Console | create și **active** de Claude (18 nov 2026), opțiunea de cumpărare `buy`, taxa „Ventes d'applications numériques”, prețuri cu TVA în zona euro: `vip_car` VIP Truck **5,99 €** · `vip_mechanic` VIP Crew Boost **3,99 €** · `battle_speed_x2` **4,99 €** · `dungeon_pass_30d` **2,99 €** (consumat de joc după verificare) · abonament `vip_pass_monthly` („VIP Pass”), plan de bază `monthly`, lunar, reînnoire automată, **5,99 €/lună**, perioadă de grație 7 zile | ✅ 18 nov 2026 |
