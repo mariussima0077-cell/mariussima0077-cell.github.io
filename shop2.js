@@ -25,7 +25,7 @@ const DIAMONDS = [
   {k:'d5', dm:9500,  price:'€49.99', ic:'ui3/sp_dm', big:1},
   {k:'d6', dm:20000, price:'€99.99', ic:'ui3/sp_chest', big:1},
 ];
-// VIP Pass tiers (only one active). gold = the old subscription product vip_pass_monthly (PK.sub = expiry)
+// VIP Pass tiers – v16-84: they STACK (one of each can be active at once, bonuses add up). gold = the old subscription product vip_pass_monthly (PK.sub = expiry)
 const PASS = {
   sil:  {n:'SILVER PASS',   mult:1.2, idle:1, cost:1500, day:{tk:1}},
   gold: {n:'GOLD PASS',     mult:1.5, idle:2, price:'€5.99', start:300, day:{dm:100, tk:2}, spd:1},
@@ -42,9 +42,11 @@ const SPC = 20;                           // stages per chapter (battle.js)
 const PK = () => T().PK;
 const S = () => { const G=T().G; if(!G.shop) G.shop={fx:{}, day:'', ge:0, pe:0, fn:[], fh:[]}; const s=G.shop; s.fx=s.fx||{}; s.fn=s.fn||[]; s.fh=s.fh||[]; return s; };
 const on = k => (PK()[k]||0) > now();
-function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; return null; }
-const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 const expKey = {sil:'sil', gold:'sub', plat:'plat'};
+function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; return null; }   // the best active one (name / colour)
+const actv = () => ['sil','gold','plat'].filter(k=>on(expKey[k]));                       // v16-84: every active pass
+const stackMult = () => { const a=actv(); return a.length ? Math.round((1+a.reduce((x,k)=>x+PASS[k].mult-1,0))*10)/10 : PASS.gold.mult; };  // +20% / +50% / +100% add up
+const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 
 // ---------------- giving things ----------------
 function rwText(r){ const a=[];
@@ -73,8 +75,8 @@ function passTick(){
   const t=T(); if(!t||!t.G||!api.live) return; const s=S(), tr=tier();
   for(const [k,key,f] of [['gold','sub','ge'],['plat','plat','pe']]){
     const e=PK()[key]||0; if(e>now() && e!==s[f]){ s[f]=e; give({dm:PASS[k].start}, PASS[k].n); } }
-  if(tr && s.day!==today()+tr){ s.day=today()+tr; give(PASS[tr].day, PASS[tr].n+' · daily gift'); }
-  if(tr==='plat' && t.idleNow && t.claimIdle && t.idleMax){ const I=t.idleNow(); if(I.hrs>=t.idleMax()-0.01 && I.money>0){ t.claimIdle(); t.toast('🧰 Platinum Pass: Idle Rewards collected automatically',3000); } }
+  for(const k of actv()){ s.dd=s.dd||{}; if(s.dd[k]!==today()){ s.dd[k]=today(); if(s.day!==today()+k) give(PASS[k].day, PASS[k].n+' · daily gift'); } }   // v16-84: every active pass gives its own gift (s.day = old one-gift key, so no double gift today)
+  if(on('plat') && t.idleNow && t.claimIdle && t.idleMax){ const I=t.idleNow(); if(I.hrs>=t.idleMax()-0.01 && I.money>0){ t.claimIdle(); t.toast('🧰 Platinum Pass: Idle Rewards collected automatically',3000); } }
 }
 
 // ---------------- buying ----------------
@@ -84,12 +86,12 @@ async function buy(k){
   try{
     if(k==='sil'){                                       // paid with diamonds earned in the game
       const G=T().G, c=PASS.sil.cost;
-      if(tier()){ T().toast('A VIP Pass is already active.',2500); return; }
+      if(on('sil')){ T().toast('Silver Pass is already active.',2500); return; }
       if((G.dm||0)<c){ T().toast('💎 Not enough diamonds ('+(G.dm||0).toLocaleString('en')+' / '+c.toLocaleString('en')+')',3000); return; }
       if(conf!=='sil'){ conf='sil'; render(); setTimeout(()=>{ if(conf==='sil'){ conf=''; render(); } },4000); return; }
       conf=''; G.dm-=c; PK().sil=now()+30*DAY; t_save(); T().save(); T().vipRefresh(); T().toast('🥈 Silver Pass active for 30 days!',3500); passTick(); render(); return;
     }
-    if(k==='sub'||k==='plat'){ if(tier()&&tier()!=='sil'){ T().toast('A VIP Pass is already active. To switch, cancel it in Google Play → Subscriptions; buy the new one when it ends.',5000); return; } }
+    if((k==='sub'||k==='plat') && on(k)){ T().toast('This VIP Pass is already active.',3000); return; }   // v16-84: other passes may be active
     const ok = await Promise.race([SEC.buy(k), new Promise(res=>setTimeout(()=>res(false),200e3))]);   // v16-78: the button never stays dead
     if(!ok) return;
     if((k==='sub'||k==='plat') && !(PK()[k]>now())) PK()[k]=now()+30*DAY;   // test mode / missing expiry
@@ -229,10 +231,10 @@ function render(){
   if(tab==='tv'){
     const row=(ic,n,v,no)=>'<li'+(no?' class="no"':'')+'><img src="'+ic+'" alt="">'+n+'<b>'+v+'</b></li>';
     const btn=(k,label,dm)=>{ const key=expKey[k];
-      if(tr===k) return '<span class="tot">Active – '+daysLeft(key)+' days left</span><button class="buy own">ACTIVE ✓</button>';
+      if(on(key)) return '<span class="tot">Active – '+daysLeft(key)+' days left</span><button class="buy own">ACTIVE ✓</button>';
       if(dm) return '<span class="tot">30 days · no renewal</span><button class="buy dm'+(conf==='sil'?' cf':'')+'" data-b="sil">'+(conf==='sil'?'CONFIRM?':IC.dm+PASS.sil.cost.toLocaleString('en'))+'</button>';
-      return '<span class="tot">'+label+' / month · cancel anytime</span><button class="buy'+(tr&&tr!=='sil'?' lock':'')+'" data-b="'+key+'">'+P(key,label)+'</button>'; };
-    h+='<div class="sec">VIP PASS · 30 DAYS'+(tr?' · <span style="color:#7CFC9A">'+PASS[tr].n+'</span>':'')+'</div>';
+      return '<span class="tot">'+label+' / month · cancel anytime</span><button class="buy" data-b="'+key+'">'+P(key,label)+'</button>'; };
+    h+='<div class="sec">VIP PASS · 30 DAYS'+(actv().length?' · <span style="color:#7CFC9A">'+(actv().length>1?actv().length+' ACTIVE · ×'+stackMult().toFixed(1).replace(/\.0$/,''):PASS[tr].n)+'</span>':'')+'</div>';
     h+='<div class="card vp s"><div class="top"><img src="'+IMG('shop/vp_sil')+'" alt=""><div><h3>SILVER PASS</h3><div class="sub">Free to play – paid with diamonds you earn</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_crown'),'VIP benefits','×1.2')+row(IMG('ui3/v_idle'),'Idle Rewards','+1 h')+row('img/ticket.webp','Recruit Ticket every day','+1')+row(IMG('ui3/v_dm'),'Diamonds every day','–',1)+row(IMG('ui3/sp_speed'),'Battle Speed ×2','–',1)+
       '</ul><div class="foot">'+btn('sil','',1)+'</div></div>';
@@ -242,7 +244,7 @@ function render(){
     h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×2','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
       '</ul><div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
-    h+='<div class="note">Only one VIP Pass is active at a time. The daily gift arrives the first time you open the game each day. To switch Gold ↔ Platinum, cancel in Google Play → Subscriptions and buy the new one when the old one ends. VIP points still come only from Daily Quests.</div>';
+    h+='<div class="note">VIP Passes stack: you can have Silver, Gold and Platinum at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
   }
   if(tab==='tf'){
     h+='<div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>';
@@ -284,11 +286,11 @@ function close(){ el.classList.remove('open'); }
 const api = window.SHOP2 = {
   live: LIVE || !!(window.SEC && SEC.TEST_MODE),
   open, close, render, grant, tier,
-  mult: () => { const tr=tier(); return tr?PASS[tr].mult:PASS.gold.mult; },
-  idleH: () => { const tr=tier(); return tr?PASS[tr].idle:0; },
-  PASSN: () => { const tr=tier(); return tr?PASS[tr].n:''; },
-  days: () => { const tr=tier(); return tr?daysLeft(expKey[tr]):0; },
-  spd: () => { const tr=tier(); return !!(tr&&PASS[tr].spd); },
+  mult: stackMult,
+  idleH: () => actv().reduce((x,k)=>x+PASS[k].idle,0),
+  PASSN: () => actv().map(k=>PASS[k].n.replace(' PASS','')).join(' + ')+(actv().length>1?' PASS':(actv().length?' PASS':'')),
+  days: () => { const a=actv(); return a.length?Math.min(...a.map(k=>daysLeft(expKey[k]))):0; },
+  spd: () => actv().some(k=>PASS[k].spd),
 };
 // start: first check after the save is loaded, then every minute (new day, new subscription period, Platinum auto-collect)
 function boot(){ if(!T()||!T().G){ setTimeout(boot,500); return; } if(!api.live) return; T().vipRefresh(); setTimeout(passTick,3000); setInterval(()=>{ passTick(); if(el.classList.contains('open')) render(); },60e3); }

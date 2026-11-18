@@ -3514,7 +3514,7 @@ let lastV=-1,lastQ=-1;
 let lastTk=-1,lastIdle=-1;
 let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
-  const vk=VLV*10+(VSUB?1:0);if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
+  const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
   if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
@@ -3540,6 +3540,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:34,d:'Nov 18, 2026',ic:'👑',t:'VIP Passes stack + hero frames on profiles',l:['You can now have <b>Silver, Gold and Platinum Pass</b> at the same time. Every pass gives its own daily gift and the bonuses add up (VIP benefits, Idle hours).','A player\'s <b>profile</b> now shows his battle team in the <b>grade frames</b> – name and grade of every hero.']},
  {id:33,d:'Nov 18, 2026',ic:'⚙️',t:'Smarter AUTO EQUIP',l:['<b>AUTO EQUIP</b> now checks your hero\'s <b>class SET</b> first (2, 3, 4… pieces) and compares it with the best normal items – the gear with the most <b>Power</b> wins.']},
  {id:32,d:'Nov 18, 2026',ic:'👑',t:'Fixed: VIP level in Ranking & Chat',l:['The <b>VIP</b> badge in RANKING, CHAT and on profiles now shows your real <b>VIP level</b>. Before, some players were shown as VIP 20 by mistake.']},
  {id:31,d:'Nov 18, 2026',ic:'🛒',t:'New SHOP: packs, diamonds & passes',l:['The <b>SHOP</b> is brand new: <b>PACKS</b> (Starter, Rookie, Pro, Elite – each with a hero), <b>DIAMONDS</b> (double diamonds on your first buy of every pack), <b>VIP PASS</b> and <b>CAMPAIGN FUNDS</b>.','<b>VIP PASS</b>: <b>SILVER</b> (paid with diamonds), <b>GOLD</b> and <b>PLATINUM</b> – daily diamonds and tickets, more income, longer Idle Rewards and ×2 battle speed.','<b>CAMPAIGN FUND</b> (Normal or Hard): big rewards every 5 chapters.','Battle speed <b>×2</b> now costs only <b>€2.99</b>.']},
@@ -3646,7 +3647,7 @@ function frame(now){
       if(goodT>15&&DPR<capDPR){DPR=Math.min(MAXDPR,DPR+.25);cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}}
     perfT=0;perfN=0;perfSum=0;perfJS=0;perfMin=99;}}
   panelT+=dt;if(panelT>.25){panelT=0;renderPanel();if(dqEl.classList.contains('open'))renderDQ();renderSm();renderTeam();renderIdle();
-    if((time|0)%5===0){dqCheck();if(VSUB!==subOn())vipRefresh();}}
+    if((time|0)%5===0){dqCheck();if(VSUB!==subOn()||(S2()&&SUB_MULT!==SHOP2.mult()))vipRefresh();}}
   requestAnimationFrame(frame);
 }
 let hidAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){save();hidAt=Date.now();}else if(started&&hidAt&&Date.now()-hidAt>6e5&&idleNow().money>0)popIdle(true);last=performance.now();});
