@@ -2629,14 +2629,25 @@ function upFx(it,v0,p0){const T=TE(),st=GSTAT[GS[it.s].st],col=T.GRADES[it.r].c,
   const u=bx.querySelector('.iUp');if(u){u.classList.remove('upHit2');void u.offsetWidth;u.classList.add('upHit2');}
   const m=bx.querySelector('.iSt.main b');if(m){m.classList.remove('upHit2');void m.offsetWidth;m.classList.add('upHit2');}}
 function equip(hid,it){const g=GR(),o=ownerOf(it);if(o)delete g.eq[o][it.s];if(!g.eq[hid])g.eq[hid]={};g.eq[hid][it.s]=it.id;}
-function autoPlan(h){const g=GR(),eq=g.eq[h.id]||{},ov={};
-  for(const sl of GSLOT){let best=itemById(eq[sl.k])||null,bp=pow(h,{...ov,[sl.k]:best});
-    for(const it of g.inv){if(it.s!==sl.k)continue;const o=ownerOf(it);if(o&&o!==h.id)continue;const p=pow(h,{...ov,[sl.k]:it});if(p>bp){bp=p;best=it;}}
-    ov[sl.k]=best;}
-  return ov;}
+// v16-83 (Marius: "first check if the set is better, then the normal pieces"): the hero's OWN class set is tried first –
+// 2, 3 … all slots with a set piece (the set slots that lose the least go first), the other slots get the best normal item.
+// The plan with the highest Power wins; if no set plan beats the normal one, the normal (best item per slot) plan is used.
+function autoPlan(h){const g=GR(),eq=g.eq[h.id]||{},k=roleOf(h);
+  const free=it=>{const o=ownerOf(it);return !o||o===h.id;};
+  const fill=ov=>{for(const sl of GSLOT){if(sl.k in ov)continue;let best=itemById(eq[sl.k])||null;if(best&&!free(best))best=null;let bp=pow(h,{...ov,[sl.k]:best});
+    for(const it of g.inv){if(it.s!==sl.k||!free(it))continue;const p=pow(h,{...ov,[sl.k]:it});if(p>bp){bp=p;best=it;}}
+    ov[sl.k]=best;}return ov;};
+  const norm=fill({});let bestOv=norm,bestP=pow(h,norm);
+  if(!SETS[k])return bestOv;
+  const cand=[];for(const sl of GSLOT){let b=null,bp=-1;
+    for(const it of g.inv){if(it.s!==sl.k||it.set!==k||!free(it))continue;const p=pow(h,{...norm,[sl.k]:it});if(p>bp){bp=p;b=it;}}
+    if(b)cand.push({k:sl.k,it:b,p:bp});}
+  cand.sort((a,b)=>b.p-a.p);
+  for(let m=2;m<=cand.length;m++){const ov={};for(let i=0;i<m;i++)ov[cand[i].k]=cand[i].it;fill(ov);const p=pow(h,ov);if(p>=bestP){bestP=p;bestOv=ov;}}
+  return bestOv;}
 function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(h),eq=g.eq[h.id]||{};const ch=GSLOT.filter(sl=>(ov[sl.k]?ov[sl.k].id:0)!==(eq[sl.k]||0));
   if(!ch.length){T.toast('⚡ '+h.n+' already wears the best free gear',2000);return;}
-  let x=`<div class="pT">Auto equip – before / after</div><div class="pD">Best free gear for ${h.n} (gear worn by other mechanics is not taken).</div><div class="aeL">`+ch.map(sl=>{const a=itemById(eq[sl.k]),b=ov[sl.k];return `<div><small>${sl.n}</small>${a?itemCard(a):'<div class="gse sm">—</div>'}<span>➜</span>${b?itemCard(b):'<div class="gse sm">—</div>'}</div>`;}).join('')+'</div>';
+  let x=`<div class="pT">Auto equip – before / after</div><div class="pD">Best free gear for ${h.n}: ${SETS[roleOf(h)]?'checks the '+SETS[roleOf(h)].n+' set first, then normal items – the one with the most Power wins':'the strongest items'} (gear worn by other mechanics is not taken).</div><div class="aeL">`+ch.map(sl=>{const a=itemById(eq[sl.k]),b=ov[sl.k];return `<div><small>${sl.n}</small>${a?itemCard(a):'<div class="gse sm">—</div>'}<span>➜</span>${b?itemCard(b):'<div class="gse sm">—</div>'}</div>`;}).join('')+'</div>';
   x+=cmpForHero(h,ov,[],[])+`<button class="cpGo" data-p="aok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`;pop(x);}
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
