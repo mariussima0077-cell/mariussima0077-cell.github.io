@@ -363,11 +363,13 @@ let ME=null,inboxN=0,chatLast=+(LS('te_chat_seen')||0),chatSrvLast=0,cur='',open
 let autoTr=LS('te_tr')!=='0';const mutes=new Set(JSON.parse(LS('te_mutes')||'[]'));
 function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.cp.best:0;if(b>=40)o.push('wr');if(b>=80)o.push('boss');if((G.rep||0)>=10)o.push('speed');if((G.rep||0)>=5)o.push('f1');
   if(G.gear&&(G.gear.inv||[]).some(it=>it.r>=4))o.push('gear');return o;}
+// v16-82: G.vip = VIP POINTS; the server and the profile need the VIP LEVEL (0-20)
+function vipLv(G){const P=typeof VIP_PTS!=='undefined'?VIP_PTS:null,v=G&&G.vip||0;if(!P)return 0;let n=0;for(let i=1;i<P.length;i++)if(v>=P[i])n=i;return n;}
 async function sync(){
   const t=T(),c=C();if(!t||!t.G||!c||!c.arenaTeam||!PID())return;
   let team=[];try{team=c.arenaTeam();}catch(e){}
   const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0);
-  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:G.vip||0,rep:G.rep||0,lv},team,unl:unlocksLocal(),icon:LS('te_icon')||undefined});
+  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),icon:LS('te_icon')||undefined});
   if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;dots();if(open_)hdr();}
   return r;}
 let arenaTk=0;
@@ -542,7 +544,7 @@ $('olCupB').addEventListener('click',async e=>{const b=e.target.closest('[data-r
 // ------------------------------------------------------------------ PROFILE
 function myHeroes(){const t=T();if(!t)return [];const G=t.G,o=[];for(const id in G.h.own){const h=t.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}o.sort((a,b)=>b.gr-a.gr||(G.h.own[b.id].s||0)-(G.h.own[a.id].s||0));return o;}
 function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty">Loading…</div>';return;}
-  const u=new Set(ME.unl||[]),G=T().G,vip=G.vip||0,rep=G.rep||0;
+  const u=new Set(ME.unl||[]),G=T().G,vip=vipLv(G),rep=G.rep||0;
   const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')));
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
