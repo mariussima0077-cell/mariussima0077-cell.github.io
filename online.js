@@ -710,7 +710,7 @@ function a2Hit(e,j,h,instant){const U=F.U,a=U[e.a],t=U[h[0]];if(!t)return;
   F.pop.push({x:t.x+(Math.random()-.5)*S*.3,y:t.y-S*1.05,v:Math.abs(h[1]),c:h[2],heal:h[1]<0,sk:e.k==='sk',t:0});
   if(h[1]<0){burst(t.x,t.y-S*.3,'#7dff8a',10,S*.6,S*1.4);F.fx.push({x:t.x,y:t.y-S*.4,im:FX('magic_02'),t:0,big:0,rot:0,heal:1});return;}
   burst(t.x,y,c,h[2]?18:e.k==='sk'?16:8,S*(h[2]?4:2.6),S*.6);F.fx.push({x:t.x,y,im:FX(e.k==='sk'?(SKFX[a.role]||'flare_01'):'slash_02'),t:0,big:e.k==='sk'||h[2],rot:Math.random()*6});
-  if(h[2]){F.hs=.08;F.shake=Math.max(F.shake,.25);}
+  if(h[2]){F.shake=Math.max(F.shake,.25);}
   if(e.k==='sk'){F.shake=Math.max(F.shake,.3);
     if(a.role==='engine'){F.dec.push({x:t.x,y:t.y,im:FX('dirt_02'),t:0,d:2.5,s:S*1.3});F.fx.push({x:t.x,y:t.y,im:FX('circle_05'),t:0,big:1,rot:0,ground:1});burst(t.x,t.y,'#a0784a',14,S*3,S*2.5,1.6);}
     else if(a.role==='paint'||a.role==='tuning'){F.dec.push({x:t.x,y:t.y,im:FX(a.role==='paint'?'twirl_02':'scorch_02'),t:0,d:3,s:S*1.1,c:a.col});burst(t.x,y,a.role==='tuning'?'#ff8a00':a.col,14,S*3.2,S*1.2,1.5);}
@@ -718,7 +718,7 @@ function a2Hit(e,j,h,instant){const U=F.U,a=U[e.a],t=U[h[0]];if(!t)return;
 function a2Ev(e,instant){const U=F.U,a=U[e.a];if(!a)return;const S=F.S;
   if(instant){e.h.forEach((h,j)=>a2Hit(e,j,h,true));return;}
   a.ps=e.k==='sk'?'skill':'atk';a.pt=0;if(a.goal&&!a.goal.dead)a.face=Math.sign(a.goal.x-a.x)||a.dir;
-  if(e.k==='sk'){F.cine={u:a,t:0};if(e.r!=='service')F.white=Math.max(F.white,.25);burst(a.x,a.y-S*.5,a.col,22,S*2.2,S*.8,1.4);
+  if(e.k==='sk'){if(!F.cine&&F.t-(F.lc||-9)>2.5){F.cine={u:a,t:0};F.lc=F.t;}if(e.r!=='service')F.white=Math.max(F.white,.25);burst(a.x,a.y-S*.5,a.col,22,S*2.2,S*.8,1.4);
     if(a.role==='engine')a.jz=1;}
   const [mx,my]=mz(a);if(e.k==='r')F.fx.push({x:mx,y:my,im:FX('muzzle_02'),t:0,big:0,rot:a.face>0?0:3.14,sm:1});
   e.h.forEach((h,j)=>{const t=U[h[0]];if(!t)return;const isK=e.k==='sk',d=(e.k==='m'?.16:e.k==='r'?.32:.5)+j*(a.role==='elec'?.09:.07);
@@ -727,9 +727,8 @@ function a2Ev(e,instant){const U=F.U,a=U[e.a];if(!a)return;const S=F.S;
       F.proj.push({sx,sy,t2:t,t:0,d:d*.92,typ,c:a.col,big:isK,tr:[]});}
     a2q(d,()=>F&&a2Hit(e,j,h,false));});}
 function a2Step(dt){const W=fc.width,H=fc.height,r=F.r,S=F.S;
-  if(F.hs>0){F.hs-=dt;dt*=.08;}
-  let slo=1;if(F.cine){F.cine.t+=dt;if(F.cine.t<.55)slo=.35;if(F.cine.t>1.25)F.cine=null;}
-  const sdt=dt*F.spd*slo;F.t+=F.t<0?dt:sdt;
+  let slo=1;if(F.cine){F.cine.t+=dt*1.6;if(F.cine.t>1.1)F.cine=null;}
+  const sdt=dt*F.spd;F.t+=F.t<0?dt:sdt;
   if(F.t>=0&&!F.done){while(F.ia<r.log.length&&r.log[F.ia].t-.5<=F.t)a2Plan(r.log[F.ia++]);
     while(F.i<r.log.length&&r.log[F.i].t<=F.t){const e=r.log[F.i++];a2Ev(e,false);const a=F.U[e.a];if(a)a.en=e.k==='sk'?0:Math.min(1,(a.en||0)+.25);}
     if(F.i>=r.log.length&&F.t>r.dur+.8&&!F.q.length)finish();}
@@ -748,13 +747,13 @@ function a2Step(dt){const W=fc.width,H=fc.height,r=F.r,S=F.S;
     if((u.ps==='atk'&&u.pt>.5)||(u.ps==='skill'&&u.pt>.9)||(u.ps==='hurt'&&u.pt>.3)){u.ps='idle';u.pt=0;}
     if(u.ps==='atk'||u.ps==='skill')u.lastHit=F.t;});
   // ---- camera: zoom on the hero casting a skill
-  const cz=F.cine&&F.cine.t<.8?1.1:1,cx=F.cine&&F.cine.t<.8?(F.cine.u.x*.35+W*.325):W/2,cy=F.cine&&F.cine.t<.8?(F.cine.u.y*.3+H*.434):H*.62,ek=1-Math.pow(.002,dt);
+  const cz=1,cx=W/2,cy=H*.62,ek=1-Math.pow(.002,dt);
   F.cam.z+=(cz-F.cam.z)*ek;F.cam.x+=(cx-F.cam.x)*ek;F.cam.y+=(cy-F.cam.y)*ek;
   g.save();if(F.shake>0){F.shake-=dt;const s=W*.03*F.shake;g.translate((Math.random()-.5)*s,(Math.random()-.5)*s);}
   g.translate(W/2,H*.62);g.scale(F.cam.z,F.cam.z);g.translate(-F.cam.x,-F.cam.y);
   arenaBg(W,H,F.t<0?F.t+2:F.t);
   F.dec=F.dec.filter(d=>{d.t+=sdt;if(d.t>d.d)return false;if(d.im.complete&&d.im.naturalWidth){g.save();g.globalAlpha=Math.min(.7,(1-d.t/d.d)*1.4);g.translate(d.x,d.y);g.scale(1,.32);g.drawImage(d.im,-d.s/2,-d.s/2,d.s,d.s);g.restore();}return true;});
-  if(F.cine&&F.cine.t<1){g.fillStyle=`rgba(0,0,0,${Math.min(.28,F.cine.t*2)*(F.cine.t>.6?Math.max(0,(1-F.cine.t)*2.5):1)})`;g.fillRect(-W,-H,W*3,H*3);}
+  if(0){g.fillStyle=`rgba(0,0,0,${Math.min(.28,F.cine.t*2)*(F.cine.t>.6?Math.max(0,(1-F.cine.t)*2.5):1)})`;g.fillRect(-W,-H,W*3,H*3);}
   F.U.slice().sort((a,b)=>a.y-b.y).forEach(u=>a2Draw(u,W,H));
   // projectiles
   F.proj=F.proj.filter(p=>{p.t+=sdt;const k=Math.min(1,p.t/Math.max(.05,p.d)),tx=p.t2.x,ty=p.t2.y-S*.5;
