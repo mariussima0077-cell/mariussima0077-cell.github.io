@@ -1,7 +1,9 @@
 # EROI CU ANIMAȚII NOI (8 cadre) – metoda (19 nov 2026)
 ✅ Făcut: **THE TORQUE KING** (m5_0, v16-94). Marius: „a ieșit super, ține minte cum am făcut, o facem și pentru următorii, dar mai târziu”.
 Următorul propus: **Lady Overdrive** (m5_1), apoi Legendary.
-⏳ **19 nov: prompturile pentru Lady Overdrive (m5_1) trimise** lui Marius (planșa `img/sheets/m5_1_lady.webp`). Aștept cele 8 poze → `img/sheets/lady/m5_1_<anim>.webp`.
+⏳ **19 nov: Legendary #1 = GRIGORE (m4_0, skill IRON QUAKE)** – prompturi trimise, aștept 8 poze → `img/sheets/grigore/m4_0_<anim>.webp`. Descriere: „huge burly bearded mechanic, dark hair tied back, brass goggles on his forehead, cream shirt with gold gear patch on the shoulder, dark overalls with tool belt and brown leather apron with a golden wrench emblem, giant steel-and-gold armored gauntlets, heavy steel-toed boots”.
+✅ **19 nov: pozele Lady Overdrive primite** (`img/sheets/lady/`), decupate cu `tools/v8_hero.py m5_1` (EXT: explozia FX + coloana de foc din skill = margine estompată, nu prelungită; KO = fără prelungire). Integrare pe branch-ul `lady-v8`: cast = cadrele skill 1-4 (`ck:4`), dash = cadrele 5-6 (`dsh`), FX = traseu de foc → explozie (cadrul 5) când trece prin grupul cel mai mare. Clip ÎNAINTE/DUPĂ trimis, **aștept OK** → `main`.
+⏳ (vechi) prompturile pentru Lady Overdrive (m5_1) trimise lui Marius (planșa `img/sheets/m5_1_lady.webp`). Aștept cele 8 poze → `img/sheets/lady/m5_1_<anim>.webp`.
 Descriere folosită: „young woman racer-mechanic, long fiery red hair in a high ponytail, racing goggles on her head, red-and-black striped armored racing suit with gold trim, red armored gauntlets and boots, big twin-turbine jet engine backpack with glowing orange turbines and exhaust flames”.
 
 ## Pașii
