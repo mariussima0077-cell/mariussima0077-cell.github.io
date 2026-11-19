@@ -1,6 +1,8 @@
 # EROI CU ANIMAȚII NOI (8 cadre) – metoda (19 nov 2026)
 ✅ Făcut: **THE TORQUE KING** (m5_0, v16-94). Marius: „a ieșit super, ține minte cum am făcut, o facem și pentru următorii, dar mai târziu”.
 Următorul propus: **Lady Overdrive** (m5_1), apoi Legendary.
+⏳ **19 nov: prompturile pentru Lady Overdrive (m5_1) trimise** lui Marius (planșa `img/sheets/m5_1_lady.webp`). Aștept cele 8 poze → `img/sheets/lady/m5_1_<anim>.webp`.
+Descriere folosită: „young woman racer-mechanic, long fiery red hair in a high ponytail, racing goggles on her head, red-and-black striped armored racing suit with gold trim, red armored gauntlets and boots, big twin-turbine jet engine backpack with glowing orange turbines and exhaust flames”.
 
 ## Pașii
 1. Claude trimite planșa actuală a eroului (`img/sheets/<id>_*.webp`) – Marius o **atașează în ChatGPT la fiecare prompt** (referință).
