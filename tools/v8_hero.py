@@ -21,6 +21,8 @@ HEROES = {
   'm4_0': ('grigore', {'idle': 428, 'run': 395, 'attack': 355, 'skill': 375, 'hitko': 400, 'win': 420, 'fx': 214}),
   # v16-96 MAMA ROSA: REF = idle 1 / attack 8 / skill 1 / hit 1 / win 1 standing; fx = holy pillar, sized ~1.1x her width
   'm4_1': ('rosa', {'idle': 432, 'run': 425, 'attack': 359, 'skill': 359, 'hitko': 380, 'win': 392, 'fx': 420}),
+  # v16-96 DUKE DIAMOND: REF = frame 1 standing height on each sheet (win: Duke frame 8, frame 1 has spark lines)
+  'm4_2': ('duke', {'idle': 424, 'run': 366, 'attack': 374, 'skill': 382, 'hitko': 361, 'win': 410, 'fx': 330}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -31,16 +33,33 @@ OLDH = 241          # standing height in 256-cell units (same size as the old sh
 APU = .75           # atlas px per unit (same as the old 192-px cells)
 P = 110             # extension padding (sheet px)
 
-def despill(a):
+KEEPBLUE = {'m4_2'}   # v16-96 Duke: blue diamonds / ice crystals (cyan) must stay blue, not turn grey
+
+def despill(a, n=''):
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     gr = (g > r) | (g > b + (r - b) * .8)
+    if HID in KEEPBLUE: gr &= g > b + 6
     fl = gr & (r > 2 * b + 20)
     sm = gr & ~fl
     a = a.copy()
     a[..., 1] = np.where(fl, np.minimum(g, r * .82), a[..., 1])
     v = (r + b) / 2
-    for k, o in ((0, 6), (1, 2), (2, 0)): a[..., k] = np.where(sm, v + o, a[..., k])
+    tint = ((0, 6), (1, 2), (2, 0))
+    if HID in KEEPBLUE and n == 'fx': v = np.maximum(r, b); tint = ((0, -40), (1, 0), (2, 25))  # teal glow → icy blue, not grey
+    for k, o in tint: a[..., k] = np.where(sm, np.clip(v + o, 0, 255), a[..., k])
     return a
+
+def drop_specks(c, mx=900):
+    """v16-96: remove tiny blobs touching the cell edge (bits of the neighbour frame that cross the cell line)"""
+    from scipy import ndimage
+    lab, k = ndimage.label(c[..., 3] > 20)
+    if not k: return c
+    sz = ndimage.sum(np.ones_like(lab), lab, range(1, k + 1))
+    edge = set(np.unique(np.concatenate([lab[:2].ravel(), lab[-2:].ravel(), lab[:, :2].ravel(), lab[:, -2:].ravel()]))) - {0}
+    c = c.copy()
+    for i in edge:
+        if sz[i - 1] < mx: c[lab == i, 3] = 0
+    return c
 
 # v16-95: per frame override where smearing the edge looks wrong (explosions / fire columns → soft fade instead,
 # tiny ground-shadow touches → nothing). key (sheet, frame 0-7)
@@ -48,17 +67,18 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
                 ('skill', 5): 'fade', ('skill', 6): 'fade', ('idle', 2): 'none', ('idle', 3): 'none', ('idle', 4): 'none',
                 ('idle', 5): 'none', ('idle', 6): 'none', ('run', 1): 'none', ('attack', 2): 'fade', ('win', 3): 'fade'},
        'm4_1': {('fx', 2): 'softtop', ('fx', 3): 'softtop', ('fx', 5): 'softtop', ('fx', 6): 'softtop'},
+       'm4_2': {('attack', 4): 'fade:R', ('win', 2): 'fade:TR', ('win', 5): 'none', **{('idle', i): 'none' for i in range(8)}, ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 
-def fade_edges(c, F=34):
+def fade_edges(c, F=34, sides='TBLR'):
     h, w = c.shape[:2]; E = 8; c = c.copy()
     def touch(a): return (a[..., 3] > 40).sum() > 6
     r = (np.arange(F) / F) ** 1.3
-    if touch(c[:E]): c[:F, :, 3] *= r[:, None]
-    if touch(c[-E:]): c[-F:, :, 3] *= r[::-1, None]
-    if touch(c[:, :E]): c[:, :F, 3] *= r[None, :]
-    if touch(c[:, -E:]): c[:, -F:, 3] *= r[None, ::-1]
+    if 'T' in sides and touch(c[:E]): c[:F, :, 3] *= r[:, None]
+    if 'B' in sides and touch(c[-E:]): c[-F:, :, 3] *= r[::-1, None]
+    if 'L' in sides and touch(c[:, :E]): c[:, :F, 3] *= r[None, :]
+    if 'R' in sides and touch(c[:, -E:]): c[:, -F:, 3] *= r[None, ::-1]
     o = np.zeros((h + 2 * P, w + 2 * P, 4), np.float32); o[P:P + h, P:P + w] = c
     return o
 
@@ -70,6 +90,7 @@ def extend(c, mode=None):
             c = c.copy(); c[..., 3] *= r[:, None]
         mode = None
     if mode == 'fade': return fade_edges(c, 95)
+    if mode and mode.startswith('fade:'): return fade_edges(c, 95, mode[5:])   # only these sides (v16-96)
     if mode == 'none':
         o = np.zeros((c.shape[0] + 2 * P, c.shape[1] + 2 * P, 4), np.float32); o[P:-P, P:-P] = c; return o
     """pad the cell; where the picture comes within 8 px of an edge, smear the line 8 px inside outward and fade it"""
@@ -96,10 +117,13 @@ def extend(c, mode=None):
 WIDE = {'m4_1': 90}
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
-    a = despill(unmix(im)).astype(np.float32)
+    a = despill(unmix(im), n).astype(np.float32)
     H, W = a.shape[:2]; ch, cw = H // 2, W // 4   # v16-96: any sheet size (Grigore's skill sheet is 1774x887)
     pc = WIDE.get(HID, 0)
-    if not pc: return [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
+    if not pc:
+        cs = [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
+        if HID in KEEPBLUE: cs = [drop_specks(c) for c in cs]   # v16-97 Duke
+        return cs
     from scipy import ndimage as nd
     lab, k = nd.label(nd.binary_dilation(a[..., 3] > 12, iterations=3))
     cx = np.array(nd.center_of_mass(a[..., 3], lab, range(1, k + 1)))[:, 1] if k else np.zeros(0)

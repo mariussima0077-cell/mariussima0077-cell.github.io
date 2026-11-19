@@ -964,7 +964,8 @@ const SPRD={
  // v16-14: Legendary + Mythic (cs = skill frames; the frames with other people / cut boxes in the sheets are not used)
  m4_0:{a:[198.7,246],m:[300,150],fx:'quake',v8:{cw:299,uw:398.7,ax:198.7,ck:5,pk:[5,6,7],rows:[[0,202,269.3,264.0],[202,176,234.7,229.3],[378,186,248.0,242.7],[564,209,278.7,273.3],[773,177,236.0,230.7],[950,190,253.3,249.3]]},fx8:{cw:314,uw:418.7,ax:206.7,rows:[[0,309,412.0,393.3]]}}, // v16-95: GRIGORE – 8 frames (tools/v8_hero.py m4_0); ck = cast frames 0-4 (smash = impact), quake wall = fxs frames
 m4_1:{a:[134.7,246],m:[253,71],look:'wrench',fx:'holy',v8:{cw:210,uw:280.0,ax:134.7,ck:4,pk:[4,5,6,7],rows:[[0,195,260.0,256.0],[195,189,252.0,248.0],[384,190,253.3,248.0],[574,286,381.3,358.7],[860,198,264.0,258.7],[1058,208,277.3,272.0]]},fx8:{cw:158,uw:210.7,ax:105.3,rows:[[0,253,337.3,325.3]]}}, // v16-96: MAMA ROSA – 8 frames (tools/v8_hero.py m4_1); ck = pray → wrench raised, pk = golden sweep → idle; holy pillar = fxs frames on every healed ally
- m4_2:{a:[120,246],m:[250,112],col:'#d05cff',cs:[[3,0],[3,1]],fx:'vortex'},m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
+ m4_2:{a:[136.0,246],m:[300,150],col:'#d05cff',fx:'vortex',v8:{cw:240,uw:320.0,ax:136.0,rows:[[0,195,260.0,256.0],[195,189,252.0,246.7],[384,188,250.7,245.3],[572,196,261.3,249.3],[768,191,254.7,249.3],[959,205,273.3,268.0]],ck:5,pk:[5,6,7]},fx8:{cw:205,uw:273.3,ax:136.0,rows:[[0,240,320.0,289.3]]}}, // v16-96: DUKE DIAMOND – 8 frames (tools/v8_hero.py m4_2); ck = cast frames 0-4 (frame 5 = beam), pk = recoil after; vortex = fxs frames, frame 5 = crystal freeze
+m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
  m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
 m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,5],rows:[[0,197,262.7,258.7],[197,183,244.0,238.7],[380,171,228.0,221.3],[551,223,297.3,286.7],[774,187,249.3,244.0],[961,206,274.7,269.3]]},fx8:{cw:286,uw:381.3,ax:190.7,rows:[[0,186,248.0,237.3]]}}, // v16-95: LADY OVERDRIVE – 8 frames (tools/v8_hero.py m5_1); ck = cast frames 0-3, dsh = dash frames
@@ -1713,9 +1714,10 @@ const SKF={
    for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(h!==dead&&!f8)imgFx('holy',h.x,fy(h.d)+6*S,90*S,1);
      if(FX2){fxs('magic_02','#fff176',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#fff176',5,22*S);}}
    teamBuff({def:6,col:'#fff176',txt:'DEF UP'});B.flash=.5;});},
- m4_2(u,ms){const c=cluster(ms,100*S)||ms[0];castAct(u,.6,()=>{const R=105*S,cx=c.x,cd=c.d;imgFx('vortex',cx,fy(cd)+12*S,215*S,1.1,{spin:1});shake(8);
-   for(const m of alive(B.mons))if(Math.hypot(m.x-cx,(m.d-cd)*(FY1-FY0)*1.25)<R){damage(u,m,2.1,{skill:1});m.stun=Math.max(m.stun,2.2);m.ice=2.2;m.mark=Math.max(m.mark,4);}
-   if(FX2){fxBurst(cx,fy(cd)-30*S,'#d05cff',70*S);fxShock(cx,fy(cd),'#80d8ff',R*.7);}});},
+ m4_2(u,ms){const c=cluster(ms,100*S)||ms[0];castAct(u,.6,()=>{const cx=c.x,cd=c.d,v=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;u.post=.6;
+   // v16-96: Duke's own vortex (8 frames): tornado grows, frame 5 = crystal burst → damage + freeze land then (old image fx only if the sheet didn't load)
+   if(v){B.fx.push({type:'sheet8',t:-.12,d:1.25,sp:u.spr,x:cx,dd:cd});if(FX2)fxBurst(cx,fy(cd)-30*S,'#d05cff',50*S);}else imgFx('vortex',cx,fy(cd)+12*S,215*S,1.1,{spin:1});
+   B.fx.push({type:'dvort',t:v?-.67:0,src:u,x:cx,dd:cd});shake(6);});},
  m4_3(u,ms){castAct(u,.85,()=>{const cx=ms.reduce((a,m)=>a+m.x,0)/ms.length,top=FY0-120*S;B.fx.push({type:'imgfx',k:'cloud',x:cx,y:top+40*S,w:Math.min(W*.9,300*S),t:0,d:1.6,cloud:1});
    for(let k=0;k<8;k++)B.fx.push({type:'strike',t:-.25-k*.13,d:.3,src:u,top});
    teamBuff({aspd:6,aspdK:.25,col:'#ffd54a',txt:'SPEED UP'});});},
@@ -1921,6 +1923,9 @@ function fxUpdate(f,dt){
   else if(f.type==='mega'&&!f.done&&f.t>=0){f.done=true;const y=fy(f.dd);if(!(f.src&&f.src.spr&&f.src.spr.fx8&&f.src.spr.fi&&f.src.spr.fi.naturalWidth))imgFx('gearboom',f.x,y+16*S,230*S,1);shake(16);B.flash=.4;
     for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.dd)*(FY1-FY0)*1.25)<110*S)damage(f.src,m,1.5,{skill:1});
     if(FX2){fxShock(f.x,y,'#ff6d00',110*S);fxScorch(f.x,y,'#2b1a10',80*S,2.5);}}
+  else if(f.type==='dvort'&&!f.done&&f.t>=0){f.done=true;const R=105*S,y=fy(f.dd);shake(10);  // v16-96: DIAMOND VORTEX impact (crystal freeze)
+    for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.dd)*(FY1-FY0)*1.25)<R){damage(f.src,m,2.1,{skill:1});m.stun=Math.max(m.stun,2.2);m.ice=2.2;m.mark=Math.max(m.mark,4);}
+    if(FX2){fxBurst(f.x,y-30*S,'#80d8ff',70*S);fxShock(f.x,y,'#80d8ff',R*.7);}}
   else if(f.type==='coil'){f.tick+=dt;if(f.tick>=.4){f.tick=0;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],y0=fy(f.dd)-70*dsc(f.dd),y=headY(m)+22*dsc(m.d);
       B.fx.push({type:'bolt',x0:f.x,y0,x1:m.x,y1:y,t:0,d:.22,col:'#e040fb'});damage(f.src,m,.8,{skill:1});m.stun=Math.max(m.stun,.5);sparks(m.x,y,6,'#ea80fc');if(FX2)fxBolt(f.x,y0,m.x,y,'#e040fb',40);}}}
   else if(f.type==='imgfx'&&f.u&&!f.u.dead){f.x=f.u.x;f.y=headY(f.u)-8*S;}
