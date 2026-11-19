@@ -1,5 +1,7 @@
 # TORQUE EMPIRE – Prompturi ChatGPT: ce mai e desenat în cod (19 nov 2026, v16-92)
 
+✅ **Toate 5 primite și puse în joc în v16-93** (fundalul 1: doar scena de sus folosită, panourile luate din `sum_bg`).
+
 Fiecare prompt are stilul complet – se copiază blocul întreg. Fond verde = Claude decupează.
 Unde scrie ATAȘEAZĂ: deschide linkul pe telefon, salvează poza și pune-o în ChatGPT împreună cu promptul.
 

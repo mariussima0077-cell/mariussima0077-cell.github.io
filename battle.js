@@ -422,6 +422,30 @@ const css3=document.createElement('style');css3.textContent=`
 #cp.hm #cpMap{background:#2a1010!important}#cp.hm #cpPath{filter:saturate(.75) hue-rotate(-18deg) brightness(.85)}
 #cp.hm #cpPath .node{filter:hue-rotate(18deg) brightness(1.18) saturate(1.3)}
 
+/* v16-93 (Marius' pictures, PROMPTS_UI8.md): battle windows = img/ui8/win.webp (9-slice), buttons = img/ui8/btn_*_s.webp + gear ornaments, stars = img/ui8/star_*.webp */
+.cpBox:not(.winSk):not(.itPop):not(.prepSk):not(.rsSk):not(.wbSk){--k:calc(min(92vw,420px)/700);background:none!important;box-shadow:none!important;border-radius:0!important;border-style:solid!important;border-color:transparent!important;border-width:calc(var(--k)*138) calc(var(--k)*48) calc(var(--k)*70)!important;border-image:url(img/ui8/win.webp) 160 115 120 fill/calc(var(--k)*160) calc(var(--k)*115) calc(var(--k)*120) stretch!important;padding:4px 6px!important;filter:drop-shadow(0 6px 18px #000c)}
+.cpGo{--bh:52px;position:relative;background:none!important;box-shadow:none!important;border-radius:0!important;border-style:solid!important;border-color:transparent!important;border-width:0!important;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch!important;color:#2a1600!important;text-shadow:0 1px 0 #fff6}
+.cpGo::before,.cpGo::after{content:'';position:absolute;left:50%;width:calc(var(--bh)*1.6);height:calc(var(--bh)*.26);transform:translateX(-50%);background:url(img/ui8/btn_ot.webp) center/100% 100% no-repeat;pointer-events:none}
+.cpRow .cpGo::before,.cpRow .cpGo::after,#gBtns .cpGo::before,#gBtns .cpGo::after{display:none}.cpGo::before{top:0}.cpGo::after{bottom:0;background-image:url(img/ui8/btn_ob.webp)}
+.cpGo.alt{border-image-source:url(img/ui8/btn_blue_s.webp)!important;color:#fff!important;text-shadow:0 2px 0 #0a1f4d!important}
+.cpGo.red{border-image-source:url(img/ui8/btn_red_s.webp)!important;color:#fff!important;text-shadow:0 2px 0 #4a0000!important}
+.cpGo.asc{border-image-source:url(img/ui8/btn_blue_s.webp)!important;color:#fff!important;filter:hue-rotate(-25deg) saturate(1.3) brightness(1.1)}
+#gBtns .cpGo.tm{border-image-source:url(img/ui8/btn_green_s.webp)!important;background:none!important;color:#062a0a!important}
+.cpGo.dis,#gBtns .cpGo.tmo{border-image-source:url(img/ui8/btn_grey_s.webp)!important;background:none!important;color:#cfd8dc!important;text-shadow:0 2px 0 #000!important;filter:none!important}
+#gBtns .cpGo{--bh:52px}
+.gStr{display:flex;justify-content:center;top:1%!important;gap:0}.gStr img{width:17%;height:auto;margin:0 -1.5%;filter:drop-shadow(0 1px 1px #000)}
+.sti{height:1.15em;width:auto;vertical-align:-.22em;margin:0 -.04em}
+/* v16-93 GEAR GUIDE (Marius: "o mică pagină cu poze ca să se vadă ușor cum ai echipament după Mythic") */
+.gGd{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:8px;border-radius:50%;border:2px solid #2ef3ff;background:#04303a;color:#2ef3ff;font:900 13px/1 system-ui;vertical-align:middle;box-shadow:0 0 8px #2ef3ff88;animation:gGdP 1.6s ease-in-out infinite}@keyframes gGdP{50%{box-shadow:0 0 2px #2ef3ff44}}
+.gdW h2{margin:0}.gdW .sub{margin-bottom:6px}
+.gdS{margin:10px 0 4px;padding:8px 8px 10px;border-radius:12px;background:linear-gradient(#0f1d33cc,#08101dcc);box-shadow:inset 0 0 0 1px #ffffff14}
+.gdH{display:flex;align-items:center;gap:6px;font:900 13px/1.1 system-ui;color:#ffd54a;letter-spacing:1px;text-shadow:0 1px 0 #000;margin-bottom:7px}.gdH i{font-style:normal;display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;background:#ffd54a;color:#2a1600;flex:none}
+.gdG{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 3%;align-items:end}.gdG>div{width:22%}.gdG .gi{width:100%}.gdG b{display:block;font:900 9.5px/1.1 system-ui;text-align:center;margin-top:2px;text-shadow:0 1px 0 #000;white-space:nowrap;overflow:hidden}
+.gdG .gi.asc{animation:gdAsc 1.4s ease-in-out infinite alternate}@keyframes gdAsc{to{filter:drop-shadow(0 0 7px #2ef3ff)}}
+.gdEq{display:flex;align-items:center;justify-content:center;gap:4px}.gdEq .gi{width:27%;flex:none}.gdEq em{font:900 26px/1 system-ui;color:#fff;font-style:normal;text-shadow:0 2px 0 #000;flex:none}.gdEq em.to{color:#2ef3ff}
+.gdL{display:grid;grid-template-columns:auto 1fr auto;gap:3px 6px;padding:0 2px;align-items:center;font:800 12px system-ui;color:#cfe0f2;margin-top:6px}.gdL span{white-space:nowrap}.gdL b{color:#7CFC9A}.gdL .sti{height:1.25em}
+.gdC{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:7px}.gdC span{padding:4px 8px;border-radius:999px;background:#04303a;box-shadow:inset 0 0 0 1px #2ef3ff88;font:800 11px system-ui;color:#c9fbff}.gdC span b{color:#fff}
+.gdT{font:700 12px/1.4 system-ui;color:#cfe0f2;text-align:center;margin-top:6px}.gdT b{color:#ffd54a}
 `;document.head.appendChild(css3);
 
 const GTKI0='<img src="img/gticket.webp" style="height:1.2em;vertical-align:-.28em">';
@@ -716,7 +740,8 @@ const GNAMES={tool:['Rusty Wrench','Steel Wrench','Torque Wrench','Impact Gun','
 // v16-89 (Marius): ASCENDED = gear grade above Mythic (grade 6, gear only) + gear STARS ★1-★5 (merge an identical piece: same slot + same grade)
 const ASC={n:'Ascended',c:'#2ef3ff',d:'#04505e'},GG=r=>r>=6?ASC:TE().GRADES[r],GGLOW=['','','','#d070ff','#ffd54a','#ff3d3d','#2ef3ff'];
 const GSTARMAX=5,GSTAR_K=.2,ASC_CH=29; // +20% main stat per star · Ascended drops from chapter 30
-const gStars=it=>'<span class="gStr">'+'★'.repeat(it.sr||0)+'</span>';
+const STI=k=>'<img class="sti" src="img/ui8/star_'+k+'.webp" alt="★">',starsH=(n,asc,all)=>{let h='';for(let i=0;i<(all?5:n);i++)h+=STI(i<n?(asc?'asc':'on'):'off');return h;}; // v16-93: Marius' star pictures
+const gStars=it=>it.sr?'<span class="gStr">'+starsH(it.sr,it.r>=6)+'</span>':'';
 function starFood(it){return GR().inv.filter(o=>o!==it&&o.s===it.s&&o.r===it.r&&!ownerOf(o)).sort((a,b)=>(a.set?1:0)-(b.set?1:0)||(a.sr||0)-(b.sr||0)||a.lv-b.lv)[0]||null;}
 const GMAXLV=10,GSUBN=[0,0,1,1,2,2,3],GINV=150;
 const GDROP=[[60,30,9,1,0,0],[30,40,22,7,1,0],[10,30,38,18,4,0],[0,15,35,35,14,1],[0,0,25,42,28,5]];
@@ -2605,7 +2630,7 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
   const mx=it.lv>=gMax(it),c=mx?0:upCost(it);
   let b1='';if(h){b1=o===h.id?`<button class="b1" data-p="ueq" data-it="${it.id}">UNEQUIP</button>`:`<button class="b1" data-p="eq" data-it="${it.id}">EQUIP<small>on ${h.n}</small></button>`;}else b1='<button class="b1 dis">EQUIP</button>';
   let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itIc">${itemCard(it)}</div>
-   <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · Lv ${it.lv}/${gMax(it)}${it.sr?' · '+'★'.repeat(it.sr):''}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
+   <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · Lv ${it.lv}/${gMax(it)}${' · '+starsH(it.sr||0,it.r>=6,1)}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
    <div class="itSt">${rows.slice(0,4).join('')}</div>
    <div class="itBt">${b1}<button class="b2${mx||G.money<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?'MAX LEVEL':`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${T.fmt(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${T.fmt(salvageV(it))}</small></button></div></div><div class="itMore">`;
   if(h){const cur=itemById((g.eq[h.id]||{})[it.s]);
@@ -2615,13 +2640,33 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
       x+=`<div class="cpSec">BEFORE / AFTER ON ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:it},xp,xc);}}
   if(it.set){const n=h&&roleOf(h)===it.set?setCount(h,heroGear(h.id)):0;x+=`<div class="cpSec">${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n.toUpperCase()} ONLY</div>`+setBlock(it.set,n);}
   // v16-89: STARS (merge an identical free piece) and ASCEND (Mythic ★5 + 1 more Mythic of the same slot)
-  {const sr=it.sr||0,f=starFood(it),nm=`${GG(it.r).n} ${sl.n}`,fx=f?`<div class="iFood">${itemCard(f)}<span>uses <b style="color:${GG(f.r).c}">${itemName(f)}</b> Lv ${f.lv}${f.sr?' '+'★'.repeat(f.sr):''}<br><small>free piece from the bag · it is gone after</small></span></div>`:`<div class="pD">Needs one more <b style="color:${GG(it.r).c}">${nm}</b> in the bag (not worn).</div>`;
-   if(sr<GSTARMAX){x+=`<div class="cpSec">★ STARS ${sr} / ${GSTARMAX}</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV({...it,sr:sr+1})}%</b> <small>(★${sr} ➜ ★${sr+1} · +${GSTAR_K*100}% each star)</small></div>${fx}<button class="cpGo${f?'':' dis'}" data-p="${f?'star':''}" data-it="${it.id}">★ STAR UP</button>`;}
-   else if(it.r===5){const nx={...it,r:6};x+=`<div class="cpSec" style="color:${ASC.c}">✦ ASCEND · ABOVE MYTHIC</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(stars stay ★5 · max Lv ${GMAXR[5]} ➜ ${GMAXR[6]} · +1 bonus stat)</small></div>${fx}<button class="cpGo asc${f?'':' dis'}" data-p="${f?'asc':''}" data-it="${it.id}">✦ ASCEND</button>`;}
-   else x+=`<div class="cpSec">★ STARS ${sr} / ${GSTARMAX} · MAX</div>`;}
+  {const sr=it.sr||0,f=starFood(it),nm=`${GG(it.r).n} ${sl.n}`,fx=f?`<div class="iFood">${itemCard(f)}<span>uses <b style="color:${GG(f.r).c}">${itemName(f)}</b> Lv ${f.lv}${f.sr?' '+starsH(f.sr,f.r>=6):''}<br><small>free piece from the bag · it is gone after</small></span></div>`:`<div class="pD">Needs one more <b style="color:${GG(it.r).c}">${nm}</b> in the bag (not worn).</div>`;
+   if(sr<GSTARMAX){x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${GSTARMAX}<button class="gGd" data-p="gguide" data-it="${it.id}">?</button></div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV({...it,sr:sr+1})}%</b> <small>(★${sr} ➜ ★${sr+1} · +${GSTAR_K*100}% each star)</small></div>${fx}<button class="cpGo${f?'':' dis'}" data-p="${f?'star':''}" data-it="${it.id}">${STI('on')} STAR UP</button>`;}
+   else if(it.r===5){const nx={...it,r:6};x+=`<div class="cpSec" style="color:${ASC.c}">${STI('asc')} ASCEND · ABOVE MYTHIC<button class="gGd" data-p="gguide" data-it="${it.id}">?</button></div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(stars stay ★5 · max Lv ${GMAXR[5]} ➜ ${GMAXR[6]} · +1 bonus stat)</small></div>${fx}<button class="cpGo asc${f?'':' dis'}" data-p="${f?'asc':''}" data-it="${it.id}">${STI('asc')} ASCEND</button>`;}
+   else x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${GSTARMAX} · MAX</div>`;}
   if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(Lv ${it.lv} ➜ ${it.lv+1})</small></div>`;}
   x+='</div>';
   if(keep)morph($('cpPopBox'),x);else pop(x);$('cpPopBox').classList.add('itPop');}
+// v16-93 GEAR GUIDE – how gear gets stronger than Mythic, with pictures (Marius: "doar scris nu se vede")
+let gdBack='';function gearGuide(back){gdBack=back||'';const T=TE(),sl='tool',st=GSTAT[GS[sl].st];
+  const it=(r,sr,lv)=>({id:'gd'+r+'_'+sr,s:sl,r,lv:lv||GMAXR[r],sr:sr||0,sub:[]}),M0=it(5,0),M5=it(5,5),A5=it(6,5);
+  let g='';for(let r=0;r<=6;r++)g+=`<div>${itemCard(it(r,r===6?5:0,1))}<b style="color:${GG(r).c}">${GG(r).n.toUpperCase()}</b></div>`;
+  let L='';for(let n=0;n<=5;n++)L+=`<span>${starsH(n,0,1)}</span><span>${n?'+'+n+' copy':'new'}</span><span>${st.n} <b>+${mainV(it(5,n))}%</b></span>`;
+  const x=`<div class="gdW"><h2>GEAR GUIDE</h2><div class="sub">HOW GEAR GETS STRONGER THAN MYTHIC</div>
+  <div class="gdS"><div class="gdH"><i>1</i>7 GRADES</div><div class="gdG">${g}</div>
+   <div class="gdT">Common ➜ Mythic come from <b>Gear Summon</b>, the Campaign and Dungeons.<br><b style="color:${ASC.c}">ASCENDED</b> is the new grade above Mythic.</div></div>
+  <div class="gdS"><div class="gdH"><i>2</i>${STI('on')} STARS ★1 – ★5</div>
+   <div class="gdEq">${itemCard(M0)}<em>+</em>${itemCard(M0)}<em class="to">➜</em>${itemCard(it(5,1))}</div>
+   <div class="gdT">Put a <b>second identical piece</b> (same grade + same slot, free in the bag) into it = <b>+1 star</b>.<br>Every star = <b>+${GSTAR_K*100}% main stat</b>. Works for every grade.</div>
+   <div class="gdL">${L}</div></div>
+  <div class="gdS"><div class="gdH"><i>3</i>${STI('asc')} <span style="color:${ASC.c}">ASCEND</span></div>
+   <div class="gdEq">${itemCard(M5)}<em>+</em>${itemCard(M0)}<em class="to">➜</em>${itemCard(A5)}</div>
+   <div class="gdT">A <b>Mythic ★5</b> + one more <b>Mythic of the same slot</b> = <b style="color:${ASC.c}">ASCENDED</b>.</div>
+   <div class="gdC"><span>${st.n} <b>+${mainV(M5)}%</b> ➜ <b>+${mainV(A5)}%</b></span><span>Max level <b>${GMAXR[5]} ➜ ${GMAXR[6]}</b></span><span><b>+1</b> bonus stat</span><span>Stars stay <b>★5</b></span></div></div>
+  <div class="gdS"><div class="gdH"><i>4</i>WHERE TO FIND</div>
+   <div class="gdT">Ascended pieces can also <b>drop in the Campaign from chapter ${ASC_CH+1}</b> (not in Gear Summon).<br>Open any Mythic piece ➜ <b>${STI('on')} STAR UP</b> / <b>${STI('asc')} ASCEND</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
+  <div class="cpRow">${gdBack?'<button class="cpGo alt" data-p="gdback">↩ BACK</button>':''}<button class="cpGo" data-p="x">GOT IT</button></div></div>`;
+  pop(x);}
 // v16-42: GEAR UPGRADE animation (Marius: "I see nothing when I upgrade – only after I leave and come back")
 // Everything stays on screen (no rebuild, no scroll jump): the item card in the popup and in the bag flashes,
 // a burst with sparks + "UPGRADE SUCCESS!  Lv 3 ➜ Lv 4  ·  HP +6.7% ➜ +7.4%" plays over the popup (taps go through it).
@@ -2687,7 +2732,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.it)popItem(+el.dataset.it);});
 // v16-46: coming back from Hero Summon / Fusion → refresh the HEROES page
 ['sm','team'].forEach(id=>{const el=document.getElementById(id);if(el)new MutationObserver(()=>{if(!el.classList.contains('open')&&$('cpGear').classList.contains('open'))renderGear();}).observe(el,{attributes:true,attributeFilter:['class']});});
-$('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}CPX().ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
+$('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}CPX().ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;if(a==='gguide'){gearGuide(el.dataset.it);return;}if(a==='gdback'){if(gdBack&&itemById(gdBack))popItem(gdBack);else closePop();return;}
   if(a==='payOK'){const g=window.__payGo;window.__payGo=null;closePop();if(g)g();return;}
   if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsHist'){gsHist();return;}if(a==='gsGear'){closePop();if(document.getElementById('sm').classList.contains('open')){gsBag();return;}closeGSum();openGear();return;}
   if(a==='x'){closePop();return;}
@@ -2705,7 +2750,7 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
     if(a==='star'){it.sr=(it.sr||0)+1;}else{it.r=6;const k0=Object.keys(GSTAT).filter(k=>k!==GS[it.s].st&&!it.sub.some(z=>z[0]===k));if(k0.length){const k=k0[Math.floor(Math.random()*k0.length)];it.sub.push([k,Math.round(GSTAT[k].v[6]*.4*10)/10]);}}
     T.save();renderGear();popItem(it.id,true);const dp=gHero()&&ownerOf(it)===gHero().id?pow(gHero())-p0:0;
     T.toast(a==='star'?'★ STAR UP! '+itemName(it)+' ★'+it.sr+(dp>0?' · Power +'+dp.toLocaleString():''):'✦ ASCENDED! '+itemName(it)+' is now Ascended',2600);return;}
-  if(a==='salv'&&it){if(!gsalv){gsalv=1;el.innerHTML=el.closest('.itBt')?'TAP AGAIN<small>to salvage</small>':'TAP AGAIN TO SALVAGE (+'+T.fmt(salvageV(it))+')';el.classList.remove('alt');el.style.background='linear-gradient(#ff8a80,#c62828)';el.style.color='#fff';return;}
+  if(a==='salv'&&it){if(!gsalv){gsalv=1;el.innerHTML=el.closest('.itBt')?'TAP AGAIN<small>to salvage</small>':'TAP AGAIN TO SALVAGE (+'+T.fmt(salvageV(it))+')';el.classList.remove('alt');el.classList.add('red');el.style.background='linear-gradient(#ff8a80,#c62828)';el.style.color='#fff';return;}
     const o=ownerOf(it);if(o)delete GR().eq[o][it.s];const g=GR();g.inv.splice(g.inv.indexOf(it),1);G.money+=salvageV(it);T.save();closePop();renderGear();T.toast('🔨 Salvaged for '+T.fmt(salvageV(it)),1800);return;}
   if(a==='aok'&&h){const ov=autoPlan(h),g=GR();if(!g.eq[h.id])g.eq[h.id]={};for(const sl of GSLOT){if(ov[sl.k])equip(h.id,ov[sl.k]);else delete g.eq[h.id][sl.k];}T.save();closePop();renderGear();return;}
   if(a==='nok'&&h){GR().eq[h.id]={};T.save();closePop();renderGear();return;}
@@ -3515,6 +3560,6 @@ function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
   G.cp.team=myMechs().slice(0,5).map(h=>h.id);
   T.save();return true;}
 if(window.SEC&&SEC.TEST_ACC){try{if(testFill())setTimeout(()=>location.reload(),300);}catch(e){console.error('testFill',e);}}
-window.CAMPAIGN={gs:{d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,INV:GINV,GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+window.CAMPAIGN={gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,INV:GINV,GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();

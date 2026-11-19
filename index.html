@@ -153,11 +153,16 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 .smDots i{font-style:normal;width:calc(var(--u)*58);height:calc(var(--u)*36);border-radius:calc(var(--u)*18);display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*22);background:#33414f;opacity:.7}
 .smDots i.on{background:linear-gradient(#ffe066,#ffb300);opacity:1;box-shadow:0 0 calc(var(--u)*12) #ffb300}
 .smFree{display:flex;align-items:center;justify-content:center;border-radius:calc(var(--u)*28);background:linear-gradient(#b388ff,#6a1b9a);color:#fff;font-weight:900;font-size:calc(var(--u)*34);box-shadow:0 0 calc(var(--u)*16) #b388ff;pointer-events:none}
+.smGd{display:flex;align-items:center;justify-content:center;border-radius:50%;border:calc(var(--u)*4) solid #2ef3ff;background:radial-gradient(#0a5b6b,#03262e);color:#fff;font:900 calc(var(--u)*40)/1 system-ui;text-shadow:0 0 calc(var(--u)*8) #2ef3ff;box-shadow:0 0 calc(var(--u)*16) #2ef3ffaa;pointer-events:auto;box-sizing:border-box;animation:gGdP 1.6s ease-in-out infinite}
 .smPity{display:flex;align-items:center;justify-content:center;color:#cfd8dc;font-weight:800;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000;pointer-events:none}
 .smPity b{color:#ffd54a;margin:0 .3em}
 .pBar{position:relative;width:100%;height:100%;border-radius:calc(var(--u)*18);background:#0b1118;box-shadow:inset 0 0 0 calc(var(--u)*2) #6b5420;overflow:hidden}
 .pBar i{position:absolute;left:0;top:0;bottom:0;border-image:url(img/ui5/fill_g.webp) 0 40 fill/0 calc(var(--u)*16) stretch;min-width:calc(var(--u)*32)}.pBar i[style^="width:0"]{display:none}
 .pBar span{position:relative;display:flex;height:100%;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000}
+/* v16-93: empty bar = Marius' picture img/ui8/bar_empty.webp (9-slice), the fill sits in its groove */
+.pBar{background:none!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important}
+.pBar::before{content:'';position:absolute;left:calc(var(--u)*-4);right:calc(var(--u)*-4);top:calc(var(--u)*-13);bottom:calc(var(--u)*-13);border-style:solid;border-color:transparent;border-width:calc(var(--u)*17) calc(var(--u)*40);border-image:url(img/ui8/bar_empty.webp) 30 72 fill/calc(var(--u)*17) calc(var(--u)*40) stretch;pointer-events:none}
+.pBar i{left:calc(var(--u)*27)!important;top:calc(var(--u)*1)!important;bottom:calc(var(--u)*1)!important;width:calc((100% - var(--u)*54)*var(--p,0))}.pBar i[style="--p:0.000"]{display:none}
 .payBox{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 4px}.payBox div{background:#0d151e;border:1.5px solid #e0aa25;border-radius:12px;padding:6px 12px;text-align:center;font-size:18px;color:#fff}.payBox small{display:block;font-size:10px;color:#9fb0c0}.payBox span{font:900 22px system-ui;color:#ffd54a}
 .smCnt{color:#ffd54a;font-weight:900;font-size:calc(var(--u)*22);text-align:center;text-shadow:0 1px 2px #000;pointer-events:none}
 .smBan{overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#5a3d0a 0%,#1a1206 45%,#0b0f14 80%);border-bottom:calc(var(--u)*4) solid #ffb300;pointer-events:none}
@@ -3143,7 +3148,7 @@ function summon(cat,n){const P=G.h.pity[cat],out=[];
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
 // ---------- DOM: summon page (my picture) ----------
-const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
+const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
 const smMap=()=>TALL.map(921,1532,[[764,.25],[1012,.2],[1097,.15],[1258,.15],[1324,.25]]);
 function smSize(){TALL.size(smBox,smMap());smKey='';}
 function openSummon(cat){if(cat)smCat=smOf(cat);smSize();smKey='';smEl.classList.add('open');renderSm();}
@@ -3183,13 +3188,13 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   h+='<div class="smL smBig" data-a="sum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+TIK(smCat)+' 1</span></div>';
   h+='<div class="smL smBig gold" data-a="sum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+TIK(smCat)+' 10</span></div>';
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
-  h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="width:'+Math.min(100,P.l/PITY_L*100).toFixed(1)+'%"></i><span>LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
+  h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
   h+='<div class="smL smCol" data-a="coll" style="'+box(150,1356,620,128)+'pointer-events:auto">'+(cr?'CREW':'HERO')+' COLLECTION<small>'+discCount(smCat)+' / '+pool.length+' collected</small></div>';
   BXM=null;smBox.innerHTML=h;}
 // v16-91 (Marius): GEAR SUMMON lives on the same SUMMON page as HERO and CREW (no other page opens) – same background, gear header, gear tickets
 function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.innerHTML='';return;}const g=GSx.d(),p=g.pity,dm=G.dm||0;
   const key='gear'+g.tk+'/'+p.l+'/'+g.inv.length+'/'+dm;if(key===smKey)return;smKey=key;
-  const M=smMap();BXM=M;let h=TALL.bg(M,'img/ui4/sum_bg.webp',0,150,921,1381.5);const GT=GSx.GTKI;
+  const M=smMap();BXM=M;let h=TALL.bg(M,'img/ui5/gsum_bg2.webp',0,150,921,1381.5);const GT=GSx.GTKI; // v16-93: forge scene (Marius' picture) on the Hero Summon panels
   // best gear floating on the portal
   const pos=[[350,372,220],[180,406,176],[565,406,176],[32,446,146],[743,446,146]],its=[['chip',5],['tool',5],['vest',5],['helm',4],['boots',4]];
   [3,4,1,2,0].forEach(i=>{const p2=pos[i],it=its[i];h+='<div class="smP smGi" style="'+box(p2[0],p2[1],p2[2],p2[2])+'border-color:'+GRADES[it[1]].c+'"><img src="'+GSx.icon(it[0],it[1])+'" alt=""></div>';});
@@ -3198,6 +3203,7 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   h+='<div data-a="back" style="'+box(20,50,105,105)+'border-radius:50%"></div>';
   h+='<div class="smL smTop" data-a="grates" style="'+box(722,87,176,50)+'pointer-events:auto">'+GT+g.tk+'</div>';
   h+='<div class="smL" style="'+box(286,144,345,45)+'"><small style="font-size:'+U(19)+';color:#9fd3ff">FOR BATTLES ONLY</small></div>';
+  h+='<div class="smGd" data-a="gguide" style="'+box(48,684,68,68)+'">?</div>'; // v16-93: GEAR GUIDE (left of the (i) button)
   h+='<div class="smL smTop smDm" style="'+box(738,170,164,78)+'">'+DMI+dmS(dm)+'</div>';
   // grade panel
   h+='<div class="smL" style="'+box(256,690,410,55)+'">AVAILABLE GEAR</div><div data-a="grates" style="'+box(805,684,68,68)+'border-radius:50%"></div>';
@@ -3209,7 +3215,7 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   h+='<div class="smL smBig" data-a="gsum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+GT+' 1</span></div>';
   h+='<div class="smL smBig gold" data-a="gsum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+GT+' 10</span></div>';
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
-  h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="width:'+Math.min(100,p.l/GSx.PITY*100).toFixed(1)+'%"></i><span>LEGENDARY PITY <b>'+p.l+' / '+GSx.PITY+'</b></span></div></div>';
+  h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,p.l/GSx.PITY).toFixed(3)+'"></i><span>LEGENDARY PITY <b>'+p.l+' / '+GSx.PITY+'</b></span></div></div>';
   h+='<div class="smL smCol" data-a="gbag" style="'+box(150,1356,620,128)+'pointer-events:auto">GEAR BAG<small>'+g.inv.length+' / '+GSx.INV+' · EQUIP YOUR HEROES</small></div>';
   BXM=null;smBox.innerHTML=h;}
 smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
@@ -3218,6 +3224,7 @@ smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}cons
   else if(a==='arrow'){const i=(SMK.indexOf(smCat)+(+t.dataset.d)+SMK.length)%SMK.length;smCat=SMK[i];smKey='';renderSm();}
   else if(a==='cat'){smCat=t.dataset.c;smKey='';renderSm();}
   else if(a==='gsum'){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(GSx)GSx.sum(+t.dataset.n);}
+  else if(a==='gguide'){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(GSx&&GSx.guide)GSx.guide();}
   else if(a==='grates'){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(GSx)GSx.rates();}
   else if(a==='gbag'){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(GSx)GSx.bag();}
   else if(a==='tier'){const g=+t.dataset.g;if(g===6){toast('🔴 Red heroes are COMING SOON',2500);return;}popTier(smCat,g);}
@@ -3570,6 +3577,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:37,d:'Nov 19, 2026',ic:'🔥',t:'GEAR GUIDE & new look',l:['<b>GEAR GUIDE</b>: tap the glowing <b>?</b> on the GEAR SUMMON page (or next to STARS / ASCEND in an item window) – pictures show how gear gets stronger than Mythic: Stars ★1-★5, then ASCEND.','<b>GEAR SUMMON</b> has its own forge background.','New windows, buttons, stars and progress bars.']},
  {id:36,d:'Nov 19, 2026',ic:'⭐',t:'Gear Stars, ASCENDED gear & new Summon tabs',l:['<b>SUMMON</b>: the 3 buttons at the bottom are now <b>HERO · CREW · GEAR</b> – switch between all summons in one tap. Rate Info = the (i) button, Summon History is inside it.','<b>GEAR STARS ★1-★5</b>: open an item → STAR UP. It uses one identical piece from the bag (same slot + same grade). Every star: +20% main stat.','<b>ASCENDED</b> – a new gear grade above Mythic: ASCEND a Mythic ★5 (uses 1 more Mythic of the same slot), or find it in campaign chapters 30-50. Max Lv 60 and 3 bonus stats.','Fixed texts: VIP Pass bonuses, ticket list, gear summon rates.']},
  {id:35,d:'Nov 19, 2026',ic:'⚔️',t:'New Arena fights + Gear Summon shortcut',l:['<b>ARENA</b> fights look brand new: heroes run in, fight up close, shoot real projectiles and every skill shows its <b>name</b>.','<b>GEAR SUMMON</b> is back on the SUMMON page – tap GEAR at the bottom.','Top 3 names on the ranking podium are now easy to read.']},
  {id:34,d:'Nov 18, 2026',ic:'👑',t:'VIP Passes stack + hero frames on profiles',l:['You can now have <b>Silver, Gold and Platinum Pass</b> at the same time. Every pass gives its own daily gift and the bonuses add up (VIP benefits, Idle hours).','A player\'s <b>profile</b> now shows his battle team in the <b>grade frames</b> – name and grade of every hero.']},
