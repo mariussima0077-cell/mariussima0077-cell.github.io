@@ -1,0 +1,106 @@
+"""v8_hero.py – v16-94: 8-frame hero animations (first: THE TORQUE KING m5_0).
+Marius' ChatGPT sheets: one animation per picture, 1536x1024, 4x2 cells of 384x512, chroma green.
+  img/sheets/king/m5_0_{idle,run,attack,skill,hitko,win,fx}.webp
+Steps: unmix green (atlas_wide.unmix) → despill (flame edges warm, smoke grey) → EXTEND effects cut by the cell
+edge (Marius: "completează tu unde trebuie": the edge line is smeared outward and fades) → one scale + one feet
+anchor for all sheets (REF = standing height in sheet px) → atlas rows idle·run·attack·skill·hit/KO·win, 8 frames,
+each row its own height (the skill row is tall because of the light beam).
+Output: img/hero/sp_m5_0.webp + img/hero/fxs_m5_0.webp, prints the SPRD entry (v8 meta) for battle.js.
+usage: python3 tools/v8_hero.py
+"""
+import sys, os, json, numpy as np
+from PIL import Image
+sys.path.insert(0, os.path.dirname(__file__))
+from atlas_wide import unmix
+
+SRC = 'img/sheets/king/m5_0_%s.webp'
+ROWS = ['idle', 'run', 'attack', 'skill', 'hitko', 'win']
+REF = {'idle': 359, 'run': 342, 'attack': 342, 'skill': 345, 'hitko': 381, 'win': 384, 'fx': 345}
+OLDH = 241          # standing height in 256-cell units (same size as the old sheet)
+APU = .75           # atlas px per unit (same as the old 192-px cells)
+P = 110             # extension padding (sheet px)
+
+def despill(a):
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    gr = (g > r) | (g > b + (r - b) * .8)
+    fl = gr & (r > 2 * b + 20)
+    sm = gr & ~fl
+    a = a.copy()
+    a[..., 1] = np.where(fl, np.minimum(g, r * .82), a[..., 1])
+    v = (r + b) / 2
+    for k, o in ((0, 6), (1, 2), (2, 0)): a[..., k] = np.where(sm, v + o, a[..., k])
+    return a
+
+def extend(c):
+    """pad the cell; where the picture comes within 8 px of an edge, smear the line 8 px inside outward and fade it"""
+    h, w = c.shape[:2]; E = 8
+    o = np.zeros((h + 2 * P, w + 2 * P, 4), np.float32); o[P:P + h, P:P + w] = c
+    n = P + E; fade = (1 - np.arange(1, n + 1) / n) ** 1.6
+    def touch(a): return (a[..., 3] > 40).sum() > 6
+    if touch(c[:E]):
+        ln = c[E:E + 3].mean(0)
+        for i in range(n): o[P + E - 1 - i, P:P + w] = ln * [1, 1, 1, fade[i]]
+    if touch(c[-E:]):
+        ln = c[-E - 3:-E].mean(0)
+        for i in range(n): o[P + h - E + i, P:P + w] = ln * [1, 1, 1, fade[i]]
+    if touch(c[:, :E]):
+        ln = c[:, E:E + 3].mean(1)
+        for i in range(n): o[P:P + h, P + E - 1 - i] = ln * [1, 1, 1, fade[i]]
+    if touch(c[:, -E:]):
+        ln = c[:, -E - 3:-E].mean(1)
+        for i in range(n): o[P:P + h, P + w - E + i] = ln * [1, 1, 1, fade[i]]
+    return o
+
+def cells(n):
+    im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
+    a = despill(unmix(im)).astype(np.float32)
+    return [a[r * 512:(r + 1) * 512, c * 384:(c + 1) * 384] for r in range(2) for c in range(4)]
+
+def torso_x(c):
+    a = c[..., 3] > 128; ys, xs = np.nonzero(a); y0, y1 = ys.min(), ys.max()
+    return np.nonzero(a[int(y0 + .4 * (y1 - y0)):int(y0 + .7 * (y1 - y0))])[1].mean()
+
+def bottom(c): return np.nonzero((c[..., 3] > 128).any(1))[0].max()
+
+def frames(n):
+    """→ list of (RGBA image at APU px/unit, anchor x, anchor y in that image)"""
+    cs = cells(n); s = OLDH / REF[n] * APU
+    if n == 'fx': ax, ay = 192, bottom(cs[4]) - 10
+    elif n == 'run': ax, ay = np.mean([torso_x(c) for c in cs]), max(bottom(c) for c in cs)
+    else: ax, ay = torso_x(cs[0]), bottom(cs[0])
+    out = []
+    for c in cs:
+        e = np.clip(extend(c), 0, 255).astype(np.uint8)
+        im = Image.fromarray(e, 'RGBA'); w, h = im.size
+        im = im.resize((round(w * s), round(h * s)), Image.LANCZOS)
+        out.append((im, (ax + P) * s, (ay + P) * s))
+    return out
+
+def pack(rows, name):
+    """rows: list of frame lists → atlas; every row: same cell width, own height. Returns meta (units)."""
+    L = R = 0; T = []; B = []
+    for fr in rows:
+        t = b = 0
+        for im, ax, ay in fr:
+            bb = im.getchannel('A').point(lambda q: 255 if q > 6 else 0).getbbox()
+            L = max(L, ax - bb[0]); R = max(R, bb[2] - ax); t = max(t, ay - bb[1]); b = max(b, bb[3] - ay)
+        T.append(int(np.ceil(t)) + 2); B.append(int(np.ceil(b)) + 2)
+    L, R = int(np.ceil(L)) + 2, int(np.ceil(R)) + 2
+    cw = L + R; hs = [T[i] + B[i] for i in range(len(rows))]
+    A = Image.new('RGBA', (cw * 8, sum(hs)))
+    y = 0; meta = []
+    for i, fr in enumerate(rows):
+        for j, (im, ax, ay) in enumerate(fr):
+            A.alpha_composite(im, (round(j * cw + L - ax), round(y + T[i] - ay)))
+        meta.append([y, hs[i], T[i]]); y += hs[i]
+    # crop each cell to its own box (alpha_composite of a neighbour never leaks: the box is the max of all frames)
+    A.save(name, quality=90, method=6)
+    u = lambda v: round(v / APU, 1)
+    return {'cw': cw, 'uw': u(cw), 'ax': u(L), 'rows': [[m[0], m[1], u(m[1]), u(m[2])] for m in meta]}, A.size
+
+if __name__ == '__main__':
+    hero = [frames(n) for n in ROWS]
+    m, sz = pack(hero, 'img/hero/sp_m5_0.webp')
+    f, fsz = pack([frames('fx')], 'img/hero/fxs_m5_0.webp')
+    print('hero atlas', sz, 'fx atlas', fsz)
+    print(json.dumps({'v8': m, 'fx8': f}, separators=(',', ':')))

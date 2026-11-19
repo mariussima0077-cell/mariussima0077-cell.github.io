@@ -686,6 +686,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #gHName{position:absolute;left:24%;width:52%;top:.6%;text-align:center;background:#000a;border-radius:12px;padding:3px 2px;line-height:1.15}
 #gHName b{display:block;font:900 14px system-ui;text-shadow:0 1px 0 #000}#gHName b em{font-style:normal;font-size:.8em;color:#fff}
 #gHName small{display:block;font:800 9.5px system-ui;color:#cfe3ff}#gHName .gPow{font:900 12px system-ui;color:#ffe27a;margin-top:1px}
+#gHName .gArt{margin-top:3px;font:900 10px system-ui;color:#2a1000;background:linear-gradient(#ffe082,#ff8f00);border:1px solid #fff3;border-radius:8px;padding:2px 8px;box-shadow:0 0 8px #ff6d00}
 #gMain{position:absolute;inset:0;display:block!important;padding:0!important;pointer-events:none}
 #gMain .gsl{position:absolute;width:21.4%;height:14.2%;pointer-events:auto;display:flex;align-items:center;justify-content:center}
 #gMain .gsl .gi{width:80%}
@@ -816,6 +817,16 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #sheet.skn .row{background:#0006;border-radius:10px;margin:4px 0;padding:8px 10px!important;border:1px solid #ffd54a33}
 #sheet.skn .vbar{height:12px;border:1px solid #ffd54a88;background:#120a26}
 #sheet.skn #shBtn{position:sticky;bottom:0}
+/* v16-94: Mythic hero splash art (summon reveal + ART button on the hero page) */
+#splash{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88)}
+#splash.open{display:flex}
+#splash .spW{position:relative;height:min(92vh,150vw);aspect-ratio:2/3;animation:spIn .7s cubic-bezier(.2,1.4,.4,1) both}
+#splash img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:3px solid #ff5a1f;box-shadow:0 0 40px #ff3d00,0 0 90px rgba(255,140,0,.5)}
+#splash .spT{position:absolute;left:0;right:0;top:3%;text-align:center;font:900 italic 7vmin/1 system-ui,sans-serif;color:#ffd54a;text-shadow:0 0 10px #ff3d00,0 3px 0 #6a1b00;letter-spacing:.06em;animation:spGl 1.2s ease-in-out infinite alternate}
+#splash .spN{position:absolute;left:0;right:0;bottom:5%;text-align:center;font:900 5.2vmin/1.1 system-ui,sans-serif;color:#fff;text-shadow:0 0 8px #000,0 2px 0 #000}
+#splash .spN small{display:block;font-size:.55em;color:#ffcc80;margin-top:.4em}
+@keyframes spIn{from{transform:scale(.3) rotate(-6deg);opacity:0;filter:brightness(4)}to{transform:none;opacity:1;filter:none}}
+@keyframes spGl{from{filter:brightness(1)}to{filter:brightness(1.5)}}
 </style>
 </head>
 <body>
@@ -837,7 +848,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 <div id="sm"><div id="smBox"></div></div>
 <div id="team"><div id="tmBox"></div></div>
 <div id="idl"><div id="idlBox"></div></div>
-<div id="res"></div>
+<div id="res"></div><div id="splash"></div>
 <div id="ros"><div class="rsTop"><button class="rsB" data-ro="back">↩</button><div class="rsTi"><b>MY CREW</b><small>WHO WORKS IN THE GARAGE · not the battle team</small></div><div class="rsTk" id="rsTk"></div><div id="rsTabsH"></div></div><div id="rsBody"></div></div>
 <div id="pop"><div id="popBox"></div></div>
 <div id="sheet"><div class="skBg"></div><div class="skH" id="shSkH"><img class="hi" alt=""><div id="shSkT"></div></div><div id="shBody">
@@ -3248,6 +3259,12 @@ $('pop').addEventListener('click',e=>{if(!e.target.closest('[data-p="payOK"]'))r
 
 // ---------- results ----------
 const resEl=$('res');
+// v16-94: full-screen splash art of a Mythic hero (tap to close). Shown when a hero with a splash is summoned + ART button on the HEROES page
+const SPLASH={m5_0:'img/hero/splash_m5_0.webp'};
+function showSplash(id,then){const H=HB[id],el=$('splash');if(!SPLASH[id]||!H||!el){if(then)then();return;}
+  el.innerHTML='<div class="spW"><img src="'+SPLASH[id]+'"><div class="spT">'+(GRADES[H.gr]?GRADES[H.gr].n.toUpperCase():'')+'</div><div class="spN">'+H.n+'<small>Tap to continue</small></div></div>';
+  el.className='open';el.onclick=()=>{el.className='';el.innerHTML='';if(then)then();};}
+window.showSplash=showSplash;
 // v11: rarity frames (my pictures) — portrait sits inside the frame window
 const FRI=g=>Math.min(5,g);
 const FIN=[[8.5,17.5,83,61.5],[8.5,17.5,83,61.5],[8.5,18,83,61],[15.5,17.5,69,55],[14.5,20.5,71,50],[17.8,21.5,64.4,46.5],[17.2,28.2,65.5,45.7]]; // [6] = ASCENDED gear frame (v16-90)
@@ -3267,6 +3284,7 @@ function showResults(res,cat,n){
   const best=Math.max(...res.map(r=>HB[r.id].gr));
   h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TIK(cat)+'1</button><button data-r="10" class="gold">Summon ×10 · '+TIK(cat)+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TIK(cat)+' '+tkN(cat)+' tickets left</div>';
   resEl.innerHTML=h;resEl.dataset.first=res[0]?res[0].id:'';resEl.className='open best'+best;
+  const sp=res.find(r=>SPLASH[r.id]&&r.r==='new');if(sp)showSplash(sp.id);
   if(best>=5)toast('🔥 MYTHIC '+CATS[cat].one.toUpperCase()+'!',3000);else if(best>=4)toast('💛 LEGENDARY '+CATS[cat].one.toUpperCase()+'!',3000);}
 resEl.addEventListener('click',e=>{const c=e.target.closest('[data-crew]');if(c){const f=HB[resEl.dataset.first];openRoster(c.dataset.crew==='c'?(f?f.cat:'d'):c.dataset.crew);return;}const b=e.target.closest('[data-r]');if(b){doSummon(+b.dataset.r);return;}if(!e.target.closest('.rc'))resEl.className='';});
 
@@ -3577,6 +3595,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:38,d:'Nov 19, 2026',ic:'👑',t:'THE TORQUE KING – new animations',l:['<b>THE TORQUE KING</b> (Mythic) has brand-new battle animations: smoother idle, run, attack, victory and knock-out – 8 frames each.','<b>GEAR APOCALYPSE</b>: a new skill animation – a burning gear halo, a beam of light, and a giant flaming gear crashing on the enemies.','New <b>splash art</b>: shown when you summon him, and with the <b>🖼 ART</b> button on his HEROES page.']},
  {id:37,d:'Nov 19, 2026',ic:'🔥',t:'GEAR GUIDE & new look',l:['<b>GEAR GUIDE</b>: tap the glowing <b>?</b> on the GEAR SUMMON page (or next to STARS / ASCEND in an item window) – pictures show how gear gets stronger than Mythic: Stars ★1-★5, then ASCEND.','<b>GEAR SUMMON</b> has its own forge background.','New windows, buttons, stars and progress bars.']},
  {id:36,d:'Nov 19, 2026',ic:'⭐',t:'Gear Stars, ASCENDED gear & new Summon tabs',l:['<b>SUMMON</b>: the 3 buttons at the bottom are now <b>HERO · CREW · GEAR</b> – switch between all summons in one tap. Rate Info = the (i) button, Summon History is inside it.','<b>GEAR STARS ★1-★5</b>: open an item → STAR UP. It uses one identical piece from the bag (same slot + same grade). Every star: +20% main stat.','<b>ASCENDED</b> – a new gear grade above Mythic: ASCEND a Mythic ★5 (uses 1 more Mythic of the same slot), or find it in campaign chapters 30-50. Max Lv 60 and 3 bonus stats.','Fixed texts: VIP Pass bonuses, ticket list, gear summon rates.']},
  {id:35,d:'Nov 19, 2026',ic:'⚔️',t:'New Arena fights + Gear Summon shortcut',l:['<b>ARENA</b> fights look brand new: heroes run in, fight up close, shoot real projectiles and every skill shows its <b>name</b>.','<b>GEAR SUMMON</b> is back on the SUMMON page – tap GEAR at the bottom.','Top 3 names on the ranking podium are now easy to read.']},
@@ -3725,7 +3744,7 @@ function startLoader(){
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},
   rect:id=>id==='parking'?{x:430,y:110,w:345,h:290}:id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:GAR[id]?{x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32}:null,
   sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>BLD[id].cost[G.lv[id]||0]||0,TKI:()=>TKI};
-window.__TE={smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
+window.__TE={SPLASH,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

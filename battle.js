@@ -965,7 +965,8 @@ const SPRD={
  m4_0:{a:[130,246],m:[230,150],cs:[[3,0],[3,1],[3,2],[3,3]],fx:'quake'},m4_1:{a:[129,246],m:[250,109],look:'wrench',cs:[[3,0],[3,1]],fx:'holy'},
  m4_2:{a:[120,246],m:[250,112],col:'#d05cff',cs:[[3,0],[3,1]],fx:'vortex'},m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
  m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
- m5_0:{a:[124,246],m:[230,150],cs:[[3,0],[3,1],[3,2]],fx:'gearboom'},m5_1:{a:[123,246],m:[230,150],cs:[[3,0]],fire:1},
+ m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
+m5_1:{a:[123,246],m:[230,150],cs:[[3,0]],fire:1},
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
  d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
  d0_4:{w:384,a:[190,248],m:[300,150]},d0_5:{w:384,a:[180,248],m:[300,150]},d0_6:{w:384,a:[193,248],m:[300,150]},
@@ -996,13 +997,28 @@ const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
 // v16-25: atlases load only when a hero/driver is actually drawn (before: ALL ~95 atlases were decoded at startup ≈ 290 MB of memory)
 for(const id in SPRD)SPRD[id].id=id;
-function sprLoad(d){if(!d.im){d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}}return d.im;}
+function sprLoad(d){if(!d.im){d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
+// v16-94: draws frame (r,c) of a sprite at the feet point (0,0), k = screen units per 256-cell unit. v8 = 8 frames per row, each row its own height
+function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.im,c*v.cw,R[0],v.cw,R[1],-v.ax*k,-R[3]*k,v.uw*k,R[2]*k);return;}
+  const w=d.w||256,cw=w*SPCELL/256;X.drawImage(d.im,c*cw,r*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);}
+// v16-94: frame of an 8-frame hero (rows idle·run·attack·skill·hit/KO·win)
+function sprFrame8(u,t){const a=u.act;
+  if(u.dead)return[4,Math.min(7,4+Math.floor(u.deadT/.13))];
+  if(a&&(a.k==='leap'||a.k==='dash'))return[1,Math.floor(t*14)%8];
+  if(a&&a.k==='cast')return[3,Math.min(7,Math.floor(a.t/a.dur*8))];
+  if(u.land>0)return[3,7];
+  if(u.st==='atk')return[2,Math.min(7,Math.floor(u.ap*8))];
+  if(u.stun>0)return[4,2];
+  if(u.hurt>.35)return[4,1];
+  if(u.st==='walk'||u.st==='run')return[1,Math.floor(u.wph/TAU*8+80)%8];
+  if(u.st==='win')return[5,Math.floor(t*8+u.k)%8];
+  return[0,Math.floor(t*8+u.k*3)%8];}
 const sprOf=h=>h&&!h.crew&&SPRD[h.id]||null;
 const sprOK=d=>{if(!d)return false;const im=sprLoad(d);return im.complete&&im.naturalWidth>0;};
 // muzzle: [x, y] on screen where a ranged attack / skill effect starts (continues the effect drawn in the picture)
 function muzzle(u,dx,dy){const d=u.spr,k=dsc(u.d);if(!sprOK(d))return[u.x+u.face*dx*S,fy(u.d)-(u.lift||0)-dy*k];
   return[u.x+u.face*(d.m[0]-d.a[0])*SPK*k,fy(u.d)-(u.lift||0)-(d.a[1]-d.m[1])*SPK*k];}
-function sprFrame(u,t){const a=u.act,d=u.spr,R=d.R||[0,1,2,3,4,5];
+function sprFrame(u,t){if(u.spr.v8)return sprFrame8(u,t);const a=u.act,d=u.spr,R=d.R||[0,1,2,3,4,5];
   if(u.dead){if(d.hk){const k=d.hk.ko;return k[Math.min(k.length-1,Math.floor(u.deadT/.12))];}return d.noKO?[R[0],0]:[R[4],u.deadT<.25?2:3];}
   if(a&&a.k==='leap'){const k=a.t/a.dur;if(d.lp)return d.lp[Math.min(d.lp.length-1,Math.floor(k*d.lp.length))];return[R[3],k<.2?0:k<.55||u.h.id==='m0_2'?1:2];} // Tom: his falling frame has a backpack he never wears → keep the jump frame
   if(a&&a.k==='dash'){if(a.back)return[R[1],Math.floor(u.wph/TAU*4+40)%4];
@@ -1021,8 +1037,7 @@ function drawSprHero(g,u,t,d,alpha){const [r,c]=sprFrame(u,t);
   g.save();g.scale(u.face,1);
   const k=SPK; // units per 256-cell px
   if(d.noKO&&u.dead)g.rotate(-Math.min(1,u.deadT*2.2)*Math.PI/2*.92); // no KO picture → falls over
-  const w=d.w||256,cw=w*SPCELL/256;
-  g.globalAlpha=alpha*GA;g.drawImage(d.im,c*cw,r*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);
+  g.globalAlpha=alpha*GA;sprBlit(g,d,r,c,k);
   g.restore();}
 function portraitCv(h){const k='cv'+h.id;if(PIMG[k])return PIMG[k].complete===false||PIMG[k].naturalWidth===0?null:PIMG[k];
   if(h.crew)return PIMG[k]=crewPortrait(+h.id.slice(4));const im=new Image();im.src=TE().portrait(h);PIMG[k]=im;return null;}
@@ -1704,7 +1719,7 @@ const SKF={
  m4_5(u){u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,mult:2.8};u.st='dash';},
  m5_0(u,ms){castAct(u,.85,()=>{for(const m of alive(B.mons))B.fx.push({type:'gear',x:m.x+rnd(-10,10),tgt:m,y0:-40,t:-rnd(0,.5),d:.55,src:u,r:rnd(15,21)*S,mult:3.2});
    for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
-   const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c)B.fx.push({type:'mega',t:-.75,d:1.1,src:u,x:c.x,dd:c.d});
+   const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
    teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});});},
  m5_1(u){castAct(u,.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
    teamBuff({aspd:6,aspdK:.3,crit:6,col:'#ff5252',txt:'OVERDRIVE!'});});}};
@@ -1896,7 +1911,7 @@ function fxUpdate(f,dt){
   else if(f.type==='strike'&&!f.done&&f.t>=0){f.done=true;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],x=m.x,y=headY(m)+22*dsc(m.d);
     B.fx.push({type:'bolt',x0:x+rnd(-30,30)*S,y0:f.top,x1:x,y1:y,t:0,d:.28,col:'#ffe066'});damage(f.src,m,1.5,{skill:1});m.stun=Math.max(m.stun,1);sparks(x,y,10,'#fff176',220);shake(5);
     if(FX2){fxBolt(x,f.top,x,y,'#ffd54a',60);fxs('spark_02','#fff59d',x,y,{d:.35,s0:40*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxBurst(x,y,'#ffd54a',40*S);}}}
-  else if(f.type==='mega'&&!f.done&&f.t>=0){f.done=true;const y=fy(f.dd);imgFx('gearboom',f.x,y+16*S,230*S,1);shake(16);B.flash=.4;
+  else if(f.type==='mega'&&!f.done&&f.t>=0){f.done=true;const y=fy(f.dd);if(!(f.src&&f.src.spr&&f.src.spr.fx8&&f.src.spr.fi&&f.src.spr.fi.naturalWidth))imgFx('gearboom',f.x,y+16*S,230*S,1);shake(16);B.flash=.4;
     for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.dd)*(FY1-FY0)*1.25)<110*S)damage(f.src,m,1.5,{skill:1});
     if(FX2){fxShock(f.x,y,'#ff6d00',110*S);fxScorch(f.x,y,'#2b1a10',80*S,2.5);}}
   else if(f.type==='coil'){f.tick+=dt;if(f.tick>=.4){f.tick=0;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],y0=fy(f.dd)-70*dsc(f.dd),y=headY(m)+22*dsc(m.d);
@@ -2082,6 +2097,7 @@ function drawFx(t){
     else if(f.type==='plus'){const u=f.u;const [x,y]=sxy(u);g.globalAlpha=1-k;g.fillStyle=f.col||'#69f0ae';g.font='900 14px system-ui';g.textAlign='center';g.fillText('✚',x+8,y-70*dsc(u.d)-k*20);}
     else if(f.type==='gear'){const x=f.tgt&&f.tgt.x!==undefined?(f.lx||f.tgt.x):f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5);const y=lerp(f.y0,ty,Math.min(1,k/.85));
       if(k<.85){g.translate(x,y);g.rotate(t*12);gearShape(f.r,'#ffd54a');g.rotate(-t*12);g.globalAlpha=.25;g.fillStyle='#ffab00';g.fillRect(-2,-80,4,70);}}
+    else if(f.type==='sheet8'){const d=f.sp,v=d.fx8,R=v.rows[0];if(d.fi&&d.fi.complete&&d.fi.naturalWidth){const c=Math.min(7,Math.floor(k*8)),kk=SPK*dsc(f.dd)*1.25;g.globalAlpha=k>.9?(1-k)*10:1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='imgfx'){const im=FXIM[f.k];if(fxOK(f.k)){const e=1-Math.pow(1-Math.min(1,k*3),3),w=f.w*(f.float?1:(.6+.4*e)),h=w*im.naturalHeight/im.naturalWidth;
         g.globalAlpha=Math.min(1,k*6)*(k<.7?1:1-(k-.7)/.3);if(f.spin){g.translate(f.x,f.y-h/2);g.scale(1+Math.sin(f.t*30)*.03,1);g.drawImage(im,-w/2,-h/2,w,h);}else g.drawImage(im,f.x-w/2,f.y-(f.cloud?h/2:h)-(f.float?Math.sin(f.t*6)*3:0),w,h);}}
     else if(f.type==='quake'&&fxOK('quake')&&f.fx!==undefined){const im=FXIM.quake,h=(FY1-FY0)*.62+40*S,w=h*im.naturalWidth/im.naturalHeight;g.globalAlpha=k<.85?1:1-(k-.85)/.15;
@@ -2566,7 +2582,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`);
-  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
+  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>${T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt" data-g="art">🖼 ART</button>':''}`;
   $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setPcs(roleOf(h),heroGear(h.id))}${setBlock(roleOf(h),n)}</div>`;})()}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
   const inT=team.includes(h.id);
@@ -2721,6 +2737,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.g==='salvGo'){const L=svPick||[];if(!L.length)return;let sum=0;L.forEach(it=>sum+=salvageV(it));
     pop(`<div class="pT">${IMGI('img/ui2/i_scrap.webp','1.4em','-.4em')} Salvage ${L.length} item${L.length>1?'s':''}?</div><div class="gDrop">${L.map(it=>itemCard(it)).join('')}</div><div class="pD">You get <b style="color:#ffd54a">+${T.fmt(sum)}</b>. Salvaged gear is gone forever.</div><button class="cpGo" data-p="svok">✓ SALVAGE</button><button class="cpGo alt" data-p="x">CANCEL</button>`);return;}
   if(el.dataset.g==='hsum'){if(T.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T.openSummon('m');}return;}
+  if(el.dataset.g==='art'){const h=gHero();if(h&&window.showSplash)showSplash(h.id);return;}
   if(el.dataset.g==='fuse'){const h=gHero();if(h&&h.gr===4&&T.openFuse){const tm=document.getElementById('team');if(tm)tm.style.zIndex=30;T.openFuse(gsel);}else T.toast('⭐ Stars go up when you summon '+(h?h.n:'this hero')+' again (max +50). Legendary +'+5+' heroes can be fused into Mythic.',3800);return;}
   if(el.dataset.g==='tin'){const h=gHero();if(!h)return;if(tsel.length<5)popTeamCmp(tsel.length,h.id);else popWhoLeaves(h.id);return;}
   if(el.dataset.g==='tout'){const h=gHero();if(!h)return;const k=tsel.indexOf(h.id);if(k<0)return;if(tsel.length<=1){T.toast('The team needs at least 1 hero',1800);return;}popTeamCmp(k,'');return;}
@@ -3162,25 +3179,26 @@ $('cpBack').onclick=()=>{if(!backToHub())close();};$('cpPrev').onclick=()=>chGo(
 $('cpGearB').innerHTML=IMGI(glyphURL('bag','#ffd54a'),'1.25em','-.3em')+'<small>HEROES</small>';
 // v16-20: mini hero on the garage map (same sprite sheet as in battle). an: idle · walk · work · cel, or a row number (drivers). hgt = height on the map.
 function mini(X,id,an,t,x,y,hgt,face,ph){const d=SPRD[id];if(!sprOK(d))return false;const R=d.R||[0,1,2,3,4,5];
-  const num=typeof an==='number',row=num?R[an]:an==='walk'?R[1]:an==='work'?R[2]:an==='cel'?R[5]:R[0],fps=num?[4,9,11,6,5,4][an]:an==='walk'?9:an==='work'?6:4,c=Math.floor(t*fps+(ph||0)*3)%4;
-  const k=hgt/215,w=d.w||256,cw=w*SPCELL/256;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
-  X.drawImage(d.im,c*cw,row*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);X.restore();return true;}
+  const num=typeof an==='number',row=num?R[an]:an==='walk'?R[1]:an==='work'?R[2]:an==='cel'?R[5]:R[0],N=d.v8?8:4,fps=(num?[4,9,11,6,5,4][an]:an==='walk'?9:an==='work'?6:4)*N/4,c=Math.floor(t*fps+(ph||0)*3)%N;
+  const k=hgt/215;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
+  sprBlit(X,d,row,c,k);X.restore();return true;}
 
 // v16-45: ARENA (online PvP) – the battle team as numbers for the server (stats incl. gear) + a pose drawer for the arena fight
 function arenaTeam(){return curTeamList().filter(Boolean).map(h=>{const s=unitStats(h),R=ROLE[roleOf(h)];
   return {id:h.id,n:h.n,gr:h.gr||0,s:stars(h),role:roleOf(h),hp:s.hp,atk:Math.round(s.atk*10)/10,def:Math.round(s.def*10)/10,as:Math.round(s.as*1000)/1000,crit:Math.round(s.crit*1000)/1000,rng:s.rng,eg:Math.round(s.eg*100)/100,pw:powS(s,R)};});}
 // pose: idle · walk · atk · skill · hurt · ko · win ; k = 0..1 progress of one-shot poses
 function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return false;const R=d.R||[0,1,2,3,4,5];let f;
-  if(ps==='walk')f=[R[1],Math.floor(t*9)%4];
+  if(d.v8){const q=n=>Math.min(n-1,Math.floor(k*n));f=ps==='walk'?[1,Math.floor(t*13)%8]:ps==='atk'?[2,q(8)]:ps==='skill'?[3,q(8)]:ps==='hurt'?[4,1]:ps==='ko'?[4,4+q(4)]:ps==='win'?[5,Math.floor(t*8)%8]:[0,Math.floor(t*8)%8];}
+  else if(ps==='walk')f=[R[1],Math.floor(t*9)%4];
   else if(ps==='atk')f=[R[2],Math.min(3,Math.floor(k*4))];
   else if(ps==='skill'){const cs=d.cs,n=cs?cs.length:d.n||4,i=Math.min(n-1,Math.floor(k*n));f=cs?cs[i]:[R[3],i];}
   else if(ps==='hurt')f=d.hk?d.hk.h:d.noKO?[R[0],0]:[R[4],0];
   else if(ps==='ko'){if(d.hk){const q=d.hk.ko;f=q[Math.min(q.length-1,Math.floor(k*q.length))];}else f=d.noKO?[R[0],0]:[R[4],k<.4?2:3];}
   else if(ps==='win')f=[R[5],Math.floor(t*5)%4];
   else f=[R[0],Math.floor(t*4)%4];
-  const kk=hgt/215,w=d.w||256,cw=w*SPCELL/256;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
+  const kk=hgt/215;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);
   if(ps==='ko'&&d.noKO)X.rotate(-Math.min(1,k*2.2)*Math.PI/2*.92);
-  X.drawImage(d.im,f[1]*cw,f[0]*SPCELL,cw,SPCELL,-d.a[0]*kk,-d.a[1]*kk,w*kk,256*kk);X.restore();return true;}
+  sprBlit(X,d,f[0],f[1],kk);X.restore();return true;}
 const hasSpr=id=>!!SPRD[id];
 let collHome=0,gsHome=0;   // v16-87: gsHome = Gear Summon opened from the main SUMMON page
 // ---------------------------------------------------------------- v16-60: WORLD BOSS (Marius' 6 pictures in img/wb/, cut by tools/wb_cut.py)
