@@ -141,7 +141,7 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 .smRib{transform:rotate(43deg);font-size:calc(var(--u)*22);color:#fff}
 .smTi{border-radius:calc(var(--u)*12);overflow:hidden;pointer-events:none}.smTi img{width:100%;height:100%;object-fit:cover;display:block}.smTi img.sil{filter:brightness(.35)}
 .smTi i{position:absolute;left:0;right:0;bottom:0;font:900 calc(var(--u)*17) system-ui;font-style:normal;color:#fff;background:#8a0012cc;text-align:center;letter-spacing:calc(var(--u)*1)}
-.smPl{font-size:calc(var(--u)*22);pointer-events:auto}
+.smPl{font-size:calc(var(--u)*22);pointer-events:auto}.smTab{gap:calc(var(--u)*6);font-size:calc(var(--u)*25)}.smTab img{height:1.35em;width:auto}.smTab.on{color:#ffd54a;text-shadow:0 calc(var(--u)*2) 0 #000,0 0 calc(var(--u)*12) #ffb300}.smTab:not(.on){opacity:.8}
 .smDm{background:url(img/ui5/coin.webp) 0 0/100% 100% no-repeat;font-size:calc(var(--u)*24);font-style:normal}
 .smFu{pointer-events:none;filter:drop-shadow(0 calc(var(--u)*2) calc(var(--u)*3) #000)}
 .smCol{flex-direction:column;gap:calc(var(--u)*4);color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7;font-size:calc(var(--u)*40)}.smCol small{color:#5a3300;font-size:.6em;font-style:normal;letter-spacing:calc(var(--u)*1)}
@@ -530,11 +530,11 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .winSk>.wT img{height:1.25em;width:auto}
 .winSk>.wX{position:absolute;left:calc(var(--k)*782);top:calc(var(--k)*-112);width:calc(var(--k)*106);height:calc(var(--k)*106);border-radius:50%;background:none!important;border:0!important;box-shadow:none!important;padding:0;margin:0;color:transparent;z-index:2}
 .wR{display:flex;align-items:center;gap:6px;min-height:calc(var(--k)*108);box-sizing:border-box;margin:calc(var(--k)*5) 0;border-style:solid;border-color:transparent;border-width:0 calc(var(--k)*60);border-image:url(img/ui5/rn.webp) 0 60 fill/0 calc(var(--k)*60) stretch;padding:calc(var(--k)*8) calc(var(--k)*14);color:#fff;font:800 min(3.4vw,14px) system-ui;text-shadow:0 1px 2px #000}
-.wR.g0{border-image-source:url(img/ui5/r0.webp)}.wR.g1{border-image-source:url(img/ui5/r1.webp)}.wR.g2{border-image-source:url(img/ui5/r2.webp)}.wR.g3{border-image-source:url(img/ui5/r3.webp)}.wR.g4{border-image-source:url(img/ui5/r4.webp)}.wR.g5{border-image-source:url(img/ui5/r5.webp)}
+.wR.g0{border-image-source:url(img/ui5/r0.webp)}.wR.g1{border-image-source:url(img/ui5/r1.webp)}.wR.g2{border-image-source:url(img/ui5/r2.webp)}.wR.g3{border-image-source:url(img/ui5/r3.webp)}.wR.g4{border-image-source:url(img/ui5/r4.webp)}.wR.g5{border-image-source:url(img/ui5/r5.webp)}.wR.g6{border-image-source:url(img/ui5/r6.webp)}
 .wR b{font-weight:900}.wR>:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wR em{font-style:normal;color:#b8c7d9;font-size:.85em;white-space:nowrap}.wR .wV{font:900 1.1em system-ui;color:#fff;min-width:3.2em;text-align:right}
 .wTx>:first-child{white-space:normal;font-size:.95em;line-height:1.3}
 .wR img{height:1.7em;width:auto;vertical-align:middle}.wR .wLk{height:2em}
-.wP{font:700 min(3.2vw,13px)/1.45 system-ui;color:#cfe0f2;padding:4px 6px}.wP b{color:#ffd54a}.wP>div{margin:3px 0}
+.wP{font:700 min(3.2vw,13px)/1.45 system-ui;color:#cfe0f2;padding:4px 6px}.wHist{display:block;margin:8px auto 4px;padding:8px 18px;border-radius:12px;border:2px solid #7ec8ff;background:linear-gradient(#1e4c9a,#0b2250);color:#e3f2ff;font:900 min(3.6vw,14px) system-ui;letter-spacing:.5px}.wP b{color:#ffd54a}.wP>div{margin:3px 0}
 .wS{text-align:center;font:900 italic min(3.4vw,14px) system-ui;color:#9fd3ff;letter-spacing:.5px;margin:2px 0 4px}
 #popBox.dlgSk .pX{display:none}
 #popBox.dlgSk .skIn{padding:0 calc(var(--k)*10) calc(var(--k)*4);margin-top:calc(var(--k)*-40)}
@@ -2829,10 +2829,10 @@ function renderPanel(){
   if(sel==='vip'){const sub=subOn(),key='vip'+G.vip+sub+(sub?Math.ceil((PK.sub-Date.now())/864e5):0);if(key===lastPanelKey)return;lastPanelKey=key;
     const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'');$('shSkT').innerHTML='VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'')+'<small>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL')+'</small>';
     $('shDots').innerHTML='<span>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL – '+G.vip+' VIP points')+'</span>';
-    $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. With the VIP Pass all benefits are ×'+SUB_MULT+'.';
+    $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. '+(S2()?'VIP Passes make all benefits stronger: Silver ×1.2 · Gold ×1.5 · Platinum ×2 – together ×2.7.':'With the VIP Pass all benefits are ×'+SUB_MULT+'.');
     const a=VIP_PTS[VLV],fr=nx?(G.vip-a)/(nx-a):1;
     let h='<div class="vbar"><i style="width:'+Math.round(fr*100)+'%"></i></div>';
-    h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>'+(S2()?'VIP Pass':'VIP Pass · '+SUB_PRICE+' / 30 days')+'</b>'+(sub?'Active – '+(S2()?SHOP2.PASSN()+' · '+SHOP2.days():Math.ceil((PK.sub-Date.now())/864e5))+' days left. All benefits ×'+SUB_MULT+'.':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.')+'</div>'+
+    h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>'+(S2()?'VIP Pass':'VIP Pass · '+SUB_PRICE+' / 30 days')+'</b>'+(sub?'Active – '+(S2()?SHOP2.PASSN()+' · '+SHOP2.days():Math.ceil((PK.sub-Date.now())/864e5))+' days left. All benefits ×'+SUB_MULT+'.':(S2()?'Silver ×1.2 · Gold ×1.5 · Platinum ×2 – you can have all three (×2.7).':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.'))+'</div>'+
       (S2()?'<button class="buy" data-buy="sub">'+(sub?'ACTIVE':'OPEN')+'</button>':sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
     h+='<div class="sec">YOUR BENEFITS · VIP '+VLV+(sub?'':' <span style="color:#9fb0c0;letter-spacing:0">(👑 = with VIP Pass)</span>')+'</div>'+VIP_BEN.map(b=>{const v=benAt(b,VLV,sub),on=VLV>=b.from;
       return '<div class="row"><span>'+(VIP_IMG[b.k]?U3(VIP_IMG[b.k]):b.ic)+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a">'+pctT(benAt(b,VLV,true),b.neg)+' 👑</em>':'')+'</div>';}).join('');
@@ -3175,13 +3175,9 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   h+='<div class="smL" style="'+box(256,690,410,55)+'">AVAILABLE '+(cr?'CREW':'HEROES')+'</div><div data-a="rates" style="'+box(805,684,68,68)+'border-radius:50%"></div>';
   TILE2.forEach((x,i)=>{const L=pool.filter(z=>z.gr===i),d=L.find(z=>G.h.disc[z.id]),hh=d||L[0];
     h+='<div class="smTi" style="'+box(x-50,792,100,100)+'">'+(hh?img(hh,d?0:1):'')+'</div>'+(i===5&&!cr?'<img class="smFu" src="img/ui5/fusion.webp" alt="FUSION" style="'+box(x-62,860,124,47)+'">':'')+'<div data-a="tier" data-g="'+i+'" style="'+box(x-64,778,128,172)+'"></div>';});
-  // 3 small plates: rates · switch HERO/CREW · history
-  const other=SMK[(SMK.indexOf(smCat)+1)%SMK.length];
-  h+='<div class="smL smPl" data-a="rates" style="'+box(47,1022,254,59)+'">RATE INFO</div>';
-  h+='<div class="smL smPl" data-a="cat" data-c="'+other+'" style="'+box(335,1022,251,59)+'color:#ffd54a">'+(other==='c'?'CREW':'HERO')+' SUMMON ›</div>';
-  h+='<div class="smL smPl" data-a="hist" style="'+box(621,1022,254,59)+'">HISTORY</div>';
-  // v16-87: GEAR SUMMON is back on the summon page (tester: "hard to find the gear summon") – blue chip on the left of the portal
-  h+='<div class="smL smGear" data-a="gear" style="'+box(14,598,250,64)+'pointer-events:auto"><img src="img/gticket.webp" alt="">GEAR SUMMON</div>';
+  // v16-89 (Marius): the 3 plates are the 3 summons – HERO · CREW · GEAR (Rate Info stays on the (i) button of the grade panel, History inside Rate Info)
+  [['m','HERO',47,254],['c','CREW',335,251],['g','GEAR',621,254]].forEach(([k,n,x,w])=>{const on=k===smCat;
+    h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="'+(k==='g'?'gear':'cat')+'" data-c="'+k+'" style="'+box(x,1022,w,59)+'">'+(k==='g'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+'</div>';});
   // summon buttons
   h+='<div class="smL smBig" data-a="sum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+TIK(smCat)+' 1</span></div>';
   h+='<div class="smL smBig gold" data-a="sum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+TIK(smCat)+' 10</span></div>';
@@ -3194,7 +3190,7 @@ smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}cons
   else if(a==='tkinfo')popTickets();
   else if(a==='arrow'){const i=(SMK.indexOf(smCat)+(+t.dataset.d)+SMK.length)%SMK.length;smCat=SMK[i];smKey='';renderSm();}
   else if(a==='cat'){smCat=t.dataset.c;smKey='';renderSm();}
-  else if(a==='gear'){if(window.CAMPAIGN&&CAMPAIGN.gearSum)CAMPAIGN.gearSum();}
+  else if(a==='gear'){if(window.CAMPAIGN&&CAMPAIGN.gearSum){closeSummon();smEl.style.zIndex='';CAMPAIGN.gearSum();}} // v16-89: tabs swap pages (no page hidden under another)
   else if(a==='tier'){const g=+t.dataset.g;if(g===6){toast('🔴 Red heroes are COMING SOON',2500);return;}popTier(smCat,g);}
   else if(a==='rates')popRates();
   else if(a==='hist')popHist();
@@ -3314,12 +3310,13 @@ const wRow=(g,a,v,e)=>'<div class="wR'+(g>=0?' g'+g:'')+'"><span>'+a+'</span>'+(
 const LOCKI='<img class="wLk" src="img/ui5/lock.webp" alt="locked">',OKI='<img src="img/ui5/ok.webp" alt="done">';
 function closePop(){popEl.classList.remove('open');popCtx=null;}
 function popTickets(){popW(TKI+' TICKETS','<div class="wP"><div>'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.</div><div>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.</div><div>Both are earned only by playing.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> – you have <b>'+(G.dm||0).toLocaleString()+'</b> (always asked first).</div></div><div class="wS">WHERE TO GET TICKETS</div>'+
-  ['📅 5000 FREE SUMMONS: every day '+TKI+' +10 · '+CTI+' +10 · Gear +10',TKI+' Every claimed Daily Quest: +1',TKI+' Daily Quest gifts: +1 / +2 / +2 / +3 · '+CTI+' same',CTI+' Every thief caught: +1',TKI+' Every new Reputation level: +5 · '+CTI+' +3',TKI+' Every new VIP level: +5 · '+CTI+' +3',TKI+' Idle Rewards: +1 every 2 hours · '+CTI+' +1 every 4 hours (4h storage + 30 min per VIP level)',TKI+' Campaign: +1 per stage · mini-boss +3 · boss +5 '+CTI+' +3 '+DMI+' +100'].map(t=>'<div class="wR wTx"><span>'+t+'</span></div>').join(''));}
+  (()=>{const GTI='<img class="tki" src="img/gticket.webp">';return ['📅 Daily Check-in: '+TKI+' +10 · '+CTI+' +10 · '+GTI+' +10',TKI+' Daily Quest: +1 each · gifts +1 / +2 / +2 / +3',CTI+' Daily Quest gifts: +1 / +2 / +2 / +3',CTI+' Thief caught: +1',TKI+' +5 · '+CTI+' +3 every new Reputation level',TKI+' +5 · '+CTI+' +3 every new VIP level',TKI+' +1 / 2 h · '+CTI+' +1 / 4 h in Idle Rewards',TKI+' Campaign: +1 · mini-boss +3 · boss +5',CTI+' +3 · '+DMI+' +100 for every campaign boss'];})().map(t=>'<div class="wR wTx"><span>'+t+'</span></div>').join(''));}
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*1000)/10)+'%';
   const row=(i,pct,right)=>wRow(i,'<b style="color:'+GRADES[i].c+'">'+GRADES[i].n+'</b>',pct,right);
   popW('SUMMON RATES','<div class="wS">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</div>'+RATES.map((r,i)=>row(i,pc(r),heroesOf(smCat,i).length+' heroes')).join('')+
   row(5,'0%','only from Fusion')+wRow(-1,LOCKI+' ???','—','coming soon')+
-  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div>');}
+  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div><button class="wHist" onclick="window.__smHist()">📜 SUMMON HISTORY</button>');}
+window.__smHist=()=>popHist();
 function popHist(){const L=G.h.hist;popW('SUMMON HISTORY','<div class="wS">Last '+L.length+' summons</div>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
   return wRow(H.gr,CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b>',null,(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'));}).join(''):'<div class="wP">No summons yet.</div>'));}
 function popTier(cat,gr){const L=heroesOf(cat,gr);
@@ -3544,7 +3541,8 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
- {id:35,d:'Nov 19, 2026',ic:'⚔️',t:'New Arena fights + Gear Summon shortcut',l:['<b>ARENA</b> fights look brand new: heroes run in, fight up close, shoot real projectiles and every skill shows its <b>name</b>.','<b>GEAR SUMMON</b> is back on the SUMMON page – tap the blue button under the portal.','Top 3 names on the ranking podium are now easy to read.']},
+ {id:36,d:'Nov 19, 2026',ic:'⭐',t:'Gear Stars, ASCENDED gear & new Summon tabs',l:['<b>SUMMON</b>: the 3 buttons at the bottom are now <b>HERO · CREW · GEAR</b> – switch between all summons in one tap. Rate Info = the (i) button, Summon History is inside it.','<b>GEAR STARS ★1-★5</b>: open an item → STAR UP. It uses one identical piece from the bag (same slot + same grade). Every star: +20% main stat.','<b>ASCENDED</b> – a new gear grade above Mythic: ASCEND a Mythic ★5 (uses 1 more Mythic of the same slot), or find it in campaign chapters 30-50. Max Lv 60 and 3 bonus stats.','Fixed texts: VIP Pass bonuses, ticket list, gear summon rates.']},
+ {id:35,d:'Nov 19, 2026',ic:'⚔️',t:'New Arena fights + Gear Summon shortcut',l:['<b>ARENA</b> fights look brand new: heroes run in, fight up close, shoot real projectiles and every skill shows its <b>name</b>.','<b>GEAR SUMMON</b> is back on the SUMMON page – tap GEAR at the bottom.','Top 3 names on the ranking podium are now easy to read.']},
  {id:34,d:'Nov 18, 2026',ic:'👑',t:'VIP Passes stack + hero frames on profiles',l:['You can now have <b>Silver, Gold and Platinum Pass</b> at the same time. Every pass gives its own daily gift and the bonuses add up (VIP benefits, Idle hours).','A player\'s <b>profile</b> now shows his battle team in the <b>grade frames</b> – name and grade of every hero.']},
  {id:33,d:'Nov 18, 2026',ic:'⚙️',t:'Smarter AUTO EQUIP',l:['<b>AUTO EQUIP</b> now checks your hero\'s <b>class SET</b> first (2, 3, 4… pieces) and compares it with the best normal items – the gear with the most <b>Power</b> wins.']},
  {id:32,d:'Nov 18, 2026',ic:'👑',t:'Fixed: VIP level in Ranking & Chat',l:['The <b>VIP</b> badge in RANKING, CHAT and on profiles now shows your real <b>VIP level</b>. Before, some players were shown as VIP 20 by mistake.']},

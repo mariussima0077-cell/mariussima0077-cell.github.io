@@ -349,7 +349,7 @@ const css3=document.createElement('style');css3.textContent=`
 .gsTkN{justify-content:flex-end;padding-right:calc(var(--u)*14);box-sizing:border-box;font-size:calc(var(--u)*30)}
 .gsDm{background:url(img/ui5/coin.webp) 0 0/100% 100% no-repeat;font-size:calc(var(--u)*28);font-style:normal}
 .gsRt{font-size:calc(var(--u)*26);font-style:normal}
-.gsPl{font-size:calc(var(--u)*28)}
+.gsPl{font-size:calc(var(--u)*28)}.gi .fc{position:relative}.gStr{position:absolute;left:0;right:0;top:3%;z-index:3;text-align:center;font:900 13px/1 system-ui;color:#ffd54a;letter-spacing:-1px;text-shadow:0 1px 0 #000,0 0 4px #000}.gi.asc .fc{filter:drop-shadow(0 0 5px #2ef3ffaa)}.iFood{display:flex;align-items:center;gap:10px;margin:6px 4px;font:800 13px/1.35 system-ui;color:#cfe0f2}.iFood .gi{width:58px;flex:none}.iFood small{color:#8ea3b8}.cpGo.asc{background:linear-gradient(#5ff7ff,#0a8c9a);color:#012}.gsTab{gap:calc(var(--u)*8);font-size:calc(var(--u)*32)}.gsTab img{height:1.3em;width:auto}.gsTab.on{color:#ffd54a;text-shadow:0 2px 0 #000,0 0 calc(var(--u)*14) #ffb300}.gsTab:not(.on){opacity:.8}
 .gsBig{flex-direction:column;gap:0;font-size:calc(var(--u)*42)}.gsBig span{display:flex;align-items:center;gap:calc(var(--u)*8);font-size:.72em;padding:calc(var(--u)*2) calc(var(--u)*22);border-radius:calc(var(--u)*30);background:#0008;margin-top:calc(var(--u)*6)}
 .gsBig.gold{color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7}.gsBig.gold span{color:#fff;text-shadow:0 2px 0 #000}.gsBig.dis{filter:grayscale(1) brightness(.7)}
 .gsRib{transform:rotate(43deg);font-size:calc(var(--u)*24);pointer-events:none}
@@ -708,12 +708,17 @@ const GSLOT=[
  {k:'boots',n:'Boots',ic:'boots',st:'aspd'},
  {k:'chip',n:'ECU Chip',ic:'chip',st:'en'}];
 const GS={};GSLOT.forEach(s=>GS[s.k]=s);
-const GSTAT={atk:{n:'Attack',ic:'atk',col:'#ff7043',v:[6,10,15,22,30,40]},hp:{n:'HP',ic:'heart',col:'#66bb6a',v:[6,10,15,22,30,40]},def:{n:'Defense',ic:'shield',col:'#42a5f5',v:[8,13,20,28,38,50]},
- crit:{n:'Crit chance',ic:'crit',col:'#ffca28',v:[3,4,6,8,11,15]},aspd:{n:'Attack speed',ic:'aspd',col:'#26c6da',v:[4,6,9,13,17,22]},en:{n:'Skill charge',ic:'energy',col:'#ffab00',v:[6,10,15,22,30,40]}};
-const GNAMES={tool:['Rusty Wrench','Steel Wrench','Torque Wrench','Impact Gun','Golden Ratchet','Titan Breaker'],helm:['Cloth Cap','Hard Hat','Welding Mask','Carbon Helmet','Golden Helmet','Crown of Gears'],
- vest:['Old Overalls','Work Vest','Kevlar Apron','Armored Vest','Golden Plate','Mythic Exo-Suit'],glove:['Cotton Gloves','Leather Gloves','Grip Gloves','Shock Gloves','Golden Gauntlets','Titan Fists'],
- boots:['Old Sneakers','Work Boots','Steel Toes','Racing Boots','Golden Boots','Nitro Boots'],chip:['Basic Fuse','ECU Chip','Tuned ECU','Stage 2 ECU','Golden ECU','Quantum ECU']};
-const GMAXLV=10,GSUBN=[0,0,1,1,2,2],GINV=150;
+const GSTAT={atk:{n:'Attack',ic:'atk',col:'#ff7043',v:[6,10,15,22,30,40,52]},hp:{n:'HP',ic:'heart',col:'#66bb6a',v:[6,10,15,22,30,40,52]},def:{n:'Defense',ic:'shield',col:'#42a5f5',v:[8,13,20,28,38,50,65]},
+ crit:{n:'Crit chance',ic:'crit',col:'#ffca28',v:[3,4,6,8,11,15,19]},aspd:{n:'Attack speed',ic:'aspd',col:'#26c6da',v:[4,6,9,13,17,22,28]},en:{n:'Skill charge',ic:'energy',col:'#ffab00',v:[6,10,15,22,30,40,52]}};
+const GNAMES={tool:['Rusty Wrench','Steel Wrench','Torque Wrench','Impact Gun','Golden Ratchet','Titan Breaker','Celestial Driver'],helm:['Cloth Cap','Hard Hat','Welding Mask','Carbon Helmet','Golden Helmet','Crown of Gears','Halo of Torque'],
+ vest:['Old Overalls','Work Vest','Kevlar Apron','Armored Vest','Golden Plate','Mythic Exo-Suit','Starforged Exo-Suit'],glove:['Cotton Gloves','Leather Gloves','Grip Gloves','Shock Gloves','Golden Gauntlets','Titan Fists','Nova Gauntlets'],
+ boots:['Old Sneakers','Work Boots','Steel Toes','Racing Boots','Golden Boots','Nitro Boots','Warp Boots'],chip:['Basic Fuse','ECU Chip','Tuned ECU','Stage 2 ECU','Golden ECU','Quantum ECU','Singularity ECU']};
+// v16-89 (Marius): ASCENDED = gear grade above Mythic (grade 6, gear only) + gear STARS ★1-★5 (merge an identical piece: same slot + same grade)
+const ASC={n:'Ascended',c:'#2ef3ff',d:'#04505e'},GG=r=>r>=6?ASC:TE().GRADES[r],GGLOW=['','','','#d070ff','#ffd54a','#ff3d3d','#2ef3ff'];
+const GSTARMAX=5,GSTAR_K=.2,ASC_CH=29; // +20% main stat per star · Ascended drops from chapter 30
+const gStars=it=>'<span class="gStr">'+'★'.repeat(it.sr||0)+'</span>';
+function starFood(it){return GR().inv.filter(o=>o!==it&&o.s===it.s&&o.r===it.r&&!ownerOf(o)).sort((a,b)=>(a.set?1:0)-(b.set?1:0)||(a.sr||0)-(b.sr||0)||a.lv-b.lv)[0]||null;}
+const GMAXLV=10,GSUBN=[0,0,1,1,2,2,3],GINV=150;
 const GDROP=[[60,30,9,1,0,0],[30,40,22,7,1,0],[10,30,38,18,4,0],[0,15,35,35,14,1],[0,0,25,42,28,5]];
 function GR(){const G=TE().G;if(!G.gear)G.gear={inv:[],eq:{},nid:1,kit:0};const g=G.gear;
   if(!g.kit){g.kit=1;['tool','helm','vest'].forEach(s=>g.inv.push(newItem(s,0)));}return g;}
@@ -722,14 +727,14 @@ function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.ke
   const it={id:g.nid++,s,r,lv:1,sub};if(set)it.set=set;return it;}
 // v14: from chapter 6 on the chances keep improving until chapter 50
 function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,5,30,45,20];return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
-const GMAXR=[10,15,20,30,40,50],gMax=it=>GMAXR[it.r];
-function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;return Math.min(5,k);}
+const GMAXR=[10,15,20,30,40,50,60],gMax=it=>GMAXR[it.r];
+function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;k=Math.min(5,k);if(k===5&&c>=ASC_CH&&Math.random()<.15*Math.min(1,(c-ASC_CH+1)/21))k=6;return k;}
 function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(g.inv.length>=GINV){return {it,sold:salvageV(it)};}g.inv.push(it);return {it};}
 const itemById=id=>id?GR().inv.find(i=>i.id===id):null;
-const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(1+.12*(it.lv-1))*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
+const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(1+.12*(it.lv-1))*(1+GSTAR_K*(it.sr||0))*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
-const salvageV=it=>Math.round(40*Math.pow(it.r+1,1.8)*(1+.5*(it.lv-1))/10)*10;
+const salvageV=it=>Math.round(40*Math.pow(it.r+1,1.8)*(1+.5*(it.lv-1))*(1+(it.sr||0))/10)*10;
 function ownerOf(it){const eq=GR().eq;for(const hid in eq)for(const s in eq[hid])if(eq[hid][s]===it.id)return hid;return null;}
 function heroGear(hid,ov){const eq=GR().eq[hid]||{},o=[];for(const sl of GSLOT){const it=ov&&(sl.k in ov)?ov[sl.k]:itemById(eq[sl.k]);if(it)o.push(it);}return o;}
 const ZB={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};
@@ -761,7 +766,7 @@ function gearBon(items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};for(const 
 // item picture: rarity glow + drawn glyph
 // ---------------------------------------------------------------- v14: item pictures – every grade has its own drawing (36 items)
 const IMAT=[{b:'#8d6e57',h:'#c9a68a',l:'#4a3527',a:'#b5562a',t:'#d9c3a5'},{b:'#8fa3a0',h:'#eef6f3',l:'#4d5d59',a:'#43c463',t:'#2e7d32'},{b:'#3f7fd6',h:'#d6ecff',l:'#123a78',a:'#40c4ff',t:'#82b1ff'},
- {b:'#6a3fa6',h:'#e2c6ff',l:'#25103f',a:'#ea5cff',t:'#b388ff'},{b:'#e6a817',h:'#fff6c2',l:'#8a5600',a:'#ff2d55',t:'#ffe082'},{b:'#4a0f14',h:'#ff8a65',l:'#140204',a:'#ff1744',t:'#ffd180'}];
+ {b:'#6a3fa6',h:'#e2c6ff',l:'#25103f',a:'#ea5cff',t:'#b388ff'},{b:'#e6a817',h:'#fff6c2',l:'#8a5600',a:'#ff2d55',t:'#ffe082'},{b:'#4a0f14',h:'#ff8a65',l:'#140204',a:'#ff1744',t:'#ffd180'},{b:'#0a5a66',h:'#b8fbff',l:'#02262c',a:'#2ef3ff',t:'#e0fdff'}];
 function IA(x,r){const m=IMAT[r];
   const met=(x0,y0,x1,y1,c)=>{c=c||m;const gr=x.createLinearGradient(x0,y0,x1,y1);gr.addColorStop(0,c.h);gr.addColorStop(.45,c.b);gr.addColorStop(1,c.l);return gr;};
   const P=(pts,close)=>{x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));if(close!==false)x.closePath();};
@@ -871,17 +876,17 @@ const itOK=s=>ITIMG[s]&&ITIMG[s].complete&&ITIMG[s].naturalWidth>0;
 let stT=0;const stRe=()=>{clearTimeout(stT);stT=setTimeout(()=>{try{if($('cpGear').classList.contains('open'))renderGear();}catch(e){}},150);}; // a set picture arrived → redraw the open HEROES / BAG page once
 const STIMG={};function stImg(set,s){const k=set+'_'+s;if(!STIMG[k]){const i=new Image();i.onload=stRe;i.src='img/ui4/st_'+k+'.webp';STIMG[k]=i;}return STIMG[k];}
 const stOK=(set,s)=>{const i=stImg(set,s);return i.complete&&i.naturalWidth>0;};
-function itemArtCv(s,r,set){if(set&&stOK(set,s)){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');if(r>=3){x.save();x.shadowColor=['','','','#d070ff','#ffd54a','#ff3d3d'][r];x.shadowBlur=r>=5?18:12;x.drawImage(STIMG[set+'_'+s],6,6,116,116);x.restore();}x.drawImage(STIMG[set+'_'+s],6,6,116,116);return c;}
+function itemArtCv(s,r,set){if(set&&stOK(set,s)){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');if(r>=3){x.save();x.shadowColor=GGLOW[r];x.shadowBlur=r>=5?18:12;x.drawImage(STIMG[set+'_'+s],6,6,116,116);x.restore();}x.drawImage(STIMG[set+'_'+s],6,6,116,116);return c;}
   return itemArtCv0(s,r);}
 function itemArtCv0(s,r){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.lineJoin='round';x.lineCap='round';
-  if(itOK(s)){if(r>=3){x.save();x.shadowColor=['','','','#d070ff','#ffd54a','#ff3d3d'][r];x.shadowBlur=r>=5?18:12;x.drawImage(ITIMG[s],10,10,108,108);x.restore();}x.drawImage(ITIMG[s],10,10,108,108);}else IDRAW[s](x,r);return c;}
+  if(itOK(s)){if(r>=3){x.save();x.shadowColor=GGLOW[r];x.shadowBlur=r>=5?18:12;x.drawImage(ITIMG[s],10,10,108,108);x.restore();}x.drawImage(ITIMG[s],10,10,108,108);}else IDRAW[s](x,r);return c;}
 function itemIconURL(s,r,set){const key='it'+s+r+(set||'');if(ICC[key])return ICC[key];const ok=set?stOK(set,s):itOK(s);const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
-  const col=TE().GRADES[r].c,dk=TE().GRADES[r].d;const bg=x.createRadialGradient(64,58,6,64,64,96);bg.addColorStop(0,hexC(col,-.15));bg.addColorStop(.45,dk);bg.addColorStop(1,'#07090c');x.fillStyle=bg;x.fillRect(0,0,128,128);
+  const col=GG(r).c,dk=GG(r).d;const bg=x.createRadialGradient(64,58,6,64,64,96);bg.addColorStop(0,hexC(col,-.15));bg.addColorStop(.45,dk);bg.addColorStop(1,'#07090c');x.fillStyle=bg;x.fillRect(0,0,128,128);
   x.globalAlpha=.18;x.strokeStyle='#fff';x.lineWidth=10;for(let i=0;i<8;i++){x.save();x.translate(64,64);x.rotate(i/8*TAU+.2);x.beginPath();x.moveTo(0,0);x.lineTo(0,-100);x.stroke();x.restore();}x.globalAlpha=1;
   x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r,set),0,0);x.restore();
   const u=c.toDataURL();if(ok)ICC[key]=u;return u;}
 function itemCard(it,extra,cls){const T=TE(),i=Math.min(5,it.r),r=T.FIN[i],p=T.FPL[i];
-  return `<div class="gi ${cls||''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp"><img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
+  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${Math.min(6,it.r)}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
 
 // ---------------------------------------------------------------- team helpers
 function myMechs(){const T=TE(),o=[];
@@ -2411,7 +2416,7 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
    <div class="ppE"><small>ENEMY</small>${ep.toLocaleString()}</div><div class="ppP" style="color:${col}"><small>YOUR TEAM</small>${tp.toLocaleString()}</div>
    ${(()=>{const st=PX.stuck;if(i!==PX.best||!st||st.si!==i)return '';const gk=Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)),nx=gk<GRIT_N?Math.ceil((216e5-(Date.now()-st.t)%216e5)/36e5):0;return `<div class="grit">🔥 NEVER GIVE UP: <b>+${Math.round(gritK(gk)*100)}%</b> HP &amp; attack${gk<GRIT_N?` · next +${gritStep(gk)*100}% in ~${nx}h`:' (max)'}</div>`;})()}
    <div class="ppRT">${first?'FIRST CLEAR':'REPLAY'}</div>${rws.slice(0,4).map((r,k)=>`<div class="ppR ppR${k}"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}
-   <div class="ppG">${['Common','Uncommon','Rare','Epic','Legendary','Mythic'].map((n,k)=>gdrop(s.c)[k]?`<span style="color:${T.GRADES[k].c}">${n.slice(0,3).toUpperCase()} ${gdrop(s.c)[k]}%</span>`:'').filter(Boolean).join(' ')}</div>
+   <div class="ppG">${(()=>{const d=gdrop(s.c).slice(),a=s.c>=ASC_CH?Math.round(d[5]*.15*Math.min(1,(s.c-ASC_CH+1)/21)*10)/10:0;d[5]=Math.round((d[5]-a)*10)/10;d.push(a);return ['COM','UNC','RAR','EPI','LEG','MYT','ASC'].map((n,k)=>d[k]?`<span style="color:${GG(k).c}">${n} ${d[k]}%</span>`:'').filter(Boolean).join(' ');})()}</div>
    ${[0,1,2,3,4].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="heroes">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
    <button class="ppB" data-a="close" aria-label="Back"></button><button class="ppF" data-a="fight">FIGHT!</button>`;
   const mc=$('cpMons');types.slice(0,3).forEach(t=>{const d=document.createElement('div');d.className='mon'+(MON[t].boss?' bossm':'');d.appendChild(monPreview(t));const l=document.createElement('div');l.textContent=MON[t].n;d.appendChild(l);mc.appendChild(d);});
@@ -2583,7 +2588,7 @@ function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n
 function gPage(p){gpg=p;['gHero','gBag','gSalv','gColl'].forEach(id=>$(id).classList.toggle('open',id==={hero:'gHero',bag:'gBag',salv:'gSalv',coll:'gColl'}[p]));if(p==='coll'){renderColl();$('gColl').scrollTop=0;}if(p==='bag')$('gInv').scrollTop=0;if(p==='hero')$('gHero').scrollTop=0;if(p==='salv'){svPick=null;renderSalv();}renderPeds(pedList);pedGo();}
 // v16-47: SALVAGE page – up to 20 free (not worn) items at once, auto-picked by grade; tap an item to keep it
 let svG=[1,1,0,0,0,0],svPick=null,svSkip=new Set();
-function svList(){const g=GR();return g.inv.filter(it=>!ownerOf(it)&&svG[Math.min(5,it.r)]&&!svSkip.has(it.id)).sort((a,b)=>a.r-b.r||a.lv-b.lv).slice(0,20);}
+function svList(){const g=GR();return g.inv.filter(it=>!ownerOf(it)&&it.r<6&&svG[it.r]&&!svSkip.has(it.id)).sort((a,b)=>a.r-b.r||a.lv-b.lv).slice(0,20);}
 function svFx(n,sum){const T=TE(),b=$('svGo');try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}const o=document.createElement('div');o.className='svFx';o.innerHTML=`<img src="img/ui2/i_scrap.webp"><b>+${T.fmt(sum)}</b><small>${n} item${n>1?'s':''} salvaged</small>`;$('gSalv').appendChild(o);setTimeout(()=>o.remove(),1700);}
 function renderSalv(){const T=TE();const L=svPick=svList();let sum=0;L.forEach(it=>sum+=salvageV(it));
   $m('svSlots').innerHTML=Array.from({length:20},(_,k)=>{const it=L[k];return `<div class="svS" style="left:${[8.5,25.6,42.7,59.6,76.7][k%5]}%;top:${[33.7,44.3,54.9,65.4][k/5|0]}%">${it?`<div data-sx="${it.id}">${itemCard(it)}</div>`:''}</div>`;}).join('');
@@ -2591,7 +2596,7 @@ function renderSalv(){const T=TE();const L=svPick=svList();let sum=0;L.forEach(i
   $('svGo').innerHTML=L.length?`SALVAGE ${L.length}`:'—';$('svGo').classList.toggle('dis',!L.length);
   $m('svHelp').innerHTML=`<div class="gNote">${IMGI('img/ui2/i_scrap.webp','1.3em','-.35em')} Gear that a hero wears is never salvaged. Tap the grades to choose what goes in · tap an item to keep it${svSkip.size?` · <u data-g="svReset">show kept items (${svSkip.size})</u>`:''}</div>`;}
 function cmpForHero(h,ov,xp,xc){return cmpBlock(unitStats(h),unitStats(h,ov),pow(h),pow(h,ov),xp,xc);}
-function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)return;const h=gHero(),sl=GS[it.s],st=GSTAT[sl.st],o=ownerOf(it),oh=o&&T.HB[o];gsalv=0;
+let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)return;const h=gHero(),sl=GS[it.s],st=GSTAT[sl.st],o=ownerOf(it),oh=o&&T.HB[o];gsalv=0;gstar='';
   // v16-47: Marius' item card (img/ui2/item_f.webp): icon · name plate · 4 stat lines · EQUIP (green) / UPGRADE (blue) / SALVAGE (orange)
   const rows=[`<div class="iSt main">${IMGI(glyphURL(st.ic,st.col),'1.1em','-.22em')} ${st.n} <b>+${mainV(it)}%</b></div>`,...it.sub.map(([k,v])=>`<div class="iSt">${IMGI(glyphURL(GSTAT[k].ic,GSTAT[k].col),'1.1em','-.22em')} ${GSTAT[k].n} <b>+${v}%</b></div>`)];
   while(rows.length<3)rows.push('<div class="iSt e">—</div>');
@@ -2599,22 +2604,27 @@ function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)retur
   const mx=it.lv>=gMax(it),c=mx?0:upCost(it);
   let b1='';if(h){b1=o===h.id?`<button class="b1" data-p="ueq" data-it="${it.id}">UNEQUIP</button>`:`<button class="b1" data-p="eq" data-it="${it.id}">EQUIP<small>on ${h.n}</small></button>`;}else b1='<button class="b1 dis">EQUIP</button>';
   let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itIc">${itemCard(it)}</div>
-   <div class="itNm"><b style="color:${T.GRADES[it.r].c}">${itemName(it)}</b><small>${T.GRADES[it.r].n} ${sl.n} · Lv ${it.lv}/${gMax(it)}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
+   <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · Lv ${it.lv}/${gMax(it)}${it.sr?' · '+'★'.repeat(it.sr):''}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
    <div class="itSt">${rows.slice(0,4).join('')}</div>
    <div class="itBt">${b1}<button class="b2${mx||G.money<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?'MAX LEVEL':`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${T.fmt(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${T.fmt(salvageV(it))}</small></button></div></div><div class="itMore">`;
   if(h){const cur=itemById((g.eq[h.id]||{})[it.s]);
     if(o===h.id){x+=`<div class="cpSec">IF YOU UNEQUIP IT FROM ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:null},[],[`${sl.n} slot becomes empty`]);}
-    else{const xc=[],xp=[];if(cur)xc.push(`Replaces <b style="color:${T.GRADES[cur.r].c}">${itemName(cur)}</b> Lv ${cur.lv} (goes back to the bag)`);
+    else{const xc=[],xp=[];if(cur)xc.push(`Replaces <b style="color:${GG(cur.r).c}">${itemName(cur)}</b> Lv ${cur.lv} (goes back to the bag)`);
       if(oh){const d=pow(oh)-pow(oh,{[it.s]:null});xc.push(`Taken from <b>${oh.n}</b> (his power −${d.toLocaleString()})`);}
       x+=`<div class="cpSec">BEFORE / AFTER ON ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:it},xp,xc);}}
   if(it.set){const n=h&&roleOf(h)===it.set?setCount(h,heroGear(h.id)):0;x+=`<div class="cpSec">${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n.toUpperCase()} ONLY</div>`+setBlock(it.set,n);}
+  // v16-89: STARS (merge an identical free piece) and ASCEND (Mythic ★5 + 1 more Mythic of the same slot)
+  {const sr=it.sr||0,f=starFood(it),nm=`${GG(it.r).n} ${sl.n}`,fx=f?`<div class="iFood">${itemCard(f)}<span>uses <b style="color:${GG(f.r).c}">${itemName(f)}</b> Lv ${f.lv}${f.sr?' '+'★'.repeat(f.sr):''}<br><small>free piece from the bag · it is gone after</small></span></div>`:`<div class="pD">Needs one more <b style="color:${GG(it.r).c}">${nm}</b> in the bag (not worn).</div>`;
+   if(sr<GSTARMAX){x+=`<div class="cpSec">★ STARS ${sr} / ${GSTARMAX}</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV({...it,sr:sr+1})}%</b> <small>(★${sr} ➜ ★${sr+1} · +${GSTAR_K*100}% each star)</small></div>${fx}<button class="cpGo${f?'':' dis'}" data-p="${f?'star':''}" data-it="${it.id}">★ STAR UP</button>`;}
+   else if(it.r===5){const nx={...it,r:6};x+=`<div class="cpSec" style="color:${ASC.c}">✦ ASCEND · ABOVE MYTHIC</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(stars stay ★5 · max Lv ${GMAXR[5]} ➜ ${GMAXR[6]} · +1 bonus stat)</small></div>${fx}<button class="cpGo asc${f?'':' dis'}" data-p="${f?'asc':''}" data-it="${it.id}">✦ ASCEND</button>`;}
+   else x+=`<div class="cpSec">★ STARS ${sr} / ${GSTARMAX} · MAX</div>`;}
   if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(Lv ${it.lv} ➜ ${it.lv+1})</small></div>`;}
   x+='</div>';
   if(keep)morph($('cpPopBox'),x);else pop(x);$('cpPopBox').classList.add('itPop');}
 // v16-42: GEAR UPGRADE animation (Marius: "I see nothing when I upgrade – only after I leave and come back")
 // Everything stays on screen (no rebuild, no scroll jump): the item card in the popup and in the bag flashes,
 // a burst with sparks + "UPGRADE SUCCESS!  Lv 3 ➜ Lv 4  ·  HP +6.7% ➜ +7.4%" plays over the popup (taps go through it).
-function upFx(it,v0,p0){const T=TE(),st=GSTAT[GS[it.s].st],col=T.GRADES[it.r].c,h=gHero(),mx=it.lv>=gMax(it);
+function upFx(it,v0,p0){const T=TE(),st=GSTAT[GS[it.s].st],col=GG(it.r).c,h=gHero(),mx=it.lv>=gMax(it);
   try{navigator.vibrate&&navigator.vibrate(25);}catch(e){}
   const bx=$('cpPopBox');let o=$('upFx');if(o)o.remove();o=document.createElement('div');o.id='upFx';o.style.setProperty('--c',col);
   const dp=h&&ownerOf(it)===h.id?pow(h)-p0:0;
@@ -2678,7 +2688,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
 ['sm','team'].forEach(id=>{const el=document.getElementById(id);if(el)new MutationObserver(()=>{if(!el.classList.contains('open')&&$('cpGear').classList.contains('open'))renderGear();}).observe(el,{attributes:true,attributeFilter:['class']});});
 $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}CPX().ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
   if(a==='payOK'){const g=window.__payGo;window.__payGo=null;closePop();if(g)g();return;}
-  if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsGear'){closePop();closeGSum();openGear();return;}
+  if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsHist'){gsHist();return;}if(a==='gsGear'){closePop();closeGSum();openGear();return;}
   if(a==='x'){closePop();return;}
   if(a==='tcmp'){popTeamCmp(+el.dataset.k,el.dataset.id||null);return;}
   if(a==='tok'){const k=+el.dataset.k,id=el.dataset.id;if(id)tsel[k]=id;else tsel.splice(k,1);G.cp.team=tsel.slice();T.save();closePop();openTeam.render&&openTeam.render();return;}
@@ -2688,6 +2698,12 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
   if(a==='ueq'&&it){const o=ownerOf(it);if(o)delete GR().eq[o][it.s];T.save();closePop();renderGear();return;}
   if(a==='up'&&it){const c=upCost(it);if(G.money<c){T.toast('Not enough money ('+T.fmt(c)+')',2000);return;}if(it.lv>=gMax(it))return;
     const v0=mainV(it),p0=gHero()?pow(gHero()):0;G.money-=c;it.lv++;T.save();renderGear();popItem(it.id,true);upFx(it,v0,p0);return;}
+  if((a==='star'||a==='asc')&&it){const f=starFood(it);if(!f)return;
+    if(gstar!==it.id+a){gstar=it.id+a;el.innerHTML='TAP AGAIN<small>'+itemName(f)+' Lv '+f.lv+' is used</small>';return;}gstar='';
+    const g=GR(),p0=gHero()?pow(gHero()):0;g.inv.splice(g.inv.indexOf(f),1);
+    if(a==='star'){it.sr=(it.sr||0)+1;}else{it.r=6;const k0=Object.keys(GSTAT).filter(k=>k!==GS[it.s].st&&!it.sub.some(z=>z[0]===k));if(k0.length){const k=k0[Math.floor(Math.random()*k0.length)];it.sub.push([k,Math.round(GSTAT[k].v[6]*.4*10)/10]);}}
+    T.save();renderGear();popItem(it.id,true);const dp=gHero()&&ownerOf(it)===gHero().id?pow(gHero())-p0:0;
+    T.toast(a==='star'?'★ STAR UP! '+itemName(it)+' ★'+it.sr+(dp>0?' · Power +'+dp.toLocaleString():''):'✦ ASCENDED! '+itemName(it)+' is now Ascended',2600);return;}
   if(a==='salv'&&it){if(!gsalv){gsalv=1;el.innerHTML=el.closest('.itBt')?'TAP AGAIN<small>to salvage</small>':'TAP AGAIN TO SALVAGE (+'+T.fmt(salvageV(it))+')';el.classList.remove('alt');el.style.background='linear-gradient(#ff8a80,#c62828)';el.style.color='#fff';return;}
     const o=ownerOf(it);if(o)delete GR().eq[o][it.s];const g=GR();g.inv.splice(g.inv.indexOf(it),1);G.money+=salvageV(it);T.save();closePop();renderGear();T.toast('🔨 Salvaged for '+T.fmt(salvageV(it)),1800);return;}
   if(a==='aok'&&h){const ov=autoPlan(h),g=GR();if(!g.eq[h.id])g.eq[h.id]={};for(const sl of GSLOT){if(ov[sl.k])equip(h.id,ov[sl.k]);else delete g.eq[h.id][sl.k];}T.save();closePop();renderGear();return;}
@@ -2745,9 +2761,9 @@ function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
   h+='<div class="gsL gsDm" style="'+gbx(812,190,186,88)+'">'+T.DMI+' '+dm.toLocaleString()+'</div>';
   h+='<div class="gsL" style="'+gbx(190,855,640,80)+'font-size:'+GSU(40)+'">AVAILABLE GEAR</div><div data-gs="rates" style="'+gbx(890,853,84,84)+'border-radius:50%"></div>';
   GEMX.forEach((x,r)=>{h+='<div class="gsL gsRt" style="'+gbx(x-75,1176,150,34)+'color:'+T.GRADES[r].c+'">'+GS_RATE[r]+'%</div><div data-gs="rates" style="'+gbx(x-72,995,144,215)+'"></div>';});
-  h+='<div class="gsL gsPl" data-gs="rates" style="'+gbx(45,1285,280,90)+'">RATE INFO</div>';
-  h+='<div class="gsL gsPl" data-gs="hsum" style="'+gbx(365,1285,295,90)+'color:#ffd54a">HERO SUMMON ›</div>';
-  h+='<div class="gsL gsPl" data-gs="hist" style="'+gbx(700,1285,290,90)+'">HISTORY</div>';
+  // v16-89 (Marius): the 3 plates = the 3 summons (HERO · CREW · GEAR); Rate Info = (i) button + tiles, History inside Rate Info
+  [['hsum','HERO','img/ticket.webp',45,280],['csum','CREW','img/cticket.webp',365,295],['','GEAR','img/gticket.webp',700,290]].forEach(([a,n,ic,x,w])=>{
+    h+='<div class="gsL gsPl gsTab'+(a?'':' on')+'" data-gs="'+(a||'on')+'" style="'+gbx(x,1285,w,90)+'"><img src="'+ic+'" alt="">'+n+'</div>';});
   h+='<div class="gsL gsBig'+(g.tk<1&&dm<T.DM_SUM?' dis':'')+'" data-gs="1" style="'+gbx(45,1405,445,125)+'">SUMMON ×1<span>'+GTKI+' 1</span></div>';
   h+='<div class="gsL gsBig gold'+(g.tk+Math.floor(dm/T.DM_SUM)<10?' dis':'')+'" data-gs="10" style="'+gbx(530,1400,400,130)+'">SUMMON ×10<span>'+GTKI+' 10</span></div>';
   h+='<div class="gsL gsRib" style="'+gbx(868,1412,72,40)+'">+1</div>';
@@ -2756,15 +2772,15 @@ function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
   h+='<div class="gsL gsCol" data-gs="gear" style="'+gbx(150,1660,725,135)+'">BAG '+g.inv.length+' / '+GINV+'<small>EQUIP YOUR HEROES</small></div>';
   GYM=null;$('gsBox').innerHTML=h;}
 function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r));
-  let x=`<h2 style="color:${T.GRADES[best].c}">${best>=5?'MYTHIC GEAR!':best>=4?'LEGENDARY GEAR!':'GEAR SUMMONED'}</h2><div class="sub">${res.length} item${res.length>1?'s':''}${n===10?' · +1 BONUS':''}</div>
-   <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${T.GRADES[o.it.r].c}">${GS_NAMES[o.it.r]}</i><i>${itemName(o.it)}</i>${o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
+  let x=`<h2 style="color:${GG(best).c}">${best>=5?'MYTHIC GEAR!':best>=4?'LEGENDARY GEAR!':'GEAR SUMMONED'}</h2><div class="sub">${res.length} item${res.length>1?'s':''}${n===10?' · +1 BONUS':''}</div>
+   <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${GG(o.it.r).c}">${GG(o.it.r).n}</i><i>${itemName(o.it)}</i>${o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
    ${sold?`<div class="sub">Bag full (${GINV}) – extra gear sold for ${T.fmt(sold)}</div>`:''}
    <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}">AGAIN x${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
-function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+T.GRADES[r].c+'">'+GS_NAMES[r]+'</b>',p+'%','max Lv '+GMAXR[r]+' · '+GSUBN[r]+' bonus stat'+(GSUBN[r]===1?'':'s'))).join('')+
-  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons (no other pity).</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
-  <div class="wS">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="wP">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div>`);}
-function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">Last '+g.hist.length+' of '+g.sum+' gear summons</div>'+(g.hist.length?g.hist.map(o=>wRowB(o.r,'<img src="'+itemIconURL(o.s,o.r)+'" alt=""> <b style="color:'+T.GRADES[o.r].c+'">'+GNAMES[o.s][o.r]+'</b>',null,GS_NAMES[o.r])).join(''):'<div class="wP">Nothing yet.</div>'));}
+function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+T.GRADES[r].c+'">'+GS_NAMES[r]+'</b>',p+'%','Lv '+GMAXR[r]+(GSUBN[r]?' · +'+GSUBN[r]+' stat'+(GSUBN[r]>1?'s':''):''))).join('')+
+  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons (no other pity).</div><div>★ <b>Stars</b>: merge 2 identical pieces (same slot + same grade) → ★1…★5, each star +20% main stat.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic) is NOT in the summon: Ascend a Mythic ★5, or find it in campaign chapters 30-50.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
+  <div class="wS">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="wP">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div><button class="wHist" data-p="gsHist">📜 SUMMON HISTORY</button>`);}
+function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">Last '+g.hist.length+' of '+g.sum+' gear summons</div>'+(g.hist.length?g.hist.map(o=>wRowB(o.r,'<img src="'+itemIconURL(o.s,o.r)+'" alt=""> <b style="color:'+GG(o.r).c+'">'+GNAMES[o.s][o.r]+'</b>',null,GS_NAMES[o.r])).join(''):'<div class="wP">Nothing yet.</div>'));}
 
 // ---------------------------------------------------------------- v16-54: TORQUE TOWER (Marius' pictures in img/ui6/tw_*)
 // 300 floors · one fight per floor · FIXED rewards (first clear only, nothing random) · boss every 10 floors (mini-boss X10, big boss X20)
@@ -2975,7 +2991,7 @@ function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/1
   if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;return r;}
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 function ctTeam(k){return myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';}).slice(0,5);}
-const GRC=['#b0bec5','#66bb6a','#42a5f5','#ab47bc','#ffb300','#ff3d3d'];
+const GRC=['#b0bec5','#66bb6a','#42a5f5','#ab47bc','#ffb300','#ff3d3d','#2ef3ff'];
 function ctSetHtml(s){return '<img src="img/ui4/st_'+s.k+'_'+s.s+'.webp" alt="" style="border-radius:4px;background:'+GRC[s.r]+'55;box-shadow:0 0 0 2px '+GRC[s.r]+'">';}
 function ctRewHtml(k,r,big){const T=TE(),a=[];if(r.set)a.push(ctSetHtml({k,s:r.set.s,r:r.set.r}));if(r.dm)a.push(T.DMI+' '+r.dm);if(r.gtk)a.push(GTKI+' '+r.gtk);if(big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
 function ctDaysTxt(k){return CT_DAYS[k].map(d=>DAYN[d]).join(' · ')+' · SUN';}
@@ -3089,7 +3105,7 @@ const hubCss=document.createElement('style');hubCss.textContent=`
 function open(){HM=hardOK()&&TE().G.cp.hm?1:0;root.classList.add('open');window.__BATTLE_ON=true;showMap();gsBadge();}
 function close(){HM=0;running=false;cancelAnimationFrame(raf);cancelAnimationFrame(gsRaf);root.classList.remove('open');['cpCard','cpTeam','cpRes','bt','cpGear','cpPop','gSum','tw','hub','ct'].forEach(id=>$(id).classList.remove('open'));window.__BATTLE_ON=false;}
 $('gSum').addEventListener('click',e=>{if(e.target.id==='gSum'){closeGSum();return;}const el=e.target.closest('[data-gs]');if(!el)return;const a=el.dataset.gs;
-  if(a==='back')closeGSum();else if(a==='hsum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon('m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
+  if(a==='back')closeGSum();else if(a==='hsum'||a==='csum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon(a==='csum'?'c':'m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
   else{const t=e.target.closest('.gsT');if(t)gsRates();}});
 $('cpGSB').onclick=()=>openGSum();$('gGSB').onclick=()=>openGSum();
 $('cpChN').onclick=()=>chList();
@@ -3335,7 +3351,7 @@ function dgRew(k,f){const m=REWARD(dgEq(f)).money,g=dgG(),r={money:Math.round(m*
   if(k==='lab')r.nitro=DG_NIT(f);return r;}
 const dgItHtml=q=>'<img src="'+itemIconURL(q.s,q.r,q.set)+'" alt="" style="border-radius:4px;background:'+GRC[q.r]+'55;box-shadow:0 0 0 2px '+GRC[q.r]+'">';
 function dgRewHtml(k,f,big){const T=TE(),r=dgRew(k,f),a=[];
-  if(r.gear)a.push(dgItHtml(r.gear)+' <b style="color:'+GRC[r.gear.r]+'">'+T.GRADES[r.gear.r].n.toUpperCase()+(r.gear.set?' SET':'')+'</b>');
+  if(r.gear)a.push(dgItHtml(r.gear)+' <b style="color:'+GRC[r.gear.r]+'">'+GG(r.gear.r).n.toUpperCase()+(r.gear.set?' SET':'')+'</b>');
   if(r.nitro)a.push('<img src="img/dg/k_lab.webp" alt=""> +'+r.nitro+'% · '+DG_NIT_H+'h');
   if(k==='vault'||big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));
   return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
@@ -3343,7 +3359,7 @@ function dgItem(q){const o=Math.random;Math.random=seeded(424242+GR().nid*31);tr
 function dgAddNitro(p){const g=dgG(),now=Date.now(),on=g.nt>now,cap=now+12*36e5;
   if(on&&g.np>p){g.nt=Math.min(cap,g.nt+DG_NIT_H*36e5*p/g.np);return;}g.np=p;g.nt=Math.min(cap,(on?g.nt:now)+DG_NIT_H*36e5);}
 function dgGive(k,f){const T=TE(),G=T.G,g=dgG(),r=dgRew(k,f),rws=[['<img src="img/ui2/i_coins.webp">',T.fmt(r.money)]];let txt='+'+T.fmt(r.money);G.money+=r.money;
-  if(r.gear){const it=dgItem(r.gear),gr=GR();g.c[k]++;const gn=T.GRADES[r.gear.r].n.toUpperCase();
+  if(r.gear){const it=dgItem(r.gear),gr=GR();g.c[k]++;const gn=GG(r.gear.r).n.toUpperCase();
     if(gr.inv.length>=GINV){const v=salvageV(it);G.money+=v;rws.push([dgItHtml(r.gear),'BAG FULL']);txt+=' · bag full → '+T.fmt(v);}else{gr.inv.push(it);rws.push([dgItHtml(r.gear),gn]);txt+=' · '+itemName(it)+' ('+gn+')';}}
   if(r.nitro){dgAddNitro(r.nitro);rws.push(['<img src="img/dg/k_lab.webp">','+'+r.nitro+'%']);txt+=' · NITRO +'+r.nitro+'% for '+DG_NIT_H+'h';}
   T.save();if(T.updHud)T.updHud();return {rws,txt};}
