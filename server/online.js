@@ -13,6 +13,7 @@ const TIERS = [[0,0,'III'],[1050,0,'II'],[1100,0,'I'],[1150,1,'III'],[1250,1,'II
   [1720,3,'III'],[1820,3,'II'],[1920,3,'I'],[2020,4,'III'],[2140,4,'II'],[2260,4,'I'],[2400,5,'']];
 export const tierOf = p => { let t = TIERS[0]; for (const x of TIERS) if (p >= x[0]) t = x; const i = TIERS.indexOf(t), nx = TIERS[i + 1];
   return {lg:t[1], div:t[2], name:LEAGUES[t[1]] + (t[2] ? ' ' + t[2] : ''), from:t[0], next:nx ? nx[0] : null}; };
+const MIN_CV = 88;   // v16-88: minimum game version allowed online (see CV in online.js)
 // v16-85: VIP level is computed HERE from the VIP points the anti-cheat bot already has (players.vip),
 // never taken from the client (old app versions sent POINTS as the level → 'VIP 15' at stage 1-13).
 const VIP_PTS = [0, 50, 220, 510, 930, 1500, 2200, 3050, 4040, 5180, 6480, 7920, 9520, 11270, 13180, 15250, 17480, 19860, 22410, 25120, 28000];
@@ -350,6 +351,9 @@ export async function onlineCron(env) { await ensure(env);
 export async function online(op, b, env) {
   await ensure(env); const db = env.DB, now = Date.now();
   if (!b || typeof b.pid !== 'string' || b.pid.length < 8 || b.pid.length > 64) return {err:'bad'};
+  // v16-88: only the newest game may go online (ranking, chat, arena, cup, mail). Old versions get err:'update'.
+  // Raise MIN_CV together with CV in online.js when a release MUST reach everybody.
+  if ((b.cv | 0) < MIN_CV) return {err:'update', min:MIN_CV};
   if (op === 'replay') return replay(env, b.id);
   if (op === 'view') { const p = await db.prepare('SELECT * FROM prof WHERE uid=?').bind(b.uid | 0).first(); if (!p) return {err:'not found'};
     const a = await db.prepare('SELECT pts, w, l, season FROM arena WHERE uid=?').bind(p.uid).first();

@@ -13,7 +13,16 @@ const toast=(m,d)=>{const t=T();if(t&&t.toast)t.toast(m,d||2600);};
 const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
-async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),...b})});return await r.json();}catch(e){return {err:'network'};}}
+// v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
+const CV=88;
+async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();return j;}catch(e){return {err:'network'};}}
+function needUpd(){if(document.getElementById('updNeed'))return;const d=document.createElement('div');d.id='updNeed';
+  d.style.cssText='position:fixed;inset:0;z-index:100000;background:#000c;display:flex;align-items:center;justify-content:center;font-family:system-ui';
+  d.innerHTML='<div style="width:min(88vw,340px);background:linear-gradient(#2a1a10,#160d07);border:2px solid #ffb300;border-radius:18px;padding:18px 16px;text-align:center;color:#fff;box-shadow:0 10px 40px #000"><div style="font-size:34px">🔄</div><div style="font:900 19px system-ui;color:#ffd54a;margin:4px 0">UPDATE REQUIRED</div><div style="font:700 13.5px system-ui;color:#e0c6ad;margin-bottom:14px">A new version of Torque Empire is out.<br>Update to play online (Arena, Ranking, Chat, Cup).<br>Your progress is saved.</div><button id="updGo" style="width:100%;padding:13px;border:0;border-radius:14px;background:#66bb6a;color:#10240f;font:900 17px system-ui">UPDATE NOW</button></div>';
+  document.body.appendChild(d);
+  d.querySelector('#updGo').onclick=()=>{const b=d.querySelector('#updGo');b.textContent='UPDATING…';b.disabled=true;try{window.TE&&TE().save&&TE().save();}catch(e){}try{(window.__TE&&__TE.save)&&__TE.save();}catch(e){}
+    const go=()=>location.reload();if(!('serviceWorker' in navigator)){go();return;}
+    navigator.serviceWorker.getRegistration().then(r=>{if(!r){go();return;}navigator.serviceWorker.addEventListener('controllerchange',go);r.update().then(()=>{if(!r.installing&&!r.waiting)go();}).catch(go);setTimeout(go,8000);}).catch(go);};}
 
 // ------------------------------------------------------------------ titles, frames, leagues
 const TT={king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
