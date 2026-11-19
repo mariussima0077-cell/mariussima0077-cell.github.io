@@ -17,6 +17,8 @@ from atlas_wide import unmix
 HEROES = {
   'm5_0': ('king', {'idle': 359, 'run': 342, 'attack': 342, 'skill': 345, 'hitko': 381, 'win': 384, 'fx': 345}),
   # v16-95 Lady Overdrive: REF measured on the standing frames (idle 1, win 1, hit 1, skill 8), run/attack stances estimated
+  # v16-96 GRIGORE (first Legendary). REF: idle/win/hit frame 1 standing; skill sheet is 1774x887 (cells 443x443) → own px
+  'm4_0': ('grigore', {'idle': 428, 'run': 395, 'attack': 355, 'skill': 375, 'hitko': 400, 'win': 420, 'fx': 214}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -40,7 +42,10 @@ def despill(a):
 
 # v16-95: per frame override where smearing the edge looks wrong (explosions / fire columns → soft fade instead,
 # tiny ground-shadow touches → nothing). key (sheet, frame 0-7)
-EXT = {'m5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
+EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill', 3): 'none', ('skill', 4): 'fade',
+                ('skill', 5): 'fade', ('skill', 6): 'fade', ('idle', 2): 'none', ('idle', 3): 'none', ('idle', 4): 'none',
+                ('idle', 5): 'none', ('idle', 6): 'none', ('run', 1): 'none', ('attack', 2): 'fade', ('win', 3): 'fade'},
+       'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 
 def fade_edges(c, F=34):
@@ -80,7 +85,8 @@ def extend(c, mode=None):
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
     a = despill(unmix(im)).astype(np.float32)
-    return [a[r * 512:(r + 1) * 512, c * 384:(c + 1) * 384] for r in range(2) for c in range(4)]
+    H, W = a.shape[:2]; ch, cw = H // 2, W // 4   # v16-96: any sheet size (Grigore's skill sheet is 1774x887)
+    return [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
 
 def torso_x(c):
     a = c[..., 3] > 128; ys, xs = np.nonzero(a); y0, y1 = ys.min(), ys.max()

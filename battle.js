@@ -962,7 +962,8 @@ const SPRD={
  m3_5:{w:384,a:[183,249],m:[300,150]},
  m3_6:{w:384,a:[203,248],m:[300,150],R:[0,1,2,3,5,6],ds:[[3,0],[3,1],[3,2],[4,0],[4,1]],boom:'fx_ninaboom',dboom:1},
  // v16-14: Legendary + Mythic (cs = skill frames; the frames with other people / cut boxes in the sheets are not used)
- m4_0:{a:[130,246],m:[230,150],cs:[[3,0],[3,1],[3,2],[3,3]],fx:'quake'},m4_1:{a:[129,246],m:[250,109],look:'wrench',cs:[[3,0],[3,1]],fx:'holy'},
+ m4_0:{a:[198.7,246],m:[300,150],fx:'quake',v8:{cw:299,uw:398.7,ax:198.7,ck:5,pk:[5,6,7],rows:[[0,202,269.3,264.0],[202,176,234.7,229.3],[378,186,248.0,242.7],[564,209,278.7,273.3],[773,177,236.0,230.7],[950,190,253.3,249.3]]},fx8:{cw:314,uw:418.7,ax:206.7,rows:[[0,309,412.0,393.3]]}}, // v16-95: GRIGORE – 8 frames (tools/v8_hero.py m4_0); ck = cast frames 0-4 (smash = impact), quake wall = fxs frames
+m4_1:{a:[129,246],m:[250,109],look:'wrench',cs:[[3,0],[3,1]],fx:'holy'},
  m4_2:{a:[120,246],m:[250,112],col:'#d05cff',cs:[[3,0],[3,1]],fx:'vortex'},m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
  m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
@@ -1008,6 +1009,7 @@ function sprFrame8(u,t){const a=u.act;
   if(a&&a.k==='dash'&&!a.back&&v.dsh)return[3,v.dsh[Math.floor(t*16)%v.dsh.length]]; // v16-95: Lady's dash = her own blurred skill frames
   if(a&&(a.k==='leap'||a.k==='dash'))return[1,Math.floor(t*14)%8];
   if(a&&a.k==='cast'){const n=v.ck||8;return[3,Math.min(n-1,Math.floor(a.t/a.dur*n))];}
+  if(u.post>0&&v.pk)return[3,v.pk[Math.min(v.pk.length-1,Math.floor((1-u.post/.6)*v.pk.length))]]; // v16-95: frames after the cast (Grigore: dust → shield)
   if(u.land>0)return[3,7];
   if(u.st==='atk')return[2,Math.min(7,Math.floor(u.ap*8))];
   if(u.stun>0)return[4,2];
@@ -1699,7 +1701,7 @@ function imgFx(k,x,y,w,d,o){B.fx.push(Object.assign({type:'imgfx',k,x,y,w,t:0,d}
 function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 function castAct(u,dur,fire){u.act={k:'cast',t:0,dur,fire};u.st='cast';}
 const SKF={
- m4_0(u){castAct(u,.75,()=>{const y=fy(.5);shake(14);B.fx.push({type:'quake',x0:u.x+30*S,t:0,d:1.1,src:u,hit:new Set()});
+ m4_0(u){castAct(u,.75,()=>{const y=fy(.5);shake(14);u.post=.6;B.fx.push({type:'quake',x0:u.x+30*S,t:0,d:1.1,src:u,hit:new Set()});
    B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);
    if(FX2){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
    u.taunt=4;u.shield=Math.max(u.shield,u.max*.3);});},
@@ -1757,7 +1759,7 @@ function monAct(m,dt){const a=m.act;a.t+=dt;
 
 // ---------------------------------------------------------------- update
 function unitUpdate(u,dt,foes,friends){
-  u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.land>0)u.land-=dt;
+  u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;
   if(u.dead){u.deadT+=dt;return;}
   u.stun=Math.max(0,u.stun-dt);u.slow=Math.max(0,u.slow-dt);u.mark=Math.max(0,u.mark-dt);
   if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
@@ -2103,6 +2105,9 @@ function drawFx(t){
     else if(f.type==='sheet8'){const d=f.sp,v=d.fx8,R=v.rows[0];if(d.fi&&d.fi.complete&&d.fi.naturalWidth){const c=Math.min(7,Math.floor(k*8)),kk=SPK*dsc(f.dd)*1.25;g.globalAlpha=k>.9?(1-k)*10:1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='imgfx'){const im=FXIM[f.k];if(fxOK(f.k)){const e=1-Math.pow(1-Math.min(1,k*3),3),w=f.w*(f.float?1:(.6+.4*e)),h=w*im.naturalHeight/im.naturalWidth;
         g.globalAlpha=Math.min(1,k*6)*(k<.7?1:1-(k-.7)/.3);if(f.spin){g.translate(f.x,f.y-h/2);g.scale(1+Math.sin(f.t*30)*.03,1);g.drawImage(im,-w/2,-h/2,w,h);}else g.drawImage(im,f.x-w/2,f.y-(f.cloud?h/2:h)-(f.float?Math.sin(f.t*6)*3:0),w,h);}}
+    else if(f.type==='quake'&&f.fx!==undefined&&f.src&&f.src.spr&&f.src.spr.fx8&&f.src.spr.fi&&f.src.spr.fi.naturalWidth){ // v16-95: Grigore's own rock wall (8 frames) rolls with the quake front
+      const d=f.src.spr,v=d.fx8,R=v.rows[0],c=Math.min(7,Math.floor(k*8)),kk=(FY1-FY0)*.85/R[2];g.globalAlpha=k>.9?(1-k)*10:1;
+      g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],f.fx-v.uw*.55*kk,fy(.58)-R[3]*kk,v.uw*kk,R[2]*kk);}
     else if(f.type==='quake'&&fxOK('quake')&&f.fx!==undefined){const im=FXIM.quake,h=(FY1-FY0)*.62+40*S,w=h*im.naturalWidth/im.naturalHeight;g.globalAlpha=k<.85?1:1-(k-.85)/.15;
       g.drawImage(im,f.fx-w,FY1+18*S-h,w,h);g.globalAlpha*=.5;g.drawImage(im,f.fx-w*1.7,FY1+18*S-h*.8,w*.8,h*.8);}
     else if(f.type==='coil'){const y=fy(f.dd),h=dsc(f.dd);g.globalAlpha=k>.9?(1-k)*10:1;g.fillStyle='#37474f';rr(g,f.x-12*h,y-10*h,24*h,10*h,3);g.fill();g.fillStyle='#ffca28';g.fillRect(f.x-12*h,y-6*h,24*h,3*h);
