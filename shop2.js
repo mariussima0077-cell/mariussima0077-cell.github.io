@@ -257,7 +257,7 @@ function render(){
   }
   h+='</div></div>';
   root.innerHTML='<style>'+css+'</style>'+h; el.scrollTop=sc;
-  if(tab==='tp'){ if(!foot.firstChild){ foot.innerHTML='<div id="s2cloud"></div><div style="opacity:.7;font:11.5px system-ui;color:#9fd3ff;margin:10px 0;line-height:1.4">Player ID: '+SEC.PID.slice(0,8)+' · <a href="privacy.html" target="_blank" style="color:#ffd54a">Privacy policy</a> · <a href="#" data-a="tut" style="color:#ffd54a">Replay tutorial</a></div>'; if(window.CLOUD) CLOUD.mount(document.getElementById('s2cloud')); } foot.style.display=''; }
+  if(tab==='tp'){ if(!foot.firstChild){ foot.innerHTML='<div id="s2cloud"></div><div style="opacity:.7;font:11.5px system-ui;color:#9fd3ff;margin:10px 0;line-height:1.4"><span data-a="pid">Player ID: '+SEC.PID.slice(0,8)+'</span> · '+(SEC.TEST_ACC?'<a href="#" data-a="taccoff" style="color:#ffd54a">↩ Back to my account</a> · ':'')+'<a href="privacy.html" target="_blank" style="color:#ffd54a">Privacy policy</a> · <a href="#" data-a="tut" style="color:#ffd54a">Replay tutorial</a></div>'; if(window.CLOUD) CLOUD.mount(document.getElementById('s2cloud')); } foot.style.display=''; }
   else foot.style.display='none';
 }
 const onClick=e=>{
@@ -265,6 +265,9 @@ const onClick=e=>{
   if(a){ e.preventDefault(); const v=a.dataset.a;
     if(v==='close') close();
     else if(v==='tut'){ close(); if(window.__TUT) __TUT.start(); }
+    else if(v==='taccoff'){ SEC.taccOff(); }
+    else if(v==='pid'){ const n=(onClick.pid=(Date.now()-(onClick.pt||0)<1500?(onClick.pid||0)+1:1)); onClick.pt=Date.now();   // v16-92: 7 taps = owner test account
+      if(n>=7){ onClick.pid=0; if(SEC.TEST_ACC){ SEC.taccOff(); return; } const k=window.prompt('Test key'); if(k) SEC.taccOn(k).then(ok=>{ if(!ok) T().toast('✖ Wrong key',2000); }); } }
     else if(v==='dg'){ close(); if(window.CAMPAIGN&&CAMPAIGN.openDG) CAMPAIGN.openDG(); else T().toast('Battle → Dungeons → DUNGEON PASS',3000); }
     return; }
   if(tb){ tab=tb.dataset.t; conf=''; render(); el.scrollTop=0; return; }

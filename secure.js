@@ -39,14 +39,22 @@ const DEV_H = '8c6657646a1b238565301291ff80b48909c3bffdf73b274812a13040a6eb6458'
     const h=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); if(h===DEV_H) LS('te_dev',DEV_H); back(); });
 })();
 const TEST_MODE = !STORE_BUILD && LS('te_dev')===DEV_H;   // owner only – everyone else in the browser cannot unlock packs
-// v16-91 (Marius): FULL TEST ACCOUNT – owner only (needs TEST MODE). ?tacc=1 = on, ?tacc=0 = back to the normal account.
-// Own player ID 'tst_…' + own save ('torqueEmpire_test') → the server hides it from every ranking (campaign, arena, cup, world boss) and the anti-cheat bot ignores it.
+// v16-91/92 (Marius): FULL TEST ACCOUNT – owner only. Works in the browser AND in the Play app:
+//  • browser with TEST MODE: ?tacc=1 (on) / ?tacc=0 (off)
+//  • anywhere (also the app): Shop → tap 'Player ID' 7 times → type the secret test key (same key as ?dev=…) → on. 'Back to my account' = off.
+// Own player ID 'tst_…' + own save ('torqueEmpire_test') → the server hides it from every ranking and the anti-cheat bot ignores it.
 (function(){ const q = new URLSearchParams(location.search), ta = q.get('tacc'); if(ta===null) return;
-  if(ta==='1') LS('te_tacc','1'); else { try{localStorage.removeItem('te_tacc');}catch(e){} }
+  if(ta==='1'){ if(LS('te_dev')===DEV_H) LS('te_tacc',DEV_H); else if(q.get('dev')!==null) LS('te_tacc_w','1'); }
+  else { try{localStorage.removeItem('te_tacc');}catch(e){} }
   if(q.get('dev')===null) location.replace(location.pathname);
 })();
-const TEST_ACC = TEST_MODE && LS('te_tacc')==='1';
+if(LS('te_tacc_w')==='1' && LS('te_dev')===DEV_H){ LS('te_tacc',DEV_H); try{localStorage.removeItem('te_tacc_w');}catch(e){} }
+const TEST_ACC = LS('te_tacc')===DEV_H;
 if(TEST_ACC){ let tp = LS('te_tpid'); if(!tp || !tp.startsWith('tst_')){ tp = 'tst_' + (crypto.randomUUID ? crypto.randomUUID().replace(/-/g,'') : Math.random().toString(36).slice(2)+Date.now().toString(36)); LS('te_tpid',tp); } PID = tp; }
+async function taccOn(code){ if(!crypto.subtle) return false; const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(code||'').trim()));
+  const h = [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); if(h!==DEV_H) return false;
+  try{ const t=T(); if(t&&t.save) t.save(); }catch(e){} LS('te_tacc',DEV_H); location.reload(); return true; }
+function taccOff(){ try{ const t=T(); if(t&&t.save) t.save(); }catch(e){} try{localStorage.removeItem('te_tacc');}catch(e){} location.reload(); }
 
 // ---------- save signature (stops editing the save file) ----------
 function h32(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36); }
@@ -210,5 +218,5 @@ async function restore(){
 }
 setTimeout(restore, 4000);
 
-window.SEC = {PID, TEST_MODE, TEST_ACC, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+window.SEC = {PID, TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

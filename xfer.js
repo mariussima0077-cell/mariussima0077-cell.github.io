@@ -5,6 +5,7 @@
 // Only runs inside the new app. In Chrome / the old version this file does nothing.
 (()=>{
 const SK = (window.SEC && SEC.SAVE_KEY) || 'torqueEmpire_v15';
+if(window.SEC && SEC.TEST_ACC){ window.XFER = {isApp:()=>false, open(){}, login(){}}; return; }   // v16-92: never on the owner's test account
 const isApp = () => !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) || /[?&]src=capapp/.test(location.search);
 let hadSave = false; try{ hadSave = !!localStorage.getItem(SK); }catch(e){}
 const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };
