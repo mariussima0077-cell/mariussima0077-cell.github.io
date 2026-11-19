@@ -134,7 +134,8 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 .smH{pointer-events:none;filter:drop-shadow(0 calc(var(--u)*6) calc(var(--u)*8) #000c)}
 .smL{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);color:#fff;font:900 italic calc(var(--u)*30) system-ui;letter-spacing:calc(var(--u)*1);text-shadow:0 calc(var(--u)*3) 0 #000a,0 0 calc(var(--u)*8) #000;white-space:nowrap;pointer-events:none}
 .smL .tki{height:1.25em;width:auto;vertical-align:middle}.smL small{font-size:.72em;color:#9fd3ff;font-style:normal;letter-spacing:calc(var(--u)*1.5)}
-.smTop{font-size:calc(var(--u)*24);gap:calc(var(--u)*5)}.smTop .tki{height:1.35em}
+.smTop{font-size:calc(var(--u)*24);gap:calc(var(--u)*5)}
+.smGear{z-index:3;white-space:nowrap;font-size:calc(var(--u)*19);gap:calc(var(--u)*6);color:#e3f2ff;background:linear-gradient(#1e4c9a,#0b2250);border:calc(var(--u)*3) solid #7ec8ff;border-radius:calc(var(--u)*20);box-shadow:0 0 calc(var(--u)*14) #3da2ffaa,inset 0 calc(var(--u)*2) 0 #ffffff44;animation:smGP 1.6s ease-in-out infinite}.smGear img{height:1.7em}@keyframes smGP{50%{box-shadow:0 0 calc(var(--u)*24) #3da2ffee,inset 0 calc(var(--u)*2) 0 #ffffff44}}.smTop .tki{height:1.35em}
 .smBig{flex-direction:column;gap:0;font-size:calc(var(--u)*40)}.smBig span{display:flex;align-items:center;gap:calc(var(--u)*8);font-size:.75em;padding:calc(var(--u)*2) calc(var(--u)*22);border-radius:calc(var(--u)*30);background:#0008;margin-top:calc(var(--u)*6)}
 .smBig.gold{color:#3a1d00;text-shadow:0 calc(var(--u)*2) 0 #fff7}.smBig.gold span{color:#fff;text-shadow:0 2px 0 #000}
 .smRib{transform:rotate(43deg);font-size:calc(var(--u)*22);color:#fff}
@@ -741,8 +742,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #olPod .av{position:relative;width:78%;aspect-ratio:90/96;margin:0 auto}
 #olPod .av .f,#olPod .av .p{position:absolute;inset:0;background-size:contain;background-repeat:no-repeat;background-position:center}#olPod .av .p{inset:16%;border-radius:50%;background-size:cover;z-index:-1}
 #olPod .crown{position:absolute;left:50%;top:-16%;width:38%;transform:translateX(-50%);z-index:2;filter:drop-shadow(0 2px 3px #000)}
-#olPod .pn{background:#000c;border-radius:8px;padding:2px 3px;box-shadow:0 0 0 1px #ffd54a88;margin-top:2px}
-#olPod .pn b{display:block;font:900 9px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#olPod .pn small{display:block;font:900 10.5px system-ui;color:#ffe27a}
+#olPod .pn{background:#000d;border-radius:8px;padding:3px 4px;box-shadow:0 0 0 1px #ffd54a99,0 2px 6px #000;margin:2px -22% 0}
+#olPod .pn b{display:block;font:900 11.5px system-ui;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#olPod .pn small{display:block;font:900 10.5px system-ui;color:#ffe27a}
 #olPod .pd:not([data-uid]){opacity:.35}
 #onl .sk-chat .inp{position:absolute;left:calc(var(--pw)*30/941);right:calc(var(--pw)*30/941);bottom:calc(var(--pw)*24/941);height:calc(var(--pw)*118/941);padding:0 6px;box-sizing:border-box;display:flex;align-items:center;gap:6px;background:none!important;border:0!important}
 #onl .sk-chat .inp input{flex:1;min-width:0;background:#0006!important;border:0!important}
@@ -3179,6 +3180,8 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   h+='<div class="smL smPl" data-a="rates" style="'+box(47,1022,254,59)+'">RATE INFO</div>';
   h+='<div class="smL smPl" data-a="cat" data-c="'+other+'" style="'+box(335,1022,251,59)+'color:#ffd54a">'+(other==='c'?'CREW':'HERO')+' SUMMON ›</div>';
   h+='<div class="smL smPl" data-a="hist" style="'+box(621,1022,254,59)+'">HISTORY</div>';
+  // v16-87: GEAR SUMMON is back on the summon page (tester: "hard to find the gear summon") – blue chip on the left of the portal
+  h+='<div class="smL smGear" data-a="gear" style="'+box(14,598,250,64)+'pointer-events:auto"><img src="img/gticket.webp" alt="">GEAR SUMMON</div>';
   // summon buttons
   h+='<div class="smL smBig" data-a="sum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+TIK(smCat)+' 1</span></div>';
   h+='<div class="smL smBig gold" data-a="sum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+TIK(smCat)+' 10</span></div>';
@@ -3191,6 +3194,7 @@ smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}cons
   else if(a==='tkinfo')popTickets();
   else if(a==='arrow'){const i=(SMK.indexOf(smCat)+(+t.dataset.d)+SMK.length)%SMK.length;smCat=SMK[i];smKey='';renderSm();}
   else if(a==='cat'){smCat=t.dataset.c;smKey='';renderSm();}
+  else if(a==='gear'){if(window.CAMPAIGN&&CAMPAIGN.gearSum)CAMPAIGN.gearSum();}
   else if(a==='tier'){const g=+t.dataset.g;if(g===6){toast('🔴 Red heroes are COMING SOON',2500);return;}popTier(smCat,g);}
   else if(a==='rates')popRates();
   else if(a==='hist')popHist();
@@ -3540,6 +3544,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:35,d:'Nov 19, 2026',ic:'⚔️',t:'New Arena fights + Gear Summon shortcut',l:['<b>ARENA</b> fights look brand new: heroes run in, fight up close, shoot real projectiles and every skill shows its <b>name</b>.','<b>GEAR SUMMON</b> is back on the SUMMON page – tap the blue button under the portal.','Top 3 names on the ranking podium are now easy to read.']},
  {id:34,d:'Nov 18, 2026',ic:'👑',t:'VIP Passes stack + hero frames on profiles',l:['You can now have <b>Silver, Gold and Platinum Pass</b> at the same time. Every pass gives its own daily gift and the bonuses add up (VIP benefits, Idle hours).','A player\'s <b>profile</b> now shows his battle team in the <b>grade frames</b> – name and grade of every hero.']},
  {id:33,d:'Nov 18, 2026',ic:'⚙️',t:'Smarter AUTO EQUIP',l:['<b>AUTO EQUIP</b> now checks your hero\'s <b>class SET</b> first (2, 3, 4… pieces) and compares it with the best normal items – the gear with the most <b>Power</b> wins.']},
  {id:32,d:'Nov 18, 2026',ic:'👑',t:'Fixed: VIP level in Ranking & Chat',l:['The <b>VIP</b> badge in RANKING, CHAT and on profiles now shows your real <b>VIP level</b>. Before, some players were shown as VIP 20 by mistake.']},

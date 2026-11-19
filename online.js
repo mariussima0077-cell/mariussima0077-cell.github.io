@@ -688,7 +688,7 @@ function stepF(dt){const W=fc.width,H=fc.height,r=F.r;const sdt=dt*F.spd;F.t+=F.
   if(F.t>=0){g.font=`900 ${W*.032}px system-ui`;g.fillStyle='#fff';g.fillText(Math.max(0,Math.ceil(75-F.t))+'s',W/2,H*.11);}}
 
 // ------------------------------------------------------------------ v16-85: ARENA 2.0 – heroes run, fight up close, real skills (preview: ?arena2=1)
-const A2ON=()=>/[?&]arena2=1/.test(location.search)||LS('te_arena2')==='1';
+const A2ON=()=>LS('te_arena2')!=='0';   // v16-87: Marius OK → Arena 2.0 for everybody (old look only with te_arena2=0)
 const A2SL={m:[[.37,.63],[.33,.77],[.39,.51],[.31,.89],[.41,.70]],r:[[.18,.58],[.14,.74],[.21,.87],[.16,.47],[.23,.66]]};
 const RCOL={engine:'#ff8a3d',tuning:'#ff4a2a',inspect:'#3de0ff',service:'#7dff8a',paint:'#ff5ce1',elec:'#9fd8ff',all:'#ffd54a',crew:'#ffd54a'};
 const SPI=id=>(C()&&C().spr&&C().spr(id))||null;
