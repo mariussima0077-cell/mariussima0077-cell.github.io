@@ -966,7 +966,7 @@ const SPRD={
  m4_2:{a:[120,246],m:[250,112],col:'#d05cff',cs:[[3,0],[3,1]],fx:'vortex'},m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
  m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
-m5_1:{a:[123,246],m:[230,150],cs:[[3,0]],fire:1},
+m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,5],rows:[[0,197,262.7,258.7],[197,183,244.0,238.7],[380,171,228.0,221.3],[551,223,297.3,286.7],[774,187,249.3,244.0],[961,206,274.7,269.3]]},fx8:{cw:286,uw:381.3,ax:190.7,rows:[[0,186,248.0,237.3]]}}, // v16-95: LADY OVERDRIVE – 8 frames (tools/v8_hero.py m5_1); ck = cast frames 0-3, dsh = dash frames
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
  d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
  d0_4:{w:384,a:[190,248],m:[300,150]},d0_5:{w:384,a:[180,248],m:[300,150]},d0_6:{w:384,a:[193,248],m:[300,150]},
@@ -1004,8 +1004,10 @@ function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.i
 // v16-94: frame of an 8-frame hero (rows idle·run·attack·skill·hit/KO·win)
 function sprFrame8(u,t){const a=u.act;
   if(u.dead)return[4,Math.min(7,4+Math.floor(u.deadT/.13))];
+  const v=u.spr.v8;
+  if(a&&a.k==='dash'&&!a.back&&v.dsh)return[3,v.dsh[Math.floor(t*16)%v.dsh.length]]; // v16-95: Lady's dash = her own blurred skill frames
   if(a&&(a.k==='leap'||a.k==='dash'))return[1,Math.floor(t*14)%8];
-  if(a&&a.k==='cast')return[3,Math.min(7,Math.floor(a.t/a.dur*8))];
+  if(a&&a.k==='cast'){const n=v.ck||8;return[3,Math.min(n-1,Math.floor(a.t/a.dur*n))];}
   if(u.land>0)return[3,7];
   if(u.st==='atk')return[2,Math.min(7,Math.floor(u.ap*8))];
   if(u.stun>0)return[4,2];
@@ -1722,6 +1724,7 @@ const SKF={
    const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
    teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});});},
  m5_1(u){castAct(u,.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
+   if(u.spr&&u.spr.fx8){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
    teamBuff({aspd:6,aspdK:.3,crit:6,col:'#ff5252',txt:'OVERDRIVE!'});});}};
 
 // ---------------------------------------------------------------- monster specials

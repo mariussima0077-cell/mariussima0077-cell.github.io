@@ -6,16 +6,23 @@ edge (Marius: "completează tu unde trebuie": the edge line is smeared outward a
 anchor for all sheets (REF = standing height in sheet px) → atlas rows idle·run·attack·skill·hit/KO·win, 8 frames,
 each row its own height (the skill row is tall because of the light beam).
 Output: img/hero/sp_m5_0.webp + img/hero/fxs_m5_0.webp, prints the SPRD entry (v8 meta) for battle.js.
-usage: python3 tools/v8_hero.py
+usage: python3 tools/v8_hero.py [m5_0|m5_1]
 """
 import sys, os, json, numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
 from atlas_wide import unmix
 
-SRC = 'img/sheets/king/m5_0_%s.webp'
+# usage: python3 tools/v8_hero.py [hero id]   (default m5_0)
+HEROES = {
+  'm5_0': ('king', {'idle': 359, 'run': 342, 'attack': 342, 'skill': 345, 'hitko': 381, 'win': 384, 'fx': 345}),
+  # v16-95 Lady Overdrive: REF measured on the standing frames (idle 1, win 1, hit 1, skill 8), run/attack stances estimated
+  'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
+}
+HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
+SRC = 'img/sheets/%s/%s_%%s.webp' % (HEROES[HID][0], HID)
 ROWS = ['idle', 'run', 'attack', 'skill', 'hitko', 'win']
-REF = {'idle': 359, 'run': 342, 'attack': 342, 'skill': 345, 'hitko': 381, 'win': 384, 'fx': 345}
+REF = HEROES[HID][1]
 OLDH = 241          # standing height in 256-cell units (same size as the old sheet)
 APU = .75           # atlas px per unit (same as the old 192-px cells)
 P = 110             # extension padding (sheet px)
@@ -31,7 +38,26 @@ def despill(a):
     for k, o in ((0, 6), (1, 2), (2, 0)): a[..., k] = np.where(sm, v + o, a[..., k])
     return a
 
-def extend(c):
+# v16-95: per frame override where smearing the edge looks wrong (explosions / fire columns → soft fade instead,
+# tiny ground-shadow touches → nothing). key (sheet, frame 0-7)
+EXT = {'m5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
+                ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
+
+def fade_edges(c, F=34):
+    h, w = c.shape[:2]; E = 8; c = c.copy()
+    def touch(a): return (a[..., 3] > 40).sum() > 6
+    r = (np.arange(F) / F) ** 1.3
+    if touch(c[:E]): c[:F, :, 3] *= r[:, None]
+    if touch(c[-E:]): c[-F:, :, 3] *= r[::-1, None]
+    if touch(c[:, :E]): c[:, :F, 3] *= r[None, :]
+    if touch(c[:, -E:]): c[:, -F:, 3] *= r[None, ::-1]
+    o = np.zeros((h + 2 * P, w + 2 * P, 4), np.float32); o[P:P + h, P:P + w] = c
+    return o
+
+def extend(c, mode=None):
+    if mode == 'fade': return fade_edges(c, 95)
+    if mode == 'none':
+        o = np.zeros((c.shape[0] + 2 * P, c.shape[1] + 2 * P, 4), np.float32); o[P:-P, P:-P] = c; return o
     """pad the cell; where the picture comes within 8 px of an edge, smear the line 8 px inside outward and fade it"""
     h, w = c.shape[:2]; E = 8
     o = np.zeros((h + 2 * P, w + 2 * P, 4), np.float32); o[P:P + h, P:P + w] = c
@@ -69,8 +95,8 @@ def frames(n):
     elif n == 'run': ax, ay = np.mean([torso_x(c) for c in cs]), max(bottom(c) for c in cs)
     else: ax, ay = torso_x(cs[0]), bottom(cs[0])
     out = []
-    for c in cs:
-        e = np.clip(extend(c), 0, 255).astype(np.uint8)
+    for i, c in enumerate(cs):
+        e = np.clip(extend(c, EXT.get(HID, {}).get((n, i))), 0, 255).astype(np.uint8)
         im = Image.fromarray(e, 'RGBA'); w, h = im.size
         im = im.resize((round(w * s), round(h * s)), Image.LANCZOS)
         out.append((im, (ax + P) * s, (ay + P) * s))
@@ -100,7 +126,7 @@ def pack(rows, name):
 
 if __name__ == '__main__':
     hero = [frames(n) for n in ROWS]
-    m, sz = pack(hero, 'img/hero/sp_m5_0.webp')
-    f, fsz = pack([frames('fx')], 'img/hero/fxs_m5_0.webp')
+    m, sz = pack(hero, 'img/hero/sp_%s.webp' % HID)
+    f, fsz = pack([frames('fx')], 'img/hero/fxs_%s.webp' % HID)
     print('hero atlas', sz, 'fx atlas', fsz)
     print(json.dumps({'v8': m, 'fx8': f}, separators=(',', ':')))
