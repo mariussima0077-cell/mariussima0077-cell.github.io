@@ -50,6 +50,7 @@ export default {
 async function report(b, env) {
   const now = Date.now();
   if (!b || typeof b.pid !== 'string' || b.pid.length > 64 || !b.s) return {err:'bad'};
+  if (b.pid.startsWith('tst_')) return {ok:true, test:1, serverTime:now};   // v16-91: owner's FULL TEST ACCOUNT – not judged, not stored
   const s = b.s, db = env.DB;
   const old = await db.prepare('SELECT * FROM players WHERE pid=?').bind(b.pid).first();
   if (old && old.banned && isGift(b.pid) && now < GIFT_UNBAN_UNTIL && !/by admin/.test(old.reason || '')) {

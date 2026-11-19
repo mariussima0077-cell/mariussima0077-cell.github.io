@@ -4,7 +4,7 @@
 // → that page uploads the game to Torque Guard under the key → the app downloads it (once) and restarts.
 // Only runs inside the new app. In Chrome / the old version this file does nothing.
 (()=>{
-const SK = 'torqueEmpire_v15';
+const SK = (window.SEC && SEC.SAVE_KEY) || 'torqueEmpire_v15';
 const isApp = () => !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) || /[?&]src=capapp/.test(location.search);
 let hadSave = false; try{ hadSave = !!localStorage.getItem(SK); }catch(e){}
 const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };

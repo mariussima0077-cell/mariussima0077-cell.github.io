@@ -221,7 +221,7 @@ function render(){
       ['spd2','ui3/sp_speed','Battle Speed ×2','Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins>','€2.99'],
     ].map(([k,i,n,d,pr])=>'<div class="pack"><div class="th"><img src="'+IMG(i)+'" alt=""></div><div class="tx"><b>'+n+'</b>'+d+'</div>'+(pk[k]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,pr)+'</button>')+'</div>').join('')+
       '<div class="pack"><div class="th"><img src="img/ui2/i_key.webp" alt=""></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day in every dungeon + SWEEP.'+(on('dg')?' <ins>Active – '+daysLeft('dg')+' days left.</ins>':'')+'</div><button class="buy" data-a="dg">'+P('dg','€2.99')+'</button></div>';
-    h+=(SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping a price gives it without payment.</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>');
+    h+=(SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping a price gives it without payment.<br>'+(SEC.TEST_ACC?'<a href="?tacc=0" style="color:#ffd54a">↩ Back to my normal account</a>':'<a href="?tacc=1" style="color:#ffd54a">🧪 Open the FULL TEST ACCOUNT (hidden from rankings)</a>')+'</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>');
   }
   if(tab==='td'){
     h+='<div class="sec">DIAMONDS</div><div class="dgrid">'+DIAMONDS.map(d=>{ const x2=!S().fx[d.k];

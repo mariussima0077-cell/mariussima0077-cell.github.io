@@ -93,7 +93,7 @@ css.textContent=`
 .rw img{vertical-align:-.28em}
 .pick .rl,.slot .rl{position:absolute;top:2px;right:2px;width:17px;height:17px}
 .roles{margin-top:10px;display:grid;grid-template-columns:1fr;gap:3px;font-size:11.5px;color:#c8a27c;font-weight:800}.roles b{color:#ffcc80;letter-spacing:.5px}
-#cpPop{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(2,3,5,.8)}#cpPop.open{display:flex}
+#cpPop.out{position:fixed;z-index:40;color:#fff;font-family:system-ui,-apple-system,Roboto,sans-serif}#cpPop{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(2,3,5,.8)}#cpPop.open{display:flex}
 #cpPop .cpBox{max-height:92vh}
 .pT{font-size:20px;font-weight:900;color:#ffcc80;text-align:center;text-shadow:0 2px 0 #000}
 .pD{font-size:12px;color:#d7b994;text-align:center;margin:4px 0 8px;line-height:1.4}
@@ -2306,7 +2306,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
     if(a==='atog'){G.cp.autoNext=G.cp.autoNext===false;T.save();anxGo();return;}
     clearInterval(ANX.id);ANX.n=0;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
     if(a==='next'){if(si<NST-1&&chOpen(STAGES[si+1].c)){CPX().ch=STAGES[si+1].c;showMap();openCard(si+1);}else showMap();}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openGear(null,si);}
-    else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();openGSum();}else if(a==='hsum'){showMap();openGear(null,si);const T2=TE();if(T2.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T2.openSummon('m');}}else showMap();};}
+    else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();gsOpenSm();}else if(a==='hsum'){showMap();openGear(null,si);const T2=TE();if(T2.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T2.openSummon('m');}}else showMap();};}
 
 // ---------------------------------------------------------------- campaign map (5 chapters × 20 stages)
 const PH=2280;
@@ -2424,9 +2424,10 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
 
 // ---------------------------------------------------------------- shared popup + before/after helpers
 // v16-53: info window (Marius' frame, CSS .winSk in index.html)
-function popW(title,html){const b=$('cpPopBox');b.className='cpBox winSk';b.innerHTML='<div class="wT">'+title+'</div><button class="wX" data-p="x" aria-label="close"></button><div class="wIn">'+html+'</div>';$('cpPop').classList.add('open');b.querySelector('.wIn').scrollTop=0;}
+function popHost(){const P=$('cpPop'),sm=document.getElementById('sm'),out=!!(sm&&sm.classList.contains('open'));if(out&&P.parentNode!==document.body){document.body.appendChild(P);P.classList.add('out');}else if(!out&&P.parentNode!==root){root.appendChild(P);P.classList.remove('out');}} // v16-91: gear summon windows over the SUMMON page
+function popW(title,html){popHost();const b=$('cpPopBox');b.className='cpBox winSk';b.innerHTML='<div class="wT">'+title+'</div><button class="wX" data-p="x" aria-label="close"></button><div class="wIn">'+html+'</div>';$('cpPop').classList.add('open');b.querySelector('.wIn').scrollTop=0;}
 const wRowB=(g,a,v,e)=>'<div class="wR'+(g>=0?' g'+g:'')+'"><span>'+a+'</span>'+(v!=null?'<b class="wV">'+v+'</b>':'')+(e?'<em>'+e+'</em>':'')+'</div>';
-function pop(html){$('cpPopBox').className='cpBox';$('cpPopBox').innerHTML=html;$('cpPop').classList.add('open');$('cpPopBox').scrollTop=0;}
+function pop(html){popHost();$('cpPopBox').className='cpBox';$('cpPopBox').innerHTML=html;$('cpPop').classList.add('open');$('cpPopBox').scrollTop=0;}
 function closePop(){$('cpPop').classList.remove('open');}
 const heroOf=id=>!id?null:id.startsWith('crew')?crewHero(+id.slice(4)):TE().HB[id];
 const gcol=h=>h.crew?'#8d6e63':TE().GRADES[h.gr].c;
@@ -2688,7 +2689,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
 ['sm','team'].forEach(id=>{const el=document.getElementById(id);if(el)new MutationObserver(()=>{if(!el.classList.contains('open')&&$('cpGear').classList.contains('open'))renderGear();}).observe(el,{attributes:true,attributeFilter:['class']});});
 $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpPop'){closePop();return;}const ci=e.target.closest('[data-ch]');if(ci){const c=+ci.dataset.ch;if(!chOpen(c)){T.toast('🔒 Locked – clear the chapter before it',1800);return;}CPX().ch=c;closePop();showMap();return;}const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
   if(a==='payOK'){const g=window.__payGo;window.__payGo=null;closePop();if(g)g();return;}
-  if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsHist'){gsHist();return;}if(a==='gsGear'){closePop();closeGSum();openGear();return;}
+  if(a==='gsAgain'){closePop();gsummon(+el.dataset.n);return;}if(a==='gsHist'){gsHist();return;}if(a==='gsGear'){closePop();if(document.getElementById('sm').classList.contains('open')){gsBag();return;}closeGSum();openGear();return;}
   if(a==='x'){closePop();return;}
   if(a==='tcmp'){popTeamCmp(+el.dataset.k,el.dataset.id||null);return;}
   if(a==='tok'){const k=+el.dataset.k,id=el.dataset.id;if(id)tsel[k]=id;else tsel.splice(k,1);G.cp.team=tsel.slice();T.save();closePop();openTeam.render&&openTeam.render();return;}
@@ -2724,7 +2725,7 @@ function gsummon(n,paid){const T=TE(),g=GSD();
   if(!paid)g.tk-=n;const cnt=n===10?11:1,res=[];let sold=0;
   for(let k=0;k<cnt;k++){const r=gsRoll(),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,r,rollSet(r));g.sum++;
     g.hist.unshift({s:it.s,r,t:Date.now()});if(g.inv.length>=GINV){sold+=salvageV(it);res.push({it,sold:1});}else{g.inv.push(it);res.push({it});}}
-  g.hist.length=Math.min(g.hist.length,60);if(sold)T.G.money+=sold;T.save();gsBadge();renderGSum();gsResults(res,n,sold);}
+  g.hist.length=Math.min(g.hist.length,60);if(sold)T.G.money+=sold;T.save();gsBadge();renderGSum();if(T.smRefresh)T.smRefresh();gsResults(res,n,sold);}
 function gsBadge(){const b=$('cpGSB');if(b)b.innerHTML='<span>'+GTKI.replace('1.15em','1.3em')+' <b>'+GSD().tk+'</b></span><small>SUMMON</small>';}
 function gsTiles(){const T=TE(),ex=['tool','helm','vest','glove','boots','chip'];
   return GS_RATE.map((p,r)=>{const i=r,fr=T.FIN[i],pl=T.FPL[i];return `<div class="gsT" data-r="${r}"><div class="fc"><img class="ff" src="img/fr${i}.webp"><img class="fp" src="${itemIconURL(ex[(r+gsTick)%6],r)}" style="left:${fr[0]}%;top:${fr[1]}%;width:${fr[2]}%;height:${fr[3]}%"><span class="fs" style="top:${pl[0]}%;height:${pl[1]}%">${p}%</span></div><b style="color:${T.GRADES[r].c}">${GS_NAMES[r]}</b></div>`;}).join('');}
@@ -3107,7 +3108,9 @@ function close(){HM=0;running=false;cancelAnimationFrame(raf);cancelAnimationFra
 $('gSum').addEventListener('click',e=>{if(e.target.id==='gSum'){closeGSum();return;}const el=e.target.closest('[data-gs]');if(!el)return;const a=el.dataset.gs;
   if(a==='back')closeGSum();else if(a==='hsum'||a==='csum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon(a==='csum'?'c':'m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
   else{const t=e.target.closest('.gsT');if(t)gsRates();}});
-$('cpGSB').onclick=()=>openGSum();$('gGSB').onclick=()=>openGSum();
+function gsOpenSm(){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon('gear');} // v16-91: Gear Summon = tab of the SUMMON page (Marius)
+function gsBag(){const sm=document.getElementById('sm');if(root.classList.contains('open')){sm.classList.remove('open');sm.style.zIndex='';}else{open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();}
+$('cpGSB').onclick=gsOpenSm;$('gGSB').onclick=gsOpenSm;
 $('cpChN').onclick=()=>chList();
 $('cpBack').onclick=()=>{if(!backToHub())close();};$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
 // v15: GEAR title is the player's picture
@@ -3496,6 +3499,22 @@ const dgCss=document.createElement('style');dgCss.textContent=`
 .dgPR span{font:900 calc(var(--u)*31) system-ui;color:#e3ebff;text-shadow:0 calc(var(--u)*2) 0 #000}.dgPR b{color:#ffd54a}
 .dgPBy{display:flex;align-items:center;justify-content:center;font:900 italic calc(var(--u)*50) system-ui;color:#fff;text-shadow:0 calc(var(--u)*4) 0 #6a2a00;cursor:pointer}.dgPBy:active{transform:scale(.96)}.dgPBy.on{font-size:calc(var(--u)*38);color:#ffe082}
 `;document.head.appendChild(dgCss);
-window.CAMPAIGN={spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+// v16-91 (Marius): FULL TEST ACCOUNT (owner only, SEC.TEST_ACC) – everything unlocked / maxed, hidden from all rankings on the server
+function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
+  // resources are topped up at every start
+  G.money=Math.max(G.money||0,1e10);G.dm=Math.max(G.dm||0,1e6);G.h.tk=Math.max(G.h.tk||0,10000);G.h.ct=Math.max(G.h.ct||0,10000);const g=GR();g.tk=Math.max(g.tk||0,10000);
+  if(!first){T.save();return false;}
+  G.tacc=1;G.tut=1;G.vip=Math.max(G.vip||0,28000);G.xp=Math.max(G.xp||0,179900);G.rep=30;G.sold=Math.max(G.sold||0,5000);
+  Object.keys(G.lv).forEach(k=>G.lv[k]=10);
+  T.HEROES.forEach(h=>{if(h.soon)return;G.h.own[h.id]={s:50};G.h.disc[h.id]=1;});
+  G.cp.best=NST;for(let i=0;i<NST;i++)G.cp.stars[i]=3;G.cph={best:NST,stars:{},ch:0};for(let i=0;i<NST;i++)G.cph.stars[i]=3;
+  // gear: a full Ascended ★5 Lv 60 class set for every Legendary + Mythic battle hero + a few Mythic pieces to try STAR UP / ASCEND
+  const hs=myMechs().filter(h=>h.gr>=4);g.inv=[];g.eq={};
+  hs.forEach(h=>{GSLOT.forEach(sl=>{const it=newItem(sl.k,6,SETS[roleOf(h)]?roleOf(h):'all');it.lv=GMAXR[6];it.sr=5;g.inv.push(it);equip(h.id,it);});});
+  GSLOT.forEach(sl=>{for(let k=0;k<2;k++){const it=newItem(sl.k,5);it.lv=GMAXR[5];g.inv.push(it);}});
+  G.cp.team=myMechs().slice(0,5).map(h=>h.id);
+  T.save();return true;}
+if(window.SEC&&SEC.TEST_ACC){try{if(testFill())setTimeout(()=>location.reload(),300);}catch(e){console.error('testFill',e);}}
+window.CAMPAIGN={gs:{d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,INV:GINV,GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();

@@ -121,6 +121,7 @@ const langOf = l => { const x = String(l || 'en').slice(0, 2).toLowerCase(); ret
 function pub(p, extra) {
   return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.vip | 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, ...extra};
 }
+const isTst = pid => String(pid || '').startsWith('tst_');   // v16-91: owner's FULL TEST ACCOUNT (hidden from rankings)
 async function profOf(env, pid) { return pid && typeof pid === 'string' ? env.DB.prepare('SELECT * FROM prof WHERE pid=?').bind(pid.slice(0, 64)).first() : null; }
 async function isBanned(env, pid) { const r = await env.DB.prepare('SELECT banned FROM players WHERE pid=?').bind(pid).first(); return !!(r && r.banned); }
 const unlocks = p => new Set([...(p.unl || '').split(','), ...(p.cunl || '').split(',')].filter(Boolean));
@@ -201,7 +202,7 @@ const saveArena = (env, a) => env.DB.prepare('UPDATE arena SET season=?, pts=?, 
 async function findOpp(env, p, a) {
   const db = env.DB, season = a.season, me = {pts:a.pts, team:JSON.parse(p.team || '[]')};
   const rows = (await db.prepare(`SELECT a.uid, a.pts, p.name, p.icon, p.frame, p.title, p.cc, p.pow, p.team FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid
-     WHERE a.srv=? AND a.season=? AND a.uid<>? AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND a.pts BETWEEN ? AND ? ORDER BY RANDOM() LIMIT 12`)
+     WHERE a.srv=? AND a.season=? AND a.uid<>? AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' AND a.pts BETWEEN ? AND ? ORDER BY RANDOM() LIMIT 12`)
     .bind(p.srv, season, p.uid, a.pts - 250, a.pts + 300).all()).results;
   const hi = rows.filter(r => r.pts > a.pts + 20), mid = rows.filter(r => Math.abs(r.pts - a.pts) <= 60), lo = rows.filter(r => r.pts < a.pts - 20);
   const out = [], used = new Set();
@@ -238,7 +239,7 @@ async function fight(env, p, b) {
   else { const r = await db.prepare('SELECT p.*, a.pts apts FROM prof p JOIN arena a ON a.uid=p.uid WHERE p.uid=?').bind(o.uid).first(); if (!r) return {err:'old_opponents'};
     td = JSON.parse(r.team || '[]'); dpts = r.apts; dname = r.name; dp = pub(r); }
   const seed = (Math.random() * 4294967295) >>> 0, res = arenaSim(ta, td, seed), g = gain(a.pts, dpts);
-  const da = res.win ? g.w : -g.l, dd = o.bot ? 0 : (res.win ? -Math.round(g.w * .5) : 3);
+  const da = res.win ? g.w : -g.l, dd = (o.bot || isTst(p.pid)) ? 0 : (res.win ? -Math.round(g.w * .5) : 3);   // v16-91: the owner's test account never changes real players
   a.tk -= 1; if (a.tk === ARENA_TK - 1) a.tkt = Date.now(); a.pts = Math.max(0, a.pts + da); a.peak = Math.max(a.peak || 0, a.pts); if (res.win) a.w++; else a.l++; a.t = Date.now();
   a.opp = JSON.stringify(await findOpp(env, p, a)); await saveArena(env, a);
   if (!o.bot) await db.prepare('UPDATE arena SET pts=MAX(0,pts+?), peak=MAX(peak,pts+?) WHERE uid=?').bind(dd, dd, o.uid).run();
@@ -246,7 +247,7 @@ async function fight(env, p, b) {
     .bind(p.srv, Date.now(), 'arena', p.uid, o.bot ? 0 : o.uid, p.name, dname, res.win, da, dd, seed, JSON.stringify(ta), JSON.stringify(td)).first()).id;
   // titles / frames from the league reached
   const tr = tierOf(a.peak); if (tr.lg >= 2) await addUnl(env, p.uid, 'glad'); if (tr.lg >= 4) await addUnl(env, p.uid, 'dia'); if (tr.lg >= 5) await addUnl(env, p.uid, 'leg');
-  const before = tierOf(a.pts - da).lg; if (tr.lg > before && tierOf(a.pts).lg >= 3) await sysMsg(env, p.srv, `⚔️ ${p.name} climbed to ${LEAGUES[tierOf(a.pts).lg]} in the Arena!`);
+  const before = tierOf(a.pts - da).lg; if (!isTst(p.pid) && tr.lg > before && tierOf(a.pts).lg >= 3) await sysMsg(env, p.srv, `⚔️ ${p.name} climbed to ${LEAGUES[tierOf(a.pts).lg]} in the Arena!`);
   const rw = res.win ? {dm:20, tk:1} : {dm:5};
   return {ok:true, id:hid, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pub(p), them:dp, da, pts:a.pts, tier:tierOf(a.pts), tk:a.tk, rw};
 }
@@ -268,7 +269,7 @@ async function cupTick(env) {
     if (!d && now >= ws + CUP_Q) {                       // qualification: the best 64 of the Arena (played in the last 3 days)
       const season = seasonOf(now);
       const rows = (await db.prepare(`SELECT a.uid, a.pts, p.name, p.icon, p.frame, p.pow FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid
-        WHERE a.srv=? AND a.season=? AND (a.t>? OR p.t>?) AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 ORDER BY a.pts DESC LIMIT 64`).bind(srv, season, now - 3 * DAY, now - 3 * DAY).all()).results;
+        WHERE a.srv=? AND a.season=? AND (a.t>? OR p.t>?) AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 64`).bind(srv, season, now - 3 * DAY, now - 3 * DAY).all()).results;
       if (!rows.length) continue;
       const n = Math.min(64, nextPow2(Math.max(8, rows.length))), P = rows.map(r => ({uid:r.uid, name:r.name, icon:r.icon, frame:r.frame, pow:r.pow, pts:r.pts}));
       let k = 0; while (P.length < n) { const ref = rows[Math.min(rows.length - 1, P.length - rows.length + Math.floor(rows.length / 2))] || rows[0];
@@ -330,7 +331,7 @@ async function rewardsTick(env) {
   // WORLD BOSS: the week is over → mail the top 100 of each server
   const wk = dayKey(weekStart(now)), wlast = await kvGet(env, 'wbwk');
   if (wlast && wlast !== wk) {
-    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
+    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
     let srv = -1, n = 0;
     for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue;
       const t = WB_RW.find(q => n >= q[0] && n <= q[1]); if (t) await mail(env, r.uid, '👹', 'World Boss – weekly ranking', `Your rank last week: #${n} (damage ${r.dmg.toLocaleString('en-US')}).`, t[2]); }
@@ -338,7 +339,7 @@ async function rewardsTick(env) {
   }
   if (wlast !== wk) await kvSet(env, 'wbwk', wk);
   // TORQUE KING title: #1 of the campaign ranking on each server
-  for (const r of (await db.prepare('SELECT srv, uid FROM prof p WHERE best=(SELECT MAX(best) FROM prof q WHERE q.srv=p.srv) GROUP BY srv').all()).results) await addUnl(env, r.uid, 'king');
+  for (const r of (await db.prepare('SELECT srv, uid FROM prof p WHERE substr(p.pid,1,4)<>\'tst_\' AND best=(SELECT MAX(best) FROM prof q WHERE q.srv=p.srv AND substr(q.pid,1,4)<>\'tst_\') GROUP BY srv').all()).results) await addUnl(env, r.uid, 'king');
   await db.prepare('DELETE FROM chat WHERE t<?').bind(now - 7 * DAY).run();
   await db.prepare('DELETE FROM ahist WHERE t<?').bind(now - 14 * DAY).run();
   await db.prepare('DELETE FROM inbox WHERE (got=1 AND t<?) OR t<?').bind(now - 7 * DAY, now - 60 * DAY).run();
@@ -402,8 +403,8 @@ export async function online(op, b, env) {
   }
   if (op === 'rank') {
     const by = ['best','pow','lv'].includes(b.by) ? b.by : 'best';
-    const rows = (await db.prepare(`SELECT p.* FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND p.t>? ORDER BY p.${by} DESC, p.pow DESC LIMIT 100`).bind(p.srv, now - 30 * DAY).all()).results;
-    const my = (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
+    const rows = (await db.prepare(`SELECT p.* FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? ORDER BY p.${by} DESC, p.pow DESC LIMIT 100`).bind(p.srv, now - 30 * DAY).all()).results;
+    const my = (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
     const tot = (await db.prepare('SELECT COUNT(*) n FROM prof WHERE srv=? AND t>?').bind(p.srv, now - 30 * DAY).first()).n;
     return {ok:true, by, list:rows.map(r => pub(r)), me:pub(p), myRank:my, total:tot, time:now};
   }
@@ -418,6 +419,7 @@ export async function online(op, b, env) {
       name:m.name, icon:m.icon, frame:m.frame, title:m.title, cc:m.cc, vip:m.vip, me:m.uid === p.uid}; }), muted:p.mute > now ? p.mute : 0};
   }
   if (op === 'say') {
+    if (isTst(b.pid)) return {err:'test'};   // v16-91: the test account only looks, it does not write in the chat
     if (await isBanned(env, b.pid)) return {err:'banned'};
     if (p.mute > now) return {err:'muted', until:p.mute};
     if (p.name.startsWith('Mechanic')) return {err:'need_name'};
@@ -439,7 +441,7 @@ export async function online(op, b, env) {
   if (op === 'fight') { if (await isBanned(env, b.pid)) return {banned:1}; return fight(env, p, b); }
   if (op === 'atop') {
     const season = seasonOf(now);
-    const rows = (await db.prepare(`SELECT a.pts, a.w, a.l, p.* FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.srv=? AND a.season=? AND COALESCE(pl.banned,0)=0 ORDER BY a.pts DESC LIMIT 100`).bind(p.srv, season).all()).results;
+    const rows = (await db.prepare(`SELECT a.pts, a.w, a.l, p.* FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.srv=? AND a.season=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 100`).bind(p.srv, season).all()).results;
     return {ok:true, list:rows.map(r => pub(r, {pts:r.pts, w:r.w, l:r.l, tier:tierOf(r.pts)}))};
   }
   if (op === 'hist') {
@@ -461,7 +463,7 @@ export async function online(op, b, env) {
   }
   if (op === 'wbrank') {
     const ws = weekStart(now), wk = dayKey(ws);
-    const top = (await db.prepare('SELECT w.uid, w.dmg, p.name, p.icon, p.frame FROM wboss w JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.srv=? AND w.wk=? AND COALESCE(pl.banned,0)=0 ORDER BY w.dmg DESC LIMIT 100').bind(p.srv, wk).all()).results;
+    const top = (await db.prepare('SELECT w.uid, w.dmg, p.name, p.icon, p.frame FROM wboss w JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.srv=? AND w.wk=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.dmg DESC LIMIT 100').bind(p.srv, wk).all()).results;
     const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
     const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1 : 0;
     return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, icon:r.icon, frame:r.frame, dmg:r.dmg})), dmg:me ? me.dmg : 0, rank, name:p.name, end:ws + 7 * DAY, now};

@@ -14,7 +14,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=90;
+const CV=91;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();return j;}catch(e){return {err:'network'};}}
 function needUpd(){if(document.getElementById('updNeed'))return;const d=document.createElement('div');d.id='updNeed';
   d.style.cssText='position:fixed;inset:0;z-index:100000;background:#000c;display:flex;align-items:center;justify-content:center;font-family:system-ui';
@@ -476,7 +476,7 @@ $('olChT').onclick=e=>{const b=e.target.closest('b');if(!b)return;if(b.dataset.t
 async function send(){const i=$('olIn'),txt=i.value.trim();if(!txt)return;
   const r=await call('say',{ch:chCh,txt,lang:LANG});
   if(r.ok){i.value='';loadChat();return;}
-  const E={need_name:'✏️ Choose your player name first (Profile)',slow:'⏳ Slow down – wait a few seconds',muted:'🔇 You are muted until '+(r.until?new Date(r.until).toLocaleString():''),banned:'🚫 Your account is blocked',network:'📶 No connection'};
+  const E={need_name:'✏️ Choose your player name first (Profile)',slow:'⏳ Slow down – wait a few seconds',muted:'🔇 You are muted until '+(r.until?new Date(r.until).toLocaleString():''),banned:'🚫 Your account is blocked',test:'🧪 Test account – chat is read-only',network:'📶 No connection'};
   toast(E[r.err]||'⚠️ Message not sent',3000);if(r.err==='need_name'){show('olProf');setTimeout(nameModal,300);}}
 $('olSend').onclick=send;$('olIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send();}});
 

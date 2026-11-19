@@ -5,7 +5,8 @@
 'use strict';
 // OAuth "Web application" client ID from Google Cloud Console (public, not a secret). Empty = sign-in hidden for players.
 const CLIENT_ID = '1041720099519-ogooa4hblh8d4s96ieervv9rp7bqh2k5.apps.googleusercontent.com';
-const SAVE_KEY = 'torqueEmpire_v15';
+const SAVE_KEY = (window.SEC && SEC.SAVE_KEY) || 'torqueEmpire_v15';
+const TACC = !!(window.SEC && SEC.TEST_ACC);   // v16-91: the test account never touches the cloud save
 const T = () => window.__TE;
 const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){ return null; } };
 const API = () => window.SEC && SEC.api();
@@ -19,7 +20,7 @@ let srv = +(LS('te_srv')||1); if(!SERVERS.find(x=>x.id===srv && x.st==='open')) 
 let sess = LS('te_sess'), syncedT = +(LS('te_cloud_t')||0), lastHash = '', lastOk = 0, busy = false, gisLoaded = false, delArm = 0, asking = false;
 
 async function call(op, body, keep){
-  if(!API()) return {err:'offline'};
+  if(!API() || TACC) return {err:'offline'};
   try{ const r = await fetch(API()+'/api/cloud/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),keepalive:!!keep}); return await r.json(); }
   catch(e){ return {err:'network'}; }
 }
