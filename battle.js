@@ -885,8 +885,8 @@ function itemIconURL(s,r,set){const key='it'+s+r+(set||'');if(ICC[key])return IC
   x.globalAlpha=.18;x.strokeStyle='#fff';x.lineWidth=10;for(let i=0;i<8;i++){x.save();x.translate(64,64);x.rotate(i/8*TAU+.2);x.beginPath();x.moveTo(0,0);x.lineTo(0,-100);x.stroke();x.restore();}x.globalAlpha=1;
   x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r,set),0,0);x.restore();
   const u=c.toDataURL();if(ok)ICC[key]=u;return u;}
-function itemCard(it,extra,cls){const T=TE(),i=Math.min(5,it.r),r=T.FIN[i],p=T.FPL[i];
-  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${Math.min(6,it.r)}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
+function itemCard(it,extra,cls){const T=TE(),i=Math.min(6,it.r),r=T.FIN[i],p=T.FPL[i];
+  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
 
 // ---------------------------------------------------------------- team helpers
 function myMechs(){const T=TE(),o=[];

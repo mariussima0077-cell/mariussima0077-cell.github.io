@@ -299,7 +299,7 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 .fc{position:relative;width:100%;aspect-ratio:220/236}
 .fc .fp{position:absolute;object-fit:cover;border-radius:5%;display:block;aspect-ratio:auto!important}
 .fc .ff{position:absolute;left:0;top:0;width:100%!important;height:100%;pointer-events:none;border-radius:0!important;aspect-ratio:auto!important}
-.fc .fs{position:absolute;left:25%;right:25%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;font-style:normal}
+.fc .fs{position:absolute;left:25%;right:25%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;font-style:normal;white-space:nowrap}
 .fc.emp{display:flex;align-items:center;justify-content:center;border:2px dashed #4a5662;border-radius:12px;color:#5f6f7f;font-weight:900;font-size:12px;box-sizing:border-box}
 .hc.big .fc .fs{font-size:15px}
 .rc.g3 .fc,.rc.g4 .fc,.rc.g5 .fc{animation:frGlow 1.4s ease-in-out infinite}
@@ -3214,8 +3214,8 @@ $('pop').addEventListener('click',e=>{if(!e.target.closest('[data-p="payOK"]'))r
 const resEl=$('res');
 // v11: rarity frames (my pictures) — portrait sits inside the frame window
 const FRI=g=>Math.min(5,g);
-const FIN=[[8.5,17.5,83,61.5],[8.5,17.5,83,61.5],[8.5,18,83,61],[15.5,17.5,69,55],[14.5,20.5,71,50],[17.8,21.5,64.4,46.5]];
-const FPL=[[81,11],[81,11],[81,11],[73.5,9.5],[74.5,9.5],[74.5,9]];
+const FIN=[[8.5,17.5,83,61.5],[8.5,17.5,83,61.5],[8.5,18,83,61],[15.5,17.5,69,55],[14.5,20.5,71,50],[17.8,21.5,64.4,46.5],[17.2,28.2,65.5,45.7]]; // [6] = ASCENDED gear frame (v16-90)
+const FPL=[[81,11],[81,11],[81,11],[73.5,9.5],[74.5,9.5],[74.5,9],[73.5,9]];
 FIN.forEach((_,i)=>{(new Image()).src='img/fr'+i+'.webp';});
 function fbox(h,sil,s){const i=FRI(h.gr),r=FIN[i],p=FPL[i];
   return '<div class="fc"><img class="ff" src="img/fr'+i+'.webp"><img class="fp" src="'+portrait(h,sil)+'" style="left:'+r[0]+'%;top:'+r[1]+'%;width:'+r[2]+'%;height:'+r[3]+'%">'+
