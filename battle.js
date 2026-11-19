@@ -963,7 +963,7 @@ const SPRD={
  m3_6:{w:384,a:[203,248],m:[300,150],R:[0,1,2,3,5,6],ds:[[3,0],[3,1],[3,2],[4,0],[4,1]],boom:'fx_ninaboom',dboom:1},
  // v16-14: Legendary + Mythic (cs = skill frames; the frames with other people / cut boxes in the sheets are not used)
  m4_0:{a:[198.7,246],m:[300,150],fx:'quake',v8:{cw:299,uw:398.7,ax:198.7,ck:5,pk:[5,6,7],rows:[[0,202,269.3,264.0],[202,176,234.7,229.3],[378,186,248.0,242.7],[564,209,278.7,273.3],[773,177,236.0,230.7],[950,190,253.3,249.3]]},fx8:{cw:314,uw:418.7,ax:206.7,rows:[[0,309,412.0,393.3]]}}, // v16-95: GRIGORE – 8 frames (tools/v8_hero.py m4_0); ck = cast frames 0-4 (smash = impact), quake wall = fxs frames
-m4_1:{a:[129,246],m:[250,109],look:'wrench',cs:[[3,0],[3,1]],fx:'holy'},
+m4_1:{a:[134.7,246],m:[253,71],look:'wrench',fx:'holy',v8:{cw:210,uw:280.0,ax:134.7,ck:4,pk:[4,5,6,7],rows:[[0,195,260.0,256.0],[195,189,252.0,248.0],[384,190,253.3,248.0],[574,286,381.3,358.7],[860,198,264.0,258.7],[1058,208,277.3,272.0]]},fx8:{cw:158,uw:210.7,ax:105.3,rows:[[0,253,337.3,325.3]]}}, // v16-96: MAMA ROSA – 8 frames (tools/v8_hero.py m4_1); ck = pray → wrench raised, pk = golden sweep → idle; holy pillar = fxs frames on every healed ally
  m4_2:{a:[120,246],m:[250,112],col:'#d05cff',cs:[[3,0],[3,1]],fx:'vortex'},m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
  m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
@@ -1705,10 +1705,12 @@ const SKF={
    B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);
    if(FX2){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
    u.taunt=4;u.shield=Math.max(u.shield,u.max*.3);});},
- m4_1(u){castAct(u,.8,()=>{const dead=!u.rev&&B.heroes.find(h=>h.dead&&h!==u);
+ m4_1(u){const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-96: her own holy pillar (8 frames), peak (frame 5) = the moment of the heal
+   if(f8){const dd=!u.rev&&B.heroes.find(h=>h.dead&&h!==u);for(const h of B.heroes)if(!h.dead||h===dd)B.fx.push({type:'sheet8',t:-.32,d:.96,sp:u.spr,x:h.x,dd:h.d});}
+   castAct(u,.8,()=>{const dead=!u.rev&&B.heroes.find(h=>h.dead&&h!==u);u.post=.6;
    if(dead){u.rev=1;dead.dead=false;dead.hp=Math.round(dead.max*.4);dead.deadT=0;dead.st='idle';dead.act=null;dead.stun=0;dead.lift=0;dead.en=0;
-     num(dead.x,headY(dead)-16,'REVIVED!','#fff59d',1);imgFx('holy',dead.x,fy(dead.d)+6*S,120*S,1.3);}
-   for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(h!==dead)imgFx('holy',h.x,fy(h.d)+6*S,90*S,1);
+     num(dead.x,headY(dead)-16,'REVIVED!','#fff59d',1);if(!f8)imgFx('holy',dead.x,fy(dead.d)+6*S,120*S,1.3);}
+   for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(h!==dead&&!f8)imgFx('holy',h.x,fy(h.d)+6*S,90*S,1);
      if(FX2){fxs('magic_02','#fff176',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#fff176',5,22*S);}}
    teamBuff({def:6,col:'#fff176',txt:'DEF UP'});B.flash=.5;});},
  m4_2(u,ms){const c=cluster(ms,100*S)||ms[0];castAct(u,.6,()=>{const R=105*S,cx=c.x,cd=c.d;imgFx('vortex',cx,fy(cd)+12*S,215*S,1.1,{spin:1});shake(8);

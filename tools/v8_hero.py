@@ -19,6 +19,8 @@ HEROES = {
   # v16-95 Lady Overdrive: REF measured on the standing frames (idle 1, win 1, hit 1, skill 8), run/attack stances estimated
   # v16-96 GRIGORE (first Legendary). REF: idle/win/hit frame 1 standing; skill sheet is 1774x887 (cells 443x443) → own px
   'm4_0': ('grigore', {'idle': 428, 'run': 395, 'attack': 355, 'skill': 375, 'hitko': 400, 'win': 420, 'fx': 214}),
+  # v16-96 MAMA ROSA: REF = idle 1 / attack 8 / skill 1 / hit 1 / win 1 standing; fx = holy pillar, sized ~1.1x her width
+  'm4_1': ('rosa', {'idle': 432, 'run': 425, 'attack': 359, 'skill': 359, 'hitko': 380, 'win': 392, 'fx': 420}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -45,6 +47,7 @@ def despill(a):
 EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill', 3): 'none', ('skill', 4): 'fade',
                 ('skill', 5): 'fade', ('skill', 6): 'fade', ('idle', 2): 'none', ('idle', 3): 'none', ('idle', 4): 'none',
                 ('idle', 5): 'none', ('idle', 6): 'none', ('run', 1): 'none', ('attack', 2): 'fade', ('win', 3): 'fade'},
+       'm4_1': {('fx', 2): 'softtop', ('fx', 3): 'softtop', ('fx', 5): 'softtop', ('fx', 6): 'softtop'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 
@@ -60,6 +63,12 @@ def fade_edges(c, F=34):
     return o
 
 def extend(c, mode=None):
+    if mode == 'softtop':   # v16-96: light pillar whose top ends ragged on the green → soft fade over its top 40 %
+        a = c[..., 3] > 30; ys = np.nonzero(a.any(1))[0]
+        if len(ys):
+            y0, y1 = ys.min(), ys.max(); r = np.clip((np.arange(c.shape[0]) - y0) / (.4 * (y1 - y0) + 1), 0, 1) ** 1.4
+            c = c.copy(); c[..., 3] *= r[:, None]
+        mode = None
     if mode == 'fade': return fade_edges(c, 95)
     if mode == 'none':
         o = np.zeros((c.shape[0] + 2 * P, c.shape[1] + 2 * P, 4), np.float32); o[P:-P, P:-P] = c; return o
@@ -82,11 +91,27 @@ def extend(c, mode=None):
         for i in range(n): o[P:P + h, P + w - E + i] = ln * [1, 1, 1, fade[i]]
     return o
 
+# v16-96: heroes whose poses / thrown weapons cross the 384-px columns (Rosa's wrench swooshes) → wide cells:
+# every picture part goes to the column its centre is in (no neighbour leaking, nothing cut at the column line)
+WIDE = {'m4_1': 90}
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
     a = despill(unmix(im)).astype(np.float32)
     H, W = a.shape[:2]; ch, cw = H // 2, W // 4   # v16-96: any sheet size (Grigore's skill sheet is 1774x887)
-    return [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
+    pc = WIDE.get(HID, 0)
+    if not pc: return [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
+    from scipy import ndimage as nd
+    lab, k = nd.label(nd.binary_dilation(a[..., 3] > 12, iterations=3))
+    cx = np.array(nd.center_of_mass(a[..., 3], lab, range(1, k + 1)))[:, 1] if k else np.zeros(0)
+    col = np.zeros(k + 1, int); col[1:] = np.clip((cx // cw).astype(int), 0, 3)
+    C = col[lab]; out = []
+    for r in range(2):
+        band = a[r * ch:(r + 1) * ch]; cb = C[r * ch:(r + 1) * ch]; lb = lab[r * ch:(r + 1) * ch]
+        p = np.zeros((ch, W + 2 * pc, 4), np.float32); p[:, pc:pc + W] = band
+        cp = np.full((ch, W + 2 * pc), -1); cp[:, pc:pc + W] = np.where(lb > 0, cb, -1)
+        for c in range(4):
+            x0 = c * cw; o = p[:, x0:x0 + cw + 2 * pc].copy(); o[cp[:, x0:x0 + cw + 2 * pc] != c] = 0; out.append(o)
+    return out
 
 def torso_x(c):
     a = c[..., 3] > 128; ys, xs = np.nonzero(a); y0, y1 = ys.min(), ys.max()
@@ -97,7 +122,7 @@ def bottom(c): return np.nonzero((c[..., 3] > 128).any(1))[0].max()
 def frames(n):
     """→ list of (RGBA image at APU px/unit, anchor x, anchor y in that image)"""
     cs = cells(n); s = OLDH / REF[n] * APU
-    if n == 'fx': ax, ay = 192, bottom(cs[4]) - 10
+    if n == 'fx': ax, ay = cs[0].shape[1] / 2, bottom(cs[4]) - 10
     elif n == 'run': ax, ay = np.mean([torso_x(c) for c in cs]), max(bottom(c) for c in cs)
     else: ax, ay = torso_x(cs[0]), bottom(cs[0])
     out = []
