@@ -920,7 +920,9 @@ function myMechs(){const T=TE(),o=[];
 function stars(h){const o=TE().G.h.own[h.id];return o?o.s:0;}
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
 function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h));let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];}
-  return {hp:Math.round(R.hp*m*(1+b.hp/100)),atk:R.atk*m*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100),mv:R.mv,rng:R.rng,as:R.as/(1+b.aspd/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+b.en/100,b};}
+  return {hp:Math.round(R.hp*m*(1+b.hp/100)),atk:R.atk*m*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100),mv:R.mv,rng:R.rng,as:R.as/(1+softCap(b.aspd,60,150)/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+softCap(b.en,60,120)/100,b};}
+// v16-98: Skill charge / Attack speed – full value up to +60%, then they grow slower and never pass +120% / +150% (max gear made ultimates non-stop)
+function softCap(x,K,C){return x<=K?x:K+(C-K)*(1-Math.exp(-(x-K)/(C-K)));}
 function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+(s.crit-R.crit)*.8)*(1+(s.eg-1)*.25)+s.def*4);}
 function pow(h,ov){return powS(unitStats(h,ov),ROLE[roleOf(h)]);}
 function crewHero(k){return {id:'crew'+k,crew:true,n:CREW_NAMES[k],gr:0,cat:'m',sp:'crew',f:false};}
@@ -1616,8 +1618,8 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   const [x]=sxy(tgt);const y=headY(tgt);
   if(FX2&&!B.sim&&!tgt.hero&&(o.skill||crit)){B.hs=Math.max(B.hs,o.skill?.06:.035);fxs('star_04','#ffffff',x,y+22*dsc(tgt.d),{d:.22,s0:20*S,s1:70*S,rot:rnd(0,1),ease:1});}
   num(x,y,(crit?'💥':'')+a,tgt.hero?'#ff8a80':crit?'#ffd54a':'#ffffff',crit?1:0);
-  if(tgt.hero)tgt.en=Math.min(100,tgt.en+a/tgt.max*55*tgt.eg);
-  if(src.hero)src.en=Math.min(100,src.en+(o.skill?0:11*src.eg));
+  if(tgt.hero&&!(tgt.enLock>0))tgt.en=Math.min(100,tgt.en+a/tgt.max*55*tgt.eg);
+  if(src.hero&&!(src.enLock>0))src.en=Math.min(100,src.en+(o.skill?0:11*src.eg)); // v16-98: no charge for 3 s after an ultimate
   if(tgt.hp<=0){kill(tgt);const ad=pv(src,'tuning',0);if(ad&&!tgt.hero){src.aspdK=Math.max(src.aspd>0?(src.aspdK||0):0,ad/100);src.aspd=Math.max(src.aspd,4);pasTxt(src,0);}}
   else if(tgt.hero){const ls=pv(tgt,'engine',1);if(ls&&!tgt.ls&&tgt.hp<tgt.max*.35){tgt.ls=1;tgt.shield=Math.max(tgt.shield,tgt.max*ls/100);tgt.taunt=Math.max(tgt.taunt,3);pasTxt(tgt,1,'LAST STAND!');if(!B.sim)B.fx.push({type:'ring',x:tgt.x,y:fy(tgt.d),t:0,d:.5,r:60*S,col:'#ffd54a',ground:1});}
     if(tgt.hp<tgt.max*.3)for(const h of B.heroes){const ek=pv(h,'service',1);if(ek&&!h.dead&&h.ekCd<=0){h.ekCd=15;heal(tgt,tgt.max*ek/100);pasTxt(h,1);if(!B.sim)B.fx.push({type:'plus',u:tgt,t:0,d:.7});break;}}}
@@ -1666,7 +1668,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
-function cast(u){if(!canCast(u))return;u.en=0;B.slowT=Math.max(B.slowT,1.3);B.flash=.35;punch(.045);if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
+function cast(u){if(!canCast(u))return;u.en=0;u.enLock=3;B.slowT=Math.max(B.slowT,1.3);B.flash=.35;punch(.045);if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
   B.banner={u,t:0,name:skOf(u.h).sk};
   const R=u.role,ms=alive(B.mons);
   if(SKF[u.h.id]){SKF[u.h.id](u,ms);return;}
@@ -1763,7 +1765,7 @@ function monAct(m,dt){const a=m.act;a.t+=dt;
 
 // ---------------------------------------------------------------- update
 function unitUpdate(u,dt,foes,friends){
-  u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;
+  u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;if(u.enLock>0)u.enLock-=dt;
   if(u.dead){u.deadT+=dt;return;}
   u.stun=Math.max(0,u.stun-dt);u.slow=Math.max(0,u.slow-dt);u.mark=Math.max(0,u.mark-dt);
   if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
