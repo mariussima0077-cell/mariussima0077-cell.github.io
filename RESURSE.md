@@ -1,4 +1,14 @@
 # TORQUE EMPIRE – Toate resursele: de unde vin și pe ce se cheltuie
+
+## NOU v16-99 (20 nov 2026)
+| Resursă | De unde | Pe ce |
+|---|---|---|
+| **Essence** `G.ess` (unitate `ESS_U` = costul unui nivel la nivelul așteptat la etapa ta) | Idle 0,5/oră · campanie prima trecere 0,5 (mini 1, boss 3), replay 0,1 · Torque Tower 0,8 (×3 la al 10-lea) · Class Towers 0,5 · toate Dungeons 0,8–1,8 · duplicat erou Common/Uncommon/Rare la maxim 1/2/5 · eventul Essence Rush (praguri) | LEVEL UP (Lv 1-300) + ASCENSION la fiecare 20 niveluri |
+| **Gear Parts** `G.gp` (unitate `GP_U` = vechii bani de campanie ÷10) | Salvage · campanie (1, mini 1,5, boss 3; replay 0,25) · Idle 0,6/oră · Tower 1 · Class Towers 0,6 · Dungeons (Scrap Mine 3, Forge 1, celelalte 0,5) · echipament vândut când geanta e plină | upgrade echipament (vechiul cost ÷10) |
+| **Bani** | ca înainte, campania ×0,71 (`CP_MON` .25) | DOAR garaj (clădiri, upgrade-uri, Classic Collection) |
+| **Diamante** – surse noi | duplicat Epic 30 / Legendary 150 / Mythic 1000 la maxim · Lucky Wheel · praguri + clasamente EVENTS | ca înainte (+ se numără la Diamond Spree) |
+| **Mythic** | DOAR din summon 0,08% (Fusion închis) | stele +1…+20 din duplicate |
+
 *(verificat în cod la 17 nov 2026, v16-63. Claude actualizează fișierul când apare o sursă nouă.)*
 
 ## 1. Bani (Cash / money – `G.money`)

@@ -22,6 +22,13 @@ const VIP_SQL = 'CASE ' + VIP_PTS.map((v, i) => [v, i]).reverse().map(([v, i]) =
 const START_PTS = 1000, ARENA_TK = 5, TK_EVERY = 2 * HOUR;
 const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena daily reward per league: [diamonds, recruit tickets]
 // v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
+// v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
+const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew'], B:['ess','dia','wheel']};
+const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40};
+const EV_RW = [[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
+const EV_TKK = {hero:'tk', gear:'gt', crew:'ct', ess:'tk', dia:'tk', wheel:null};
+const EV_NAME = {hero:'Hero Summon Festival', gear:'Gear Summon Forge', crew:'Crew Summon Rally', ess:'Essence Rush', dia:'Diamond Spree', wheel:'Lucky Wheel'};
+const evIdx = t => Math.floor((t - EV_E0) / EV_DUR), evKind = (tr, i) => EV_TRK[tr][((i % 3) + 3) % 3];
 const WB_RW = [[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]];
 const WB_DAY = 6;        // max hits per UTC day (3 keys per local day → up to 6 in one UTC day around midnight)
 const WB_CAP = 60;       // one 60 s hit can be at most WB_CAP × team power (normal play: ~1-5 ×)
@@ -89,6 +96,8 @@ async function ensure(env) {
     db.prepare('CREATE TABLE IF NOT EXISTS kv(k TEXT PRIMARY KEY, v TEXT)'),
     db.prepare('CREATE TABLE IF NOT EXISTS wboss(uid INTEGER, wk TEXT, srv INTEGER, dmg INTEGER DEFAULT 0, best INTEGER DEFAULT 0, hits INTEGER DEFAULT 0, day TEXT, nday INTEGER DEFAULT 0, t INTEGER, PRIMARY KEY(uid, wk))'),
     db.prepare('CREATE INDEX IF NOT EXISTS wboss_rank ON wboss(srv, wk, dmg)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS evt(uid INTEGER, eid TEXT, srv INTEGER, sc INTEGER DEFAULT 0, t INTEGER, PRIMARY KEY(uid, eid))'),
+    db.prepare('CREATE INDEX IF NOT EXISTS evt_rank ON evt(eid, srv, sc)'),
   ]);
   ready = true;
 }
@@ -338,6 +347,16 @@ async function rewardsTick(env) {
     await db.prepare('DELETE FROM wboss WHERE wk<?').bind(dayKey(weekStart(now) - 21 * DAY)).run();
   }
   if (wlast !== wk) await kvSet(env, 'wbwk', wk);
+  // v16-99 TIME EVENTS: an event is over → mail the top 100 of each server
+  for (const tr of ['A', 'B']) { const ci = evIdx(now), key = 'ev_' + tr, li = await kvGet(env, key);
+    if (li !== null && +li < ci) { const eid = tr + li, k = evKind(tr, +li), tkk = EV_TKK[k];
+      const rows = (await db.prepare('SELECT e.uid, e.srv, e.sc FROM evt e LEFT JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.srv, e.sc DESC, e.t ASC').bind(eid).all()).results;
+      let srv = -1, n = 0;
+      for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue; const q = EV_RW.find(x => n >= x[0] && n <= x[1]); if (!q) continue;
+        const rw = {dm: tkk ? q[2] : Math.round(q[2] * 1.5)}; if (tkk) rw[tkk] = q[3];
+        await mail(env, r.uid, '⭐', EV_NAME[k] + ' – final ranking', `Your rank: #${n} (score ${Math.round(r.sc).toLocaleString('en-US')}).`, rw); }
+      await db.prepare('DELETE FROM evt WHERE eid=?').bind(tr + (+li - 4)).run(); }
+    if (li === null || +li !== ci) await kvSet(env, key, ci); }
   // TORQUE KING title: #1 of the campaign ranking on each server
   for (const r of (await db.prepare('SELECT srv, uid FROM prof p WHERE substr(p.pid,1,4)<>\'tst_\' AND best=(SELECT MAX(best) FROM prof q WHERE q.srv=p.srv AND substr(q.pid,1,4)<>\'tst_\') GROUP BY srv').all()).results) await addUnl(env, r.uid, 'king');
   await db.prepare('DELETE FROM chat WHERE t<?').bind(now - 7 * DAY).run();
@@ -460,6 +479,17 @@ export async function online(op, b, env) {
     const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
     const rank = (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1;
     return {ok:true, dmg:me.dmg, rank};
+  }
+  if (op === 'evsc' || op === 'evrank') {   // v16-99 TIME EVENTS
+    if (!p) return {err:'noprof'}; const eid = String(b.eid || ''), m = /^([AB])(\d{1,6})$/.exec(eid); if (!m) return {err:'bad'};
+    const tr = m[1], i = +m[2], k = evKind(tr, i), ci = evIdx(now); if (i !== ci && !(i === ci - 1 && now - (EV_E0 + ci * EV_DUR) < HOUR)) return {err:'over'};
+    if (op === 'evsc') { if (await isBanned(env, b.pid)) return {banned:1}; const sc = Math.round(num(b.sc, 0, EV_CAP[k]));
+      await db.prepare('INSERT INTO evt(uid,eid,srv,sc,t) VALUES(?,?,?,?,?) ON CONFLICT(uid,eid) DO UPDATE SET srv=excluded.srv, t=CASE WHEN excluded.sc>evt.sc THEN excluded.t ELSE evt.t END, sc=MAX(evt.sc, excluded.sc)').bind(p.uid, eid, p.srv, sc, now).run(); }
+    const me = await db.prepare('SELECT sc, t FROM evt WHERE uid=? AND eid=?').bind(p.uid, eid).first();
+    const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM evt WHERE eid=? AND srv=? AND (sc>? OR (sc=? AND t<?))').bind(eid, p.srv, me.sc, me.sc, me.t).first()).n + 1 : 0;
+    if (op === 'evsc') return {ok:true, rank, sc:me ? me.sc : 0};
+    const top = (await db.prepare('SELECT e.uid, e.sc, p.name FROM evt e JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND e.srv=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.sc DESC, e.t ASC LIMIT 100').bind(eid, p.srv).all()).results;
+    return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, sc:r.sc})), me:p.uid, rank, sc:me ? me.sc : 0};
   }
   if (op === 'wbrank') {
     const ws = weekStart(now), wk = dayKey(ws);

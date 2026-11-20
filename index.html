@@ -558,6 +558,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #side2 button>svg,#side2 button>small{display:none!important}
 #side2 #rkBtn{background-image:url(img/ui3/s_rank.webp)!important}#side2 #chBtn{background-image:url(img/ui3/s_chat.webp)!important}#side2 #ciBtn{background-image:url(img/ui3/s_ci.webp)!important}#side2 #nwBtn{background-image:url(img/ui3/s_news.webp)!important}#side2 #mlBtn{background-image:url(img/ui3/s_mail.webp)!important}
 #side2 i{right:-2px!important;top:-2px!important}
+.itBt button small img.tki{display:inline;height:1.25em;vertical-align:-.3em;margin:0 .1em}
+.idEG{display:flex;align-items:center;justify-content:center;gap:4px;font:800 calc(var(--u,1px)*24) system-ui;color:#e8dcff;text-shadow:0 2px 3px #000;white-space:nowrap}.idEG b{color:#d6b4ff}.idEG .tki{height:1.3em;vertical-align:-.3em}
 @media (max-height:700px){#side2 button{width:46px!important;height:51px!important}}
 
 /* v16-49 CHECK-IN (5000 free summons) day tiles = Marius' pictures (img/ui3/ci_*) */
@@ -842,7 +844,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 <div id="toast"></div>
 <div id="zoom"><button id="zin">+</button><button id="zout">−</button></div>
 <div id="side"><button id="cpBtn"><img src="img/ui/ic_battle.webp" alt="Battle"></button><button id="smBtn"><img src="img/ui3/n_summon.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/ui3/n_crew.webp" alt="Crew"><i id="rosDot"></i></button><button id="idBtn"><img src="img/ui3/n_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/ui3/n_quests.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small></button></div>
-<div id="side2"><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button></div>
+<div id="side2"><button id="evBtn"><svg viewBox="0 0 40 40"><path d="M20 3l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L20 26.6l-9.3 4.9 1.8-10.3L5 13.9l10.4-1.5z" fill="#ffd54a" stroke="#7a4a00" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="18" r="5" fill="#ff5252"/><path d="M8 34h24" stroke="#ff5252" stroke-width="3" stroke-linecap="round"/></svg><small>EVENTS</small><i id="evDot">!</i></button><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button></div>
 <div id="xp" class="skP sk-mail"><div class="skBg"></div><div class="skH"><img class="hi" src="img/ui2/mail_h.webp" alt=""><div class="rsTop"><button class="rsB" id="xpBack">↩</button><div class="rsTi"><b id="xpT"></b><small id="xpS"></small></div><div class="rsTk" id="xpTk"></div></div></div><div id="xpBody" class="skB"></div></div>
 <div id="dq"><div id="dqBox"></div></div>
 <div id="sm"><div id="smBox"></div></div>
@@ -1037,7 +1039,7 @@ const SAVE_KEY=(window.SEC&&SEC.SAVE_KEY)||'torqueEmpire_v15'; // v16-91: the ow
 const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:[],gifts:[0,0,0,0]},h:{tk:10,ct:5,ctInit:1,own:{},disc:{},as:{},pity:{m:{e:0,l:0},g:{e:0,l:0},d:{e:0,l:0},c:{e:0,l:0}},hist:[],free:''},idle:Date.now(),cp:{best:0,stars:{},team:[],ch:0},gear:{inv:[],eq:{},nid:1,kit:0},dm:0,lv:{parking:1,inspect:1,service:1,paint:0,elec:0,engine:0,tuning:0,parts:0,office:1,trailer:1,security:1,wash:0,gas:0,factory:0},up:{}};
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
 function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;if(s.ci)G.ci=s.ci;if(s.nw)G.nw=s.nw;if(s.ml)G.ml=s.ml;if(s.dm)G.dm=s.dm;if(s.c5)G.c5=s.c5;/* v16-69 BUG FIX: Torque Tower, Class Towers, Dungeons, World Boss and the Classic Collection were saved but NOT loaded back → lost at every restart/update. Now everything in the save comes back (also future parts of G). */['tw','ct','dg','wb','cc'].forEach(k=>{if(s[k]&&typeof s[k]==='object')G[k]=s[k];});for(const k in s)if(G[k]===undefined&&s[k]!=null)G[k]=s[k];G.rep=repFor(G.xp);}}catch(e){}}
-function save(){if(window.__noSave)return;try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
+function save(){if(window.__noSave)return;if(window.EVT)try{EVT.tick();}catch(e){}try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
 load();
 let time=0, started=false, SPD=1;
 
@@ -2972,7 +2974,8 @@ const GRADES=[
  {n:'Legendary',c:'#ffd21a',d:'#8a5a00'},
  {n:'Mythic',c:'#ff3b3b',d:'#7f0000'},
  {n:'???',c:'#8fa3b8',d:'#1b2735'}];
-const RATES=[.49,.28,.15,.06,.02], PITY_E=0, PITY_L=500, MAXS=50, STAR_K=.2, STAR_K2=.04, FUSE_S=5;
+const RATES=[.55,.28,.1172,.04,.012,.0008], PITY_E=0, // v16-99: rates lower, Mythic 0.08% from summon (Fusion removed)
+  PITY_L=500, MAXS=50, STAR_K=.2, STAR_K2=.04, FUSE_S=5;
 const CATS={
  m:{n:'Mechanics',one:'Mechanic',ic:'🔧',title:'MECHANIC',sub:'Recruit skilled Mechanics for your Garage!'},
  g:{n:'Guards',one:'Guard',ic:'🛡️',title:'GUARD',sub:'Hire tough Guards to stop the car thieves!'},
@@ -3035,9 +3038,31 @@ const spName=sp=>sp==='all'?'🌟 All workshops':(ST[sp]?ST[sp].icon+' '+ST[sp].
 // v11: +1…+5 = +20% of base each, +6…+50 = +4% each (+50 = ×3.8)
 // v16-40: stars after +5 give less on low grades (an Uncommon +50 was stronger than a Legendary)
 const STAR_KG=[.01,.012,.018,.025,.04,.05];
-const starK=(s,gr)=>1+STAR_K*Math.min(s,5)+(gr==null?STAR_K2:STAR_KG[gr])*Math.max(0,s-5);
+const starK=(s,gr)=>gr===5?(1+STAR_K*Math.min(s,5)+.12*Math.max(0,Math.min(s,20)-5))*Math.pow(1.05,Math.min(4,Math.floor(s/5))):1+STAR_K*Math.min(s,5)+(gr==null?STAR_K2:STAR_KG[gr])*Math.max(0,s-5); // v16-99: Mythic max +20, every +5 = new star color (+5% everything)
+// ===== v16-99 (20 nov 2026, Marius): HERO LEVELS 1-300 with ESSENCE · ASCENSION every 20 levels (more stats + skill level) · GEAR PARTS for gear upgrades (money stays for the garage) · Mythic +20 · no Fusion =====
+const LV_MAX=300,ASC_STEP=20,ASC_MAX=LV_MAX/ASC_STEP-1; // 14 ascensions: at Lv 20, 40 … 280
+const MYTH_MAXS=20,hMaxS=h=>h&&h.gr===5?MYTH_MAXS:MAXS,mythT=s=>Math.min(4,Math.floor((s||0)/5));
+const ESI='<img class="tki" src="img/ui9/essence.svg" alt="Essence">',GPI='<img class="tki" src="img/ui9/gparts.svg" alt="Gear Parts">';
+const lvO=id=>G.h.own[id]||{lv:1,a:0,s:0};
+const lvOf=id=>lvO(id).lv||1, ascOf=id=>lvO(id).a||0;
+const lvCap=id=>Math.min(LV_MAX,ASC_STEP*(ascOf(id)+1));
+const lvCost=L=>Math.max(10,Math.round(25*Math.pow(L,1.55)/10)*10);
+const ascCost=a=>Math.round(lvCost(ASC_STEP*(a+1))*6/100)*100;
+const lvMul=(lv,a)=>(1+.01*((lv||1)-1))*(1+.03*(a||0));
+const heroLvK=id=>lvMul(lvOf(id),ascOf(id));
+const expLv=i=>1+299*Math.pow(Math.max(0,Math.min(999,i||0))/999,.8);   // the hero level the game expects at campaign stage i (Lv 300 at the last stage)
+const expMul=i=>{const e=Math.max(1,expLv(i)*.85);return lvMul(e,Math.min(ASC_MAX,Math.floor((e-1)/ASC_STEP)));}; // monsters grow with it (a bit below → leveling always helps)
+const ESS_U=()=>lvCost(Math.round(expLv(G.cp.best||0))+4);   // 1 "essence unit" ≈ 1 level at the level expected for your stage
+const GP_U=()=>{const i=Math.min(999,G.cp.best||0);return Math.max(20,Math.round(.35*(i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/100)*10);}; // 1 "parts unit" = old campaign money of your stage ÷ 10
+const skLv=id=>{const h=HB[id];return 1+ascOf(id)+(h&&h.gr===5?mythT(lvO(id).s):0);};
+const nfmt=n=>fmt(n).replace('$','');
+function addEss(n,why){n=Math.round(n);if(!n)return;G.ess=(G.ess||0)+n;save();if(why)toast(ESI+' +'+nfmt(n)+' Essence · '+why,2600);}
+function addGp(n,why){n=Math.round(n);if(!n)return;G.gp=(G.gp||0)+n;save();if(why)toast(GPI+' +'+nfmt(n)+' Gear Parts · '+why,2600);}
+const DUPX=[{e:1},{e:2},{e:5},{d:30},{d:150},{d:1000}]; // duplicate after the max: Common-Rare → Essence (× essence unit), Epic-Mythic → Diamonds
+function lvUp(id,n){const o=G.h.own[id];if(!o)return 0;if(!o.lv)o.lv=1;let k=0,sp=0;while(k<n&&o.lv<lvCap(id)){const c=lvCost(o.lv);if((G.ess||0)<c)break;G.ess-=c;sp+=c;o.lv++;k++;}if(k){save();if(window.EVT){EVT.add('ess',sp);EVT.q('lvl',k);}}return k;}
+function ascend(id){const o=G.h.own[id];if(!o||(o.lv||1)<lvCap(id)||lvCap(id)>=LV_MAX)return false;const c=ascCost(o.a||0);if((G.ess||0)<c)return false;G.ess-=c;o.a=(o.a||0)+1;save();if(window.EVT){EVT.add('ess',c);EVT.q('lvl',1);}return true;}
 const HCAP={crit:.6,shield:.8,tip:.8};
-const hv=(h,k,s)=>Math.min(HCAP[k]||9,(HS[h.cat][k][h.gr]||0)*starK(s));
+const hv=(h,k,s)=>Math.min(HCAP[k]||9,(HS[h.cat][k][h.gr]||0)*starK(s)*(h.cat==='m'?1+.001*(lvOf(h.id)-1):1)); // v16-99: hero level also helps a little in the garage (+0.1% per level)
 const own=id=>G.h.own[id];
 const pw=id=>{const h=HB[id],o=own(id);return h.gr*10+(o?o.s:0);};
 let HVER=0;
@@ -3060,7 +3085,7 @@ function heroRefresh(){HVER++;lastPanelKey='';
   CATK.forEach(cat=>{SB[cat]={};SETB[cat].forEach(([k,v],gr)=>{if(setDone(cat,gr))SB[cat][k]=(SB[cat][k]||0)+v;});});
   for(const id in drivers)drivers[id].forEach(d=>d.p.spd=1+drvBonus(id,d.k).spd);}
 function mechBonus(st,j){const o={spd:SB.m.spd||0,inc:SB.m.inc||0,crit:0};
-  const h=heroIn('m|'+st+'|'+j);if(h){const s=own(h.id).s,f=(h.sp==='all'||h.sp===st)?1:.5;o.spd+=hv(h,'spd',s)*f;o.inc+=hv(h,'inc',s)*f;o.crit=hv(h,'crit',s)*f;}
+  const h=heroIn('m|'+st+'|'+j);if(h){const s=own(h.id).s,f=(h.sp==='all'||h.sp===st)?1:0;o.spd+=hv(h,'spd',s)*f;o.inc+=hv(h,'inc',s)*f;o.crit=hv(h,'crit',s)*f;}
   for(let k=0;k<PLV(st);k++){const a=heroIn('m|'+st+'|'+k);if(a&&a.gr===5)o.spd+=MYTH_AURA;}
   return o;}
 function guardBonus(){const o={cat:SB.g.cat||0,rew:SB.g.rew||0,shield:0,spd:[SB.g.spd||0,SB.g.spd||0]};
@@ -3151,11 +3176,11 @@ function rollGrade(P){P.e++;P.l++;let gr;
   else{let r=Math.random(),a=0;gr=0;for(let i=0;i<RATES.length;i++){a+=RATES[i];if(r<a){gr=i;break;}}}
   if(gr>=4)P.l=0;if(gr>=3)P.e=0;return gr;}
 function gain(id){const h=HB[id],o=own(id);let r;
-  if(!o){G.h.own[id]={s:0};r='new';}else if(o.s<MAXS){o.s++;r='star';}else{r='max';}
-  G.h.disc[id]=1;const res={id,r};if(r==='max'){res.money=Math.round(DUP_MONEY[h.gr]*(1+(G.rep-1)*.5));G.money+=res.money;}return res;}
+  if(!o){G.h.own[id]={s:0,lv:1,a:0};r='new';}else if(o.s<hMaxS(h)){o.s++;r='star';}else{r='max';}
+  G.h.disc[id]=1;const res={id,r};if(r==='max'){const q=DUPX[h.gr]||DUPX[0];if(q.e){res.ess=Math.round(q.e*ESS_U());G.ess=(G.ess||0)+res.ess;}else{res.dm=q.d;G.dm=(G.dm||0)+q.d;}}return res;} // v16-99: no money any more
 function summon(cat,n){const P=G.h.pity[cat],out=[];
   for(let i=0;i<n;i++){const gr=rollGrade(P),L=heroesOf(cat,gr);const res=gain(pick(L).id);out.push(res);G.h.hist.unshift({c:cat,id:res.id,r:res.r,t:Date.now()});}
-  G.h.hist.length=Math.min(G.h.hist.length,60);save();heroRefresh();return out;}
+  G.h.hist.length=Math.min(G.h.hist.length,60);if(window.EVT){EVT.add(cat==='m'?'hero':'crew',out.length);EVT.q('sum',out.length);}save();heroRefresh();return out;}
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
 // ---------- DOM: summon page (my picture) ----------
@@ -3191,7 +3216,7 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   // grade panel
   h+='<div class="smL" style="'+box(256,690,410,55)+'">AVAILABLE '+(cr?'CREW':'HEROES')+'</div><div data-a="rates" style="'+box(805,684,68,68)+'border-radius:50%"></div>';
   TILE2.forEach((x,i)=>{const L=pool.filter(z=>z.gr===i),d=L.find(z=>G.h.disc[z.id]),hh=d||L[0];
-    h+='<div class="smTi" style="'+box(x-50,792,100,100)+'">'+(hh?img(hh,d?0:1):'')+'</div>'+(i===5&&!cr?'<img class="smFu" src="img/ui5/fusion.webp" alt="FUSION" style="'+box(x-62,860,124,47)+'">':'')+'<div data-a="tier" data-g="'+i+'" style="'+box(x-64,778,128,172)+'"></div>';});
+    h+='<div class="smTi" style="'+box(x-50,792,100,100)+'">'+(hh?img(hh,d?0:1):'')+'</div>'+'<div data-a="tier" data-g="'+i+'" style="'+box(x-64,778,128,172)+'"></div>';});
   // v16-89 (Marius): the 3 plates are the 3 summons – HERO · CREW · GEAR (Rate Info stays on the (i) button of the grade panel, History inside Rate Info)
   [['m','HERO',47,254],['c','CREW',335,251],['g','GEAR',621,254]].forEach(([k,n,x,w])=>{const on=k===smCat;
     h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+(k==='g'?'gear':k)+'" style="'+box(x,1022,w,59)+'">'+(k==='g'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+'</div>';});
@@ -3279,7 +3304,7 @@ function stars(s){return '<span class="stn">★+'+s+'</span>';}
 function showResults(res,cat,n){
   let h='<div class="resT">'+CATS[cat].ic+' '+CATS[cat].title+' SUMMON ×'+res.length+'</div><div class="resG'+(res.length>1?' many':'')+'">';
   res.forEach((r,i)=>{const H=HB[r.id],o=own(r.id);
-    const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?'<i class="up">+'+o.s+' ★</i>':'<i class="mx">MAX · +'+fmt(r.money)+'</i>';
+    const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?'<i class="up">+'+o.s+' ★</i>':'<i class="mx">MAX → '+(r.dm?DMI+' +'+r.dm:ESI+' +'+nfmt(r.ess||0))+'</i>';
     h+='<div class="rc g'+H.gr+'" style="animation-delay:'+(i*.16)+'s">'+card(H,o,tagT)+'</div>';});
   const best=Math.max(...res.map(r=>HB[r.id].gr));
   h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TIK(cat)+'1</button><button data-r="10" class="gold">Summon ×10 · '+TIK(cat)+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TIK(cat)+' '+tkN(cat)+' tickets left</div>';
@@ -3368,30 +3393,30 @@ function popTickets(){popW(TKI+' TICKETS','<div class="wP"><div>'+TKI+' <b>Recru
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*1000)/10)+'%';
   const row=(i,pct,right)=>wRow(i,'<b style="color:'+GRADES[i].c+'">'+GRADES[i].n+'</b>',pct,right);
   popW('SUMMON RATES','<div class="wS">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</div>'+RATES.map((r,i)=>row(i,pc(r),heroesOf(smCat,i).length+' heroes')).join('')+
-  row(5,'0%','only from Fusion')+wRow(-1,LOCKI+' ???','—','coming soon')+
-  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>). Every + makes his stats stronger: +1…+5 = +20% of his base each, +6…+50 = +4% each (at +50 = ×3.8). Already +'+MAXS+' → money instead.</div></div><button class="wHist" onclick="window.__smHist()">📜 SUMMON HISTORY</button>');}
+  wRow(-1,LOCKI+' ???','—','coming soon')+
+  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>, <b style="color:#ff3b3b">Mythic</b> up to <b>+'+MYTH_MAXS+'</b> – new star color every +5). Already at the max → <b>Common–Rare: '+ESI+' Essence</b>, <b>Epic: '+DMI+' 30</b>, <b>Legendary: '+DMI+' 150</b>, <b>Mythic: '+DMI+' 1,000</b>.</div><div>'+ESI+' Heroes level up (Lv 1 → '+LV_MAX+') with <b>Essence</b>, not with duplicates.</div></div><button class="wHist" onclick="window.__smHist()">📜 SUMMON HISTORY</button>');}
 window.__smHist=()=>popHist();
 function popHist(){const L=G.h.hist;popW('SUMMON HISTORY','<div class="wS">Last '+L.length+' summons</div>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
   return wRow(H.gr,CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b>',null,(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'));}).join(''):'<div class="wP">No summons yet.</div>'));}
 function popTier(cat,gr){const L=heroesOf(cat,gr);
-  popW('<span style="color:'+GRADES[gr].c+'">'+GRADES[gr].n.toUpperCase()+'</span>',wRow(gr,'<b style="color:'+GRADES[gr].c+'">◆ '+GRADES[gr].n+' '+CATS[cat].n+'</b>',gr<5?(RATES[gr]*100)+'%':gr===5?'—':null,gr===5?'only from Fusion':L.length+' heroes')+'<div class="hg">'+L.map(h=>{const o=own(h.id),d=G.h.disc[h.id],w=o&&whereIs(h.id);
+  popW('<span style="color:'+GRADES[gr].c+'">'+GRADES[gr].n.toUpperCase()+'</span>',wRow(gr,'<b style="color:'+GRADES[gr].c+'">◆ '+GRADES[gr].n+' '+CATS[cat].n+'</b>',gr<6?(Math.round(RATES[gr]*10000)/100)+'%':null,L.length+' heroes')+'<div class="hg">'+L.map(h=>{const o=own(h.id),d=G.h.disc[h.id],w=o&&whereIs(h.id);
     return '<div data-p="hero" data-id="'+h.id+'" class="'+(d?'':'sil')+'">'+(d?card(h,o,(w?'<i class="wk">📍</i>':'')+(o?'':'<i class="gone">used</i>')):silCard(h))+'</div>';}).join('')+'</div>');}
 function silCard(h){const g=GRADES[h.gr];return '<div class="hc" style="--gc:'+g.c+';--gd:'+g.d+'">'+fbox(h,1,null)+'<b>'+(h.soon?'SOON':'???')+'</b></div>';}
 function popHero(id){const h=HB[id],o=own(id),G0=GRADES[h.gr],w=whereIs(id),s=o?o.s:0;
-  popBox.style.setProperty('--hg',G0.c);let x='<div class="hcard"></div><div class="hd" style="--gc:'+G0.c+';--gd:'+G0.d+'"><div class="hdF">'+fbox(h,0,o?s:null)+'</div><div><div class="pT" style="color:'+G0.c+'">'+h.n+'</div><div class="pD"><b style="color:'+G0.c+'">◆ '+G0.n+' '+CATS[h.cat].one+'</b>'+(h.cat==='m'?'<br>'+spName(h.sp):'')+'<br>'+(o?stars(s)+' <span style="color:#9fb0c0">/ +'+MAXS+'</span>':'not owned')+'</div>'+
-    (o?'<div class="sbar"><i style="width:'+(s/MAXS*100)+'%"></i></div>':'')+'</div></div>';
-  x+='<div class="sec">STATS'+(o&&s<MAXS?' <span style="color:#9fb0c0;letter-spacing:0">(→ at +'+(s+1)+')</span>':'')+'</div>';
-  const now=statLines(h,s),nx=o&&s<MAXS?statLines(h,s+1):null;
+  popBox.style.setProperty('--hg',G0.c);let x='<div class="hcard"></div><div class="hd" style="--gc:'+G0.c+';--gd:'+G0.d+'"><div class="hdF">'+fbox(h,0,o?s:null)+'</div><div><div class="pT" style="color:'+G0.c+'">'+h.n+'</div><div class="pD"><b style="color:'+G0.c+'">◆ '+G0.n+' '+CATS[h.cat].one+'</b>'+(h.cat==='m'?'<br>'+spName(h.sp):'')+'<br>'+(o?stars(s)+' <span style="color:#9fb0c0">/ +'+hMaxS(h)+'</span>'+(h.cat==='m'?' · <b style="color:#b9f">Lv '+lvOf(id)+'/'+lvCap(id)+'</b>':''):'not owned')+'</div>'+
+    (o?'<div class="sbar"><i style="width:'+(s/hMaxS(h)*100)+'%"></i></div>':'')+'</div></div>';
+  x+='<div class="sec">STATS'+(o&&s<hMaxS(h)?' <span style="color:#9fb0c0;letter-spacing:0">(→ at +'+(s+1)+')</span>':'')+'</div>';
+  const now=statLines(h,s),nx=o&&s<hMaxS(h)?statLines(h,s+1):null;
   x+=now.map((t,i)=>'<div class="pR"><span>'+t+'</span>'+(nx?'<em>→ '+nx[i].split(' ')[1]+'</em>':'')+'</div>').join('');
-  x+='<div class="pD">Every duplicate summon gives <b>+1</b> (max +'+MAXS+'). Each + adds stats: +1…+5 = +20% of base each, +6…+50 = +4% each.</div>';
+  x+='<div class="pD">'+(h.gr===5?'Every duplicate summon gives <b>+1 ★</b> (max +'+MYTH_MAXS+'). Every +5 the stars change color (gold → red → purple → rainbow): +5% to everything and +1 skill level.':'Every duplicate summon gives <b>+1</b> (max +'+MAXS+'). Each + adds stats: +1…+5 = +20% of base each, +6…+50 = +4% each.')+(h.cat==='m'?' Levels: HEROES page → LEVEL UP with '+ESI+' Essence.':'')+'</div>';
   if(h.cat==='m'&&!h.soon&&window.CAMPAIGN&&CAMPAIGN.passives){const sk=CAMPAIGN.skill(h);x+='<div class="sec">IN BATTLE · '+CAMPAIGN.roleName(h).toUpperCase()+'</div><div class="pD" style="text-align:left"><b style="color:#ffd54a">⚔️ '+sk.sk+'</b> (skill) – '+sk.skd+'</div>'+CAMPAIGN.passives(h).map(p=>'<div class="pD" style="text-align:left"><b style="color:#ffe082">'+p.ic+' '+p.n+'</b> (passive, automatic) – '+p.d+'</div>').join('');}
-  if(h.cat==='m'&&h.sp!=='all')x+='<div class="pD">🏁 Full bonus in <b>'+spName(h.sp)+'</b>. In other workshops '+(h.f?'she':'he')+' gives half.</div>';
+  if(h.cat==='m'&&h.sp!=='all')x+='<div class="pD">🏁 Works only in <b>'+spName(h.sp)+'</b> (every workshop has its own class).</div>';
   if(h.cat==='g')x+='<div class="pD">Guards work in the Security office: the desk guard and (Security LV 3+) the patrol guard.</div>';
   if(h.cat==='d')x+='<div class="pD">Drivers work for Arrival Parking (valets), every workshop and the Sales Office.</div>';
   if(o){x+='<div class="sec">WORKS AT</div><div class="pR"><span>'+(w?slotName(w):'— not assigned —')+'</span></div>';
     x+='<button class="pB" data-p="slots" data-id="'+id+'">'+(w?'MOVE TO ANOTHER PLACE':'ASSIGN')+'</button>'+(w?'<button class="pB grey" data-p="unas" data-id="'+id+'">REMOVE</button>':'');
-    if(h.gr===4)x+='<div class="pD">'+(s>=FUSE_S?'🧪 Ready for Fusion: 3 Legendary +'+FUSE_S+' → 1 Mythic. (His stars are used up too.)':'🧪 At +'+FUSE_S+' this hero can be used in the Fusion Lab.')+'</div>';}
-  else if(G.h.disc[id])x+='<div class="pD">You had this hero (used in Fusion). Summon him again to get him back.</div>';
+}
+  else if(G.h.disc[id])x+='<div class="pD">You had this hero. Summon him again to get him back.</div>';
   pop(x);}
 // v11: what a hero gives in one exact place (bay / desk / driver seat)
 function slotStats(key,id){const c=key[0];if(!id||!own(id)){return c==='m'?[0,0,0,0]:c==='g'?[0,0,0,0]:[0,0];}
@@ -3419,16 +3444,17 @@ function popCompare(key,id,from){const cur=G.h.as[key]&&own(G.h.as[key])?G.h.as[
   if(cur)x+='<div class="pD">↩ '+HB[cur].n+' goes back to the bench.</div>';
   x+='<button class="pB" data-p="put" data-k="'+key+'" data-id="'+id+'">✓ CONFIRM</button><button class="pB grey" data-p="cback" data-k="'+key+'" data-id="'+id+'" data-f="'+from+'">CANCEL</button>';
   pop(x);}
-function popSlots(id){const h=HB[id],L=slotsOf(h.cat);
+const CAMPAIGN_CLS={engine:'Bruiser',tuning:'Racer',inspect:'Scanner',service:'Medic',paint:'Sprayer',elec:'Shocker'};
+function popSlots(id){const h=HB[id],L=slotsOf(h.cat).filter(k=>h.cat!=='m'||h.sp==='all'||k.split('|')[1]===h.sp);
   pop('<div class="pT">Where should '+h.n+' work?</div><div class="pD">Tap a place to see the difference before you move him.</div>'+(L.length?L.map(k=>{const cur=heroIn(k),m=h.cat==='m'?(h.sp==='all'||k.split('|')[1]===h.sp):true;
-    return '<div class="pR pk" data-p="cmp" data-f="s" data-k="'+k+'" data-id="'+id+'"><span>'+slotName(k)+(h.cat==='m'?(m?' <b style="color:#7CFC9A">✓ full</b>':' <b style="color:#ffb74d">½</b>'):'')+'<br>'+(cur&&cur.id===id?'':cmpHint(k,id))+'</span><em>'+(cur?(cur.id===id?'★ here':'<span style="color:'+GRADES[cur.gr].c+'">'+cur.n+'</span>'):'empty')+'</em></div>';}).join(''):'<div class="pD">No free places yet. Build or upgrade buildings to unlock more.</div>'));}
+    return '<div class="pR pk" data-p="cmp" data-f="s" data-k="'+k+'" data-id="'+id+'"><span>'+slotName(k)+(h.cat==='m'?' <b style="color:#7CFC9A">✓</b>':'')+'<br>'+(cur&&cur.id===id?'':cmpHint(k,id))+'</span><em>'+(cur?(cur.id===id?'★ here':'<span style="color:'+GRADES[cur.gr].c+'">'+cur.n+'</span>'):'empty')+'</em></div>';}).join(''):'<div class="pD">No free places yet. Build or upgrade buildings to unlock more.</div>'));}
 function popPicker(key){const cat=key[0],cur=heroIn(key),st=cat==='m'?key.split('|')[1]:'';
-  const L=Object.keys(G.h.own).filter(id=>HB[id].cat===cat).sort((a,b)=>slotStats(key,b)[0]-slotStats(key,a)[0]||pw(b)-pw(a));
+  const L=Object.keys(G.h.own).filter(id=>HB[id].cat===cat&&(cat!=='m'||HB[id].sp==='all'||HB[id].sp===st)).sort((a,b)=>slotStats(key,b)[0]-slotStats(key,a)[0]||pw(b)-pw(a));
   if(cat==='m'){ // v16-49: Marius' CHOOSE MECHANIC picture (portrait window · info · shield with the +)
     let x='<div class="kpT">'+slotName(key)+'</div><div class="pD kpD">Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="kpR" data-p="put" data-k="'+key+'" data-id=""><div class="kpI"><b>— Remove '+cur.n+' —</b></div></div>':'');
     x+=L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=h.sp==='all'||h.sp===st;
-      return '<div class="kpR'+(w===key?' on':'')+'" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><img class="kpP" src="'+portrait(h)+'" style="box-shadow:0 0 0 2px '+GRADES[h.gr].c+'"><div class="kpI"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b><small>'+spName(h.sp)+(m?' ✓':' · ½ here')+'</small>'+(w===key?'<small style="color:#eaffd0">★ works here</small>':(w?'<small>at '+slotName(w)+'</small>':'')+cmpHint(key,id))+'</div><div class="kpS">+'+o.s+'</div></div>';}).join('')
-     :'<div class="pD">You have no mechanics yet.</div>';
+      return '<div class="kpR'+(w===key?' on':'')+'" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><img class="kpP" src="'+portrait(h)+'" style="box-shadow:0 0 0 2px '+GRADES[h.gr].c+'"><div class="kpI"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b><small>'+spName(h.sp)+' ✓ · Lv '+lvOf(id)+'</small>'+(w===key?'<small style="color:#eaffd0">★ works here</small>':(w?'<small>at '+slotName(w)+'</small>':'')+cmpHint(key,id))+'</div><div class="kpS">+'+o.s+'</div></div>';}).join('')
+     :'<div class="pD">No '+(CAMPAIGN_CLS[st]||'')+' mechanics for this workshop yet · every workshop takes only its own class (Legend = all).</div>';
     pop(x,null,'chSk');popBox.insertAdjacentHTML('beforeend',L.length?'<button class="pB kpB" data-p="x">CLOSE</button>':'<button class="pB kpB" data-p="gosum" data-c="m">'+TKI+' GO TO SUMMON</button>');return;}
   pop('<div class="pT">'+slotName(key)+'</div><div class="pD">Choose a '+CATS[cat].one.toLowerCase()+'. Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="pR pk" data-p="put" data-k="'+key+'" data-id=""><span>— Remove '+cur.n+' —</span></div>':'')+
     (L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=cat==='m'?(h.sp==='all'||h.sp===st):true;
@@ -3499,7 +3525,7 @@ teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}co
   if(a==='x')closeTeam();
   else if(a==='tk')popTickets();
   else if(a==='cat'){if(t.dataset.c==='m'){heroColl();return;}teamCat=t.dataset.c;teamTab='coll';teamKey='';renderTeam();}
-  else if(a==='fuse'){teamTab='fuse';fuseSel=[];teamKey='';renderTeam();}
+  else if(a==='fuse'){teamEl.classList.remove('open');if(window.CAMPAIGN){CAMPAIGN.open();CAMPAIGN.openGear();}toast('🧪 Fusion is closed · Mythic heroes come from Summon ('+(RATES[5]*100)+'%) · level up your heroes here',3200);}
   else if(a==='fcat'){teamCat=t.dataset.c;fuseSel=[];teamKey='';renderTeam();}
   else if(a==='tier')popTier(teamCat,+t.dataset.g);
   else if(a==='soon')toast('❓ New heroes are COMING SOON',2500);
@@ -3518,7 +3544,7 @@ const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
 const ccR=()=>window.CC?CC.rates():{dm:0,tk:0,ct:0,gt:0,mon:0};
 function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')+ccR().mon));}
-function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),full:hrs>=idleMax()};}
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*.5*ESS_U()),gp:Math.floor(hrs*.6*GP_U()),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}
@@ -3533,12 +3559,13 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV grn" style="'+box(860,836,265,70)+'">1 every '+IDLE_TK_H+'h</div>';
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
   const cc=(I.dm||I.gt||ccR().dm)?'<br>🏆 <b>Classic cars</b>: '+DMI+' +'+(I.dm||0)+(I.gt?' · '+GTI+' +'+I.gt:'')+' (tickets above include them)':'';
+  h+='<div class="idEG" style="'+box(150,1092,900,40)+'">'+ESI+' Essence <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' Gear Parts <b>+'+nfmt(I.gp)+'</b></div>';
   h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+cc+'</span></div>';
   morph(idlBox,h);}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
-function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.idle=SEC.now();save();closeIdle();
-  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:''),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
+function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;G.idle=SEC.now();if(window.EVT)EVT.q('idle',1);save();closeIdle();
+  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp),3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
 addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open')){teamKey='';renderTeam();}if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
@@ -3592,9 +3619,10 @@ function c5Rw(n){const left=C5_TOTAL-c5Got(n);if(left<=0)return null;const a=Mat
 const ciReady=()=>G.c5.day!==dayKey()&&!!c5Rw(G.c5.n);
 const GTI='<img class="tki" src="img/gticket.webp">';
 function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);if(r.gt)a.push(GTI+' ×'+r.gt);if(r.dm)a.push(DMI+' ×'+r.dm);if(r.vipTo)a.push('👑 VIP '+r.vipTo);return a.join('<br>');}
-function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
+function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:43,d:'Nov 20, 2026',ic:'⭐',t:'Hero LEVELS, Essence, Gear Parts & EVENTS',l:['Heroes now have <b>levels 1 → 300</b>: HEROES page → <b>LEVEL UP</b> with <b>Essence</b>. Every <b>20 levels</b> = <b>ASCENSION</b>: +3% all stats, +1 skill level and +20 max level. Your heroes already got the level that fits your campaign progress.','<b>Essence</b>: Idle Rewards, campaign, Torque Tower, Class Towers, <b>every Dungeon</b> and duplicates of maxed heroes.','<b>Gear Parts</b> now pay for gear upgrades (salvage gives Gear Parts). Money is only for the garage.','<b>Mythic heroes</b> come from <b>Summon</b> (0.08%) – no more Fusion. Mythic stars go to <b>+20</b>: every +5 a new star color, more stats and +1 skill level. Duplicates of maxed heroes → Essence or Diamonds.','<b>Ascended gear</b> is in the Gear Summon (0.02%) and goes up to <b>★20</b> (new star color + new stat every 5).','Every workshop now takes only <b>its own class</b> (Legend = all). <b>✎ EDIT TEAM</b> before every battle (also Towers, Dungeons, World Boss).','New <b>⭐ EVENTS</b> (right side): Hero / Gear / Crew Summon, Essence Rush, Diamond Spree and the <b>Lucky Wheel</b> – milestone rewards + TOP 100 with prizes.']},
  {id:42,d:'Nov 19, 2026',ic:'⚖️',t:'Battle balance – ultimates',l:['With very high gear, heroes could fire their <b>ultimate</b> almost after every hit. Fixed.','<b>Skill charge</b> and <b>Attack speed</b> now count fully up to <b>+60%</b>; above that they grow slower (max <b>+120%</b> charge, <b>+150%</b> speed).','After an ultimate a hero does not charge for <b>3 seconds</b>. Ultimates are rarer, but every one is a real show again.']},
  {id:41,d:'Nov 19, 2026',ic:'💎',t:'DUKE DIAMOND – new animations',l:['<b>DUKE DIAMOND</b> (Legendary) has brand-new battle animations: idle, run, paint-blaster shot, victory and knock-out – 8 frames each.','<b>DIAMOND VORTEX</b>: he charges his golden blaster, fires a beam and a paint-and-diamond tornado rises on the biggest group – then it bursts into ice crystals that freeze the enemies.','New <b>splash art</b>: shown when you summon him, and with the <b>🖼 ART</b> button on the HEROES page.']},
  {id:40,d:'Nov 19, 2026',ic:'✨',t:'MAMA ROSA – new animations',l:['<b>MAMA ROSA</b> (Legendary) has brand-new battle animations: idle, run, wrench throw, victory and knock-out – 8 frames each.','<b>MIRACLE SHIFT</b>: she prays, raises her golden wrench and a pillar of holy light rises under every mechanic of the team.','New <b>splash art</b>: shown when you summon her, and with the <b>🖼 ART</b> button on the HEROES page.']},
@@ -3748,7 +3776,14 @@ function startLoader(){
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},
   rect:id=>id==='parking'?{x:430,y:110,w:345,h:290}:id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:GAR[id]?{x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32}:null,
   sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>BLD[id].cost[G.lv[id]||0]||0,TKI:()=>TKI};
-window.__TE={SPLASH,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{openTeam('m',1);teamTab='fuse';fuseSel=[];teamKey='';renderTeam();},canFuse:id=>{const h=HB[id],o=G.h.own[id];return !!(h&&o&&h.gr===4&&(o.s||0)>=FUSE_S);},payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
+// v16-99: one-time update of old saves – heroes get the level that fits their campaign progress (so nothing gets harder), Mythic stars above +20 → 💎300 each, workshops keep only their own class
+function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Math.round(expLv(G.cp.best||0)*.9)));
+  for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o)continue;if(h.cat==='m'){o.lv=e;o.a=Math.min(ASC_MAX,Math.floor((e-1)/ASC_STEP));}else{o.lv=o.lv||1;o.a=o.a||0;}
+    if(h.gr===5&&o.s>MYTH_MAXS){const x=o.s-MYTH_MAXS;o.s=MYTH_MAXS;G.dm=(G.dm||0)+x*300;}}
+  for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
+  G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
+try{migr99();heroRefresh();}catch(e){console.error(e);}
+window.__TE={SPLASH,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};
@@ -3776,6 +3811,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 <script src="classic.js"></script>
 <script src="tutorial.js"></script>
 <script src="shop2.js"></script>
+<script src="events.js"></script>
 <script>if(window.SEC&&SEC.TEST_ACC){const b=document.createElement('a');b.href='?tacc=0';b.textContent='🧪 TEST ACCOUNT · hidden from rankings';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 2px);z-index:9;font:800 10px system-ui;color:#ffd54a;background:#000a;border:1px solid #ffd54a88;border-radius:9px;padding:2px 8px;white-space:nowrap;text-decoration:none;pointer-events:none';document.body.appendChild(b);}</script>
 </body>
 </html>
