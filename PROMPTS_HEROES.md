@@ -41,3 +41,12 @@ Rules: same character size and camera in every cell, facing RIGHT, feet on the s
 8. **WIN** – sărbătoare de 8 cadre.
 
 Exemplu de descriere (regele): „old muscular king-mechanic, silver-white hair, big white beard, golden gear crown with red gem, red royal cape with gold gear patterns, black-and-gold armored mechanic outfit, tool belt, giant golden wrench with a red gear center”. Pozele rezultate: `img/sheets/king/`.
+
+## 20 nov 2026 – generate de Claude direct în ChatGPT (Chrome-ul lui Marius)
+Marius descarcă pozele din ChatGPT și le trimite. Prompturile: `tools/hero_prompts/mk.py` (Legendary) + `mk2.py` (Epic, aura mov) → `python3 mk2.py` scrie câte 8 fișiere text per erou.
+Referința atașată = captură cu cadrele mari din planșa veche (ChatGPT nu primește fișiere, doar captura).
+- ✅ **SOFIA LIGHTNING (m4_3)** – 8/8 (chat „Create Splash Art”). Attack cadrul 4 și skill cadrul 5: fulgerul atinge marginea → de estompat.
+- ✅ **ORACLE OTTO (m4_4)** – 8/8 (chat „Create splash art”). Hit/KO = **varianta 2** (ChatGPT a dat 2). Skill cadrul 6 fără rucsac → de înlocuit cu cadrul 5 colorat albastru. FX: interiorul ceasului e verde-închis → atenție la decupare (KEEP).
+- ✅ **REX REDLINE (m4_5)** – 8/8 (chat „Create splash art”).
+- ✅ **VIKTOR (m3_0, Epic)** – 8/8 (chat „Create Viktor Splash Art”). Attack cadrul 3: cheia atinge sus → de prelungit.
+- ⏳ Următorii Epic: Big Mo (m3_1), Gloria (m3_2), Dr. Ohm (m3_3), Hugo (m3_4), Aria (m3_5), Nina (m3_6) – prompturile gata în `mk2.py`.
