@@ -19,6 +19,7 @@ const GIFT_VIP = ['160672a2'];
 const isGift = pid => GIFT_VIP.some(g => String(pid).startsWith(g));
 // v16-71: Alex was banned by mistake for the gift (VIP 20 jump) → unbanned automatically at his next check-in (only until this date)
 const GIFT_UNBAN_UNTIL = Date.parse('2026-11-24T00:00:00Z');
+const TESTER_UNBAN = ['03245000-cda3-4e5c-9e6d-d388955218a8'];   // v16-103: one-time unban (Wazza4ever)
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20};
 const json = (o, s=200) => new Response(JSON.stringify(o), {status:s, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-headers':'content-type'}});
@@ -57,6 +58,16 @@ async function report(b, env) {
     await db.prepare('UPDATE players SET banned=0, score=0, reason=? WHERE pid=?').bind('unbanned: gift VIP (v16-71)', b.pid).run();
     await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'unban', 'gift VIP – banned by mistake').run();
     old.banned = 0; old.score = 0;
+  }
+  // v16-103 (Marius, 20 nov): tester Wazza4ever (found the cloud-save re-roll, fixed in v16-102) – unbanned ONCE at his next check-in.
+  // If he gets banned again later, the ban stays (the 'unban' event below is written only once).
+  if (old && old.banned && TESTER_UNBAN.includes(b.pid) && !/by admin/.test(old.reason || '')) {
+    const done = await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='unban' AND detail LIKE 'tester%'").bind(b.pid).first();
+    if (!done) {
+      await db.prepare('UPDATE players SET banned=0, score=0, reason=? WHERE pid=?').bind('unbanned: tester (v16-103)', b.pid).run();
+      await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'unban', 'tester – found the re-roll bug').run();
+      old.banned = 0; old.score = 0;
+    }
   }
   let pts = 0; const why = [];
   // 1) warning signs found by the game itself
