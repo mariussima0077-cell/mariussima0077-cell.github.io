@@ -8,7 +8,8 @@ from playwright.async_api import async_playwright
 
 MODE, DAYS, OUT = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DST = f'/tmp/te_sim_{MODE}'
+TAG = os.environ.get('TAG','')
+DST = f'/tmp/te_sim_{MODE}{TAG}'
 shutil.rmtree(DST, ignore_errors=True)
 shutil.copytree(SRC, DST, ignore=shutil.ignore_patterns('.git', 'sheets', 'preregister'))
 p = DST + '/battle.js'; s = open(p).read()
@@ -18,7 +19,8 @@ open(p, 'w').write(s)
 p = DST + '/index.html'; s = open(p).read()
 i = s.rindex('})();\n</script>'); s = s[:i] + 'window.__EV=c=>eval(c);\n' + s[i:]; open(p, 'w').write(s)
 # cloud / guard servers are not reachable here → harmless, but keep the page quiet
-CLOCK = """
+SEED = int(os.environ.get('SEED', '0'))  # v16-120: SEED=n → same luck in every run (compare two versions fairly)
+CLOCK = ("""(()=>{let s=%d;Math.random=()=>{s=(s*16807)%%2147483647;return (s-1)/2147483646;};})();""" % SEED if SEED else '') + """
 (()=>{const RD=Date,T0=RD.UTC(2026,10,16,7,0,0);let off=0;window.__adv=ms=>{off+=ms;};window.__now=()=>T0+off;
  class FD extends RD{constructor(...a){if(a.length===0)super(T0+off);else super(...a);} static now(){return T0+off;}}
  FD.UTC=RD.UTC;FD.parse=RD.parse;window.Date=FD;})();
@@ -99,7 +101,7 @@ window.__BOT={
 """
 
 async def main():
-    port = 8770 + (1 if MODE == 'paid' else 0)
+    port = 8770 + (1 if MODE == 'paid' else 0) + 2 * int(os.environ.get('PORTOFF', '0'))
     srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(port)], cwd=DST, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1); errs = []; days = []
     paid = MODE == 'paid'; speed = 2.0 if paid else 1.5

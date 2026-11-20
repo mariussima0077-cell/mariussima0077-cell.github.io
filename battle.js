@@ -617,10 +617,10 @@ const MON={
  neonc:{n:'NEON CRUSHER',dr:'crusher',hp:5200,atk:114,def:26,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#7b1fa2',b:'#2a0638',c:'#ff4fd8',e:'#00e5ff',horn:1},desc:'Mini-boss'},
  magma:{n:'MAGMA CRUSHER',dr:'crusher',hp:5400,atk:118,def:28,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#3a2a2a',b:'#120808',c:'#ff6d00',e:'#ffea00',horn:1},desc:'Mini-boss'},
  titan:{n:'JUNK TITAN',hp:12500,atk:130,def:28,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'imp',lc:'#ffea00',desc:'Chapter boss'},
- tanker:{n:'ACID TANKER',hp:13500,atk:132,def:28,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'canister',lc:'#76ff03',desc:'Chapter boss'},
- plow:{n:'FROST PLOW',hp:14500,atk:136,def:30,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'hubcap',lc:'#80d8ff',desc:'Chapter boss'},
- wyrm:{n:'TURBO WYRM',hp:15500,atk:140,def:30,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'turbo',lc:'#ff4fd8',desc:'Chapter boss'},
- omega:{n:'OMEGA ENGINE',hp:17000,atk:146,def:32,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'bat',lc:'#ff3d00',desc:'Final boss'}};
+ tanker:{n:'ACID TANKER',hp:13000,atk:132,def:28,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'canister',lc:'#76ff03',desc:'Chapter boss'},
+ plow:{n:'FROST PLOW',hp:13000,atk:134,def:29,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'hubcap',lc:'#80d8ff',desc:'Chapter boss'},
+ wyrm:{n:'TURBO WYRM',hp:13500,atk:134,def:30,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'turbo',lc:'#ff4fd8',desc:'Chapter boss'},
+ omega:{n:'OMEGA ENGINE',hp:13500,atk:134,def:30,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'bat',lc:'#ff3d00',desc:'Final boss'}};
 // v16-39: monsters drawn by Marius (ChatGPT sprite sheets, cut by tools/atlas_mon.py → img/mon/<id>.webp)
 // rows: idle 6 · walk 8 · attack 8 · skill 8 · hurt 4 · death 6 · w/h = cell, ax/ay = feet point, ih = idle height (atlas px)
 const MSPR={cbrute:{w:281,h:153,ax:140.5,ay:144.5,ih:138.6},crawler:{w:197,h:132,ax:98.5,ay:120.8,ih:115.6},esnake:{w:239,h:119,ax:119.5,ay:113.2,ih:100.0},hound:{w:253,h:119,ax:126.5,ay:112.8,ih:111.2},jtitan:{w:280,h:187,ax:140.0,ay:178.0,ih:176.0},ndragon:{w:294,h:171,ax:147.0,ay:166.0,ih:165.0},pimp:{w:228,h:142,ax:114.0,ay:135.2,ih:130.4},rat:{w:224,h:121,ax:112.0,ay:113.6,ih:109.6},towking:{w:284,h:179,ax:142.0,ay:169.0,ih:159.0},wasp:{w:269,h:163,ax:134.5,ay:145.8,ih:140.4},
@@ -716,7 +716,7 @@ function bioVariant(P,m){const o={};for(const k in P){const v=P[k];o[k]=typeof v
 function monClone(k,a){const A=ACTS[a],key=k+'_'+a;if(MON[key])return key;const M=MON[k];
   let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';
   // bosses of acts 2-10 get the same base stats in every world, so only the stage level decides how hard they are
-  const norm=M.b==='titan'?{hp:14000,atk:136,def:30}:M.b==='crusher'?{hp:5000,atk:112,def:26}:{};
+  const norm=M.b==='titan'?{hp:12500,atk:130,def:28}:M.b==='crusher'?{hp:5000,atk:112,def:26}:{};
   MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===9?'Final boss':M.desc});return key;}
 for(let a=1;a<10;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb=t+a*5;
   const bios=B0.bios.map(bi=>{BIO.push(Object.assign(bioVariant(BIO[bi],A.bio),{n:A.n+' '+BIO[bi].n}));return BIO.length-1;});
