@@ -21,6 +21,9 @@ const LS = (k,v) => { try{ if(v===undefined) return localStorage.getItem(k); loc
 // ---------- player id (anonymous) ----------
 let PID = LS('te_pid');
 if(!PID){ PID = (crypto.randomUUID ? crypto.randomUUID() : 'p'+Math.random().toString(36).slice(2)+Date.now().toString(36)); LS('te_pid',PID); }
+// v16-104: every Player ID this phone has used (a cloud load changes the ID) – the server finds the purchases made under any of them
+let PIDS = []; try{ PIDS = JSON.parse(LS('te_pids')||'[]'); }catch(e){}
+if(!PIDS.includes(PID)){ PIDS.push(PID); PIDS = PIDS.slice(-5); LS('te_pids', JSON.stringify(PIDS)); }
 
 // ---------- where are we running? ----------
 // Inside the Google Play app (Trusted Web Activity) the page is opened with an android-app:// referrer.
@@ -98,8 +101,30 @@ function sane(){
 }
 setInterval(sane, 3000);
 
+// ---------- v16-104: memory-edit guard (GameGuardian / Cheat Engine) ----------
+// money, diamonds, tickets and VIP points get a hidden coded copy that only the game itself updates.
+// A memory editor changes the number but not the coded copy → 'mem_edit' (the game can never make them differ).
+const K0 = (Math.random()*4294967295)>>>0, K1 = (Math.random()*4294967295)>>>0;
+const gF = new Float64Array(1), gU = new Uint32Array(gF.buffer);
+function guard(o, k){
+  if(!o) return; const d = Object.getOwnPropertyDescriptor(o, k);
+  if(d && d.get && d.get.__te) return; if(d && (d.get || d.set || d.configurable===false)) return;
+  let v = o[k], m0 = 0, m1 = 0;
+  const put = x => { v = x; gF[0] = typeof x==='number' ? x : NaN; m0 = gU[0]^K0; m1 = gU[1]^K1; };
+  const get = () => v; get.__te = 1;
+  get.ok = () => { gF[0] = typeof v==='number' ? v : NaN; return (gU[0]^K0)===m0 && (gU[1]^K1)===m1; };
+  put(v); Object.defineProperty(o, k, {get, set:put, enumerable:true, configurable:true});
+}
+const GUARDS = G => [[G,'money'],[G,'dm'],[G,'vip'],[G.h,'tk'],[G.h,'ct'],[G.gear,'tk']];
+function memCheck(){
+  const t=T(); if(!t||!t.G||!t.G.h) return;
+  for(const [o,k] of GUARDS(t.G)){ if(!o) continue; const d = Object.getOwnPropertyDescriptor(o,k);
+    if(d && d.get && d.get.__te){ if(!d.get.ok()) flag('mem_edit'); } else guard(o,k); }
+}
+setInterval(memCheck, 2000);
+
 // ---------- online check-in with the anti-cheat server ----------
-let lastRep = 0, banned = false;
+let lastRep = 0, banned = false, pkChecking = false;   // pkChecking: the forced restore runs once per start
 async function report(force){
   if(!API) return; const t=T(); if(!t||!t.G) return;
   if(!force && Date.now()-lastRep < 5*60e3) return; lastRep = Date.now();
@@ -107,12 +132,15 @@ async function report(force){
   const body = {pid:PID, v:15, app:STORE_BUILD?1:0, t:Date.now(),
     s:{money:Math.round(G.money), sold:G.sold, xp:G.xp, vip:G.vip, lv:Object.values(G.lv).reduce((a,b)=>a+b,0), best:G.cp?G.cp.best:0,
        tk:G.h.tk, gtk:(G.gear&&G.gear.tk)||0, heroes:own.length, stars:own.reduce((a,id)=>a+(G.h.own[id].s||0),0), mythic:own.filter(id=>t.HB[id]&&t.HB[id].gr===5).length},
-    flags:[...flags]};
+    flags:[...flags], pids:PIDS,
+    // v16-104: packs this phone says it owns – the server compares them with the purchases Google confirmed
+    pk:Object.keys(t.PK||{}).filter(k=>SKU[k] && !CONS(k) && (SUBS(k) ? +t.PK[k] > Date.now() : t.PK[k]===true))};
   try{
     const r = await fetch(API+'/api/report',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
     const j = await r.json();
     if(j.serverTime){ srvOff = j.serverTime - Date.now(); LS('te_off',String(srvOff)); }
     if(j.banned && !banned){ banned = true; showBan(j.msg); }
+    if(j.pkCheck && !pkChecking){ pkChecking = true; await restore(true); setTimeout(()=>report(true), 2000); }   // v16-104: link the purchases to this ID
   }catch(e){}
 }
 function showBan(msg){
@@ -197,7 +225,7 @@ async function prices(){
     return o; }catch(e){ return null; }
 }
 // restore purchases after reinstall / new phone
-async function restore(){
+async function restore(force){   // force (v16-104): check every Play purchase again with the server, also packs already owned
   const s = await billing(); const t=T(); if(!s||!t) return;
   try{ const L = await s.listPurchases(); let ch=false;
     for(const p of L){ const k=Object.keys(SKU).find(k=>SKU[k]===p.itemId); if(!k) continue;
@@ -212,7 +240,7 @@ async function restore(){
           dgUsed(p.purchaseToken); if(window.SHOP2) SHOP2.grant(k); }
         try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
       if(SUBS(k)){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK[k]||t.PK[k]<v.expiry)){ t.PK[k]=v.expiry; ch=true; if(window.SHOP2) SHOP2.grant(k,1); } }
-      else if(!t.PK[k]){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid){ t.PK[k]=true; ch=true; if(window.SHOP2&&/^(p\d|fn|fh)$/.test(k)) SHOP2.grant(k,1); } } }
+      else if(!t.PK[k] || force){ const had=!!t.PK[k]; const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid && !had){ t.PK[k]=true; ch=true; if(window.SHOP2&&/^(p\d|fn|fh)$/.test(k)) SHOP2.grant(k,1); } } }
     if(ch){ t.savePacks(); t.toast('✓ Purchases restored',2500); }
   }catch(e){}
 }

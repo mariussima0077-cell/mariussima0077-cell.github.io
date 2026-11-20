@@ -21,7 +21,11 @@ const isGift = pid => GIFT_VIP.some(g => String(pid).startsWith(g));
 const GIFT_UNBAN_UNTIL = Date.parse('2026-11-24T00:00:00Z');
 const TESTER_UNBAN = ['03245000-cda3-4e5c-9e6d-d388955218a8'];   // v16-103: one-time unban (Wazza4ever)
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
-const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20};
+const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20,
+  mem_edit:100, unpaid_pack:100};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
+// v16-104: pack key in the game → product ID in Play Console (same as SKU in secure.js; consumables are not checked)
+const PACK_SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', plat:'vip_pass_platinum',
+  p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite', fn:'fund_normal', fh:'fund_hard'};
 const json = (o, s=200) => new Response(JSON.stringify(o), {status:s, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-headers':'content-type'}});
 
 // best possible income per second at a total building level (same model as the game, ×40 safety margin)
@@ -70,6 +74,20 @@ async function report(b, env) {
     }
   }
   let pts = 0; const why = [];
+  // 0) v16-104: packs without a purchase confirmed by Google (only in the Play app; the browser test mode is free on purpose)
+  let pkCheck = false;
+  if (b.app && Array.isArray(b.pk) && b.pk.length && !isGift(b.pid) && !(old && old.banned)) {
+    const ids = [...new Set([b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].filter(x => typeof x === 'string' && x.length <= 64))].slice(0, 6);
+    const got = new Set((await db.prepare(`SELECT DISTINCT p.sku FROM purchase_use u JOIN purchases p ON p.token=u.token WHERE p.state='ok' AND u.pid IN (${ids.map(() => '?').join(',')})`).bind(...ids).all()).results.map(r => r.sku));
+    const miss = b.pk.filter(k => PACK_SKU[k] && !got.has(PACK_SKU[k]));
+    if (miss.length) {
+      // first time: the game is asked to send its Google Play purchases again (new phone / cloud load / app closed during payment)
+      const ask = await db.prepare("SELECT t FROM events WHERE pid=? AND kind='pkask' ORDER BY t DESC LIMIT 1").bind(b.pid).first();
+      if (!ask) { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'pkask', miss.join(',')).run(); pkCheck = true; }
+      else if (now - ask.t > 15 * 60e3) { b.flags = [...(b.flags || []), 'unpaid_pack']; why.push('no Google purchase for: ' + miss.join(',')); }
+      else pkCheck = true;
+    }
+  }
   // 1) warning signs found by the game itself
   const newFlags = (b.flags || []).filter(f => FLAG_PTS[f] && !(old && (old.flags || '').split(',').includes(f)));
   newFlags.forEach(f => { pts += FLAG_PTS[f]; why.push('client:' + f); });
@@ -97,7 +115,7 @@ async function report(b, env) {
     .bind(b.pid, now, b.v | 0, b.app | 0, s.money | 0, s.sold | 0, s.xp | 0, s.vip | 0, s.lv | 0, s.best | 0, s.tk | 0, s.gtk | 0, s.heroes | 0, s.stars | 0, s.mythic | 0, score, banned, why.length && pts ? why.join(' · ') : null, flags).run();
   await db.prepare('INSERT INTO snaps(pid,t,money,lv,tk,vip,best) VALUES(?,?,?,?,?,?,?)').bind(b.pid, now, s.money | 0, s.lv | 0, s.tk | 0, s.vip | 0, s.best | 0).run();
   if (pts) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, banned ? 'ban' : 'flag', why.join(' · ')).run();
-  return {ok:true, serverTime:now, banned:!!banned, msg: banned ? 'Our anti-cheat system found impossible changes in this game (edited save, money/ticket hack or speed hack).' : undefined};
+  return {ok:true, serverTime:now, banned:!!banned, pkCheck: pkCheck && !banned, msg: banned ? 'Our anti-cheat system found impossible changes in this game (edited save, money/ticket hack or speed hack).' : undefined};
 }
 
 // ------------------------------------------------------------------ the bot: runs every 10 minutes
