@@ -838,6 +838,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #splash .spN small{display:block;font-size:.55em;color:#ffcc80;margin-top:.4em}
 @keyframes spIn{from{transform:scale(.3) rotate(-6deg);opacity:0;filter:brightness(4)}to{transform:none;opacity:1;filter:none}}
 @keyframes spGl{from{filter:brightness(1)}to{filter:brightness(1.5)}}
+@keyframes ulNew{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 #ffd54a)}50%{transform:scale(1.15);filter:drop-shadow(0 0 10px #ffd54a)}}.ulNew{animation:ulNew 1s ease-in-out 6}
 </style>
 </head>
 <body>
@@ -911,7 +912,11 @@ const TRK={x0:20,y0:440,x1:345,y1:1320+DY};     // race track (coming soon)
 const ISC={loading:.8};
 let PASS='all'; // 'static' = painted once into the cached map tiles, 'dyn' = drawn every frame
 function DI(o,sx,sy,sw,sh,dx,dy,dw,dh){const k=o.sc||1;X.drawImage(o.el,sx*k,sy*k,sw*k,sh*k,dx,dy,dw,dh);}
-const IMG={};['garage','mech','vip','loading','b_arrivals','b_arrivals0','b_office','b_office0','b_yard','b_arm','b_security','b_security2','b_security3','b_security4','b_ysign',...['paint','elec','inspect','tuning','engine'].flatMap(g=>[2,3,4].map(t=>'g_'+g+t)),'s_paint','s_elec','s_inspect','s_tuning','s_engine','p_parts0','p_parts2','p_parts3','p_parts4','b_collection',...XIDS.flatMap(g=>[1,2,3,4].map(t=>'x_'+g+t))].forEach(n=>{const el=new Image();IMG[n]={el,ok:false};el.onload=()=>{try{const sc=ISC[n]||1,c=document.createElement('canvas');c.width=Math.round(el.naturalWidth*sc);c.height=Math.round(el.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(el,0,0,c.width,c.height);IMG[n].el=c;IMG[n].sc=sc;}catch(e){}IMG[n].ok=true;};el.onerror=()=>{IMG[n].bad=true;};el.src='img/'+n+'.webp';});
+const IMG={};['garage','mech','vip','loading','b_arrivals','b_arrivals0','b_office','b_office0','b_yard','b_arm','b_security','b_security2','b_security3','b_security4','b_ysign',...['paint','elec','inspect','tuning','engine'].flatMap(g=>[2,3,4].map(t=>'g_'+g+t)),'s_paint','s_elec','s_inspect','s_tuning','s_engine','p_parts0','p_parts2','p_parts3','p_parts4','b_collection',...XIDS.flatMap(g=>[1,2,3,4].map(t=>'x_'+g+t))].forEach(n=>{
+  // v16-120 (memory): an image is loaded only the first time the map asks for it (IMG[n].ok) – before, ALL building levels LV1-4 were
+  // decoded at start (~150 MB of canvases on a budget phone) even if the player only has LV1. `st` = requested, `_ok` = ready.
+  const E={el:null,_ok:false,bad:false,st:false,sc:1};IMG[n]=E;
+  Object.defineProperty(E,'ok',{get(){if(!E.st){E.st=true;const el=new Image();E.el=el;el.onload=()=>{try{const sc=ISC[n]||1,c=document.createElement('canvas');c.width=Math.round(el.naturalWidth*sc);c.height=Math.round(el.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(el,0,0,c.width,c.height);E.el=c;E.sc=sc;}catch(e){}E._ok=true;};el.onerror=()=>{E.bad=true;};el.src='img/'+n+'.webp';}return E._ok;},set(v){E._ok=v;}});});
 const IM={"garage":{"w":1000,"h":568,"floor":[0,569,207,340],"door":[211,569,190,27],"floorT":[[243,198,457,538],[467,198,684,538],[696,198,913,538]],"doorT":[[257,540,447,567],[485,540,675,567],[713,540,903,567]]},"mech":{"cw":66,"ch":89,"cols":16,"rows":6,"pad":2,"anims":["idle","walk","work","repair","think","celebrate"]},"vip":{"cw":72,"ch":101,"cols":16,"rows":7,"pad":2,"anims":["idle","walk","work","repair","inspect","think","celebrate"]},"vipcar":{"cw":184,"ch":117,"cols":4,"rows":4,"pad":2,"sizes":[[133,112],[129,106],[180,74],[177,73]]},"loading":{"w":922,"h":1706,"bar":[117,1482,797,1529],"txt":[461,1572],"track":[17,28,41],"panel":[20,31,45]}};
 // =================== PACKS (kept forever: every chapter & stage) ===================
 const BM={"arrivals":{"w":1536,"h":1024,"cols":[142,293,447,604,765,921,1079,1238,1398],"rows":[[158,460],[626,914]]},"office":{"w":1672,"h":941,"crop":[15,10,1657,925],"desks":[[262,505,525,748],[597,505,860,748],[932,505,1195,748],[1262,492,1590,724]],"chairs":[[393,540],[728,540],[1063,540],[1412,530]]},"yard":{"crop":[36,318,1052,1218],"arms":[[452,344,628,365],[452,1152,628,1173]],"road":543,"spots":{"xL":355,"xR":730,"y0":480,"y1":1090}},"security":{"crop":[70,165,1146,1145],"rec":[938,228],"chair":[608,758],"door":[608,960],"out":[608,1150],"beacon":[850,622],"mon":[[155,372,438,545],[462,372,760,545],[783,372,1065,545]]}};
@@ -2658,7 +2663,7 @@ function bgDraw(L,sc,budget,onlyHave,count){
     else{const x0=Math.round(ox+i*TP*k),y0=Math.round(oy+j*TP*k),x1=Math.round(ox+(i+1)*TP*k),y1=Math.round(oy+(j+1)*TP*k);X.drawImage(c,x0,y0,x1-x0,y1-y0);}}
   return miss;}
 function drawBG(){
-  const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+Object.values(IMG).filter(i=>i.ok).length+'|'+(window.CC?CC.sig():'');
+  const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+Object.values(IMG).filter(i=>i._ok).length+'|'+(window.CC?CC.sig():'');
   if(BG.lvP!==sig||!OV.c){BG.lv.clear();BG.cur=null;BG.lvP=sig;ovBuild();}
   const sc=Z*DPR,det=DET,now=performance.now();BG.now=now;
   if(sc!==BG.lastSc){BG.lastSc=sc;BG.stableT=now;}
@@ -3497,7 +3502,7 @@ popEl.addEventListener('click',e=>{if(e.target===popEl){closePop();return;}const
 
 // ---------- v11: team & collection page + fusion lab (my pictures) ----------
 const teamEl=$('team'),tmBox=$('tmBox');let teamCat='m',teamTab='coll',teamKey='',fuseSel=[];
-['img/team.webp','img/fusion.webp','img/idle.webp','img/ticket.webp'].forEach(s=>{(new Image()).src=s;});
+['img/team.webp','img/idle.webp','img/ticket.webp'].forEach(s=>{(new Image()).src=s;});
 function fit(el,W,H){const k=Math.min(innerWidth/W,innerHeight/H);el.style.width=W*k+'px';el.style.height=H*k+'px';el.style.setProperty('--u',k+'px');}
 // v16-51: the Mechanics collection moved to HEROES → HERO COLLECTION (battle bonus)
 function heroColl(){closeTeam();closeSummon();if(window.CAMPAIGN&&CAMPAIGN.openColl)CAMPAIGN.openColl();}
@@ -3618,7 +3623,15 @@ heroRefresh();
 let lastM=-1,lastS=-1,lastX=-1,lastDm=-1;
 let lastV=-1,lastQ=-1;
 let lastTk=-1,lastIdle=-1;
-let hudN=0;function hud(){hudN++;if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
+// v16-120: GRADUAL UNLOCK of the map buttons (Marius: a new player must not see everything at once). Battle, Heroes, Summon, Idle,
+// Quests, Check-in, Mail stay from the start (the tutorial uses them). Each button opens ONCE with a "NEW" toast (G.ul = already announced).
+const SIDE_UL=[{b:'nwBtn',n:'NEWS',rep:2},{b:'tmBtn',n:'CREW',rep:3},{b:'vipBtn',n:'VIP',rep:3},{b:'rkBtn',n:'RANK',st:10},{b:'evBtn',n:'EVENTS',st:15},{b:'chBtn',n:'CHAT',rep:5,st:10}];
+const ulOK=u=>(!u.rep||G.rep>=u.rep)&&(!u.st||(G.cp&&G.cp.best||0)>=u.st);
+function sideLock(){const first=!Array.isArray(G.ul);if(first)G.ul=[];const nw=[];
+  for(const u of SIDE_UL){const el=$(u.b);if(!el)continue;const ok=ulOK(u);el.style.display=ok?'':'none';
+    if(ok&&!G.ul.includes(u.b)){G.ul.push(u.b);if(!first&&started){nw.push(u.n);el.classList.add('ulNew');setTimeout(()=>el.classList.remove('ulNew'),8000);}}}
+  if(first)save();else if(nw.length){save();toast('🔓 NEW: <b>'+nw.join(' · ')+'</b> unlocked!',3500);}}
+let hudN=0;function hud(){hudN++;if(hudN%30===1)sideLock();if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
@@ -3802,13 +3815,14 @@ function drawLoader(t){
   g.restore();
 }
 function rrG(g,x,y,w,h,r){r=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+let asTouched=false;
 function startLoader(){
   sizeLoader();addEventListener('resize',sizeLoader);const t0=performance.now();
-  const assetsDone=()=>Object.values(IMG).every(i=>i.ok||i.bad);
+  const assetsDone=()=>{if(!IMG.loading.ok)return false;if(!asTouched){asTouched=true;try{render();}catch(e){}}return Object.values(IMG).every(i=>!i.st||i._ok||i.bad);}; // v16-120: one hidden render() asks for exactly the pictures the map needs now
   (function lf(now){if(started)return;const t=(now-t0)/1000;
     const cap=assetsDone()?100:88;lp=Math.min(cap,lp+.9);if(lp>=100&&!lready){lready=true;if(window.CLOUD){CLOUD.mountStart($('lpanel'));$('lpanel').classList.add('on');}}
     drawLoader(t);requestAnimationFrame(lf);})(t0);
-  $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;},1500);/* v16-115: free the loading canvas (~5 MB) */last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
+  $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;try{IMG.loading.el=null;IMG.loading._ok=false;IMG.loading.bad=true;}catch(e){}},1500);setTimeout(()=>{for(const id in GAR){try{if(G.lv[id]>0)void IMG['g_'+id+gTier(id)].ok;}catch(e){}}},2500);/* v16-120: garages outside the screen get their current level picture a bit later *//* v16-115: free the loading canvas (~5 MB) */last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
 // v16-72: what the tutorial (tutorial.js) needs from the map – camera, building areas, panel
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},

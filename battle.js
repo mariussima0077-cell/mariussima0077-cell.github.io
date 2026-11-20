@@ -3127,14 +3127,14 @@ function hubTab(m,hh){const f=hh/m.sh,u='url(img/ui7/'+m.im+'.webp)',L=HUB_L*f,R
     '<i class="hubP" style="right:0;width:'+GSU(R)+';background:'+u+' 100% 0/'+GSU(full)+' 100% no-repeat"></i>';}
 function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');
   let h=tallBg()+'<button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
-  const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:'PvP · ONLINE',tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
-    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:'EVERY WEEKEND',soon:'',
+  const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:arOK()?'PvP · ONLINE':'🔒 STAGE '+sLabel(AR_UNLOCK),tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
+    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',
     boss:wbOK()?WBOSS[wbCur()].n+' · KEYS '+wbKeys()+'/'+WB_KEYS:'🔒 STAGE '+sLabel(WB_UNLOCK-1),
     dg:dgOK()?'KEYS '+DG_K.reduce((a,k)=>a+dgKeys(k),0)+'/'+DG_K.length*dgMax():'🔒 STAGE '+sLabel(DG_UNLOCK)};
   const top=285,avail=1536+HX-(HX>0?250:20)-top,n=HUBM.length,ex=m=>m.full?1.3:m.k==='camp'?1.08:1,
     hh=Math.max(118,Math.min(190,(avail-(n-1)*30)/HUBM.reduce((a,m)=>a+ex(m),0))),ths=HUBM.map(m=>m.full?Math.min(HUB_W/m.ar,hh*ex(m)):hh*ex(m)),sum=ths.reduce((a,b)=>a+b,0),
     gap=Math.max(10,Math.min(70,(avail-sum)/(n-1)));let y=top+Math.max(0,(avail-sum-(n-1)*gap)*.4);
-  HUBM.forEach((m,i)=>{const th=ths[i],lock=(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK())||(m.k==='boss'&&!wbOK())||(m.k==='dg'&&!dgOK()),bw=m.full?Math.min(HUB_W,th*m.ar):HUB_W;
+  HUBM.forEach((m,i)=>{const th=ths[i],lock=((m.k==='arena'||m.k==='cup')&&!arOK())||(m.k==='tower'&&!twOK())||(m.k==='class'&&!ctOK())||(m.k==='boss'&&!wbOK())||(m.k==='dg'&&!dgOK()),bw=m.full?Math.min(HUB_W,th*m.ar):HUB_W;
     h+='<div class="hubM'+(lock?' lk':'')+'" data-hb="'+m.k+'" style="'+gbx((1024-bw)/2,y,bw,th)+'">'+(m.full?'<img src="'+m.full+'" alt="">':hubTab(m,th))+(st[m.k]?'<b class="hubS">'+st[m.k]+'</b>':'')+'</div>';y+=th+gap;});
   $('hubBox').innerHTML=h;}
 function hubOpen(){HM=0;rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
@@ -3145,6 +3145,7 @@ function hubGo(k){if(k==='back'){hubClose();return;}
   if(k==='class'&&!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign stage '+sLabel(CT_UNLOCK),2600);return;}
   if(k==='boss'&&!wbOK()){TE().toast('🔒 WORLD BOSS opens after campaign stage '+sLabel(WB_UNLOCK-1),2600);return;}
   if(k==='dg'&&!dgOK()){TE().toast('🔒 DUNGEONS open after campaign stage '+sLabel(DG_UNLOCK),2600);return;}
+  if((k==='arena'||k==='cup')&&!arOK()){TE().toast('🔒 '+(k==='arena'?'ARENA':'TORQUE CUP')+' opens after campaign stage '+sLabel(AR_UNLOCK),2600);return;}
   hubEl.classList.remove('open');HUBS.from=1;
   if(k==='boss'){wbOpen();return;}
   if(k==='dg'){dgOpen();return;}
@@ -3161,6 +3162,7 @@ function backToHub(){if(HUBS.from){HUBS.from=0;hubEl.classList.add('open');hubRe
 // FIXED rewards on the first clear (nothing random): 💎 + coins every floor, a SET PIECE of that class every 5th floor
 // (slot in a fixed order, grade Rare → Epic → Legendary → Mythic), 💎 + gear ticket every 10th. Saved in G.ct = {class: floors cleared}.
 const CT_K=['engine','tuning','inspect','service','paint','elec'],CT_N=100,CT_UNLOCK=20;
+const AR_UNLOCK=20,arOK=()=>TE().G.cp.best>=AR_UNLOCK; // v16-120: ARENA + TORQUE CUP open with the Class Towers (end of chapter 1) – new players are not thrown into PvP
 const CT_DAYS={engine:[1,4],tuning:[1,4],inspect:[2,5],service:[2,5],paint:[3,6],elec:[3,6]};
 const DAYN=['SUN','MON','TUE','WED','THU','FRI','SAT'],DAYL=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
 const ctOK=()=>TE().G.cp.best>=CT_UNLOCK;
