@@ -2532,9 +2532,9 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
    <div class="ppRT">${first?'FIRST CLEAR':'REPLAY'}</div>${rws.slice(0,4).map((r,k)=>`<div class="ppR ppR${k}"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}
    <div class="ppG">${(()=>{const d=gdrop(s.c).slice(),a=s.c>=ASC_CH?Math.round(d[5]*.15*Math.min(1,(s.c-ASC_CH+1)/21)*10)/10:0;d[5]=Math.round((d[5]-a)*10)/10;d.push(a);return ['COM','UNC','RAR','EPI','LEG','MYT','ASC'].map((n,k)=>d[k]?`<span style="color:${GG(k).c}">${n} ${d[k]}%</span>`:'').filter(Boolean).join(' ');})()}</div>
    ${[0,1,2,3,4].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="team">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
-   <button class="ppEd" data-a="team">✎ EDIT TEAM</button><button class="ppB" data-a="close" aria-label="Back"></button><button class="ppF" data-a="fight">FIGHT!</button>`;
+   <button class="ppB" data-a="close" aria-label="Back"></button><button class="ppF" data-a="fight">FIGHT!</button>`;
   const mc=$('cpMons');types.slice(0,3).forEach(t=>{const d=document.createElement('div');d.className='mon'+(MON[t].boss?' bossm':'');d.appendChild(monPreview(t));const l=document.createElement('div');l.textContent=MON[t].n;d.appendChild(l);mc.appendChild(d);});
-  $('cpCard').classList.add('open');$('cpCardBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;if(a==='close')$('cpCard').classList.remove('open');if(a==='heroes'){openGear(null,i);}if(a==='team'){$('cpCard').classList.remove('open');openTeam(i);}if(a==='fight'){const T=TE();if(!T.G.cp.team||!T.G.cp.team.length){T.G.cp.team=curTeamList().map(h=>h.id);T.save();}$('cpCard').classList.remove('open');safeStart(i,teamHeroes());}};}
+  $('cpCard').classList.add('open');$('cpCardBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;if(a==='close')$('cpCard').classList.remove('open');if(a==='heroes'){openGear(null,i);}if(a==='team'){$('cpCard').classList.remove('open');gRet=()=>openCard(i);openGear(null,i);}if(a==='fight'){const T=TE();if(!T.G.cp.team||!T.G.cp.team.length){T.G.cp.team=curTeamList().map(h=>h.id);T.save();}$('cpCard').classList.remove('open');safeStart(i,teamHeroes());}};}
 
 // ---------------------------------------------------------------- shared popup + before/after helpers
 // v16-53: info window (Marius' frame, CSS .winSk in index.html)
@@ -2653,7 +2653,7 @@ function popLvl(h){const T=TE(),G=T.G,id=h.id,lv=T.lvOf(id),cap=T.lvCap(id),a=T.
   pop(x);}
 
 // ---------------------------------------------------------------- GEAR page (separate page · gear works only in battles)
-let gsel=null,gfil='all',gsalv=0,gsort='pow',gpgFrom='';
+let gRet=null,gsel=null,gfil='all',gsalv=0,gsort='pow',gpgFrom='';
 function cleanGear(){const T=TE(),g=GR();for(const hid in g.eq){if(!T.G.h.own[hid]){delete g.eq[hid];continue;}for(const s in g.eq[hid])if(!itemById(g.eq[hid][s]))delete g.eq[hid][s];}}
 function gHero(){const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=>h.id===gsel))gsel=L[0].id;return TE().HB[gsel];}
 function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(CPX().best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
@@ -2666,7 +2666,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   // BATTLE TEAM (5 places) – tap a place to change it (before / after)
   const tl=team.map(heroOf),tp=teamPower(tl),si=Math.max(0,Math.min(NST-1,tsi==null?CPX().best:tsi)),ep=enemyPower(si),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
   renderPeds(tl);
-  $m('gTeam').innerHTML=`<div class="gtH">⚔️ BATTLE TEAM <span style="color:#c9b88a;font-size:10px;letter-spacing:0">also for the Arena</span><button data-g="tedit" class="tEd">✎ EDIT TEAM</button><button data-g="best">${IMGI(glyphURL('bolt','#2a1000'))} AUTO BEST</button></div>
+  $m('gTeam').innerHTML=`<div class="gtH">⚔️ BATTLE TEAM <span style="color:#c9b88a;font-size:10px;letter-spacing:0">for ALL battles</span><button data-g="best">${IMGI(glyphURL('bolt','#2a1000'))} AUTO BEST</button></div>
     <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`;
   $m('gBagS').textContent=g.inv.length+'/'+GINV;
   {const C=collInfo();$m('gColS').textContent=C.reduce((a,c)=>a+c.n,0)+' / '+C.reduce((a,c)=>a+c.tot,0);}
@@ -2822,7 +2822,7 @@ function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
 $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr]');if(!el)return;
-  if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(TWS.ret){TWS.ret=0;twOpen();return;}if(WBS.ret){WBS.ret=0;wbOpen();return;}if(DGS.ret){DGS.ret=0;rootOn();dgEl.classList.add('open');dgRender();return;}if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
+  if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(gRet){const f=gRet;gRet=null;f();return;}if(TWS.ret){TWS.ret=0;twOpen();return;}if(WBS.ret){WBS.ret=0;wbOpen();return;}if(DGS.ret){DGS.ret=0;rootOn();dgEl.classList.add('open');dgRender();return;}if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
   if(el.dataset.g==='auto'){popAuto();return;}if(el.dataset.g==='none'){popNone();return;}
   if(el.dataset.g==='best'){popAutoBest();return;}
   if(el.dataset.g==='hback'||el.dataset.g==='bback'){gPage(el.dataset.g==='bback'&&gpgFrom==='hero'?'hero':'');return;}
@@ -2842,7 +2842,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.g==='tin'){const h=gHero();if(!h)return;if(tsel.length<5)popTeamCmp(tsel.length,h.id);else popWhoLeaves(h.id);return;}
   if(el.dataset.g==='tout'){const h=gHero();if(!h)return;const k=tsel.indexOf(h.id);if(k<0)return;if(tsel.length<=1){T.toast('The team needs at least 1 hero',1800);return;}popTeamCmp(k,'');return;}
   if(el.dataset.sort){gsort=el.dataset.sort;renderGear();return;}
-  if(el.dataset.ts!=null){const k=+el.dataset.ts,id=tsel[k];if(id&&!id.startsWith('crew')){gsel=id;renderGear();gPage('hero');return;}if(id){popReplace(k);return;}T.toast('Tap a hero below, then ➕ ADD TO BATTLE TEAM',2200);return;}
+  if(el.dataset.ts!=null){const k=+el.dataset.ts,id=tsel[k];if(id&&!id.startsWith('crew')){gsel=id;renderGear();gPage('hero');return;}if(id){popReplace(k);return;}T.toast('Tap a hero below, then ➕ ADD TO TEAM',2200);return;}
   if(el.dataset.h){gsel=el.dataset.h;renderGear();gPage('hero');return;}
   if(el.dataset.f){gfil=el.dataset.f;renderGear();return;}
   if(el.dataset.s){const h=gHero(),it=h&&itemById((GR().eq[h.id]||{})[el.dataset.s]);if(it)popItem(it.id);else{gfil=el.dataset.s;gpgFrom='hero';renderGear();gPage('bag');T.toast('Choose a '+GS[el.dataset.s].n+' – you will see before / after',2200);}return;}
@@ -3023,7 +3023,7 @@ function twFloorInfo(f){const T=TE(),F=twFloor(f),t=twG(),types=[...new Set(F.w.
   popW('FLOOR '+f,x);}
 // v16-99 (Marius): before every battle you can change the team
 function mainCX(t,ep,go,back){const T=TE();return {t,ep,go,back,pool:()=>[...myMechs(),...[0,1,2,3,4].map(crewHero)],get:()=>curTeamList().map(h=>h.id),set:ids=>{T.G.cp.team=ids;},best:bestTeam};}
-function twGo(direct){const t=twG();if(t.b>=TW_N)return;const f=t.b+1;if(direct===true)return twGo0(teamHeroes());$('tw').classList.remove('open');openTeam(twFloor(f).eq,mainCX('TORQUE TOWER · FLOOR '+f,()=>twPower(f),twGo0,twOpen));}
+function twGo(direct){const t=twG();if(t.b>=TW_N)return;$('tw').classList.remove('open');return twGo0(teamHeroes());} // v16-110: no team screen – the HEROES team fights
 function twGo0(team){const t=twG();if(t.b>=TW_N)return;if(!team||!team.length)team=bestTeam().map(heroOf);
   const F=twFloor(t.b+1);$('tw').classList.remove('open');try{teamHeroes().forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}safeStart(F.eq,team,F);}
 function twFinish(win,retreat){if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
@@ -3163,7 +3163,7 @@ function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/1
   if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;const T=TE();r.ess=Math.round(.5*T.ESS_U());r.gp=Math.round(.6*T.GP_U());return r;}
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';});
-function ctTeam(k){const T=TE(),sv=(T.G.ctm||{})[k],P=ctPool(k),ok=sv&&sv.map(id=>P.find(h=>h.id===id)).filter(Boolean);return ok&&ok.length?ok.slice(0,5):P.slice(0,5);} // v16-99: own team per class tower
+function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,5);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)
 const GRC=['#b0bec5','#66bb6a','#42a5f5','#ab47bc','#ffb300','#ff3d3d','#2ef3ff'];
 function ctSetHtml(s){return '<img src="img/ui4/st_'+s.k+'_'+s.s+'.webp" alt="" style="border-radius:4px;background:'+GRC[s.r]+'55;box-shadow:0 0 0 2px '+GRC[s.r]+'">';}
 function ctRewHtml(k,r,big){const T=TE(),a=EGI(r);if(r.set)a.push(ctSetHtml({k,s:r.set.s,r:r.set.r}));if(r.dm)a.push(T.DMI+' '+r.dm);if(r.gtk)a.push(GTKI+' '+r.gtk);if(big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
@@ -3221,9 +3221,7 @@ function ctFloorInfo(k,f){const T=TE(),F=ctFloor(k,f),t=ctG(),types=[...new Set(
   popW('FLOOR '+f,x);}
 function ctGo(k,direct){const t=ctG();if(t[k]>=CT_N)return;if(!ctOpenK(k)){TE().toast('🔒 This tower is closed today · open: '+ctDaysTxt(k),2600);return;}
   if(!ctPool(k).length){TE().toast('You have no '+ROLE[k].n+' heroes yet – summon some!',2600);return;}
-  const T=TE(),f=t[k]+1;CTS.k=k;ctEl.classList.remove('open');if(direct===true){const F=ctFloor(k,f);safeStart(F.eq,ctTeam(k),F);return;}
-  openTeam(ctFloor(k,f).eq,{t:ROLE[k].n.toUpperCase()+' TOWER · FLOOR '+f+' · only '+ROLE[k].n+' + Legend',cls:k,ep:()=>ctPower(k,f),pool:()=>ctPool(k),get:()=>ctTeam(k).map(h=>h.id),set:ids=>{if(!T.G.ctm)T.G.ctm={};T.G.ctm[k]=ids;},best:()=>ctPool(k).slice(0,5).map(h=>h.id),
-    go:team=>{const F=ctFloor(k,t[k]+1);CTS.k=k;safeStart(F.eq,team,F);},back:()=>ctOpen(k)});}
+  const f=t[k]+1;CTS.k=k;ctEl.classList.remove('open');const F=ctFloor(k,f);safeStart(F.eq,ctTeam(k),F);}
 function ctFinish(win,retreat){const T=TE(),G=T.G,t=ctG(),F=B.tw,k=F.ct,f=F.f;let html;
   if(win&&f===t[k]+1){const r=ctRew(k,f);t[k]=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;
     let setTxt='';if(r.set){const g=GR(),it=newItem(r.set.s,r.set.r,k);if(g.inv.length>=GINV){const v=salvageV(it);G.gp=(G.gp||0)+v;setTxt='BAG FULL → '+GPN(v);}else{g.inv.push(it);setTxt=itemName(it);}}
@@ -3405,7 +3403,7 @@ function wbClaim(i){const T=TE(),w=wbG();if(wbTierSt(i)!==1)return;const q=WB_TI
   if(!T.giveRw){if(q.dm)T.G.dm=(T.G.dm||0)+q.dm;if(q.tk)T.G.h.tk+=q.tk;if(q.gt)GSD().tk+=q.gt;if(q.ct)T.G.h.ct+=q.ct;}
   T.save();T.toast('🎁 '+wbRwHtml(q).replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ')+' · claimed!',2600);if(T.updHud)T.updHud();wbRender();}
 function wbGo(){const w=wbG();if(w.n>=WB_KEYS){TE().toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
-  wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);openTeam(wbEq(),mainCX('WORLD BOSS · '+WBOSS[wbCur()].n,()=>Math.round((w.L||0)*2),wbGo0,wbOpen));}
+  wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);wbGo0(teamHeroes());}
 function wbGo0(team){const w=wbG();if(w.n>=WB_KEYS)return;if(!team||!team.length)team=bestTeam().map(heroOf);
   w.n++;TE().save();wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);
   try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad(WBOSS[wbCur()].sp);
@@ -3609,7 +3607,7 @@ dgPw.addEventListener('click',e=>{const el=e.target.closest('[data-pw]');if(!el)
     (window.SEC?SEC.buy('dg'):Promise.resolve(false)).then(ok=>{delete el.dataset.busy;if(!ok)return;T.PK.dg=Math.max(Date.now(),T.PK.dg||0)+DG_DAYS*864e5;T.savePacks();
       T.toast('🔑 DUNGEON PASS active for '+DG_DAYS+' days! +'+DG_PASS+' keys a day + SWEEP',4000);dgPassWin();if(dgEl.classList.contains('open'))dgRender();});}});
 function dgGo(direct){const k=DGS.k,g=dgG(),f=DGS.sel||Math.min(DG_N,g.b[k]+1);if(!dgKeys(k)){dgNoKeys();return;}if(f>g.b[k]+1)return;
-  dgEl.classList.remove('open');if(direct===true)return dgGo0(teamHeroes(),k,f);openTeam(dgEq(f),mainCX(DG[k].n.toUpperCase()+' · FLOOR '+f,()=>dgPower(k,f),team=>dgGo0(team,k,f),()=>{DGS.k=k;dgEl.classList.add('open');dgRender();}));}
+  dgEl.classList.remove('open');return dgGo0(teamHeroes(),k,f);}
 function dgGo0(team,k,f){DGS.k=k;if(!team||!team.length)team=bestTeam().map(heroOf);dgEl.classList.remove('open');try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}
   safeStart(dgEq(f),team,dgFloor(k,f));}
 function dgSweep(){const k=DGS.k,g=dgG();if(!dgPass()){dgPassWin();return;}if(!g.b[k]){TE().toast('Win floor 1 first – SWEEP repeats floors you already cleared',2600);return;}if(!dgKeys(k)){dgNoKeys();return;}
@@ -3693,6 +3691,6 @@ function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
   G.cp.team=myMechs().slice(0,5).map(h=>h.id);
   T.save();return true;}
 if(window.SEC&&SEC.TEST_ACC){try{if(testFill())setTimeout(()=>location.reload(),300);}catch(e){console.error('testFill',e);}}
-window.CAMPAIGN={gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,INV:GINV,GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={card:i=>{rootOn();showMap();openCard(i);},popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+window.CAMPAIGN={heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&!h.crew&&lvCan(h.id));}catch(e){return false;}},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,INV:GINV,GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
