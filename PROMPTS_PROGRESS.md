@@ -1,6 +1,6 @@
 # TORQUE EMPIRE – Prompturi ChatGPT pentru v16-99 (20 nov 2026): Level / Essence / Gear Parts / Events / Stele
 
-Până vin pozele, jocul folosește înlocuitori desenați de Claude (SVG / culori din cod). Fiecare prompt are stilul complet – copiază blocul întreg. Fond verde = Claude decupează.
+✅ **Toate 9 primite și puse în joc (v16-100, 20 nov).** Până vin pozele, jocul folosea înlocuitori desenați de Claude (SVG / culori din cod). Fiecare prompt are stilul complet – copiază blocul întreg. Fond verde = Claude decupează.
 Unde scrie ATAȘEAZĂ: deschide linkul pe telefon, salvează poza și pune-o în ChatGPT împreună cu promptul.
 
 ## 1 · Iconița ESSENCE (level up eroi)

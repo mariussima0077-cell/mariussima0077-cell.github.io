@@ -435,7 +435,7 @@ const css3=document.createElement('style');css3.textContent=`
 .cpGo.dis,#gBtns .cpGo.tmo{border-image-source:url(img/ui8/btn_grey_s.webp)!important;background:none!important;color:#cfd8dc!important;text-shadow:0 2px 0 #000!important;filter:none!important}
 #gBtns .cpGo{--bh:52px}
 .gStr{display:flex;justify-content:center;top:1%!important;gap:0}.gStr img{width:17%;height:auto;margin:0 -1.5%;filter:drop-shadow(0 1px 1px #000)}
-.sti{height:1.15em;width:auto;vertical-align:-.22em;margin:0 -.04em}.sti.st1{filter:hue-rotate(150deg) saturate(2.2) brightness(1.05)}.sti.st2{filter:hue-rotate(80deg) saturate(1.8)}.sti.st3{filter:hue-rotate(200deg) saturate(3) brightness(1.25) drop-shadow(0 0 2px #fff)}
+.sti{height:1.15em;width:auto;vertical-align:-.22em;margin:0 -.04em}
 .gh .lv{position:absolute;left:3px;bottom:17px;font:900 9px system-ui;color:#e6d2ff;background:#2a0f45d0;border-radius:5px;padding:0 3px;font-style:normal}
 .lvW{text-align:center}.lvW .lvN{font:900 26px system-ui;color:#e2c6ff;text-shadow:0 2px 0 #000}.lvW .lvN small{font-size:14px;color:#a993c4}
 .lvBar{height:10px;border-radius:6px;background:#1a1028;box-shadow:inset 0 0 0 1px #6a3fa0;margin:6px 8px;overflow:hidden}.lvBar i{display:block;height:100%;background:linear-gradient(90deg,#9d4edd,#e0aaff)}
@@ -450,6 +450,7 @@ const css3=document.createElement('style');css3.textContent=`
 .gdG{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 3%;align-items:end}.gdG>div{width:22%}.gdG .gi{width:100%}.gdG b{display:block;font:900 9.5px/1.1 system-ui;text-align:center;margin-top:2px;text-shadow:0 1px 0 #000;white-space:nowrap;overflow:hidden}
 .gdG .gi.asc{animation:gdAsc 1.4s ease-in-out infinite alternate}@keyframes gdAsc{to{filter:drop-shadow(0 0 7px #2ef3ff)}}
 .gdEq{display:flex;align-items:center;justify-content:center;gap:4px}.gdEq .gi{width:27%;flex:none}.gdEq em{font:900 26px/1 system-ui;color:#fff;font-style:normal;text-shadow:0 2px 0 #000;flex:none}.gdEq em.to{color:#2ef3ff}
+.ascI{height:1.45em;width:auto;vertical-align:-.4em;filter:drop-shadow(0 1px 2px #000)}
 .gdL{display:grid;grid-template-columns:auto 1fr auto;gap:3px 6px;padding:0 2px;align-items:center;font:800 12px system-ui;color:#cfe0f2;margin-top:6px}.gdL span{white-space:nowrap}.gdL b{color:#7CFC9A}.gdL .sti{height:1.25em}
 .gdC{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:7px}.gdC span{padding:4px 8px;border-radius:999px;background:#04303a;box-shadow:inset 0 0 0 1px #2ef3ff88;font:800 11px system-ui;color:#c9fbff}.gdC span b{color:#fff}
 .gdT{font:700 12px/1.4 system-ui;color:#cfe0f2;text-align:center;margin-top:6px}.gdT b{color:#ffd54a}
@@ -749,7 +750,7 @@ const GNAMES={tool:['Rusty Wrench','Steel Wrench','Torque Wrench','Impact Gun','
 const ASC={n:'Ascended',c:'#2ef3ff',d:'#04505e'},GG=r=>r>=6?ASC:TE().GRADES[r],GGLOW=['','','','#d070ff','#ffd54a','#ff3d3d','#2ef3ff'];
 const GSTARMAX=5,GSTAR_K=.2,ASC_CH=29,GSTARMAX6=20,gsMax=it=>it&&it.r>=6?GSTARMAX6:GSTARMAX; // v16-99: Ascended ★1…★20 (every 5 = new color + new stat)
 const gStarK=sr=>{sr=sr||0;return sr<=5?1+GSTAR_K*sr:(1+GSTAR_K*5+.05*(sr-5))*Math.pow(1.03,Math.floor((sr-1)/5));}; // +20% main stat per star · Ascended drops from chapter 30
-const STI=(k,t)=>'<img class="sti'+(t?' st'+t:'')+'" src="img/ui8/star_'+k+'.webp" alt="★">',starsH=(n,asc,all)=>{let h='';if(n>5){const t=Math.min(3,Math.ceil(n/5)-1),w=n-5*t;for(let i=0;i<5;i++)h+=STI(asc?'asc':'on',i<w?t:t-1);return h;}for(let i=0;i<(all?5:n);i++)h+=STI(i<n?(asc?'asc':'on'):'off');return h;};
+const STI=(k,t)=>'<img class="sti" src="'+(t&&k!=='off'?'img/ui9/star_'+ST_COL[t]:'img/ui8/star_'+k)+'.webp" alt="★">',starsH=(n,asc,all)=>{let h='';if(n>5){const t=Math.min(3,Math.ceil(n/5)-1),w=n-5*t;for(let i=0;i<5;i++)h+=STI(asc?'asc':'on',i<w?t:t-1);return h;}for(let i=0;i<(all?5:n);i++)h+=STI(i<n?(asc?'asc':'on'):'off');return h;};
 const ST_COL=['gold','red','purple','rainbow']; // v16-93: Marius' star pictures
 const gStars=it=>it.sr?'<span class="gStr">'+starsH(it.sr,it.r>=6)+'</span>':'';
 function starFood(it){return GR().inv.filter(o=>o!==it&&o.s===it.s&&o.r===it.r&&!ownerOf(o)).sort((a,b)=>(a.set?1:0)-(b.set?1:0)||(a.sr||0)-(b.sr||0)||a.lv-b.lv)[0]||null;}
@@ -2362,7 +2363,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">STAGE ${lab} · ${S0.n.toUpperCase()}<small>HOW TO GET STRONGER – tap one</small></div>
       <div class="rsDB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>works only in battles</span></div>
       <div class="rsDB b1" data-a="hsum">${TKI}<span><b>Summon more mechanics</b>higher color = much stronger · duplicates +1 star</span></div>
-      <div class="rsDB b2" data-a="team"><img src="img/ui9/essence.svg"><span><b>Level up your heroes</b>Essence → LEVEL UP · Ascension every 20 levels</span></div>
+      <div class="rsDB b2" data-a="team"><img src="img/ui9/essence.webp"><span><b>Level up your heroes</b>Essence → LEVEL UP · Ascension every 20 levels</span></div>
       <button class="rsGo" data-a="retry">RETRY</button></div>
       <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="map">CAMPAIGN</button></div></div>`;}
   $('cpResBox').classList.add('rsSk');
@@ -2595,11 +2596,11 @@ function popLvl(h){const T=TE(),G=T.G,id=h.id,lv=T.lvOf(id),cap=T.lvCap(id),a=T.
   const costN=n=>{let c=0;for(let k=0;k<n;k++)c+=T.lvCost(lv+k);return c;},can=()=>{let c=0,k=0;while(lv+k<cap&&c+T.lvCost(lv+k)<=es){c+=T.lvCost(lv+k);k++;}return k;};
   const n10=Math.min(10,cap-lv),nm=can();
   let x=`<div class="pT">LEVEL UP · <span style="color:${gcol(h)}">${h.n}</span></div><div class="lvW"><div class="lvN">Lv ${lv} <small>/ ${cap}${cap<T.LV_MAX?' · max '+T.LV_MAX:''}</small></div><div class="lvBar"><i style="width:${lv/T.LV_MAX*100}%"></i></div>
-    <div class="lvE">${T.ESI} Essence: <b>${T.nf(es)}</b></div><div class="pD">✦ Ascension ${a} / ${T.LV_MAX/T.ASC_STEP-1} · Skill Lv <b>${T.skLv(id)}</b> (+${(T.skLv(id)-1)*6}% skill damage &amp; heal)${h.gr===5?' · Mythic stars +'+stars(h)+' / 20 '+starsH(stars(h)||0,0,1):''}</div></div>`;
+    <div class="lvE">${T.ESI} Essence: <b>${T.nf(es)}</b></div><div class="pD"><img class="ascI" src="img/ui9/asc_badge.webp" alt=""> Ascension ${a} / ${T.LV_MAX/T.ASC_STEP-1} · Skill Lv <b>${T.skLv(id)}</b> (+${(T.skLv(id)-1)*6}% skill damage &amp; heal)${h.gr===5?' · Mythic stars +'+stars(h)+' / 20 '+starsH(stars(h)||0,0,1):''}</div></div>`;
   if(lv<cap){x+=`<div class="lvG"><button class="cpGo${es>=T.lvCost(lv)?'':' dis'}" data-p="lvN" data-h="${id}" data-n="1">+1<small>${T.nf(T.lvCost(lv))}</small></button><button class="cpGo${es>=costN(n10)?'':' dis'}" data-p="lvN" data-h="${id}" data-n="${n10}">+${n10}<small>${T.nf(costN(n10))}</small></button><button class="cpGo alt${nm?'':' dis'}" data-p="lvN" data-h="${id}" data-n="${Math.max(1,nm)}">MAX +${nm}<small>${nm?T.nf(costN(nm)):'—'}</small></button></div>
     <div class="tpw">POWER <b>${p0.toLocaleString()}</b> ➜ +1: <b class="up">${powLv(h,1,0).toLocaleString()}</b>${n10>1?` · +${n10}: <b class="up">${powLv(h,n10,0).toLocaleString()}</b>`:''}</div>`;}
   else if(cap<T.LV_MAX){const c=T.ascCost(a);x+=`<div class="lvA"><b>✦ ASCENSION ${a} ➜ ${a+1}</b> – Lv ${lv} is the limit for now.<br>• all stats <b>+3%</b> (power ${p0.toLocaleString()} ➜ <b class="up">${powLv(h,0,1).toLocaleString()}</b>)<br>• skill Lv <b>${T.skLv(id)} ➜ ${T.skLv(id)+1}</b> (+6% skill damage &amp; heal)<br>• max level <b>${cap} ➜ ${cap+T.ASC_STEP}</b></div>
-    <button class="cpGo${es>=c?'':' dis'}" data-p="hasc" data-h="${id}">✦ ASCEND · ${T.ESI} ${T.nf(c)}</button>`;}
+    <button class="cpGo${es>=c?'':' dis'}" data-p="hasc" data-h="${id}"><img class="ascI" src="img/ui9/asc_badge.webp" alt=""> ASCEND · ${T.ESI} ${T.nf(c)}</button>`;}
   else x+=`<div class="lvA" style="text-align:center"><b>MAX LEVEL ${T.LV_MAX}</b> · all ascensions done</div>`;
   x+=`<div class="pD" style="text-align:left">${T.ESI} <b>Essence</b> comes from Idle Rewards, campaign stages, Torque Tower, Class Towers, all Dungeons, the Essence event and duplicates of maxed heroes. Levels work in every battle and a little in the garage (+0.1% per level).</div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
@@ -2630,7 +2631,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`);
-  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)} / ${T.lvCap(h.id)}${T.ascOf(h.id)?' · ✦ ASCENSION '+T.ascOf(h.id):''} · SKILL Lv ${T.skLv(h.id)}${h.gr===5?' · '+starsH(stars(h)||0,0,1):''}</small><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>${T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt" data-g="art">🖼 ART</button>':''}`;
+  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)} / ${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt=""> ASCENSION '+T.ascOf(h.id):''} · SKILL Lv ${T.skLv(h.id)}${h.gr===5?' · '+starsH(stars(h)||0,0,1):''}</small><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>${T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt" data-g="art">🖼 ART</button>':''}`;
   $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setPcs(roleOf(h),heroGear(h.id))}${setBlock(roleOf(h),n)}</div>`;})()}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
   const inT=team.includes(h.id);
