@@ -55,7 +55,7 @@ function dot(){const d=document.getElementById('evDot');if(d)d.classList.toggle(
 // ---------------- wheel
 let spinning=0,ang=0;
 function spin(){const st=S().B,w=st.w;if(spinning||w.sp<1)return;w.sp--;w.used++;dirty();
-  let r=Math.random()*WHEEL.reduce((a,x)=>a+x[1],0),k=0;for(;k<WHEEL.length;k++){r-=WHEEL[k][1];if(r<0)break;}k=Math.min(k,WHEEL.length-1);
+  let k=T().srun('w',()=>{let r=Math.random()*WHEEL.reduce((a,x)=>a+x[1],0),k=0;for(;k<WHEEL.length;k++){r-=WHEEL[k][1];if(r<0)break;}return Math.min(k,WHEEL.length-1);}); // v16-101 anti-reroll
   const n=WHEEL.length,seg=360/n,target=360*6+(360-k*seg);const a0=ang%360,t0=performance.now(),D=3600;spinning=1;
   const cv=document.getElementById('evWh');
   const step=now=>{const p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);ang=a0+(target-a0)*e;drawWheel(cv);if(p<1)requestAnimationFrame(step);else{spinning=0;const v=WHEEL[k][0];T().G.dm=(T().G.dm||0)+v;w.won+=v;dmL=T().G.dm;T().save();T().toast('🎡 LUCKY WHEEL: '+DM()+' +'+v+'!',3000);render();}};

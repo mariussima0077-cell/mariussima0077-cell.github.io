@@ -3172,6 +3172,14 @@ function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/h
 function shadeC(h,t){return h.startsWith('#')&&h.length===7?shade(h,t):h;}
 
 // ---------- summon ----------
+// v16-101 ANTI-REROLL (tester Wazza4ever: 2 phones + cloud save → pull, if no Mythic load the old cloud save, pull again).
+// Every summon / wheel spin takes its random numbers from a fixed seed kept IN THE SAVE + a counter per type (G.h.rs / G.h.rc).
+// Going back to an older save (cloud, 2nd phone, backup) gives exactly the SAME results again → re-rolling is useless.
+function fnv32(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function srun(st,fn){const H=G.h;if(!H.rs)H.rs=(fnv32('te-rs|'+((window.SEC&&SEC.PID)||Math.random()))).toString(36)+(fnv32('te-rs2|'+((window.SEC&&SEC.PID)||Math.random()))).toString(36);
+  if(!H.rc)H.rc={};const n=H.rc[st]||0;H.rc[st]=n+1;let a=fnv32(H.rs+'|'+st+'|'+n);
+  const R0=Math.random;Math.random=()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};
+  try{return fn();}finally{Math.random=R0;}}
 function rollGrade(P){P.e++;P.l++;let gr;
   if(P.l>=PITY_L)gr=4; // v16-37: only one pity – a Legendary every 500 summons (Marius)
   else{let r=Math.random(),a=0;gr=0;for(let i=0;i<RATES.length;i++){a+=RATES[i];if(r<a){gr=i;break;}}}
@@ -3180,7 +3188,7 @@ function gain(id){const h=HB[id],o=own(id);let r;
   if(!o){G.h.own[id]={s:0,lv:1,a:0};r='new';}else if(o.s<hMaxS(h)){o.s++;r='star';}else{r='max';}
   G.h.disc[id]=1;const res={id,r};if(r==='max'){const q=DUPX[h.gr]||DUPX[0];if(q.e){res.ess=Math.round(q.e*ESS_U());G.ess=(G.ess||0)+res.ess;}else{res.dm=q.d;G.dm=(G.dm||0)+q.d;}}return res;} // v16-99: no money any more
 function summon(cat,n){const P=G.h.pity[cat],out=[];
-  for(let i=0;i<n;i++){const gr=rollGrade(P),L=heroesOf(cat,gr);const res=gain(pick(L).id);out.push(res);G.h.hist.unshift({c:cat,id:res.id,r:res.r,t:Date.now()});}
+  for(let i=0;i<n;i++){const id=srun('h'+cat,()=>{const gr=rollGrade(P),L=heroesOf(cat,gr);return pick(L).id;});const res=gain(id);out.push(res);G.h.hist.unshift({c:cat,id:res.id,r:res.r,t:Date.now()});}
   G.h.hist.length=Math.min(G.h.hist.length,60);if(window.EVT){EVT.add(cat==='m'?'hero':'crew',out.length);EVT.q('sum',out.length);}save();heroRefresh();return out;}
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
@@ -3786,7 +3794,7 @@ function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Mat
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={SPLASH,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
+window.__TE={SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};
