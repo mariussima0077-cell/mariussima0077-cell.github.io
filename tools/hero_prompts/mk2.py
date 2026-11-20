@@ -53,6 +53,6 @@ for k in E:
   P=mk.prompts(k)
   for i,(t,p) in enumerate(P):
     p=p.replace('golden LEGENDARY aura','purple EPIC aura')
-    if i in(6,7): p=p.replace(' Image 1536x1024',' Keeps the backpack in EVERY frame. Image 1536x1024',1)
+    if i in(4,6,7): p=p.replace('\nImage 1536x1024','\nKeeps the backpack in EVERY frame. Image 1536x1024',1)
     open(f'{k}_{i}.txt','w').write(p.replace('\n',' '))
 print('ok')

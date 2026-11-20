@@ -1023,6 +1023,8 @@ const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;
 // v16-25: atlases load only when a hero/driver is actually drawn (before: ALL ~95 atlases were decoded at startup ≈ 290 MB of memory)
 for(const id in SPRD)SPRD[id].id=id;
+// v16-107: skill sheets/booms are decoded in the background (off the main thread) at battle start → the first ultimate no longer stutters
+function warmIm(im){if(!im||!im.decode)return;const d=()=>{im.decode().catch(()=>{});};if(im.complete&&im.naturalWidth)d();else im.addEventListener('load',d,{once:true});}
 function sprLoad(d){if(!d.im){d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
 // v16-94: draws frame (r,c) of a sprite at the feet point (0,0), k = screen units per 256-cell unit. v8 = 8 frames per row, each row its own height
 function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.im,c*v.cw,R[0],v.cw,R[1],-v.ax*k,-R[3]*k,v.uw*k,R[2]*k);return;}
@@ -1562,7 +1564,7 @@ function startBattle(si,team,tw){
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
   B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)TE().toast('⚡ NITRO BOOST: +'+Math.round(B.nit*100)+'% HP & attack',2400);},B.grit?2700:0);
   B.lowRes=LOWRES;if(!bsize())buildBG();
-  B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr)sprLoad(u.spr);});
+  B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr){sprLoad(u.spr);warmIm(u.spr.im);warmIm(u.spr.fi);warmIm(u.spr.bi);}});if(!window.__SIM)for(const k in FXIM)warmIm(FXIM[k]);
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
   spawnWave();
   $('bt').classList.add('open');window.__BATTLE_ON=true;if(!window.__SIM){let n=0;try{n=+localStorage.getItem('te_bhint')||0;localStorage.setItem('te_bhint',n+1);}catch(e){}if(n<3)setTimeout(()=>{if(B&&!B.res)TE().toast('🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',4200);},2600);}running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
@@ -1690,7 +1692,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
-function cast(u){if(!canCast(u))return;u.en=0;u.enLock=3;B.slowT=Math.max(B.slowT,1.3);B.flash=.35;punch(.045);if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
+function cast(u){if(!canCast(u))return;u.en=0;u.enLock=3;B.flash=.15;if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
   B.banner={u,t:0,name:skOf(u.h).sk};
   const R=u.role,ms=alive(B.mons);
   if(SKF[u.h.id]){B.hk=u.skK||1;try{SKF[u.h.id](u,ms);}finally{B.hk=1;}return;}
@@ -1749,7 +1751,7 @@ const SKF={
    else B.fx.push({type:'imgfx',k:'cloud',x:cx,y:top+40*S,w:Math.min(W*.9,300*S),t:0,d:1.6,cloud:1});
    for(let k=0;k<8;k++)B.fx.push({type:'strike',t:-.25-k*.13,d:.3,src:u,top});
    teamBuff({aspd:6,aspdK:.25,col:'#ffd54a',txt:'SPEED UP'});});},
- m4_4(u,ms){castAct(u,1,()=>{B.flash=.45;B.slowT=Math.max(B.slowT,1.3);u.post=.6;
+ m4_4(u,ms){castAct(u,1,()=>{B.flash=.2;u.post=.6;
    if(u.spr&&u.spr.fx8){const c=cluster(ms,100*S)||ms[0];B.fx.push({type:'sheet8',t:0,d:1.1,sp:u.spr,x:c.x,dd:c.d});} // v16-106: Otto's All-Seeing Eye clock (8 frames) over the biggest group
    for(const m of alive(B.mons)){m.slow=Math.max(m.slow,6);m.mark=Math.max(m.mark,6);m.tw=6;imgFx('hglass',m.x,headY(m)-8*S,30*S,1.4,{float:1,u:m});damage(u,m,.6,{skill:1,noCrit:1});}
    teamBuff({aspd:6,aspdK:.4,col:'#80d8ff',txt:'SPEED UP'});});},
@@ -1838,14 +1840,15 @@ function unitUpdate(u,dt,foes,friends){
   if(!u.hero){const tn=alive(foes).find(h=>h.taunt>0);tg=tn||nearest(u,foes);}else tg=nearest(u,foes);
   if(!tg){u.st=B.phase==='win'?'win':'idle';return;}
   if(!u.hero||u.st!=='atk'||Math.abs(tg.x-u.x)>8*S)u.face=tg.x>=u.x?1:-1;
-  const dd=dist(u,tg),range=u.rng+(tg.boss?(tg.b==='titan'?60:20)*S:0);
+  let dd=dist(u,tg),range=u.rng+(tg.boss?(tg.b==='titan'?60:20)*S:0);
+  if(u.rng<80*S&&tg.b!=='titan'&&!tg.wbB&&!u.wbB)range=Math.max(range,bw(u)+bw(tg)+4*S); // v16-107: melee units stop face to face, not inside each other
   const spot=u.hero&&u.rng<80*S?meleeSpot(u,tg,range):null;
   if(u.st==='atk'){const prev=u.ap;u.ap+=dt/(u.hero?.42/(u.aspd>0?1+u.aspdK:1):Math.min(.6,u.as*.45));
     if(prev<.55&&u.ap>=.55)doHit(u,tg);
     if(u.ap>=1){u.st='idle';u.ap=0;u.cd=u.as/(u.aspd>0?1+u.aspdK:1);}return;}
   u.cd-=dt;
   // spider pounce
-  if(u.pounce&&dd<140*S&&dd>u.rng*1.5){u.pounce=0;u.act=null;B.fx.push({type:'dust',x:u.x,y:fy(u.d)});u.x=tg.x-u.face*24*S;u.d=tg.d;damage(u,tg,1.5);shake(4);sparks(tg.x,headY(tg)+20,8);return;}
+  if(u.pounce&&dd<140*S&&dd>u.rng*1.5){u.pounce=0;u.act=null;B.fx.push({type:'dust',x:u.x,y:fy(u.d)});u.x=tg.x-u.face*(bw(u)+bw(tg));u.d=tg.d;damage(u,tg,1.5);shake(4);sparks(tg.x,headY(tg)+20,8);return;}
   if(dd<=range||(spot&&Math.abs(u.x-spot[0])<=18*S&&Math.abs(u.d-spot[1])*(FY1-FY0)<=18*S)){if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
   // move
   const sp=u.mv*(u.slow>0?.5:1)*(u.charge?2.2:1)*(spot&&dd<130*S?1.7:1)*dt;
@@ -1858,7 +1861,7 @@ function unitUpdate(u,dt,foes,friends){
 // and attacks from that place. Before, two mechanics on one monster pushed each other out of range and just stood there.
 function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
   if(u.sT!==tg){u.sT=tg;u.sK=null;}
-  const at=k=>[clamp(tg.x-u.face*(range*.85+Math.abs(k)*30*S),26*S,W-26*S),tg.d+k*st/F];
+  const at=k=>[clamp(tg.x-u.face*(range*(k?.85:.95)+Math.abs(k)*30*S),26*S,W-26*S),tg.d+k*st/F];
   const gap=k=>{const p=at(k);if(p[1]<.03||p[1]>.97)return -1;let g=1e9;for(const h of B.heroes){if(h===u||h.dead||!h.sP||h.rng>=80*S)continue;g=Math.min(g,Math.hypot(p[0]-h.sP[0],(p[1]-h.sP[1])*F*KD));}return g;};
   if(u.sK==null||gap(u.sK)<44*S){const cur=(u.d-tg.d)*F/st;let best=0,bs=-1e9;
     for(const k of [0,1,-1,2,-2,3,-3]){const g=gap(k);if(g<0)continue;const sc=Math.min(g,56*S)/S-Math.abs(k-cur)*9-Math.abs(k)*4;if(sc>bs){bs=sc;best=k;}}u.sK=best;}
@@ -1892,6 +1895,12 @@ function sep(list){for(let i=0;i<list.length;i++){const a=list[i];if(a.dead||a.a
   let dx=b.x-a.x,dd=(b.d-a.d)*(FY1-FY0);if(Math.abs(dx)+Math.abs(dd)<.01){dd=(j%2?1:-1)*.5;dx=.3;}const hh=a.hero&&b.hero,kd=hh?.72:1,L=Math.hypot(dx,dd*kd),min=(a.boss||b.boss?48:hh?56:30)*S;if(L<min){const p=(min-L)/2*(hh?1.6:1);const ux=dx/L,uy=dd*kd/L/kd;
     if(!a.boss){a.x-=ux*p*.5;a.d-=uy*p/(FY1-FY0);}if(!b.boss){b.x+=ux*p*.5;b.d+=uy*p/(FY1-FY0);}a.d=clamp(a.d,.02,.98);b.d=clamp(b.d,.02,.98);}}}}
 
+// v16-107 (Marius: 'heroes ride on the monsters'): half body width in px + heroes and monsters in the same lane can no longer stand
+// inside each other – each one is pushed back to its own side (bosses don't move; the giant titan keeps its own rules).
+function bw(u){if(u.hero)return 26*dsc(u.d);const M=MON[u.t];return Math.min(70*S,(M?M.h*M.sc:40)*(u.boss?1:1.22)*.38*dsc(u.d));}
+function sepHM(){const F=FY1-FY0;for(const h of B.heroes){if(h.dead||h.act)continue;for(const m of B.mons){if(m.dead||m.act||m.b==='titan'||m.wbB)continue;
+  if(Math.abs(m.d-h.d)*F>40*S)continue;const dx=m.x-h.x,min=(bw(h)+bw(m))*.9,ax=Math.abs(dx);if(ax>=min)continue;
+  const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;if(m.boss)h.x-=dir*o;else{h.x-=dir*o*.5;m.x+=dir*o*.5;}}}}
 function keepIn(){for(const m of B.mons){if(m.dead||m.b==='titan')continue;const xm=W-(m.boss?64:40)*S;if(m.x<=xm)m.in=1;else if(m.in)m.x=xm;if(m.in&&!m.act)m.x=Math.max(m.x,30*S);}}
 function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelAnimationFrame(raf);B.auto=true;let t=0;while(t<(maxT||400)&&!B.res){step(1/30);t+=1/30;}
   const r={win:B.phase==='win',t:Math.round(t),deaths:B.deaths,wave:B.wave,left:B.mons.filter(m=>!m.dead).map(m=>m.t+':'+Math.round(m.hp/m.max*100)+'%')};return r;}
@@ -1905,7 +1914,7 @@ function step(dt){B.t+=dt;B.phT+=dt;
     if(B.mod==='burn')for(const u of B.heroes)if(!u.dead)u.hp=Math.max(1,u.hp-u.max*.006*dt);
     for(const u of B.heroes)unitUpdate(u,dt,B.mons,B.heroes);
     for(const m of B.mons)unitUpdate(m,dt,B.heroes,B.mons);
-    sep(B.heroes);sep(B.mons);
+    sep(B.heroes);sep(B.mons);sepHM();
     for(const u of B.heroes)if(!u.dead){u.x=clamp(u.x,u.act?8*S:26*S,W-(u.act?8:26)*S);}
     // v16-46: monsters can no longer be pushed out of the picture (knock-backs + crowding moved them past the right edge)
     keepIn();
@@ -2330,7 +2339,8 @@ function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
 function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-lastT<14.5)return; // v16-27: max 60 fps (120 Hz phones drew twice as much)
   const raw=Math.min(.05,(now-lastT)/1000);lastT=now;
   if(!B.paused){B.real+=raw;B.shake=Math.max(0,B.shake-raw*40);if(B.zoom)B.zoom=Math.max(0,B.zoom-raw*(B.zoom*5+.02));if(B.combo){B.combo.t+=raw;if(B.combo.t>1.4)B.combo=null;}B.flash=Math.max(0,B.flash-raw*2.2);
-    let ts=B.spd;if(B.slowT>0){B.slowT-=raw;ts=.38;} // v16-41: skills in slow motion (same at ×1, ×1.5, ×2) so you can see themif(B.hs>0){B.hs-=raw;ts*=.06;}
+    let ts=B.spd;if(B.slowT>0)B.slowT-=raw; // v16-107: no more slow motion on skills (Marius: 'freeze' at ultimates)
+     // v16-41: skills in slow motion (same at ×1, ×1.5, ×2) so you can see themif(B.hs>0){B.hs-=raw;ts*=.06;}
     let left=raw*ts;while(left>0){const s=Math.min(1/60,left);step(s);left-=s;}}
   const t0=performance.now();render();
   // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".

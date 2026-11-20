@@ -51,4 +51,4 @@ Referința atașată = captură cu cadrele mari din planșa veche (ChatGPT nu pr
 - ✅ **REX REDLINE (m4_5)** – 8/8 (chat „Create splash art”).
 - ✅ **VIKTOR (m3_0, Epic)** – 8/8 (chat „Create Viktor Splash Art”). Attack cadrul 3: cheia atinge sus → de prelungit.
 - ✅ **BIG MO (m3_1, Epic)** – 8/8 (al doilea chat „Generate Splash Art”, cel mai nou). Attack cadrul 4: flash-ul atinge marginea dreaptă; FX = dom semi-transparent (atenție la verdele din spate la decupare).
-- ⏳ Următorii Epic: Gloria (m3_2), Dr. Ohm (m3_3), Hugo (m3_4), Aria (m3_5), Nina (m3_6) – prompturile gata în `mk2.py`.
+- ⏳ Următorii Epic: Gloria (m3_2), Dr. Ohm (m3_3), Hugo (m3_4), Aria (m3_5), Nina (m3_6) – prompturile gata în `mk2.py`. **20 nov (v16-107): trimise lui Marius** (Gloria în chat, ceilalți 4 într-un .txt, fiecare cu poza de referință .jpg).
