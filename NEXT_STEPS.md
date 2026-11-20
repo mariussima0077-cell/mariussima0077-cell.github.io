@@ -1,4 +1,5 @@
 # TORQUE EMPIRE – Publicare Google Play · stare și pașii următori
+  - **20 nov – POZE EROI NOI GENERATE ÎN CHATGPT de Claude** (Sofia, Otto, Rex, Viktor, Big Mo – câte 8): Marius le descarcă și le trimite → decupare cu `tools/v8_hero.py` + integrare. Detalii + ce trebuie reparat la decupare: `PROMPTS_HEROES.md` (secțiunea 20 nov). Rămân: Gloria, Dr. Ohm, Hugo, Aria, Nina (prompturi în `tools/hero_prompts/mk2.py`).
 *(trimite fișierul ăsta la începutul unui chat nou cu Claude. Arhiva NU mai trebuie: Claude ia jocul direct de pe GitHub și îl poate testa live)*
 
 > 📜 **Ce am declarat la Google Play și ce NU avem voie să schimbăm → `PLAY_RULES.md`** (Claude îl citește înainte de orice schimbare).

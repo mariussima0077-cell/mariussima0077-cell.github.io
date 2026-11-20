@@ -49,4 +49,5 @@ Referința atașată = captură cu cadrele mari din planșa veche (ChatGPT nu pr
 - ✅ **ORACLE OTTO (m4_4)** – 8/8 (chat „Create splash art”). Hit/KO = **varianta 2** (ChatGPT a dat 2). Skill cadrul 6 fără rucsac → de înlocuit cu cadrul 5 colorat albastru. FX: interiorul ceasului e verde-închis → atenție la decupare (KEEP).
 - ✅ **REX REDLINE (m4_5)** – 8/8 (chat „Create splash art”).
 - ✅ **VIKTOR (m3_0, Epic)** – 8/8 (chat „Create Viktor Splash Art”). Attack cadrul 3: cheia atinge sus → de prelungit.
-- ⏳ Următorii Epic: Big Mo (m3_1), Gloria (m3_2), Dr. Ohm (m3_3), Hugo (m3_4), Aria (m3_5), Nina (m3_6) – prompturile gata în `mk2.py`.
+- ✅ **BIG MO (m3_1, Epic)** – 8/8 (al doilea chat „Generate Splash Art”, cel mai nou). Attack cadrul 4: flash-ul atinge marginea dreaptă; FX = dom semi-transparent (atenție la verdele din spate la decupare).
+- ⏳ Următorii Epic: Gloria (m3_2), Dr. Ohm (m3_3), Hugo (m3_4), Aria (m3_5), Nina (m3_6) – prompturile gata în `mk2.py`.
