@@ -980,7 +980,7 @@ const SPRD={
  m3_0:{w:384,a:[195,248],m:[300,150],R:[0,1,2,3,5,6],lp:[[3,0],[3,1],[3,2],[3,3]],ld:[[4,0],[4,1],[4,2],[4,3]],lt:.6},
  m3_1:{w:384,a:[194,249],m:[300,100],look:'wrench'},
  m3_2:{a:[114.7,246],m:[176.2,102.5],col:'#d05cff',boom:'fx_purpleboom',v8:{cw:189,uw:252.0,ax:114.7,rows:[[0,191,254.7,250.7],[191,195,260.0,256.0],[386,189,252.0,246.7],[575,191,254.7,249.3],[766,187,249.3,245.3],[953,190,253.3,249.3]],ck:5,pk:[5,6,7]},fx8:{cw:201,uw:268.0,ax:134.7,rows:[[0,203,270.7,256.0]]}}, // v16-108: GLORIA – 8 frames (tools/v8_hero.py m3_2); ck = shake/aim/charge 0-4, pk = sweep burst → drops → idle; paint wave = fxs, frame 5 = crash
- m3_3:{w:384,a:[184,250],m:[312,130],col:'#d05cff'},
+ m3_3:{a:[132.0,246],m:[232,100],col:'#d05cff',v8:{cw:198,uw:264.0,ax:132.0,ck:5,pk:[5,6,7],rows:[[0,196,261.3,256.0],[196,197,262.7,258.7],[393,187,249.3,245.3],[580,207,276.0,264.0],[787,195,260.0,254.7],[982,204,272.0,268.0]]},fx8:{cw:199,uw:265.3,ax:132.0,rows:[[0,220,293.3,282.7]]}}, // v16-109 DR. OHM: 8-frame animations (ChatGPT sheets) + his own Tesla tower
  m3_4:{w:384,a:[201,248],m:[312,142],col:'#e040fb',R:[0,1,3,4,5,6]},
  m3_5:{w:384,a:[183,249],m:[300,150]},
  m3_6:{w:384,a:[203,248],m:[300,150],R:[0,1,2,3,5,6],ds:[[3,0],[3,1],[3,2],[4,0],[4,1]],boom:'fx_ninaboom',dboom:1},
@@ -1733,6 +1733,7 @@ const SKF={
    castAct(u,.6,()=>{u.post=.6;const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],ok=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;let ds=0;
    if(c&&ok){const tt=.7*Math.max(0,c.x-u.x)/Math.max(1,W+20-u.x);ds=Math.max(0,.46-tt);B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}
    B.fx.push({type:'scan',x:u.x,t:-ds,d:.7,src:u,hit:new Set(),p:P});});},
+ m3_3(u){castAct(u,.6,()=>{u.post=.6;B.fx.push({type:'coil',x:u.x+u.face*62*S,dd:u.d,t:0,d:4,tick:0,src:u});if(FX2)fxBurst(u.x+u.face*62*S,fy(u.d)-40*dsc(u.d),'#e040fb',40*S);});}, // v16-109 Dr. Ohm: cast frames 1-5 (5 = plants the coil) → laughs
  m4_0(u){castAct(u,.75,()=>{const y=fy(.5);shake(14);u.post=.6;B.fx.push({type:'quake',x0:u.x+30*S,t:0,d:1.1,src:u,hit:new Set()});
    B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);
    if(FX2){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
@@ -2162,6 +2163,8 @@ function drawFx(t){
       g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],f.fx-v.uw*.55*kk,fy(.58)-R[3]*kk,v.uw*kk,R[2]*kk);}
     else if(f.type==='quake'&&fxOK('quake')&&f.fx!==undefined){const im=FXIM.quake,h=(FY1-FY0)*.62+40*S,w=h*im.naturalWidth/im.naturalHeight;g.globalAlpha=k<.85?1:1-(k-.85)/.15;
       g.drawImage(im,f.fx-w,FY1+18*S-h,w,h);g.globalAlpha*=.5;g.drawImage(im,f.fx-w*1.7,FY1+18*S-h*.8,w*.8,h*.8);}
+    else if(f.type==='coil'&&f.src&&f.src.spr&&f.src.spr.fx8&&f.src.spr.fi&&f.src.spr.fi.naturalWidth){const d=f.src.spr,v=d.fx8,R=v.rows[0],kk=SPK*dsc(f.dd)*1.25,T=f.t,E=f.d-.45; // v16-109: Dr. Ohm's tower – appears (0-2), big burst (4), crackles at every zap (3/5 ↔ 2), dies out (5-7)
+      const c=T<.3?Math.floor(T/.1):T<.48?4:T>E?Math.min(7,5+Math.floor((T-E)/.15)):(f.tick<.12?3:f.tick<.22?5:2);g.globalAlpha=T>f.d-.12?Math.max(0,(f.d-T)/.12):1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}
     else if(f.type==='coil'){const y=fy(f.dd),h=dsc(f.dd);g.globalAlpha=k>.9?(1-k)*10:1;g.fillStyle='#37474f';rr(g,f.x-12*h,y-10*h,24*h,10*h,3);g.fill();g.fillStyle='#ffca28';g.fillRect(f.x-12*h,y-6*h,24*h,3*h);
       g.fillStyle='#78909c';g.fillRect(f.x-3*h,y-60*h,6*h,52*h);g.strokeStyle='#b87333';g.lineWidth=2*h;for(let i=0;i<7;i++){g.beginPath();g.ellipse(f.x,y-14*h-i*6*h,7*h,2.2*h,0,0,TAU);g.stroke();}
       const gl=g.createRadialGradient(f.x,y-70*h,2,f.x,y-70*h,22*h);gl.addColorStop(0,'#ffffff');gl.addColorStop(.35,'#e040fb');gl.addColorStop(1,'rgba(224,64,251,0)');g.fillStyle=gl;circ(g,f.x,y-70*h,(18+Math.sin(f.t*30)*4)*h);}

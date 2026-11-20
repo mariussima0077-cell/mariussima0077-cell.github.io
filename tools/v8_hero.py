@@ -29,6 +29,8 @@ HEROES = {
   'm4_5': ('rex', {'idle': 428, 'run': 405, 'attack': 399, 'skill': 384, 'hitko': 398, 'win': 393, 'fx': 420}),
   # v16-108 (20 nov): GLORIA – first Epic with 8 frames. REF = frame 1 standing (idle sheet drawn bigger); fx = paint wave
   'm3_2': ('gloria', {'idle': 461, 'run': 400, 'attack': 386, 'skill': 379, 'hitko': 388, 'win': 424, 'fx': 340}),
+  # v16-109 (20 nov): DR. OHM. REF = frame 1 standing on each sheet; fx = Tesla tower ~70 % of his height
+  'm3_3': ('ohm', {'idle': 413, 'run': 378, 'attack': 378, 'skill': 401, 'hitko': 387, 'win': 387, 'fx': 350}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -42,6 +44,8 @@ P = 110             # extension padding (sheet px)
 SPECKS = {'m3_2'}   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
 KEEPBLUE = {'m4_2', 'm4_3', 'm4_4'}   # v16-106: + Sofia's crown gem, Otto's blue tablet / ear piece / clock glow   # v16-96 Duke: blue diamonds / ice crystals (cyan) must stay blue, not turn grey
 
+PURPLEGLOW = {'m3_3'}
+
 def despill(a, n=''):
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     gr = (g > r) | (g > b + (r - b) * .8)
@@ -54,6 +58,7 @@ def despill(a, n=''):
     tint = ((0, 6), (1, 2), (2, 0))
     if HID in KEEPBLUE and n == 'fx': v = np.maximum(r, b); tint = ((0, -40), (1, 0), (2, 25))  # teal glow → icy blue, not grey
     if HID == 'm3_2' and n in ('fx', 'skill', 'attack'): tint = ((0, 18), (1, -28), (2, 34))   # v16-108 Gloria: paint spill edges → purple, not grey
+    if HID in PURPLEGLOW: tint = ((0, 10), (1, -8), (2, 24))   # v16-109 Ohm: lightning haze stays lilac, not grey smoke
     for k, o in tint: a[..., k] = np.where(sm, np.clip(v + o, 0, 255), a[..., k])
     return a
 
@@ -85,6 +90,8 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
        'm3_2': {**{('idle', i): 'none' for i in range(8)}, ('attack', 3): 'fade:R', ('attack', 4): 'none', ('skill', 4): 'fade',
                 ('hitko', 1): 'none', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none', ('win', 1): 'fade:R',
                 ('win', 2): 'fade:R', ('win', 3): 'none', ('win', 4): 'none', ('win', 5): 'none', ('fx', 4): 'fade'},
+       'm3_3': {('attack', 3): 'fade:R', ('fx', 3): 'fade', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none',
+                ('hitko', 7): 'none'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 
@@ -131,7 +138,7 @@ def extend(c, mode=None):
 
 # v16-96: heroes whose poses / thrown weapons cross the 384-px columns (Rosa's wrench swooshes) → wide cells:
 # every picture part goes to the column its centre is in (no neighbour leaking, nothing cut at the column line)
-WIDE = {'m4_1': 90}
+WIDE = {'m4_1': 90, 'm3_3': {'hitko': 90}}   # v16-109 Ohm: only his KO sheet (lying body crosses the column line)
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
     a = despill(unmix(im), n).astype(np.float32)
@@ -140,6 +147,7 @@ def cells(n):
         a[..., :3] = rgb * (1 - k) + np.array([235, 160, 255]) * k
     H, W = a.shape[:2]; ch, cw = H // 2, W // 4   # v16-96: any sheet size (Grigore's skill sheet is 1774x887)
     pc = WIDE.get(HID, 0)
+    if isinstance(pc, dict): pc = pc.get(n, 0)
     if not pc:
         cs = [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
         if HID in KEEPBLUE or HID in SPECKS: cs = [drop_specks(c) for c in cs]   # v16-97 Duke
