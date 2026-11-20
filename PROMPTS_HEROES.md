@@ -45,6 +45,7 @@ Exemplu de descriere (regele): „old muscular king-mechanic, silver-white hair,
 ## 20 nov 2026 – generate de Claude direct în ChatGPT (Chrome-ul lui Marius)
 Marius descarcă pozele din ChatGPT și le trimite. Prompturile: `tools/hero_prompts/mk.py` (Legendary) + `mk2.py` (Epic, aura mov) → `python3 mk2.py` scrie câte 8 fișiere text per erou.
 Referința atașată = captură cu cadrele mari din planșa veche (ChatGPT nu primește fișiere, doar captura).
+- ✅✅ **SOFIA + OTTO + REX în main la v16-106** (20 nov): `v8_hero.py m4_3/m4_4/m4_5`, `KEEPBLUE` pentru Sofia/Otto (tableta albastră), Otto: hit/KO = **varianta 1** (cadrul 1 în picioare, ca la ceilalți; v2 păstrată `m4_4_hitko_v2.webp`), skill cadrul 6 = cadrul 5 colorat albastru. Sofia `ck:5 pk:[5,6,7]` + norul `sheet8` pe grupul cel mai mare; Otto `ck:5 pk:[5,6,7]` + ceasul cu ochiul pe grupul cel mai mare; Rex `ck:4 dsh:[4]` (castAct .4 înainte de dash) + explozia pe primul monstru din banda lui. Splash-uri m4_3/4/5.
 - ✅ **SOFIA LIGHTNING (m4_3)** – 8/8 (chat „Create Splash Art”). Attack cadrul 4 și skill cadrul 5: fulgerul atinge marginea → de estompat.
 - ✅ **ORACLE OTTO (m4_4)** – 8/8 (chat „Create splash art”). Hit/KO = **varianta 2** (ChatGPT a dat 2). Skill cadrul 6 fără rucsac → de înlocuit cu cadrul 5 colorat albastru. FX: interiorul ceasului e verde-închis → atenție la decupare (KEEP).
 - ✅ **REX REDLINE (m4_5)** – 8/8 (chat „Create splash art”).

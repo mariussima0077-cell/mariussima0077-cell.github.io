@@ -988,8 +988,9 @@ const SPRD={
  m4_0:{a:[198.7,246],m:[300,150],fx:'quake',v8:{cw:299,uw:398.7,ax:198.7,ck:5,pk:[5,6,7],rows:[[0,202,269.3,264.0],[202,176,234.7,229.3],[378,186,248.0,242.7],[564,209,278.7,273.3],[773,177,236.0,230.7],[950,190,253.3,249.3]]},fx8:{cw:314,uw:418.7,ax:206.7,rows:[[0,309,412.0,393.3]]}}, // v16-95: GRIGORE – 8 frames (tools/v8_hero.py m4_0); ck = cast frames 0-4 (smash = impact), quake wall = fxs frames
 m4_1:{a:[134.7,246],m:[253,71],look:'wrench',fx:'holy',v8:{cw:210,uw:280.0,ax:134.7,ck:4,pk:[4,5,6,7],rows:[[0,195,260.0,256.0],[195,189,252.0,248.0],[384,190,253.3,248.0],[574,286,381.3,358.7],[860,198,264.0,258.7],[1058,208,277.3,272.0]]},fx8:{cw:158,uw:210.7,ax:105.3,rows:[[0,253,337.3,325.3]]}}, // v16-96: MAMA ROSA – 8 frames (tools/v8_hero.py m4_1); ck = pray → wrench raised, pk = golden sweep → idle; holy pillar = fxs frames on every healed ally
  m4_2:{a:[136.0,246],m:[300,150],col:'#d05cff',fx:'vortex',v8:{cw:240,uw:320.0,ax:136.0,rows:[[0,195,260.0,256.0],[195,189,252.0,246.7],[384,188,250.7,245.3],[572,196,261.3,249.3],[768,191,254.7,249.3],[959,205,273.3,268.0]],ck:5,pk:[5,6,7]},fx8:{cw:205,uw:273.3,ax:136.0,rows:[[0,240,320.0,289.3]]}}, // v16-96: DUKE DIAMOND – 8 frames (tools/v8_hero.py m4_2); ck = cast frames 0-4 (frame 5 = beam), pk = recoil after; vortex = fxs frames, frame 5 = crystal freeze
-m4_3:{a:[119,246],m:[250,117],col:'#ffd54a',cs:[[3,1],[3,2],[3,3]],fx:'cloud'},
- m4_4:{a:[124,247],m:[250,118],col:'#ffd21a',cs:[[3,0],[3,1],[3,2],[3,3]],fx:'hglass'},m4_5:{a:[135,247],m:[230,150],fire:1},
+m4_3:{a:[118.7,246],m:[249.7,117],col:'#ffd54a',fx:'cloud',v8:{cw:175,uw:233.3,ax:118.7,rows:[[0,189,252.0,248.0],[189,186,248.0,242.7],[375,188,250.7,245.3],[563,213,284.0,278.7],[776,187,249.3,245.3],[963,211,281.3,276.0]],ck:5,pk:[5,6,7]},fx8:{cw:172,uw:229.3,ax:114.7,rows:[[0,222,296.0,285.3]]}}, // v16-106: SOFIA LIGHTNING – 8 frames (tools/v8_hero.py m4_3); ck = charge frames 0-4 (5 = lightning from her fists), pk = after; storm cloud = fxs, frame 5 = the big strike
+ m4_4:{a:[118.7,246],m:[244.7,118],col:'#ffd21a',fx:'hglass',v8:{cw:234,uw:312.0,ax:118.7,rows:[[0,196,261.3,257.3],[196,186,248.0,242.7],[382,187,249.3,245.3],[569,202,269.3,265.3],[771,202,269.3,264.0],[973,205,273.3,268.0]],ck:5,pk:[5,6,7]},fx8:{cw:154,uw:205.3,ax:102.7,rows:[[0,185,246.7,237.3]]}}, // v16-106: ORACLE OTTO – 8 frames; ck = tablet → clock → All-Seeing Eye (frame 5), pk = time-warp blue → idle; fxs = the eye clock over the enemies
+ m4_5:{a:[128.0,246],m:[223.0,150],fire:1,v8:{cw:231,uw:308.0,ax:128.0,rows:[[0,197,262.7,257.3],[197,187,249.3,245.3],[384,191,254.7,249.3],[575,190,253.3,248.0],[765,191,254.7,249.3],[956,197,262.7,257.3]],ck:4,dsh:[4]},fx8:{cw:165,uw:220.0,ax:109.3,rows:[[0,160,213.3,197.3]]}}, // v16-106: REX REDLINE – 8 frames; ck = crouch + flame charge (frames 0-3), dsh = flying kick (frame 4); fxs = fire trail → explosion
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
 m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,5],rows:[[0,197,262.7,258.7],[197,183,244.0,238.7],[380,171,228.0,221.3],[551,223,297.3,286.7],[774,187,249.3,244.0],[961,206,274.7,269.3]]},fx8:{cw:286,uw:381.3,ax:190.7,rows:[[0,186,248.0,237.3]]}}, // v16-95: LADY OVERDRIVE – 8 frames (tools/v8_hero.py m5_1); ck = cast frames 0-3, dsh = dash frames
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
@@ -1742,13 +1743,20 @@ const SKF={
    // v16-96: Duke's own vortex (8 frames): tornado grows, frame 5 = crystal burst → damage + freeze land then (old image fx only if the sheet didn't load)
    if(v){B.fx.push({type:'sheet8',t:-.12,d:1.25,sp:u.spr,x:cx,dd:cd});if(FX2)fxBurst(cx,fy(cd)-30*S,'#d05cff',50*S);}else imgFx('vortex',cx,fy(cd)+12*S,215*S,1.1,{spin:1});
    B.fx.push({type:'dvort',t:v?-.67:0,src:u,x:cx,dd:cd});shake(6);});},
- m4_3(u,ms){castAct(u,.85,()=>{const cx=ms.reduce((a,m)=>a+m.x,0)/ms.length,top=FY0-120*S;B.fx.push({type:'imgfx',k:'cloud',x:cx,y:top+40*S,w:Math.min(W*.9,300*S),t:0,d:1.6,cloud:1});
+ m4_3(u,ms){castAct(u,.85,()=>{const cx=ms.reduce((a,m)=>a+m.x,0)/ms.length,top=FY0-120*S;u.post=.6;
+   // v16-106: Sofia's own storm cloud (8 frames, frame 5 = the big strike); the old cloud picture only if the sheet didn't load
+   if(u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth){const c=cluster(ms,100*S)||ms[0];B.fx.push({type:'sheet8',t:0,d:1.05,sp:u.spr,x:c.x,dd:c.d});}
+   else B.fx.push({type:'imgfx',k:'cloud',x:cx,y:top+40*S,w:Math.min(W*.9,300*S),t:0,d:1.6,cloud:1});
    for(let k=0;k<8;k++)B.fx.push({type:'strike',t:-.25-k*.13,d:.3,src:u,top});
    teamBuff({aspd:6,aspdK:.25,col:'#ffd54a',txt:'SPEED UP'});});},
- m4_4(u,ms){castAct(u,1,()=>{B.flash=.45;B.slowT=Math.max(B.slowT,1.3);
+ m4_4(u,ms){castAct(u,1,()=>{B.flash=.45;B.slowT=Math.max(B.slowT,1.3);u.post=.6;
+   if(u.spr&&u.spr.fx8){const c=cluster(ms,100*S)||ms[0];B.fx.push({type:'sheet8',t:0,d:1.1,sp:u.spr,x:c.x,dd:c.d});} // v16-106: Otto's All-Seeing Eye clock (8 frames) over the biggest group
    for(const m of alive(B.mons)){m.slow=Math.max(m.slow,6);m.mark=Math.max(m.mark,6);m.tw=6;imgFx('hglass',m.x,headY(m)-8*S,30*S,1.4,{float:1,u:m});damage(u,m,.6,{skill:1,noCrit:1});}
    teamBuff({aspd:6,aspdK:.4,col:'#80d8ff',txt:'SPEED UP'});});},
- m4_5(u){u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,mult:2.8};u.st='dash';},
+ m4_5(u){const go=()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,mult:2.8};u.st='dash';
+   // v16-106: Rex's fire trail → explosion (frame 5) on the first enemy in his lane, timed with his arrival
+   if(u.spr&&u.spr.fx8){const ln=alive(B.mons).filter(m=>m.x>u.x&&Math.abs(m.d-u.d)<.2).sort((a,b)=>a.x-b.x)[0];if(ln){const tt=Math.max(0,(ln.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.5),d:.96,sp:u.spr,x:ln.x,dd:ln.d});}}};
+   if(u.spr&&u.spr.v8)castAct(u,.4,go);else go();},
  m5_0(u,ms){castAct(u,.85,()=>{for(const m of alive(B.mons))B.fx.push({type:'gear',x:m.x+rnd(-10,10),tgt:m,y0:-40,t:-rnd(0,.5),d:.55,src:u,r:rnd(15,21)*S,mult:3.2});
    for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
    const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
