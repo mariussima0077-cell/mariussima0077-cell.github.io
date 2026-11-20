@@ -14,7 +14,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=100;
+const CV=101;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();return j;}catch(e){return {err:'network'};}}
 function needUpd(){if(document.getElementById('updNeed'))return;const d=document.createElement('div');d.id='updNeed';
   d.style.cssText='position:fixed;inset:0;z-index:100000;background:#000c;display:flex;align-items:center;justify-content:center;font-family:system-ui';
@@ -234,6 +234,7 @@ const css=`
 #onl .tlist div.sel{box-shadow:0 0 0 1.5px #ffc23a,0 0 10px #ffb30055}
 #onl .tlist div.o-lock .tt{filter:grayscale(1) brightness(.6)}
 #onl .modal{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:#000b}
+#onl .modal .box .mX{position:sticky;top:0;float:right;z-index:6;width:36px;height:36px;margin:-6px -6px 4px 8px;border:2px solid #ffd54a;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff7a6a,#c62828 60%,#6d0f0f);color:#fff;font:900 17px/1 system-ui;padding:0}
 #onl .modal .box{width:88%;max-height:84%;overflow:auto;border-radius:18px;padding:16px;background:linear-gradient(#2a2010,#120e08);box-shadow:0 0 0 2px #ffd54a,0 0 30px #ffb30066;text-align:center;animation:olPop .3s cubic-bezier(.2,1.5,.4,1)}
 #onl .modal h4{margin:0 0 10px;font:900 17px system-ui;color:#ffe27a}
 #onl .modal input{width:100%;background:#0b0f15;box-shadow:0 0 0 1.5px #e0aa25;border:0;border-radius:12px;padding:12px;font:800 16px system-ui;color:#fff;outline:none;user-select:text;-webkit-user-select:text}
@@ -604,8 +605,8 @@ async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 
      const t=T();if(t&&t.giveRw){t.giveRw(tot);t.save();}toast('🎁 '+(rwTxt(tot)||'Claimed'),3500);inboxN=0;hdr();dots();return true;});}
 
 // ------------------------------------------------------------------ modal helper
-function modal(html,cb){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="box">${html}</div>`;root.appendChild(d);
-  d.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b){if(e.target===d){d.remove();}return;}const k=await (cb?cb(b.dataset.m):true);if(k!==false)d.remove();});return d;}
+function modal(html,cb){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="box"><button class="mX" data-mx aria-label="close">✕</button>${html}</div>`;root.appendChild(d);
+  d.addEventListener('click',async e=>{if(e.target.closest('[data-mx]')){d.remove();return;}const b=e.target.closest('[data-m]');if(!b){if(e.target===d){d.remove();}return;}const k=await (cb?cb(b.dataset.m):true);if(k!==false)d.remove();});return d;}
 
 // ------------------------------------------------------------------ ARENA FIGHT – plays the fight decided by the server
 const fc=$('olFc'),g=fc.getContext('2d');let F=null,fRaf=0;
