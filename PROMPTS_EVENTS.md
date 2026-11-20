@@ -4,7 +4,7 @@ Ce e încă desenat din cod pe pagina EVENTS → 5 poze. Butoanele CLAIM și bar
 
 **Mărimi verificate (regula lui Marius: Claude verifică mereu dimensiunea):** ChatGPT face doar 1024x1024, 1536x1024 sau 1024x1536 → fiecare prompt cere una din ele. Pe telefon pagina are ~340 px lățime (×3 pixeli pe ecranele bune ≈ 1020 px) → orice element lat de ~1400 px în poză e destul de clar. Ramele se taie „9-slice” (colțurile rămân neatinse, mijlocul se întinde), de aceea ornamentele trebuie să fie DOAR la colțuri / capete și mijlocul marginilor simplu.
 
-Pentru toate: ATAȘEAZĂ și poza paginii ca să ia aceleași culori: https://mariussima0077-cell.github.io/img/ui9/ev_bg.webp — fond verde = Claude decupează.
+Pentru toate: ATAȘEAZĂ poza paginii (`img/ui9/ev_bg.webp`, Claude o trimite direct în chat ca .jpg) ca să ia aceleași culori — fond verde = Claude decupează.
 
 ## 1 · Rama rândului MILESTONE (3 stări într-o poză) → `img/ui10/ev_row_*.webp`
 În joc: rând 340×78 px (raport ~4,4:1). În poză: 3 rame de ~1440×280 una sub alta.
