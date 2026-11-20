@@ -1,4 +1,5 @@
 # TORQUE EMPIRE – Publicare Google Play · stare și pașii următori
+  - **20 nov – v16-117: Gear Parts vizibile** (cererea testerului Wazza4ever): fereastra unei piese arată „YOU HAVE” sus-stânga, la UPGRADE „Cost · You have · need X more”, și în BAG jos. Verificat: nu există coduri de cadou în joc; serverul Torque Guard NU salvează Gear Parts (doar bani, tichete, VIP etc.) → dacă vrem să vedem resursele unui jucător, trebuie adăugat `gp`/`ess` în raportul anti-cheat.
   - **20 nov – POZE EROI NOI GENERATE ÎN CHATGPT de Claude** (Sofia, Otto, Rex, Viktor, Big Mo – câte 8): Marius le descarcă și le trimite → decupare cu `tools/v8_hero.py` + integrare. Detalii + ce trebuie reparat la decupare: `PROMPTS_HEROES.md` (secțiunea 20 nov). Rămân: Gloria, Dr. Ohm, Hugo, Aria, Nina (prompturi în `tools/hero_prompts/mk2.py`).
 *(trimite fișierul ăsta la începutul unui chat nou cu Claude. Arhiva NU mai trebuie: Claude ia jocul direct de pe GitHub și îl poate testa live)*
 

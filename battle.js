@@ -2707,7 +2707,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
 function renderBag(h){const T=TE(),g=GR();
   $m('gFil').innerHTML=[['all','ALL','bag'],...GSLOT.map(s=>[s.k,s.n,s.ic])].map(([k,n,ic])=>`<button class="gf${gfil===k?' on':''}" data-f="${k}"><img src="${glyphURL(ic,gfil===k?'#2a1000':'#ffd54a')}" alt="${n}"></button>`).join('');
   $m('gBagFor').innerHTML=h?`for <b style="color:${gcol(h)}">${h.n}</b> · ${gfil==='all'?'ALL GEAR':GS[gfil].n.toUpperCase()}`:'';
-  $m('gBagN').innerHTML=`BAG <b>${g.inv.length}</b>/${GINV}`;
+  $m('gBagN').innerHTML=`BAG <b>${g.inv.length}</b>/${GINV} &nbsp;${TE().GPI} <b>${TE().nf(TE().G.gp||0)}</b>`;
   const inv=g.inv.filter(it=>gfil==='all'||it.s===gfil).sort((a,b)=>b.r-a.r||b.lv-a.lv||a.s.localeCompare(b.s));
   $m('gInv').innerHTML=inv.length?'<div class="gGrid">'+inv.map(it=>{const o=ownerOf(it);const oh=o&&T.HB[o];return '<div class="gSlot">'+itemCard(it,o?`<img class="own" src="${portraitURL(oh)}" style="border-color:${gcol(oh)}">`:'',h&&o===h.id?'mine':o?'used':'')+'</div>';}).join('')+'</div>':'<div class="gEmpty">No gear here yet. Win battles to find gear!</div>';}
 // v16-47: the 5 battle-team heroes stand on the pedestals of Marius' HEROES page (animated idle pose)
@@ -2761,7 +2761,7 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
   rows.push(oh?`<div class="iSt ow">${IMGI(portraitURL(oh),'1.4em','-.4em')} worn by <b style="color:${gcol(oh)}">${oh.n}</b></div>`:`<div class="iSt ow">${IMGI('img/ui2/i_key.webp','1.2em','-.3em')} free · in the bag</div>`);
   const mx=it.lv>=gMax(it),c=mx?0:gpCost(it);
   let b1='';if(h){b1=o===h.id?`<button class="b1" data-p="ueq" data-it="${it.id}">UNEQUIP</button>`:`<button class="b1" data-p="eq" data-it="${it.id}">EQUIP<small>on ${h.n}</small></button>`;}else b1='<button class="b1 dis">EQUIP</button>';
-  let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itIc">${itemCard(it)}</div>
+  let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itHave" title="Your Gear Parts">${TE().GPI}<span><small>YOU HAVE</small>${T.nf(G.gp||0)}</span></div><div class="itIc">${itemCard(it)}</div>
    <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · Lv ${it.lv}/${gMax(it)}${' · '+starsH(it.sr||0,it.r>=6,1)}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
    <div class="itSt">${rows.slice(0,4).join('')}</div>
    <div class="itBt">${b1}<button class="b2${mx||(G.gp||0)<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?'MAX LEVEL':`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${GPN(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${GPN(salvageV(it))}</small></button></div></div><div class="itMore">`;
@@ -2776,7 +2776,7 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
    const SM=gsMax(it);if(sr<SM){x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${SM}<button class="gGd" data-p="gguide" data-it="${it.id}">?</button></div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV({...it,sr:sr+1})}%</b> <small>(★${sr} ➜ ★${sr+1}${sr>=5?' · +5% each star'+((sr+1)%5===0&&sr+1>5?' · NEW STAR COLOR + NEW STAT':''):' · +'+GSTAR_K*100+'% each star'})</small></div>${fx}<button class="cpGo${f?'':' dis'}" data-p="${f?'star':''}" data-it="${it.id}">${STI('on')} STAR UP</button>`;}
    else if(it.r===5){const nx={...it,r:6};x+=`<div class="cpSec" style="color:${ASC.c}">${STI('asc')} ASCEND · ABOVE MYTHIC<button class="gGd" data-p="gguide" data-it="${it.id}">?</button></div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(stars stay ★5 · max Lv ${GMAXR[5]} ➜ ${GMAXR[6]} · +1 bonus stat)</small></div>${fx}<button class="cpGo asc${f?'':' dis'}" data-p="${f?'asc':''}" data-it="${it.id}">${STI('asc')} ASCEND</button>`;}
    else x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${SM} · MAX</div>`;}
-  if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(Lv ${it.lv} ➜ ${it.lv+1})</small></div>`;}
+  if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(Lv ${it.lv} ➜ ${it.lv+1})</small></div><div class="iUp iCost">Cost: <b>${GPN(c)}</b> · You have: <b class="${(G.gp||0)<c?'no':'up'}">${GPN(G.gp||0)}</b>${(G.gp||0)<c?` <small>(need ${T.nf(c-(G.gp||0))} more)</small>`:''}</div>`;}
   x+='</div>';
   if(keep)morph($('cpPopBox'),x);else pop(x);$('cpPopBox').classList.add('itPop');}
 // v16-93 GEAR GUIDE – how gear gets stronger than Mythic, with pictures (Marius: "doar scris nu se vede")
