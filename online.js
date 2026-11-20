@@ -8,13 +8,13 @@ const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null
 const LANG=(navigator.language||'en');
 const esc=s=>String(s??'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
 const flag=cc=>cc&&/^[A-Z]{2}$/.test(cc)?String.fromCodePoint(...[...cc].map(c=>127397+c.charCodeAt(0))):'';
-const fmtN=n=>n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+'M':n>=1e4?Math.round(n/1e3)+'K':String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const fmtN=n=>n>=1e9?(n/1e9).toFixed(n>=1e10?0:1)+'B':n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+'M':n>=1e4?Math.round(n/1e3)+'K':String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
 const toast=(m,d)=>{const t=T();if(t&&t.toast)t.toast(m,d||2600);};
 const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=113;
+const CV=114;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -134,7 +134,7 @@ const css=`
 #onl .pin{padding:6px 10px 8px;background:linear-gradient(#0000,#000c 30%)}
 #onl .pin .o-row{margin:0}
 #onl .o-note{font:700 10.5px/1.45 system-ui;color:#8fa0b4;text-align:center;padding:6px 4px 8px}
-#onl .empty{font:800 13px/1.5 system-ui;color:#c9b88a;text-align:center;padding:30px 16px}
+#onl .empty{font:800 13px/1.5 system-ui;color:#ffe7b0;text-align:center;padding:12px 16px;margin:20px auto;width:fit-content;max-width:86%;background:#0a0f1ae6;border:1px solid #e0a82e88;border-radius:12px;position:relative;z-index:2}
 #onl .msgs{flex:1;overflow:auto;padding:8px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 #onl .m{display:flex;gap:8px;margin-bottom:11px;animation:olM .4s cubic-bezier(.2,1.3,.4,1) both}
 @keyframes olM{from{transform:translateY(14px) scale(.92);opacity:0}}
@@ -216,15 +216,15 @@ const css=`
 #onl .pname b{font:900 22px system-ui;text-shadow:0 2px 0 #000}
 #onl .edit{width:30px;height:30px;border-radius:9px;border:0;background:linear-gradient(#fff1a8,#ffb300);box-shadow:0 2px 0 #7a4a00;font-size:14px}
 #onl .pid{position:relative;font:700 10px system-ui;color:#c9b88a;margin-top:5px}
-#onl .stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:6px}
+#onl .stats{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;margin-bottom:6px}
 #onl .stats div{background:linear-gradient(#1f2937,#111820);box-shadow:0 0 0 1px #3a4656;border-radius:12px;padding:8px 10px;font:700 10px system-ui;color:#8fa0b4}
 #onl .stats div b{display:block;font:900 16px system-ui;color:#ffe27a;margin-top:2px}
 #onl h3{margin:14px 2px 8px;font:900 12px system-ui;letter-spacing:1.5px;color:#ffd54a;display:flex;align-items:center;gap:6px}
 #onl h3:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#ffd54a88,transparent)}
-#onl .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:2px}
+#onl .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:2px}
 #onl .grid .ring{aspect-ratio:1;width:100%}
 #onl .grid .ring.sel{box-shadow:0 0 0 2.5px #fff,0 0 0 4.5px #ffc23a,0 0 14px #ffc23a}
-#onl .frames{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#onl .frames{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #onl .frames .av{width:100%;aspect-ratio:220/235;height:auto}
 #onl .frames .sel .av{filter:drop-shadow(0 0 8px #ffc23a)}
 #onl .frames .o-lock .av{filter:grayscale(1) brightness(.45)}

@@ -68,3 +68,46 @@ new MutationObserver(ms => {
 }).observe(document.documentElement, {subtree:true, attributes:true, attributeFilter:['class'], attributeOldValue:true});
 window.PAGEFX = {ready};
 })();
+
+// v16-113: AUTO-FIT TEXT. Marius: "verifică tot scrisul peste tot". A one-line text (name, number, button label)
+// that is wider than its box is no longer cut ("The Torque Ki…") or pushed out of its frame: its letters get a
+// little smaller until it fits (never below 62% of the normal size). Runs only on the parts of the page that
+// changed, at most 4 times a second, and skips everything inside the battle canvas.
+(function(){
+'use strict';
+const MIN = .62, done = new WeakMap(), fitted = new WeakSet();
+let q = new Set(), tm = 0;
+const INL = new Set(['SPAN','B','I','EM','SMALL','STRONG','IMG','BR','U','SUP','SUB','svg','use']);
+// a "text line": only text and inline pieces inside (name, number, label with an icon)
+function leaf(el){ if(!el.textContent.trim()) return false; for(const c of el.querySelectorAll('*')) if(!INL.has(c.tagName)) return false; return true; }
+function fit(el){
+  if(!el.isConnected) return;
+  if(!el.clientWidth) return;   // hidden (display:none) → checked again when its page opens
+  const key = el.textContent + '|' + el.clientWidth;
+  if(done.get(el) === key) return;
+  const cs = getComputedStyle(el);
+  if(cs.whiteSpace!=='nowrap' && cs.whiteSpace!=='pre') { done.set(el,key); return; }
+  if(cs.display==='inline'){ done.set(el,key); return; }
+  el.style.removeProperty('font-size');
+  const base = parseFloat(getComputedStyle(el).fontSize), w = el.clientWidth, sw = el.scrollWidth;
+  if(sw > w && base){ fitted.add(el); const f = Math.max(MIN, (w / sw) * .98); el.style.setProperty('font-size', (base*f).toFixed(2)+'px', 'important');
+    if(el.scrollWidth > el.clientWidth && f > MIN) el.style.setProperty('font-size', (base*Math.max(MIN,f*.92)).toFixed(2)+'px', 'important'); }
+  done.set(el, el.textContent + '|' + el.clientWidth);
+}
+function run(){ tm = 0; const roots = [...q]; q.clear(); let n = 0;
+  for(const r of roots){ if(!r.isConnected || r.closest && r.closest('#bt')) continue;
+    if(r.nodeType!==1 || hid(r)) continue;
+    const tw = document.createTreeWalker(r, NodeFilter.SHOW_ELEMENT, {acceptNode: e => (SKIPT.has(e.tagName) || hid(e)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    for(let el = r; el && ++n < 20000; el = tw.nextNode()){ if(!SKIPT.has(el.tagName) && leaf(el)) fit(el); } } }
+const hid = e => !e.getClientRects().length && getComputedStyle(e).display!=='contents';
+const SKIPT = new Set(['CANVAS','IMG','SVG','svg','SCRIPT','STYLE','VIDEO','INPUT','TEXTAREA','SELECT']);
+function push(t){ if(t && t.nodeType===3) t = t.parentElement; if(!t || t===document.body || t===document.documentElement) return; q.add(t); if(!tm) tm = setTimeout(run, 250); }
+function start(){
+  new MutationObserver(ms => { for(const m of ms){ if(m.type==='characterData') push(m.target.parentElement); else if(m.type==='childList'){ if(m.addedNodes.length){ if(m.target===document.body) m.addedNodes.forEach(push); else push(m.target); } } else if(m.attributeName==='class') { const t=m.target; if(t.classList && t.classList.contains('open')) push(t); }
+      else if(m.attributeName==='style' && fitted.has(m.target) && !m.target.style.fontSize){ done.delete(m.target); push(m.target); } } })  // the game's morph() redraw removed our size → fit again
+    .observe(document.body, {subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:['class','style']});
+  addEventListener('resize', () => { push(document.body.firstElementChild); document.querySelectorAll('.open').forEach(push); });
+}
+if(document.body) start(); else addEventListener('DOMContentLoaded', start);
+window.__FIT = {all:()=>{ document.querySelectorAll('body > *').forEach(e=>q.add(e)); run(); }};
+})();

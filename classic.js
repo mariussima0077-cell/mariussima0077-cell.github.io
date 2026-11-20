@@ -260,7 +260,7 @@ const css=document.createElement('style');css.textContent=`
 .ccTabs img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px #000a)}.ccTabs .i1{display:none}.ccTabs button.on .i1{display:block}.ccTabs button.on .i0{display:none}
 #ccBody{flex:1;overflow-y:auto;padding:4px 10px 18px;touch-action:pan-y}
 .ccSum{background:linear-gradient(#1f1a33ee,#120f20ee);border:2px solid #e0aa2588;border-radius:14px;padding:10px;text-align:center;margin-bottom:10px}.ccSum b{color:#ffd54a;font-size:12px;letter-spacing:.5px}.ccSum div{margin:6px 0;font:800 13px system-ui}.ccSum small{color:#9fb0c0}.ccSum i{color:#7CFC9A;font-style:normal}
-.ccGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ccGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .ccSp{position:relative;aspect-ratio:420/539;background:url(img/cc/card.webp) center/100% 100% no-repeat;text-align:center;container-type:inline-size;filter:drop-shadow(0 4px 8px #000c)}
 .ccGl{position:absolute;left:8%;right:8%;top:12%;height:58%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,var(--gc,#000) 30%,transparent),transparent 70%)}
 .ccGl>img{width:100%}.ccGl em{font:900 7cqw system-ui;color:var(--gc);font-style:normal;text-shadow:0 1px 2px #000}.ccGl small{font:800 6.4cqw/1.3 system-ui;color:#d7e3ff;text-shadow:0 1px 2px #000}.ccGl .tki{height:1.25em;vertical-align:-.3em}
