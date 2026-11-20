@@ -3796,7 +3796,7 @@ function startLoader(){
   (function lf(now){if(started)return;const t=(now-t0)/1000;
     const cap=assetsDone()?100:88;lp=Math.min(cap,lp+.9);if(lp>=100&&!lready){lready=true;if(window.CLOUD){CLOUD.mountStart($('lpanel'));$('lpanel').classList.add('on');}}
     drawLoader(t);requestAnimationFrame(lf);})(t0);
-  $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
+  $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;},1500);/* v16-115: free the loading canvas (~5 MB) */last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
 // v16-72: what the tutorial (tutorial.js) needs from the map – camera, building areas, panel
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},

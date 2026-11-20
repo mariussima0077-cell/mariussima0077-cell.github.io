@@ -67,13 +67,13 @@ const S=[
  {el:()=>$('shBtn'),tap:1,enter:function(){lv0=G.lv.service||0;this.next=FORCE?'NEXT':'';if(!FORCE&&G.money<upCost()){G.money=upCost();try{save();}catch(e){}}},t:()=>`Tap <b>UPGRADE</b>: more mechanics, faster work and bigger pay.`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>(G.lv.service||0)>lv0},
  {el:()=>$('smBtn'),tap:1,enter:()=>{try{closePanel();}catch(e){}},t:`Your mechanics are also <b>HEROES</b>! Open <b>SUMMON</b> – you have free Recruit Tickets.`,done:()=>isOpen('sm')},
  {el:()=>document.querySelector('#smBox [data-a="sum"][data-n="10"]')||document.querySelector('#smBox [data-a="sum"]'),tap:1,enter:function(){tk0=G.h.tk;hc0=(G.h.hist||[]).length;this.next=FORCE?'NEXT':'';},t:()=>`Tap <b>×10</b> to recruit 11 heroes at once!`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>G.h.tk<tk0||(G.h.hist||[]).length!==hc0||isOpen('res')},
- {free:1,top:1,p:'thumb',t:`Nice team! Heroes <b>work in your garage</b> and <b>fight in battles</b>. Now close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
+ {el:()=>isOpen('res')?null:document.querySelector('#smBox [data-a="back"]'),tap:1,top:1,p:'thumb',t:`Nice team! Heroes <b>work in your garage</b> and <b>fight in battles</b>. Now close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
  {el:()=>$('cpBtn'),tap:1,t:`Monsters made of car parts are attacking the city! Tap <b>BATTLE</b>.`,done:()=>isOpen('hub')||isOpen('cp')},
  {el:()=>document.querySelector('#hub.open [data-hb="camp"]'),tap:1,t:`Open the <b>CAMPAIGN</b>.`,done:()=>vis(document.querySelector('#cpPath .node.cur'))&&!isOpen('hub')},
  {el:()=>document.querySelector('#cpPath .node.cur'),tap:1,enter:()=>{best0=G.cp.best;},t:`Tap your stage.`,done:()=>isOpen('cpCard')},
  {el:()=>document.querySelector('#cpCard.open .ppF'),tap:1,t:`Your best heroes are already in the team. Press <b>FIGHT!</b>`,done:()=>isOpen('bt')},
  {hide:1,done:()=>isOpen('cpRes')},
- {free:1,top:1,res:1,t:()=>G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear. Now go back to your garage with <b>↩</b>.`:`So close! Make your heroes stronger with gear and try again. Go back to your garage with <b>↩</b>.`,done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
+ {el:()=>isOpen('cpRes')?document.querySelector('#cpResBox [data-a="map"]'):isOpen('hub')?document.querySelector('#hub [data-hb="back"]'):isOpen('cp')?document.getElementById('cpBack'):null,tap:1,top:1,res:1,t:()=>(G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear.`:`So close! Make your heroes stronger with gear and try again later.`)+(isOpen('cpRes')?` Tap <b>CAMPAIGN</b>, then <b>↩</b> to go back to your garage.`:` Tap <b>↩</b> to go back to your garage.`),done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
  {el:()=>$('dqBtn'),t:`<b>DAILY QUESTS</b>: finish them every day for VIP points, diamonds and tickets.`,next:'NEXT'},
  {el:()=>$('idBtn'),t:`<b>IDLE REWARDS</b>: your garage keeps earning while you are offline. Collect it here!`,next:'NEXT'},
  {t:()=>`That's it, boss! Here is a welcome gift. Now build your <b>TORQUE EMPIRE</b>!<div class="gift"><span>${TE().DMI} 100</span><span>${X().TKI()} 2</span></div>`,next:'START',gift:1},
@@ -87,6 +87,8 @@ const ptI=root.querySelector('.pt img');let pose='';function setPose(k){if(k!==p
 const tb={T:$('tbT')||root.querySelector('#tbT'),B:root.querySelector('#tbB'),L:root.querySelector('#tbL'),R:root.querySelector('#tbR')};
 let i=-1,cur=null,skipArm=0,lastTx='';
 function place(L,T,Wd,H){const s=(e,a,b,c,d)=>{e.style.left=a+'px';e.style.top=b+'px';e.style.width=Math.max(0,c)+'px';e.style.height=Math.max(0,d)+'px';};
+  // v16-115: place(0,0,0,0) = no blockers at all (before, tbB covered the whole screen → "free" steps were stuck)
+  if(Wd<=0&&H<=0){for(const k in tb)s(tb[k],0,0,0,0);return;}
   s(tb.T,0,0,innerWidth,T);s(tb.B,0,T+H,innerWidth,innerHeight-T-H);s(tb.L,0,T,L,H);s(tb.R,L+Wd,T,innerWidth-L-Wd,H);}
 let L=S,MINI=null;
 function go(n){i=n;cur=L[i];skipArm=0;lastTx='';if(!cur){end();return;}

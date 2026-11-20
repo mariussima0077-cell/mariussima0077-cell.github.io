@@ -41,11 +41,18 @@ window.__BOT={
      const c=costOf(id,lv);if(c<=G.money&&(!best||c<best.c))best={id,c};}
    return best;},
  buyAll(){let n=0,spent=0;for(let k=0;k<60;k++){const b=this.bestUpgrade();if(!b)break;sel=b.id;$('shBtn').onclick();n++;spent+=b.c;(this.up=this.up||[]).push([Math.round((Date.now()-1794812400000)/36e5*10)/10,b.id,G.lv[b.id],b.c]);}sel=null;try{closePanel();}catch(e){}return n;},
- gearUp(){ // balanced player: half of the money goes to gear levels of the battle team (cheapest step first)
-   const T=__BT,g=T.GR();let budget=G.money*.5,n=0;
+ gearUp(){ // v16-115: gear is upgraded with Gear Parts (G.gp) since v16-99, hero levels with Essence – the player spends both
+   this.levelUp();
+   const T=__BT,g=T.GR();let budget=G.gp||0,n=0;
    for(let k=0;k<400;k++){let best=null;for(const id of G.cp.team||[]){const eq=g.eq[id];if(!eq)continue;for(const s in eq){const it=T.itemById(eq[s]);if(!it||it.lv>=T.gMax(it))continue;const c=T.upCost(it);if(!best||c<best.c)best={it,c};}}
-     if(!best||best.c>budget)break;G.money-=best.c;budget-=best.c;best.it.lv++;n++;}
+     if(!best||best.c>budget)break;G.gp-=best.c;budget-=best.c;best.it.lv++;n++;}
    if(n)save();return n;},
+ levelUp(){ // Essence → LEVEL UP the battle team evenly (lowest level first), ascend when capped
+   let n=0;for(let k=0;k<3000;k++){const ids=(G.cp.team||[]).filter(id=>G.h.own[id]);if(!ids.length)break;
+     ids.sort((a,b)=>(G.h.own[a].lv||1)-(G.h.own[b].lv||1));let done=false;
+     for(const id of ids){if(lvUp(id,1)){done=true;n++;break;}if(ascend(id)){done=true;n++;break;}}
+     if(!done)break;}
+   return n;},
  team(){ // like a real player: best tank (Bruiser/Legend) + best Medic, then the strongest others
    const T=__BT,L=T.myMechs(),out=[];const take=f=>{const h=L.find(x=>!out.includes(x.id)&&f(T.roleOf(x)));if(h)out.push(h.id);};
    take(r=>r==='engine'||r==='all');take(r=>r==='service');for(const h of L){if(out.length>=5)break;if(!out.includes(h.id))out.push(h.id);}
