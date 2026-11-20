@@ -51,4 +51,6 @@ Referința atașată = captură cu cadrele mari din planșa veche (ChatGPT nu pr
 - ✅ **REX REDLINE (m4_5)** – 8/8 (chat „Create splash art”).
 - ✅ **VIKTOR (m3_0, Epic)** – 8/8 (chat „Create Viktor Splash Art”). Attack cadrul 3: cheia atinge sus → de prelungit.
 - ✅ **BIG MO (m3_1, Epic)** – 8/8 (al doilea chat „Generate Splash Art”, cel mai nou). Attack cadrul 4: flash-ul atinge marginea dreaptă; FX = dom semi-transparent (atenție la verdele din spate la decupare).
+- ✅✅ **GLORIA (m3_2) în main la v16-108** (20 nov, primul Epic cu 8 cadre): `v8_hero.py m3_2` (`SPECKS` = scoate bucățile din cadrul vecin la KO, marginile vopselei → mov, nu gri; spray-ul din FX → roz-mov lucios). `SKF.m3_2`: cast .6 s `ck:5`, `pk:[5,6,7]`, valul `sheet8` pe grupul cel mai mare, sincron cu linia `scan` (damage-ul GLOSS WAVE neschimbat). Splash `splash_m3_2`.
+- ⏳ Dr. Ohm (m3_3): prompturile + referința trimise din nou în chat (20 nov), aștept 8 poze → `img/sheets/ohm/m3_3_<anim>.webp`.
 - ⏳ Următorii Epic: Gloria (m3_2), Dr. Ohm (m3_3), Hugo (m3_4), Aria (m3_5), Nina (m3_6) – prompturile gata în `mk2.py`. **20 nov (v16-107): trimise lui Marius** (Gloria în chat, ceilalți 4 într-un .txt, fiecare cu poza de referință .jpg).

@@ -27,6 +27,8 @@ HEROES = {
   'm4_3': ('sofia', {'idle': 451, 'run': 410, 'attack': 397, 'skill': 392, 'hitko': 393, 'win': 389, 'fx': 400}),
   'm4_4': ('otto', {'idle': 407, 'run': 400, 'attack': 388, 'skill': 395, 'hitko': 388, 'win': 384, 'fx': 450}),
   'm4_5': ('rex', {'idle': 428, 'run': 405, 'attack': 399, 'skill': 384, 'hitko': 398, 'win': 393, 'fx': 420}),
+  # v16-108 (20 nov): GLORIA – first Epic with 8 frames. REF = frame 1 standing (idle sheet drawn bigger); fx = paint wave
+  'm3_2': ('gloria', {'idle': 461, 'run': 400, 'attack': 386, 'skill': 379, 'hitko': 388, 'win': 424, 'fx': 340}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -37,6 +39,7 @@ OLDH = 241          # standing height in 256-cell units (same size as the old sh
 APU = .75           # atlas px per unit (same as the old 192-px cells)
 P = 110             # extension padding (sheet px)
 
+SPECKS = {'m3_2'}   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
 KEEPBLUE = {'m4_2', 'm4_3', 'm4_4'}   # v16-106: + Sofia's crown gem, Otto's blue tablet / ear piece / clock glow   # v16-96 Duke: blue diamonds / ice crystals (cyan) must stay blue, not turn grey
 
 def despill(a, n=''):
@@ -50,6 +53,7 @@ def despill(a, n=''):
     v = (r + b) / 2
     tint = ((0, 6), (1, 2), (2, 0))
     if HID in KEEPBLUE and n == 'fx': v = np.maximum(r, b); tint = ((0, -40), (1, 0), (2, 25))  # teal glow → icy blue, not grey
+    if HID == 'm3_2' and n in ('fx', 'skill', 'attack'): tint = ((0, 18), (1, -28), (2, 34))   # v16-108 Gloria: paint spill edges → purple, not grey
     for k, o in tint: a[..., k] = np.where(sm, np.clip(v + o, 0, 255), a[..., k])
     return a
 
@@ -78,6 +82,9 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
                 ('hitko', 7): 'none', ('fx', 4): 'fade'},
        'm4_5': {('idle', 3): 'none', ('idle', 4): 'none', ('attack', 2): 'fade:R', ('attack', 3): 'fade:R', ('skill', 3): 'fade',
                 ('fx', 3): 'fade', ('fx', 4): 'fade'},
+       'm3_2': {**{('idle', i): 'none' for i in range(8)}, ('attack', 3): 'fade:R', ('attack', 4): 'none', ('skill', 4): 'fade',
+                ('hitko', 1): 'none', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none', ('win', 1): 'fade:R',
+                ('win', 2): 'fade:R', ('win', 3): 'none', ('win', 4): 'none', ('win', 5): 'none', ('fx', 4): 'fade'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 
@@ -128,11 +135,14 @@ WIDE = {'m4_1': 90}
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
     a = despill(unmix(im), n).astype(np.float32)
+    if HID == 'm3_2' and n == 'fx':   # v16-108: whitish see-through spray reads grey on the battlefield → light glossy pink-purple
+        rgb = a[..., :3]; sat = rgb.max(-1) - rgb.min(-1); k = np.clip(1 - sat / 90, 0, 1)[..., None] * .55
+        a[..., :3] = rgb * (1 - k) + np.array([235, 160, 255]) * k
     H, W = a.shape[:2]; ch, cw = H // 2, W // 4   # v16-96: any sheet size (Grigore's skill sheet is 1774x887)
     pc = WIDE.get(HID, 0)
     if not pc:
         cs = [a[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] for r in range(2) for c in range(4)]
-        if HID in KEEPBLUE: cs = [drop_specks(c) for c in cs]   # v16-97 Duke
+        if HID in KEEPBLUE or HID in SPECKS: cs = [drop_specks(c) for c in cs]   # v16-97 Duke
         if HID == 'm4_4' and n == 'skill':   # v16-106 Otto: frame 6 was drawn without his backpack → frame 5 in time-warp blue
             b = cs[4].copy(); l = b[..., :3].mean(-1, keepdims=True)
             b[..., :3] = np.clip(b[..., :3] * .25 + l * np.array([.30, .95, 1.45]) * .85, 0, 255); cs[5] = b

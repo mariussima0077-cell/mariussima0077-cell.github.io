@@ -979,7 +979,7 @@ const SPRD={
  // cs = skill frames · lp = leap frames · ld = landing frames (lt s) · ds = dash frames (first ones once, last 2 loop) · noKO = sheet has no hurt/KO row
  m3_0:{w:384,a:[195,248],m:[300,150],R:[0,1,2,3,5,6],lp:[[3,0],[3,1],[3,2],[3,3]],ld:[[4,0],[4,1],[4,2],[4,3]],lt:.6},
  m3_1:{w:384,a:[194,249],m:[300,100],look:'wrench'},
- m3_2:{w:384,a:[205,248],m:[312,102],col:'#d05cff',boom:'fx_purpleboom',R:[0,1,2,3,0,5],cs:[[3,1],[3,2],[3,3],[4,0],[4,1]],hk:{h:[6,1],s:[7,0],ko:[[6,2],[6,3],[7,1],[7,2],[7,3]]}},
+ m3_2:{a:[114.7,246],m:[176.2,102.5],col:'#d05cff',boom:'fx_purpleboom',v8:{cw:189,uw:252.0,ax:114.7,rows:[[0,191,254.7,250.7],[191,195,260.0,256.0],[386,189,252.0,246.7],[575,191,254.7,249.3],[766,187,249.3,245.3],[953,190,253.3,249.3]],ck:5,pk:[5,6,7]},fx8:{cw:201,uw:268.0,ax:134.7,rows:[[0,203,270.7,256.0]]}}, // v16-108: GLORIA – 8 frames (tools/v8_hero.py m3_2); ck = shake/aim/charge 0-4, pk = sweep burst → drops → idle; paint wave = fxs, frame 5 = crash
  m3_3:{w:384,a:[184,250],m:[312,130],col:'#d05cff'},
  m3_4:{w:384,a:[201,248],m:[312,142],col:'#e040fb',R:[0,1,3,4,5,6]},
  m3_5:{w:384,a:[183,249],m:[300,150]},
@@ -1729,6 +1729,10 @@ function imgFx(k,x,y,w,d,o){B.fx.push(Object.assign({type:'imgfx',k,x,y,w,t:0,d}
 function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 function castAct(u,dur,fire){u.act={k:'cast',t:0,dur,fire};u.st='cast';}
 const SKF={
+ m3_2(u,ms){const P=skp(u); // v16-108: Gloria's GLOSS WAVE – her own paint wave (8 frames) crashes on the biggest group when the sweep reaches it
+   castAct(u,.6,()=>{u.post=.6;const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],ok=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;let ds=0;
+   if(c&&ok){const tt=.7*Math.max(0,c.x-u.x)/Math.max(1,W+20-u.x);ds=Math.max(0,.46-tt);B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}
+   B.fx.push({type:'scan',x:u.x,t:-ds,d:.7,src:u,hit:new Set(),p:P});});},
  m4_0(u){castAct(u,.75,()=>{const y=fy(.5);shake(14);u.post=.6;B.fx.push({type:'quake',x0:u.x+30*S,t:0,d:1.1,src:u,hit:new Set()});
    B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);
    if(FX2){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
@@ -1948,7 +1952,7 @@ function fxUpdateGear(f){f.done=true;const x=f.tgt?f.tgt.x:f.x;const y=f.tgt?fy(
   if(f.tgt&&!f.tgt.dead){damage(f.src,f.tgt,f.mult||3,{skill:1});}debris(x,y-6,4,['#ffd54a','#ffca28','#9e9e9e']);shake(6);B.fx.push({type:'ring',x,y,t:0,d:.35,r:40*S,col:'#ffd54a',ground:1});f.lx=x;
   if(FX2){fxs('fire_01','#ffab00',x,y-16*S,{d:.45,s0:24*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxShock(x,y,'#ffd54a',40*S);fxScorch(x,y,'#2b1a10',30*S,2);}}
 function fxUpdate(f,dt){
-  if(f.type==='scan'){const P=f.p||{},SC=P.col||'#64ffda',x=lerp(f.x,W+20,Math.max(0,f.t/f.d));if(FX2&&Math.random()<.5)fxs('trace_01',SC,x,(FY0+FY1)/2-50*S,{d:.3,s0:(FY1-FY0)+180*S,s1:(FY1-FY0)+180*S,sx:.35,a0:.6});
+  if(f.type==='scan'){if(f.t<0)return;const P=f.p||{},SC=P.col||'#64ffda',x=lerp(f.x,W+20,Math.max(0,f.t/f.d));if(FX2&&Math.random()<.5)fxs('trace_01',SC,x,(FY0+FY1)/2-50*S,{d:.3,s0:(FY1-FY0)+180*S,s1:(FY1-FY0)+180*S,sx:.35,a0:.6});
     for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);m.mark=Math.max(m.mark,P.mark||7);if(P.slow)m.slow=Math.max(m.slow,P.slow);damage(f.src,m,P.mult||1.2,{skill:1});sparks(m.x,headY(m)+20,6,SC);if(FX2){const my=headY(m)+22*dsc(m.d);fxs('magic_02',SC,m.x,my,{d:.7,s0:20*S,s1:80*S,vr:3,ease:1});fxs('circle_05','#a7ffeb',m.x,my,{d:.35,s0:20*S,s1:60*S});}}}
   else if(f.type==='chain'&&!f.done&&f.t>=0){f.done=true;if(!f.b.dead){damage(f.src,f.b,f.mult,{skill:1});f.b.stun=Math.max(f.b.stun,f.stun||1.5);sparks(f.b.x,headY(f.b)+20,10,'#80d8ff',200);}shake(3);
     if(FX2){const a=f.a,b=f.b,ax=a.x,ay=a.hero?fy(a.d)-44*dsc(a.d):headY(a)+20,bx=b.x,by=headY(b)+20;fxBolt(ax,ay,bx,by,'#40c4ff',80);fxs('spark_02','#80d8ff',bx,by,{d:.4,s0:40*S,s1:100*S,rot:rnd(0,TAU),ease:1});fxBurst(bx,by,'#40c4ff',36*S);}}
