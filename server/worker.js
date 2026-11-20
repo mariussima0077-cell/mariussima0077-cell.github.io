@@ -38,8 +38,13 @@ export default {
     try {
       if (url.pathname === '/api/report' && req.method === 'POST') return json(await report(await req.json(), env));
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
-      if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') return json(await cloud(url.pathname.slice(11), await req.json(), env));
-      if (url.pathname.startsWith('/api/on/') && req.method === 'POST') return json(await online(url.pathname.slice(8), await req.json(), env));
+      if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') { const op = url.pathname.slice(11), b = await req.json();
+        if (op === 'save' && !(await integOk(env, b && b.pid))) return json({err:'integrity'});
+        return json(await cloud(op, b, env)); }
+      if (url.pathname === '/api/integrity' && req.method === 'POST') return json(await integrity(await req.json(), env));
+      if (url.pathname.startsWith('/api/on/') && req.method === 'POST') { const op = url.pathname.slice(8), b = await req.json();
+        if (INTEG_OPS.includes(op) && !(await integOk(env, b && b.pid))) return json({err:'integrity'});   // v16-105: only when INTEGRITY = 'enforce'
+        return json(await online(op, b, env)); }
       if (url.pathname.startsWith('/api/xfer/') && req.method === 'POST') return json(await xfer(url.pathname.slice(10), await req.json(), env));
       if (url.pathname === '/admin/chat') return env.ADMIN_KEY && url.searchParams.get('key') === env.ADMIN_KEY ? onlineAdmin(url, env) : new Response('no', {status:403});
       if (url.pathname === '/admin') return admin(url, env);
@@ -147,6 +152,49 @@ async function scan(env) {
   await ensureCloud(env); await db.prepare('DELETE FROM accounts WHERE t<?').bind(now - 730 * day).run();
 }
 
+// ------------------------------------------------------------------ v16-105: Google Play Integrity
+// The Play app (TEIntegrity.java) asks Google for a token; we ask Google what it means:
+//   app  = PLAY_RECOGNIZED → the real app from Google Play (not a modded APK / Lucky Patcher copy)
+//   dev  = MEETS_DEVICE_INTEGRITY → a real phone, not rooted, not an emulator
+//   lic  = LICENSED → installed from Google Play by this Google account
+// Mode = variable INTEGRITY in wrangler.toml: 'log' (only written down, shown on /admin) or 'enforce'
+// (online modes + cloud save only for players with a good result in the last 3 days; the browser and old apps are refused).
+const INTEG_OPS = ['sync', 'fight', 'refresh', 'wbhit', 'evsc', 'say', 'prof'];
+let integReady = false;
+async function ensureInteg(env) {
+  if (integReady) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS integ(pid TEXT PRIMARY KEY, t INTEGER, app TEXT, dev TEXT, lic TEXT, ok INTEGER, err TEXT)').run();
+  integReady = true;
+}
+async function integOk(env, pid) {
+  if (env.INTEGRITY !== 'enforce') return true;
+  if (typeof pid !== 'string' || pid.startsWith('tst_')) return true;            // the owner's test account
+  await ensureInteg(env);
+  const r = await env.DB.prepare('SELECT t, ok FROM integ WHERE pid=?').bind(pid).first();
+  return !!(r && r.ok && Date.now() - r.t < 3 * 864e5);
+}
+async function integrity(b, env) {
+  await ensureInteg(env); const db = env.DB, now = Date.now();
+  if (!b || typeof b.pid !== 'string' || b.pid.length > 64) return {err:'bad'};
+  const save = (app, dev, lic, ok, err) => db.prepare('INSERT INTO integ(pid,t,app,dev,lic,ok,err) VALUES(?,?,?,?,?,?,?) ON CONFLICT(pid) DO UPDATE SET t=?2,app=?3,dev=?4,lic=?5,ok=?6,err=?7')
+    .bind(b.pid, now, app, dev, lic, ok ? 1 : 0, err ? String(err).slice(0, 200) : null).run();
+  if (!b.token) { await save('', '', '', 0, 'no token: ' + (b.err || '?')); return {ok:true, good:false}; }
+  let p;
+  try {
+    const r = await fetch(`https://playintegrity.googleapis.com/v1/${env.PACKAGE_NAME}:decodeIntegrityToken`, {method:'POST',
+      headers:{authorization:'Bearer ' + await gToken(env), 'content-type':'application/json'}, body:JSON.stringify({integrity_token:String(b.token)})});
+    const j = await r.json(); p = j.tokenPayloadExternal;
+    if (!p) { await save('', '', '', 0, 'google: ' + JSON.stringify(j.error || j).slice(0, 180)); return {ok:true, good:false}; }
+  } catch (e) { return {err:'google'}; }
+  const rq = p.requestDetails || {}, ai = p.appIntegrity || {}, di = p.deviceIntegrity || {}, ad = p.accountDetails || {};
+  const app = ai.appRecognitionVerdict || '', dev = (di.deviceRecognitionVerdict || []).join(','), lic = ad.appLicensingVerdict || '';
+  const fresh = rq.nonce === b.nonce && String(b.nonce).includes(b.pid.replace(/[^A-Za-z0-9]/g, '').slice(0, 12)) && Math.abs(now - (+rq.timestampMillis || 0)) < 10 * 60e3 && rq.requestPackageName === env.PACKAGE_NAME;
+  const good = fresh && app === 'PLAY_RECOGNIZED' && dev.includes('MEETS_DEVICE_INTEGRITY') && lic !== 'UNLICENSED';
+  await save(app, dev, lic, good, fresh ? null : 'old or foreign token');
+  if (!good) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'integ', `app=${app} dev=${dev || 'none'} lic=${lic}${fresh ? '' : ' stale'}`).run();
+  return {ok:true, good};
+}
+
 // ------------------------------------------------------------------ Google sign-in + cloud save
 let cloudReady = false;
 async function ensureCloud(env) {
@@ -252,6 +300,9 @@ async function diag(env) {
   try { const at = await gToken(env); out.token = !!at;
     const r = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${env.PACKAGE_NAME}/purchases/products/pack_starter/tokens/diag-fake-token`, {headers:{authorization:'Bearer ' + at}});
     const j = await r.json().catch(() => ({})); out.status = r.status; out.google = (j.error && j.error.message) || 'ok';
+    // v16-105: Play Integrity reachable? A fake token must give 'invalid token' (= all good), not 'permission denied'
+    const ri = await fetch(`https://playintegrity.googleapis.com/v1/${env.PACKAGE_NAME}:decodeIntegrityToken`, {method:'POST', headers:{authorization:'Bearer ' + at, 'content-type':'application/json'}, body:'{"integrity_token":"diag-fake-token"}'});
+    const ji = await ri.json().catch(() => ({})); out.integrity = {status:ri.status, google:(ji.error && ji.error.message) || 'ok', mode:env.INTEGRITY || 'log'};
     const q = await env.DB.prepare("SELECT sku,type,state,t FROM purchases ORDER BY t DESC LIMIT 5").all(); out.last = (q.results || []).map(x => ({sku:x.sku, type:x.type, state:x.state, t:new Date(x.t).toISOString()}));
   } catch (e) { out.err = String(e).slice(0, 200); }
   return out;
@@ -263,7 +314,7 @@ async function gToken(env) {
   if (tokCache.t > Date.now() + 60e3) return tokCache.v;
   const sa = JSON.parse(env.GOOGLE_SA), now = Math.floor(Date.now() / 1000);
   const enc = o => btoa(JSON.stringify(o)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
-  const unsigned = enc({alg:'RS256', typ:'JWT'}) + '.' + enc({iss:sa.client_email, scope:'https://www.googleapis.com/auth/androidpublisher', aud:'https://oauth2.googleapis.com/token', iat:now, exp:now + 3600});
+  const unsigned = enc({alg:'RS256', typ:'JWT'}) + '.' + enc({iss:sa.client_email, scope:'https://www.googleapis.com/auth/androidpublisher https://www.googleapis.com/auth/playintegrity', aud:'https://oauth2.googleapis.com/token', iat:now, exp:now + 3600});
   const pem = sa.private_key.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
   const key = await crypto.subtle.importKey('pkcs8', Uint8Array.from(atob(pem), c => c.charCodeAt(0)), {name:'RSASSA-PKCS1-v1_5', hash:'SHA-256'}, false, ['sign']);
   const sig = new Uint8Array(await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned)));
@@ -291,11 +342,12 @@ async function admin(url, env) {
   const bad = (await db.prepare('SELECT * FROM players WHERE score>0 ORDER BY banned DESC, score DESC LIMIT 100').all()).results;
   const ev = (await db.prepare('SELECT * FROM events ORDER BY t DESC LIMIT 40').all()).results;
   const buys = await db.prepare("SELECT COUNT(*) n FROM purchases WHERE state='ok'").first();
+  await ensureInteg(env); const ig = await db.prepare('SELECT COUNT(*) n, SUM(ok) g FROM integ WHERE t>?').bind(Date.now() - 3 * 864e5).first();
   const esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
-<h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b></div>
+<h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
 <h3>Flagged / banned</h3>${bad.map(p => `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b> · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>flags: ${esc(p.flags)} · money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br>${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`).join('') || '<div class=c>Nobody flagged 👍</div>'}
 <h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});

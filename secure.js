@@ -246,5 +246,18 @@ async function restore(force){   // force (v16-104): check every Play purchase a
 }
 setTimeout(restore, 4000);
 
-window.SEC = {PID, TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+// ---------- v16-105: Google Play Integrity (real app from Play + real phone, not rooted / emulator / modded APK) ----------
+// The app asks Google for a sealed token; only our server can open it (server/worker.js → integrity). Once per 12 h.
+async function integ(force){
+  if(!isCap || !API || TEST_ACC) return; const P = Capacitor.Plugins && Capacitor.Plugins.TEIntegrity;
+  const last = +(LS('te_integ_t')||0); if(!force && Date.now()-last < 12*3600e3) return;
+  let r = {err:'no plugin (old app)'};
+  const nonce = (PID.replace(/[^A-Za-z0-9]/g,'').slice(0,12) + Date.now().toString(36) + Math.random().toString(36).slice(2,12)).padEnd(24,'x');
+  if(P){ try{ r = await P.token({nonce}); }catch(e){ r = {err:String((e&&e.message)||e)}; } }
+  try{ const a = await fetch(API+'/api/integrity',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID, nonce, token:r.token||'', err:r.err||''})});
+    const j = await a.json(); if(j.ok) LS('te_integ_t', String(Date.now())); }catch(e){}
+}
+setTimeout(integ, 6000);
+
+window.SEC = {integ:()=>integ(true), PID, TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

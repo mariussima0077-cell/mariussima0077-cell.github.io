@@ -14,8 +14,10 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=104;
-async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();return j;}catch(e){return {err:'network'};}}
+const CV=105;
+async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
+// v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
+let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
 function needUpd(){if(document.getElementById('updNeed'))return;const d=document.createElement('div');d.id='updNeed';
   d.style.cssText='position:fixed;inset:0;z-index:100000;background:#000c;display:flex;align-items:center;justify-content:center;font-family:system-ui';
   d.innerHTML='<div style="width:min(88vw,340px);background:linear-gradient(#2a1a10,#160d07);border:2px solid #ffb300;border-radius:18px;padding:18px 16px;text-align:center;color:#fff;box-shadow:0 10px 40px #000"><div style="font-size:34px">🔄</div><div style="font:900 19px system-ui;color:#ffd54a;margin:4px 0">UPDATE REQUIRED</div><div style="font:700 13.5px system-ui;color:#e0c6ad;margin-bottom:14px">A new version of Torque Empire is out.<br>Update to play online (Arena, Ranking, Chat, Cup).<br>Your progress is saved.</div><button id="updGo" style="width:100%;padding:13px;border:0;border-radius:14px;background:#66bb6a;color:#10240f;font:900 17px system-ui">UPDATE NOW</button></div>';

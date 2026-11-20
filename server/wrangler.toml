@@ -6,6 +6,7 @@ keep_vars = true          # keep the secrets/variables you add in the dashboard 
 
 [vars]
 PACKAGE_NAME = "com.torqueempire.game"
+INTEGRITY = "log"         # v16-105 Play Integrity: "log" = only written down (/admin) · "enforce" = online + cloud save only for the real app on a real phone
 GOOGLE_CLIENT_ID = "1041720099519-ogooa4hblh8d4s96ieervv9rp7bqh2k5.apps.googleusercontent.com"      # Google sign-in: the OAuth Web client ID (public, not a secret) – see PLAY_RULES.md
 
 [triggers]
