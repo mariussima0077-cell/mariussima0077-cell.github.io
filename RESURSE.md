@@ -68,7 +68,7 @@
 - **Stele (+1)** vin DOAR din duplicate (același erou din summon). Nu există altă resursă pentru stele.
 - **Summon** = bilete (secțiunea 3) sau diamante (100 = 1).
 - Estimare jucător activ gratuit: ~40–45 summonuri / zi (10 check-in + ~13 quests + ~8 idle + 4 World Boss + arenă + ~5 din diamante) → primul Mythic în aproximativ **5–6 săptămâni**.
-- Excepție: pre-înregistrarea promite The Torque King (Mythic) la 200K – de dat prin Mail la lansare.
+- Excepție: pre-înregistrarea promite The Torque King (Mythic) la 200K – de dat prin Mail la lansare (lista completă a pragurilor: `NEXT_STEPS.md`, 20 nov, site v2).
 
 ## 7. Echipament (gear, doar pentru bătălii)
 | De unde | Ce |

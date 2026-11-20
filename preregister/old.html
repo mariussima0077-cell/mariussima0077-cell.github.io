@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torque Empire – Pre-Register</title>
+<meta name="description" content="Pre-register for Torque Empire on Google Play and unlock milestone rewards for every player.">
+<meta property="og:title" content="Torque Empire – Pre-register now">
+<meta property="og:description" content="Unlock rewards for everyone: hundreds of free tickets, diamonds, VIP points, a Legendary hero and The Torque King!">
+<meta property="og:image" content="a/bg.webp">
+<meta name="theme-color" content="#0b0d12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--card:#151924;--line:#272e3f;--txt:#eef1f7;--mut:#8d95aa;--acc:#ff7a1a;--acc2:#ffc640;--ok:#3ddc84;--leg:#ffcc33;--myth:#ff3b3b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;line-height:1.5;overflow-x:hidden}
+img{display:block}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.f-r{font-family:'Russo One',sans-serif;letter-spacing:.01em}
+h2{font-family:'Russo One';font-size:clamp(26px,7vw,40px);text-align:center;line-height:1.1}
+h2 em{font-style:normal;background:linear-gradient(180deg,#fff,var(--acc2) 55%,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{text-align:center;color:var(--mut);margin:8px auto 30px;max-width:520px}
+section{padding:56px 0;position:relative}
+
+/* ---------- reveal on scroll ---------- */
+.rv{opacity:0;transform:translateY(40px) scale(.97);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;min-height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.hero .bg{position:absolute;left:0;right:0;top:0;height:82%;background:url(a/bg.webp) center top/cover no-repeat;animation:kb 22s ease-in-out infinite alternate;transform-origin:50% 20%}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.12) translateY(-1.5%)}}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 22%,rgba(11,13,18,.7) 40%,rgba(11,13,18,.94) 52%,var(--bg) 66%);pointer-events:none}
+#embers{position:absolute;inset:0;z-index:2;pointer-events:none}
+.hero .in{position:relative;z-index:3;text-align:center;padding:0 16px 46px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:99px;background:rgba(255,122,26,.15);border:1px solid rgba(255,198,64,.6);color:var(--acc2);font:800 12px Inter;letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(6px);position:relative;overflow:hidden}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--myth);box-shadow:0 0 10px var(--myth);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.big{font-family:'Russo One';font-size:clamp(34px,10vw,64px);line-height:1.02;margin:14px 0 8px;text-shadow:0 4px 30px rgba(255,122,26,.45)}
+.big span{display:block;background:linear-gradient(180deg,#fff 15%,var(--acc2) 55%,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{color:#c3c9d8;max-width:460px;margin:0 auto 24px;font-size:16px}
+.cta{position:relative;display:inline-flex;align-items:center;gap:12px;padding:18px 30px;border-radius:16px;border:0;cursor:pointer;text-decoration:none;
+ font:800 18px Inter;color:#1d0e00;background:linear-gradient(180deg,#ffe07a,var(--acc2) 35%,var(--acc));box-shadow:0 10px 0 #a3420a,0 18px 40px rgba(255,122,26,.55);
+ transition:transform .12s,box-shadow .12s;overflow:hidden;isolation:isolate}
+.cta:active{transform:translateY(8px);box-shadow:0 2px 0 #a3420a,0 8px 20px rgba(255,122,26,.4)}
+.cta:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.75) 50%,transparent 65%);transform:translateX(-120%);animation:shine 3s infinite;z-index:-1}
+@keyframes shine{60%,100%{transform:translateX(120%)}}
+.cta .ring{position:absolute;inset:-6px;border-radius:20px;border:2px solid var(--acc2);animation:ring 2s infinite;pointer-events:none}
+@keyframes ring{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.18)}}
+.cta svg{width:24px;height:24px}
+.cta.off{filter:saturate(.5);cursor:default}
+.counter{margin-top:30px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mut);font-size:14px}
+.digits{display:flex;gap:4px}
+.digits b{font-family:'Russo One';font-size:34px;min-width:30px;padding:2px 4px;border-radius:8px;background:linear-gradient(180deg,#232a3a,#141822);border:1px solid #2f3850;color:#fff;box-shadow:inset 0 -12px 0 rgba(0,0,0,.25)}
+.digits b.sep{background:none;border:0;box-shadow:none;min-width:0;padding:0 1px;color:var(--mut)}
+.scroll{margin-top:22px;font-size:12px;color:var(--mut);animation:bob 1.6s infinite}
+@keyframes bob{50%{transform:translateY(6px)}}
+
+/* ---------- MYTHIC SHOWCASE ---------- */
+.show{background:radial-gradient(ellipse at 50% 60%,rgba(255,59,59,.22),transparent 60%)}
+.stage{position:relative;height:380px;max-width:420px;margin:0 auto;cursor:pointer;user-select:none}
+.halo{position:absolute;left:50%;top:48%;width:330px;height:330px;margin:-165px 0 0 -165px;border-radius:50%;
+ background:conic-gradient(from 0deg,transparent,rgba(255,122,26,.45),transparent 30%,rgba(255,59,59,.4),transparent 60%,rgba(255,198,64,.45),transparent 85%);
+ filter:blur(8px);animation:spin 9s linear infinite}
+.gearbg{position:absolute;left:50%;top:48%;width:300px;height:300px;margin:-150px 0 0 -150px;opacity:.18;animation:spin 24s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.podium{position:absolute;left:50%;bottom:22px;width:250px;height:56px;margin-left:-125px;border-radius:50%;
+ background:radial-gradient(ellipse,#3a2a1a 0,#1a1410 60%,transparent 71%);box-shadow:0 0 50px rgba(255,122,26,.5)}
+.podium:before{content:"";position:absolute;inset:8px 20px;border-radius:50%;border:2px solid rgba(255,198,64,.55);box-shadow:0 0 18px var(--acc2),inset 0 0 18px var(--acc2)}
+.spr{background-repeat:no-repeat;image-rendering:auto}
+.bigspr{position:absolute;left:50%;bottom:34px;width:320px;height:320px;margin-left:-160px;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6))}
+.fx{position:absolute;left:50%;top:40%;width:280px;height:280px;margin:-140px 0 0 -140px;mix-blend-mode:screen;background:center/contain no-repeat;opacity:0;pointer-events:none}
+.fx.go{animation:boom .9s ease-out}
+@keyframes boom{0%{opacity:0;transform:scale(.3) rotate(-20deg)}25%{opacity:1}100%{opacity:0;transform:scale(1.5) rotate(15deg)}}
+.stage.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+.flash{position:fixed;inset:0;background:radial-gradient(circle,rgba(255,200,120,.55),transparent 70%);opacity:0;pointer-events:none;z-index:50}
+.flash.go{animation:fl .5s}
+@keyframes fl{20%{opacity:1}100%{opacity:0}}
+.skname{position:absolute;left:0;right:0;top:12px;text-align:center;font-family:'Russo One';font-size:28px;color:#fff;
+ text-shadow:0 0 18px var(--acc),0 3px 0 #a3420a;opacity:0;transform:scale(2);pointer-events:none}
+.skname.go{animation:skn 1.6s ease-out}
+@keyframes skn{0%{opacity:0;transform:scale(2.2)}15%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.who{text-align:center;margin-top:6px}
+.who .nm{font-family:'Russo One';font-size:26px}
+.who .rk{display:inline-block;margin:4px 0 8px;padding:3px 12px;border-radius:99px;font:800 11px Inter;letter-spacing:.14em;background:linear-gradient(90deg,#ff3b3b,#ff9a2a);color:#fff}
+.who p{color:var(--mut);font-size:14px;max-width:400px;margin:0 auto}
+.tabs{display:flex;justify-content:center;gap:10px;margin-top:18px}
+.tab{padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:700 14px Inter;cursor:pointer}
+.tab.on{border-color:var(--myth);box-shadow:0 0 0 1px var(--myth),0 0 20px rgba(255,59,59,.35)}
+.hint{text-align:center;color:var(--mut);font-size:12px;margin-top:10px}
+
+/* ---------- MILESTONE ROAD ---------- */
+.roadbox{position:relative;max-width:620px;margin:0 auto}
+.roadbox svg.road{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.node{position:absolute;width:76px;height:68px;margin:-34px 0 0 -38px;background:url(a/node0.webp) center/contain no-repeat;display:grid;place-items:center;
+ font:800 15px 'Russo One';color:#cfd6e6;text-shadow:0 2px 0 #000;z-index:2;transition:transform .4s}
+.node.done{background-image:url(a/node.webp);color:#3a1d00;text-shadow:0 1px 0 rgba(255,255,255,.5);animation:pop 2.4s infinite}
+@keyframes pop{50%{transform:scale(1.08)}}
+.rcard{position:absolute;width:calc(50% - 20px);transform:translateY(-50%);background:linear-gradient(160deg,#1c2232,#131721);border:1px solid var(--line);border-radius:16px;padding:12px;z-index:2}
+.rcard.L{left:6px}.rcard.R{right:6px}
+.rcard.done{border-color:var(--ok);box-shadow:0 0 22px rgba(61,220,132,.2)}
+.rcard.next{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 0 26px rgba(255,122,26,.35)}
+.rcard.leg{background:linear-gradient(160deg,#3b2a0c,#151921 70%)}
+.rcard.vip{background:linear-gradient(160deg,#2c1440,#151921 70%)}
+.rcard.myth{background:linear-gradient(160deg,#401010,#151921 70%)}
+.rcard .st{font:800 10px Inter;letter-spacing:.12em;color:var(--mut)}
+.rcard.done .st{color:var(--ok)} .rcard.next .st{color:var(--acc2)}
+.rcard .goal{font-family:'Russo One';font-size:18px;margin:2px 0 6px}
+.icons{display:grid;grid-template-columns:repeat(2,max-content);gap:6px 8px;align-items:center;margin-bottom:6px}
+.icons .ig{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.icons img{height:26px;width:auto;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+.icons .qty{font:800 12px Inter;color:#fff}
+.rcard .rw{font-size:12.5px;color:#b8c0d2;line-height:1.35}
+.mini{position:relative;width:58px;height:58px;flex:none}
+.mini .spr{position:absolute;inset:6px 4px 8px;z-index:1}
+.mini .frm{position:absolute;inset:0;background:center/100% 100% no-repeat}
+#car{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;z-index:3;filter:drop-shadow(0 0 10px rgba(255,122,26,.9))}
+.total{max-width:620px;margin:0 auto 22px;padding:14px;border-radius:18px;text-align:center;background:linear-gradient(135deg,#2a1a08,#1a1222 60%,#2a0d0d);border:1px solid #6b4a14;box-shadow:0 0 30px rgba(255,198,64,.15)}
+.total .t{font:800 11px Inter;letter-spacing:.14em;color:var(--acc2)}
+.total .row{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin-top:8px}
+.total .it{display:flex;align-items:center;gap:5px;font:800 16px 'Russo One'}
+.total img{height:30px}
+.pct{text-align:center;margin:-8px 0 26px;color:var(--mut);font-size:14px}
+.pct b{color:var(--acc2)}
+
+/* ---------- LEGENDARY CARDS ---------- */
+.rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 16px 24px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.hc{flex:none;width:200px;scroll-snap-align:center;perspective:700px;cursor:pointer}
+.hc .card{position:relative;height:270px;border-radius:18px;transform-style:preserve-3d;transition:transform .25s;
+ background:radial-gradient(ellipse at 50% 35%,#5a3d0a,#1a1408 75%);overflow:hidden}
+.hc.m .card{background:radial-gradient(ellipse at 50% 35%,#6a1414,#1a0a0a 75%)}
+.hc .card:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 48%,transparent 62%);transform:translateX(-120%);animation:shine 4.5s infinite}
+.hc .spr{position:absolute;left:10%;right:10%;top:12%;height:58%;z-index:1}
+.hc .frm{position:absolute;left:0;right:0;top:0;height:200px;background:url(a/fr4.webp) center/100% 100% no-repeat;pointer-events:none}
+.hc.m .frm{background-image:url(a/fr5.webp)}
+.hc .fx{width:200px;height:200px;margin:-100px 0 0 -100px;top:40%}
+.hc .meta{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(0deg,rgba(0,0,0,.85),transparent)}
+.hc .nm{font-family:'Russo One';font-size:16px;line-height:1.1}
+.hc .sk{font:800 11px Inter;color:var(--leg);letter-spacing:.06em;margin-top:3px}
+.hc.m .sk{color:#ff7b6b}
+.stars{color:var(--leg);font-size:12px;letter-spacing:2px}
+
+/* ---------- SCREENS MARQUEE ---------- */
+.mq{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mq .tr{display:flex;gap:16px;width:max-content;animation:mq 36s linear infinite}
+@keyframes mq{to{transform:translateX(-50%)}}
+.phone{width:170px;border-radius:24px;padding:7px;background:linear-gradient(160deg,#3a4254,#151922);box-shadow:0 14px 30px rgba(0,0,0,.6),inset 0 0 0 1px #4a5368}
+.phone img{width:100%;border-radius:18px;aspect-ratio:9/19;object-fit:cover;object-position:top}
+.phone figcaption{text-align:center;font:700 12px Inter;color:var(--mut);padding:6px 0 2px}
+
+/* ---------- FEATURES / STEPS / FAQ ---------- */
+.feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.f{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden}
+.f .ico{font-size:28px}
+.f h3{font-size:15px;margin:6px 0 4px}
+.f p{font-size:13px;color:var(--mut)}
+.steps{display:grid;gap:10px;max-width:600px;margin:0 auto;counter-reset:s}
+.step{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.step:before{counter-increment:s;content:counter(s);flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:800 16px 'Russo One';background:linear-gradient(180deg,var(--acc2),var(--acc));color:#1d0e00}
+.share{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.sbtn{padding:12px 18px;border-radius:12px;background:var(--card);border:1px solid var(--line);font:700 14px Inter;text-decoration:none;color:var(--txt);cursor:pointer}
+details{max-width:600px;margin:0 auto 10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+summary{font-weight:700;cursor:pointer}
+details p{color:var(--mut);font-size:14px;margin-top:8px}
+.final{text-align:center;padding:70px 16px;background:radial-gradient(ellipse at 50% 100%,rgba(255,122,26,.3),transparent 65%)}
+footer{padding:26px 0 40px;text-align:center;color:var(--mut);font-size:12px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:#fff;color:#111;padding:10px 18px;border-radius:10px;font-weight:700;transition:.3s;z-index:60}
+.toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="flash" id="flash"></div>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+ <div class="bg"></div>
+ <canvas id="embers"></canvas>
+ <div class="in">
+  <span class="pill"><i></i> Pre-registration open</span>
+  <div class="big">BUILD YOUR<span>GARAGE EMPIRE</span></div>
+  <p class="tag">Fix wrecks, sell them, grow your empire — then lead your mechanic heroes into battle against monsters made of car parts.</p>
+  <a class="cta" id="cta1" target="_blank" rel="noopener"><span class="ring"></span>
+   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.8c-.3.3-.5.8-.5 1.4v17.6c0 .6.2 1.1.5 1.4l.1.1 9.9-9.9v-.2L3.7 1.7l-.1.1zm13.3 13.3-3.3-3.3v-.2l3.3-3.3.1.1 3.9 2.2c1.1.6 1.1 1.7 0 2.3l-3.9 2.2h-.1zm-.1.1L13.4 12 3.6 22.2c.4.4 1 .4 1.7.1l11.5-7.1M16.8 8.8 5.3 1.7c-.7-.4-1.3-.3-1.7.1L13.4 12l3.4-3.2z"/></svg>
+   <span class="ctaTxt">Pre-register on Google Play</span></a>
+  <div class="counter"><div class="digits" id="digits"></div>players already joined</div>
+  <div class="scroll">▼ See the rewards</div>
+ </div>
+</header>
+
+<!-- ===================== MYTHIC SHOWCASE ===================== -->
+<section class="show">
+ <div class="wrap">
+  <h2 class="rv">Meet the <em>Mythic</em> heroes</h2>
+  <p class="sub rv">Tap the hero to unleash the skill</p>
+  <div class="stage rv" id="stage">
+   <svg class="gearbg" viewBox="0 0 100 100"><path fill="#ffc640" d="M43 2h14l2 11 7 3 9-6 10 10-6 9 3 7 11 2v14l-11 2-3 7 6 9-10 10-9-6-7 3-2 11H43l-2-11-7-3-9 6-10-10 6-9-3-7-11-2V43l11-2 3-7-6-9 10-10 9 6 7-3zM50 32a18 18 0 1 0 0 36 18 18 0 0 0 0-36z"/></svg>
+   <div class="halo"></div>
+   <div class="podium"></div>
+   <div class="spr bigspr" id="bigspr"></div>
+   <div class="fx" id="bigfx"></div>
+   <div class="skname" id="skname"></div>
+  </div>
+  <div class="who">
+   <div class="nm" id="whoName"></div>
+   <span class="rk">★ MYTHIC ★</span>
+   <p id="whoSk"></p>
+  </div>
+  <div class="tabs"><button class="tab on" data-h="0">👑 Torque King</button><button class="tab" data-h="1">🔥 Lady Overdrive</button></div>
+ </div>
+</section>
+
+<!-- ===================== MILESTONES ===================== -->
+<section id="rewards">
+ <div class="wrap">
+  <h2 class="rv">Milestone <em>Rewards</em></h2>
+  <p class="sub rv">The more players join, the bigger the gifts. <b>Every unlocked reward goes to everyone</b> at launch.</p>
+  <div class="total rv" id="total"></div>
+  <p class="pct" id="pct"></p>
+  <div class="roadbox" id="road"></div>
+ </div>
+</section>
+
+<!-- ===================== LEGENDARY ===================== -->
+<section>
+ <h2 class="rv">Collect <em>Legendary</em> heroes</h2>
+ <p class="sub rv">Every hero has a unique skill. Tap a card!</p>
+ <div class="rail" id="rail"></div>
+</section>
+
+<!-- ===================== SCREENS ===================== -->
+<section>
+ <h2 class="rv">Inside the <em>game</em></h2>
+ <p class="sub rv">Idle tycoon + battle campaign with 50+ chapters</p>
+ <div class="mq"><div class="tr" id="mq"></div></div>
+</section>
+
+<section class="wrap">
+ <div class="feat">
+  <div class="f rv"><div class="ico">🏭</div><h3>Build & upgrade</h3><p>Inspection, paint, electrical, engine & tuning garages up to level 10.</p></div>
+  <div class="f rv"><div class="ico">⚔️</div><h3>50+ chapters</h3><p>Team of 5 heroes vs. bosses made of car parts.</p></div>
+  <div class="f rv"><div class="ico">🦸</div><h3>Common → Mythic</h3><p>Fusion up to +50 and gear for every grade.</p></div>
+  <div class="f rv"><div class="ico">🚨</div><h3>Catch thieves</h3><p>Upgrade security and let the police chase them.</p></div>
+  <div class="f rv"><div class="ico">🚿</div><h3>Car wash & fuel</h3><p>Open a car wash, a gas station and a car factory.</p></div>
+  <div class="f rv"><div class="ico">🌙</div><h3>Idle rewards</h3><p>Your empire keeps earning while you sleep.</p></div>
+ </div>
+</section>
+
+<section class="wrap">
+ <h2 class="rv">How it <em>works</em></h2>
+ <p class="sub rv">Free · 5 seconds</p>
+ <div class="steps">
+  <div class="step rv"><div>Tap <b>Pre-register</b> and confirm on Google Play.</div></div>
+  <div class="step rv"><div>Share with friends to unlock the next milestone faster.</div></div>
+  <div class="step rv"><div>On launch day you get a notification. Your rewards wait in the in-game <b>Mail</b>.</div></div>
+ </div>
+</section>
+
+<section class="wrap">
+ <h2 class="rv">Spread the <em>word</em></h2>
+ <p class="sub rv">Every share brings The Torque King closer</p>
+ <div class="share rv">
+  <button class="sbtn" id="copy">🔗 Copy link</button>
+  <a class="sbtn" id="wa" target="_blank" rel="noopener">💬 WhatsApp</a>
+  <a class="sbtn" id="fb" target="_blank" rel="noopener">📘 Facebook</a>
+  <a class="sbtn" id="tt" target="_blank" rel="noopener">🎵 TikTok</a>
+ </div>
+</section>
+
+<section class="wrap">
+ <h2 class="rv">FAQ</h2><p class="sub">&nbsp;</p>
+ <details><summary>Is it free?</summary><p>Yes. Torque Empire is free to play, and pre-registering is free. You can cancel anytime from Google Play.</p></details>
+ <details><summary>Who gets the milestone rewards?</summary><p>Every player who starts the game in the first 30 days after launch. Rewards arrive in the in-game Mail.</p></details>
+ <details><summary>When does the game launch?</summary><p id="launchTxt">Soon! Pre-register and Google Play will notify you on launch day.</p></details>
+ <details><summary>Which phones are supported?</summary><p>Android phones and tablets, through Google Play.</p></details>
+</section>
+
+<div class="final">
+ <h2 class="rv">Your empire is <em>waiting</em></h2>
+ <p class="sub rv">Join now and claim every reward on day one</p>
+ <a class="cta rv" id="cta2" target="_blank" rel="noopener"><span class="ring"></span><span class="ctaTxt">Pre-register on Google Play</span></a>
+</div>
+
+<footer>© <span id="yr"></span> Torque Studios · Torque Empire</footer>
+<div class="toast" id="toast">Link copied!</div>
+
+<script>
+/* ======================= CONFIG — edit only these values ======================= */
+const CONFIG = {
+  playLink: "",          // Google Play link. Leave "" until pre-registration is active.
+  count: 0,              // pre-registered players (Play Console > Pre-registration)
+  launch: "",            // e.g. "January 2027"
+  tiktok: "https://www.tiktok.com/@torqueempire",
+  facebook: "",
+  milestones: [
+    { goal: 1000,   icons:[["💵","50K"],["ticket","×10"]],                     text:"50,000 Cash + 10 Hero Summon Tickets" },
+    { goal: 5000,   icons:[["ticket","×20"],["gticket","×10"]],                text:"20 Hero Tickets + 10 Gear Tickets" },
+    { goal: 10000,  icons:[["diamond","500"],["cticket","×10"]],               text:"500 Diamonds + 10 Crew Tickets" },
+    { goal: 25000,  icons:[["vip","500"],["ticket","×20"]],                 text:"500 VIP Points + 20 Hero Tickets", tier:"vip" },
+    { goal: 50000,  icons:[["ticket","×30"],["gticket","×20"],["diamond","1000"]], text:"30 Hero Tickets + 20 Gear Tickets + 1,000 Diamonds" },
+    { goal: 100000, icons:[["hero:l5:fr4",""],["vip","1500"]],             text:"Legendary hero Rex Redline + 1,500 VIP Points", tier:"leg" },
+    { goal: 150000, icons:[["ticket","×50"],["gticket","×50"],["cticket","×50"],["diamond","2000"]], text:"50 Hero + 50 Gear + 50 Crew Tickets + 2,000 Diamonds" },
+    { goal: 200000, icons:[["hero:king:fr5",""],["ticket","×100"]],           text:"MYTHIC hero The Torque King + 100 Hero Tickets for everyone!", tier:"myth" }
+  ]
+};
+/* ============================================================================== */
+if(location.hash==='#demo')CONFIG.count=7300; // preview only: open the page with #demo to see unlocked milestones
+
+const $=s=>document.querySelector(s), RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const IMG={ticket:'a/ticket.webp',gticket:'a/gticket.webp',cticket:'a/cticket.webp',diamond:'a/diamond.svg',vip:'a/vip.webp'};
+
+/* ---------- sprite engine (strip of 192px frames) ---------- */
+const sprites=[];
+function sprite(el,src,n){const s={el,n,f:0,seq:null,loop:[0,1,2,3],i:0,done:null};
+ el.style.backgroundImage=`url(${src})`;el.style.backgroundSize=`${n*100}% 100%`;sprites.push(s);draw(s);return s;}
+function draw(s){s.el.style.backgroundPosition=`${s.f/(s.n-1)*100}% 0`;}
+function play(s,frames,cb){s.seq=frames;s.i=0;s.done=cb;}
+let last=0;
+function tick(t){requestAnimationFrame(tick);if(t-last<110)return;last=t;
+ for(const s of sprites){ if(!s.vis)continue;
+  if(s.seq){s.f=s.seq[s.i++];if(s.i>=s.seq.length){s.seq=null;const c=s.done;s.done=null;c&&c();}}
+  else{s.f=s.loop[s.i++%s.loop.length];}
+  draw(s);} }
+requestAnimationFrame(tick);
+const vio=new IntersectionObserver(es=>es.forEach(e=>{const s=sprites.find(x=>x.el===e.target);if(s)s.vis=e.isIntersecting;}),{rootMargin:'100px'});
+
+/* ---------- CTA ---------- */
+document.querySelectorAll('.cta').forEach(a=>{
+ if(CONFIG.playLink)a.href=CONFIG.playLink;
+ else{a.classList.add('off');a.querySelector('.ctaTxt').textContent='Coming soon on Google Play';}});
+
+/* ---------- counter digits ---------- */
+(function(){const d=$('#digits'),target=CONFIG.count;let t0;
+ function render(v){d.innerHTML=v.toLocaleString('en-US').split('').map(c=>c===','?'<b class="sep">,</b>':`<b>${c}</b>`).join('');}
+ function step(ts){t0??=ts;const p=Math.min((ts-t0)/1800,1);render(Math.round(target*(1-Math.pow(1-p,4))));if(p<1)requestAnimationFrame(step);}
+ render(0);setTimeout(()=>requestAnimationFrame(step),500);})();
+
+/* ---------- embers ---------- */
+(function(){if(RM)return;const c=$('#embers'),x=c.getContext('2d');let W,H,P=[],run=true;
+ function size(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}size();addEventListener('resize',size);
+ const N=innerWidth<500?28:45;
+ for(let i=0;i<N;i++)P.push(np(true));
+ function np(r){return{x:Math.random()*W,y:r?Math.random()*H:H+10,v:.4+Math.random()*1.2,s:1+Math.random()*2.6,w:Math.random()*6.28,a:.4+Math.random()*.6}}
+ new IntersectionObserver(e=>run=e[0].isIntersecting).observe(c);
+ (function loop(){requestAnimationFrame(loop);if(!run)return;x.clearRect(0,0,W,H);
+  for(const p of P){p.y-=p.v;p.w+=.03;p.x+=Math.sin(p.w)*.6;if(p.y<-10)Object.assign(p,np());
+   const g=x.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s*3);g.addColorStop(0,`rgba(255,200,90,${p.a})`);g.addColorStop(1,'rgba(255,90,20,0)');
+   x.fillStyle=g;x.beginPath();x.arc(p.x,p.y,p.s*3,0,7);x.fill();}})();})();
+
+/* ---------- Mythic showcase ---------- */
+const MY=[
+ {name:'The Torque King',src:'a/king.webp',fx:'a/fx_gear.webp',sk:'GEAR APOCALYPSE',d:'Flaming gears crash on every enemy: 320% damage. Team: +30% attack and −20% damage taken.'},
+ {name:'Lady Overdrive',src:'a/lady.webp',fx:'a/fx_gear.webp',sk:'OVERDRIVE',d:'Blasts through ALL enemies – 300% damage, always critical, they burn for 4s. Team: +30% attack speed.'}];
+const big=sprite($('#bigspr'),MY[0].src,16);big.vis=true;let cur=0,busy=false;
+// strip: 0-3 idle · 4-7 attack · 8-11 skill · 12-15 win
+function skill(){if(busy)return;busy=true;const h=MY[cur];
+ play(big,[4,5,6,7,8,9,10,10,11,11,11],()=>{play(big,[12,13,14,15,15,15],()=>busy=false);});
+ setTimeout(()=>{const fx=$('#bigfx');fx.style.backgroundImage=`url(${h.fx})`;fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');
+  const st=$('#stage');st.classList.remove('shake');void st.offsetWidth;st.classList.add('shake');
+  const fl=$('#flash');fl.classList.remove('go');void fl.offsetWidth;fl.classList.add('go');
+  if(navigator.vibrate)try{navigator.vibrate(60)}catch(e){} },900);
+ const n=$('#skname');n.textContent=h.sk;n.classList.remove('go');void n.offsetWidth;n.classList.add('go');}
+function setHero(i){cur=i;const h=MY[i];big.el.style.backgroundImage=`url(${h.src})`;$('#whoName').textContent=h.name;$('#whoSk').innerHTML=`<b style="color:#ffc640">${h.sk}</b> — ${h.d}`;
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',+t.dataset.h===i));}
+setHero(0);$('#stage').onclick=skill;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{if(!busy){setHero(+t.dataset.h);skill();}});
+setInterval(()=>{if(!busy&&big.vis&&document.visibilityState==='visible')skill();},7000);
+vio.observe(big.el);
+
+/* ---------- Milestone road ---------- */
+(function(){const box=$('#road'),ms=CONFIG.milestones,c=CONFIG.count,n=ms.length,GAP=270,TOP=60;
+ const H=TOP+n*GAP+60;box.style.height=H+'px';
+ const pts=[[.5,10]];ms.forEach((m,i)=>pts.push([i%2?.8:.2,TOP+i*GAP+GAP/2]));
+ // progress (0..n)
+ let prog=0,prev=0;for(const m of ms){if(c>=m.goal){prog++;prev=m.goal;}else{prog+=Math.max(0,(c-prev)/(m.goal-prev));break;}}
+ const done=ms.filter(m=>c>=m.goal).length, nextM=ms[done];
+ $('#pct').innerHTML=nextM?`Next reward at <b>${nextM.goal.toLocaleString('en-US')}</b> players — <b>${Math.max(0,nextM.goal-c).toLocaleString('en-US')}</b> to go!`:'<b>All rewards unlocked! 🎉</b>';
+ const fmtK=g=>g>=1000?g/1000+'K':g;
+ // cards + nodes
+ let html='';ms.forEach((m,i)=>{const st=c>=m.goal?'done':(i===done?'next':'');const side=i%2?'L':'R';
+  const ic=m.icons.map(([k,q])=>{if(k.startsWith('hero:')){const[,id,fr]=k.split(':');return `<div class="mini"><div class="spr" data-src="a/${id}.webp" data-n="${id.length>3?16:8}"></div><div class="frm" style="background-image:url(a/${fr}.webp)"></div></div>`;}
+   return '<span class="ig">'+(IMG[k]?`<img src="${IMG[k]}" alt="">`:`<span style="font-size:24px">${k}</span>`)+(q?`<span class="qty">${q}</span>`:'')+'</span>';}).join('');
+  html+=`<div class="node ${st==='done'?'done':''}" data-i="${i}">${fmtK(m.goal)}</div>
+  <div class="rcard ${side} ${st} ${m.tier||''} rv" data-i="${i}"><div class="st">${st==='done'?'✓ UNLOCKED':st==='next'?'▶ NEXT':'🔒 LOCKED'}</div>
+  <div class="goal">${m.goal.toLocaleString('en-US')} players</div><div class="icons">${ic}</div><div class="rw">${m.text}</div></div>`;});
+ box.innerHTML=`<svg class="road"><path id="rb" fill="none" stroke="#1d2331" stroke-width="22" stroke-linecap="round"/><path id="rl" fill="none" stroke="#3a4358" stroke-width="2" stroke-dasharray="10 12"/><path id="rp" fill="none" stroke="url(#gr)" stroke-width="10" stroke-linecap="round" style="filter:drop-shadow(0 0 6px #ff7a1a)"/>
+  <defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc640"/><stop offset="1" stop-color="#ff7a1a"/></linearGradient></defs></svg>
+  <svg id="car" viewBox="0 0 40 40"><g transform="rotate(90 20 20)"><rect x="12" y="4" width="16" height="32" rx="6" fill="#ff7a1a" stroke="#1d0e00" stroke-width="1.5"/><rect x="14.5" y="11" width="11" height="7" rx="2" fill="#1b2a3a"/><rect x="14.5" y="24" width="11" height="5" rx="2" fill="#1b2a3a"/><rect x="18.5" y="4" width="3" height="32" fill="#ffc640" opacity=".8"/><rect x="9.5" y="8" width="3" height="7" rx="1" fill="#111"/><rect x="27.5" y="8" width="3" height="7" rx="1" fill="#111"/><rect x="9.5" y="26" width="3" height="7" rx="1" fill="#111"/><rect x="27.5" y="26" width="3" height="7" rx="1" fill="#111"/><circle cx="15" cy="5.5" r="1.4" fill="#fff8c0"/><circle cx="25" cy="5.5" r="1.4" fill="#fff8c0"/></g></svg>`+html;
+ box.querySelectorAll('.mini .spr').forEach(e=>{const s=sprite(e,e.dataset.src,+e.dataset.n);vio.observe(e);});
+ const rp=$('#rp'),car=$('#car');let segL=[],L=0;
+ function layout(){const W=box.clientWidth,P=pts.map(([x,y])=>[x*W,y]);let d=`M${P[0][0]} ${P[0][1]}`;segL=[0];
+  const tmp=document.createElementNS('http://www.w3.org/2000/svg','path');
+  for(let i=1;i<P.length;i++){const[a,b]=[P[i-1],P[i]],my=(a[1]+b[1])/2;const seg=` C${a[0]} ${my} ${b[0]} ${my} ${b[0]} ${b[1]}`;d+=seg;tmp.setAttribute('d',d);segL.push(tmp.getTotalLength());}
+  ['#rb','#rl','#rp'].forEach(s=>$(s).setAttribute('d',d));L=segL[segL.length-1];
+  box.querySelectorAll('.node').forEach(e=>{const p=P[+e.dataset.i+1];e.style.left=p[0]+'px';e.style.top=p[1]+'px';});
+  box.querySelectorAll('.rcard').forEach(e=>{e.style.top=P[+e.dataset.i+1][1]+'px';});
+  rp.style.strokeDasharray=L;place(shown);}
+ const target=()=>{const k=Math.floor(prog),f=prog-k;return k>=n?L:segL[k]+(segL[k+1]-segL[k])*f;};
+ let shown=0;
+ function place(len){rp.style.strokeDashoffset=L-len;const p=rp.getPointAtLength(Math.max(len,.01)),q=rp.getPointAtLength(Math.min(len+2,L));
+  car.style.transform=`translate(${p.x}px,${p.y}px) rotate(${Math.atan2(q.y-p.y,q.x-p.x)}rad)`;}
+ layout();addEventListener('resize',layout);
+ let started=false;new IntersectionObserver(e=>{if(e[0].isIntersecting&&!started){started=true;const t=target(),t0=performance.now();
+  (function an(ts){const p=Math.min((ts-t0)/2600,1),e=1-Math.pow(1-p,3);shown=t*e;place(shown);if(p<1)requestAnimationFrame(an);})(t0);}},{threshold:.15}).observe(box);
+})();
+
+
+/* ---------- total rewards banner ---------- */
+(function(){const T={};for(const m of CONFIG.milestones)for(const[k,q]of m.icons){const v=parseInt(String(q).replace(/[^0-9]/g,''));if(!isNaN(v)&&IMG[k])T[k]=(T[k]||0)+v;}
+ const lab={ticket:'Hero',gticket:'Gear',cticket:'Crew',diamond:'',vip:'VIP pts'};
+ $('#total').innerHTML='<div class="t">🎁 TOTAL FREE REWARDS AT 200K</div><div class="row">'+Object.entries(T).map(([k,v])=>`<span class="it"><img src="${IMG[k]}" alt="">${v.toLocaleString('en-US')} <small style="font:600 12px Inter;color:#b8c0d2">${lab[k]}</small></span>`).join('')+'<span class="it">🦸 Legendary</span><span class="it">👑 Mythic</span></div>';})();
+
+/* ---------- Legendary rail ---------- */
+const HEROES=[
+ ['l0','Grigore Iron Hands','IRON QUAKE','fx_quake'],['l1','Mama Rosa','MIRACLE SHIFT','fx_holy'],['l2','Duke Diamond','DIAMOND VORTEX','fx_vortex'],
+ ['l3','Sofia Lightning','THUNDERSTORM','fx_cloud'],['l4','Oracle Otto','TIME WARP','fx_hglass'],['l5','Rex Redline','INFERNO DASH','fx_gear'],
+ ['king','The Torque King','GEAR APOCALYPSE','fx_gear',1],['lady','Lady Overdrive','OVERDRIVE','fx_gear',1]];
+$('#rail').innerHTML=HEROES.map(([id,nm,sk,fx,m],i)=>`<div class="hc ${m?'m':''}" data-i="${i}"><div class="card"><div class="spr"></div><div class="frm"></div><div class="fx" style="background-image:url(a/${fx}.webp)"></div>
+ <div class="meta"><div class="stars">${m?'★★★★★★':'★★★★★'}</div><div class="nm">${nm}</div><div class="sk">${m?'MYTHIC':'LEGENDARY'} · ${sk}</div></div></div></div>`).join('');
+document.querySelectorAll('.hc').forEach(hc=>{const[id,,,,m]=HEROES[+hc.dataset.i],N=m?16:8,sk=m?[8,9,10,11,11]:[4,5,6,7,7];
+ const s=sprite(hc.querySelector('.spr'),`a/${id}.webp`,N);vio.observe(s.el);const card=hc.querySelector('.card');let b=false;
+ hc.onclick=()=>{if(b)return;b=true;play(s,sk,()=>b=false);const fx=hc.querySelector('.fx');setTimeout(()=>{fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');},250);};
+ hc.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.style.transform=`rotateY(${x*18}deg) rotateX(${-y*18}deg)`;});
+ hc.addEventListener('pointerleave',()=>card.style.transform='');});
+
+/* ---------- screens marquee ---------- */
+const SC=[['s1','Campaign map'],['s2','Your garages'],['s5','Police chase'],['s6','Gear summon']];
+const one=SC.map(([f,t])=>`<figure class="phone"><img src="a/${f}.webp" alt="${t}" loading="lazy"><figcaption>${t}</figcaption></figure>`).join('');
+$('#mq').innerHTML=one+one;
+
+/* ---------- reveal ---------- */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(e=>ro.observe(e));
+
+/* ---------- misc ---------- */
+if(CONFIG.launch)$('#launchTxt').textContent='Planned for '+CONFIG.launch+'. Pre-register and Google Play will notify you on launch day.';
+const url=location.href.split('#')[0],msg='Pre-register for Torque Empire and unlock rewards for everyone! ';
+$('#wa').href='https://wa.me/?text='+encodeURIComponent(msg+url);
+$('#fb').href=CONFIG.facebook||'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url);
+$('#tt').href=CONFIG.tiktok;
+$('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(url);}catch(e){}const t=$('#toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);};
+$('#yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
