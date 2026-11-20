@@ -116,7 +116,7 @@ const css0 = `
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;cursor:pointer}
 #s2 .w{max-width:520px;margin:0 auto;padding-bottom:40px;position:relative}
-#s2 .x{position:fixed;right:10px;top:10px;z-index:3;width:42px;height:42px;border:0;border-radius:14px;background:linear-gradient(#e2473b,#9a1a10);color:#fff;font:900 20px system-ui;box-shadow:0 0 0 2px #ffd0c8,0 4px 10px #000}
+#s2 .x{position:fixed;left:10px;top:10px;z-index:3;width:51px;height:34px;border:0;padding:0;background:url(img/ui8/ic_back.webp) center/contain no-repeat;color:transparent;font-size:0;filter:drop-shadow(0 2px 3px #000a)}#s2 .x:active{transform:scale(.92)}
 #s2 .hd img{display:block;width:100%}
 #s2 .bar{display:flex;justify-content:center;gap:8px;margin:-6px 10px 6px;flex-wrap:wrap}
 #s2 .cur{display:flex;align-items:center;gap:6px;background:#0d151e;border:1.5px solid #e0aa25;border-radius:999px;padding:4px 12px 4px 6px;font:900 14px system-ui;color:#fff}
