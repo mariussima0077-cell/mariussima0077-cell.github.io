@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(TEBilling.class);   // Google Play Billing (payments) – see TEBilling.java
+        registerPlugin(TEIntegrity.class); // Google Play Integrity (anti-cheat) – see TEIntegrity.java
         super.onCreate(savedInstanceState);
         hideBars();
     }
