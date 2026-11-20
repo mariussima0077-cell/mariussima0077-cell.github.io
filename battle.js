@@ -3301,7 +3301,7 @@ $('gSum').addEventListener('click',e=>{if(e.target.id==='gSum'){closeGSum();retu
   if(a==='back')closeGSum();else if(a==='hsum'||a==='csum'){closeGSum();const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon(a==='csum'?'c':'m');}else if(a==='1')gsummon(1);else if(a==='10')gsummon(10);else if(a==='rates')gsRates();else if(a==='hist')gsHist();else if(a==='gear'){closeGSum();openGear();}
   else{const t=e.target.closest('.gsT');if(t)gsRates();}});
 function gsOpenSm(){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;TE().openSummon('gear');} // v16-91: Gear Summon = tab of the SUMMON page (Marius)
-function gsBag(){const sm=document.getElementById('sm');if(root.classList.contains('open')){sm.classList.remove('open');sm.style.zIndex='';}else{open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();}
+function gsBag(){const sm=document.getElementById('sm');if(root.classList.contains('open')){sm.classList.remove('open');sm.style.zIndex='';}else{open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gpgFrom='';gfil='all';renderGear();gPage('bag');} /* v16-119: GEAR BAG opens the bag itself (was: the HEROES page) */
 $('cpGSB').onclick=gsOpenSm;$('gGSB').onclick=gsOpenSm;
 $('cpChN').onclick=()=>chList();
 $('cpBack').onclick=()=>{if(!backToHub())close();};$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();

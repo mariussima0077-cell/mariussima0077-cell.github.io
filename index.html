@@ -611,6 +611,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #ros .rsB{position:absolute!important;left:3.59%;top:22.66%;width:9.78%;height:24.87%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:50%!important;color:transparent!important;width:auto;height:auto}
 #ros .rsTk{position:absolute!important;left:76.84%;top:27.21%;width:19.77%;height:14.45%;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:40px!important;display:flex;align-items:center;justify-content:flex-end;padding-right:7%!important;font:900 min(4vw,18px) system-ui;color:#fff!important;text-shadow:0 1px 0 #000}
 #ros .rsTk img{position:absolute;left:0;top:-8%;height:116%!important;width:auto;filter:drop-shadow(0 2px 2px #000)}
+.rsTk{box-sizing:border-box!important;padding-left:30%!important;white-space:nowrap} /* v16-119: 10000 tickets went out of the screen */
 #rsTabsH{display:contents}
 #ros .rsTm{position:absolute!important;left:5.12%;top:69.53%;width:30.02%;height:20.96%;}
 #ros .rsTg{position:absolute!important;left:36.63%;top:69.53%;width:27.46%;height:20.96%;}
@@ -830,8 +831,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 /* v16-94: Mythic hero splash art (summon reveal + ART button on the hero page) */
 #splash{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88)}
 #splash.open{display:flex}
-#splash .spW{position:relative;height:min(92vh,150vw);aspect-ratio:2/3;animation:spIn .7s cubic-bezier(.2,1.4,.4,1) both}
-#splash img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:3px solid #ff5a1f;box-shadow:0 0 40px #ff3d00,0 0 90px rgba(255,140,0,.5)}
+#splash .spW{position:relative;height:min(92vh,141vw);aspect-ratio:2/3;animation:spIn .7s cubic-bezier(.2,1.4,.4,1) both}
+#splash img{box-sizing:border-box;width:100%;height:100%;object-fit:cover;border-radius:14px;border:3px solid #ff5a1f;box-shadow:0 0 40px #ff3d00,0 0 90px rgba(255,140,0,.5)}
 #splash .spT{position:absolute;left:0;right:0;top:3%;text-align:center;font:900 italic 7vmin/1 system-ui,sans-serif;color:#ffd54a;text-shadow:0 0 10px #ff3d00,0 3px 0 #6a1b00;letter-spacing:.06em;animation:spGl 1.2s ease-in-out infinite alternate}
 #splash .spN{position:absolute;left:0;right:0;bottom:5%;text-align:center;font:900 5.2vmin/1.1 system-ui,sans-serif;color:#fff;text-shadow:0 0 8px #000,0 2px 0 #000}
 #splash .spN small{display:block;font-size:.55em;color:#ffcc80;margin-top:.4em}
@@ -3326,8 +3327,7 @@ function showResults(res,cat,n){
     h+='<div class="rc g'+H.gr+'" style="animation-delay:'+(i*.16)+'s">'+card(H,o,tagT)+'</div>';});
   const best=Math.max(...res.map(r=>HB[r.id].gr));
   h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TIK(cat)+'1</button><button data-r="10" class="gold">Summon ×10 · '+TIK(cat)+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TIK(cat)+' '+tkN(cat)+' tickets left</div>';
-  resEl.innerHTML=h;resEl.dataset.first=res[0]?res[0].id:'';resEl.className='open best'+best;
-  /* v16-116: results always above the SUMMON page (it gets z-index 30 when opened from Heroes / battle pages) */resEl.style.zIndex=Math.max(11,(parseInt(getComputedStyle(smEl).zIndex)||8)+1);
+  resEl.innerHTML=h;resEl.dataset.first=res[0]?res[0].id:'';resEl.className='open best'+best;liftZ(resEl);
   const sp=res.find(r=>SPLASH[r.id]&&r.r==='new');if(sp)showSplash(sp.id);
   if(best>=5)toast('🔥 MYTHIC '+CATS[cat].one.toUpperCase()+'!',3000);else if(best>=4)toast('💛 LEGENDARY '+CATS[cat].one.toUpperCase()+'!',3000);}
 resEl.addEventListener('click',e=>{const c=e.target.closest('[data-crew]');if(c){const f=HB[resEl.dataset.first];openRoster(c.dataset.crew==='c'?(f?f.cat:'d'):c.dataset.crew);return;}const b=e.target.closest('[data-r]');if(b){doSummon(+b.dataset.r);return;}if(!e.target.closest('.rc'))resEl.className='';});
@@ -3364,12 +3364,12 @@ function popAutoBest(){const cat=rosCat,plan=autoPlan(cat),keys=slotsOf(cat);let
   pop(x,{plan,cat},'abSk');popBox.insertAdjacentHTML('beforeend','<button class="pB abOK" data-p="abOK">✓ CONFIRM</button><button class="pB grey abNo" data-p="x">CANCEL</button>');}
 $('pop').addEventListener('click',e=>{const t=e.target.closest('[data-p="abOK"]');if(!t||!popCtx||!popCtx.plan)return;const {plan,cat}=popCtx;
   for(const k of slotsOf(cat))delete G.h.as[k];for(const k in plan)G.h.as[k]=plan[k];save();heroRefresh();closePop();toast('✓ Best '+CATS[cat].n.toLowerCase()+' placed',2500);});
-function openRoster(cat){if(cat)rosCat=cat;closeSummon();resEl.className='';rosEl.classList.add('open');renderRoster();rsBody.scrollTop=0;}
+function openRoster(cat){if(cat)rosCat=cat;closeSummon();liftZ(rosEl);resEl.className='';rosEl.classList.add('open');renderRoster();rsBody.scrollTop=0;}
 function closeRoster(){rosEl.classList.remove('open');}
 let rosKey='';
 function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=rosCat,mine=Object.keys(G.h.own).filter(id=>HB[id].cat===cat);
   const key=cat+HVER+'|'+JSON.stringify(G.h.as)+'|'+Object.values(G.lv).join(',')+'|'+mine.length+'|'+G.h.tk;if(key===rosKey)return;rosKey=key;
-  $('rsTk').innerHTML=TKI+' '+G.h.tk;
+  $('rsTk').innerHTML=TKI+' '+(G.h.tk>9999?nfmt(G.h.tk):G.h.tk);
   // v16-49: the 3 tabs are on Marius' MY CREW picture (wrench · shield · scooter)
   $('rsTabsH').innerHTML=CATK.map(c=>{const n=Object.keys(G.h.own).filter(id=>HB[id].cat===c).length;return '<button class="rsTab rsT'+c+(c===cat?' on':'')+'" data-ro="cat" data-c="'+c+'"><span>'+CATS[c].n+' <small>'+n+'</small></span>'+(rosHint(c)?'<i></i>':'')+'</button>';}).join('');
   let x='';
@@ -3401,9 +3401,14 @@ rosEl.addEventListener('click',e=>{const t=e.target.closest('[data-ro]');if(!t)r
   else if(a==='bench'){const id=t.dataset.id,b=rosBetter(id);if(b)popCompare(b.k,id,'s');else popSlots(id);}});
 // ---------- generic popup ----------
 const popEl=$('pop'),popBox=$('popBox');let popCtx=null;
-function pop(html,ctx,sk){popCtx=ctx||null;popBox.className=sk||'';popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+(sk?'<div class="skIn">'+html+'</div>':html);popEl.classList.add('open');}
+// v16-119: a window that opens is always put above every page already open (Summon / HEROES / battle pages / Shop…)
+function liftZ(el){el.style.zIndex='';const base=parseInt(getComputedStyle(el).zIndex)||0;let m=0;
+  for(const e of document.body.children){if(e===el||/^(toast|splash|loader|pgSpin|game)$/.test(e.id))continue;const st=getComputedStyle(e);
+    if(st.position!=='fixed'||st.display==='none'||st.visibility==='hidden')continue;const z=parseInt(st.zIndex)||0;if(z>m&&z<200)m=z;}
+  if(m>=base)el.style.zIndex=m+1;}
+function pop(html,ctx,sk){popCtx=ctx||null;popBox.className=sk||'';popBox.innerHTML='<button class="pX" data-p="x">✕</button>'+(sk?'<div class="skIn">'+html+'</div>':html);popEl.classList.add('open');liftZ(popEl);}
 // v16-53: info window (Marius' frame): title on the plate, red X closes, rows = wRow(grade or -1, left, value, right)
-function popW(title,html,ctx){popCtx=ctx||null;popBox.className='winSk';popBox.innerHTML='<div class="wT">'+title+'</div><button class="wX" data-p="x" aria-label="close"></button><div class="wIn">'+html+'</div>';popEl.classList.add('open');popBox.querySelector('.wIn').scrollTop=0;}
+function popW(title,html,ctx){popCtx=ctx||null;popBox.className='winSk';popBox.innerHTML='<div class="wT">'+title+'</div><button class="wX" data-p="x" aria-label="close"></button><div class="wIn">'+html+'</div>';popEl.classList.add('open');liftZ(popEl);popBox.querySelector('.wIn').scrollTop=0;}
 const wRow=(g,a,v,e)=>'<div class="wR'+(g>=0?' g'+g:'')+'"><span>'+a+'</span>'+(v!=null?'<b class="wV">'+v+'</b>':'')+(e?'<em>'+e+'</em>':'')+'</div>';
 const LOCKI='<img class="wLk" src="img/ui5/lock.webp" alt="locked">',OKI='<img src="img/ui5/ok.webp" alt="done">';
 function closePop(){popEl.classList.remove('open');popCtx=null;}
@@ -3641,6 +3646,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:57,d:'Nov 20, 2026',ic:'🛠',t:'Big bug check – every page',l:['A robot tapped every button of every page (about 1,500 taps) to find hidden bugs.','Fixed: <b>SEE MY CREW</b> and the <b>Use Diamonds?</b> window opened behind the HEROES / Summon page.','Fixed: <b>GEAR BAG</b> on the Summon page now opens the bag (it opened the HEROES page).','Fixed: two ✕ buttons on top of each other in the gear window, the ticket number in My Crew going out of the screen, hero ART a bit too wide.']},
  {id:56,d:'Nov 20, 2026',ic:'↩',t:'Same buttons everywhere',l:['Every page now has the <b>same Back button</b> (top left) and every window the <b>same red ✕</b> – no more different styles.','Idle Rewards: the money per hour is shorter (<b>/h</b>) so it always fits.']},
   {id:55,d:'Nov 20, 2026',ic:'🔩',t:'See your Gear Parts',l:['The gear window now shows <b>how many Gear Parts you have</b> (top left), next to the UPGRADE cost.','Under UPGRADE: <b>Cost</b> · <b>You have</b> · and how many you still need.','The BAG page also shows your Gear Parts at the bottom.']},
  {id:54,d:'Nov 20, 2026',ic:'🎟',t:'Summon results fixed',l:['Fixed: when you summon heroes or crew from the <b>HEROES</b> / battle pages, the results were hidden behind the Summon page. Now they always show on top.']},
@@ -3856,6 +3862,8 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 #xpBack,#xp .rsB,#ev .evX,.evX,#cpBack,.cpB[data-g="back"],.cpB.gBk{background:url(img/ui8/ic_close.webp) center/contain no-repeat!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:transparent!important;font-size:0!important;width:51px!important;height:34px!important;min-width:0!important;padding:0!important;filter:drop-shadow(0 2px 3px #000a)}
 #xpBack,#xp .rsB,#ev .evX,.evX,#cpBack,.cpB[data-g="back"],.cpB.gBk,.ccX[data-cc="x"],#sheet.skn #shClose,#onl .top .x{background-image:url(img/ui8/ic_back.webp)!important}
 :is(.stX,.mX,.pX,.itX,#shClose,#onl .x,.ccX,#xpBack,#xp .rsB,.evX,#cpBack,.cpB[data-g="back"],.cpB.gBk):active{transform:scale(.92)}
+/* v16-119: the gear window had 2 ✕ on top of each other (its own .itX + the general .stX) → only one */
+#cpPopBox:has(.itX)>.stX{display:none!important}
 /* full pages: back sits top-LEFT like the page headers */
 #onl .top .x{position:absolute!important;left:8px;top:calc(8px + env(safe-area-inset-top));z-index:5}
 #onl .top{padding-left:66px!important}
