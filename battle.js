@@ -981,7 +981,7 @@ const SPRD={
  m3_1:{w:384,a:[194,249],m:[300,100],look:'wrench'},
  m3_2:{a:[114.7,246],m:[176.2,102.5],col:'#d05cff',boom:'fx_purpleboom',v8:{cw:189,uw:252.0,ax:114.7,rows:[[0,191,254.7,250.7],[191,195,260.0,256.0],[386,189,252.0,246.7],[575,191,254.7,249.3],[766,187,249.3,245.3],[953,190,253.3,249.3]],ck:5,pk:[5,6,7]},fx8:{cw:201,uw:268.0,ax:134.7,rows:[[0,203,270.7,256.0]]}}, // v16-108: GLORIA – 8 frames (tools/v8_hero.py m3_2); ck = shake/aim/charge 0-4, pk = sweep burst → drops → idle; paint wave = fxs, frame 5 = crash
  m3_3:{a:[132.0,246],m:[232,100],col:'#d05cff',v8:{cw:198,uw:264.0,ax:132.0,ck:5,pk:[5,6,7],rows:[[0,196,261.3,256.0],[196,197,262.7,258.7],[393,187,249.3,245.3],[580,207,276.0,264.0],[787,195,260.0,254.7],[982,204,272.0,268.0]]},fx8:{cw:199,uw:265.3,ax:132.0,rows:[[0,220,293.3,282.7]]}}, // v16-109 DR. OHM: 8-frame animations (ChatGPT sheets) + his own Tesla tower
- m3_4:{w:384,a:[201,248],m:[312,142],col:'#e040fb',R:[0,1,3,4,5,6]},
+ m3_4:{a:[118.7,246.7],m:[242.7,69.3],col:'#e040fb',v8:{cw:191,uw:254.7,ax:118.7,rows:[[0,197,262.7,258.7],[197,190,253.3,248.0],[387,189,252.0,246.7],[576,187,249.3,245.3],[763,188,250.7,246.7],[951,200,266.7,262.7]],ck:5,pk:[5,6,7]},fx8:{cw:161,uw:214.7,ax:106.7,rows:[[0,214,285.3,280.0]]}}, // v16-109: HAWK-EYE HUGO – 8 frames (tools/v8_hero.py m3_4); ck = kneel → scope → laser lock → SHOT (frame 4), pk = smoke → stand up; fxs = crosshair locks on → sky beam (frame 4)
  m3_5:{w:384,a:[183,249],m:[300,150]},
  m3_6:{w:384,a:[203,248],m:[300,150],R:[0,1,2,3,5,6],ds:[[3,0],[3,1],[3,2],[4,0],[4,1]],boom:'fx_ninaboom',dboom:1},
  // v16-14: Legendary + Mythic (cs = skill frames; the frames with other people / cut boxes in the sheets are not used)
@@ -1734,6 +1734,13 @@ const SKF={
    if(c&&ok){const tt=.7*Math.max(0,c.x-u.x)/Math.max(1,W+20-u.x);ds=Math.max(0,.46-tt);B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}
    B.fx.push({type:'scan',x:u.x,t:-ds,d:.7,src:u,hit:new Set(),p:P});});},
  m3_3(u){castAct(u,.6,()=>{u.post=.6;B.fx.push({type:'coil',x:u.x+u.face*62*S,dd:u.d,t:0,d:4,tick:0,src:u});if(FX2)fxBurst(u.x+u.face*62*S,fy(u.d)-40*dsc(u.d),'#e040fb',40*S);});}, // v16-109 Dr. Ohm: cast frames 1-5 (5 = plants the coil) → laughs
+ m3_4(u,ms){ // v16-110: Hugo's HEADSHOT – crosshair (fxs 0-3) locks on the strongest enemy while he kneels and aims, the shot (skill frame 4) = the sky beam (fxs frame 4); same numbers as before
+   const pick=()=>alive(B.mons).slice().sort((a,b)=>b.hp-a.hp)[0];let t=pick();if(!t)return;const P=skp(u),ok=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;
+   const f=ok?{type:'sheet8',t:-.12,d:.96,sp:u.spr,x:t.x,dd:t.d}:null;if(f)B.fx.push(f);
+   castAct(u,.75,()=>B.fx.push({type:'call',t:-.15,d:.05,fn:()=>{if(u.dead)return;u.post=.6;if(t.dead)t=pick();if(!t)return;if(f){f.x=t.x;f.dd=t.d;}
+     const k=dsc(u.d),bx=u.x+u.face*113*SPK*k,by=fy(u.d)-(u.lift||0)-125*SPK*k,x=t.x,y=headY(t)+22*dsc(t.d),C=P.col||'#e040fb';
+     B.fx.push({type:'beam',x0:bx,y0:by,x1:x,y1:y,t:0,d:ok?.3:.5,col:C,w:ok?7:14});damage(u,t,4.5,{crit:1,skill:1});t.mark=Math.max(t.mark,6);shake(10);
+     B.fx.push({type:'ring',x,y:ok?fy(t.d):y,t:0,d:.4,r:50*S,col:C,ground:ok?1:0});if(FX2){fxBurst(x,y,C,60*S);if(!ok)fxs('flare_01','#ffffff',x,y,{d:.3,s0:20*S,s1:110*S});}}}));},
  m4_0(u){castAct(u,.75,()=>{const y=fy(.5);shake(14);u.post=.6;B.fx.push({type:'quake',x0:u.x+30*S,t:0,d:1.1,src:u,hit:new Set()});
    B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);
    if(FX2){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
@@ -1966,6 +1973,7 @@ function fxUpdate(f,dt){
   else if(f.type==='strike'&&!f.done&&f.t>=0){f.done=true;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],x=m.x,y=headY(m)+22*dsc(m.d);
     B.fx.push({type:'bolt',x0:x+rnd(-30,30)*S,y0:f.top,x1:x,y1:y,t:0,d:.28,col:'#ffe066'});damage(f.src,m,1.5,{skill:1});m.stun=Math.max(m.stun,1);sparks(x,y,10,'#fff176',220);shake(5);
     if(FX2){fxBolt(x,f.top,x,y,'#ffd54a',60);fxs('spark_02','#fff59d',x,y,{d:.35,s0:40*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxBurst(x,y,'#ffd54a',40*S);}}}
+  else if(f.type==='call'&&!f.done&&f.t>=0){f.done=true;f.fn();} // v16-109: delayed skill moment (Hugo's shot on his skill frame 4)
   else if(f.type==='mega'&&!f.done&&f.t>=0){f.done=true;const y=fy(f.dd);if(!(f.src&&f.src.spr&&f.src.spr.fx8&&f.src.spr.fi&&f.src.spr.fi.naturalWidth))imgFx('gearboom',f.x,y+16*S,230*S,1);shake(16);B.flash=.4;
     for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.dd)*(FY1-FY0)*1.25)<110*S)damage(f.src,m,1.5,{skill:1});
     if(FX2){fxShock(f.x,y,'#ff6d00',110*S);fxScorch(f.x,y,'#2b1a10',80*S,2.5);}}

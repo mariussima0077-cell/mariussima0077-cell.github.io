@@ -31,6 +31,8 @@ HEROES = {
   'm3_2': ('gloria', {'idle': 461, 'run': 400, 'attack': 386, 'skill': 379, 'hitko': 388, 'win': 424, 'fx': 340}),
   # v16-109 (20 nov): DR. OHM. REF = frame 1 standing on each sheet; fx = Tesla tower ~70 % of his height
   'm3_3': ('ohm', {'idle': 413, 'run': 378, 'attack': 378, 'skill': 401, 'hitko': 387, 'win': 387, 'fx': 350}),
+  # v16-109 (20 nov): HAWK-EYE HUGO (Epic). REF = frame 1 standing (idle/win drawn bigger, antenna included); fx = crosshair → sky beam
+  'm3_4': ('hugo', {'idle': 424, 'run': 392, 'attack': 367, 'skill': 379, 'hitko': 389, 'win': 413, 'fx': 430}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -41,7 +43,7 @@ OLDH = 241          # standing height in 256-cell units (same size as the old sh
 APU = .75           # atlas px per unit (same as the old 192-px cells)
 P = 110             # extension padding (sheet px)
 
-SPECKS = {'m3_2'}   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
+SPECKS = {'m3_2', 'm3_4'}   # v16-109 Hugo: barrel tip of attack frame 3 crosses into frame 4   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
 KEEPBLUE = {'m4_2', 'm4_3', 'm4_4'}   # v16-106: + Sofia's crown gem, Otto's blue tablet / ear piece / clock glow   # v16-96 Duke: blue diamonds / ice crystals (cyan) must stay blue, not turn grey
 
 PURPLEGLOW = {'m3_3'}
@@ -57,7 +59,7 @@ def despill(a, n=''):
     v = (r + b) / 2
     tint = ((0, 6), (1, 2), (2, 0))
     if HID in KEEPBLUE and n == 'fx': v = np.maximum(r, b); tint = ((0, -40), (1, 0), (2, 25))  # teal glow → icy blue, not grey
-    if HID == 'm3_2' and n in ('fx', 'skill', 'attack'): tint = ((0, 18), (1, -28), (2, 34))   # v16-108 Gloria: paint spill edges → purple, not grey
+    if HID in ('m3_2', 'm3_4') and n in ('fx', 'skill', 'attack'): tint = ((0, 18), (1, -28), (2, 34))   # v16-108 Gloria: paint spill edges → purple, not grey
     if HID in PURPLEGLOW: tint = ((0, 10), (1, -8), (2, 24))   # v16-109 Ohm: lightning haze stays lilac, not grey smoke
     for k, o in tint: a[..., k] = np.where(sm, np.clip(v + o, 0, 255), a[..., k])
     return a
@@ -92,6 +94,8 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
                 ('win', 2): 'fade:R', ('win', 3): 'none', ('win', 4): 'none', ('win', 5): 'none', ('fx', 4): 'fade'},
        'm3_3': {('attack', 3): 'fade:R', ('fx', 3): 'fade', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none',
                 ('hitko', 7): 'none'},
+       'm3_4': {('attack', 3): 'fade:R', ('skill', 3): 'fade:R', ('skill', 4): 'fade:R', ('fx', 4): 'fade',
+                ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 

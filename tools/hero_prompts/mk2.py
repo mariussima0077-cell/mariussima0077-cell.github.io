@@ -33,7 +33,7 @@ E={
  sk="HEADSHOT: 1-2 kneels and shoulders the rifle; 3-4 the scope glows, purple aiming laser; 5 PEAK: fires, big purple muzzle flash; 6 recoil, smoke from the barrel; 7-8 stands up back to idle. Only effects close to his body (the big beam is a separate image)",
  fx="a big purple sniper crosshair target with a powerful purple energy beam hitting it at the bottom-center. 1-2 the crosshair appears and locks; 3-4 it shrinks and glows; 5 = IMPACT: a huge purple beam hits with a bright explosion; 6-8 sparks and smoke fade",
  win="spins the rifle onto his shoulder, smirks, thumbs-up, proud pose"),
-'m3_5':dict(name='ARIA NEON',d="young woman street racer, magenta-purple high ponytail, purple goggles on her head, purple crop top with checkered accents, black-and-purple armored pants with neon knee pads, neon purple speaker-wheel backpack, black gloves, neon boots",
+'m3_5':dict(name='ARIA NEON',d="young woman street racer, magenta-purple high ponytail, purple goggles on her head, purple crop top under a short black cropped jacket with checkered sleeves, black-and-purple armored pants with neon knee pads, neon purple speaker-wheel backpack, black gloves, neon boots",
  bg="a neon night street with purple lights, light trails and a racing line",
  atk="a NEON KICK: 1-2 spins; 3 starts a spinning kick; 4 IMPACT: kick forward with a neon purple arc (inside the cell); 5 follow-through; 6-7 lands; 8 = idle pose",
  sk="NEON SPIN: 1-2 crouches, neon lights turn on; 3-4 starts spinning, purple light ring around her; 5 PEAK: full fast spin, neon trails; 6 stops, sparks; 7-8 back to idle. Only effects close to her body (the big spinning path is a separate image)",
