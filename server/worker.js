@@ -17,6 +17,7 @@ import {online, onlineCron, onlineAdmin} from './online.js';
 // v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
 const GIFT_VIP = ['160672a2'];
 const isGift = pid => GIFT_VIP.some(g => String(pid).startsWith(g));
+const LEGACY_T = Date.parse('2026-11-18T00:00:00Z');   // v16-125: before this, packs were free in the test versions
 // v16-71: Alex was banned by mistake for the gift (VIP 20 jump) → unbanned automatically at his next check-in (only until this date)
 const GIFT_UNBAN_UNTIL = Date.parse('2026-11-24T00:00:00Z');
 const TESTER_UNBAN = ['03245000-cda3-4e5c-9e6d-d388955218a8'];   // v16-103: one-time unban (Wazza4ever)
@@ -85,7 +86,10 @@ async function report(b, env) {
   if (b.app && Array.isArray(b.pk) && b.pk.length && !isGift(b.pid) && !(old && old.banned)) {
     const ids = [...new Set([b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].filter(x => typeof x === 'string' && x.length <= 64))].slice(0, 6);
     const got = new Set((await db.prepare(`SELECT DISTINCT p.sku FROM purchase_use u JOIN purchases p ON p.token=u.token WHERE p.state='ok' AND u.pid IN (${ids.map(() => '?').join(',')})`).bind(...ids).all()).results.map(r => r.sku));
-    const miss = b.pk.filter(k => PACK_SKU[k] && !got.has(PACK_SKU[k]));
+    // v16-125: players from before the real Shop (18 nov 2026) got car / vip / sub / spd2 for free in the old test versions
+    // (Marius' own account was banned for it) → those 4 are allowed for them; everything newer must be paid
+    const legacy = old && old.first && old.first < LEGACY_T ? ['car', 'vip', 'sub', 'spd2'] : [];
+    const miss = b.pk.filter(k => PACK_SKU[k] && !got.has(PACK_SKU[k]) && !legacy.includes(k));
     if (miss.length) {
       // first time: the game is asked to send its Google Play purchases again (new phone / cloud load / app closed during payment)
       const ask = await db.prepare("SELECT t FROM events WHERE pid=? AND kind='pkask' ORDER BY t DESC LIMIT 1").bind(b.pid).first();
