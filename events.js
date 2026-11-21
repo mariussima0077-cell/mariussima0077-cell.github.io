@@ -54,6 +54,10 @@ function dirty(){dot();clearTimeout(sendT);sendT=setTimeout(send,15000);}
 async function send(){if(!window.ONLINE||!ONLINE.call)return;const s=S();for(const tr of ['A','B']){const st=s[tr],sc=isW(st.k)?(st.w?st.w.used:0):st.sc;if(sc>0&&sc!==st.sent){const r=await ONLINE.call('evsc',{eid:st.id,k:st.k,sc});if(r&&r.ok){st.sent=sc;rk[st.id]={rank:r.rank,t:Date.now()};}}}}
 async function rank(tr){const st=S()[tr];if(!window.ONLINE||!ONLINE.call)return null;await send();const r=await ONLINE.call('evrank',{eid:st.id,k:st.k});return r&&r.ok?r:null;}
 // ---------------- rewards
+// v16-125 (Marius: "nothing in the frames, only text"): rewards as big icons + gold number pictures, the event's own icon in the left box
+const NH=(v,em)=>T().numH?T().numH(String(v),'gold',em||1.05):String(v);
+const evIc=E=>E.u==='essence'?ES():E.u==='diamonds'?DM():E.bn==='key'?'<img class="tki" src="img/wb/key.webp" alt="">':E.tkk==='gt'?GT:E.tkk==='ct'?CT:TK;
+function rwBig(r){const a=[];if(r.dm)a.push([DM(),r.dm]);if(r.tk)a.push([TK,r.tk]);if(r.gt)a.push([GT,r.gt]);if(r.ct)a.push([CT,r.ct]);if(r.ess)a.push([ES(),T().nf(r.ess)]);return a.map(([i,v])=>'<span class="evRw">'+i+NH((typeof v==='number'?'×':'')+v,1)+'</span>').join('');}
 function rwHtml(r){const a=[];if(r.dm)a.push(DM()+' '+r.dm);if(r.tk)a.push(TK+' '+r.tk);if(r.gt)a.push(GT+' '+r.gt);if(r.ct)a.push(CT+' '+r.ct);if(r.ess)a.push(ES()+' '+T().nf(r.ess));return a.join(' ');}
 function realRw(st,r){const o={...r};if(o.ess)o.ess=Math.round(o.ess*(st.b||300));return o;}
 function claim(tr,i){const s=S(),st=s[tr],E=EV[st.k],m=E.m[i],sc=isW(st.k)?st.w.used:st.sc;if(!m||st.cl.includes(i)||sc<goal(st,m[0]))return;
@@ -130,7 +134,9 @@ const css=`#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716
 #ev .evM{position:relative;box-sizing:border-box;width:100%;aspect-ratio:860/182;margin:6px 0;padding:0 5.5% 0 28%;gap:6px;border-radius:0;box-shadow:none!important;opacity:1!important;background:url(img/ui10/ev_row_lock.webp) center/100% 100% no-repeat!important}
 #ev .evM.ok{background-image:url(img/ui10/ev_row_ready.webp)!important}#ev .evM.done{background-image:url(img/ui10/ev_row_done.webp)!important}
 #ev .evM .g{position:absolute;left:10.6%;width:15.4%;top:19%;bottom:18%;min-width:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#ffe082;text-shadow:0 2px 0 #000;white-space:nowrap}
-#ev .evM .r{min-width:0;font-size:15px;text-shadow:0 2px 0 #000;white-space:nowrap}#ev .evM.done .r{opacity:.6}
+#ev .evM .r{min-width:0;font-size:15px;text-shadow:0 2px 0 #000;white-space:nowrap}
+#ev .evM .g{flex-direction:column;gap:1px;font-size:15px}#ev .evM .g .tki{height:1.55em;width:auto;filter:drop-shadow(0 2px 2px #000)}#ev .evM .g .numP{font-size:15px}
+#ev .evRw{display:inline-flex;align-items:center;gap:3px;margin-right:10px;font-size:16px}#ev .evRw .tki{height:1.75em!important;width:auto;vertical-align:middle;filter:drop-shadow(0 2px 2px #000)}#ev .evRw .numP{font-size:16px}#ev .evM.done .r{opacity:.6}
 #ev .evM button{width:84px;height:38px;font-size:15px;font-style:normal}#ev .evM.done button{visibility:hidden}
 #ev .evRk{display:block;width:100%;aspect-ratio:860/183;height:auto;margin:12px 0 4px;padding:0 6% 0 24%;border-radius:0;box-shadow:none;background:url(img/ui10/ev_rank_btn.webp) center/100% 100% no-repeat;font-size:21px;color:#fff;text-shadow:0 2px 0 #062050,0 0 10px #4fc3ff}
 #ev .evRk:active{transform:scale(.97)}
@@ -154,10 +160,10 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
-  h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+T().nf(sc)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
+  h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+NH(T().nf(sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
   if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
     h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+v+'/'+x[2]+'</div><div class="r">'+x[1]+'<div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
-  h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+T().nf(g)+'</div><div class="r">'+rwHtml(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
+  h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evIc(E)+NH(T().nf(g),1.1)+'</div><div class="r">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
   const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+EV[nx.k].ic+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div>';
   body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
