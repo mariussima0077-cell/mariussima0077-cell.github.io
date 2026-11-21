@@ -95,6 +95,7 @@ function place(L,T,Wd,H){const s=(e,a,b,c,d)=>{e.style.left=a+'px';e.style.top=b
   s(tb.T,0,0,innerWidth,T);s(tb.B,0,T+H,innerWidth,innerHeight-T-H);s(tb.L,0,T,L,H);s(tb.R,L+Wd,T,innerWidth-L-Wd,H);}
 let L=S,MINI=null;
 function go(n){i=n;cur=L[i];skipArm=0;lastTx='';if(!cur){end();return;}
+  if(!MINI&&!FORCE&&G.tutS!==i){G.tutS=i;try{save();}catch(e){}}   // v16-122: remember that the tutorial was started
   if(cur.enter)try{cur.enter();}catch(e){}
   setPose(cur.p||(cur.gift?'cheer':i===0&&!MINI?'talk':(cur.el||cur.w)?'point':'talk'));
   if(cur.w){camTo(R[cur.w]());try{if(sel0()&&!cur.tap)closePanel();}catch(e){}}
@@ -141,7 +142,7 @@ function start(replay){if(running)return;if(replay)FORCE=true;running=true;windo
   try{closePanel();}catch(e){}}
 const wait=setInterval(()=>{const ld=document.getElementById('loader');if(!ld||!ld.classList.contains('hide')||!window.__TE)return;clearInterval(wait);
   // wait a moment: the cloud / transfer window may still bring an older save
-  setTimeout(()=>{if(FORCE||isNew())start();},1500);},200);
+  setTimeout(()=>{if(FORCE||isNew()||(!G.tut&&G.tutS!=null&&!progressed()))start();},1500);/* v16-122: app closed in the middle → the tutorial starts again (gift only once, at the end) */},200);
 // ---------- mini-guides: one bubble the first time a battle mode is open in the Battle Hub ----------
 const MG={arena:`<b>ARENA</b>: your battle team fights other players' teams. 5 fights a day – climb from BRONZE to LEGEND!`,
   cup:`<b>TORQUE CUP</b>: every weekend the best Arena players fight in a tournament for big prizes.`,
@@ -165,7 +166,7 @@ const PG={
   vip:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>VIP</b> is free for everybody: <b>Daily Quests</b> give VIP points. Every VIP level makes your bonuses stronger (income, Idle time…). VIP Passes make them even bigger.`},
   events:{ok:()=>isOpen('ev'),t:`<b>EVENTS</b>: 2 events at the same time, 3 days each. Just play (summon, spend Essence…) to collect points → <b>milestone rewards</b> and <b>TOP 100</b> prizes.`},
   checkin:{ok:()=>isOpen('xp')&&!!document.getElementById('ciGo'),t:`<b>DAILY CHECK-IN</b>: come back every day for free tickets. Missing a day <b>never resets</b> your progress – you simply continue.`}};
-setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut)return;            // only after the main tutorial (done or skipped)
+setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
   MINI='p_'+k;L=[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];
   running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},900);
