@@ -40,6 +40,8 @@ HEROES = {
   'm3_0': ('viktor', {'idle': 455, 'run': 410, 'attack': 393, 'skill': 371, 'hitko': 428, 'win': 425, 'fx': 360}),
   'm3_1': ('bigmo', {'idle': 430, 'run': 404, 'attack': 409, 'skill': 410, 'hitko': 417, 'win': 403, 'fx': 400}),
   'm3_6': ('nina', {'idle': 442, 'run': 415, 'attack': 406, 'skill': 374, 'hitko': 390, 'win': 410, 'fx': 400}),
+  # v16-128 (21 nov): IGNIS, THE IRON PHOENIX (new Mythic m5_2). REF = frame 1 hair-top → feet (each sheet drawn at its own size); fx = fire phoenix, the impact ~1.2× his height
+  'm5_2': ('ignis', {'idle': 433, 'run': 381, 'attack': 350, 'skill': 327, 'hitko': 390, 'win': 377, 'fx': 300}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -50,7 +52,7 @@ OLDH = 241          # standing height in 256-cell units (same size as the old sh
 APU = .75           # atlas px per unit (same as the old 192-px cells)
 P = 110             # extension padding (sheet px)
 
-SPECKS = {'m3_0', 'm3_1', 'm3_2', 'm3_4', 'm3_5', 'm3_6'}   # v16-109 Hugo: barrel tip of attack frame 3 crosses into frame 4   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
+SPECKS = {'m5_2', 'm3_0', 'm3_1', 'm3_2', 'm3_4', 'm3_5', 'm3_6'}   # v16-109 Hugo: barrel tip of attack frame 3 crosses into frame 4   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
 KEEPBLUE = {'m4_2', 'm4_3', 'm4_4'}   # v16-106: + Sofia's crown gem, Otto's blue tablet / ear piece / clock glow   # v16-96 Duke: blue diamonds / ice crystals (cyan) must stay blue, not turn grey
 
 PURPLEGLOW = {'m3_0', 'm3_1', 'm3_3', 'm3_5', 'm3_6'}   # v16-125 Nina: nitro smoke + rocket flame stay purple   # v16-113 Aria: neon swooshes + tornado haze → lilac, not grey
@@ -111,6 +113,8 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
                 ('fx', 6): 'fadeS', ('fx', 7): 'fadeS', **{('hitko', i): 'none' for i in range(8)}, ('win', 4): 'fade'},
        'm3_6': {('attack', 3): 'fade:R', ('attack', 4): 'fade:R', ('skill', 4): 'fade', ('fx', 0): 'fade:L', ('fx', 1): 'fade:L',
                 ('fx', 2): 'fade:L', ('fx', 3): 'fade', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
+       'm5_2': {('attack', 3): 'fade:R', ('attack', 2): 'fade:T', ('fx', 1): 'fadeS', ('fx', 4): 'fade', ('win', 3): 'fade:T',
+                ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
 
@@ -158,7 +162,7 @@ def extend(c, mode=None):
 
 # v16-96: heroes whose poses / thrown weapons cross the 384-px columns (Rosa's wrench swooshes) → wide cells:
 # every picture part goes to the column its centre is in (no neighbour leaking, nothing cut at the column line)
-WIDE = {'m4_1': 90, 'm3_6': {'hitko': 90}, 'm3_0': {'attack': 90, 'hitko': 90}, 'm3_1': {'idle': 90, 'skill': 90, 'hitko': 90, 'win': 90, 'attack': 90}, 'm3_3': {'hitko': 90}, 'm3_5': {'hitko': 90, 'attack': 90}}   # v16-109 Ohm: only his KO sheet (lying body crosses the column line)
+WIDE = {'m4_1': 90, 'm5_2': {'run': 90, 'attack': 90, 'hitko': 90, 'win': 90}, 'm3_6': {'hitko': 90}, 'm3_0': {'attack': 90, 'hitko': 90}, 'm3_1': {'idle': 90, 'skill': 90, 'hitko': 90, 'win': 90, 'attack': 90}, 'm3_3': {'hitko': 90}, 'm3_5': {'hitko': 90, 'attack': 90}}   # v16-109 Ohm: only his KO sheet (lying body crosses the column line)
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
     a = despill(unmix(im), n).astype(np.float32)

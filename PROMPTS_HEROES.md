@@ -1,4 +1,5 @@
 # EROI CU ANIMAȚII NOI (8 cadre) – metoda (19 nov 2026)
+✅✅ **21 nov – EROU NOU de la zero: IGNIS (m5_2, Mythic)**: întâi o PREZENTARE (3 poze + fața, fond verde, atașată Lady idle ca stil) → corectat proporțiile (chibi, cap 1/4, aripi în sus) → apoi cele 8 prompturi cu prezentarea + Lady idle atașate. Merge bine pentru eroi noi.
 ✅ Făcut: **THE TORQUE KING** (m5_0, v16-94). Marius: „a ieșit super, ține minte cum am făcut, o facem și pentru următorii, dar mai târziu”.
 Următorul propus: **Lady Overdrive** (m5_1), apoi Legendary.
 ✅ **19 nov: pozele GRIGORE primite** (`img/sheets/grigore/`, foaia skill e 1774x887 → `cells()` acceptă orice mărime), decupate cu `tools/v8_hero.py m4_0` (EXT: idle 3-7 / run 2 = fără prelungire, fx 4-6 + skill 5-7 = estompat). **În main la v16-95 (OK de la Marius, împreună cu Lady):** `ck:5` (cadrele skill 1-5, al 5-lea = lovitura în pământ), `pk:[5,6,7]` = după cast (praf → scut, `u.post` 0,6 s), zidul de pietre din `fxs_m4_0` merge odată cu fața cutremurului (`quake`). Splash `splash_m4_0.webp`. 
