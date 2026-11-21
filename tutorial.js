@@ -58,8 +58,11 @@ const sel0=()=>X().sel(),closePanel=()=>X().closePanel(),fmt=n=>TE().fmt(n),save
 
 // ---------- the steps ----------
 let lv0=0,tk0=0,hc0=0,best0=0;
+// v16-122 (Marius): a BIG gift at the end so players don't skip – announced in the first bubble
+const GIFT={dm:1000,tk:10};
+const giftH=()=>`<div class="gift"><span>${TE().DMI} ${GIFT.dm}</span><span>${X().TKI()} ${GIFT.tk}</span><span><img class="tki" src="img/cticket.webp"> ${GIFT.tk}</span><span><img class="tki" src="img/gticket.webp"> ${GIFT.tk}</span></div>`;
 const S=[
- {t:`Welcome to <b>TORQUE EMPIRE</b>, boss! I'm Mama Rosa, your chief mechanic. Let me show you around – it only takes a minute.`,next:'LET\'S GO'},
+ {t:()=>`Welcome to <b>TORQUE EMPIRE</b>, boss! I'm Mama Rosa, your chief mechanic. Let me show you around – it only takes a minute.<br><b>Finish the tutorial for a big gift:</b>`+giftH(),next:'LET\'S GO'},
  {w:'parking',t:`Customer cars arrive here, at the <b>ARRIVAL PARKING</b>. Valet drivers take them to the workshops by themselves.`,next:'NEXT'},
  {w:'inspect',t:`<b>INSPECTION</b> checks every car and decides what must be repaired and which workshop it visits.`,next:'NEXT'},
  {w:'office',t:`When a car is fixed, the <b>SALES OFFICE</b> sells it and you get the money. It all runs by itself – even while you are away!`,next:'NEXT'},
@@ -76,7 +79,7 @@ const S=[
  {el:()=>isOpen('cpRes')?document.querySelector('#cpResBox [data-a="map"]'):isOpen('hub')?document.querySelector('#hub [data-hb="back"]'):isOpen('cp')?document.getElementById('cpBack'):null,tap:1,top:1,res:1,t:()=>(G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear.`:`So close! Make your heroes stronger with gear and try again later.`)+(isOpen('cpRes')?` Tap <b>CAMPAIGN</b>, then <b>↩</b> to go back to your garage.`:` Tap <b>↩</b> to go back to your garage.`),done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
  {el:()=>$('dqBtn'),t:`<b>DAILY QUESTS</b>: finish them every day for VIP points, diamonds and tickets.`,next:'NEXT'},
  {el:()=>$('idBtn'),t:`<b>IDLE REWARDS</b>: your garage keeps earning while you are offline. Collect it here!`,next:'NEXT'},
- {t:()=>`That's it, boss! Here is a welcome gift. Now build your <b>TORQUE EMPIRE</b>!<div class="gift"><span>${TE().DMI} 100</span><span>${X().TKI()} 2</span></div>`,next:'START',gift:1},
+ {t:()=>`That's it, boss! Here is your welcome gift. Now build your <b>TORQUE EMPIRE</b>!`+giftH(),next:'START',gift:1},
 ];
 function upCost(){try{return X().upCost('service');}catch(e){return 0;}}
 
@@ -102,10 +105,10 @@ function end(){root.remove();running=false;window.__TUTON=false;
   if(MINI){(G.tutM=G.tutM||[]).push(MINI);MINI=null;L=S;try{save();}catch(e){}return;}
   if(!G.tutM&&!FORCE)G.tutM=[];
   if(!FORCE){G.tut=1;try{save();}catch(e){}}}
-nx.onclick=()=>{if(FORCE&&cur&&!cur.gift&&isOpen('sm')&&cur.tap){const b=document.querySelector('#smBox [data-a="back"]');if(b)b.click();go(i+2);return;}if(cur&&cur.gift&&!FORCE){G.dm=(G.dm||0)+100;G.h.tk+=2;try{save();toast('🎁 Welcome gift: 100 diamonds + 2 Recruit Tickets',3500);}catch(e){}}
+nx.onclick=()=>{if(FORCE&&cur&&!cur.gift&&isOpen('sm')&&cur.tap){const b=document.querySelector('#smBox [data-a="back"]');if(b)b.click();go(i+2);return;}if(cur&&cur.gift&&!FORCE){G.dm=(G.dm||0)+GIFT.dm;G.h.tk+=GIFT.tk;G.h.ct=(G.h.ct||0)+GIFT.tk;G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+GIFT.tk;try{save();toast('🎁 Welcome gift: '+GIFT.dm+' diamonds + '+GIFT.tk+' Recruit, '+GIFT.tk+' Crew and '+GIFT.tk+' Gear Tickets',4000);}catch(e){}}
   if(cur&&cur.gift&&FORCE){try{toast('Preview: the gift is not given (test only)',2500);}catch(e){}}
   go(i+1);};
-sk.onclick=()=>{if(!skipArm){skipArm=1;sk.textContent='TAP AGAIN TO SKIP';setTimeout(()=>{skipArm=0;sk.textContent='SKIP TUTORIAL';},2500);return;}end();};
+sk.onclick=()=>{if(!skipArm){skipArm=1;sk.textContent='SKIP = NO GIFT · TAP AGAIN';setTimeout(()=>{skipArm=0;sk.textContent='SKIP TUTORIAL';},2500);return;}end();};
 let running=false;
 function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;if(!MINI&&progressed()){G.tut=1;try{save();}catch(e){}root.remove();running=false;window.__TUTON=false;return;}
   camStep();
@@ -153,5 +156,18 @@ setInterval(()=>{if(!isOpen('hub')){hubDone=false;return;}if(running||hubDone||!
   const k=open.find(k=>!G.tutM.includes(k));if(!k)return;
   hubDone=true;MINI=k;L=[{el:()=>document.querySelector('#hub.open .hubM[data-hb="'+k+'"]'),t:MG[k],next:'GOT IT'}];
   running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},700);
+// ---------- v16-122 (Marius): mini-guides the FIRST time a page is opened (one bubble, once per player) ----------
+const PG={
+  heroes:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b>HEROES</b>: your <b>BATTLE TEAM</b> (5 heroes) fights here. Tap a hero to <b>LEVEL UP</b> with ${'<b>Essence</b>'} – every 20 levels = <b>ASCENSION</b>. <b>AUTO BEST</b> picks your strongest team.`},
+  gear:{ok:()=>isOpen('cpPop')&&!!document.querySelector('#cpPopBox .iUp'),t:`<b>GEAR</b> makes heroes stronger in battle. <b>UPGRADE</b> with <b>Gear Parts</b> (salvage, campaign, Dungeons, Idle). Two identical pieces = <b>★ STAR UP</b>. A full class set gives extra bonuses.`},
+  crew:{ok:()=>isOpen('ros'),t:`<b>MY CREW</b> = everybody who <b>works in your garage</b>: mechanics (heroes), guards and drivers. Each workshop takes only <b>its own class</b>. Better crew = faster work and more money. <b>AUTO BEST</b> fills every place.`},
+  summon:{ok:()=>isOpen('sm')&&!isOpen('res'),t:`<b>SUMMON</b>: <b>HERO</b> = mechanics who work AND fight · <b>CREW</b> = drivers and guards for the garage · <b>GEAR</b> = equipment. <b>×10</b> gives 11. A <b>Legendary</b> is guaranteed every 500 summons.`},
+  vip:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>VIP</b> is free for everybody: <b>Daily Quests</b> give VIP points. Every VIP level makes your bonuses stronger (income, Idle time…). VIP Passes make them even bigger.`},
+  events:{ok:()=>isOpen('ev'),t:`<b>EVENTS</b>: 2 events at the same time, 3 days each. Just play (summon, spend Essence…) to collect points → <b>milestone rewards</b> and <b>TOP 100</b> prizes.`},
+  checkin:{ok:()=>isOpen('xp')&&!!document.getElementById('ciGo'),t:`<b>DAILY CHECK-IN</b>: come back every day for free tickets. Missing a day <b>never resets</b> your progress – you simply continue.`}};
+setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut)return;            // only after the main tutorial (done or skipped)
+  const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
+  MINI='p_'+k;L=[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];
+  running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},900);
 window.__TUT={start:()=>{MINI=null;L=S;start(true);},go:n=>go(n),end};
 })();

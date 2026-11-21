@@ -2679,7 +2679,7 @@ function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(C
 function lvCan(id){const T=TE(),G=T.G,l=T.lvOf(id),c=T.lvCap(id),e=G.ess||0;return l<c?e>=T.lvCost(l):c<T.LV_MAX&&e>=T.ascCost(T.ascOf(id));}
 function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gGSB').innerHTML='<b>GEAR SUMMON</b><span><img src="img/gticket.webp" alt="">'+GSD().tk.toLocaleString()+'</span>';
-  $m('gMoney').innerHTML=T.ESI+' '+T.nf(G.ess||0)+' &nbsp;'+T.GPI+' '+T.nf(G.gp||0); // v16-99: Essence (hero levels) + Gear Parts (gear upgrades)
+  $m('gMoney').innerHTML=T.ESI+' '+T.nf(G.ess||0)+' &nbsp;'+T.GPI+' '+T.nf(G.gp||0);{const gm=$('gMoney');if(gm&&!gm.dataset.ri){gm.dataset.ri=1;gm.style.pointerEvents='auto';gm.style.cursor='pointer';gm.onclick=()=>popW('RESOURCES',TE().resHtml('ess'));}} // v16-99: Essence (hero levels) + Gear Parts (gear upgrades)
   tsel=curTeamList().map(x=>x.id);const team=tsel;let L=myMechs();
   if(gsort==='pow')L=L.slice().sort((a,b)=>pow(b)-pow(a));else if(gsort==='gr')L=L.slice().sort((a,b)=>(b.gr||0)-(a.gr||0)||stars(b)-stars(a));
   // BATTLE TEAM (5 places) – tap a place to change it (before / after)

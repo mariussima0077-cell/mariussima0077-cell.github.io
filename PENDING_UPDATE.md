@@ -60,3 +60,11 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - Test (Chrome 360 px): jucător etapa 5 → nimic; etapa 700 → piesă r=6 în sac; 2000 cufere de 8 h → 0,55%; claimIdle OK; Mythic ★5 fără buton ASCEND; 0 erori.
 - NEWS id 59.
 
+## 9. Joc mai ușor de înțeles (Marius, 21 nov 2026: „toate da” + cadou mare la tutorial) – gata, testat
+- **Cadou tutorial**: 1000 💎 + 10 Recruit + 10 Crew + 10 Gear Tickets (înainte 100 💎 + 2 Recruit), anunțat din primul balon (`GIFT`, `giftH` în `tutorial.js`); SKIP arată „SKIP = NO GIFT · TAP AGAIN”. Replay (`?tut=1`) nu dă cadou. Sub limitele botului (bilete < 60 / 100).
+- **Mini-ghiduri la prima deschidere** (`PG` în `tutorial.js`, cheie `p_*` în `G.tutM`): HEROES, GEAR (fereastra unei piese), MY CREW, SUMMON, VIP, EVENTS, CHECK-IN. Doar după tutorial (`G.tut`), o singură dată, un balon cu Mama Rosa + GOT IT.
+- **Fereastra RESOURCES** (`resHtml`/`popRes` în `index.html`): ce e / GET / USE pentru bani, diamante, cele 3 bilete, Essence, Gear Parts, chei, puncte VIP. Se deschide la tap pe 💎 din bara de sus (înainte doar toast) și pe Essence / Gear Parts din pagina HEROES (`battle.js`).
+- **„CREW” de 2 ori**: verificat – MY CREW are 3 tab-uri (mecanici, gardieni, șoferi) = tot ce lucrează în garaj, iar Crew Summon dă șoferi + gardieni → numele se potrivesc. NU am redenumit (ar fi cerut 3+ poze noi: butonul hărții, antetul MY CREW, antetul CREW SUMMON); explicat în ghidurile SUMMON și MY CREW.
+- **NEXT GOAL**: doar machetă trimisă lui Marius (bandă sub bara de sus: obiectiv + GO). De făcut doar după OK.
+- Test Chrome 360 px: cadoul vine corect (0→1000 💎, +10 din fiecare bilet), ghidurile Summon/Heroes/VIP apar o dată, fereastra RESOURCES OK, 0 erori. NEWS id 60.
+
