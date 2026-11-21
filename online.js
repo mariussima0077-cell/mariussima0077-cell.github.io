@@ -27,11 +27,11 @@ function needUpd(){if(document.getElementById('updNeed'))return;const d=document
     navigator.serviceWorker.getRegistration().then(r=>{if(!r){go();return;}navigator.serviceWorker.addEventListener('controllerchange',go);r.update().then(()=>{if(!r.installing&&!r.waiting)go();}).catch(go);setTimeout(go,8000);}).catch(go);};}
 
 // ------------------------------------------------------------------ titles, frames, leagues
-const TT={king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
+const TT={fdr:['t5','FOUNDER','Founder Pass (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
  boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game']};
-const TORD=['king','cup','leg','glad','boss','gear','speed','chat','wr','rook'];
+const TORD=['fdr','king','cup','leg','glad','boss','gear','speed','chat','wr','rook'];
 const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
-const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win']];
+const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)']];   // v16-122: 7 = FOUNDER (img/fr7 – 6 is the Ascended gear frame)
 const LG=[['BRONZE','#ffd8b0','#d0864a','#5a2a08','#e07a3a'],['SILVER','#ffffff','#b8c4d2','#4a5462','#7fd0ff'],['GOLD','#fffbe6','#ffc23a','#6a3a00','#ff3b3b'],['PLATINUM','#e8fffb','#5fe0c8','#0a4a44','#3fa7ff'],['DIAMOND','#e8f4ff','#5aa8ff','#0a2a6a','#c35cff'],['LEGEND','#fff1d0','#ff5a3c','#5a0a0a','#ffd54a']];
 let bid=0;
 function badge(i,num){i=Math.max(0,Math.min(5,i|0));return `<span class="lgb"><img src="img/ui3/lg${i}.webp" alt="${LG[i][0]}">${num!=null?`<b>${num}</b>`:''}</span>`;} // v16-49: Marius' league shields (img/ui3/lg0-5)
@@ -43,7 +43,7 @@ const GRN=['Common','Uncommon','Rare','Epic','Legendary','Mythic'],GRC=['#b8c2cf
 const hName=id=>{const t=T(),h=t&&t.HB&&t.HB[id];return h&&h.n?h.n:'';};
 const fcard=(id,s,w=60)=>{const g=Math.max(0,Math.min(5,gradeOf(id))),r=FIN5[g],p=FPL5[g];
   return `<div class="hfc" style="width:${w}px"><div style="position:relative;width:100%;aspect-ratio:220/236"><img src="img/fr${g}.webp" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><img src="${HI(id)}" alt="" style="position:absolute;left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%;object-fit:cover;border-radius:5%">${s?`<span style="position:absolute;left:20%;right:20%;top:${p[0]}%;height:${p[1]}%;display:flex;align-items:center;justify-content:center;font:900 10px system-ui;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000">+${s}</span>`:''}</div><small style="display:block;font:800 9px/1.15 system-ui;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hName(id))}</small><small style="display:block;font:800 8px system-ui;color:${GRC[g]}">${GRN[g].toUpperCase()}</small></div>`;};
-const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p" style="background-image:url(${HI(id)})"></div>`;
+const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)===7?7:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p" style="background-image:url(${HI(id)})"></div>`;
 const stLab=b=>C()&&C().sLabel?C().sLabel(b):String(b);
 const ICON={trophy:'<svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg>',chat:'<svg viewBox="0 0 64 64"><use href="#olChat"/></svg>',arena:'<svg viewBox="0 0 64 64"><use href="#olSwords"/></svg>',cup:'<svg viewBox="0 0 64 64"><use href="#olCup"/></svg>',user:'<svg viewBox="0 0 64 64"><use href="#olUser"/></svg>'};
 
@@ -379,7 +379,7 @@ const st=document.createElement('style');st.textContent=css;document.head.append
 // ------------------------------------------------------------------ state
 let ME=null,inboxN=0,chatLast=+(LS('te_chat_seen')||0),chatSrvLast=0,cur='',open_=false,polls={},rkBy='best',rkPrev={},chCh='w',chSince=0,chList=[],arTab='fight',arData=null;
 let autoTr=LS('te_tr')!=='0';const mutes=new Set(JSON.parse(LS('te_mutes')||'[]'));
-function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.cp.best:0;if(b>=40)o.push('wr');if(b>=80)o.push('boss');if((G.rep||0)>=10)o.push('speed');if((G.rep||0)>=5)o.push('f1');
+function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.cp.best:0;if(b>=40)o.push('wr');if(b>=80)o.push('boss');if((G.rep||0)>=10)o.push('speed');if((G.rep||0)>=5)o.push('f1');if(T().PK&&T().PK.fdr)o.push('fdr');
   if(G.gear&&(G.gear.inv||[]).some(it=>it.r>=4))o.push('gear');return o;}
 // v16-82: G.vip = VIP POINTS; the server and the profile need the VIP LEVEL (0-20)
 function vipLv(G){const P=typeof VIP_PTS!=='undefined'?VIP_PTS:null,v=G&&G.vip||0;if(!P)return 0;let n=0;for(let i=1;i<P.length;i++)if(v>=P[i])n=i;return n;}
@@ -387,7 +387,7 @@ async function sync(){
   const t=T(),c=C();if(!t||!t.G||!c||!c.arenaTeam||!PID())return;
   let team=[];try{team=c.arenaTeam();}catch(e){}
   const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0);
-  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),icon:LS('te_icon')||undefined});
+  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),pids:window.SEC&&SEC.pids?SEC.pids():undefined,icon:LS('te_icon')||undefined});
   if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;dots();if(open_)hdr();}
   return r;}
 let arenaTk=0;
@@ -563,7 +563,7 @@ $('olCupB').addEventListener('click',async e=>{const b=e.target.closest('[data-r
 function myHeroes(){const t=T();if(!t)return [];const G=t.G,o=[];for(const id in G.h.own){const h=t.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}o.sort((a,b)=>b.gr-a.gr||(G.h.own[b.id].s||0)-(G.h.own[a.id].s||0));return o;}
 function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty">Loading…</div>';return;}
   const u=new Set(ME.unl||[]),G=T().G,vip=vipLv(G),rep=G.rep||0;
-  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')));
+  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)));
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
   $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}${vip?' · VIP '+vip:''}</div>

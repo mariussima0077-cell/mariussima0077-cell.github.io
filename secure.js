@@ -10,8 +10,9 @@ const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip
   // v16-75 new Shop (shop2.js): Platinum subscription, one-time packs, consumable diamonds, campaign funds
   plat:'vip_pass_platinum', p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite',
   d1:'diamonds_300', d2:'diamonds_800', d3:'diamonds_1700', d4:'diamonds_3600', d5:'diamonds_9500', d6:'diamonds_20000',
-  fn:'fund_normal', fh:'fund_hard'};
-const SUBS = k => k==='sub'||k==='plat';                    // subscriptions
+  fn:'fund_normal', fh:'fund_hard',
+  dia:'vip_pass_diamond', fdr:'founder_pass'};   // v16-122: Diamond Pass (subscription 14.99) · Founder Pass (one-time 4.99)
+const SUBS = k => k==='sub'||k==='plat'||k==='dia';                    // subscriptions
 const CONS = k => k==='dg'||/^d\d$/.test(k);                // consumables (can be bought again) // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
 const PLAY = 'https://play.google.com/billing';
 
@@ -259,5 +260,5 @@ async function integ(force){
 }
 setTimeout(integ, 6000);
 
-window.SEC = {integ:()=>integ(true), PID, TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+window.SEC = {integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

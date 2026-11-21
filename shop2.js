@@ -30,6 +30,7 @@ const PASS = {
   sil:  {n:'SILVER PASS',   mult:1.2, idle:1, cost:1500, day:{tk:1}},
   gold: {n:'GOLD PASS',     mult:1.5, idle:2, price:'€5.99', start:300, day:{dm:100, tk:2}, spd:1},
   plat: {n:'PLATINUM PASS', mult:2,   idle:4, price:'€9.99', start:600, day:{dm:200, tk:3, gt:2}, spd:1, auto:1},
+  dia:  {n:'DIAMOND PASS',  mult:1,   idle:0, price:'€14.99', start:900, day:{dm:300, tk:2}},   // v16-122 (Marius, 21 nov 2026): diamonds only – 9,900 💎 / 30 days, no VIP bonus (same 💎 per € as Platinum)
 };
 // Campaign Funds: rewards at every 5th chapter (NORMAL / HARD)
 const FUND = {
@@ -42,9 +43,9 @@ const SPC = 20;                           // stages per chapter (battle.js)
 const PK = () => T().PK;
 const S = () => { const G=T().G; if(!G.shop) G.shop={fx:{}, day:'', ge:0, pe:0, fn:[], fh:[]}; const s=G.shop; s.fx=s.fx||{}; s.fn=s.fn||[]; s.fh=s.fh||[]; return s; };
 const on = k => (PK()[k]||0) > now();
-const expKey = {sil:'sil', gold:'sub', plat:'plat'};
-function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; return null; }   // the best active one (name / colour)
-const actv = () => ['sil','gold','plat'].filter(k=>on(expKey[k]));                       // v16-84: every active pass
+const expKey = {sil:'sil', gold:'sub', plat:'plat', dia:'dia'};
+function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; if(on('dia')) return 'dia'; return null; }   // the best active one (name / colour)
+const actv = () => ['sil','gold','plat','dia'].filter(k=>on(expKey[k]));                       // v16-84: every active pass
 const stackMult = () => { const a=actv(); return a.length ? Math.round((1+a.reduce((x,k)=>x+PASS[k].mult-1,0))*10)/10 : PASS.gold.mult; };  // +20% / +50% / +100% add up
 const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 
@@ -66,14 +67,14 @@ function grant(k, quiet){
   const p=PACKS.find(x=>x.k===k); if(p){ PK()[k]=true; t_save(); give(p, quiet?'Restored '+p.n:p.n); return; }
   const d=DIAMONDS.find(x=>x.k===k); if(d){ const s=S(), x2=!s.fx[k]; s.fx[k]=1; give({dm:d.dm*(x2?2:1)}, x2?'Diamonds ×2 (first time)':'Diamonds'); return; }
   if(k==='fn'||k==='fh'){ PK()[k]=true; t_save(); if(!quiet) T().toast('🏁 '+FUND[k].n+' unlocked! Claim your rewards.',4000); render(); return; }
-  if(k==='plat'||k==='sub'){ passTick(); T().vipRefresh(); render(); return; }
+  if(k==='plat'||k==='sub'||k==='dia'){ passTick(); T().vipRefresh(); render(); return; }
 }
 const t_save = () => T().savePacks();
 
 // the pass: start bonus once per new period + daily gift + Platinum auto-collect
 function passTick(){
   const t=T(); if(!t||!t.G||!api.live) return; const s=S(), tr=tier();
-  for(const [k,key,f] of [['gold','sub','ge'],['plat','plat','pe']]){
+  for(const [k,key,f] of [['gold','sub','ge'],['plat','plat','pe'],['dia','dia','de']]){
     const e=PK()[key]||0; if(e>now() && e!==s[f]){ s[f]=e; give({dm:PASS[k].start}, PASS[k].n); } }
   for(const k of actv()){ s.dd=s.dd||{}; if(s.dd[k]!==today()){ s.dd[k]=today(); if(s.day!==today()+k) give(PASS[k].day, PASS[k].n+' · daily gift'); } }   // v16-84: every active pass gives its own gift (s.day = old one-gift key, so no double gift today)
   if(on('plat') && t.idleNow && t.claimIdle && t.idleMax){ const I=t.idleNow(); if(I.hrs>=t.idleMax()-0.01 && I.money>0){ t.claimIdle(); t.toast('🧰 Platinum Pass: Idle Rewards collected automatically',3000); } }
@@ -91,10 +92,10 @@ async function buy(k){
       if(conf!=='sil'){ conf='sil'; render(); setTimeout(()=>{ if(conf==='sil'){ conf=''; render(); } },4000); return; }
       conf=''; G.dm-=c; PK().sil=now()+30*DAY; t_save(); T().save(); T().vipRefresh(); T().toast('🥈 Silver Pass active for 30 days!',3500); passTick(); render(); return;
     }
-    if((k==='sub'||k==='plat') && on(k)){ T().toast('This VIP Pass is already active.',3000); return; }   // v16-84: other passes may be active
+    if((k==='sub'||k==='plat'||k==='dia') && on(k)){ T().toast('This VIP Pass is already active.',3000); return; }   // v16-84: other passes may be active
     const ok = await Promise.race([SEC.buy(k), new Promise(res=>setTimeout(()=>res(false),200e3))]);   // v16-78: the button never stays dead
     if(!ok) return;
-    if((k==='sub'||k==='plat') && !(PK()[k]>now())) PK()[k]=now()+30*DAY;   // test mode / missing expiry
+    if((k==='sub'||k==='plat'||k==='dia') && !(PK()[k]>now())) PK()[k]=now()+30*DAY;   // test mode / missing expiry
     t_save(); grant(k);
   } finally { busy=false; }
 }
@@ -166,7 +167,7 @@ button{font-family:inherit;cursor:pointer}
 #s2 .dp small{display:block;font-size:10px;color:#9fd3ff;margin-bottom:6px;min-height:12px}
 #s2 .dp .buy{min-width:0;width:92%;padding:7px 0;font-size:14px}
 #s2 .vp{--c:#9fb0c0;background:linear-gradient(135deg,#2c3542,#11161d 70%)}#s2 .vp.g{--c:#ffcf5a;background:linear-gradient(135deg,#5e430c,#1e1504 70%)}
-#s2 .vp.p{--c:#e9c8ff;background:linear-gradient(135deg,#43275e,#170d24 60%,#0d1a2a)}
+#s2 .vp.p{--c:#e9c8ff;background:linear-gradient(135deg,#43275e,#170d24 60%,#0d1a2a)}#s2 .vp.d{--c:#7fe8ff;background:linear-gradient(135deg,#0d4a63,#06202e 60%,#0a1424)}
 #s2 .card .top{display:flex;gap:10px;align-items:center}#s2 .card .top img{width:64px;height:64px;object-fit:contain;flex:none;filter:drop-shadow(0 3px 5px #000)}
 #s2 .fund .top img{width:72px;height:72px;margin:-4px 0 -2px}
 #s2 .bn{position:relative;margin:-12px -12px 8px;line-height:0}#s2 .bn>img{display:block;width:100%}
@@ -216,6 +217,7 @@ function render(){
           '</div><div class="foot"><span class="val"><b>×'+p.val+'</b>VALUE</span>'+(lk?'<button class="buy lock">🔒 '+P(p.k,p.price)+'</button>':'<button class="buy" data-b="'+p.k+'">'+P(p.k,p.price)+'</button>')+'</div></div>'; });
     } else h+='<div class="note">✓ You bought all special offers – thank you!</div>';
     h+='<div class="sec">FOREVER PACKS</div>'+[
+      ['fdr','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99'],
       ['car','ui3/sp_truck','VIP Truck · Rich Clients','Forever: rich clients, priority in every garage, pay ×2.','€5.99'],
       ['vip','ui3/sp_crew','VIP Crew Boost','Forever: every mechanic +25% speed &amp; money.','€3.99'],
       ['spd2','ui3/sp_speed','Battle Speed ×3','Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins>','€2.99'],
@@ -244,7 +246,10 @@ function render(){
     h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
       '</ul><div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
-    h+='<div class="note">VIP Passes stack: you can have Silver, Gold and Platinum at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
+    h+='<div class="card vp d"><div class="rib">MOST 💎</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
+      row(IMG('ui3/v_dm'),'Diamonds right away','900')+row(IMG('ui3/v_dm'),'Diamonds every day','+300')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','–',1)+row(IMG('ui3/v_idle'),'Idle Rewards','–',1)+
+      '</ul><div class="tot">In 30 days: 9,900 💎 + 60 tickets ≈ 159 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
+    h+='<div class="note">VIP Passes stack: you can have Silver, Gold, Platinum and Diamond at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
   }
   if(tab==='tf'){
     h+='<div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>';
@@ -272,14 +277,14 @@ const onClick=e=>{
     return; }
   if(tb){ tab=tb.dataset.t; conf=''; render(); el.scrollTop=0; return; }
   if(c){ const [k,i]=c.dataset.c.split(':'); claimFund(k,+i); return; }
-  if(b){ const k=b.dataset.b; if(k==='car'||k==='vip'||k==='spd2'){ buyForever(k); return; } buy(k); }
+  if(b){ const k=b.dataset.b; if(k==='car'||k==='vip'||k==='spd2'||k==='fdr'){ buyForever(k); return; } buy(k); }
 };
 root.addEventListener('click',onClick); foot.addEventListener('click',e=>{ if(e.target.closest('[data-a]')) onClick(e); });
 // the old forever packs (same logic as the old shop)
 async function buyForever(k){ if(busy||PK()[k]) return; busy=true;
   try{ const ok=await SEC.buy(k); if(!ok) return; PK()[k]=true; t_save();
     if(k==='car'&&T().vtStart) T().vtStart();
-    T().toast(k==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':k==='spd2'?'⏩ Battle Speed ×3 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000); render(); }
+    T().toast(k==='fdr'?'🏅 Founder Pass: Battle Speed ×3 + FOUNDER frame & title!':k==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':k==='spd2'?'⏩ Battle Speed ×3 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000); render(); }
   finally{ busy=false; } }
 
 function open(t){ if(t) tab=t; conf=''; el.classList.add('open'); render(); el.scrollTop=0;

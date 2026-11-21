@@ -139,7 +139,7 @@ async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl 
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
-function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))); }
+function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')); }   // v16-122: 7 = FOUNDER (Founder Pass)
 const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king'];
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 
@@ -383,7 +383,10 @@ export async function online(op, b, env) {
     if (await isBanned(env, b.pid)) return {banned:1};
     const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, team = cleanTeam(b.team), lang = String(b.lang || 'en').slice(0, 12);
     const best = num(s.best, 0, 1000) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 200) | 0, pw = teamPow(team);
-    const cunl = (Array.isArray(b.unl) ? b.unl : []).filter(k => ['wr','boss','gear','speed','f1'].includes(k)).join(',');
+    const cl = Array.isArray(b.unl) ? b.unl : [];
+    // v16-122: FOUNDER only with a purchase Google confirmed (purchases table) – the test account (tst_…) may claim it
+    const fdr = cl.includes('fdr') && (String(b.pid).startsWith('tst_') || !!(await db.prepare("SELECT 1 FROM purchases WHERE sku='founder_pass' AND state='ok' AND pid IN (" + [b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].slice(0, 6).map(() => '?').join(',') + ") LIMIT 1").bind(b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)).first()));
+    const cunl = cl.filter(k => ['wr','boss','gear','speed','f1'].includes(k) || (k === 'fdr' && fdr)).join(',');
     const icon = String(b.icon || (team[0] && team[0].id) || 'm0_0').replace(/[^a-z0-9_]/g, '').slice(0, 12), dk = dayKey(now);
     if (!p) {
       await db.prepare(`INSERT INTO prof(pid,srv,name,nlow,icon,cc,lang,vip,rep,best,bday,bd0,pow,lv,team,t,created,cunl) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)

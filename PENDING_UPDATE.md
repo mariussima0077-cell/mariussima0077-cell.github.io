@@ -33,3 +33,15 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - **Battle Speed pack: ×2 → ×3** (cine l-a cumpărat are ×3). Iconiță nouă `img/ui3/b_x3.webp` (de la Marius, ChatGPT). ⚠️ La urcare: schimbă numele/descrierea produsului `battle_speed_x2` în Play Console („Battle Speed ×3”) + PLAY_RULES.md.
 - News id 58 (data de pus la ziua urcării).
 - Test (test mode): 0 erori; telefon buget: hartă 457 MB, încărcare 9,6 s.
+
+## 6. Diamond Pass + Founder Pass (gata pe ramură, 21 nov 2026 – Marius: „ok cu diamond pass” + „one time pass ieftin: cadru, titlu, battle speed ×3”)
+- **DIAMOND PASS** – abonament lunar **14,99 €**: 900 💎 la cumpărare + 300 💎/zi + 2 Recruit/zi = 9.900 💎 / 30 zile (≈ 660 💎/€, ca Platinum). Fără bonus VIP / Idle. Se cumulează cu Silver/Gold/Platinum. Cheie `dia`, SKU `vip_pass_diamond` (shop2.js, secure.js, server/worker.js).
+- **FOUNDER PASS** – o singură plată **4,99 €** (Forever Packs): Battle Speed ×3 + cadru FOUNDER (`img/fr7` – 6 e cadrul Ascended de echipament) + titlu FOUNDER. Cheie `fdr`, SKU `founder_pass`. Serverul (server/online.js `sync`) dă cadrul/titlul DOAR dacă Google a confirmat cumpărarea (tabela `purchases`) – contul de test `tst_` poate oricum.
+- Lista veche din index.html: Battle Speed ×3 corectat la **2,99 €** (ca în Play).
+- ⚠️ Poze provizorii (de înlocuit cu ale lui Marius): `img/shop/vp_dia.webp` (=copie vp_plat), `img/shop/founder.webp` (=copie sp_speed), `img/fr7.webp` (=copie fr5).
+
+### 🛒 De făcut în Play Console la urcare (Marius zice când e la laptop → Claude face automat)
+1. Abonament nou `vip_pass_diamond` „Diamond Pass”, plan de bază `monthly`, lunar, reînnoire automată, **14,99 €**, grație 7 zile.
+2. Produs nou (o singură dată, NU consumabil) `founder_pass` „Founder Pass”, **4,99 €**.
+3. `battle_speed_x2`: nume/descriere → „Battle Speed ×3” (prețul rămâne 2,99 €).
+4. Apoi PLAY_RULES.md (tabelul secțiunea 1) + Cloudflare ia server/ din GitHub automat la merge.
