@@ -5,6 +5,7 @@
 'use strict';
 const LIVE = true;                         // ← true only after: Classification "random items" = Oui, IARC redone, Belgium removed, products created
 const T = () => window.__TE;
+const DMh='<img class="tki" src="img/ui/diamond.svg" alt="">'; // v16-140: the game's diamond icon instead of the 💎 emoji
 const DAY = 864e5;
 const now = () => (window.SEC && SEC.now ? SEC.now() : Date.now());
 const today = () => { const d = new Date(now()); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
@@ -54,7 +55,7 @@ const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 // ---------------- giving things ----------------
 function rwText(r){ const a=[];
   if(r.hero){ const h=T().HB[r.hero]; a.push((h?h.n:'Hero')); }
-  if(r.dm) a.push('💎'+r.dm.toLocaleString('en')); if(r.tk) a.push(r.tk+' Recruit'); if(r.gt) a.push(r.gt+' Gear'); if(r.ct) a.push(r.ct+' Crew');
+  if(r.dm) a.push(DMh+' '+r.dm.toLocaleString('en')); if(r.tk) a.push(r.tk+' Recruit'); if(r.gt) a.push(r.gt+' Gear'); if(r.ct) a.push(r.ct+' Crew');
   if(r.money) a.push(T().fmt(r.money)); if(r.pk) a.push(r.pk.r+' of each role part + '+r.pk.bk+' Builder Kit'); return a.join(' + '); }
 function give(r, why){
   const t=T(), G=t.G;
@@ -90,7 +91,7 @@ async function buy(k){
     if(k==='sil'){                                       // paid with diamonds earned in the game
       const G=T().G, c=PASS.sil.cost;
       if(on('sil')){ T().toast('Silver Pass is already active.',2500); return; }
-      if((G.dm||0)<c){ T().toast('💎 Not enough diamonds ('+(G.dm||0).toLocaleString('en')+' / '+c.toLocaleString('en')+')',3000); return; }
+      if((G.dm||0)<c){ T().toast(DMh+' Not enough diamonds ('+(G.dm||0).toLocaleString('en')+' / '+c.toLocaleString('en')+')',3000); return; }
       if(conf!=='sil'){ conf='sil'; render(); setTimeout(()=>{ if(conf==='sil'){ conf=''; render(); } },4000); return; }
       conf=''; G.dm-=c; PK().sil=now()+30*DAY; t_save(); T().save(); T().vipRefresh(); T().toast('🥈 Silver Pass active for 30 days!',3500); passTick(); render(); return;
     }
@@ -231,7 +232,7 @@ function render(){
   if(tab==='td'){
     h+='<div class="sec">DIAMONDS</div><div class="dgrid">'+DIAMONDS.map(d=>{ const x2=!S().fx[d.k];
       return '<div class="dp'+(d.big?' big':'')+'">'+(x2?'<span class="x2">×2</span>':'')+'<img src="'+IMG(d.ic)+'" alt=""><b>'+d.dm.toLocaleString('en')+'</b><small>'+(x2?'first time: '+(d.dm*2).toLocaleString('en'):'')+'</small><button class="buy" data-b="'+d.k+'">'+P(d.k,d.price)+'</button></div>'; }).join('')+'</div>';
-    h+='<div class="note">100 💎 = 1 summon (you are always asked first). Rate Info and the Legendary pity (every 500 summons) stay the same.</div>';
+    h+='<div class="note">100 '+DMh+' = 1 summon (you are always asked first). Rate Info and the Legendary pity (every 500 summons) stay the same.</div>';
   }
   if(tab==='tv'){
     const row=(ic,n,v,no)=>'<li'+(no?' class="no"':'')+'><img src="'+ic+'" alt="">'+n+'<b>'+v+'</b></li>';
@@ -245,13 +246,13 @@ function render(){
       '</ul><div class="foot">'+btn('sil','',1)+'</div></div>';
     h+='<div class="card vp g"><div class="rib">POPULAR</div><div class="top"><img src="'+IMG('shop/vp_gold')+'" alt=""><div><h3>GOLD PASS</h3><div class="sub">Monthly subscription</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','300')+row(IMG('ui3/v_dm'),'Diamonds every day','+100')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×1.5')+row(IMG('ui3/v_idle'),'Idle Rewards','+2 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+
-      '</ul><div class="tot">In 30 days: 3,300 💎 + 60 tickets ≈ 93 summons</div><div class="foot">'+btn('gold','€5.99')+'</div></div>';
+      '</ul><div class="tot">In 30 days: 3,300 '+DMh+' + 60 tickets ≈ 93 summons</div><div class="foot">'+btn('gold','€5.99')+'</div></div>';
     h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
-      '</ul><div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
-    if(NEWP())h+='<div class="card vp d"><div class="rib">MOST 💎</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
+      '</ul><div class="tot">In 30 days: 6,600 '+DMh+' + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
+    if(NEWP())h+='<div class="card vp d"><div class="rib">MOST DIAMONDS</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','900')+row(IMG('ui3/v_dm'),'Diamonds every day','+300')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','–',1)+row(IMG('ui3/v_idle'),'Idle Rewards','–',1)+
-      '</ul><div class="tot">In 30 days: 9,900 💎 + 60 tickets ≈ 159 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
+      '</ul><div class="tot">In 30 days: 9,900 '+DMh+' + 60 tickets ≈ 159 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
     h+='<div class="note">VIP Passes stack: you can have Silver, Gold, Platinum'+(NEWP()?' and Diamond':'')+' at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
   }
   if(tab==='tf'){
@@ -261,7 +262,7 @@ function render(){
       h+='<div class="card fund'+(F.hard?' h':'')+'">'+(F.hard?'<div class="rib">HARD ×1.5</div>':'')+'<div class="top"><img src="'+IMG('shop/fund_'+(F.hard?'h':'n'))+'" alt=""><div><h3>'+F.n+(own?'<span class="act">OWNED</span>':'')+'</h3><div class="sub">'+(F.hard?'Rewards at every 5th chapter of HARD MODE – bigger rewards.':'Rewards at every 5th chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward to claim it.':'')+'</div></div></div><div class="ms">'+
         F.ms.map((m,i)=>{ const rd=done>=(i+1)*5, dn=s.includes(i), cl=own&&rd&&!dn;
           return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'>'+(F.hard?'H ':'CH ')+((i+1)*5)+'<b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
-        '</div><div class="tot">Total: '+tot.dm.toLocaleString('en')+' 💎 + '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · your progress: '+(F.hard?'H ':'CH ')+done+'</div><div class="foot"><span class="val"><b>×'+(F.hard?9:6)+'</b>VALUE</span>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }
+        '</div><div class="tot">Total: '+tot.dm.toLocaleString('en')+' '+DMh+' + '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · your progress: '+(F.hard?'H ':'CH ')+done+'</div><div class="foot"><span class="val"><b>×'+(F.hard?9:6)+'</b>VALUE</span>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }
   }
   h+='</div></div>';
   root.innerHTML='<style>'+css+'</style>'+h; el.scrollTop=sc;

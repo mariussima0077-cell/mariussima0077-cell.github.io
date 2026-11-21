@@ -63,6 +63,7 @@ async function rank(tr){const st=S()[tr];if(!window.ONLINE||!ONLINE.call)return 
 // ---------------- rewards
 // v16-125 (Marius: "nothing in the frames, only text"): rewards as big icons + gold number pictures, the event's own icon in the left box
 const NH=(v,em)=>T().numH?T().numH(String(v),'gold',em||1.05):String(v);
+const evTabIc=E=>['hero','gear','crew','ess','dia','key'].includes(E.bn)?evIc(E):E.ic; // v16-140: one icon per resource (no 🎟/💎 emoji)
 const evIc=E=>E.u==='essence'?ES():E.u==='diamonds'?DM():E.bn==='key'?'<img class="tki" src="img/wb/key.webp" alt="">':E.tkk==='gt'?GT:E.tkk==='ct'?CT:TK;
 function rwBig(r){const a=[];if(r.dm)a.push([DM(),r.dm]);if(r.tk)a.push([TK,r.tk]);if(r.gt)a.push([GT,r.gt]);if(r.ct)a.push([CT,r.ct]);if(r.ess)a.push([ES(),T().nf(r.ess)]);return a.map(([i,v])=>'<span class="evRw">'+i+NH((typeof v==='number'?'×':'')+v,1)+'</span>').join('');}
 function rwHtml(r){const a=[];if(r.dm)a.push(DM()+' '+r.dm);if(r.tk)a.push(TK+' '+r.tk);if(r.gt)a.push(GT+' '+r.gt);if(r.ct)a.push(CT+' '+r.ct);if(r.ess)a.push(ES()+' '+T().nf(r.ess));return a.join(' ');}
@@ -180,7 +181,7 @@ function build(){if(el)return;const st=document.createElement('style');st.textCo
     else if(a==='wq'){const B=S().B,w=B.w,x=QL(B.k).find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast((B.k==='key'?'🔑':'🎡')+' +'+x[3]+' free spin',1800);render();}});}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function render(){if(!el||!el.classList.contains('open'))return;const s=S();
-  document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+EV[s[tr].k].ic+' '+EV[s[tr].k].n+'</b>').join('');
+  document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+evTabIc(EV[s[tr].k])+' '+EV[s[tr].k].n+'</b>').join('');
   const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
@@ -190,7 +191,7 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
     h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
   h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evIc(E)+NH(T().nf(g),T().nf(g).length>5?.85:1.1)+'</div><div class="r'+(Object.values(realRw(st,m[1])).filter(Boolean).length>1?' two':'')+'">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
-  const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+EV[nx.k].ic+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div>';
+  const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div>';
   body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
 function rkPrizes(st){const k=EV[st.k].tkk,ic=k==='gt'?GT:k==='ct'?CT:k==='tk'?TK:'';return '<div class="evS">RANKING PRIZES</div><div class="evSn">sent by Mail when the event ends</div><div class="evPz">'+RANKRW.map(r=>'<div class="evPr">'+MDL(r[0],r[0]===r[1]?r[0]:r[0]+'-'+r[1])+'<span class="pz">'+rwBig(Object.assign({dm:k==='dm'?r[2]*1.5:r[2]},ic?{[k]:r[3]}:{}))+'</span></div>').join('')+'</div>';}
 async function showRank(){const r=await rank(tab),L=document.getElementById('evRkL');if(!L)return;if(!r){L.innerHTML='<div class="evP" style="text-align:center;margin:20px">The ranking needs internet. Your score is saved and sent later.</div>';return;}
