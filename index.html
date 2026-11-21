@@ -2713,6 +2713,8 @@ const rwScore=()=>(G.lv.wash>0?lvT('wash'):0)+(G.lv.gas>0?lvT('gas'):0)+(G.lv.fa
 function rwW(){const q=Math.min(1,rwScore()/150);return [60-50*q,25,10+10*q,4+12*q,1+8*q,.2+4*q];}
 function rwRoll(min){const w=rwW();let r=Math.random()*w.reduce((a,b)=>a+b,0),g=0;for(;g<5;g++){r-=w[g];if(r<0)break;}return Math.max(min||0,g);}
 const rwTok=(g,n)=>Math.round(RW_TOK[g]*n/4);
+const rwNext=()=>{const s=RWS(),cap=rCap();if(s.n>=cap)return 0;if(dcars.some(c=>c.exp)||RT.park.some(Boolean)||RT.mv.length)return -1;return Math.max(0,RW_FILL/cap-(s.acc||0));};   // v16-147
+const rwNextTxt=()=>{const t=rwNext();if(t<0)return 'car on the way';const m=t/60|0,x=t%60|0;return m+':'+String(x).padStart(2,'0');};
 const RT={park:[],mv:[],cars:[],st:'dock',x:0,v:0,t:0,g:0,nOn:0,boot:0};
 function RWS(){if(!G.rw)G.rw={g:-1,rf:0,n:0,acc:0,ft:Date.now()};const s=G.rw;if(s.g<0)s.g=rwRoll(0);
   if(!RT.boot){RT.boot=1;RT.g=s.g;RT.x=rStop();const cap=rCap();   // offline: the factory kept filling the train
@@ -2746,7 +2748,8 @@ function updateRail(dt){
   for(const c of RT.park)if(c&&c.fade<1)c.fade=Math.min(1,c.fade+dt*2);
   // export cars from the factory (one train ≈ 1 hour)
   const fly=dcars.filter(c=>c.exp).length+RT.park.filter(Boolean).length+RT.mv.length;
-  if(G.lv.factory>0&&s.n+fly<cap){s.acc=(s.acc||0)+dt;if(s.acc>=RW_FILL/cap&&rwSpawn())s.acc=0;}
+  if(G.lv.factory>0&&s.n+fly<cap){const iv=RW_FILL/cap;if(s.n===0&&fly===0&&RT.st==='dock'&&(s.acc||0)<iv)s.acc=iv;   // v16-147: the 1st car of a new train comes at once
+    s.acc=(s.acc||0)+dt;if(s.acc>=iv&&rwSpawn())s.acc=0;}
   // parked cars go up on the train
   if(RT.st==='dock')RT.park.forEach((c,k)=>{if(!c)return;c.pt+=dt;if(c.pt>1.4&&s.n+RT.mv.length<cap){const r=rRect(),p=rSpot(r,k);RT.park[k]=null;RT.mv.push({c,x0:p.x,y0:p.y,s0:r.a.s,s:s.n+RT.mv.length,t:0});}});
   for(let i=RT.mv.length-1;i>=0;i--){const m=RT.mv[i];m.t+=dt/.8;if(m.t>=1){RT.cars[m.s]=m.c;s.n=Math.min(cap,s.n+1);RT.mv.splice(i,1);}}
@@ -2766,7 +2769,7 @@ function drawRailDyn(){
     for(let i=0;i<n;i++){const p=rSlot(i);drawCarAt(rwCar(i),p.x,p.y,0,.5,1);}
     for(const m of RT.mv){const p=rSlot(m.s),e=m.t<.5?2*m.t*m.t:1-Math.pow(-2*m.t+2,2)/2;drawCarAt(m.c,m.x0+(p.x-m.x0)*e,m.y0+(p.y-m.y0)*e-Math.sin(e*Math.PI)*14,-Math.PI/2*(1-e),m.s0+(.5-m.s0)*e,1);}
     if(L.complete&&L.naturalWidth){const lh=146*L.naturalHeight/L.naturalWidth;X.drawImage(L,x1-146,ry+5-lh,146,lh);}else{X.fillStyle='#0d47a1';X.fillRect(x1-146,ry-30,146,34);}
-    if(DET&&RT.st==='dock'){const full=s.n>=cap,cx=x1-rLen()/2,cy=ry-46,txt=RW_GN[RT.g]+' TRAIN · '+(full?'READY TO SEND!':s.n+' / '+cap+' cars');
+    if(DET&&RT.st==='dock'){const full=s.n>=cap,cx=x1-rLen()/2,cy=ry-46,txt=RW_GN[RT.g]+' TRAIN · '+(full?'READY TO SEND!':s.n+' / '+cap+' cars · next '+rwNextTxt());
       X.font='900 9px Game,system-ui';const tw=X.measureText(txt).width+16;X.fillStyle='rgba(0,0,0,.72)';rr(cx-tw/2,cy-10,tw,15,7);X.fill();
       X.strokeStyle=RW_GC[RT.g];X.lineWidth=1.5;X.stroke();X.fillStyle=full&&(time*2|0)%2?'#fff':RW_GC[RT.g];X.textAlign='center';X.fillText(txt,cx,cy+1);}}
   // the RAIL WARS button next to the terminal (opens the page)
@@ -3017,7 +3020,8 @@ function pkMigrate(){if(G.upkV)return;G.upkV=1;const old=Object.values(G.lv).red
     for(const k in g)pkAdd(k,g[k]);G.pkGift=g;}else{['tank','warrior','ranger','support'].forEach(k=>pkAdd(k,150));pkAdd('mage',300);pkAdd('bk',520);}G.up={};}
 function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');bldSkin(id!=='shop'&&id!=='vip'&&id!=='rep'&&id!=='car'&&id!=='inc');renderPanel();sheet.classList.add('open');}
 // v16-47: Shop + VIP use Marius' full-screen pages (img/ui2) – other panels stay bottom sheets
-function skinSheet(n){sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/g,'').trim();const b=$('shBody');b.className='';if(n){sheet.classList.add('skn','skP','sk-'+n);b.className='skB';const im=$('shSkH').querySelector('img');if(!im.src.endsWith(n+'_h.webp'))im.src='img/ui2/'+n+'_h.webp';}}
+function skinSheet(n){if(n!=='vip'){const t=$('shSkT');if(t)t.innerHTML='';}   // v16-147: the VIP header text stayed on the building popups (Marius' screenshot)
+  sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/g,'').trim();const b=$('shBody');b.className='';if(n){sheet.classList.add('skn','skP','sk-'+n);b.className='skB';const im=$('shSkH').querySelector('img');if(!im.src.endsWith(n+'_h.webp'))im.src='img/ui2/'+n+'_h.webp';}}
 // v16-49: building popup = Marius' picture (img/ui3/bld_*): title plate, 10 level lights, rows with the green "next" part, crew bar, orange coin button
 function bldSkin(on){sheet.classList.toggle('bldP',on);const im=$('shSkH').querySelector('img');if(on&&!im.src.endsWith('bld_h.webp'))im.src='img/ui3/bld_h.webp';}
 function closePanel(){sel=null;selCar=null;sheet.classList.remove('open');}
@@ -4096,7 +4100,7 @@ function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Mat
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
+window.__TE={rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

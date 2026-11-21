@@ -74,7 +74,7 @@ function render(){if(!el||!el.classList.contains('open'))return;const G=T().G,bo
   if(!(G.lv.rail>0)){body.innerHTML=h+'<div class="card off">🚆 Build the RAIL TERMINAL (next to the Car Factory) to join RAIL WARS.</div>'+shopH(st);return;}
   const s=T().RWS(),cap=T().rCap(),full=s.n>=cap,w=T().rwW(),ws=w.reduce((a,b)=>a+b,0);
   h+='<div class="stS">YOUR TRAIN</div><div class="card" style="--gc:'+GC(s.g)+'">'+trainImg(s.g)+'<div class="gr">'+GN(s.g)+'</div>';
-  h+='<div class="bar"><i style="width:'+(s.n/cap*100)+'%"></i></div><div class="ln"><span>Cars</span><b>'+s.n+' / '+cap+(full?' · FULL':' · next in ~'+Math.max(1,Math.round((60/cap)))+' min')+'</b></div>';
+  h+='<div class="bar"><i style="width:'+(s.n/cap*100)+'%"></i></div><div class="ln"><span>Cars</span><b>'+s.n+' / '+cap+(full?' · FULL':' · next: '+T().rwNextTxt())+'</b></div>';
   h+='<div class="ln"><span>Brings when full</span><b>'+TI()+' '+T().nf(T().rwTok(s.g,cap))+'</b></div>';
   h+='<div class="ln"><span>Sends today</span><b>'+(D&&D.ok?D.sends+' / '+D.sendMax:'–')+'</b></div>';
   h+='<div class="btns"><button class="y'+(s.rf>=2?' dis':'')+'" data-s="rf">'+(s.rf>=2?'🔒 LOCKED':'🔄 REFRESH '+(2-s.rf)+'/2')+'</button><button class="g'+(full&&!(D&&D.ok&&D.sends<=0)?'':' dis')+'" data-s="send">🚆 SEND</button></div>';
@@ -93,7 +93,7 @@ function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'
 function open(){build();el.classList.add('open');render();load();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}
   const now=Date.now();if(D&&D.mine&&D.mine.some(t=>t.t1<=now))load(true);else render();},1000);}
 // a row for the building panels (Car Wash, Gas Station, Car Factory, Rail Terminal)
-function row(id){if(!T()||!T().G)return '';const s=S();return '<div class="row stRow" data-street="1"><span>🚆 RAIL WARS · '+TI()+' '+T().nf(s.tok)+'</span><b>OPEN ›</b></div>';}
+function row(id){if(!T()||!T().G)return '';const s=S();return '<div class="row stRow" data-street="1"><span>🚆 RAIL WARS</span><b>'+TI()+' '+T().nf(s.tok)+'</b><em>OPEN ›</em></div>';}
 window.STREET={open,row,give,state:S};
 function boot(){if(!T()||!T().G){setTimeout(boot,600);return;}S();document.addEventListener('click',e=>{if(e.target.closest('[data-street]'))open();});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
