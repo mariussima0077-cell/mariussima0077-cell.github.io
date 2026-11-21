@@ -38,7 +38,7 @@ const KWH=[['vault',1,17],['mine',1,17],['forge',1,17],['lab',1,17],['any',2,14]
 const KQ=[['login','Open the game today',1,1],['win','Win 5 battles in the campaign',5,1],['dgk','Use 3 Dungeon keys',3,1],['sum','Summon 10 times (heroes, crew or gear)',10,1],['idle','Collect Idle Rewards 2 times',2,1]];
 const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
 // CASH ROULETTE slices: [what, amount, chance %] – rp = random role parts, bk = Builder Kit (both × your campaign stage), key = 1 dungeon key (random), kall = 1 key in every dungeon, jack = parts jackpot
-const CWH=[['rp',8,22],['bk',20,20],['rp',16,16],['key',1,14],['bk',40,12],['rp',32,9],['kall',1,5],['jack',60,2]],CW_MAX=25;
+const CWH=[['rp',80,22],['bk',260,20],['rp',160,16],['key',1,14],['bk',520,12],['rp',320,9],['kall',1,5],['jack',600,2]],CW_MAX=25;
 const cwBase=()=>{const t=T();return Math.max(5000,Math.round((t.idleRate?t.idleRate():20000)*.5/100)*100);};   // first spin = 30 min of your idle money
 const cwPrice=w=>Math.round(((w.base||cwBase())*Math.pow(1.15,w.used||0))/100)*100;   // ×1.15 per spin → 25 spins ≈ 106 h of idle money
 const isW=k=>k==='wheel'||k==='key'||k==='cash',QL=k=>k==='key'?KQ:k==='cash'?[]:WQ,SL=k=>k==='key'?KWH:k==='cash'?CWH:WHEEL;
@@ -89,7 +89,7 @@ function cwGive(z,kd,w){const t=T(),U=t.PART_U?t.PART_U():1,a=[];
   else if(z[0]==='bk'){const n=Math.round(z[1]*U);t.pkAdd('bk',n);a.push(t.PKI('bk')+' +'+t.nf(n));}
   else if(z[0]==='key'){if(window.DGK)DGK.add(kd,1);a.push('🔑 +1 '+DGN[kd]+' key');}
   else if(z[0]==='kall'){['vault','mine','forge','lab'].forEach(d=>{if(window.DGK)DGK.add(d,1);});a.push('🔑 +1 key in EVERY dungeon');}
-  else if(z[0]==='jack'){['tank','warrior','ranger','mage','support'].forEach(q=>t.pkAdd(q,Math.round(z[1]*U)));t.pkAdd('bk',Math.round(z[1]*2.5*U));a.push('JACKPOT! '+t.PKI('tank')+' +'+t.nf(Math.round(z[1]*U))+' of every part + '+t.PKI('bk')+' +'+t.nf(Math.round(z[1]*2.5*U)));}
+  else if(z[0]==='jack'){['tank','warrior','ranger','mage','support'].forEach(q=>t.pkAdd(q,Math.round(z[1]*U)));t.pkAdd('bk',Math.round(z[1]*3.25*U));a.push('JACKPOT! '+t.PKI('tank')+' +'+t.nf(Math.round(z[1]*U))+' of every part + '+t.PKI('bk')+' +'+t.nf(Math.round(z[1]*3.25*U)));}
   w.won++;t.save();t.toast('💰 CASH ROULETTE: '+a.join(' '),3600);render();}
 const WI={};['wheel','wheel_disc','wheel_pin'].forEach(k=>{const i=new Image();i.onload=()=>{if(!spinning)drawWheel(document.getElementById('evWh'));};i.src='img/ui9/'+k+'.webp';WI[k]=i;});
 const DMG=new Image();DMG.src='img/ui/diamond.svg';

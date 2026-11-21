@@ -37,3 +37,8 @@ tot mai scumpă, limită de rotiri); garaje până la LV 100, la început puțin
 
 ## La urcare
 `const V` + `CV`, `python3 tools/sw_hash.py`, NEWS, test + `tools/budget_phone.py`, apoi `main`. Pozele lui Marius: 6 piese (`img/ui12/pk_*`), banner `evb_cash`.
+
+## 6. v16-129b (21 nov, Marius: „1 + puțin din 2 + puțin din 3”) – cifre ×10, puțin mai lent, mai mult Builder Kit
+- Cost ×13 (`PCOST` rotunjit la 5): LV1 40 · LV10 350 · LV50 3.950 · LV100 11.450. Piesele primite ×10, Builder Kit ×13 (idle 20·U rol + 65·U kit / oră, stage 50/80/150·U rol + 52/78/156·U kit, salvage 10-600, Class Towers 100+20·etaj, Torque Tower 130+20·etaj kit, ruleta ×10, pachete Starter 300/1000 … Elite 2500/8000, start 150 / 300 Mage / 520 kit).
+- Bonusul de garaj mai mic la început: `GB(L)=0,0001·L²` → LV10 +1% · LV25 +6% · LV50 +25% · LV75 +56% · LV100 +100%.
+- Simulare free 30 zile SEED=7: clădiri 342/1400 (medie LV24), 15 mașini (+6%). Campania: 13-20 (live fără garage parts: 8-20) – DAR simularea e foarte zgomotoasă: aceeași ramură cu bonusul de garaj oprit SAU cu bonusul Collection oprit a ajuns doar la 5-9 / 5-11 în ziua 20. ⚠️ De făcut mai multe simulări (alte SEED) înainte de live.

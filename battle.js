@@ -795,7 +795,7 @@ const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(1+.12*(it.lv-1))*gStarK(i
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
 // v16-129: salvage also gives GARAGE PARTS – set pieces give the parts of their class's role, other gear a random role
-const SALV_PK=[1,2,4,8,15,30,60];
+const SALV_PK=[10,20,40,80,150,300,600];
 function salvPk(list){const T=TE(),U=T.PART_U?T.PART_U():1,o={};for(const it of list){const n=Math.round(SALV_PK[Math.min(6,it.r)]*(1+U/10));
   if(it.set&&CLS2ROLE[it.set])o[CLS2ROLE[it.set]]=(o[CLS2ROLE[it.set]]||0)+n;else{const q=T.pkRoles?T.pkRoles(n):{};for(const k in q)o[k]=(o[k]||0)+q[k];}}return o;}
 function salvPkGive(list){const T=TE(),o=salvPk(list);if(T.pkAdd)for(const k in o)T.pkAdd(k,o[k]);return o;}
@@ -2451,7 +2451,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;
     const ct=first?R.ct:0,dmw=first?R.dm:0;if(ct)G.h.ct+=ct;if(dmw)G.dm=(G.dm||0)+dmw;
     const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?3:S0.mini?1:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3:S0.mini?1.5:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);
-    const PU=T.PART_U?T.PART_U():1,pkr=T.pkRoles?T.pkRoles(PU*(first?(S0.boss?15:S0.mini?8:5):.5)*hk):{},pkb=Math.round(PU*(first?(S0.boss?12:S0.mini?6:4):.3)*hk);if(T.pkAdd){for(const k in pkr)T.pkAdd(k,pkr[k]);T.pkAdd('bk',pkb);} // v16-129: garage parts from stages // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
+    const PU=T.PART_U?T.PART_U():1,pkr=T.pkRoles?T.pkRoles(PU*(first?(S0.boss?150:S0.mini?80:50):5)*hk):{},pkb=Math.round(PU*(first?(S0.boss?156:S0.mini?78:52):4)*hk);if(T.pkAdd){for(const k in pkr)T.pkAdd(k,pkr[k]);T.pkAdd('bk',pkb);} // v16-129: garage parts from stages // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
     T.save();if(tk)T.addTickets(tk,'Campaign '+lab);
     const chDone=first&&S0.boss&&S0.c<NCH-1;
     // v16-47: Marius' VICTORY page – stars on the emblem (missing ones greyed), rewards in the 4 slots
@@ -3050,7 +3050,7 @@ function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],
 const EGI=r=>{const T=TE(),a=[];if(r.ess)a.push(T.ESI+' '+T.nf(r.ess));if(r.gp)a.push(T.GPI+' '+T.nf(r.gp));if(r.pk&&T.PKI)for(const k in r.pk)a.push(T.PKI(k)+' '+T.nf(r.pk[k]));return a;}; // v16-99
 const giveEG=r=>{const G=TE().G;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk&&TE().pkAdd)for(const k in r.pk)TE().pkAdd(k,r.pk[k]);}; // v16-129: + garage parts
 function twRew(f){const F=twFloor(f),r={money:REWARD(F.eq).money,dm:5,tk:0,gtk:0,ct:0};
-  if(f%5===0)r.tk=2;if(f%10===0){r.dm=100;r.gtk=3;r.ct=1;}if(f%50===0)r.dm+=400;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_U());r.gp=Math.round(x*T.GP_U());r.pk={bk:Math.round((10+1.5*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit
+  if(f%5===0)r.tk=2;if(f%10===0){r.dm=100;r.gtk=3;r.ct=1;}if(f%50===0)r.dm+=400;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_U());r.gp=Math.round(x*T.GP_U());r.pk={bk:Math.round((130+20*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit
 const twG=()=>{const G=TE().G;if(!G.tw)G.tw={b:0};return G.tw;};
 const twOK=()=>TE().G.cp.best>=TW_UNLOCK;
 const TWA={};function twArenaImg(){const k=B&&B.tw&&B.tw.wb?'wb':B&&B.tw&&B.tw.dg?'dg_'+B.tw.dg:'im';if(!TWA[k]){TWA[k]=new Image();TWA[k].decoding='async';TWA[k].src=k==='wb'?'img/wb/wb_arena.webp':k.startsWith('dg_')?'img/dg/bt_'+k.slice(3)+'.webp':'img/ui6/tw_arena.webp';}return TWA[k];}
@@ -3241,7 +3241,7 @@ function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=
   return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;
 function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/10)*10,dm:3,gtk:0,set:null};
-  if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;const T=TE();r.ess=Math.round(.5*T.ESS_U());r.gp=Math.round(.6*T.GP_U());r.pk={[CLS2ROLE[k]]:Math.round((10+2*f)*(f%10===0?2:1))};return r;} // v16-129: Class Tower → the parts of its class (Bruiser Tower → Tank Parts…)
+  if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;const T=TE();r.ess=Math.round(.5*T.ESS_U());r.gp=Math.round(.6*T.GP_U());r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0?2:1))};return r;} // v16-129: Class Tower → the parts of its class (Bruiser Tower → Tank Parts…)
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';});
 function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,5);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)

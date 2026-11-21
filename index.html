@@ -2917,14 +2917,14 @@ function pkRoles(n){n=Math.round(n);const o={};if(n<=0)return o;const ks=Object.
   const ch=Math.max(1,Math.ceil(n/6));for(let left=n;left>0;){const c=Math.min(ch,left);let r=Math.random()*tw,k=ks[0];for(const q of ks){r-=PK_W[q];if(r<0){k=q;break;}}o[k]=(o[k]||0)+c;left-=c;}return o;}
 const pkGive0=o=>Object.keys(o).map(k=>PKI(k)+' +'+nfmt(o[k])).join(' ');
 function pkGive(o){const out=[];for(const k in o)if(pkAdd(k,o[k]))out.push(PKI(k)+' +'+nfmt(o[k]));return out.join(' · ');}
-const PCOST=(id,L)=>Math.ceil((2+.7*Math.pow(L,1.55))*(id==='factory'?1.5:1)*(1-VB('disc')));   // parts for level L (1 = build): LV10 26 · LV50 300 · LV100 870
+const PCOST=(id,L)=>Math.ceil((2+.7*Math.pow(L,1.55))*13*(id==='factory'?1.5:1)*(1-VB('disc'))/5)*5;   // v16-129b (Marius: ×10 numbers, a bit slower): LV1 40 · LV10 350 · LV50 3,950 · LV100 11,450
 const PART_U=()=>1+Math.min(999,(G.cp&&G.cp.best)||0)/40;   // drops grow with your campaign stage (×1 → ×26)
-const GB=L=>.0025*L+.000075*L*L;   // battle bonus (ATK + HP) of a garage of level L: LV10 +3% · LV25 +11% · LV50 +31% · LV75 +61% · LV100 +100%
+const GB=L=>.0001*L*L;   // battle bonus (ATK + HP) of a garage of level L (v16-129b: slower at first): LV10 +1% · LV25 +6% · LV50 +25% · LV75 +56% · LV100 +100%
 function garB(cls){if(CLSG[cls])return GB(lvT(CLSG[cls]));if(cls==='all'){let a=0;for(const k in CLSG)a+=GB(lvT(CLSG[k]));return a/6;}return 0;}   // Legend (Mythic) = average of the 6
 // old saves: levels stay; unfinished money steps (LV 4-10) and the money already in buildings become a small parts gift
 function pkMigrate(){if(G.upkV)return;G.upkV=1;const old=Object.values(G.lv).reduce((a,b)=>a+b,0)>14||G.sold>40;
   if(old){const g={};for(const id in G.lv){const k=partOf(id),L=G.lv[id]||0;let n=Math.ceil(PCOST(id,Math.min(MAXT,L+1))*1.5);if(UPP(id))n+=Math.ceil(PCOST(id,L+1)*UPP(id)/UPN);g[k]=(g[k]||0)+n;}
-    for(const k in g)pkAdd(k,g[k]);G.pkGift=g;}else{['tank','warrior','ranger','support'].forEach(k=>pkAdd(k,15));pkAdd('mage',30);pkAdd('bk',40);}G.up={};}
+    for(const k in g)pkAdd(k,g[k]);G.pkGift=g;}else{['tank','warrior','ranger','support'].forEach(k=>pkAdd(k,150));pkAdd('mage',300);pkAdd('bk',520);}G.up={};}
 function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');bldSkin(id!=='shop'&&id!=='vip'&&id!=='rep'&&id!=='car'&&id!=='inc');renderPanel();sheet.classList.add('open');}
 // v16-47: Shop + VIP use Marius' full-screen pages (img/ui2) – other panels stay bottom sheets
 function skinSheet(n){sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/g,'').trim();const b=$('shBody');b.className='';if(n){sheet.classList.add('skn','skP','sk-'+n);b.className='skB';const im=$('shSkH').querySelector('img');if(!im.src.endsWith(n+'_h.webp'))im.src='img/ui2/'+n+'_h.webp';}}
@@ -3712,7 +3712,7 @@ const qiLeft=()=>{const n=VP(VLV).qi;if(!n)return 0;if(!G.qi||G.qi.d!==dayK())re
 function quickIdle(){if(!qiLeft()){toast(VLV?'🎁 No Quick Idle left today – more with a higher VIP level':'👑 Quick Idle opens at VIP 1 (Daily Quests give VIP points)',2800);return;}
   if(!G.qi||G.qi.d!==dayK())G.qi={d:dayK(),n:0};G.qi.n++;const I=idleCalc(2);G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;save();idlKey='';renderIdle();
   toast('🎁 Quick Idle (2 h): +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+' · '+qiLeft()+' left today',3200);}
-function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U()),rp:Math.floor(hrs*2*PART_U()),bk:Math.floor(hrs*5*PART_U()),full:hrs>=idleMax()};} // v16-129: + garage parts (role parts split at random, Builder Kit)
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U()),rp:Math.floor(hrs*20*PART_U()),bk:Math.floor(hrs*65*PART_U()),full:hrs>=idleMax()};} // v16-129: + garage parts (role parts split at random, Builder Kit)
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}

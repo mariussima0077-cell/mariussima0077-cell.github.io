@@ -12,10 +12,10 @@ const today = () => { const d = new Date(now()); return d.getFullYear()+'-'+(d.g
 // ---------------- what is sold ----------------
 // one-time packs, in a chain (the next opens after the previous one is bought)
 const PACKS = [
-  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m3_1', dm:300,  tk:10, pk:{r:30,bk:80}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
-  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m3_5', dm:800,  tk:20, gt:10, pk:{r:60,bk:150}},
-  {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:7, hero:'m4_0', dm:1500, tk:30, gt:20, pk:{r:120,bk:300}},
-  {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:6, hero:'m4_5', dm:3000, tk:50, gt:30, ct:20, pk:{r:250,bk:600}},
+  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m3_1', dm:300,  tk:10, pk:{r:300,bk:1000}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
+  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m3_5', dm:800,  tk:20, gt:10, pk:{r:600,bk:2000}},
+  {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:7, hero:'m4_0', dm:1500, tk:30, gt:20, pk:{r:1200,bk:4000}},
+  {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:6, hero:'m4_5', dm:3000, tk:50, gt:30, ct:20, pk:{r:2500,bk:8000}},
 ];
 const DIAMONDS = [
   {k:'d1', dm:300,   price:'€1.99',  ic:'ui3/v_dm'},
