@@ -1522,7 +1522,16 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
     if(u.st==='walk')return[L.w,Math.floor(u.wph/TAU*8+80)%8];
     return[L.i,Math.floor(t*7+u.k)%8];}
   if(u.dead)return[5,Math.min(5,Math.floor(u.deadT/.1))];
-  const WBX=MSPR[id].wb,SZ=!!WBX; // v16-61: every WORLD BOSS sprite (SCRAPZILLA, CRUSHER KING, INFERNO PISTON, TOW SERPENT)
+  const WBX=MSPR[id].wb,SZ=!!WBX;
+  if(WBX&&WBX.v2){const F=v=>Math.min(5,Math.max(0,Math.floor(v))); // v16-134 WORLD BOSS v2 (6 frames per row)
+    if(u.wbI==null)u.wbI=t;const it=t-u.wbI;if(it<1.5&&!a)return[6,F(it/1.5*6)]; // INTRO when the fight starts
+    if(a&&a.k==='pound')return[WBX.pr,F(a.t/a.dur*4)]; // wind-up → hit on frame 4 exactly when the slam lands
+    if(u.wbP>0)return[WBX.pr,u.wbP>.18?4:5]; // after the slam
+    if(a&&a.k==='laser')return[3,a.t<a.dur?F(a.t/a.dur*3):a.t<a.dur+.45?3+Math.floor(a.t*10)%2:5];
+    if(u.st==='atk')return[2,F(u.ap*6)];
+    if(u.enr){if(u.enrT==null)u.enrT=t;const e=t-u.enrT;return[5,e<.9?F(e/.9*6):3+Math.floor(t*7+u.k)%3];} // ENRAGE stays visible (hits come all the time)
+    if(u.hurtS>0)return[4,F((.45-u.hurtS)/.45*6)];
+    return[0,Math.floor(t*7+u.k)%6];} // v16-61: every WORLD BOSS sprite (SCRAPZILLA, CRUSHER KING, INFERNO PISTON, TOW SERPENT)
   if(a&&a.k==='pound')return[SZ?WBX.pr:3,Math.min(7,Math.floor(a.t/a.dur*8))];
   if(a&&a.k==='laser'){if(id==='ndragon'||SZ)return[3,a.t<a.dur?Math.min(2,Math.floor(a.t/a.dur*3)):2]; // dragon: open mouth, the game draws the nitro breath
     return[3,Math.min(7,Math.floor(a.t/(a.dur+.6)*8))];}
@@ -1673,7 +1682,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   a=Math.max(1,Math.round(a));let left=a;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
   tgt.hp-=left;tgt.flash=1;tgt.hurt=1;
-  if(tgt.wbB){B.wbD+=left;if(o.skill||crit)tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
+  if(tgt.wbB){B.wbD+=left;if((o.skill||crit)&&!(tgt.hurtS>-2))tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
   const [x]=sxy(tgt);const y=headY(tgt);
   if(FX2&&!B.sim&&!tgt.hero&&(o.skill||crit)){B.hs=Math.max(B.hs,o.skill?.06:.035);fxs('star_04','#ffffff',x,y+22*dsc(tgt.d),{d:.22,s0:20*S,s1:70*S,rot:rnd(0,1),ease:1});}
   num(x,y,(crit?'💥':'')+a,tgt.hero?'#ff8a80':crit?'#ffd54a':'#ffffff',crit?1:0);if(!tgt.hero){const n=B.nums[B.nums.length-1];n.dv=a;n.crit=crit;}
@@ -1866,6 +1875,11 @@ function monSpecial(m,dt){const hs=alive(B.heroes);if(!hs.length)return false;
       num(m.x,headY(m)+20,'SUMMON!','#80d8ff',1);}}
   return false;}
 function monAct(m,dt){const a=m.act;a.t+=dt;
+  const WX=m.wbB&&MSPR[MON[m.t].sp].wb;if(WX&&WX.v2){ // v16-134: World Boss skill effects from Marius' pictures
+    if(a.k==='pound'&&WX.fxP&&!a.fx&&a.t>=a.dur-.38){a.fx=1;const y=fy(a.td);B.fx.push({type:'wbfx',id:MON[m.t].sp,x0:m.x-40*dsc(m.d),y0:y,x1:a.tx-a.r*.55,t:0,d:.75});}
+    if(a.k==='pound'&&a.t+dt>=a.dur&&a.t<a.dur+dt)m.wbP=.36;
+    if(a.k==='laser'&&WX.lz&&!a.fx&&a.t>=a.dur-.12){a.fx=1;const LZ=MON[m.t].lz,sc=dsc(m.d);
+      B.fx.push(WX.lz===1?{type:'wbfx',id:MON[m.t].sp,x0:m.x-LZ[0]*sc,y0:fy(m.d)-LZ[1]*sc,x1:-30*S,t:0,d:.85,y1:fy(a.d)-30*dsc(a.d)}:{type:'wbfx',id:MON[m.t].sp,x0:m.x-LZ[0]*sc,y0:fy(a.d),x1:-30*S,t:0,d:.95});}}
   if(a.k==='pound'){m.ap=a.t/a.dur;if(a.t>=a.dur){const hs=alive(B.heroes);const mult=m.b==='titan'?2.0:m.b==='crusher'?1.9:1.8;
       for(const h of hs)if(Math.hypot(h.x-a.tx,(h.d-a.td)*(FY1-FY0)*1.25)<a.r){damage(m,h,mult);h.stun=Math.max(h.stun,.8);}
       const y=fy(a.td);B.fx.push({type:'ring',x:a.tx,y,t:0,d:.45,r:a.r,col:'#ff8a65',ground:1});smoke(a.tx,y,10,'rgba(120,90,60,.55)',1.4);debris(a.tx,y,8,['#6d4c41','#8d6e63','#9e9e9e']);shake(m.boss?14:9);if(FX2){fxShock(a.tx,y,'#ff5722',a.r*.8);fxs('dirt_02','#6d4c41',a.tx,y-12*S,{add:0,d:.55,s0:40*S,s1:a.r*1.6,rot:rnd(0,TAU),ease:1});fxScorch(a.tx,y,'#2b1a10',a.r*.6,2);}
@@ -1875,7 +1889,7 @@ function monAct(m,dt){const a=m.act;a.t+=dt;
     if(Math.random()<.6)smoke(m.x+30*S,fy(m.d),1,'rgba(140,110,80,.5)');
     if(m.x<=W*.06){m.act={k:'return',t:0};}}
   else if(a.k==='return'){m.face=1;m.st='walk';m.wph+=dt*10;m.x+=m.mv*dt*1.5;if(m.x>=Math.min(a.x0||W*.7,W*.72)){m.act=null;m.face=-1;}}
-  else if(a.k==='laser'){if(a.t>=a.dur&&!a.fired){a.fired=true;shake(12);for(const h of alive(B.heroes))if(Math.abs(h.d-a.d)<.16)damage(m,h,2.0);const LZ=MON[m.t].lz||[30,185];B.fx.push({type:'beam',x0:m.x-LZ[0]*dsc(m.d),y0:fy(m.d)-LZ[1]*dsc(m.d),x1:-20,y1:fy(a.d)-30*dsc(a.d),t:0,d:.6,col:MON[m.t].lc,w:16});}
+  else if(a.k==='laser'){if(a.t>=a.dur&&!a.fired){a.fired=true;shake(12);for(const h of alive(B.heroes))if(Math.abs(h.d-a.d)<.16)damage(m,h,2.0);const LZ=MON[m.t].lz||[30,185];if(!a.fx)B.fx.push({type:'beam',x0:m.x-LZ[0]*dsc(m.d),y0:fy(m.d)-LZ[1]*dsc(m.d),x1:-20,y1:fy(a.d)-30*dsc(a.d),t:0,d:.6,col:MON[m.t].lc,w:16});}
     if(a.t>=a.dur+.6){m.act=null;m.st='idle';}}}
 
 // ---------------------------------------------------------------- update
@@ -1988,7 +2002,7 @@ function keepIn(){for(const m of B.mons){if(m.dead||m.b==='titan')continue;const
 function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelAnimationFrame(raf);B.auto=true;let t=0;while(t<(maxT||400)&&!B.res){step(1/30);t+=1/30;}
   const r={win:B.phase==='win',t:Math.round(t),deaths:B.deaths,wave:B.wave,left:B.mons.filter(m=>!m.dead).map(m=>m.t+':'+Math.round(m.hp/m.max*100)+'%')};return r;}
 function step(dt){B.t+=dt;B.phT+=dt;
-  if(B.wbB&&B.wbB.hurtS>0)B.wbB.hurtS-=dt;
+  if(B.wbB&&B.wbB.hurtS>-2)B.wbB.hurtS-=dt;if(B.wbB&&B.wbB.wbP>0)B.wbB.wbP-=dt;
   if(B.bossBar&&!B.bossBar.dead&&B.bossBar.b==='titan'&&!B.bossBar.enr&&(B.wbB?B.wbT<WB_ENR:B.bossBar.hp<B.bossBar.max*.5)){const b=B.bossBar;b.enr=true;b.as*=.7;b.atk*=1.15;B.flash=.6;shake(16);B.banner={boss:b,t:0,name:'ENRAGED!'};}
   if(B.phase==='intro'){for(const u of B.heroes){const dx=u.fx-u.x;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),250*S*dt);u.st=Math.abs(dx)>1?'walk':'idle';u.wph+=dt*11;u.face=1;}
     for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.6+.12*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=m.mv*dt*1.3;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*7;}else m.st='idle';}
@@ -2218,7 +2232,10 @@ function drawGroundFx(){for(const f of B.fx){if(f.type==='puddle'){const a=Math.
 function bolt(x0,y0,x1,y1,w,col){const n=7;g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);for(let i=1;i<n;i++){const k=i/n;g.lineTo(lerp(x0,x1,k)+rnd(-7,7),lerp(y0,y1,k)+rnd(-7,7));}g.lineTo(x1,y1);g.stroke();}
 function drawFx(t){
   for(const f of B.fx){if(f.t<0)continue;const k=f.t/f.d;g.save();
-    if(f.type==='beam'){g.globalAlpha=1-k;g.strokeStyle=f.col;g.lineWidth=f.w*(1-k*.5);g.lineCap='round';g.beginPath();g.moveTo(f.x0,f.y0);g.lineTo(f.x1,f.y1);g.stroke();g.strokeStyle='#fff';g.lineWidth=Math.max(1,f.w*.35);g.stroke();
+    if(f.type==='wbfx'){const im=wbFxIm(f.id),X=MSPR[f.id].wb.fx;if(im.complete&&im.naturalWidth){const st=k<.66?Math.min(2,Math.floor(k/.66*3)):3,L=Math.max(40*S,f.x0-f.x1),
+        H=clamp(L*X.h/X.w*1.5,70*S,150*S),ang=f.y1!=null?Math.atan2(f.y1-f.y0,f.x1-f.x0)+Math.PI:0;
+        g.globalAlpha=k<.82?1:(1-k)/.18;g.translate(f.x0,f.y0);if(ang)g.rotate(ang);g.drawImage(im,0,st*X.h,X.w,X.h,-L,-X.ya*H,L,H);}}
+    else if(f.type==='beam'){g.globalAlpha=1-k;g.strokeStyle=f.col;g.lineWidth=f.w*(1-k*.5);g.lineCap='round';g.beginPath();g.moveTo(f.x0,f.y0);g.lineTo(f.x1,f.y1);g.stroke();g.strokeStyle='#fff';g.lineWidth=Math.max(1,f.w*.35);g.stroke();
       if(f.w>8){g.globalAlpha=(1-k)*.35;g.strokeStyle=f.col;g.lineWidth=f.w*3;g.stroke();}}
     else if(f.type==='bolt'){g.globalAlpha=1-k;bolt(f.x0,f.y0,f.x1,f.y1,2.5,f.col||'#80d8ff');bolt(f.x0,f.y0,f.x1,f.y1,1,'#fff');}
     else if(f.type==='chain'){const a=f.a,b=f.b;const cc=f.src&&f.src.spr&&f.src.spr.col||'#40c4ff';let [ax,ay]=a.hero?muzzle(a,20,44):[a.x,headY(a)+20];const bx=b.x,by=headY(b)+20;g.globalAlpha=1-k;bolt(ax,ay,bx,by,4,cc);bolt(ax,ay,bx,by,1.5,'#fff');g.fillStyle='rgba(128,216,255,.4)';circ(g,bx,by,16*(1-k)+4);}
@@ -3419,10 +3436,10 @@ let collHome=0,gsHome=0;   // v16-87: gsHome = Gear Summon opened from the main 
 // the first visit of the day; best heroes, not the current team → cannot be lowered on purpose). A normal team does ~2-4 bars per attack.
 // Saved in G.wb.
 const WB_UNLOCK=21,WB_KEYS=3,WB_T=60,WB_ENR=20,WB_LAYERS=100,WB_LK=.5;
-const WBOSS=[{k:'scrap',sp:'scrapzilla',n:'SCRAPZILLA',weak:'elec',d:'A gigantic dinosaur made of crushed cars: claw swipes, ground slams and a wide fire breath. It ENRAGES in the last 20 seconds.'},
-  {k:'crushk',sp:'crusher',n:'CRUSHER KING',weak:'inspect',d:'A giant golem built from a car-crusher press: huge hydraulic punches and frequent ground slams that hit everyone close to it. No ranged attack. It ENRAGES in the last 20 seconds.'},
-  {k:'infp',sp:'inferno',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'},
-  {k:'tows',sp:'tow',n:'TOW SERPENT',weak:'tuning',d:'A giant serpent made of heavy chains and crane hooks with a tow-truck head: fast lunges along the ground that hit everyone in front of it, many times. No ranged attack. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 · v16-62 boss 4
+const WBOSS=[{k:'scrap',sp:'scrapzilla2',n:'SCRAPZILLA',weak:'elec',d:'A gigantic dinosaur made of crushed cars: claw swipes, ground slams and a wide fire breath. It ENRAGES in the last 20 seconds.'},
+  {k:'crushk',sp:'crusher2',n:'CRUSHER KING',weak:'inspect',d:'A giant golem built from a car-crusher press: huge hydraulic punches and frequent ground slams that hit everyone close to it. No ranged attack. It ENRAGES in the last 20 seconds.'},
+  {k:'infp',sp:'inferno2',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'},
+  {k:'tows',sp:'tow2',n:'TOW SERPENT',weak:'tuning',d:'A giant serpent made of heavy chains and crane hooks with a tow-truck head: fast lunges along the ground that hit everyone in front of it, many times. No ranged attack. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 · v16-62 boss 4
 const WB_TIER=[{b:1,dm:20},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:8,dm:40,tk:1},{b:12,dm:50,gt:1,ct:1},{b:18,dm:80,tk:2,gt:1}];
 const WB_RANK=[[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]]; // same table in server/online.js (WB_RW)
 MON.scrap={n:'SCRAPZILLA',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[58,155],dr:'spr_scrapzilla',dr0:'titan',sp:'scrapzilla',sc:1,desc:'World boss'};
@@ -3437,6 +3454,16 @@ MSPR.inferno={w:322,h:177,ax:161,ay:173,ih:150,wb:{pr:2,ni:5}};MDRAW.spr_inferno
 // pound = the ATTACK row (lunge forward, sparks on the ground), no breath (like CRUSHER KING → pounds more often)
 MON.tows={n:'TOW SERPENT',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ffab00',lz:[40,120],dr:'spr_tow',dr0:'titan',sp:'tow',sc:1,noLz:1,desc:'World boss'};
 MSPR.tow={w:310,h:191,ax:155,ay:158,ih:151,wb:{pr:2,ni:6}};MDRAW.spr_tow=(g,u,t)=>drawSprMon(g,u,t,'tow');
+// v16-134: WORLD BOSS ANIMATIONS v2 (Marius' new sheets img/sheets/wb/<boss>2/, cut by tools/wb_v2.py): 6 frames per row –
+// 0 idle · 1 idle · 2 attack · 3 skill · 4 hit · 5 enrage · 6 intro; skill effect from his pictures (img/wb/fx_<id>.webp, 4 strips, emitter at the right end):
+// SCRAPZILLA fire breath (laser, from the mouth) · CRUSHER KING shockwave (ground slam) · INFERNO PISTON lava wave (laser lane, on the ground) · TOW SERPENT chain hook (slam)
+MSPR.scrapzilla2={w:266,h:234,ax:147.5,ay:219.0,ih:182.0,wb:{v2:1,ni:6,pr:2,lz:1,fx:{w:1024,h:171,ya:0.5}}};MDRAW.spr_scrapzilla2=(g,u,t)=>drawSprMon(g,u,t,'scrapzilla2');
+MSPR.crusher2={w:269,h:236,ax:143.0,ay:232.0,ih:199.0,wb:{v2:1,ni:6,pr:3,fxP:1,fx:{w:1024,h:171,ya:0.9}}};MDRAW.spr_crusher2=(g,u,t)=>drawSprMon(g,u,t,'crusher2');
+MSPR.inferno2={w:264,h:230,ax:126.5,ay:223.5,ih:200.5,wb:{v2:1,ni:6,pr:2,lz:2,fx:{w:1024,h:171,ya:0.9}}};MDRAW.spr_inferno2=(g,u,t)=>drawSprMon(g,u,t,'inferno2');
+MSPR.tow2={w:259,h:234,ax:139.0,ay:225.0,ih:188.0,wb:{v2:1,ni:6,pr:3,fxP:1,fx:{w:1024,h:171,ya:0.8}}};MDRAW.spr_tow2=(g,u,t)=>drawSprMon(g,u,t,'tow2');
+for(const [k,sp] of [['scrap','scrapzilla2'],['crushk','crusher2'],['infp','inferno2'],['tows','tow2']]){MON[k].sp=sp;MON[k].dr='spr_'+sp;}
+MON.scrap.lz=[138,150];MON.infp.lz=[60,0]; // v16-134: SCRAPZILLA mouth in the new skill frames · INFERNO lava starts at its feet
+const WBFX={};function wbFxIm(id){if(!WBFX[id]){WBFX[id]=new Image();WBFX[id].decoding='async';WBFX[id].src='img/wb/fx_'+id.replace(/2$/,'')+'.webp';}return WBFX[id];}
 const WBS={ret:0,sending:0,rank:null,raf:0};
 const wbEl=document.createElement('div');wbEl.id='wb';wbEl.innerHTML='<div id="wbBox"></div>';root.appendChild(wbEl);
 const fmtD=n=>{n=Math.round(n||0);return n>=1e12?(n/1e12).toFixed(2)+'T':n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e3).toFixed(1)+'K':String(n);};
