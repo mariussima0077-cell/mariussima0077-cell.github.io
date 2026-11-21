@@ -38,11 +38,13 @@ window.__BOT={
  run(sec){ // garage running for sec game-seconds (fake clock moves with it)
    let left=sec;while(left>0){const s=Math.min(.05,left);update(s);__adv(s*1000);left-=s;}
  },
- bestUpgrade(){ // cheapest affordable building step, buildings first opened by reputation
-   let best=null;for(const id in BLD){const B=BLD[id];if(!B.cost||NOUP(id))continue;const lv=G.lv[id];if(lv>=MAXLV||G.rep<(B.rep||0))continue;
-     const c=costOf(id,lv);if(c<=G.money&&(!best||c<best.c))best={id,c};}
+ bestUpgrade(){ // v16-129: buildings cost PARTS (role parts / Builder Kit) – cheapest affordable level first
+   let best=null;for(const id in BLD){const B=BLD[id];if(!B.cost||NOUP(id))continue;const lt=lvT(id);if(lt>=MAXT||G.rep<(B.rep||0))continue;
+     const c=PCOST(id,lt+1);if(c<=pkN(partOf(id))&&(!best||c/(1+lt)<best.c))best={id,c:c/(1+lt)};}
    return best;},
- buyAll(){let n=0,spent=0;for(let k=0;k<60;k++){const b=this.bestUpgrade();if(!b)break;sel=b.id;$('shBtn').onclick();n++;spent+=b.c;(this.up=this.up||[]).push([Math.round((Date.now()-1794812400000)/36e5*10)/10,b.id,G.lv[b.id],b.c]);}sel=null;try{closePanel();}catch(e){}return n;},
+ buyCars(){if(!window.CC)return 0;const s=CC.st();if(!s.o&&G.rep>=6&&G.money>=150e3){G.money-=150e3;s.o=1;}if(!s.o)return 0;let n=0;  // v16-129: money → Classic Collection
+   for(const c of CC.CARS){if(s.own.includes(c.id)||G.rep<c.rep)continue;if(G.money>=c.price){G.money-=c.price;s.own.push(c.id);n++;}else break;}return n;},
+ buyAll(){let n=0,spent=0;for(let k=0;k<60;k++){const b=this.bestUpgrade();if(!b)break;sel=b.id;$('shBtn').onclick();n++;spent+=b.c;(this.up=this.up||[]).push([Math.round((Date.now()-1794812400000)/36e5*10)/10,b.id,lvT(b.id),b.c]);}sel=null;this.buyCars();try{closePanel();}catch(e){}return n;},
  gearUp(){ // v16-115: gear is upgraded with Gear Parts (G.gp) since v16-99, hero levels with Essence – the player spends both
    this.levelUp();
    const T=__BT,g=T.GR();let budget=G.gp||0,n=0;
@@ -92,9 +94,9 @@ window.__BOT={
    return {win:r.win,t:r.t,si};},
  state(){const own=G.h.own,gr=[0,0,0,0,0,0];for(const id in own){const h=HB[id];if(h&&h.cat==='m')gr[h.gr]++;}
    const team=this.team().map(id=>id.startsWith('crew')?'crew':HB[id].n+' '+['C','U','R','E','L','M'][HB[id].gr]+'+'+own[id].s);
-   let lv=0,lvMax=0,n=0;for(const id in BLD){if(!BLD[id].cost||NOUP(id))continue;lv+=G.lv[id];n++;lvMax+=MAXLV;}
+   let lv=0,lvMax=0,n=0;for(const id in BLD){if(!BLD[id].cost||NOUP(id))continue;lv+=lvT(id);n++;lvMax+=MAXT;}
    return {money:Math.round(G.money),rep:G.rep,vip:VLV,stage:G.cp.best,label:G.cp.best<__BT.NST?__BT.sLabel(G.cp.best):'END',
-     bld:Object.fromEntries(Object.keys(BLD).filter(id=>BLD[id].cost&&!NOUP(id)).map(id=>[id,G.lv[id]])),bldSum:lv+'/'+lvMax,
+     bld:Object.fromEntries(Object.keys(BLD).filter(id=>BLD[id].cost&&!NOUP(id)).map(id=>[id,lvT(id)])),bldSum:lv+'/'+lvMax,pk:JSON.stringify(G.upk),cars:(window.CC?CC.st().own.length:0),ccB:(window.CC?Math.round(CC.battleB()):0),
      mechs:gr,team,power:Math.round(__BT.teamPower(this.team().map(__BT.heroOf))),
      dm:G.dm||0,tk:G.h.tk,sold:G.sold||0};}
 };
@@ -159,7 +161,7 @@ async def main():
                 st = await pg.evaluate("__BOT.state()")
                 st.update(day=d, wins=wins, losses=losses, battle_min=round(bt_time / 60), summons={k: sm.get(k, 0) + sm2.get(k, 0) for k in set(sm) | set(sm2)})
                 days.append(st)
-                print(f"[{MODE}] day {d}: stage {st['label']} rep {st['rep']} vip {st['vip']} bld {st['bldSum']} money {st['money']} power {st['power']} mechs {st['mechs']} ({time.time()-t0:.0f}s)", flush=True)
+                print(f"[{MODE}] day {d}: stage {st['label']} rep {st['rep']} vip {st['vip']} bld {st['bldSum']} cars {st.get('cars')} ccB {st.get('ccB')}% pk {st.get('pk')} money {st['money']} power {st['power']} mechs {st['mechs']} ({time.time()-t0:.0f}s)", flush=True)
                 json.dump(dict(mode=MODE, days=days, errors=errs[:20], log=await pg.evaluate('__BOT.log.slice(0,30)'), up=await pg.evaluate('__BOT.up||[]')), open(OUT, 'w'), indent=1)
                 # offline until tomorrow (22 h)
                 await pg.evaluate("__adv(22*3600*1000)")

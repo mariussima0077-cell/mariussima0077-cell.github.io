@@ -390,7 +390,7 @@ function vipLv(G){const P=typeof VIP_PTS!=='undefined'?VIP_PTS:null,v=G&&G.vip||
 async function sync(){
   const t=T(),c=C();if(!t||!t.G||!c||!c.arenaTeam||!PID())return;
   let team=[];try{team=c.arenaTeam();}catch(e){}
-  const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0);
+  const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0)+Object.values(G.lx||{}).reduce((a,b)=>a+b,0);
   const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),pids:window.SEC&&SEC.pids?SEC.pids():undefined,icon:LS('te_icon')||undefined});
   if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;dots();if(open_)hdr();}
   return r;}
