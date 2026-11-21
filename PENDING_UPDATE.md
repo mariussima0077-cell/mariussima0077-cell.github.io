@@ -69,3 +69,16 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - **NEXT GOAL**: doar machetă trimisă lui Marius (bandă sub bara de sus: obiectiv + GO). De făcut doar după OK.
 - Test Chrome 360 px: cadoul vine corect (0→1000 💎, +10 din fiecare bilet), ghidurile Summon/Heroes/VIP apar o dată, fereastra RESOURCES OK, 0 erori. NEWS id 60.
 
+## 10. VIP NOU 1-10 (Marius, 21 nov 2026: „prea multe nivele” + toate ideile 1-9, fără garaj/skin/erou exclusiv) – gata, testat
+- **10 niveluri** (`VIP_MAX=10`, `VIP_PTS=[0,100,1300,2850,4900,7500,10600,14200,18300,22900,28000]`, aceleași în `server/online.js`). Gratis ≈ 6 luni (28.000 puncte ca înainte). Bonusurile: `per` dublu → VIP 10 = vechiul VIP 20 (income +20%, Idle money +100%…); deblocări: income/idle 1 · thief 2 · speed 3 · sale 4 · discount 5 · customers 6. Idle +1 h / nivel (VIP 10 = 14 h).
+- **Puncte VIP din cumpărături**: Marius: „trebuie de 5 ori mai mult” → **1 € = 20 puncte** (`VIP_EUR`, `EURO` + `vipBuy` în `secure.js`): VIP 10 ≈ 1.400 € dacă e cumpărat. Abonamente: puncte la cumpărare + la fiecare reînnoire lunară (restore). Botul: `vip_jump` ignorat după cumpărare (`rebase`); serverul permite +2.100 puncte / cumpărare confirmată (raport + scanarea 24 h).
+- **Cufăr la fiecare nivel NOU** (`vipChests`, `G.vipC` = ultimul nivel plătit): n×100 💎 + n×5 Recruit/Crew/Gear; VIP 5 = erou **Legendary**, VIP 10 = **Mythic** (la întâmplare, `srun('vipH')`). Migrare: salvările vechi primesc `vipC` = nivelul nou → fără cufere pentru niveluri deja atinse (testat: 28.000 puncte → VIP 10, 0 cufere).
+- **Pagina VIP**: insignele lui Marius (`img/vip/v1-10`, `tools/vip_cut.py`), cutia „VIP n GIFTS”: **DAILY** = n summon-uri gratis (Recruit) + 💎 10…60 (`vipDaily`, `G.vipD`), **WEEKLY** (luni) = 3n din fiecare bilet + 1 cheie (`vipWeekly`, `G.vipW`); lista nivelurilor cu tot ce aduce fiecare.
+- **Quick Idle** (`quickIdle`, `G.qi`): 2 h de Idle Rewards instant, 1/1/1/2/2/2/3/3/3/3 pe zi; buton auriu în fereastra Idle. Serverul: plafonul de bani +6 h idle.
+- **SWEEP** de la VIP 4: campanie (buton albastru pe cartea etapei deja câștigate, în locul cutiilor 3-4 goale la replay: aceleași recompense ca replay, `cpSweep`) + Dungeons (`dgSw` = Dungeon Pass SAU VIP 4).
+- **Bag** +20 la VIP 3/6/9 (`GINV_()`), **Arena** +1 luptă la VIP 3/6/9 (`ATK(p)` pe server), **chei Dungeon** +1 la VIP 5, +2 la VIP 10 (`dgMax`).
+- **Insigne VIP** în chat, clasament, profil (`vipB` în `online.js`); **HIDE VIP** în profil (`prof.hv`, coloană nouă creată singură; ceilalți primesc `vip:-1` → nicio insignă, tu păstrezi bonusurile). Titluri noi **VIP STAR** (VIP 5) și **VIP LEGEND** (VIP 10); `fdr` (FOUNDER) lipsea din `TITLES` pe server → adăugat.
+- Ramele de profil rămân la VIP 3 și VIP 7 (acum mai greu de luat). Ramă nouă VIP 10 = ar cere poză (nefăcută).
+- ⚠️ **Serverul (`server/online.js`, `server/worker.js`) e pe ramura asta** → se publică ÎMPREUNĂ cu jocul (merge în main); altfel profilul/clasamentul ar arăta nivelurile vechi.
+- Test Chrome 360 px: VIP 0→5 = 1.500 💎 + 75 bilete din fiecare + Legendary (Mama Rosa), fără dublare; DAILY/WEEKLY o singură dată; Quick Idle 2/zi la VIP 5; bag 170; SWEEP dă recompensa; cumpărare 99,99 € → +2.000 puncte; 0 erori. NEWS id 61.
+

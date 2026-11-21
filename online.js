@@ -27,7 +27,7 @@ function needUpd(){if(document.getElementById('updNeed'))return;const d=document
     navigator.serviceWorker.getRegistration().then(r=>{if(!r){go();return;}navigator.serviceWorker.addEventListener('controllerchange',go);r.update().then(()=>{if(!r.installing&&!r.waiting)go();}).catch(go);setTimeout(go,8000);}).catch(go);};}
 
 // ------------------------------------------------------------------ titles, frames, leagues
-const TT={fdr:['t5','FOUNDER','Founder Pass (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
+const TT={vip10:['t5','VIP LEGEND','Reach VIP 10'],vip5:['t3','VIP STAR','Reach VIP 5'],fdr:['t5','FOUNDER','Founder Pass (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
  boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game']};
 const TORD=['fdr','king','cup','leg','glad','boss','gear','speed','chat','wr','rook'];
 const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
@@ -100,6 +100,7 @@ const css=`
 #onl .t2{background:linear-gradient(90deg,#0a3a7a,#3fa7ff,#b8e4ff)}
 #onl .t1{background:linear-gradient(90deg,#14532a,#4cd964)}
 #onl .t0{background:linear-gradient(90deg,#3a4452,#7d8b9c)}
+#onl .vipB{height:1.55em;width:auto;vertical-align:-.45em;filter:drop-shadow(0 1px 1px #000)}#onl .pvip{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:4px 0;font:900 12px system-ui;color:#ffd54a}#onl .pvip .vipB{height:34px}#onl .pvip small{width:100%;text-align:center;font:700 10px system-ui;color:#9fb0c0}#onl .hvB{border:1px solid #d79b22;background:#1d1430;color:#e8dcff;border-radius:10px;padding:4px 10px;font:900 11px system-ui}
 #onl .vip{font:900 8.5px system-ui;color:#3a1d00;background:linear-gradient(#fff1a8,#ffb300);border-radius:4px;padding:1px 4px;vertical-align:middle}
 #onl .ai{font:900 8.5px system-ui;color:#fff;background:#56657a;border-radius:4px;padding:1px 4px;vertical-align:middle}
 #onl .pod{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:42px 0 10px}
@@ -381,7 +382,9 @@ let ME=null,inboxN=0,chatLast=+(LS('te_chat_seen')||0),chatSrvLast=0,cur='',open
 let autoTr=LS('te_tr')!=='0';const mutes=new Set(JSON.parse(LS('te_mutes')||'[]'));
 function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.cp.best:0;if(b>=40)o.push('wr');if(b>=80)o.push('boss');if((G.rep||0)>=10)o.push('speed');if((G.rep||0)>=5)o.push('f1');if(T().PK&&T().PK.fdr)o.push('fdr');
   if(G.gear&&(G.gear.inv||[]).some(it=>it.r>=4))o.push('gear');return o;}
-// v16-82: G.vip = VIP POINTS; the server and the profile need the VIP LEVEL (0-20)
+// v16-82: G.vip = VIP POINTS; the server and the profile need the VIP LEVEL (0-10 since v16-122)
+// v16-122: VIP badge pictures (img/vip/v1-10) next to names; -1 = the player hides his VIP
+const vipB=n=>n>0?`<img class="vipB" src="img/vip/v${Math.min(10,n)}.webp" alt="VIP ${n}">`:'';
 function vipLv(G){const P=typeof VIP_PTS!=='undefined'?VIP_PTS:null,v=G&&G.vip||0;if(!P)return 0;let n=0;for(let i=1;i<P.length;i++)if(v>=P[i])n=i;return n;}
 async function sync(){
   const t=T(),c=C();if(!t||!t.G||!c||!c.arenaTeam||!PID())return;
@@ -433,10 +436,10 @@ async function loadRank(first){
     B.innerHTML=`<div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
 
   const rows=$('olRows');const html=L.slice(3).map((p,i)=>{const ch=rkPrev[p.uid]!==undefined&&rkPrev[p.uid]!==p[rkBy];
-    return `<div class="o-row rk3 ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${p.vip?`<span class="vip">VIP ${p.vip}</span>`:''}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
+    return `<div class="o-row rk3 ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${ring(p.icon)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${vipB(p.vip)}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
   rows.innerHTML=html;
   L.forEach(p=>rkPrev[p.uid]=p[rkBy]);
-  const m=r.me;$('olRkMe').innerHTML=`<div class="o-row rk3 me" data-uid="${m.uid}"><span class="k">${r.myRank}</span>${ring(m.icon)}<div class="o-nm"><b>⭐ ${esc(m.name)} ${m.vip?`<span class="vip">VIP ${m.vip}</span>`:''}</b><small>${tt(m.title)} ${subv(m)}</small></div><div class="v">${val(m)}<small>${rkBy==='best'&&m.today?`<span class="o-up">▲${m.today}</span> today`:''}</small></div></div>`;}
+  const m=r.me;$('olRkMe').innerHTML=`<div class="o-row rk3 me" data-uid="${m.uid}"><span class="k">${r.myRank}</span>${ring(m.icon)}<div class="o-nm"><b>⭐ ${esc(m.name)} ${vipB(m.vip)}</b><small>${tt(m.title)} ${subv(m)}</small></div><div class="v">${val(m)}<small>${rkBy==='best'&&m.today?`<span class="o-up">▲${m.today}</span> today`:''}</small></div></div>`;}
 $('olRkT').onclick=e=>{const b=e.target.closest('b');if(!b)return;rkBy=b.dataset.by;$('olRkT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));rkPrev={};loadRank(true);};
 
 // ------------------------------------------------------------------ CHAT
@@ -459,7 +462,7 @@ function msgHtml(m){const tm=new Date(m.t).toLocaleTimeString([],{hour:'2-digit'
   if(m.sys)return `<div class="sys"><span class="shine">${esc(m.txt)}</span></div>`;
   const txt=autoTr&&m.tr?m.tr:m.txt;const trl=autoTr&&m.tr?`<div class="tr">🌐 translated from ${LNAME[m.lang]||m.lang} · <u data-orig="${m.id}">show original</u></div>`:'';
   if(m.me)return `<div class="m me" data-mid="${m.id}">${ring(m.icon)}<div class="bub"><div class="h" style="justify-content:flex-end"><span class="tm">${tm}</span>${tt(m.title)} You</div><p>${esc(m.txt)}</p></div></div>`;
-  return `<div class="m" data-mid="${m.id}" data-u="${m.uid}">${ring(m.icon)}<div class="bub"><div class="h">${flag(m.cc)} ${esc(m.name)} ${m.vip?`<span class="vip">VIP ${m.vip}</span>`:''} ${tt(m.title)}<span class="tm">${tm}</span></div><p>${esc(txt)}</p>${trl}</div></div>`;}
+  return `<div class="m" data-mid="${m.id}" data-u="${m.uid}">${ring(m.icon)}<div class="bub"><div class="h">${flag(m.cc)} ${esc(m.name)} ${vipB(m.vip)} ${tt(m.title)}<span class="tm">${tm}</span></div><p>${esc(txt)}</p>${trl}</div></div>`;}
 $('olMsgs').addEventListener('click',e=>{const o=e.target.closest('[data-orig]');if(o){const m=chList.find(x=>x.id===+o.dataset.orig);if(m){const p=o.closest('.bub').querySelector('p');const sh=o.textContent==='show original';p.textContent=sh?m.txt:m.tr;o.textContent=sh?'show translation':'show original';}return;}
   const mm=e.target.closest('.m[data-u]');if(mm&&!e.target.closest('.menu'))openMenu(mm);});
 let lpT=0;$('olMsgs').addEventListener('touchstart',e=>{const mm=e.target.closest('.m[data-u]');if(!mm)return;clearTimeout(lpT);lpT=setTimeout(()=>openMenu(mm),450);},{passive:true});
@@ -566,7 +569,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
   const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)));
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
-  $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}${vip?' · VIP '+vip:''}</div>
+  $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}</div><div class="pvip">${vip?vipB(vip)+' <b>VIP '+vip+'</b>':''}<button class="hvB" data-a="hv">${ME.hv?'🙈 VIP HIDDEN':'👁 VIP VISIBLE'}</button><small>${ME.hv?'Others do not see your VIP level':'Tap to hide your VIP level from others'}</small></div>
     <div class="pst s1">CAMPAIGN<b>⚔️ ${stLab(ME.best)}</b></div><div class="pst s2">TEAM POWER<b>⚡ ${fmtN(ME.pow)}</b></div><div class="pst s3">GARAGE · CUP<b>🏗️ ${ME.lv} · 🏆 ${ME.cupw||0}</b></div>`;
   B.innerHTML=`   ${/^Mechanic\d+$/.test(ME.name)?`<div class="btns" style="margin-bottom:10px"><div class="shine" data-a="name">✏️ CHOOSE YOUR PLAYER NAME (FREE)</div></div>`:''}
    <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
@@ -577,7 +580,7 @@ async function setProf(set,paid){const r=await call('prof',{set,paid});
   if(r.ok){ME={...ME,...r.me};renderProf();return r;}
   const E={name_rules:'✏️ 3–14 letters, numbers, _ . -',name_bad:'🚫 This name is not allowed',name_taken:'❌ This name is already used on your server',locked:'🔒 Not unlocked yet',network:'📶 No connection'};
   if(r.err!=='pay')toast(E[r.err]||'⚠️ Could not save',3000);return r;}
-$('olPrH').addEventListener('click',e=>{if(e.target.closest('[data-a="name"]'))nameModal();});
+$('olPrH').addEventListener('click',e=>{if(e.target.closest('[data-a="name"]'))nameModal();if(e.target.closest('[data-a="hv"]'))setProf({hv:ME.hv?0:1});});
 $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}

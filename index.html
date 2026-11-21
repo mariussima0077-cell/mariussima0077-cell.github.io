@@ -543,6 +543,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .wR b{font-weight:900}.wR>:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wR em{font-style:normal;color:#b8c7d9;font-size:.85em;white-space:nowrap}.wR .wV{font:900 1.1em system-ui;color:#fff;min-width:3.2em;text-align:right}
 .wTx>:first-child{white-space:normal;font-size:.95em;line-height:1.3}
 .wR img{height:1.7em;width:auto;vertical-align:middle}.wR .wLk{height:2em}
+.idQI{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:calc(var(--u,1px)*30);background:linear-gradient(#ffe082,#ffb300);color:#3a2200;font:900 13px system-ui;border:2px solid #fff6;box-shadow:0 2px 0 #7a4a00,0 0 10px #ffb30088;pointer-events:auto}.idQI.off{filter:grayscale(.8) brightness(.75)}
+.vipGift{display:flex;align-items:center;gap:8px;margin:8px 0;padding:8px;border-radius:14px;background:linear-gradient(#3a2a5c,#1d1430);border:2px solid #d79b22}.vipGift .tx{flex:1;font:700 11.5px/1.35 system-ui;color:#e8dcff}.vipGift .tx b{color:#ffd54a}.vipGift .bt{display:flex;flex-direction:column;gap:4px}.vipGift .buy{font-size:11px!important;padding:6px 8px!important}
 .rsInfo .rsI{display:flex;flex-direction:column;gap:2px;padding:6px 8px;margin:4px 0;border-radius:10px;background:rgba(10,20,40,.55);border:1px solid #ffffff1a}.rsInfo .rsI.on{border:2px solid #ffd54a;box-shadow:0 0 10px #ffb30066}.rsInfo .rsI b{color:#ffe9a8}.rsInfo .rsI em{font-style:normal;font-weight:900;font-size:.8em;color:#7ee0ff;margin-right:4px}
 .wP{font:700 min(3.2vw,13px)/1.45 system-ui;color:#cfe0f2;padding:4px 6px}.wHist{display:block;margin:8px auto 4px;padding:8px 18px;border-radius:12px;border:2px solid #7ec8ff;background:linear-gradient(#1e4c9a,#0b2250);color:#e3f2ff;font:900 min(3.6vw,14px) system-ui;letter-spacing:.5px}.wP b{color:#ffd54a}.wP>div{margin:3px 0}
 .wS{text-align:center;font:900 italic min(3.4vw,14px) system-ui;color:#9fd3ff;letter-spacing:.5px;margin:2px 0 4px}
@@ -1063,21 +1065,27 @@ load();
 let time=0, started=false, SPD=1;
 
 // =================== VIP (levels 1-20) — points only from Daily Quests ===================
-const VIP_MAX=20;let SUB_MULT=1.5;const SUB_DAYS=30, SUB_PRICE='€5.99';
+const VIP_MAX=10;let SUB_MULT=1.5;const SUB_DAYS=30, SUB_PRICE='€5.99';
 // v8: VIP 20 = 28,000 points ≈ 6 months of daily quests (max ~155 points/day)
-const VIP_PTS=[0];for(let n=1;n<=VIP_MAX;n++)VIP_PTS.push(n===VIP_MAX?28000:Math.round(50*Math.pow(n,Math.log(560)/Math.log(20))/10)*10);
+// v16-122 (Marius: "too many levels"): VIP 1-10, same 28,000 points ≈ 6 months for free · 1 € spent = 100 VIP points
+const VIP_PTS=[0,100,1300,2850,4900,7500,10600,14200,18300,22900,28000];
+// perks per level: free daily summons (Recruit tickets) · daily diamonds · Quick Idle per day · SWEEP · bag slots · Arena fights · Dungeon keys
+const VIP_EUR=20; // Marius: VIP 10 must cost at least 5× more → 1 € = 20 VIP points (28,000 points ≈ 1,400 €; free: ~6 months)
+const VIP_DM=[0,10,15,20,25,30,35,40,45,50,60],VIP_QI=[0,1,1,1,2,2,2,3,3,3,3];
+const VP=n=>({sum:n,dm:VIP_DM[n]||0,qi:VIP_QI[n]||0,sweep:n>=4,bag:20*Math.min(3,Math.floor(n/3)),arena:Math.min(3,Math.floor(n/3)),dkey:n>=10?2:n>=5?1:0});
+const VIPI=(n,h)=>n>0?'<img src="img/vip/v'+Math.min(10,n)+'.webp" alt="VIP '+n+'" style="height:'+(h||'1.4em')+';width:auto;vertical-align:-.4em">':'';
 // v16-49: one picture per thing (Marius' icon sheets in img/ui3)
 const U3=(f,h)=>'<img src="img/ui3/'+f+'.webp" alt="" style="height:'+(h||'1.35em')+';width:auto;vertical-align:-.35em">';
 const VIP_IMG={income:'v_coins',thief:'v_sec',speed:'v_fast',sale:'q_sell',disc:'v_disc',cust:'v_garage',idle:'n_idle'};
 const DQ_IMG={sell:'q_sell',earn:'q_money',inspect:'g_inspect',service:'g_service',paint:'g_paint',elec:'g_elec',engine:'g_engine',tuning:'g_tuning',upgrade:'q_upg',thief:'v_sec',fleet:'q_police'};
-const VIP_BEN=[
- {k:'income',ic:'💰',n:'Job income',from:1},
- {k:'thief',ic:'🛡️',n:'Thief catch chance',from:2},
- {k:'speed',ic:'⚡',n:'Work speed',from:3},
- {k:'sale',ic:'🏷️',n:'Sale price',from:5},
- {k:'disc',ic:'🔧',n:'Upgrade discount',from:8,neg:1},
- {k:'cust',ic:'🚗',n:'More customers',from:10},
- {k:'idle',ic:'🧰',n:'Idle Rewards money',from:1,per:.05}];
+const VIP_BEN=[ // v16-122: 10 levels – every level counts double, VIP 10 = what VIP 20 gave before
+ {k:'income',ic:'💰',n:'Job income',from:1,per:.02},
+ {k:'thief',ic:'🛡️',n:'Thief catch chance',from:2,per:.019/.9},
+ {k:'speed',ic:'⚡',n:'Work speed',from:3,per:.0225},
+ {k:'sale',ic:'🏷️',n:'Sale price',from:4,per:.016/.7},
+ {k:'disc',ic:'🔧',n:'Upgrade discount',from:5,neg:1,per:.013/.6},
+ {k:'cust',ic:'🚗',n:'More customers',from:6,per:.022},
+ {k:'idle',ic:'🧰',n:'Idle Rewards money',from:1,per:.1}];
 const S2=()=>window.SHOP2&&SHOP2.live; // v16-75: new Shop (Silver / Gold / Platinum) – only when live
 const subOn=()=>S2()?!!SHOP2.tier():PK.sub>Date.now();
 let VLV=0,VSUB=false;const VBC={};
@@ -1086,9 +1094,22 @@ function benAt(b,l,sub){return Math.max(0,l-b.from+1)*(b.per||.01)*(sub?SUB_MULT
 const VB=k=>VBC[k]||0;
 const pctT=(v,neg)=>(neg?'−':'+')+(Math.round(v*1000)/10)+'%';
 function addVip(n){const l0=VLV;G.vip+=n;vipRefresh();save();
-  if(VLV>l0){G.h.tk+=5*(VLV-l0);G.h.ct+=3*(VLV-l0);G.dm=(G.dm||0)+100*(VLV-l0);save();toast('👑 VIP '+VLV+'! Your benefits went up · '+TKI+' +'+5*(VLV-l0)+' · '+CTI+' +'+3*(VLV-l0)+' · '+DMI+' +'+100*(VLV-l0),5000);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');
+  if(VLV>l0){vipChests();const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#b388ff'])});}}
+// v16-122: a chest for every NEW VIP level (once – G.vipC = last level paid): n×100 💎 + n×5 of every ticket · VIP 5 = Legendary hero · VIP 10 = Mythic hero
+function vipChests(){if(G.vipC==null)G.vipC=VLV;const got=[];let dm=0,tk=0;
+  while(G.vipC<VLV){const n=++G.vipC;dm+=100*n;tk+=5*n;
+    if(n===5||n===10){const gr=n===5?4:5;const id=srun('vipH',()=>pick(heroesOf('m',gr)).id);const r=gain(id);G.h.hist.unshift({c:'m',id:r.id,r:r.r,t:Date.now()});got.push(r);}}
+  if(!dm)return;try{SEC.rebase&&SEC.rebase();}catch(e){}G.dm=(G.dm||0)+dm;G.h.tk+=tk;G.h.ct+=tk;G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+tk;save();try{heroRefresh();}catch(e){}
+  popW(VIPI(VLV,'1.6em')+' VIP '+VLV+'!','<div class="wP" style="text-align:center"><div>Your VIP benefits went up!</div><div style="font-size:1.25em;margin:8px 0"><b>'+DMI+' +'+dm+'</b> · <b>'+TKI+' +'+tk+'</b> · <b>'+CTI+' +'+tk+'</b> · <b><img class="tki" src="img/gticket.webp"> +'+tk+'</b></div>'+(got.length?'<div style="color:#ffd54a">+ '+got.map(r=>'<b>'+(GRADES[HB[r.id].gr]||{}).n+' '+HB[r.id].n+'</b>').join(' · ')+'</div>':'')+'<div>New today: '+VP(VLV).sum+' free summons · '+DMI+' '+VP(VLV).dm+' a day on the VIP page.</div></div>');
+  const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');}
+// daily VIP gift (free summons = Recruit tickets + diamonds) and the weekly VIP chest (Monday) – claimed on the VIP page
+const dayK=()=>new Date(SEC.now()).toISOString().slice(0,10),weekK=()=>{const d=new Date(SEC.now());d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));return d.toISOString().slice(0,10);};
+function vipDaily(){if(!VLV||G.vipD===dayK())return;const P=VP(VLV);G.vipD=dayK();G.h.tk+=P.sum;G.dm=(G.dm||0)+P.dm;save();toast('👑 VIP '+VLV+' daily gift: '+TKI+' +'+P.sum+' free summons · '+DMI+' +'+P.dm,3500);lastPanelKey='';}
+function vipWeekly(){if(!VLV||G.vipW===weekK())return;const n=3*VLV;G.vipW=weekK();G.h.tk+=n;G.h.ct+=n;G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+n;try{if(window.DGK)DGK.add(1);}catch(e){}save();toast('👑 VIP weekly chest: '+TKI+' +'+n+' · '+CTI+' +'+n+' · <img class="tki" src="img/gticket.webp"> +'+n+' · 🗝 +1',3500);lastPanelKey='';}
 vipRefresh();
+// v16-122 migration: old 20-level saves keep their points – only the steps changed; no chests again for levels already reached
+if(G.vipC==null){G.vipC=VLV;}
 
 // =================== DAILY QUESTS (reward: VIP points only) ===================
 const DQ_GIFTS=[{need:2,vip:10,tk:1,dm:20},{need:3,vip:15,tk:2,dm:30},{need:4,vip:20,tk:2,dm:40},{need:5,vip:30,tk:3,dm:60}];
@@ -2884,18 +2905,23 @@ function renderPanel(){
   if(sel==='vip'){const sub=subOn(),key='vip'+G.vip+sub+(sub?Math.ceil((PK.sub-Date.now())/864e5):0);if(key===lastPanelKey)return;lastPanelKey=key;
     const nx=VIP_PTS[VLV+1];$('shTitle').textContent='👑 VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'');$('shSkT').innerHTML='VIP '+VLV+(sub?' · PASS ×'+SUB_MULT:'')+'<small>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL')+'</small>';
     $('shDots').innerHTML='<span>'+(nx?G.vip+' / '+nx+' VIP points':'MAX LEVEL – '+G.vip+' VIP points')+'</span>';
-    $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every VIP level makes your benefits stronger. '+(S2()?'VIP Passes make all benefits stronger: Silver ×1.2 · Gold ×1.5 · Platinum ×2 – together ×2.7.':'With the VIP Pass all benefits are ×'+SUB_MULT+'.');
+    $('shDesc').textContent='Complete Daily Quests to earn VIP points – free for everyone. Every purchase also gives VIP points (1 € = '+VIP_EUR+' points). Every VIP level makes your benefits stronger. '+(S2()?'VIP Passes make all benefits stronger: Silver ×1.2 · Gold ×1.5 · Platinum ×2 – together ×2.7.':'With the VIP Pass all benefits are ×'+SUB_MULT+'.');
     const a=VIP_PTS[VLV],fr=nx?(G.vip-a)/(nx-a):1;
     let h='<div class="vbar"><i style="width:'+Math.round(fr*100)+'%"></i></div>';
     h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>'+(S2()?'VIP Pass':'VIP Pass · '+SUB_PRICE+' / 30 days')+'</b>'+(sub?'Active – '+(S2()?SHOP2.PASSN()+' · '+SHOP2.days():Math.ceil((PK.sub-Date.now())/864e5))+' days left. All benefits ×'+SUB_MULT+'.':(S2()?'Silver ×1.2 · Gold ×1.5 · Platinum ×2 – you can have all three (×2.7).':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.'))+'</div>'+
       (S2()?'<button class="buy" data-buy="sub">'+(sub?'ACTIVE':'OPEN')+'</button>':sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
+    {const P=VP(VLV),dOK=VLV&&G.vipD!==dayK(),wOK=VLV&&G.vipW!==weekK();
+     h+='<div class="vipGift">'+VIPI(VLV||1,'58px')+'<div class="tx"><b>VIP '+VLV+' GIFTS</b><br>'+(VLV?'Every day: '+TKI+' <b>'+P.sum+'</b> free summons · '+DMI+' <b>'+P.dm+'</b><br>Every Monday: '+TKI+CTI+'<img class="tki" src="img/gticket.webp"> <b>'+3*VLV+'</b> each + 🗝 1':'Reach VIP 1 with Daily Quests to unlock daily gifts.')+'</div><div class="bt"><button class="buy'+(dOK?'':' own')+'" data-vg="d">'+(dOK?'DAILY':'✓ TODAY')+'</button><button class="buy'+(wOK?'':' own')+'" data-vg="w">'+(wOK?'WEEKLY':'✓ WEEK')+'</button></div></div>';
+     if(VLV)h+='<div class="row"><span>🎁 Quick Idle (2 h at once)</span><b style="color:#7CFC9A">'+P.qi+' / day</b></div>'+(P.sweep?'<div class="row"><span>⚡ SWEEP (campaign + Dungeons)</span><b style="color:#7CFC9A">ON</b></div>':'')+(P.bag?'<div class="row"><span>🎒 Gear bag</span><b style="color:#7CFC9A">+'+P.bag+'</b></div>':'')+(P.arena?'<div class="row"><span>⚔️ Arena fights a day</span><b style="color:#7CFC9A">+'+P.arena+'</b></div>':'')+(P.dkey?'<div class="row"><span>🗝 Dungeon keys a day</span><b style="color:#7CFC9A">+'+P.dkey+'</b></div>':'');}
     h+='<div class="sec">YOUR BENEFITS · VIP '+VLV+'</div>'+(sub?'':'<div style="color:#9fb0c0;font:700 11px system-ui;margin:-4px 0 6px 2px">👑 = with VIP Pass</div>')+VIP_BEN.map(b=>{const v=benAt(b,VLV,sub),on=VLV>=b.from;
       return '<div class="row"><span>'+(VIP_IMG[b.k]?U3(VIP_IMG[b.k]):b.ic)+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a;white-space:nowrap">'+pctT(benAt(b,VLV,true),b.neg)+'&nbsp;👑</em>':'')+'</div>';}).join('');
     h+='<div class="sec">ALL VIP LEVELS'+(sub?' (with VIP Pass)':'')+'</div>';
     for(let n=1;n<=VIP_MAX;n++){const nw=VIP_BEN.filter(b=>b.from===n);
-      h+='<div class="vlv'+(n===VLV?' cur':n>VLV?' off':'')+'"><b>'+(n<=VLV?U3('v_crown','1.25em'):'🔒')+' VIP '+n+'</b><span>'+VIP_PTS[n]+' pts · '+VIP_BEN.filter(b=>n>=b.from).map(b=>U3(VIP_IMG[b.k],'1.15em')+' '+pctT(benAt(b,n,sub),b.neg)).join(' · ')+(nw.length?'<br><span style="color:#ffd54a">NEW: '+nw.map(b=>b.n).join(', ')+'</span>':'')+'</span></div>';}
+      const P=VP(n),xt=[TKI+' '+P.sum+'/day',DMI+' '+P.dm+'/day','🎁 '+P.qi+' Quick Idle'].concat(n===3||n===6||n===9?['🎒 +20 bag','⚔️ +1 Arena']:[]).concat(n===4?['⚡ SWEEP']:[]).concat(n===5||n===10?['🗝 +1 key','🎁 '+(n===5?'Legendary':'Mythic')+' hero']:[]);
+      h+='<div class="vlv'+(n===VLV?' cur':n>VLV?' off':'')+'"><b>'+VIPI(n,'44px')+(n<=VLV?'':' 🔒')+'</b><span>'+VIP_PTS[n].toLocaleString()+' pts · '+xt.join(' · ')+'<br>'+VIP_BEN.filter(b=>n>=b.from).map(b=>U3(VIP_IMG[b.k],'1.15em')+' '+pctT(benAt(b,n,sub),b.neg)).join(' · ')+(nw.length?'<br><span style="color:#ffd54a">NEW: '+nw.map(b=>b.n).join(', ')+'</span>':'')+'</span></div>';}
     if(SEC.TEST_MODE)h+='<div class="note">🧪 TEST MODE (owner): tapping the price activates the VIP Pass without payment.</div>';
-    $('shStats').innerHTML=h;const b=$('shBtn');b.style.display='';b.disabled=false;b.textContent='📋 DAILY QUESTS';return;}
+    $('shStats').innerHTML=h;$('shStats').querySelectorAll('[data-vg]').forEach(e=>e.onclick=()=>{if(e.dataset.vg==='d')vipDaily();else vipWeekly();openPanel('vip');});
+    const b=$('shBtn');b.style.display='';b.disabled=false;b.textContent='📋 DAILY QUESTS';return;}
   if(sel==='inc'){const key='inc'+Math.floor(Date.now()/2e3);if(key===lastPanelKey)return;lastPanelKey=key;const R=incRates(),ks=Object.keys(R.r).sort((a,b)=>R.r[b]-R.r[a]),mx=Math.max(1,...ks.map(k=>R.r[k]));
     $('shTitle').textContent='💰 Income per hour';$('shDots').innerHTML='<span>'+(R.ok?'≈ '+fmt(R.tot)+' / hour':'measuring… play 1-2 minutes')+'</span>';
     $('shDesc').textContent='What every building earned in your last 20 minutes of play, per hour. Tap a building on the map to see how much its next upgrade adds.';
@@ -3609,13 +3635,19 @@ teamEl.addEventListener('click',e=>{if(e.target===teamEl){closeTeam();return;}co
     const r=gain(pick(heroesOf(cat,5)).id);G.h.hist.unshift({c:cat,id:r.id,r:r.r,t:Date.now()});save();heroRefresh();teamKey='';renderTeam();showResults([r],cat,0);resEl.querySelector('.resT').textContent='🧪 FUSION · MYTHIC '+CATS[cat].one.toUpperCase();resEl.querySelector('.resB').style.display='none';}});
 
 // ---------- idle rewards (my picture) — v11: also grows with the VIP level ----------
-const IDLE_BASE_H=4, IDLE_VIP_H=0.5, IDLE_TK_H=2; // v16: 4h standard + 30 min per VIP level (VIP 20 = 14h). VIP Pass does NOT boost hours
+const IDLE_BASE_H=4, IDLE_VIP_H=1, IDLE_TK_H=2; // v16-122: 4h standard + 1 h per VIP level (VIP 10 = 14h). VIP Pass does NOT boost hours
 const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV+(S2()?SHOP2.idleH():0); // v16-75: VIP Pass Silver +1h / Gold +2h / Platinum +4h
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
 const ccR=()=>window.CC?CC.rates():{dm:0,tk:0,ct:0,gt:0,es:0,gp:0,mon:0};
 function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')+ccR().mon));}
+function idleCalc(hrs){const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U())};}
+// v16-122: QUICK IDLE (VIP 1+: 1-3 a day) = 2 hours of Idle Rewards at once – the normal Idle chest keeps filling
+const qiLeft=()=>{const n=VP(VLV).qi;if(!n)return 0;if(!G.qi||G.qi.d!==dayK())return n;return Math.max(0,n-G.qi.n);};
+function quickIdle(){if(!qiLeft()){toast(VLV?'🎁 No Quick Idle left today – more with a higher VIP level':'👑 Quick Idle opens at VIP 1 (Daily Quests give VIP points)',2800);return;}
+  if(!G.qi||G.qi.d!==dayK())G.qi={d:dayK(),n:0};G.qi.n++;const I=idleCalc(2);G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;save();idlKey='';renderIdle();
+  toast('🎁 Quick Idle (2 h): +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+' · '+qiLeft()+' left today',3200);}
 function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U()),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
@@ -3632,10 +3664,11 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
   const cc=(I.dm||I.gt||ccR().dm)?'<br>🏆 <b>Classic cars</b>: '+DMI+' +'+(I.dm||0)+(I.gt?' · '+GTI+' +'+I.gt:'')+' (tickets above include them)':'';
   h+='<div class="idEG" style="'+box(150,1083,900,34)+'">'+ESI+' Essence <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' Gear Parts <b>+'+nfmt(I.gp)+'</b></div>';
+  h+='<div class="idQI'+(qiLeft()?'':' off')+'" data-i="qi" style="'+box(330,1222,540,74)+'">🎁 QUICK IDLE 2h · '+(VLV?qiLeft()+' left':'VIP 1')+'</div>';
   h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+cc+'</span></div>';
   morph(idlBox,h);}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
-  if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
+  if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='qi')quickIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
 function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;let ia=null;try{ia=window.CAMPAIGN&&CAMPAIGN.idleAsc?CAMPAIGN.idleAsc(I.hrs):null;}catch(e){}G.idle=SEC.now();if(window.EVT)EVT.q('idle',1);save();closeIdle();
   toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+(ia?' · ✦ ASCENDED '+CAMPAIGN.itemName(ia)+'!':''),ia?5000:3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
@@ -3704,9 +3737,10 @@ function c5Rw(n){const left=C5_TOTAL-c5Got(n);if(left<=0)return null;const a=Mat
 const ciReady=()=>G.c5.day!==dayKey()&&!!c5Rw(G.c5.n);
 const GTI='<img class="tki" src="img/gticket.webp">';
 function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);if(r.gt)a.push(GTI+' ×'+r.gt);if(r.dm)a.push(DMI+' ×'+r.dm);if(r.vipTo)a.push('👑 VIP '+r.vipTo);return a.join('<br>');}
-function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
+function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:61,d:'Nov 21, 2026',ic:'👑',t:'New VIP: 10 levels, gifts and badges',l:['VIP now has <b>10 levels</b> (before 20) – every level counts double and VIP 10 gives what VIP 20 gave. Your VIP points stay the same.','Every <b>new VIP level</b> opens a chest: diamonds + tickets, a <b>Legendary</b> hero at VIP 5 and a <b>Mythic</b> hero at VIP 10.','VIP page: <b>free summons + diamonds every day</b> and a <b>weekly chest</b> every Monday.','New VIP perks: <b>Quick Idle</b> (2 h at once), <b>SWEEP</b> in campaign and Dungeons (VIP 4), bigger gear bag, more Arena fights and Dungeon keys.','New <b>VIP badges</b> in chat, rankings and profile – and a <b>HIDE VIP</b> button on your profile.','Every purchase now also gives VIP points.']},
  {id:60,d:'Nov 21, 2026',ic:'💡',t:'Easier to understand',l:['<b>Finish the tutorial</b> for a big gift: <b>1000 diamonds</b> + <b>10 Recruit, 10 Crew and 10 Gear Tickets</b>.','Mama Rosa now explains every page the first time you open it (Heroes, Gear, My Crew, Summon, VIP, Events, Check-in).','Tap the <b>diamonds</b> (top bar) or the <b>Essence / Gear Parts</b> on the HEROES page: one window explains every resource – where to get it and what it is for.']},
  {id:59,d:'Nov 21, 2026',ic:'✦',t:'Ascended gear: drops only',l:['<b>Ascended</b> gear can no longer be made from a Mythic ★5.','It now <b>drops</b> from: <b>Gear Summon</b> (0.02%), <b>campaign battles</b> from chapter 30 and <b>Idle Rewards</b> from chapter 30 (a small chance for every hour in the chest).']},
  {id:58,d:'Nov 21, 2026',ic:'💰',t:'See your income + faster towers',l:['<b>Income per hour</b>: under your money you now see how much your garage earns per hour. Tap it for every building.','Every building shows <b>💰 Income now → after the upgrade</b>, so you know what is worth upgrading.','Heroes in buildings now show their bonus (⚡ speed · 💵 pay). Wrong class = no bonus – now you can see it.','<b>Towers</b>: AUTO NEXT like the campaign – the next floor starts after 3 s.','<b>Battle Speed pack</b>: now <b>×3</b> (was ×2). Already bought? You have ×3 now.','<b>Classic Collection</b>: the cars now give <b>Essence + Gear Parts</b> for your heroes and fewer diamonds.','New buttons open step by step for new players (News, Crew, VIP, Rank, Events, Chat). Arena and Torque Cup open after stage 1-20.','Less memory: the map loads only the pictures you need – smoother on small phones.','Chapter bosses are a bit weaker (Omega Engine 5-20 was much too strong).']},
@@ -3886,7 +3920,7 @@ function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Mat
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
+window.__TE={VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

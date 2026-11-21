@@ -12,6 +12,9 @@ const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip
   d1:'diamonds_300', d2:'diamonds_800', d3:'diamonds_1700', d4:'diamonds_3600', d5:'diamonds_9500', d6:'diamonds_20000',
   fn:'fund_normal', fh:'fund_hard',
   dia:'vip_pass_diamond', fdr:'founder_pass'};   // v16-122: Diamond Pass (subscription 14.99) · Founder Pass (one-time 4.99)
+// v16-122 (Marius): every purchase gives VIP points – price in € × VIP_EUR (index.html, 20 points per €)
+const EURO = {car:5.99, vip:3.99, spd2:2.99, sub:5.99, dg:2.99, plat:9.99, p1:.99, p2:2.99, p3:5.99, p4:9.99, d1:1.99, d2:4.99, d3:9.99, d4:19.99, d5:49.99, d6:99.99, fn:9.99, fh:9.99, dia:14.99, fdr:4.99};
+function vipBuy(k){ try{ const t=T(); if(!t||!t.addVip||!EURO[k]) return; const n=Math.round(EURO[k]*(t.VIP_EUR||20)); rebase(); t.addVip(n); rebase(); t.toast('👑 +'+n+' VIP points',2500); }catch(e){} }
 const SUBS = k => k==='sub'||k==='plat'||k==='dia';                    // subscriptions
 const CONS = k => k==='dg'||/^d\d$/.test(k);                // consumables (can be bought again) // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
 const PLAY = 'https://play.google.com/billing';
@@ -179,7 +182,7 @@ async function verify(sku, token, type){
 // returns: true (bought) / false (cancelled or failed)
 async function buy(pack){
   const sku = SKU[pack]; const t=T();
-  if(TEST_MODE){ t.toast('🧪 TEST MODE (browser): unlocked for free. In the Google Play app this is a real payment.',3500); return true; }
+  if(TEST_MODE){ t.toast('🧪 TEST MODE (browser): unlocked for free. In the Google Play app this is a real payment.',3500); vipBuy(pack); return true; }
   if(!STORE_BUILD){ t.toast('📱 Packs can be bought only in the Torque Empire app on Google Play.',3500); return false; }
   const s = await billing();
   if(!s){ t.toast(isCap?'📲 Please update Torque Empire from Google Play to buy packs.':'⚠️ Google Play payments are not available on this device.',3500); return false; }
@@ -195,7 +198,7 @@ async function buy(pack){
     if(!v.valid){ t.toast('⚠️ Payment could not be verified. You were not charged twice – try again later.',4000); return false; }
     if(SUBS(pack) && v.expiry) t.PK[pack] = v.expiry;
     if(CONS(pack) && s.consume){ dgUsed(token); try{ await s.consume(token); }catch(e){} } // consumable → can be bought again
-    return true;
+    vipBuy(pack); return true;
   }catch(e){ const n=(e&&(e.name||e.message))||''; if(n!=='AbortError') t.toast('📲 Payments work only in the new Torque Empire app from Google Play (this is the old Chrome version). Install the update from the Play Store.',6000); return false; }
 }
 async function buyNative(pack, sku, s){
@@ -214,7 +217,7 @@ async function buyNative(pack, sku, s){
   if(!v.valid){ t.toast('⚠️ Payment could not be verified yet – it will be added automatically when you restart the game.',4500); return false; }
   if(SUBS(pack) && v.expiry) t.PK[pack] = v.expiry;
   if(CONS(pack)){ dgUsed(r.token); try{ await s.consume(r.token); }catch(e){} }
-  return true;
+  vipBuy(pack); return true;
 }
 // DUNGEON PASS tokens already given (so a pass whose "consume" failed is not given twice)
 const dgUsed = tok => { try{ const a=JSON.parse(LS('te_dgtok')||'[]'); if(tok){ a.push(tok); LS('te_dgtok',JSON.stringify(a.slice(-60))); } return a; }catch(e){ return []; } };
@@ -240,7 +243,7 @@ async function restore(force){   // force (v16-104): check every Play purchase a
         if(!dgUsed().includes(p.purchaseToken)){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(!v.valid) continue;
           dgUsed(p.purchaseToken); if(window.SHOP2) SHOP2.grant(k); }
         try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
-      if(SUBS(k)){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK[k]||t.PK[k]<v.expiry)){ t.PK[k]=v.expiry; ch=true; if(window.SHOP2) SHOP2.grant(k,1); } }
+      if(SUBS(k)){ const v=await verify(p.itemId,p.purchaseToken,'subs'); if(v.valid&&v.expiry&&(!t.PK[k]||t.PK[k]<v.expiry)){ if(t.PK[k]&&t.PK[k]>Date.now()-40*864e5&&v.expiry-t.PK[k]>20*864e5) vipBuy(k); t.PK[k]=v.expiry; ch=true; if(window.SHOP2) SHOP2.grant(k,1); } }
       else if(!t.PK[k] || force){ const had=!!t.PK[k]; const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(v.valid && !had){ t.PK[k]=true; ch=true; if(window.SHOP2&&/^(p\d|fn|fh)$/.test(k)) SHOP2.grant(k,1); } } }
     if(ch){ t.savePacks(); t.toast('✓ Purchases restored',2500); }
   }catch(e){}

@@ -16,10 +16,11 @@ export const tierOf = p => { let t = TIERS[0]; for (const x of TIERS) if (p >= x
 const MIN_CV = 88;   // v16-88: minimum game version allowed online (see CV in online.js)
 // v16-85: VIP level is computed HERE from the VIP points the anti-cheat bot already has (players.vip),
 // never taken from the client (old app versions sent POINTS as the level → 'VIP 15' at stage 1-13).
-const VIP_PTS = [0, 50, 220, 510, 930, 1500, 2200, 3050, 4040, 5180, 6480, 7920, 9520, 11270, 13180, 15250, 17480, 19860, 22410, 25120, 28000];
+const VIP_PTS = [0, 100, 1300, 2850, 4900, 7500, 10600, 14200, 18300, 22900, 28000];   // v16-122: VIP 1-10 (same as index.html)
 const vipLvOf = pts => { let n = 0; for (let i = 1; i < VIP_PTS.length; i++) if ((pts | 0) >= VIP_PTS[i]) n = i; return n; };
 const VIP_SQL = 'CASE ' + VIP_PTS.map((v, i) => [v, i]).reverse().map(([v, i]) => `WHEN pl.vip>=${v} THEN ${i}`).join(' ') + ' ELSE 0 END';
 const START_PTS = 1000, ARENA_TK = 5, TK_EVERY = 2 * HOUR;
+const ATK = p => ARENA_TK + Math.min(3, Math.floor(((p && p.vip) | 0) / 3));   // v16-122: VIP 3 / 6 / 9 = +1 Arena fight each
 const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena daily reward per league: [diamonds, recruit tickets]
 // v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
@@ -99,6 +100,7 @@ async function ensure(env) {
     db.prepare('CREATE TABLE IF NOT EXISTS evt(uid INTEGER, eid TEXT, srv INTEGER, sc INTEGER DEFAULT 0, t INTEGER, PRIMARY KEY(uid, eid))'),
     db.prepare('CREATE INDEX IF NOT EXISTS evt_rank ON evt(eid, srv, sc)'),
   ]);
+  try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-122: HIDE VIP (others do not see the VIP level)
   ready = true;
 }
 const kvGet = async (env, k) => { const r = await env.DB.prepare('SELECT v FROM kv WHERE k=?').bind(k).first(); return r ? r.v : null; };
@@ -128,19 +130,19 @@ function ccOf(lang) {
 }
 const langOf = l => { const x = String(l || 'en').slice(0, 2).toLowerCase(); return LANGS.includes(x) ? x : 'en'; };
 function pub(p, extra) {
-  return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.vip | 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, ...extra};
+  return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.hv ? -1 : p.vip | 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, ...extra};
 }
 const isTst = pid => String(pid || '').startsWith('tst_');   // v16-91: owner's FULL TEST ACCOUNT (hidden from rankings)
 async function profOf(env, pid) { return pid && typeof pid === 'string' ? env.DB.prepare('SELECT * FROM prof WHERE pid=?').bind(pid.slice(0, 64)).first() : null; }
 async function isBanned(env, pid) { const r = await env.DB.prepare('SELECT banned FROM players WHERE pid=?').bind(pid).first(); return !!(r && r.banned); }
-const unlocks = p => new Set([...(p.unl || '').split(','), ...(p.cunl || '').split(',')].filter(Boolean));
+const unlocks = p => new Set([...(p.unl || '').split(','), ...(p.cunl || '').split(','), ...((p.vip | 0) >= 5 ? ['vip5'] : []), ...((p.vip | 0) >= 10 ? ['vip10'] : [])].filter(Boolean));   // v16-122: VIP titles
 async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl FROM prof WHERE uid=?').bind(uid).first(); if (!p) return;
   const s = new Set((p.unl || '').split(',').filter(Boolean)); if (s.has(k)) return; s.add(k); await env.DB.prepare('UPDATE prof SET unl=? WHERE uid=?').bind([...s].join(','), uid).run(); }
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
 function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')); }   // v16-122: 7 = FOUNDER (Founder Pass)
-const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king'];
+const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10'];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 
 // ------------------------------------------------------------------ ARENA FIGHT (decided by the server, seeded → the same fight can be replayed)
@@ -204,7 +206,7 @@ async function arenaRow(env, p) {
   if (!a) { a = {uid:p.uid, srv:p.srv, season, pts:START_PTS, w:0, l:0, tk:ARENA_TK, tkt:now, opp:'[]', peak:START_PTS, t:0, rday:''};
     await db.prepare('INSERT INTO arena(uid,srv,season,pts,w,l,tk,tkt,opp,peak,t) VALUES(?,?,?,?,0,0,?,?,?,?,0)').bind(p.uid, p.srv, season, START_PTS, ARENA_TK, now, '[]', START_PTS).run(); }
   if (a.season !== season) { a.pts = START_PTS + Math.round((a.pts - START_PTS) * .5); a.season = season; a.w = 0; a.l = 0; }
-  if (a.tk < ARENA_TK) { const n = Math.floor((now - a.tkt) / TK_EVERY); if (n > 0) { a.tk = Math.min(ARENA_TK, a.tk + n); a.tkt = a.tk >= ARENA_TK ? now : a.tkt + n * TK_EVERY; } } else a.tkt = now;
+  const AM = ATK(p); if (a.tk < AM) { const n = Math.floor((now - a.tkt) / TK_EVERY); if (n > 0) { a.tk = Math.min(AM, a.tk + n); a.tkt = a.tk >= AM ? now : a.tkt + n * TK_EVERY; } } else a.tkt = now;
   return a;
 }
 const saveArena = (env, a) => env.DB.prepare('UPDATE arena SET season=?, pts=?, w=?, l=?, tk=?, tkt=?, opp=?, peak=?, t=?, srv=? WHERE uid=?').bind(a.season, a.pts, a.w, a.l, a.tk, a.tkt, a.opp, a.peak, a.t, a.srv, a.uid).run();
@@ -235,7 +237,7 @@ async function arenaView(env, p) {
   await saveArena(env, a);
   const rank = (await env.DB.prepare('SELECT COUNT(*) n FROM arena WHERE srv=? AND season=? AND pts>?').bind(p.srv, a.season, a.pts).first()).n + 1;
   const end = weekStart(Date.now()) + 7 * DAY;
-  return {pts:a.pts, w:a.w, l:a.l, tk:a.tk, tkMax:ARENA_TK, tkNext:a.tk < ARENA_TK ? a.tkt + TK_EVERY : 0, rank, tier:tierOf(a.pts), peak:tierOf(a.peak || a.pts), season:a.season, end,
+  return {pts:a.pts, w:a.w, l:a.l, tk:a.tk, tkMax:ATK(p), tkNext:a.tk < ATK(p) ? a.tkt + TK_EVERY : 0, rank, tier:tierOf(a.pts), peak:tierOf(a.peak || a.pts), season:a.season, end,
     opp:await oppView(env, p, a), daily:DAILY.map((d, i) => ({lg:LEAGUES[i], dm:d[0], tk:d[1]})), leagues:TIERS.map(x => ({p:x[0], name:LEAGUES[x[1]] + (x[2] ? ' ' + x[2] : ''), lg:x[1]}))};
 }
 async function fight(env, p, b) {
@@ -249,7 +251,7 @@ async function fight(env, p, b) {
     td = JSON.parse(r.team || '[]'); dpts = r.apts; dname = r.name; dp = pub(r); }
   const seed = (Math.random() * 4294967295) >>> 0, res = arenaSim(ta, td, seed), g = gain(a.pts, dpts);
   const da = res.win ? g.w : -g.l, dd = (o.bot || isTst(p.pid)) ? 0 : (res.win ? -Math.round(g.w * .5) : 3);   // v16-91: the owner's test account never changes real players
-  a.tk -= 1; if (a.tk === ARENA_TK - 1) a.tkt = Date.now(); a.pts = Math.max(0, a.pts + da); a.peak = Math.max(a.peak || 0, a.pts); if (res.win) a.w++; else a.l++; a.t = Date.now();
+  a.tk -= 1; if (a.tk === ATK(p) - 1) a.tkt = Date.now(); a.pts = Math.max(0, a.pts + da); a.peak = Math.max(a.peak || 0, a.pts); if (res.win) a.w++; else a.l++; a.t = Date.now();
   a.opp = JSON.stringify(await findOpp(env, p, a)); await saveArena(env, a);
   if (!o.bot) await db.prepare('UPDATE arena SET pts=MAX(0,pts+?), peak=MAX(peak,pts+?) WHERE uid=?').bind(dd, dd, o.uid).run();
   const hid = (await db.prepare('INSERT INTO ahist(srv,t,kind,a,d,an,dn,win,da,dd,seed,ta,td) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id')
@@ -403,8 +405,8 @@ export async function online(op, b, env) {
     const inbox = (await db.prepare('SELECT COUNT(*) n FROM inbox WHERE uid=? AND got=0').bind(p.uid).first()).n;
     const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();
     const ar = await db.prepare('SELECT tk, tkt, season FROM arena WHERE uid=?').bind(p.uid).first();
-    const atk = ar ? (ar.season !== seasonOf(now) ? ARENA_TK : Math.min(ARENA_TK, ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ARENA_TK;
-    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic')}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now};
+    const atk = ar ? (ar.season !== seasonOf(now) ? ATK(p) : Math.min(ATK(p), ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ATK(p);
+    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now};
   }
   if (!p) return {err:'no_profile'};
   if (op === 'prof') {
@@ -417,11 +419,12 @@ export async function online(op, b, env) {
       if (p.chg > 0 && !b.paid) return {err:'pay', cost:300};
       up.name = n; up.nlow = n.toLowerCase(); up.chg = p.chg + 1;
     }
+    if (set.hv !== undefined) up.hv = set.hv ? 1 : 0;   // v16-122: HIDE VIP
     if (set.icon !== undefined) up.icon = String(set.icon).replace(/[^a-z0-9_]/g, '').slice(0, 12);
     if (set.frame !== undefined) { const f = set.frame | 0; if (!frameOk(p, f)) return {err:'locked'}; up.frame = f; }
     if (set.title !== undefined) { const k = String(set.title); if (!TITLES.includes(k) || !titleOk(p, k)) return {err:'locked'}; up.title = k; }
     const ks = Object.keys(up); if (ks.length) await db.prepare(`UPDATE prof SET ${ks.map(k => k + '=?').join(',')} WHERE uid=?`).bind(...ks.map(k => up[k]), p.uid).run();
-    p = await profOf(env, b.pid); return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)]})};
+    p = await profOf(env, b.pid); return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], vip:p.vip | 0, hv:p.hv | 0})};
   }
   if (op === 'rank') {
     const by = ['best','pow','lv'].includes(b.by) ? b.by : 'best';
@@ -432,13 +435,13 @@ export async function online(op, b, env) {
   }
   if (op === 'chat') {
     const ch = b.ch === 'a' ? 'a' : 'w', lang = langOf(b.lang), since = b.since | 0;
-    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.id>? ORDER BY c.id DESC LIMIT 40`)
+    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.id>? ORDER BY c.id DESC LIMIT 40`)
       .bind(p.srv, ch, since).all()).results.reverse();
     const todo = rows.filter(m => !m.sys && m.lang !== lang && b.tr !== false && !JSON.parse(m.tr || '{}')[lang]).slice(-12);
     await Promise.all(todo.map(async m => { const t = await translate(env, m.txt, m.lang, lang); if (t === null) return; const tr = JSON.parse(m.tr || '{}'); tr[lang] = t; m.tr = JSON.stringify(tr);
       await db.prepare('UPDATE chat SET tr=? WHERE id=?').bind(m.tr, m.id).run(); }));
     return {ok:true, list:rows.map(m => { const tr = JSON.parse(m.tr || '{}')[lang]; return {id:m.id, uid:m.uid, sys:m.sys, t:m.t, txt:m.txt, lang:m.lang, tr:tr && tr !== '=' ? tr : null,
-      name:m.name, icon:m.icon, frame:m.frame, title:m.title, cc:m.cc, vip:m.vip, me:m.uid === p.uid}; }), muted:p.mute > now ? p.mute : 0};
+      name:m.name, icon:m.icon, frame:m.frame, title:m.title, cc:m.cc, vip:m.hv ? -1 : m.vip, me:m.uid === p.uid}; }), muted:p.mute > now ? p.mute : 0};
   }
   if (op === 'say') {
     if (isTst(b.pid)) return {err:'test'};   // v16-91: the test account only looks, it does not write in the chat

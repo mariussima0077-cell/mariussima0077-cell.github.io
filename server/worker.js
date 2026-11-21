@@ -103,11 +103,13 @@ async function report(b, env) {
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);
     const ps = capPerSec(Math.max(s.lv, old.lv));
-    const capMoney = 600 * ps + ps * dt + 16 * 3600 * ps / 20;     // + a full idle chest (max 14h at VIP 20)
+    const capMoney = 600 * ps + ps * dt + 22 * 3600 * ps / 20;   // v16-122: + 3 Quick Idle (2 h each)     // + a full idle chest (max 14h at VIP 10)
     if (s.money - old.money > capMoney) { pts += 40; why.push(`money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`); }
     if (s.tk - old.tk > 100 + dt / 45) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
     if (s.gtk - old.gtk > 100 + dt / 45) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
-    if (s.vip - old.vip > 200 + dt * 160 / 86400 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
+    // v16-122: purchases give VIP points (1 € = 20) → allow 2,100 per confirmed purchase since the last report
+    const nb = old ? ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(b.pid, old.last - 6e5).first()) || {n:0}).n : 0;
+    if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
     if (s.best - old.best > 30 + dt / 90) { pts += 30; why.push(`campaign +${s.best - old.best} stages`); }
     if (s.lv - old.lv > 12 + dt / 600) { pts += 30; why.push(`buildings +${s.lv - old.lv} levels`); }
     if (s.sold < old.sold || s.xp < old.xp) { /* new save / reinstall – allowed, just note it */ why.push('progress_reset'); }
@@ -134,7 +136,8 @@ async function scan(env) {
     if (!r || !r.t0) continue;
     const dt = (r.t1 - r.t0) / 1000, why = [];
     if (r.m1 - r.m0 > capPerSec(p.lv) * dt / 4 + 5e7) why.push('24h money too high');
-    if (r.v1 - r.v0 > 400 && !isGift(p.pid)) why.push('24h VIP points too high');
+    const nb24 = ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(p.pid, now - day).first()) || {n:0}).n;   // v16-122
+    if (r.v1 - r.v0 > 400 + nb24 * 2100 && !isGift(p.pid)) why.push('24h VIP points too high');
     if (why.length) {
       const score = p.score + 50, ban = score >= BAN_AT ? 1 : 0;
       await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, why.join(' · '), p.pid).run();
