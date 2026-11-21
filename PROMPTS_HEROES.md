@@ -1,4 +1,5 @@
 # EROI CU ANIMAȚII NOI (8 cadre) – metoda (19 nov 2026)
+✅✅ **21 nov – GOLIATH (m5_3, Mythic TANK)**: aceeași metodă (prezentare cu Lady idle + Ignis concept atașate → 8 prompturi, ChatGPT a pus text pe splash → curățat de Claude). Descrierea + prompturile: `tools/hero_prompts/goliath_8.txt`.
 ✅✅ **21 nov – EROU NOU de la zero: IGNIS (m5_2, Mythic)**: întâi o PREZENTARE (3 poze + fața, fond verde, atașată Lady idle ca stil) → corectat proporțiile (chibi, cap 1/4, aripi în sus) → apoi cele 8 prompturi cu prezentarea + Lady idle atașate. Merge bine pentru eroi noi.
 ✅ Făcut: **THE TORQUE KING** (m5_0, v16-94). Marius: „a ieșit super, ține minte cum am făcut, o facem și pentru următorii, dar mai târziu”.
 Următorul propus: **Lady Overdrive** (m5_1), apoi Legendary.

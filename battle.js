@@ -524,7 +524,8 @@ const HSK={
  m4_5:{sk:'INFERNO DASH',skd:'Rocket-kick dash through every enemy in its lane: 280% damage, always critical, and they burn for 4s.'},
  m5_0:{sk:'GEAR APOCALYPSE',skd:'Flaming gears crash on every enemy: 320% damage + a giant gear on the biggest group (150%). Team: +30% attack and −20% damage taken for 8s.'},
  m5_1:{sk:'OVERDRIVE',skd:'Full throttle: blasts through ALL enemies – 300% damage, always critical, they burn for 4s. Team: +30% attack speed and +15% crit for 6s.'},
- m5_2:{sk:'REBIRTH FLAME',skd:'A giant fire phoenix dives on the enemies: 200% damage to ALL, they burn for 4s. Heals all mechanics 35% + 15% over 4s, team −20% damage taken for 6s. Once per battle it brings back ALL fallen mechanics with 40% HP.'}};
+ m5_2:{sk:'REBIRTH FLAME',skd:'A giant fire phoenix dives on the enemies: 200% damage to ALL, they burn for 4s. Heals all mechanics 35% + 15% over 4s, team −20% damage taken for 6s. Once per battle it brings back ALL fallen mechanics with 40% HP.'},
+ m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
 const SKP={
  // Bruisers (jump + ground slam)
@@ -964,7 +965,7 @@ function stars(h){const o=TE().G.h.own[h.id];return o?o.s:0;}
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
 // v16-127 (preview): BATTLE ROLES – every class keeps its name (garages, towers, sets) and gets a role tag (Marius' 5 badges img/ui12/role_*.webp)
 const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},ranger:{n:'RANGER',c:'#b6f25a'},mage:{n:'MAGE',c:'#d59bff'},support:{n:'SUPPORT',c:'#5ef0a0'}};
-const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support'};
+const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank'};
 function bRoleOf(h){if(!h||h.crew)return null;return MYTH_ROLE[h.id]||CLS2ROLE[roleOf(h)]||null;}
 const RLI=k=>'img/ui12/role_'+k+'.webp';
 const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
@@ -1024,6 +1025,7 @@ m4_3:{a:[118.7,246],m:[249.7,117],col:'#ffd54a',fx:'cloud',v8:{cw:175,uw:233.3,a
  m4_5:{a:[128.0,246],m:[223.0,150],fire:1,v8:{cw:231,uw:308.0,ax:128.0,rows:[[0,197,262.7,257.3],[197,187,249.3,245.3],[384,191,254.7,249.3],[575,190,253.3,248.0],[765,191,254.7,249.3],[956,197,262.7,257.3]],ck:4,dsh:[4]},fx8:{cw:165,uw:220.0,ax:109.3,rows:[[0,160,213.3,197.3]]}}, // v16-106: REX REDLINE – 8 frames; ck = crouch + flame charge (frames 0-3), dsh = flying kick (frame 4); fxs = fire trail → explosion
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
 m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,5],rows:[[0,197,262.7,258.7],[197,183,244.0,238.7],[380,171,228.0,221.3],[551,223,297.3,286.7],[774,187,249.3,244.0],[961,206,274.7,269.3]]},fx8:{cw:286,uw:381.3,ax:190.7,rows:[[0,186,248.0,237.3]]}}, // v16-95: LADY OVERDRIVE – 8 frames (tools/v8_hero.py m5_1); ck = cast frames 0-3, dsh = dash frames
+m5_3:{a:[170.7,246],m:[300,150],v8:{"cw":243,"uw":324.0,"ax":170.7,"rows":[[0,225,300.0,294.7],[225,226,301.3,296.0],[451,273,364.0,340.0],[724,265,353.3,320.0],[989,220,293.3,286.7],[1209,222,296.0,292.0]],ck:5,pk:[5,6,7]},fx8:{"cw":247,"uw":329.3,"ax":165.3,"rows":[[0,315,420.0,397.3]]}}, // v16-132: GOLIATH, THE IRON BULWARK (new Mythic TANK) – 8 frames (tools/v8_hero.py m5_3); ck = shield slam → hex dome (frame 5), pk = dome holds → idle; fxs = hex shield falls → impact (frame 4) → shatters
 m5_2:{a:[148.0,246],m:[300,150],fire:1,v8:{cw:237,uw:316.0,ax:148.0,rows:[[0,196,261.3,256.0],[196,191,254.7,250.7],[387,221,294.7,289.3],[608,238,317.3,304.0],[846,196,261.3,257.3],[1042,219,292.0,286.7]],ck:5,pk:[5,6,7]},fx8:{cw:233,uw:310.7,ax:154.7,rows:[[0,290,386.7,348.0]]}}, // v16-128: IGNIS, THE IRON PHOENIX (new Mythic) – 8 frames (tools/v8_hero.py m5_2); ck = plants the staff → wings open → rises → BURST (frame 4), pk = lands → idle; fxs = fire phoenix dives → impact (frame 4) → embers
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
  d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
@@ -1826,6 +1828,15 @@ const SKF={
    for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
    const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
    teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});});},
+ m5_3(u){ // v16-132: Goliath's IRON FORTRESS – the hex shield (fxs) falls on the biggest group; impact (fxs frame 4) = end of his slam (skill frame 5 = dome) = damage + stun; he taunts with a big shield, the team gets shields + less damage
+   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
+   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,.7,()=>{u.post=.6;shake(14);B.flash=.25;
+     if(c){const R=120*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);if(FX2)fxBurst(m.x,headY(m)+24*dsc(m.d),'#ffca28',36*S);}
+       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ffca28',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ffb300',R);}debris(c.x,fy(c.d),8,['#6d4c41','#ffca28','#9e9e9e']);}
+     if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);B.fx.push({type:'ring',x:u.x,y:fy(u.d),t:0,d:.6,r:70*S,col:'#ffca28',ground:1});}
+     for(const h of alive(B.heroes))if(h!==u){h.shield=Math.max(h.shield,h.max*.25);if(FX2)fxs('magic_02','#ffd54f',h.x,fy(h.d),{ground:1,d:.9,s0:20*S,s1:80*S,sy:.34,vr:2.5,ease:1});}
+     teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
    if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
@@ -2314,7 +2325,7 @@ const FRM=[0,1,2,3,4,5].map(i=>{const im=new Image();im.src='img/fr'+i+'.webp';r
 const FWIN=[[8.5,17.5,83,61.5],[8.5,17.5,83,61.5],[8.5,18,83,61],[15.5,17.5,69,55],[14.5,20.5,71,50],[17.8,21.5,64.4,46.5]]; // window % (same as the Team page)
 const FPLT=[[81,11],[81,11],[81,11],[73.5,9.5],[74.5,9.5],[74.5,9]]; // bottom plate % (top, height)
 const FSTR=[[62,78],[62,78],[62,78],[60,76],[58,74],[96,108]];
-const FACE={m0_0:0.7,m0_1:0.64,m0_2:0.64,m0_3:0.68,m0_4:0.6,m0_5:0.66,m0_6:0.62,m0_7:0.58,m0_8:0.58,m0_9:0.55,m1_0:0.55,m1_1:0.62,m1_2:0.58,m1_3:0.66,m1_4:0.62,m1_5:0.58,m1_6:0.58,m1_7:0.62,m1_8:0.58,m2_0:0.64,m2_1:0.58,m2_2:0.58,m2_3:0.66,m2_4:0.62,m2_5:0.62,m2_6:0.62,m2_7:0.65,m3_0:0.6,m3_1:0.6,m3_2:0.65,m3_3:0.62,m3_4:0.62,m3_5:0.65,m3_6:0.65,m4_0:0.64,m4_1:0.52,m4_2:0.62,m4_3:0.6,m4_4:0.58,m4_5:0.66,m5_0:0.5,m5_1:0.62,m5_2:0.5}; // v16-40: where the face is in each portrait (0-1 of the width) → card window centred on it
+const FACE={m5_3:0.5,m0_0:0.7,m0_1:0.64,m0_2:0.64,m0_3:0.68,m0_4:0.6,m0_5:0.66,m0_6:0.62,m0_7:0.58,m0_8:0.58,m0_9:0.55,m1_0:0.55,m1_1:0.62,m1_2:0.58,m1_3:0.66,m1_4:0.62,m1_5:0.58,m1_6:0.58,m1_7:0.62,m1_8:0.58,m2_0:0.64,m2_1:0.58,m2_2:0.58,m2_3:0.66,m2_4:0.62,m2_5:0.62,m2_6:0.62,m2_7:0.65,m3_0:0.6,m3_1:0.6,m3_2:0.65,m3_3:0.62,m3_4:0.62,m3_5:0.65,m3_6:0.65,m4_0:0.64,m4_1:0.52,m4_2:0.62,m4_3:0.6,m4_4:0.58,m4_5:0.66,m5_0:0.5,m5_1:0.62,m5_2:0.5}; // v16-40: where the face is in each portrait (0-1 of the width) → card window centred on it
 function drawFCard(u,x,y,cw,ch,ready,t){const h=u.h,i=h.crew?0:Math.min(5,h.gr|0),im=FRM[i];
   if(!im.complete||!im.naturalWidth)return false;
   const iw=im.naturalWidth,ih=im.naturalHeight;let s=cw/iw;if(ih*s>ch)s=ch/ih;
