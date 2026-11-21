@@ -513,7 +513,7 @@ const ROLE={
  elec:{n:'Shocker',ic:'⚡',hp:730,atk:90,def:10,mv:80,rng:205,as:1.25,crit:.1,sk:'OVERVOLT',skd:'Chain lightning jumps 6 times: 200% damage and stun 1.5s.'},
  all:{n:'Legend',ic:'🌟',hp:1350,atk:112,def:26,mv:92,rng:42,as:.9,crit:.15,sk:'TORQUE STORM',skd:'Giant gears rain on every enemy: 300% damage. All mechanics +30% attack for 6s.'},
  crew:{n:'Crew',ic:'🔩',hp:700,atk:50,def:8,mv:84,rng:30,as:1.1,crit:.06,sk:'WRENCH THROW',skd:'Throws a spinning wrench: 250% damage.'}};
-const GMUL=[1,1.32,1.75,2.3,3.4,4.4]; // v16-40: Legendary 3.0→3.4, Mythic 3.9→4.4 (a new Legendary now beats an Uncommon +50)
+const GMUL=[1,1.4,1.95,2.75,4.1,5.6]; // v16-134 (Marius: bigger gaps between grades): was [1,1.32,1.75,2.3,3.4,4.4] – ~×1.4 per grade; monsters follow with GK(i) // v16-40: Legendary 3.0→3.4, Mythic 3.9→4.4 (a new Legendary now beats an Uncommon +50)
 // v16-14: unique skills (each Legendary / Mythic has its own skill; the others still use their class skill)
 const HSK={
  m4_0:{sk:'IRON QUAKE',skd:'Smashes the ground: a wall of rocks rolls through ALL enemies – 230% damage and stun 1.6s. Gains a 30% shield and taunts enemies.'},
@@ -749,7 +749,8 @@ const HARD_K=2.5,HARD_RW=1.5;let HM=0;
 const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{},ch:0};if(!G.cph.stars)G.cph.stars={};return G.cph;};
 const hardOK=()=>TE().G.cp.best>=SPC;
 const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K:1);
-const stageMul0=i=>stageMulB(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
+const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
+const stageMul0=i=>stageMulB(i)*GK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
 const stageMulB=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
 // v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
 const CP_MON=.25; // v16-99: .35→.25 – gear does not cost money any more (Gear Parts), money is only for the garage
