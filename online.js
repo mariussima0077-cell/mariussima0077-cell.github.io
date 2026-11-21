@@ -3,6 +3,8 @@
 (function(){
 'use strict';
 const T=()=>window.__TE, C=()=>window.CAMPAIGN, $=id=>document.getElementById(id);
+// v16-140: the game's icons instead of 💎 / 🎟 / ⚙️ / 🎫 emoji (one icon per resource everywhere)
+const DMh='<img class="tki" src="img/ui/diamond.svg" alt="">',TKh='<img class="tki" src="img/ticket.webp" alt="">',GTh='<img class="tki" src="img/gticket.webp" alt="">',CTh='<img class="tki" src="img/cticket.webp" alt="">';
 const API=()=>window.SEC&&SEC.api(), PID=()=>window.SEC&&SEC.PID;
 const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}};
 const LANG=(navigator.language||'en');
@@ -14,7 +16,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=139;
+const CV=140;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -495,12 +497,12 @@ async function loadArena(){const B=$('olArB');if(!arData)B.innerHTML='<div class
   if(!r.ok){B.innerHTML=`<div class="empty">📶 Could not reach the Arena.</div>`;return;}
   arData=r;arenaTk=r.tk;dots();const t=r.tier;
   B.innerHTML=`<div class="ahero ah3"><div class="badge">${badge(t.lg,t.div||'★')}</div><div class="t"><b>${t.name}</b><small>🏅 ${r.pts} points · rank #${r.rank} · ${r.w}W / ${r.l}L</small><div class="o-bar"><i style="width:0"></i></div><small>${t.next?`${t.next-r.pts} pts to the next division`:'Top league!'} · season ${r.season} ends in <span id="olSeason">${dur(r.end-Date.now())}</span></small></div></div>
-   <div class="tk"><span>🎟️ Arena fights <b id="olTk">${r.tk}</b> / ${r.tkMax} <span id="olTkN"></span></span><span>🎁 daily reward 22:00</span></div>
+   <div class="tk"><span>⚔️ Arena fights <b id="olTk">${r.tk}</b> / ${r.tkMax} <span id="olTkN"></span></span><span>🎁 daily reward 22:00</span></div>
    <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ⚡ ${fmtN(o.pow)}</small></div><button class="fight f3 ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}"><small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
    <div class="btns"><div class="shine" data-a="def">🛡️ MY TEAM</div><div class="shine" data-a="ref">🔄 NEW RIVALS</div></div>
    <div class="leag">${LG.map((l,i)=>`<div class="${i===t.lg?'on':''}">${badge(i)}${l[0]}</div>`).join('')}</div>
    <div class="o-note">Fights are automatic: your <b>battle team</b> (with gear) against the other player's team – he does not need to be online. Win = up to +${win(r.pts,r.pts+400)} points. When others attack you, you lose a few points only if they win.<br>Rivals marked <span class="ai">AI</span> are training rivals while the server is still filling up.</div>
-   <h3>DAILY REWARD (22:00)</h3><div class="o-rw">${r.daily.map(d=>`<span>${d.lg}</span><span>💎 ${d.dm} · 🎟️ ${d.tk}</span>`).join('')}</div>`;
+   <h3>DAILY REWARD (22:00)</h3><div class="o-rw">${r.daily.map(d=>`<span>${d.lg}</span><span>${DMh} ${d.dm} · ${TKh} ${d.tk}</span>`).join('')}</div>`;
   requestAnimationFrame(()=>{const i=B.querySelector('.ahero .o-bar i');if(i)i.style.width=tierPct(t,r.pts)+'%';});arenaTick();}
 const win=(a,b)=>{const E=1/(1+Math.pow(10,(b-a)/400));return Math.max(6,Math.round(32*(1-E))+4);};
 function arenaTick(){if(!arData||arTab!=='fight')return;const s=$('olSeason');if(s)s.textContent=dur(arData.end-Date.now());const n=$('olTkN');if(n)n.textContent=arData.tkNext?'· +1 in '+dur(arData.tkNext-Date.now()):'';
@@ -511,7 +513,7 @@ async function arHist(){const B=$('olArB');const r=await call('hist',{});if(!r.o
   B.innerHTML=r.list.length?r.list.map(h=>`<div class="hrow ${h.win?'hw':'hl'}"><b class="w ${h.win?'o-y':'o-n'}">${h.win?'WIN':'LOSS'}</b><span>${h.kind==='cup'?'🏟️':h.atk?'⚔️ you attacked':'🛡️ attacked you:'} <b>${esc(h.other)}</b><br><small>${new Date(h.t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${h.d>0?'+':''}${h.d} pts</small></span><button class="play" data-replay="${h.id}">▶ WATCH</button></div>`).join(''):'<div class="empty">No fights yet.</div>';}
 $('olArT').onclick=e=>{const b=e.target.closest('b');if(!b)return;arTab=b.dataset.t;$('olArT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));arData=null;loadArena();};
 $('olArB').addEventListener('click',async e=>{
-  const f=e.target.closest('[data-fight]');if(f){e.stopPropagation();if(f.classList.contains('off')){toast('🎟️ No Arena fights left – +1 every 2 hours');return;}doFight(f.dataset.fight);return;}
+  const f=e.target.closest('[data-fight]');if(f){e.stopPropagation();if(f.classList.contains('off')){toast('⚔️ No Arena fights left – +1 every 2 hours');return;}doFight(f.dataset.fight);return;}
   const rp=e.target.closest('[data-replay]');if(rp){e.stopPropagation();const r=await call('replay',{id:+rp.dataset.replay});if(r.ok)playFight(r,true);else toast('⚠️ This fight is too old');return;}
   const a=e.target.closest('[data-a]');if(!a)return;
   if(a.dataset.a==='ref'){const r=await call('refresh',{});if(r.ok&&arData){arData.opp=r.opp;loadArena();}}
@@ -519,7 +521,7 @@ $('olArB').addEventListener('click',async e=>{
     modal(`<h4>🛡️ My Arena team</h4><p>Your Arena team is your <b>battle team</b> from the Campaign (with its gear). It attacks and it also defends you when others attack.</p><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0">${tm.map(h=>fcard(h.id,h.s,52)).join('')}</div><p style="text-align:center">⚡ Power <b style="color:#ffe27a">${fmtN(c&&c.teamPower?c.teamPower():0)}</b></p><div class="ok"><button class="btn gray" data-m="no">CLOSE</button><button class="btn" data-m="ok">⚔️ HEROES PAGE</button></div>`,
       b=>{if(b==='ok'){closeHub();if(c){c.open();setTimeout(()=>c.openGear(),50);}}});}});
 async function doFight(key){if(fightBusy)return;fightBusy=true;await sync();const r=await call('fight',{key});fightBusy=false;
-  if(!r.ok){toast({no_tickets:'🎟️ No Arena fights left',old_opponents:'🔄 Rivals changed – try again',no_team:'⚔️ You need a battle team first',network:'📶 No connection',banned:'🚫 Account blocked'}[r.err]||'⚠️ Could not start the fight',3000);loadArena();return;}
+  if(!r.ok){toast({no_tickets:'⚔️ No Arena fights left',old_opponents:'🔄 Rivals changed – try again',no_team:'⚔️ You need a battle team first',network:'📶 No connection',banned:'🚫 Account blocked'}[r.err]||'⚠️ Could not start the fight',3000);loadArena();return;}
   if(r.rw){const t=T();if(t&&t.giveRw){t.giveRw(r.rw);t.save();}}
   playFight(r,false);}
 let fightBusy=false;
@@ -589,9 +591,9 @@ $('olPrB').addEventListener('click',async e=>{
   const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+((FR.find(x=>x[0]===+fr.dataset.fr)||[])[2]||'Locked'),2500);return;}await setProf({frame:+fr.dataset.fr});return;}
   const tk=e.target.closest('[data-tt]');if(tk){if(tk.classList.contains('o-lock')){toast('🔒 '+TT[tk.dataset.tt][2],2500);return;}await setProf({title:tk.dataset.tt});}});
 function nameModal(){const free=!(ME&&ME.chg>0);
-  modal(`<h4>✏️ ${free?'CHOOSE YOUR NAME':'CHANGE NAME'}</h4><input id="olNm" maxlength="14" value="${esc(ME&&!/^Mechanic\d+$/.test(ME.name)?ME.name:'')}" placeholder="Your player name"><p>3–14 letters / numbers ( _ . - allowed) · no bad words · one name per server<br>${free?'<b style="color:#7dff8a">This change is FREE</b>':'This change costs <b style="color:#ffe27a">300 💎</b> (you have '+fmtN(T().G.dm||0)+')'}</p><div class="ok"><button class="btn gray" data-m="no">CANCEL</button><button class="btn shine" data-m="ok">SAVE</button></div>`,
+  modal(`<h4>✏️ ${free?'CHOOSE YOUR NAME':'CHANGE NAME'}</h4><input id="olNm" maxlength="14" value="${esc(ME&&!/^Mechanic\d+$/.test(ME.name)?ME.name:'')}" placeholder="Your player name"><p>3–14 letters / numbers ( _ . - allowed) · no bad words · one name per server<br>${free?'<b style="color:#7dff8a">This change is FREE</b>':'This change costs <b style="color:#ffe27a">300 '+DMh+'</b> (you have '+fmtN(T().G.dm||0)+')'}</p><div class="ok"><button class="btn gray" data-m="no">CANCEL</button><button class="btn shine" data-m="ok">SAVE</button></div>`,
    async b=>{if(b!=='ok')return true;const n=$('olNm').value.trim();const G=T().G;
-     if(!free&&(G.dm||0)<300){toast('💎 You need 300 Diamonds',2500);return false;}
+     if(!free&&(G.dm||0)<300){toast(DMh+' You need 300 Diamonds',2500);return false;}
      const r=await setProf({name:n},!free);
      if(r.ok){if(!free){G.dm-=300;T().save();}toast('✅ Name saved: '+n,2500);return true;}
      return false;});
@@ -604,7 +606,7 @@ async function viewProfile(uid){const r=await call('view',{uid});if(!r.ok){toast
 
 // ------------------------------------------------------------------ INBOX (Arena / Cup rewards)
 async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 No connection');return;}
-  const rwTxt=w=>[w.dm?'💎 '+w.dm:'',w.tk?'🎟️ '+w.tk+' Recruit':'',w.gt?'⚙️ '+w.gt+' Gear':'',w.ct?'🎫 '+w.ct+' Crew':''].filter(Boolean).join(' · ');
+  const rwTxt=w=>[w.dm?DMh+' '+w.dm:'',w.tk?TKh+' '+w.tk+' Recruit':'',w.gt?GTh+' '+w.gt+' Gear':'',w.ct?CTh+' '+w.ct+' Crew':''].filter(Boolean).join(' · ');
   modal(`<h4>🎁 Rewards</h4>${r.list.length?r.list.map(m=>`<div class="ib"><span class="o-ic">${esc(m.ic)}</span><div><b>${esc(m.title)}</b>${esc(m.body)}${rwTxt(m.rw)?`<br><span class="rw2">${rwTxt(m.rw)}</span>`:''}</div></div>`).join(''):'<p style="text-align:center">Nothing new.</p>'}
    <div class="ok"><button class="btn gray" data-m="no">CLOSE</button>${r.list.length?'<button class="btn shine" data-m="ok">CLAIM ALL</button>':''}</div>`,
    async b=>{if(b!=='ok')return true;const tot={};for(const m of r.list){const c=await call('claim',{id:m.id});if(c.ok)for(const k in c.rw)tot[k]=(tot[k]||0)+c.rw[k];}
@@ -655,7 +657,7 @@ function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u
   setTimeout(()=>{if(!F)return;const R=$('olRes'),t=r.tier;R.classList.toggle('lose',!r.win);
     R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
      ${t&&!F.replay?`<div class="lg"><div class="o-bar"><i style="width:${tierPct(t,r.pts-r.da)}%"></i></div><small>${t.name} · ${r.pts} pts</small></div>`:''}
-     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>💎 +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>🎟️ +${r.rw.tk} Recruit</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
+     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>${DMh} +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>${TKh} +${r.rw.tk} Recruit</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
     R.classList.add('on');$('olFx').classList.add('end');if(!F.replay){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
       setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
     $('olCont').onclick=()=>{$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(cur==='olArena'){arData=null;loadArena();}};},1100);}
