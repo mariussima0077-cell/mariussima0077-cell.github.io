@@ -182,7 +182,9 @@ async function integrity(b, env) {
   if (!b || typeof b.pid !== 'string' || b.pid.length > 64) return {err:'bad'};
   const save = (app, dev, lic, ok, err) => db.prepare('INSERT INTO integ(pid,t,app,dev,lic,ok,err) VALUES(?,?,?,?,?,?,?) ON CONFLICT(pid) DO UPDATE SET t=?2,app=?3,dev=?4,lic=?5,ok=?6,err=?7')
     .bind(b.pid, now, app, dev, lic, ok ? 1 : 0, err ? String(err).slice(0, 200) : null).run();
-  if (!b.token) { await save('', '', '', 0, 'no token: ' + (b.err || '?')); return {ok:true, good:false}; }
+  // v16-120: no token (old app 106, plugin error) → ok:false, so the phone does NOT wait 12 h and asks again at the next start
+  // (after updating to 107 the check runs right away instead of up to 12 h later)
+  if (!b.token) { await save('', '', '', 0, 'no token: ' + (b.err || '?')); return {ok:false, good:false}; }
   let p;
   try {
     const r = await fetch(`https://playintegrity.googleapis.com/v1/${env.PACKAGE_NAME}:decodeIntegrityToken`, {method:'POST',
@@ -192,9 +194,16 @@ async function integrity(b, env) {
   } catch (e) { return {err:'google'}; }
   const rq = p.requestDetails || {}, ai = p.appIntegrity || {}, di = p.deviceIntegrity || {}, ad = p.accountDetails || {};
   const app = ai.appRecognitionVerdict || '', dev = (di.deviceRecognitionVerdict || []).join(','), lic = ad.appLicensingVerdict || '';
-  const fresh = rq.nonce === b.nonce && String(b.nonce).includes(b.pid.replace(/[^A-Za-z0-9]/g, '').slice(0, 12)) && Math.abs(now - (+rq.timestampMillis || 0)) < 10 * 60e3 && rq.requestPackageName === env.PACKAGE_NAME;
+  // v16-120: Google gives the nonce back RE-ENCODED as base64 (padding '=' added, last characters can change when the
+  // length is not a multiple of 4) → the exact compare failed for every real phone (18 × "old or foreign token").
+  // Now: the first 20 characters (12 = this player's ID + 8 = time of the request) must match, the rest is ignored.
+  const nz = x => String(x || '').replace(/[=\s]/g, '').replace(/-/g, '+').replace(/_/g, '/');
+  const pid12 = b.pid.replace(/[^A-Za-z0-9]/g, '').slice(0, 12), gotN = nz(rq.nonce), myN = nz(b.nonce);
+  const okN = myN.length >= 20 && myN.startsWith(pid12) && gotN.slice(0, 20) === myN.slice(0, 20);
+  const okT = Math.abs(now - (+rq.timestampMillis || 0)) < 10 * 60e3, okP = rq.requestPackageName === env.PACKAGE_NAME;
+  const fresh = okN && okT && okP;
   const good = fresh && app === 'PLAY_RECOGNIZED' && dev.includes('MEETS_DEVICE_INTEGRITY') && lic !== 'UNLICENSED';
-  await save(app, dev, lic, good, fresh ? null : 'old or foreign token');
+  await save(app, dev, lic, good, fresh ? null : 'stale:' + (okN ? '' : ` nonce(got ${String(rq.nonce || '-').slice(0, 26)} want ${String(b.nonce).slice(0, 26)})`) + (okT ? '' : ` time(${Math.round((now - (+rq.timestampMillis || 0)) / 1000)}s)`) + (okP ? '' : ` pkg(${rq.requestPackageName || '-'})`));
   if (!good) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'integ', `app=${app} dev=${dev || 'none'} lic=${lic}${fresh ? '' : ' stale'}`).run();
   return {ok:true, good};
 }
@@ -347,11 +356,18 @@ async function admin(url, env) {
   const ev = (await db.prepare('SELECT * FROM events ORDER BY t DESC LIMIT 40').all()).results;
   const buys = await db.prepare("SELECT COUNT(*) n FROM purchases WHERE state='ok'").first();
   await ensureInteg(env); const ig = await db.prepare('SELECT COUNT(*) n, SUM(ok) g FROM integ WHERE t>?').bind(Date.now() - 3 * 864e5).first();
+  // v16-120: WHY phones fail Play Integrity (reason → count) + the last 15 checks
+  const igr = (await db.prepare(`SELECT CASE WHEN ok=1 THEN '✅ OK' WHEN err IS NOT NULL AND err NOT LIKE 'stale%' AND err<>'old or foreign token' THEN err
+      ELSE 'app=' || COALESCE(NULLIF(app,''),'-') || ' dev=' || COALESCE(NULLIF(dev,''),'none') || ' lic=' || COALESCE(NULLIF(lic,''),'-') || CASE WHEN err IS NULL THEN '' ELSE ' · ' || err END END r,
+      COUNT(*) n FROM integ WHERE t>? GROUP BY r ORDER BY n DESC LIMIT 20`).bind(Date.now() - 3 * 864e5).all()).results;
+  const igl = (await db.prepare('SELECT pid,t,app,dev,lic,ok,err FROM integ ORDER BY t DESC LIMIT 15').all()).results;
   const esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
 <h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
+<h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r)}`).join('<br>') || 'no checks yet'}</div>
+<details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
 <h3>Flagged / banned</h3>${bad.map(p => `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b> · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>flags: ${esc(p.flags)} · money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br>${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`).join('') || '<div class=c>Nobody flagged 👍</div>'}
 <h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
