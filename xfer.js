@@ -13,9 +13,9 @@ const api = () => (window.SEC && SEC.api && SEC.api()) || 'https://torque-guard.
 const P = n => window.Capacitor && Capacitor.Plugins && Capacitor.Plugins[n];
 let key = null, poll = 0, box = null, until = 0, mode = 'xfer';   // v16-67: mode 'login' = Google sign-in through Chrome (glogin.html)
 
-const css = 'position:fixed;inset:0;z-index:2147483000;background:#05070ce6;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui;color:#fff';
+const css = 'position:fixed;inset:0;z-index:2147483000;background:#05070ce6;display:flex;align-items:center;justify-content:center;padding:16px;font-family:Game,system-ui;color:#fff';
 const card = h => '<div style="max-width:360px;width:100%;background:linear-gradient(#152033,#0b1420);border:2px solid #e0a82e;border-radius:18px;padding:16px 14px;box-shadow:0 8px 30px #000;text-align:center">'+h+'</div>';
-const btn = (a,t,bg) => '<button data-xf="'+a+'" style="width:100%;margin-top:9px;padding:12px;border:0;border-radius:999px;background:'+bg+';color:#fff;font:900 15px system-ui;box-shadow:0 3px 0 #0006">'+t+'</button>';
+const btn = (a,t,bg) => '<button data-xf="'+a+'" style="width:100%;margin-top:9px;padding:12px;border:0;border-radius:999px;background:'+bg+';color:#fff;font:900 15px Game,system-ui;box-shadow:0 3px 0 #0006">'+t+'</button>';
 
 function show(h){
   if(!box){ box = document.createElement('div'); box.style.cssText = css; box.addEventListener('click', onClick, true); document.body.appendChild(box); }
@@ -26,7 +26,7 @@ function stop(){ if(poll){ clearInterval(poll); poll = 0; } }
 
 function ask(){
   show('<div style="font-size:40px;line-height:1">📲</div>'+
-    '<div style="font:900 19px system-ui;margin:6px 0 4px;color:#ffd54a">Played Torque Empire before?</div>'+
+    '<div style="font:900 19px Game,system-ui;margin:6px 0 4px;color:#ffd54a">Played Torque Empire before?</div>'+
     '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">The game got a new app. If you played the old version on this phone, bring your progress here – garage, heroes, VIP and packs.</div>'+
     (hadSave?'<div style="font-size:12px;color:#ffb74d;margin-top:6px">⚠️ This replaces the game you have in this app now.</div>':'')+
     btn('go','📲 TRANSFER MY PROGRESS','#2e7d32')+
@@ -39,7 +39,7 @@ function rnd(){ const a = new Uint8Array(24); crypto.getRandomValues(a); return 
 async function go(m){
   if(m) mode = m;
   const B = P('Browser');
-  if(!B){ show('<div style="font:900 17px system-ui;color:#ff8a80">⚠️ Can\'t open Chrome</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Please update the app and try again.</div>'+btn('close','OK','#2b3a52')); return; }
+  if(!B){ show('<div style="font:900 17px Game,system-ui;color:#ff8a80">⚠️ Can\'t open Chrome</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Please update the app and try again.</div>'+btn('close','OK','#2b3a52')); return; }
   key = rnd(); until = Date.now() + 10*60e3;
   waiting();
   try{ await B.open({url: location.origin + (mode==='login' ? '/glogin.html?k=' : '/transfer.html?k=') + key, toolbarColor:'#0b1420'}); }catch(e){}
@@ -48,13 +48,13 @@ async function go(m){
 function waiting(){
   if(mode === 'login'){
     show('<div style="font-size:36px;line-height:1">☁️</div>'+
-      '<div style="font:900 17px system-ui;margin:6px 0 4px;color:#ffd54a">Signing in with Google…</div>'+
+      '<div style="font:900 17px Game,system-ui;margin:6px 0 4px;color:#ffd54a">Signing in with Google…</div>'+
       '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">Choose your Google account in Chrome.<br>Then tap <b>RETURN TO GAME</b> (or the ✕ at the top).</div>'+
       btn('again','OPEN CHROME AGAIN','#1f5fa8')+btn('cancel','CANCEL','#2b3a52'));
     return;
   }
   show('<div style="font-size:36px;line-height:1">⏳</div>'+
-    '<div style="font:900 17px system-ui;margin:6px 0 4px;color:#ffd54a">Waiting for your old game…</div>'+
+    '<div style="font:900 17px Game,system-ui;margin:6px 0 4px;color:#ffd54a">Waiting for your old game…</div>'+
     '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">Chrome opens and sends your progress here.<br>Then tap <b>RETURN TO GAME</b> (or the ✕ at the top).</div>'+
     btn('again','OPEN CHROME AGAIN','#1f5fa8')+btn('cancel','CANCEL','#2b3a52'));
 }
@@ -62,7 +62,7 @@ function waiting(){
 let busy = false;
 async function check(){
   if(!key || busy) return;
-  if(Date.now() > until){ stop(); if(mode==='login'){ close(); return; } show('<div style="font:900 17px system-ui;color:#ff8a80">⌛ Time is up</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Nothing arrived. Try again.</div>'+btn('go','TRY AGAIN','#2e7d32')+btn('cancel','CLOSE','#2b3a52')); return; }
+  if(Date.now() > until){ stop(); if(mode==='login'){ close(); return; } show('<div style="font:900 17px Game,system-ui;color:#ff8a80">⌛ Time is up</div><div style="font-size:13px;color:#c8d2dc;margin-top:6px">Nothing arrived. Try again.</div>'+btn('go','TRY AGAIN','#2e7d32')+btn('cancel','CLOSE','#2b3a52')); return; }
   busy = true;
   try{
     const r = await (await fetch(api() + '/api/xfer/get', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({k:key})})).json();
@@ -80,7 +80,7 @@ function apply(data){
     return;
   }
   if(!o || o.none){
-    show('<div style="font-size:36px;line-height:1">🔍</div><div style="font:900 17px system-ui;margin:6px 0;color:#ffd54a">No old game found</div>'+
+    show('<div style="font-size:36px;line-height:1">🔍</div><div style="font:900 17px Game,system-ui;margin:6px 0;color:#ffd54a">No old game found</div>'+
       '<div style="font-size:13px;color:#c8d2dc;line-height:1.45">Chrome on this phone has no Torque Empire progress. If you signed in with Google in the old version, sign in here too – your cloud save comes back.</div>'+
       btn('new','START A NEW GAME','#2e7d32')+btn('go','TRY AGAIN','#2b3a52'));
     return;
@@ -90,7 +90,7 @@ function apply(data){
   window.__noSave = true;                          // the empty new game must not overwrite what we bring
   try{ for(const k in keys) localStorage.setItem(k, keys[k]); }catch(e){}
   LS('te_xfer', 'done');
-  show('<div style="font-size:42px;line-height:1">✅</div><div style="font:900 19px system-ui;margin:6px 0;color:#7ee787">Progress transferred!</div>'+
+  show('<div style="font-size:42px;line-height:1">✅</div><div style="font:900 19px Game,system-ui;margin:6px 0;color:#7ee787">Progress transferred!</div>'+
     '<div style="font-size:13px;color:#c8d2dc">Welcome back, boss. Restarting…</div>');
   setTimeout(() => location.reload(), 1300);
 }
