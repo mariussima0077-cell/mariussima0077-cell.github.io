@@ -3138,7 +3138,7 @@ function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');
   const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:arOK()?'PvP · ONLINE':'🔒 STAGE '+sLabel(AR_UNLOCK),tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
     class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',
     boss:wbOK()?WBOSS[wbCur()].n+' · KEYS '+wbKeys()+'/'+WB_KEYS:'🔒 STAGE '+sLabel(WB_UNLOCK-1),
-    dg:dgOK()?'KEYS '+DG_K.reduce((a,k)=>a+dgKeys(k),0)+'/'+DG_K.length*dgMax():'🔒 STAGE '+sLabel(DG_UNLOCK)};
+    dg:dgOK()?'KEYS '+DG_K.reduce((a,k)=>a+dgDay(k),0)+'/'+DG_K.length*dgMax()+((t=>t?' +'+t:'')(DG_K.reduce((a,k)=>a+dgBon(k),0))):'🔒 STAGE '+sLabel(DG_UNLOCK)};
   const top=285,avail=1536+HX-(HX>0?250:20)-top,n=HUBM.length,ex=m=>m.full?1.3:m.k==='camp'?1.08:1,
     hh=Math.max(118,Math.min(190,(avail-(n-1)*30)/HUBM.reduce((a,m)=>a+ex(m),0))),ths=HUBM.map(m=>m.full?Math.min(HUB_W/m.ar,hh*ex(m)):hh*ex(m)),sum=ths.reduce((a,b)=>a+b,0),
     gap=Math.max(10,Math.min(70,(avail-sum)/(n-1)));let y=top+Math.max(0,(avail-sum-(n-1)*gap)*.4);
@@ -3543,7 +3543,12 @@ function dgG(){const G=TE().G;if(!G.dg)G.dg={d:'',n:{},b:{},c:{mine:0,forge:0},n
   DG_K.forEach(k=>{if(g.n[k]==null)g.n[k]=0;if(g.b[k]==null)g.b[k]=0;});if(g.d!==d){g.d=d;DG_K.forEach(k=>g.n[k]=0);}return g;}
 const dgPass=()=>{const P=TE().PK;return !!(P&&P.dg&&P.dg>Date.now());};
 const dgMax=()=>DG_FREE+(dgPass()?DG_PASS:0);
-const dgKeys=k=>Math.max(0,dgMax()-dgG().n[k]);
+const dgDay=k=>Math.max(0,dgMax()-dgG().n[k]);   // daily keys left (reset at midnight)
+const dgBon=k=>{const g=dgG();return Math.max(0,(g.x&&g.x[k])||0);};   // v16-120 KEY ROULETTE bonus keys: they stack, never expire
+const dgKeys=k=>dgDay(k)+dgBon(k);
+function dgUse(k){const g=dgG();if(dgDay(k)>0)g.n[k]++;else if(dgBon(k)>0)g.x[k]--;if(window.EVT)EVT.q('dgk',1);}   // daily keys first, bonus keys after
+function dgAddKeys(k,n){const g=dgG();if(!g.x)g.x={};g.x[k]=(g.x[k]||0)+n;}
+window.DGK={add:dgAddKeys,keys:dgKeys,bon:dgBon,K:DG_K,ok:()=>dgOK()};
 const dgNitro=()=>{try{const g=dgG();return g.nt>Date.now()?g.np:0;}catch(e){return 0;}};
 const dgEq=f=>Math.min(NST-1,Math.round(6+f*f*.95));
 const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:4,forge:f=>f<=10?2:f<=20?3:4},DG_NIT=f=>f<=10?10:f<=20?15:20;
@@ -3589,7 +3594,7 @@ function dgRenderList(){const T=TE(),g=dgG(),M=dgMap(),bx=$('dgBox');TALL.size(b
   h+='<div class="dgPS" style="'+gbx(162,420,700,50)+'"><span>'+(dgPass()?'<b>ACTIVE</b> · '+Math.ceil((TE().PK.dg-Date.now())/864e5)+' days left · '+dgMax()+' keys a day + SWEEP':'Free: <b>'+DG_FREE+' keys</b> a day per dungeon · used only when you win')+'</span></div>';
   GYM=null;const y0=M.top(490),y1=M.top(1100)-40,grid=y1-y0>1300,cw=grid?Math.min(420,((y1-y0-60)/2)*.4417):240,ch=cw/.4417; // tall phone → 2×2 bigger cards
   DG_K.forEach((k,i)=>{const D=DG[k],ky=dgKeys(k),x=grid?512+(i%2?14:-14-cw):14+i*252,y=grid?y0+(y1-y0-2*ch-60)/2+Math.floor(i/2)*(ch+60):y0+(y1-y0-ch)*.35;
-    h+='<div class="dgC" data-dk="'+k+'" style="'+'left:'+GSU(x)+';top:'+GSU(y)+';width:'+GSU(cw)+';height:'+GSU(ch)+';--cs:'+(cw/240)+'"><img src="img/dg/c_'+k+'.webp" alt="'+D.n+'"><div class="dgCP"><b>FLOOR '+Math.min(DG_N,g.b[k]+1)+'<i>/'+DG_N+'</i></b><span><img src="img/dg/k_'+k+'.webp" alt="">'+ky+'/'+dgMax()+'</span></div><div class="dgCR" style="color:'+D.c+'">'+D.r+'</div>'+(ky?'<em></em>':'')+'</div>';});
+    h+='<div class="dgC" data-dk="'+k+'" style="'+'left:'+GSU(x)+';top:'+GSU(y)+';width:'+GSU(cw)+';height:'+GSU(ch)+';--cs:'+(cw/240)+'"><img src="img/dg/c_'+k+'.webp" alt="'+D.n+'"><div class="dgCP"><b>FLOOR '+Math.min(DG_N,g.b[k]+1)+'<i>/'+DG_N+'</i></b><span><img src="img/dg/k_'+k+'.webp" alt="">'+dgDay(k)+'/'+dgMax()+(dgBon(k)?'<b class="dgBn">+'+dgBon(k)+'</b>':'')+'</span></div><div class="dgCR" style="color:'+D.c+'">'+D.r+'</div>'+(ky?'<em></em>':'')+'</div>';});
   const nt=dgNitTxt();GYM=M;
   h+='<div class="dgBar" style="'+gbx(62,1110,900,115)+'"><img src="img/dg/bar.webp" alt=""><span>'+(nt?'<img src="img/dg/k_lab.webp" alt=""> <b>'+nt+'</b> · ':'')+'New keys in <b>'+dgLeft()+'</b> · rewards are fixed</span></div>';
   GYM=null;bx.innerHTML=h;}
@@ -3600,8 +3605,8 @@ function dgRenderOne(k){const T=TE(),g=dgG(),D=DG[k],M=dgMap(),bx=$('dgBox'),cur
   h+='<button class="cpB dgBk" data-dg="list" style="'+gbx(18,18,96,96)+'">↩</button><button class="cpB dgBk" data-dg="info" style="'+gbx(910,18,96,96)+'">?</button>';
   h+='<img class="dgOC" src="img/dg/c_'+k+'.webp" alt="'+D.n+'" style="'+gbx(40,40,250,566)+'">';
   let p='<div class="dgN" style="color:'+D.c+'">'+D.n+'</div><div class="dgD">'+D.d+'</div>';
-  p+='<div class="dgK">'+Array.from({length:dgMax()},(_,i)=>'<img src="img/dg/k_'+k+'.webp" alt="" class="'+(i<ky?'':'off')+'">').join('')+(dgPass()?'':'<img src="img/dg/k_pass.webp" alt="" class="pk" data-dg="pass">')+'</div>';
-  p+='<div class="dgL"><b>'+ky+'/'+dgMax()+'</b> KEYS · new in '+dgLeft()+'</div>';
+  p+='<div class="dgK">'+Array.from({length:dgMax()},(_,i)=>'<img src="img/dg/k_'+k+'.webp" alt="" class="'+(i<dgDay(k)?'':'off')+'">').join('')+(dgPass()?'':'<img src="img/dg/k_pass.webp" alt="" class="pk" data-dg="pass">')+'</div>';
+  p+='<div class="dgL"><b>'+dgDay(k)+'/'+dgMax()+'</b> KEYS · new in '+dgLeft()+(dgBon(k)?' · <b class="dgBn">+'+dgBon(k)+' BONUS</b>':'')+'</div>';
   p+='<div class="dgL">BEST <b>'+g.b[k]+'</b> / '+DG_N+'</div>';
   if(k==='lab'){const nt=dgNitTxt();p+='<div class="dgL">'+(nt?'<b>'+nt+'</b>':'NITRO BOOST: off')+'</div>';}
   if(k==='mine'||k==='forge'){const q=dgRew(k,f).gear;p+='<div class="dgL">NEXT: <b>'+(q.set?ROLE[q.set].n.toUpperCase()+' SET · ':'')+GS[q.s].n.toUpperCase()+'</b></div>';}
@@ -3642,9 +3647,9 @@ function dgGo(direct){const k=DGS.k,g=dgG(),f=DGS.sel||Math.min(DG_N,g.b[k]+1);i
 function dgGo0(team,k,f){DGS.k=k;if(!team||!team.length)team=bestTeam().map(heroOf);dgEl.classList.remove('open');try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}
   safeStart(dgEq(f),team,dgFloor(k,f));}
 function dgSweep(){const k=DGS.k,g=dgG();if(!dgPass()){dgPassWin();return;}if(!g.b[k]){TE().toast('Win floor 1 first – SWEEP repeats floors you already cleared',2600);return;}if(!dgKeys(k)){dgNoKeys();return;}
-  const f=Math.min(DGS.sel||g.b[k],g.b[k]);g.n[k]++;const R=dgGive(k,f);TE().toast('⏩ SWEEP '+DG[k].n+' floor '+f+': '+R.txt,3000);dgRender();}
+  const f=Math.min(DGS.sel||g.b[k],g.b[k]);dgUse(k);const R=dgGive(k,f);TE().toast('⏩ SWEEP '+DG[k].n+' floor '+f+': '+R.txt,3000);dgRender();}
 function dgFinish(win,retreat){const T=TE(),g=dgG(),F=B.tw,k=F.dg,f=F.f,D=DG[k];let html;
-  if(win){const first=f>g.b[k];if(first)g.b[k]=f;g.n[k]++;const R=dgGive(k,f),ky=dgKeys(k);
+  if(win){const first=f>g.b[k];if(first)g.b[k]=f;dgUse(k);const R=dgGive(k,f),ky=dgKeys(k);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${D.n} · FLOOR ${f}<small>${first&&f<DG_N?'FLOOR '+(f+1)+' IS OPEN':f>=DG_N&&first?'ALL FLOORS CLEARED!':'KEYS LEFT TODAY: '+ky}</small></div>
       ${R.rws.slice(0,4).map((q,i)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][i]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
       <div class="rsU">${R.txt.includes(' · ')?R.txt.slice(R.txt.indexOf(' · ')+3)+' · ':''}Best: floor ${g.b[k]} / ${DG_N} · keys ${ky}/${dgMax()}</div></div>
@@ -3725,3 +3730,5 @@ if(window.SEC&&SEC.TEST_ACC){try{if(testFill())setTimeout(()=>location.reload(),
 window.CAMPAIGN={heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&!h.crew&&lvCan(h.id));}catch(e){return false;}},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,INV:GINV,GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
+
+(function(){const st=document.createElement('style');st.textContent='.dgBn{color:#7CFC9A!important;text-shadow:0 0 6px #00e67688,0 1px 0 #000;margin-left:3px}';document.head.appendChild(st);})();

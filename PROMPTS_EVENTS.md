@@ -45,3 +45,7 @@ STYLE: premium mobile game UI (AFK Arena / Clash Royale quality), Torque Empire 
 ```
 
 Când vin pozele: originale în `img/sheets/ui10/`, Claude decupează în `img/ui10/` și le pune în `events.js` (rânduri 9-slice: `ev_row_lock` / `ev_row_ready` / `ev_row_done`; rândurile cu premiile din clasament folosesc rama LOCKED + medalia).
+
+## KEY ROULETTE (21 nov 2026) – 2 poze opționale
+1. **Banner** `img/ui9/evb_key.webp` – în joc 900×360 (2,5:1, lățimea paginii pe 360 px ×2,5). ChatGPT 1536x1024, apoi decupat la 2,5:1. Referință: bannerul LUCKY WHEEL (aceeași ramă, aceeași poziție a titlului: jumătatea stângă rămâne liberă pentru text).
+2. **Disc** `img/ui9/kwheel_disc.webp` – în joc 441×441 (discul se învârte în rama roții). ChatGPT 1024x1024, fond verde, decupat rotund. 8 felii goale, FĂRĂ text/iconițe (cheile și cifrele le pune jocul). Referință: discul LUCKY WHEEL.

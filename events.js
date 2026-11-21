@@ -1,13 +1,14 @@
 // Torque Empire – v16-99 (20 nov 2026, Marius): TIME EVENTS that repeat.
 // Two events always run at the same time, each lasts 3 days, then the next one starts:
 //   track A: HERO SUMMON → GEAR SUMMON → CREW SUMMON → …   (count summons)
-//   track B: ESSENCE SPEND → DIAMOND SPEND → LUCKY WHEEL → … (count what you spend / spins)
+//   track B: ESSENCE SPEND → DIAMOND SPEND → LUCKY WHEEL → KEY ROULETTE → … (count what you spend / spins)
+// v16-120 KEY ROULETTE (Marius, 21 nov): like the Lucky Wheel, but it wins ONLY Dungeon keys. Won keys = BONUS keys (G.dg.x): they stack, never expire, used after the daily keys.
 // Every event: milestone rewards (diamonds + free summons …) + a live TOP 100 on the server (prizes by Mail when it ends).
 // LUCKY WHEEL: wins ONLY diamonds; spins come ONLY from event quests (never sold, never paid with diamonds).
 (function(){
 const T=()=>window.__TE;
 const E0=Date.UTC(2026,10,20),DUR=3*864e5;
-const TRK={A:['hero','gear','crew'],B:['ess','dia','wheel']};
+const TRK={A:['hero','gear','crew'],B:['ess','dia','wheel','key']};
 const TK='<img class="tki" src="img/ticket.webp" alt="">',CT='<img class="tki" src="img/cticket.webp" alt="">',GT='<img class="tki" src="img/gticket.webp" alt="">';
 const DM=()=>T().DMI,ES=()=>T().ESI;
 const EV={
@@ -21,61 +22,76 @@ const EV={
    m:[[5,{dm:50}],[15,{tk:2}],[30,{dm:100,ess:5}],[60,{tk:3}],[100,{dm:200,ess:10}],[160,{tk:5}],[250,{dm:400,ess:20}],[400,{dm:600,tk:8}]]},
  dia:{bn:'dia',n:'DIAMOND SPREE',ic:'💎',col:'#4dd0e1',d:'Spend diamonds anywhere (summons, name change …). Every diamond spent counts.',u:'diamonds',tkk:'tk',
    m:[[300,{tk:2}],[800,{dm:80}],[1500,{tk:3,gt:2}],[3000,{dm:250}],[5000,{tk:5,ct:3}],[8000,{dm:500}],[12000,{tk:8,gt:5}],[20000,{dm:1200,tk:10}]]},
+ key:{bn:'key',n:'KEY ROULETTE',ic:'🔑',col:'#4fc3f7',d:'Spin the roulette – it gives ONLY Dungeon keys. Won keys are BONUS keys: they stack, never expire and wait for you (daily keys are used first). Free spins come only from the event quests below (no buying).',u:'spins',tkk:'dm',
+   m:[[3,{tk:1}],[6,{dm:100}],[9,{tk:2,gt:1}],[12,{dm:250}],[15,{tk:3,ct:2}]]},
  wheel:{bn:'wheel',n:'LUCKY WHEEL',ic:'🎡',col:'#ffd54a',d:'Spin the wheel – it gives ONLY diamonds. Free spins come from the event quests below (no buying).',u:'spins',tkk:'dm',
    m:[[3,{tk:1}],[6,{dm:100}],[9,{tk:2,gt:1}],[12,{dm:250}],[15,{tk:3,ct:2}]]}};
 // ranking prizes (sent by Mail by the server when the event ends) – the same table is in server/online.js (EV_RW)
 const RANKRW=[[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
 const WHEEL=[[20,30],[30,25],[50,18],[80,12],[100,8],[150,4.5],[300,2],[1000,.5]];
+// KEY ROULETTE slices: [dungeon ('any' = one random dungeon, 'all' = every dungeon), keys, chance %]
+const KWH=[['vault',1,17],['mine',1,17],['forge',1,17],['lab',1,17],['any',2,14],['all',1,10],['any',3,6],['all',3,2]];
+const KQ=[['login','Open the game today',1,1],['win','Win 5 battles in the campaign',5,1],['dgk','Use 3 Dungeon keys',3,1],['sum','Summon 10 times (heroes, crew or gear)',10,1],['idle','Collect Idle Rewards 2 times',2,1]];
+const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
+const isW=k=>k==='wheel'||k==='key',QL=k=>k==='key'?KQ:WQ,SL=k=>k==='key'?KWH:WHEEL;
 const WQ=[['login','Open the game today',1,1],['win','Win 5 battles in the campaign',5,1],['sum','Summon 10 times (heroes, crew or gear)',10,1],['idle','Collect Idle Rewards 2 times',2,1],['lvl','Level up heroes 10 times',10,1]];
-const cur=(tr,t)=>{const i=Math.floor(((t||Date.now())-E0)/DUR);return {i,k:TRK[tr][((i%3)+3)%3],id:tr+i,end:E0+(i+1)*DUR,start:E0+i*DUR};};
+const cur=(tr,t)=>{const i=Math.floor(((t||Date.now())-E0)/DUR);return {i,k:TRK[tr][((i%TRK[tr].length)+TRK[tr].length)%TRK[tr].length],id:tr+i,end:E0+(i+1)*DUR,start:E0+i*DUR};};
 const day=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
 function S(){const G=T().G;if(!G.ev)G.ev={};const s=G.ev;
   for(const tr of ['A','B']){const c=cur(tr);if(!s[tr]||s[tr].id!==c.id){s[tr]={id:c.id,k:c.k,sc:0,cl:[],b:0,sent:0};}}
   const B=s.B;if(B.k==='ess'&&!B.b)B.b=T().ESS_U?T().ESS_U():300;  // essence goals grow with your stage (fixed for this event)
-  if(B.k==='wheel'){if(!B.w)B.w={sp:0,used:0,won:0,d:'',q:{},got:{}};const w=B.w;if(w.d!==day()){w.d=day();w.q={login:1};w.got={};}}
+  if(isW(B.k)){if(!B.w)B.w={sp:0,used:0,won:0,d:'',q:{},got:{}};const w=B.w;if(w.d!==day()){w.d=day();w.q={login:1};w.got={};}}
   return s;}
 const goal=(st,m)=>EV[st.k].rel?m*st.b:m;
 function add(kind,n){if(!n||!T()||!T().G)return;const s=S();for(const tr of ['A','B']){const st=s[tr];if(st.k===kind){st.sc+=n;dirty();}}}
-function q(kind,n){if(!T()||!T().G)return;const s=S(),B=s.B;if(B.k!=='wheel')return;B.w.q[kind]=(B.w.q[kind]||0)+n;dot();}
+function q(kind,n){if(!T()||!T().G)return;const s=S(),B=s.B;if(!isW(B.k))return;B.w.q[kind]=(B.w.q[kind]||0)+n;dot();}
 let dmL=null;
 function tick(){const G=T()&&T().G;if(!G)return;const d=G.dm||0;if(dmL!=null&&d<dmL){const x=dmL-d;if(x<2e6)add('dia',x);}dmL=d;}
 // ---------------- server: live ranking
 let sendT=0,rk={};
 function dirty(){dot();clearTimeout(sendT);sendT=setTimeout(send,15000);}
-async function send(){if(!window.ONLINE||!ONLINE.call)return;const s=S();for(const tr of ['A','B']){const st=s[tr],sc=st.k==='wheel'?(st.w?st.w.used:0):st.sc;if(sc>0&&sc!==st.sent){const r=await ONLINE.call('evsc',{eid:st.id,k:st.k,sc});if(r&&r.ok){st.sent=sc;rk[st.id]={rank:r.rank,t:Date.now()};}}}}
+async function send(){if(!window.ONLINE||!ONLINE.call)return;const s=S();for(const tr of ['A','B']){const st=s[tr],sc=isW(st.k)?(st.w?st.w.used:0):st.sc;if(sc>0&&sc!==st.sent){const r=await ONLINE.call('evsc',{eid:st.id,k:st.k,sc});if(r&&r.ok){st.sent=sc;rk[st.id]={rank:r.rank,t:Date.now()};}}}}
 async function rank(tr){const st=S()[tr];if(!window.ONLINE||!ONLINE.call)return null;await send();const r=await ONLINE.call('evrank',{eid:st.id,k:st.k});return r&&r.ok?r:null;}
 // ---------------- rewards
 function rwHtml(r){const a=[];if(r.dm)a.push(DM()+' '+r.dm);if(r.tk)a.push(TK+' '+r.tk);if(r.gt)a.push(GT+' '+r.gt);if(r.ct)a.push(CT+' '+r.ct);if(r.ess)a.push(ES()+' '+T().nf(r.ess));return a.join(' ');}
 function realRw(st,r){const o={...r};if(o.ess)o.ess=Math.round(o.ess*(st.b||300));return o;}
-function claim(tr,i){const s=S(),st=s[tr],E=EV[st.k],m=E.m[i],sc=st.k==='wheel'?st.w.used:st.sc;if(!m||st.cl.includes(i)||sc<goal(st,m[0]))return;
+function claim(tr,i){const s=S(),st=s[tr],E=EV[st.k],m=E.m[i],sc=isW(st.k)?st.w.used:st.sc;if(!m||st.cl.includes(i)||sc<goal(st,m[0]))return;
   st.cl.push(i);const r=realRw(st,m[1]);T().giveRw(r);T().save();T().toast('🎁 '+E.n+': '+rwHtml(r),2800);render();}
-function canClaim(){if(!T()||!T().G)return false;const s=S();for(const tr of ['A','B']){const st=s[tr],E=EV[st.k],sc=st.k==='wheel'?st.w.used:st.sc;if(E.m.some((m,i)=>!st.cl.includes(i)&&sc>=goal(st,m[0])))return true;
-  if(st.k==='wheel'){const w=st.w;if(w.sp>0)return true;if(WQ.some(x=>!w.got[x[0]]&&(w.q[x[0]]||0)>=x[2]))return true;}}return false;}
+function canClaim(){if(!T()||!T().G)return false;const s=S();for(const tr of ['A','B']){const st=s[tr],E=EV[st.k],sc=isW(st.k)?st.w.used:st.sc;if(E.m.some((m,i)=>!st.cl.includes(i)&&sc>=goal(st,m[0])))return true;
+  if(isW(st.k)){const w=st.w;if(w.sp>0)return true;if(QL(st.k).some(x=>!w.got[x[0]]&&(w.q[x[0]]||0)>=x[2]))return true;}}return false;}
 function dot(){const d=document.getElementById('evDot');if(d)d.classList.toggle('on',canClaim());}
 // ---------------- wheel
 let spinning=0,ang=0;
-function spin(){const st=S().B,w=st.w;if(spinning||w.sp<1)return;w.sp--;w.used++;dirty();
-  let k=T().srun('w',()=>{let r=Math.random()*WHEEL.reduce((a,x)=>a+x[1],0),k=0;for(;k<WHEEL.length;k++){r-=WHEEL[k][1];if(r<0)break;}return Math.min(k,WHEEL.length-1);}); // v16-101 anti-reroll
-  const n=WHEEL.length,seg=360/n,target=360*6+(360-k*seg);const a0=ang%360,t0=performance.now(),D=3600;spinning=1;
+function spin(){const st=S().B,w=st.w;if(spinning||w.sp<1)return;w.sp--;w.used++;dirty();const KR=st.k==='key',SW=SL(st.k),wi=SW[0].length-1;
+  let kd=null,k=T().srun(KR?'kw':'w',()=>{let r=Math.random()*SW.reduce((a,x)=>a+x[wi],0),k=0;for(;k<SW.length;k++){r-=SW[k][wi];if(r<0)break;}k=Math.min(k,SW.length-1);kd=KR?['vault','mine','forge','lab'][Math.floor(Math.random()*4)]:null;return k;}); // v16-101 anti-reroll (the random dungeon too)
+  const n=SW.length,seg=360/n,target=360*6+(360-k*seg);const a0=ang%360,t0=performance.now(),D=3600;spinning=1;
   const cv=document.getElementById('evWh');
-  const step=now=>{const p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);ang=a0+(target-a0)*e;drawWheel(cv);if(p<1)requestAnimationFrame(step);else{spinning=0;const v=WHEEL[k][0];T().G.dm=(T().G.dm||0)+v;w.won+=v;dmL=T().G.dm;T().save();T().toast('🎡 LUCKY WHEEL: '+DM()+' +'+v+'!',3000);render();}};
+  const step=now=>{const p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);ang=a0+(target-a0)*e;drawWheel(cv);if(p<1)requestAnimationFrame(step);else{spinning=0;if(KR){const z=SW[k],L=z[0]==='all'?['vault','mine','forge','lab']:[z[0]==='any'?kd:z[0]];L.forEach(d=>{if(window.DGK)DGK.add(d,z[1]);});w.won+=z[1]*L.length;T().save();
+      T().toast('🔑 KEY ROULETTE: '+(z[0]==='all'?'+'+z[1]+' key'+(z[1]>1?'s':'')+' in EVERY dungeon':'+'+z[1]+' '+DGN[L[0]]+' key'+(z[1]>1?'s':''))+'! (bonus keys, they stack)',3400);render();return;}
+    const v=WHEEL[k][0];T().G.dm=(T().G.dm||0)+v;w.won+=v;dmL=T().G.dm;T().save();T().toast('🎡 LUCKY WHEEL: '+DM()+' +'+v+'!',3000);render();}};
   T().save();requestAnimationFrame(step);}
 // v16-100: Marius' wheel picture – wheel.webp = frame (ring, bulbs, hub), wheel_disc.webp = the 8 slices (turns), wheel_pin.webp = pointer
 const WI={};['wheel','wheel_disc','wheel_pin'].forEach(k=>{const i=new Image();i.onload=()=>{if(!spinning)drawWheel(document.getElementById('evWh'));};i.src='img/ui9/'+k+'.webp';WI[k]=i;});
 const DMG=new Image();DMG.src='img/ui/diamond.svg';
+const KIM={};['vault','mine','forge','lab','pass'].forEach(k=>{const i=new Image();i.src='img/dg/k_'+k+'.webp';KIM[k]=i;});
+// v16-120: Key Roulette pictures (optional – until Marius sends them the Lucky Wheel frame/disc are used)
+const KWI={};['kwheel','kwheel_disc'].forEach(k=>{const i=new Image();i.onload=()=>{if(!spinning)drawWheel(document.getElementById('evWh'));};i.src='img/ui9/'+k+'.webp';KWI[k]=i;});
 const WF={w:550,h:601,cx:275,cy:296,r:218.5,top:44};   // frame size + disc centre / radius in the frame picture
-function drawWheel(cv){if(!cv)return;const d=Math.min(2,devicePixelRatio||1),cw=cv.clientWidth||260,ch=cw*(WF.h+WF.top)/WF.w;
+let wKind='wheel';
+function drawWheel(cv){if(!cv)return;const KR=wKind==='key',SW=SL(wKind),okI=x=>x&&x.complete&&x.naturalWidth,FR=KR&&okI(KWI.kwheel)?KWI.kwheel:WI.wheel,DS=KR&&okI(KWI.kwheel_disc)?KWI.kwheel_disc:WI.wheel_disc;const d=Math.min(2,devicePixelRatio||1),cw=cv.clientWidth||260,ch=cw*(WF.h+WF.top)/WF.w;
   if(cv.width!==Math.round(cw*d)){cv.width=Math.round(cw*d);cv.height=Math.round(ch*d);}
   const g=cv.getContext('2d'),k=cv.width/WF.w,ok=x=>x&&x.complete&&x.naturalWidth;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);
-  const n=WHEEL.length,X=WF.cx*k,Y=(WF.cy+WF.top)*k,R=WF.r*k;
+  const n=SW.length,X=WF.cx*k,Y=(WF.cy+WF.top)*k,R=WF.r*k;
   g.save();g.translate(X,Y);g.rotate(ang*Math.PI/180);
-  if(ok(WI.wheel_disc)){const D=WI.wheel_disc.naturalWidth*k;g.drawImage(WI.wheel_disc,-D/2,-D/2,D,D);}
+  if(ok(DS)){const D=DS.naturalWidth*k;g.drawImage(DS,-D/2,-D/2,D,D);if(KR&&DS===WI.wheel_disc){g.save();g.globalCompositeOperation='hue';g.fillStyle='#1e88e5';g.beginPath();g.arc(0,0,D/2,0,7);g.fill();g.restore();}}
   else{const cols=['#ff7043','#ffca28','#66bb6a','#29b6f6','#ab47bc','#ef5350','#26c6da','#ffd54a'];for(let i=0;i<n;i++){const a=-Math.PI/2-Math.PI/n+i*2*Math.PI/n;g.beginPath();g.moveTo(0,0);g.arc(0,0,R,a,a+2*Math.PI/n);g.closePath();g.fillStyle=cols[i];g.fill();}}
   for(let i=0;i<n;i++){g.save();g.rotate(i*2*Math.PI/n);g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';
+    if(KR){const z=SW[i],lb=(z[0]==='all'?'ALL ':'')+'×'+z[1];g.font='900 '+(R*(z[0]==='all'?.12:.15))+'px system-ui';g.lineWidth=R*.045;g.strokeStyle='#001a33';g.fillStyle=z[0]==='all'&&z[1]>1?'#ffe082':'#fff';g.strokeText(lb,0,-R*.74);g.fillText(lb,0,-R*.74);
+      const s=R*.22,ic=z[0]==='all'||z[0]==='any'?KIM.pass:KIM[z[0]];if(ok(ic))g.drawImage(ic,-s/2,-R*.5-s/2,s,s);if(z[0]==='any'){g.font='900 '+(R*.12)+'px system-ui';g.strokeText('?',R*.07,-R*.45);g.fillStyle='#ffe082';g.fillText('?',R*.07,-R*.45);}g.restore();continue;}
     g.font='900 '+(R*.17)+'px system-ui';g.lineWidth=R*.045;g.strokeStyle='#1a0d00';g.fillStyle='#fff';g.strokeText(WHEEL[i][0],0,-R*.72);g.fillText(WHEEL[i][0],0,-R*.72);
     const s=R*.17;if(ok(DMG))g.drawImage(DMG,-s/2,-R*.53-s/2,s,s);else{g.font='900 '+(R*.1)+'px system-ui';g.fillText('💎',0,-R*.53);}g.restore();}
   g.restore();
-  if(ok(WI.wheel))g.drawImage(WI.wheel,0,WF.top*k,WF.w*k,WF.h*k);
+  if(ok(FR))g.drawImage(FR,0,WF.top*k,WF.w*k,WF.h*k);
   if(ok(WI.wheel_pin)){const pw=82*k,ph=pw*WI.wheel_pin.naturalHeight/WI.wheel_pin.naturalWidth;g.drawImage(WI.wheel_pin,X-pw/2,4*k,pw,ph);}
   else{g.beginPath();g.moveTo(X-R*.09,Y-R*1.05);g.lineTo(X+R*.09,Y-R*1.05);g.lineTo(X,Y-R*.85);g.closePath();g.fillStyle='#ff1744';g.fill();}}
 function shade(c){const n=parseInt(c.slice(1),16),f=v=>Math.round(v*.45);return 'rgb('+f(n>>16)+','+f(n>>8&255)+','+f(n&255)+')';}
@@ -111,20 +127,20 @@ function build(){if(el)return;const st=document.createElement('style');st.textCo
     else if(a==='cl')claim(t.dataset.t,+t.dataset.i);
     else if(a==='rk'){view='rank';render();showRank();}
     else if(a==='spin')spin();
-    else if(a==='wq'){const w=S().B.w,x=WQ.find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast('🎡 +'+x[3]+' free spin',1800);render();}});}
+    else if(a==='wq'){const B=S().B,w=B.w,x=QL(B.k).find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast((B.k==='key'?'🔑':'🎡')+' +'+x[3]+' free spin',1800);render();}});}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+EV[s[tr].k].ic+' '+EV[s[tr].k].n+'</b>').join('');
-  const st=s[tab],E=EV[st.k],c=cur(tab),sc=st.k==='wheel'?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
+  const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
   h+='<div class="evSc">YOUR '+E.u.toUpperCase()+': <b>'+T().nf(sc)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
-  if(st.k==='wheel'){const w=st.w,can=w.sp>0&&!spinning;h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left</button><div class="evP">Won in this event: '+DM()+' <b>'+T().nf(w.won)+'</b></div></div>';
-    h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+WQ.map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="r">'+x[1]+'<div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><div class="g">'+v+'/'+x[2]+'</div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+' 🎡')+'</button></div>';}).join('');}
+  if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
+    h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="r">'+x[1]+'<div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><div class="g">'+v+'/'+x[2]+'</div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
   h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+T().nf(g)+'</div><div class="r">'+rwHtml(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">🏆 TOP 100 RANKING</button>'+rkPrizes(st);
   const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+EV[nx.k].ic+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div>';
-  body.innerHTML=h;if(st.k==='wheel')drawWheel(document.getElementById('evWh'));}
+  body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
 function rkPrizes(st){const k=EV[st.k].tkk,ic=k==='gt'?GT:k==='ct'?CT:k==='tk'?TK:'';return '<div class="evS">RANKING PRIZES (by Mail when the event ends)</div><div class="evP">'+RANKRW.map(r=>'#'+(r[0]===r[1]?r[0]:r[0]+'-'+r[1])+': '+DM()+' '+(k==='dm'?r[2]*1.5:r[2])+(ic?' + '+ic+' '+r[3]:'')).join('<br>')+'</div>';}
 async function showRank(){const r=await rank(tab),L=document.getElementById('evRkL');if(!L)return;if(!r){L.innerHTML='<div class="evP" style="text-align:center;margin:20px">The ranking needs internet. Your score is saved and sent later.</div>';return;}
   rk[S()[tab].id]={rank:r.rank,t:Date.now()};

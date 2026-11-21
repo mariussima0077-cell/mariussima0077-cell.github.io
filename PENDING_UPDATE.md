@@ -45,3 +45,10 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 2. Produs nou (o singură dată, NU consumabil) `founder_pass` „Founder Pass”, **4,99 €**.
 3. `battle_speed_x2`: nume/descriere → „Battle Speed ×3” (prețul rămâne 2,99 €).
 4. Apoi PLAY_RULES.md (tabelul secțiunea 1) + Cloudflare ia server/ din GitHub automat la merge.
+
+## 7. KEY ROULETTE – event nou (21 nov 2026, cererea lui Marius) – gata, testat
+- Track B are acum 4 eventuri pe rând: ESSENCE RUSH → DIAMOND SPREE → LUCKY WHEEL → **KEY ROULETTE** (3 zile fiecare). Același sistem ca Lucky Wheel: rotiri DOAR din questuri zilnice (login, 5 victorii campanie, **folosește 3 chei de Dungeon**, 10 summon, 2× Idle), milestone 3/6/9/12/15 rotiri, TOP 100 (premii 💎 ×1,5 prin Mail, ca la roată).
+- Roata dă DOAR chei de Dungeon: Vault/Mine/Forge/Lab ×1 (17% fiecare), 2 chei la un dungeon aleator 14%, 1 cheie în TOATE 10%, 3 chei la un dungeon aleator 6%, **JACKPOT 3 chei în TOATE 2%**. Anti-reroll: `srun('kw')`.
+- **Cheile câștigate = BONUS (`G.dg.x`)**: se adună, NU expiră la miezul nopții; se folosesc după cheile zilnice (`dgUse`). Afișare: „2/2 +5” pe cartea dungeonului, „+5 BONUS” în pagina lui, total în Battle Hub.
+- Server (`server/online.js`): `EV_TRK.B` + `key`, `EV_CAP/EV_TKK/EV_NAME`, `evKind` cu lungimea listei (A are 3, B are 4). ⚠️ Serverul trebuie urcat odată cu jocul.
+- Poze: banner provizoriu `img/ui9/evb_key.webp` (făcut din bannerul roții + cheile din Dungeons); discul = discul roții colorat albastru în cod. Opțional de la Marius: `evb_key.webp` 900×360 + `kwheel_disc.webp` 441×441 (dacă există, jocul le folosește singur). Prompturi în `PROMPTS_EVENTS.md`.

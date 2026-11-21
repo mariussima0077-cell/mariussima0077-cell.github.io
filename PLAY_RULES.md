@@ -109,3 +109,6 @@ Ultima actualizare: 15 noiembrie 2026 (v16-45 – online: clasament, chat, aren�
 - Salvare automată la 3 minute + când ieși din joc. Dacă alt telefon a salvat mai nou, jocul arată **ambele salvări una lângă alta** și jucătorul alege.
 - Jucătorii banați nu pot salva în cloud.
 - **Pornire**: trebuie un **Client ID OAuth** de tip Web (îl face Marius în Google Cloud Console, contul torqueempirehelp@gmail.com). Claude îl pune în `cloud.js` (`const CLIENT_ID`) și în `server/wrangler.toml` (`GOOGLE_CLIENT_ID`). Client ID-ul NU e secret, poate sta pe GitHub. Cât timp e gol, jucătorii nu văd căsuța.
+
+### v16-120 (21 nov 2026, pe ramura pending): KEY ROULETTE
+- Aceleași reguli ca Lucky Wheel: dă DOAR chei de Dungeon; rotirile vin DOAR din questurile zilnice ale eventului; **NU se vând și nu se cumpără cu diamante**. Cheile de bonus nu se vând nici ele.
