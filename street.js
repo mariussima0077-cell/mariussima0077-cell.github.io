@@ -3,12 +3,13 @@
 //  Other players can attack my train (a fight like the Arena, but separate). Grade from the Car Wash / Gas Station / Car Factory levels,
 //  refresh for a higher grade = more coins for the Shop." Decisions: permanent mode, 3 trains a day, 5 attacks a day, 2 refreshes then locked.
 // The map part (export cars, train, grade, refresh) is in index.html (rwSend, rwRefresh, RWS); the fights + limits are on the server (op rw*).
-// Street Tokens (G.st.tok) never expire. Shop prices are PROVISIONAL – Marius sets them later.
+// Street Tokens (G.st.tok) never expire. Shop: all tickets + all Dungeon keys 500 each (Marius 21 nov); Essence 250 provisional.
+// World Boss keys / Arena fights are NOT sold here: the server counts them per day for the rankings.
 (function(){
 const T=()=>window.__TE, O=()=>window.ONLINE;
 const TOK='img/ui12/st_token.webp',TI=e=>'<img class="tki stTok" src="'+TOK+'" alt=""'+(e?' style="height:'+e+'"':'')+'>';
 const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
-const SHOP=[['k_vault',350],['k_mine',350],['k_forge',350],['k_lab',350],['tk',600],['gt',450],['ct',300],['ess',250]];   // PROVISIONAL prices
+const SHOP=[['tk',500],['gt',500],['ct',500],['k_vault',500],['k_mine',500],['k_forge',500],['k_lab',500],['ess',250]];   // Marius 21 nov: every ticket and every key = 500 (Essence still provisional)
 const essN=()=>Math.round((T().ESS_U?T().ESS_U():300)*2);
 function itIcon(k){if(k[0]==='k')return '<img class="tki" src="img/dg/k_'+k.slice(2)+'.webp" alt="">';if(k==='tk')return '<img class="tki" src="img/ticket.webp" alt="">';if(k==='ct')return '<img class="tki" src="img/cticket.webp" alt="">';if(k==='gt')return '<img class="tki" src="img/gticket.webp" alt="">';return T().ESI;}
 function itName(k){if(k[0]==='k')return DGN[k.slice(2)]+' Key';return {tk:'Recruit Ticket',gt:'Gear Ticket',ct:'Crew Ticket',ess:T().nf(essN())+' Essence'}[k];}
