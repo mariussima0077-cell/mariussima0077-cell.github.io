@@ -61,6 +61,14 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:sy
 #zoom button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(13,20,27,.82);color:#ffd54a;font-size:24px;font-weight:900;line-height:1;padding:0}
 #toast{position:fixed;left:50%;top:62px;transform:translateX(-50%);background:rgba(13,20,27,.94);border:1px solid #ffb30088;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:700;z-index:30;opacity:0;transition:opacity .4s;pointer-events:none;text-align:center;max-width:88vw}
 #loader{position:fixed;inset:0;z-index:10;background:#0b1420;transition:opacity .5s}
+#loader:has(#updS) #lpanel{visibility:hidden}
+#updS{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(5,10,18,.45);animation:lpIn .35s ease-out}
+#updS .uB{position:relative;width:min(92vw,420px);aspect-ratio:1000/661}#updS .uB>img{position:absolute;inset:0;width:100%;height:100%}
+#updS .uT{position:absolute;left:10%;right:10%;top:33%;bottom:24%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;color:#e8f1ff;font:800 min(3.9vw,15px) system-ui}
+#updS .uT b{font:900 min(5.6vw,22px) system-ui;color:#ffd54a;text-shadow:0 2px 0 #000;letter-spacing:.5px}#updS .uT small{font:700 min(3vw,12px) system-ui;color:#9fb6d0}
+#updS .uG{position:absolute;left:12.6%;top:79.2%;width:74.8%;height:5.8%;border-radius:99px;overflow:hidden}
+#updS .uG i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(#ffe082,#ffb300 55%,#ff8f00);box-shadow:inset 0 2px 0 #fff8;transition:width .3s}
+#updS .uG em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 min(3.4vw,13px) system-ui;font-style:normal;color:#fff;text-shadow:0 1px 2px #000}
 #loader.hide{opacity:0;pointer-events:none}
 #lpanel{position:absolute;left:0;right:0;bottom:calc(24% + env(safe-area-inset-bottom));display:none}#lpanel.on{display:block;animation:lpIn .4s ease-out}@keyframes lpIn{from{opacity:0;transform:translateY(12px)}}
 #lcv{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -3907,7 +3915,7 @@ function startLoader(){
   (function lf(now){if(started)return;const t=(now-t0)/1000;
     const cap=assetsDone()?100:88;lp=Math.min(cap,lp+.9);if(lp>=100&&!lready){lready=true;if(window.CLOUD){CLOUD.mountStart($('lpanel'));$('lpanel').classList.add('on');}}
     drawLoader(t);requestAnimationFrame(lf);})(t0);
-  $('loader').onclick=()=>{if(!lready||started)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;try{IMG.loading.el=null;IMG.loading._ok=false;IMG.loading.bad=true;}catch(e){}},1500);setTimeout(()=>{for(const id in GAR){try{if(G.lv[id]>0)void IMG['g_'+id+gTier(id)].ok;}catch(e){}}},2500);/* v16-120: garages outside the screen get their current level picture a bit later *//* v16-115: free the loading canvas (~5 MB) */last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
+  $('loader').onclick=()=>{if(!lready||started||window.__UPD)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;try{IMG.loading.el=null;IMG.loading._ok=false;IMG.loading.bad=true;}catch(e){}},1500);setTimeout(()=>{for(const id in GAR){try{if(G.lv[id]>0)void IMG['g_'+id+gTier(id)].ok;}catch(e){}}},2500);/* v16-120: garages outside the screen get their current level picture a bit later *//* v16-115: free the loading canvas (~5 MB) */last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
 // v16-72: what the tutorial (tutorial.js) needs from the map – camera, building areas, panel
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},
@@ -3928,10 +3936,20 @@ $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||wi
 $('heBtn').onclick=()=>{closePanel();if(window.CAMPAIGN&&CAMPAIGN.heroes)CAMPAIGN.heroes();};
 makeGrass();resize();startLoader();requestAnimationFrame(frame);
 // v16-11: auto-update – a new version on GitHub is downloaded by itself; v16-17: the player confirms the restart with OK (never in the middle of a battle)
+// v16-124 (Marius): at the START (loading screen) a new version is downloaded with Marius' UPDATE panel + progress bar,
+// then the game restarts by itself and opens already updated. During the game it stays as before (OK / LATER).
+const UPD={on:false,t0:0,p:0};
+function updShow(){if(UPD.on||started)return;UPD.on=true;UPD.t0=Date.now();window.__UPD=1;const d=document.createElement('div');d.id='updS';
+  d.innerHTML='<div class="uB"><img src="img/ui/upd_panel.webp" alt=""><div class="uT"><b>NEW VERSION</b><span id="updTx">Downloading the update…</span><small>Your progress is safe</small></div><div class="uG"><i id="updF"></i><em id="updP">0%</em></div></div>';
+  $('loader').appendChild(d);setTimeout(()=>{if(UPD.on&&!started&&Date.now()-UPD.t0>=89e3){UPD.on=false;window.__UPD=0;d.remove();}},9e4);}   // never stuck: after 90 s the game can start anyway
+function updPct(v){UPD.p=Math.max(UPD.p,Math.min(100,v));const f=$('updF'),q=$('updP');if(f)f.style.width=UPD.p+'%';if(q)q.textContent=Math.round(UPD.p)+'%';}
 if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!navigator.serviceWorker.controller;let upd=false;
+  navigator.serviceWorker.addEventListener('message',e=>{const m=e.data;if(!m||m.te!=='upd'||!hadSW||started)return;updShow();updPct(m.t?95*m.d/m.t:5);});
   navigator.serviceWorker.register('sw.js').then(reg=>{const chk=()=>reg.update().catch(()=>{});
+    reg.addEventListener('updatefound',()=>{if(hadSW&&!started){updShow();updPct(3);}});if(hadSW){chk();setTimeout(chk,1200);setTimeout(chk,4000);}   // check for a new version right at the start (again a bit later: the first check can be skipped by the browser while the page is still loading)
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')chk();});setInterval(chk,15*60*1000);}).catch(()=>{});
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadSW||upd)return;upd=true;
+    if(!started){updShow();updPct(100);const t=$('updTx');if(t)t.textContent='Update installed – starting…';setTimeout(()=>location.reload(),600);return;}   // v16-124: not playing yet → restart by itself
     // v16-17: no more automatic restart – the player taps OK (LATER hides it; the update is used at the next start)
     const ask=()=>{if(window.__BATTLE_ON){setTimeout(ask,3000);return;}if(document.getElementById('updBox'))return;
       const d=document.createElement('div');d.id='updBox';
