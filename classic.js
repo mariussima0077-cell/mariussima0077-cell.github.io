@@ -215,7 +215,7 @@ const el=document.createElement('div');el.id='ccP';el.innerHTML='<div id="ccBox"
   '<div class="ccTabs"><button data-cc="tab:g"><img class="i1" src="img/cc/tg1.webp" alt="MY GARAGE"><img class="i0" src="img/cc/tg0.webp" alt="MY GARAGE"></button><button data-cc="tab:d"><img class="i1" src="img/cc/td1.webp" alt="DEALER"><img class="i0" src="img/cc/td0.webp" alt="DEALER"></button></div><div id="ccBody"></div></div><div id="ccPop"></div>';
 document.body.appendChild(el);let tab='g';
 const GN=['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC','ASCENDED'];
-function gc(gr){const G=T().GRADES;return G&&G[gr]?G[gr].c:'#999';}
+function gc(gr){if(gr>=6)return '#2ef3ff';const G=T().GRADES;return G&&G[gr]?G[gr].c:'#999';}   // v16-130: Ascended cars = cyan (GRADES[6] is the hidden '???')
 function rwLine(r,big,b){const T0=T(),a=[];if(b)a.push('⚔️ <b style="color:#7dff8a">+'+b+'% ATK &amp; HP</b>');const per=v=>v>=1?'+'+Math.round(v*10)/10+' / h':'1 every '+Math.round(1/v)+' h';
   if(r.dm)a.push(T0.DMI+' '+per(r.dm));if(r.es)a.push(T0.ESI+' +'+T0.fmt(Math.round(r.es*T0.ESS_U())).replace('$','')+' / h');if(r.gp)a.push(T0.GPI+' +'+T0.fmt(Math.round(r.gp*T0.GP_U())).replace('$','')+' / h');if(r.tk)a.push('<img class="tki" src="img/ticket.webp"> '+per(r.tk));if(r.ct)a.push('<img class="tki" src="img/cticket.webp"> '+per(r.ct));if(r.gt)a.push('<img class="tki" src="img/gticket.webp"> '+per(r.gt));
   return a.join(big?'<br>':' · ');}
@@ -240,7 +240,7 @@ function render(){const T0=T(),G=T0.G,s=st();document.getElementById('ccMon').in
   document.getElementById('ccBody').innerHTML=h;}
 function pop(id){const T0=T(),G=T0.G,s=st(),m=BY[id],own=s.own.includes(id);
   const P=$p();P.innerHTML='<div class="ccPB" style="--gc:'+gc(m.gr)+'"><button class="ccX" data-cc="px">✕</button><em>'+GN[m.gr]+'</em><h3>'+m.n+'</h3><img src="'+thumb(id,300,140)+'">'+
-    '<div class="ccPR"><b>WHILE YOU OWN IT</b><div>'+rwLine(m.r,1,m.b)+'</div></div>'+
+    '<div class="ccPR"><b>WHILE YOU OWN IT</b><div>'+rwLine(m.r,1,m.b)+'</div><small style="color:#9fb0c0;font-size:11px">+1% idle money · counts forever</small></div>'+
     (own?'<button class="ccBuy sell" data-cc="sell:'+id+'">SELL · '+T0.fmt(m.price*SELL_BACK)+'</button>':'<button class="ccBuy" data-cc="buy:'+id+'">BUY · '+T0.fmt(m.price)+(G.rep<m.rep?' · 🔒 REP '+m.rep:'')+'</button>')+'</div>';
   P.classList.add('open');}
 function act(a){const T0=T(),G=T0.G,s=st();
@@ -287,6 +287,7 @@ const css=document.createElement('style');css.textContent=`
 .ccClosed{text-align:center;padding:20px 10px}.ccClosed img{width:80%;max-width:300px}.ccClosed h3{color:#ffd54a;font:900 20px Game,system-ui}.ccClosed p{color:#d7e3ff;line-height:1.45}.ccClosed .ccBuy{font-size:17px;padding:12px 26px}
 #ccPop{position:fixed;inset:0;z-index:41;display:none;align-items:center;justify-content:center;background:#000a}#ccPop.open{display:flex}
 .ccPB{position:relative;width:min(92vw,400px);border-radius:18px;border:3px solid var(--gc);background:radial-gradient(ellipse at 50% 30%,#2c2440,#0f0c18);padding:16px;text-align:center;box-shadow:0 0 30px color-mix(in srgb,var(--gc) 50%,transparent)}
+.ccPB .ccPR img{width:auto!important;height:1.35em;vertical-align:-.32em}   /* v16-130: reward icons were stretched to the full width */
 .ccPB .ccX{position:absolute;right:8px;top:8px;width:34px;height:34px;font-size:16px}.ccPB em{color:var(--gc);font:900 12px Game,system-ui;font-style:normal}.ccPB h3{margin:2px 0 6px;font:900 italic 22px Game,system-ui;color:#fff}.ccPB img{width:100%}
 .ccPR{margin:8px 0 12px;background:#0007;border-radius:12px;padding:8px;font:800 14px Game,system-ui;line-height:1.6}.ccPR b{color:#ffd54a;font-size:11px}
 #ccP .tki,#ccPop .tki{height:1.3em;vertical-align:-.3em}
