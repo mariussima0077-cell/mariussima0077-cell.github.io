@@ -32,7 +32,7 @@ const NEW=[['Copper Clipper','sedan30',['#b87333','#f0dcc0']],['Mint Marauder','
  ['Inferno Imperator','muscle',['#ff3d00','#1a0000']],['Starlight Sultan','eternal',['#1a237e','#ffeb3b']],['Diamond Duchess','roadster',['#b9f2ff','#ffffff']],['Titan Tycoon','limo',['#37474f','#ffd54a']],
  ['Aurora Archon','gull',['#00e5ff','#ea80fc']],['Crown of Torque','dynasty',['#ffd700','#b71c1c']],['Celestial Kaiser','eternal',['#0b0033','#00e5ff']],['The Last Legend','arrow',['#ffffff','#ff1744']]];
 NEW.forEach(([n,k,c],j)=>CARS.push({id:'x'+j,n,gr:j<6?3:j<14?4:j<21?5:6,k,c,price:Math.round(80e6*Math.pow(1.42,j)/1e6)*1e6,rep:Math.min(30,18+Math.floor(j/2)),
-  r:{dm:.3+j*.05,es:.4+j*.04,gp:.4+j*.04,tk:.012*Math.pow(1.1,12+j),gt:.009*Math.pow(1.1,12+j),ct:.006*Math.pow(1.1,12+j)}}));
+  r:{dm:.3+j*.05,es:.4+j*.04,gp:.4+j*.04,tk:.012*Math.pow(1.1,12+j)*(1+2*j/23),gt:.012*Math.pow(1.1,12+j)*(1+2*j/23),ct:.012*Math.pow(1.1,12+j)*(1+2*j/23)}   /* v16-131 (Marius: big at the end): last car = 1 Recruit + 1 Gear + 1 Crew ticket per hour */}));
 CARS.forEach((c,i)=>c.b=Math.round(.15*Math.pow(1.12,i)*100)/100);   // battle bonus % per car: car 1 +0.15% … car 12 +0.5% … car 24 +2% … car 36 +8% (all 36 ≈ +72%)
 const BY={};CARS.forEach(c=>BY[c.id]=c);
 const OPEN_COST=150e3,OPEN_REP=6,SPOTS=6,SPOT_COST=[0,0,500e3,1.5e6,5e6,15e6],FULL_BONUS=.10,SELL_BACK=.5;
