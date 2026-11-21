@@ -313,7 +313,8 @@ const css3=document.createElement('style');css3.textContent=`
 #cpCardBox .ppT{position:absolute!important;left:18.12%;top:6.03%;width:63.86%;height:8.85%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.1}
 #cpCardBox .ppT b{font:900 5.4cqw system-ui;color:#ffd54a;text-shadow:0 2px 0 #000,0 0 8px #ff9800aa}#cpCardBox .ppT small{font:800 2.9cqw system-ui;color:#cfe3ff;letter-spacing:.5px;margin-top:2px}
 #cpCardBox .mons{position:absolute!important;left:15.64%;top:21.44%;width:68.81%;height:13.11%;display:flex!important;justify-content:space-between;gap:0;margin:0;padding:0}
-#cpCardBox .mons .mon{width:28.6%;height:100%;margin:0;padding:0;background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:none}#cpCardBox .mons .mon canvas{width:100%;height:auto;max-height:78%}#cpCardBox .mons .mon div{font:900 2.5cqw system-ui;color:#fff;text-shadow:0 1px 0 #000;white-space:nowrap;max-width:96%;overflow:hidden;text-overflow:ellipsis}
+#cpCardBox .mons .mon{width:28.6%;height:100%;margin:0;padding:0;background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:none}#cpCardBox .mons .monInfo b{font:900 7cqw system-ui;color:#ffd54a;text-shadow:0 2px 0 #000}#cpCardBox .mons .monInfo div{font:900 2.6cqw system-ui;color:#cfe0f2}
+#cpCardBox .mons .mon canvas{width:100%;height:auto;max-height:78%}#cpCardBox .mons .mon div{font:900 2.5cqw system-ui;color:#fff;text-shadow:0 1px 0 #000;white-space:nowrap;max-width:96%;overflow:hidden;text-overflow:ellipsis}
 #cpCardBox .ppE{position:absolute!important;left:9.21%;top:38.62%;width:31.68%;height:5.77%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-left:4%;font:900 4.4cqw system-ui;color:#fff;text-shadow:0 2px 0 #000}
 #cpCardBox .ppP{position:absolute!important;left:59.7%;top:38.62%;width:31.68%;height:5.77%;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding-right:4%;font:900 4.4cqw system-ui;text-shadow:0 2px 0 #000,0 0 6px #000}
 #cpCardBox .ppE small,#cpCardBox .ppP small{font:900 2.2cqw system-ui;color:#fff;opacity:.85;letter-spacing:1px}
@@ -961,9 +962,9 @@ function softCap(x,K,C){return x<=K?x:K+(C-K)*(1-Math.exp(-(x-K)/(C-K)));}
 function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+(s.crit-R.crit)*.8)*(1+(s.eg-1)*.25)+s.def*4);}
 function pow(h,ov){return powS(unitStats(h,ov),ROLE[roleOf(h)]);}
 function crewHero(k){return {id:'crew'+k,crew:true,n:CREW_NAMES[k],gr:0,cat:'m',sp:'crew',f:false};}
-function teamHeroes(){const T=TE(),ids=(T.G.cp.team||[]).filter(id=>id.startsWith('crew')||(T.HB[id]&&T.G.h.own[id]));
+function teamHeroes(){const T=TE(),ids=(T.G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&T.G.h.own[id]);
   return ids.slice(0,5).map(id=>id.startsWith('crew')?crewHero(+id.slice(4)):T.HB[id]);}
-function bestTeam(){const m=myMechs().slice(0,5).map(h=>h.id);let k=0;while(m.length<5)m.push('crew'+(k++));return m;}
+function bestTeam(){return myMechs().slice(0,5).map(h=>h.id);} // v16-122 (Marius): no more old 'Rookie Crew' helpers – only your real heroes
 function teamPower(list){return list.reduce((a,h)=>a+pow(h),0);}
 // v15: early bosses are easier (no long wall at the start of the game)
 const BEASE=c=>[.42,.55,.68,.8,.8][c]??.72; // v16-40: 2-month test – chapter bosses were walls of 7-13 days (5-20 .9→.8, chapter 6+ 1→.72)
@@ -1574,6 +1575,7 @@ function safeStart(si,team,tw){try{startBattle(si,team,tw);return;}catch(e){cons
     const e=window.__BERR||e2,msg=String(e&&e.message||e).slice(0,160),st=String(e&&e.stack||'').split('\n').slice(0,3).join(' | ').slice(0,300);
     pop(`<div class="pT">Battle could not start</div><div class="pD">Please send a screenshot of this to the developer:</div><div class="pD" style="font-family:monospace;font-size:11px;word-break:break-all;text-align:left">${msg.replace(/</g,'&lt;')}<br>${st.replace(/</g,'&lt;')}<br>${navigator.userAgent.replace(/</g,'&lt;')}</div><button class="cpGo alt" data-p="x">CLOSE</button>`);}}
 function startBattle(si,team,tw){
+  team=(team||[]).filter(h=>h&&!h.crew);if(!team.length){const T=TE();T.toast('🦸 You have no heroes yet – summon your first heroes!',3000);try{if(T.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T.openSummon('m');}}catch(e){}return;}
   B={si,stage:tw?tw.st:STAGES[si],tw:tw||null,mod:tw&&tw.mod>=0?TW_MOD[tw.mod].k:'',wave:0,heroes:[],mons:[],proj:[],fx:[],parts:[],nums:[],tele:[],t:0,real:0,ts:1,slowT:0,spd:spdOK(TE().G.cp.spd),auto:TE().G.cp.auto!==false,
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
   B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)TE().toast('⚡ NITRO BOOST: +'+Math.round(B.nit*100)+'% HP & attack',2400);},B.grit?2700:0);
@@ -2417,7 +2419,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
       ${rws.slice(0,4).map((r,k)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][k]}%">${r[0]}<b>${r[1]}</b></div>`).join('')}
       <div class="rsU">${rws.length>4?rws.slice(4).map(r=>r[0]+' '+r[1]).join(' · ')+' · ':''}${st<3?'⭐⭐⭐ = no mechanic knocked out':'Perfect! No mechanic was knocked out.'}</div></div>
       <div class="rsM">${chDone?`<div class="chUn">CHAPTER ${S0.c+1} CLEARED!<br><small>Chapter ${S0.c+2} · ${CHAP[S0.c+1].n} is now open</small></div>`:''}
-      ${drops.length?`<div class="cpSec">${IMGI(glyphURL('bag','#ffb300'))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">Bag full (${GINV_()}) – salvaged for ${GPN(sold)}</div>`:''}`:''}
+      ${drops.length?`<div class="cpSec">${IMGI(itemIconURL('tool',4))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">Bag full (${GINV_()}) – salvaged for ${GPN(sold)}</div>`:''}`:''}
       ${si<NST-1?'<div class="anx" data-a="atog"><span>⟳ AUTO NEXT</span><i id="anxC"></i><b id="anxS"></b></div>':''}
       <div class="cpRow">${si<NST-1?'<button class="cpGo" data-a="next">NEXT ▶</button>':''}<button class="cpGo alt" data-a="map">CAMPAIGN</button></div>${gtk?'<button class="cpGo alt" data-a="gsum">'+GTKI+' GEAR SUMMON</button>':''}${drops.length?'<button class="cpGo alt" data-a="gear">'+IMGI(glyphURL('bag','#ffd9b0'))+' EQUIP GEAR</button>':''}</div>`;}
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">STAGE ${lab} · ${S0.n.toUpperCase()}<small>HOW TO GET STRONGER – tap one</small></div>
@@ -2539,9 +2541,9 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
   const tp=teamPower(curTeamList()),ep=enemyPower(i);
   const col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';const big=s.boss||s.mini;
   // v16-49: stage card = Marius' battle-prep picture (img/ui3/prep.webp): title plate, 3 enemy windows, VS power bar, 4 reward boxes, 5 team boxes, BACK + FIGHT
-  const rws=[[IMGI(badge('coin','#ffb300'),'1.5em'),T.fmt(first?R.money:Math.round(R.money*.25/10)*10)]];
+  const rws=[['<img src="img/ui3/v_coins.webp" alt="" style="height:1.75em;width:auto">',T.fmt(first?R.money:Math.round(R.money*.25/10)*10)]];
   if(first){rws.push([TKI.replace('1.15em','1.6em')+(R.ct?'<img src="img/cticket.webp" style="height:1.2em;margin-left:-.5em;vertical-align:-.1em">':''),'+'+R.tk+(R.ct?' / +'+R.ct:'')]);rws.push([T.DMI.replace(/height:[^;"]+/,'height:1.5em'),'+'+R.dm]);}
-  rws.push([IMGI(glyphURL('bag','#ffd54a'),'1.5em'),first?(s.boss?'2 ★':big?'1 ★':'×1'):(big?'×1':'40%')]);
+  rws.push([IMGI(itemIconURL('tool',s.boss?5:big?4:3),'1.75em'),first?(s.boss?'2 ★':big?'1 ★':'×1'):(big?'×1':'40%')]);
   const tm=curTeamList();
   $('cpCardBox').classList.add('prepSk');
   $('cpCardBox').innerHTML=`<div class="ppT"><b>${s.boss?IMGI(glyphURL('skull','#ff8a80'))+' ':s.mini?IMGI(glyphURL('horns','#ffb74d'))+' ':''}${sLabel(i)} · ${s.n}</b><small>CH ${s.c+1} · ${C.zones[Math.floor(s.j/5)].toUpperCase()} · ${s.w.length} WAVES${HM?' · HARD ×'+HARD_RW+' REWARDS':''}${PX.stars[i]?' · '+'⭐'.repeat(PX.stars[i]):''}</small></div>
@@ -2552,7 +2554,9 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
    <div class="ppG">${(()=>{const d=gdrop(s.c).slice(),a=s.c>=ASC_CH?Math.round(d[5]*.15*Math.min(1,(s.c-ASC_CH+1)/21)*10)/10:0;d[5]=Math.round((d[5]-a)*10)/10;d.push(a);return ['COM','UNC','RAR','EPI','LEG','MYT','ASC'].map((n,k)=>d[k]?`<span style="color:${GG(k).c}">${n} ${d[k]}%</span>`:'').filter(Boolean).join(' ');})()}</div>
    ${[0,1,2,3,4].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="team">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
    <button class="ppB" data-a="close" aria-label="Back"></button><button class="ppF" data-a="fight">FIGHT!</button>${!first&&!HM?`<button class="ppSw${cpSwOK()?'':' off'}" data-a="sweep">⚡ SWEEP<small>${cpSwOK()?'no fight':'VIP 4'}</small></button>`:''}`;
-  const mc=$('cpMons');types.slice(0,3).forEach(t=>{const d=document.createElement('div');d.className='mon'+(MON[t].boss?' bossm':'');d.appendChild(monPreview(t));const l=document.createElement('div');l.textContent=MON[t].n;d.appendChild(l);mc.appendChild(d);});
+  const mc=$('cpMons');const nMon=s.w.flat().length,info=()=>{const d=document.createElement('div');d.className='mon monInfo';d.innerHTML='<b>×'+nMon+'</b><div>'+s.w.length+' WAVES</div>';return d;};
+  const tl=types.slice(0,3);if(tl.length<3)setTimeout(()=>{if(tl.length===2)mc.insertBefore(info(),mc.children[1]);else if(tl.length===1){mc.insertBefore(info(),mc.firstChild);}},0);
+  tl.forEach(t=>{const d=document.createElement('div');d.className='mon'+(MON[t].boss?' bossm':'');d.appendChild(monPreview(t));const l=document.createElement('div');l.textContent=MON[t].n;d.appendChild(l);mc.appendChild(d);});
   $('cpCard').classList.add('open');$('cpCardBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;if(a==='close')$('cpCard').classList.remove('open');if(a==='heroes'){openGear(null,i);}if(a==='sweep'){cpSweep(i);return;}if(a==='team'){$('cpCard').classList.remove('open');gRet=()=>openCard(i);openGear(null,i);}if(a==='fight'){const T=TE();if(!T.G.cp.team||!T.G.cp.team.length){T.G.cp.team=curTeamList().map(h=>h.id);T.save();}$('cpCard').classList.remove('open');safeStart(i,teamHeroes());}};}
 
 // v16-122: SWEEP (VIP 4+) – a stage you already won gives its REPLAY rewards at once (money 25%, gear chance, Essence, Gear Parts)
@@ -2593,7 +2597,7 @@ let tsel=[],tsi=0,TCX=null; // v16-99: TCX = team screen opened from Tower / Cla
 const tPool=()=>TCX?TCX.pool():[...myMechs(),...[0,1,2,3,4].map(crewHero)],tEP=()=>TCX?TCX.ep():enemyPower(tsi),tBest=()=>TCX?TCX.best():bestTeam();
 function tSave(){const T=TE();if(TCX)TCX.set(tsel.slice());else T.G.cp.team=tsel.slice();T.save();}
 const isTank=r=>r==='engine'||r==='all';
-function curTeamList(){const T=TE(),G=T.G;const ids=(G.cp.team&&G.cp.team.length?G.cp.team:bestTeam()).filter(id=>id.startsWith('crew')||(T.HB[id]&&G.h.own[id])).slice(0,5);return ids.map(heroOf);}
+function curTeamList(){const T=TE(),G=T.G;let ids=(G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&G.h.own[id]);if(!ids.length)ids=bestTeam();return ids.slice(0,5).map(heroOf);}
 function teamDiff(Lb,La){const cb=Lb.map(h=>roleOf(h)),ca=La.map(h=>roleOf(h)),pros=[],cons=[];
   const med=l=>l.filter(r=>r==='service').length,tank=l=>l.filter(isTank).length,rng=l=>l.filter(r=>ROLE[r].rng>=80).length;
   if(med(cb)&&!med(ca))cons.push('No Medic left – nobody heals the team');if(!med(cb)&&med(ca))pros.push('Team gets a Medic – heals everybody');
@@ -2703,7 +2707,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const fz=T.canFuse?T.canFuse:()=>false;
   $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">+${stars(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
   $m('gHSB').innerHTML='<b>HERO SUMMON</b><span><img src="img/ticket.webp" alt="">'+T.G.h.tk.toLocaleString()+'</span>';
-  if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon mechanics first – the Rookie Crew can't use gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
+  if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon your first heroes – they fight and wear gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'');

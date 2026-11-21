@@ -82,3 +82,9 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - ⚠️ **Serverul (`server/online.js`, `server/worker.js`) e pe ramura asta** → se publică ÎMPREUNĂ cu jocul (merge în main); altfel profilul/clasamentul ar arăta nivelurile vechi.
 - Test Chrome 360 px: VIP 0→5 = 1.500 💎 + 75 bilete din fiecare + Legendary (Mama Rosa), fără dublare; DAILY/WEEKLY o singură dată; Quick Idle 2/zi la VIP 5; bag 170; SWEEP dă recompensa; cumpărare 99,99 € → +2.000 puncte; 0 erori. NEWS id 61.
 
+## 11. Cartea etapei curățată (Marius, 21 nov 2026: „eroi vechi care n-au ce căuta acolo, icoane vechi”) – gata, testat
+- **Scos „Rookie Crew”** (cei 5 mecanici vechi desenați din cod, cu salopetă portocalie) din TOATE echipele de luptă: `bestTeam()` dă doar eroii tăi, `teamHeroes`/`curTeamList` ignoră `crew*`, locurile goale arată „+”. Fără niciun erou → `startBattle` nu pornește, mesaj + se deschide SUMMON (cine dă SKIP la tutorial are oricum 10 Recruit).
+- **Fereastra din mijloc** (monștri) era goală când etapa are doar 2 tipuri → acum arată „×7 · 2 WAVES” (câți monștri în total).
+- **Iconițe vechi** (moneda și sacul desenate din cod) → pozele jocului: monede `img/ui3/v_coins`, echipament = iconița reală a unei piese (Epic / Legendary / Mythic după etapă); și la „GEAR FOUND” pe ecranul VICTORY.
+- Test: jucător cu 1 erou (fără crew), cont full; carte, luptă, victorie, hartă – 0 erori.
+
