@@ -70,7 +70,7 @@ function rwHtml(r){const a=[];if(r.dm)a.push(DM()+' '+r.dm);if(r.tk)a.push(TK+' 
 function realRw(st,r){const o={...r};if(o.ess)o.ess=Math.round(o.ess*(st.b||300));return o;}
 function claim(tr,i){const s=S(),st=s[tr],E=EV[st.k],m=E.m[i],sc=isW(st.k)?st.w.used:st.sc;if(!m||st.cl.includes(i)||sc<goal(st,m[0]))return;
   st.cl.push(i);const r=realRw(st,m[1]);T().giveRw(r);T().save();T().toast('🎁 '+E.n+': '+rwHtml(r),2800);render();}
-function canClaim(){if(!T()||!T().G)return false;const s=S();for(const tr of ['A','B']){const st=s[tr],E=EV[st.k],sc=isW(st.k)?st.w.used:st.sc;if(E.m.some((m,i)=>!st.cl.includes(i)&&sc>=goal(st,m[0])))return true;
+function canClaim(){if(!T()||!T().G)return false;if(window.STREET&&STREET.canClaim())return true;const s=S();for(const tr of ['A','B']){const st=s[tr],E=EV[st.k],sc=isW(st.k)?st.w.used:st.sc;if(E.m.some((m,i)=>!st.cl.includes(i)&&sc>=goal(st,m[0])))return true;
   if(isW(st.k)){const w=st.w;if(w.sp>0)return true;if(QL(st.k).some(x=>!w.got[x[0]]&&(w.q[x[0]]||0)>=x[2]))return true;}}return false;}
 function dot(){const d=document.getElementById('evDot');if(d)d.classList.toggle('on',canClaim());}
 // ---------------- wheel
@@ -168,20 +168,22 @@ const css=`#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716
 #ev .evPz{gap:2px}#ev .evPr{position:relative;box-sizing:border-box;width:100%;aspect-ratio:860/150;padding:0 5% 0 28%;border-radius:0;box-shadow:none;background:url(img/ui10/ev_row_lock.webp) center/100% 100% no-repeat}
 #ev .evPr .rkm{position:absolute;left:18.3%;top:50%;transform:translate(-50%,-50%) scale(1.15)}#ev .evPr .pz{display:flex;align-items:center;flex-wrap:nowrap}
 #ev i.rkm{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:50px;min-width:0;background:center/contain no-repeat;font:400 13px Lilita,Game,system-ui;font-style:normal;color:#fff;text-shadow:0 0 3px #000,0 1px 0 #000,0 0 6px #000;padding-bottom:4px;box-sizing:border-box}
-#ev .evL{padding:3px 10px 3px 4px;font-size:15px}#ev .evL b{font-weight:400;color:#ffe082}`;
+#ev .evL{padding:3px 10px 3px 4px;font-size:15px}#ev .evL b{font-weight:400;color:#ffe082}
+#ev .evTabs b.stTab{font-size:12px}#ev .evTabs b.stTab .tki{height:1.5em;width:auto;margin-right:3px}`;
 let el,tab='A',view='main';
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);el=document.createElement('div');el.id='ev';
   el.innerHTML='<div class="evTop"><button class="evX" data-e="x">↩</button><div class="evTi">EVENTS</div></div><div class="evTabs" id="evTabs"></div><div class="evB" id="evBody"></div>';document.body.appendChild(el);
   el.addEventListener('click',e=>{const t=e.target.closest('[data-e]');if(!t)return;const a=t.dataset.e;
     if(a==='x'){if(view!=='main'){view='main';render();return;}el.classList.remove('open');dot();}
     else if(a==='tab'){tab=t.dataset.t;view='main';render();}
+    else if(a==='street'){if(window.STREET)STREET.open();}   // v16-146 Business Street (street.js)
     else if(a==='cl')claim(t.dataset.t,+t.dataset.i);
     else if(a==='rk'){view='rank';render();showRank();}
     else if(a==='spin')spin();
     else if(a==='wq'){const B=S().B,w=B.w,x=QL(B.k).find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast((B.k==='key'?'🔑':'🎡')+' +'+x[3]+' free spin',1800);render();}});}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function render(){if(!el||!el.classList.contains('open'))return;const s=S();
-  document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+evTabIc(EV[s[tr].k])+' '+EV[s[tr].k].n+'</b>').join('');
+  document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+evTabIc(EV[s[tr].k])+' '+EV[s[tr].k].n+'</b>').join('')+(window.STREET?'<b data-e="street" class="stTab">'+STREET.tabHtml()+'</b>':'');
   const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
