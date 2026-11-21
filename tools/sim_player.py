@@ -29,6 +29,12 @@ CLOCK = ("""(()=>{let s=%d;Math.random=()=>{s=(s*16807)%%2147483647;return (s-1)
 BOT = r"""
 window.__BOT={
  log:[],
+ // v16-131: PAYING player (≈ €28/month): day 1 all 4 one-time packs + VIP Crew + VIP Truck + Battle Speed ×3,
+ // every 30 days Gold + Platinum Pass + 800-diamond pack (€4.99). VIP points 20 / €.
+ pay(d){if(!window.SHOP2)return 0;let e=0;const add=(k,v)=>{try{SHOP2.grant(k,1);}catch(x){}e+=v;};
+   if(d===1){['p1','p2','p3','p4'].forEach((k,i)=>add(k,[0.99,2.99,5.99,9.99][i]));PK.vip=true;PK.car=true;PK.spd2=true;e+=3.99+5.99+2.99;}
+   if((d-1)%30===0){PK.sub=Date.now()+30*864e5;PK.plat=Date.now()+30*864e5;try{savePacks();}catch(x){}add('sub',5.99);add('plat',9.99);add('d2',4.99);}
+   try{savePacks();vipRefresh();}catch(x){}if(e)addVip(Math.round(e*20));this.eur=(this.eur||0)+e;return this.eur;},
  setup(paid){
    if(paid){PK.car=true;PK.vip=true;PK.spd2=true;PK.sub=Date.now()+400*864e5;try{savePacks();}catch(e){}try{vipRefresh();}catch(e){}}
    // the one-time mail gifts every player gets
@@ -106,7 +112,7 @@ async def main():
     port = 8770 + (1 if MODE == 'paid' else 0) + 2 * int(os.environ.get('PORTOFF', '0'))
     srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(port)], cwd=DST, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1); errs = []; days = []
-    paid = MODE == 'paid'; speed = 2.0 if paid else 1.5
+    paid = MODE == 'paid'; speed = 3.0 if paid else 1.5
     try:
         async with async_playwright() as p:
             b = await p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox'])
@@ -134,6 +140,7 @@ async def main():
             t0 = time.time()
             for d in range(1, DAYS + 1):
                 await pg.evaluate("__BOT.daily()")
+                eur = await pg.evaluate(f"__BOT.pay({d})") if paid else 0
                 sm = await pg.evaluate("__BOT.summons()")
                 bt_budget = 2 * 3600.0          # 2 h played
                 wins = losses = 0; fails = 0; bt_time = 0.0
@@ -159,9 +166,9 @@ async def main():
                 await pg.evaluate("__BOT.quests()")
                 sm2 = await pg.evaluate("__BOT.summons()")
                 st = await pg.evaluate("__BOT.state()")
-                st.update(day=d, wins=wins, losses=losses, battle_min=round(bt_time / 60), summons={k: sm.get(k, 0) + sm2.get(k, 0) for k in set(sm) | set(sm2)})
+                st.update(day=d, eur=round(eur or 0,2), wins=wins, losses=losses, battle_min=round(bt_time / 60), summons={k: sm.get(k, 0) + sm2.get(k, 0) for k in set(sm) | set(sm2)})
                 days.append(st)
-                print(f"[{MODE}] day {d}: stage {st['label']} rep {st['rep']} vip {st['vip']} bld {st['bldSum']} cars {st.get('cars')} ccB {st.get('ccB')}% pk {st.get('pk')} money {st['money']} power {st['power']} mechs {st['mechs']} ({time.time()-t0:.0f}s)", flush=True)
+                print(f"[{MODE}] day {d} €{st.get('eur',0)}: stage {st['label']} rep {st['rep']} vip {st['vip']} bld {st['bldSum']} cars {st.get('cars')} ccB {st.get('ccB')}% pk {st.get('pk')} money {st['money']} power {st['power']} mechs {st['mechs']} ({time.time()-t0:.0f}s)", flush=True)
                 json.dump(dict(mode=MODE, days=days, errors=errs[:20], log=await pg.evaluate('__BOT.log.slice(0,30)'), up=await pg.evaluate('__BOT.up||[]')), open(OUT, 'w'), indent=1)
                 # offline until tomorrow (22 h)
                 await pg.evaluate("__adv(22*3600*1000)")
