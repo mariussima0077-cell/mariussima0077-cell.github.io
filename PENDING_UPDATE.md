@@ -52,3 +52,11 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - **Cheile câștigate = BONUS (`G.dg.x`)**: se adună, NU expiră la miezul nopții; se folosesc după cheile zilnice (`dgUse`). Afișare: „2/2 +5” pe cartea dungeonului, „+5 BONUS” în pagina lui, total în Battle Hub.
 - Server (`server/online.js`): `EV_TRK.B` + `key`, `EV_CAP/EV_TKK/EV_NAME`, `evKind` cu lungimea listei (A are 3, B are 4). ⚠️ Serverul trebuie urcat odată cu jocul.
 - Poze: pozele lui Marius integrate (21 nov) – `img/ui9/evb_key.webp` 900×360 + `img/ui9/kwheel_disc.webp` 441×441 (verdele scos). Rama și săgeata = cele ale Lucky Wheel. Testat: 0 erori.
+
+## 8. Ascended doar din drop (Marius, 21 nov 2026) – gata, testat
+- Scos **ASCEND** (Mythic ★5 + Mythic același slot → Ascended): butonul nu mai apare, acțiunea `asc` nu mai face nimic (`battle.js`). Mythic ★5 = „STARS 5 / 5 · MAX”.
+- Ascended vine DOAR din: **Gear Summon 0,02%** · **campanie de la capitolul 30** (ca înainte, până la 15% din drop-urile Mythic la cap. 50) · **Idle Rewards de la capitolul 30**: 0,1% pe fiecare oră din cufăr (`IDLE_ASC_H`, `idleAsc` în `battle.js`, chemat din `claimIdle` în `index.html`), cu sămânță `srun('ia')` → fără reroll. Cufăr de 8 h ≈ 0,8% (~1 piesă la ~1-2 luni cu 3 cufere/zi). Toast „✦ ASCENDED …!”.
+- GEAR GUIDE secțiunea 3 = „ASCENDED · WHERE TO FIND” (cele 3 surse), textul din Gear Rates actualizat.
+- Test (Chrome 360 px): jucător etapa 5 → nimic; etapa 700 → piesă r=6 în sac; 2000 cufere de 8 h → 0,55%; claimIdle OK; Mythic ★5 fără buton ASCEND; 0 erori.
+- NEWS id 59.
+
