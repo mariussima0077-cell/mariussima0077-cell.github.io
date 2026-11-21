@@ -24,3 +24,12 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - `tools/sim_player.py`: `SEED=n` (același noroc), `TAG`/`PORTOFF` (două simulări în paralel).
 - ⚠️ Progresul depinde mult de noroc: un Mythic din summon în ziua 1 (0,08%) = ~2-3 capitole în plus după 2 săptămâni. Fără el, jucătorul gratuit e la cap. 4 după 2 săptămâni, cap. 7 după 30 de zile.
 - Rămâne de văzut: banii se strâng în milioane în unele zile (nimic de cumpărat).
+
+## 5. Feedback tester Wazza4ever (21 nov 2026) – gata, testat
+- **Venit pe oră**: sub bani „+$X/h” (ultimele 20 min de joc); tap pe bani → pagina „Income per hour” pe clădiri; fiecare clădire: „💰 Income now → după upgrade” (spălătorie/benzinărie/fabrică = calcul exact; garaje/birou = măsurat × efectul upgrade-ului). `incAdd/incSale/incRates` în index.html.
+- Eroii din clădiri arată bonusul (⚡ viteză · 💵 plată · 🎯 crit); clasă greșită = „wrong class · no bonus”.
+- **Classic Collection**: 💎 ÷5 (max 16/h în loc de 80/h), în plus Essence + Gear Parts (`es`/`gp` în classic.js, adăugate la Idle). Reparat „+1.0833333 / h”.
+- **Towers**: AUTO NEXT (3 s) la Torque Tower + Class Towers, același buton ON/OFF ca la campanie (`anxTower`).
+- **Battle Speed pack: ×2 → ×3** (cine l-a cumpărat are ×3). Iconiță nouă `img/ui3/b_x3.webp` (făcută din b_x2). ⚠️ La urcare: schimbă numele/descrierea produsului `battle_speed_x2` în Play Console („Battle Speed ×3”) + PLAY_RULES.md.
+- News id 58 (data de pus la ziua urcării).
+- Test (test mode): 0 erori; telefon buget: hartă 457 MB, încărcare 9,6 s.

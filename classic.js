@@ -5,20 +5,22 @@
 (()=>{
 const T=()=>window.__TE;
 // ---------------------------------------------------------------- the cars (names invented – no real brands, PLAY_RULES)
+// v16-121: diamonds ÷5 (tester: up to 80 💎/h made the Shop useless – 800 💎 cost €4.99) → max ~16 💎/h; instead the cars give
+// Essence (es) + Gear Parts (gp) for the battles, in idle units (es 1 = what 2 h of normal idle give).
 // r = idle rewards per hour: dm diamonds, tk Recruit, ct Crew, gt Gear tickets (fractions add up while you are away)
 const CARS=[
- {id:'bug',   n:'Pebble Bug',      gr:0,k:'bug',     c:['#7ec8e3','#e9f6fb'],price:40e3, rep:6, r:{dm:2}},
- {id:'ramb',  n:'Rusty Rambler',   gr:0,k:'sedan30', c:['#2e3b4e','#151c26'],price:60e3, rep:6, r:{dm:2}},
- {id:'sun',   n:'Sunset Roadster', gr:1,k:'roadster',c:['#e53935','#f5e6c8'],price:150e3,rep:8, r:{dm:3,ct:1/12}},
- {id:'woody', n:'Woody Wagon',     gr:1,k:'wagon',   c:['#f2e3c0','#9a6033'],price:200e3,rep:8, r:{dm:3,ct:1/12}},
- {id:'star',  n:'Starline Cruiser',gr:2,k:'cruiser', c:['#4fc3d9','#f4f1e8'],price:600e3,rep:10,r:{dm:5,tk:1/12}},
- {id:'midn',  n:'Midnight Coupe',  gr:2,k:'coupe',   c:['#1b2a52','#c9d3e6'],price:800e3,rep:10,r:{dm:5,tk:1/12}},
- {id:'thund', n:'Thunderbolt GT',  gr:3,k:'muscle',  c:['#ff8f00','#111111'],price:2.5e6,rep:13,r:{dm:8,tk:1/8,gt:1/12}},
- {id:'arrow', n:'Silver Arrow',    gr:3,k:'arrow',   c:['#cfd8dc','#e53935'],price:3e6,  rep:13,r:{dm:8,tk:1/8,gt:1/12}},
- {id:'royal', n:'Royal Phantom',   gr:4,k:'limo',    c:['#4a0e1a','#d9c27a'],price:10e6, rep:17,r:{dm:12,tk:1/6,ct:1/8,gt:1/8}},
- {id:'gull',  n:'Gullwing Grand',  gr:4,k:'gull',    c:['#eceff1','#263238'],price:12e6, rep:17,r:{dm:12,tk:1/6,ct:1/8,gt:1/8}},
- {id:'dyn',   n:'Golden Dynasty',  gr:5,k:'dynasty', c:['#ffcf40','#7a4a00'],price:40e6, rep:22,r:{dm:20,tk:1/4,ct:1/6,gt:1/6}},
- {id:'etern', n:'Eternal Torque',  gr:5,k:'eternal', c:['#12051f','#ff3d71'],price:50e6, rep:22,r:{dm:20,tk:1/4,ct:1/6,gt:1/6}},
+ {id:'bug',   n:'Pebble Bug',      gr:0,k:'bug',     c:['#7ec8e3','#e9f6fb'],price:40e3, rep:6, r:{dm:0.5,es:0.05,gp:0.05}},
+ {id:'ramb',  n:'Rusty Rambler',   gr:0,k:'sedan30', c:['#2e3b4e','#151c26'],price:60e3, rep:6, r:{dm:0.5,es:0.05,gp:0.05}},
+ {id:'sun',   n:'Sunset Roadster', gr:1,k:'roadster',c:['#e53935','#f5e6c8'],price:150e3,rep:8, r:{dm:0.75,es:0.08,gp:0.08,ct:1/12}},
+ {id:'woody', n:'Woody Wagon',     gr:1,k:'wagon',   c:['#f2e3c0','#9a6033'],price:200e3,rep:8, r:{dm:0.75,es:0.08,gp:0.08,ct:1/12}},
+ {id:'star',  n:'Starline Cruiser',gr:2,k:'cruiser', c:['#4fc3d9','#f4f1e8'],price:600e3,rep:10,r:{dm:1,es:0.12,gp:0.12,tk:1/12}},
+ {id:'midn',  n:'Midnight Coupe',  gr:2,k:'coupe',   c:['#1b2a52','#c9d3e6'],price:800e3,rep:10,r:{dm:1,es:0.12,gp:0.12,tk:1/12}},
+ {id:'thund', n:'Thunderbolt GT',  gr:3,k:'muscle',  c:['#ff8f00','#111111'],price:2.5e6,rep:13,r:{dm:1.5,es:0.18,gp:0.18,tk:1/8,gt:1/12}},
+ {id:'arrow', n:'Silver Arrow',    gr:3,k:'arrow',   c:['#cfd8dc','#e53935'],price:3e6,  rep:13,r:{dm:1.5,es:0.18,gp:0.18,tk:1/8,gt:1/12}},
+ {id:'royal', n:'Royal Phantom',   gr:4,k:'limo',    c:['#4a0e1a','#d9c27a'],price:10e6, rep:17,r:{dm:2.5,es:0.28,gp:0.28,tk:1/6,ct:1/8,gt:1/8}},
+ {id:'gull',  n:'Gullwing Grand',  gr:4,k:'gull',    c:['#eceff1','#263238'],price:12e6, rep:17,r:{dm:2.5,es:0.28,gp:0.28,tk:1/6,ct:1/8,gt:1/8}},
+ {id:'dyn',   n:'Golden Dynasty',  gr:5,k:'dynasty', c:['#ffcf40','#7a4a00'],price:40e6, rep:22,r:{dm:4,es:0.4,gp:0.4,tk:1/4,ct:1/6,gt:1/6}},
+ {id:'etern', n:'Eternal Torque',  gr:5,k:'eternal', c:['#12051f','#ff3d71'],price:50e6, rep:22,r:{dm:4,es:0.4,gp:0.4,tk:1/4,ct:1/6,gt:1/6}},
 ];
 const BY={};CARS.forEach(c=>BY[c.id]=c);
 const OPEN_COST=150e3,OPEN_REP=6,SPOTS=6,SPOT_COST=[0,0,500e3,1.5e6,5e6,15e6],FULL_BONUS=.10,SELL_BACK=.5;
@@ -27,8 +29,8 @@ const SPOT=[[130,380],[430,380],[130,558],[430,558],[130,735],[430,735]];
 
 function st(){const G=T().G;if(!G.cc)G.cc={o:0,sp:2,p:['','','','','','']};return G.cc;}
 function parked(){return st().p.filter(Boolean).map(id=>BY[id]).filter(Boolean);}
-function rates(){const s=st(),o={dm:0,tk:0,ct:0,gt:0,mon:0};if(!s.o)return o;
-  for(const c of parked())for(const k in c.r)o[k]+=c.r[k];
+function rates(){const s=st(),o={dm:0,tk:0,ct:0,gt:0,es:0,gp:0,mon:0};if(!s.o)return o;
+  for(const c of parked())for(const k in c.r)o[k]=(o[k]||0)+c.r[k];
   if(parked().length>=SPOTS)o.mon=FULL_BONUS;return o;}
 
 // ---------------------------------------------------------------- drawing (nose = +x, centred, length L, width W)
@@ -200,8 +202,8 @@ const el=document.createElement('div');el.id='ccP';el.innerHTML='<div id="ccBox"
 document.body.appendChild(el);let tab='g';
 const GN=['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC'];
 function gc(gr){const G=T().GRADES;return G&&G[gr]?G[gr].c:'#999';}
-function rwLine(r,big){const T0=T(),a=[];const per=v=>v>=1?'+'+v+' / h':'1 every '+Math.round(1/v)+' h';
-  if(r.dm)a.push(T0.DMI+' '+per(r.dm));if(r.tk)a.push('<img class="tki" src="img/ticket.webp"> '+per(r.tk));if(r.ct)a.push('<img class="tki" src="img/cticket.webp"> '+per(r.ct));if(r.gt)a.push('<img class="tki" src="img/gticket.webp"> '+per(r.gt));
+function rwLine(r,big){const T0=T(),a=[];const per=v=>v>=1?'+'+Math.round(v*10)/10+' / h':'1 every '+Math.round(1/v)+' h';
+  if(r.dm)a.push(T0.DMI+' '+per(r.dm));if(r.es)a.push(T0.ESI+' +'+T0.fmt(Math.round(r.es*T0.ESS_U())).replace('$','')+' / h');if(r.gp)a.push(T0.GPI+' +'+T0.fmt(Math.round(r.gp*T0.GP_U())).replace('$','')+' / h');if(r.tk)a.push('<img class="tki" src="img/ticket.webp"> '+per(r.tk));if(r.ct)a.push('<img class="tki" src="img/cticket.webp"> '+per(r.ct));if(r.gt)a.push('<img class="tki" src="img/gticket.webp"> '+per(r.gt));
   return a.join(big?'<br>':' · ');}
 function open(t){tab=t||tab;el.classList.add('open');render();}
 function close(){el.classList.remove('open');$p().classList.remove('open');}
@@ -213,7 +215,7 @@ function render(){const T0=T(),G=T0.G,s=st();document.getElementById('ccMon').in
       '<button class="ccBuy'+(ok&&G.money>=OPEN_COST?'':' off')+'" data-cc="open">'+(ok?'OPEN · '+T0.fmt(OPEN_COST):'🔒 REP '+OPEN_REP)+'</button></div>';
     document.getElementById('ccBody').innerHTML=h;return;}
   if(tab==='g'){const R=rates(),n=parked().length;
-    h+='<div class="ccSum"><b>IDLE BONUS FROM YOUR CARS</b><div>'+(n?rwLine(R):'Park a car to get diamonds and tickets')+'</div>'+
+    h+='<div class="ccSum"><b>IDLE BONUS FROM YOUR CARS</b><div>'+(n?rwLine(R):'Park a car to get diamonds, Essence, Gear Parts and tickets')+'</div>'+
       '<small>'+n+' / '+SPOTS+' cars'+(R.mon?' · <i>FULL SHOWROOM: idle money +'+Math.round(FULL_BONUS*100)+'%</i>':' · fill all '+SPOTS+' spots: idle money +'+Math.round(FULL_BONUS*100)+'%')+'</small></div><div class="ccGrid">';
     for(let i=0;i<SPOTS;i++){const m=BY[s.p[i]];
       if(i>=s.sp){const can=i===s.sp;h+='<div class="ccSp lock'+(can?' nx':'')+'" data-cc="'+(can?'spot':'')+'"><div class="ccGl"><span>🔒</span>'+(can?'<button class="ccBuy'+(G.money>=SPOT_COST[i]?'':' off')+'">UNLOCK · '+T0.fmt(SPOT_COST[i])+'</button>':'<em>unlock spot '+(i)+' first</em>')+'</div><b class="ccPl">SPOT '+(i+1)+'</b></div>';continue;}

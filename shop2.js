@@ -218,7 +218,7 @@ function render(){
     h+='<div class="sec">FOREVER PACKS</div>'+[
       ['car','ui3/sp_truck','VIP Truck · Rich Clients','Forever: rich clients, priority in every garage, pay ×2.','€5.99'],
       ['vip','ui3/sp_crew','VIP Crew Boost','Forever: every mechanic +25% speed &amp; money.','€3.99'],
-      ['spd2','ui3/sp_speed','Battle Speed ×2','Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins>','€2.99'],
+      ['spd2','ui3/sp_speed','Battle Speed ×3','Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins>','€2.99'],
     ].map(([k,i,n,d,pr])=>'<div class="pack"><div class="th"><img src="'+IMG(i)+'" alt=""></div><div class="tx"><b>'+n+'</b>'+d+'</div>'+(pk[k]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,pr)+'</button>')+'</div>').join('')+
       '<div class="pack"><div class="th"><img src="img/ui2/i_key.webp" alt=""></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day in every dungeon + SWEEP.'+(on('dg')?' <ins>Active – '+daysLeft('dg')+' days left.</ins>':'')+'</div><button class="buy" data-a="dg">'+P('dg','€2.99')+'</button></div>';
     h+=(SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping a price gives it without payment.<br>'+(SEC.TEST_ACC?'<a href="?tacc=0" style="color:#ffd54a">↩ Back to my normal account</a>':'<a href="?tacc=1" style="color:#ffd54a">🧪 Open the FULL TEST ACCOUNT (hidden from rankings)</a>')+'</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>');
@@ -236,13 +236,13 @@ function render(){
       return '<span class="tot">'+label+' / month · cancel anytime</span><button class="buy" data-b="'+key+'">'+P(key,label)+'</button>'; };
     h+='<div class="sec">VIP PASS · 30 DAYS'+(actv().length?' · <span style="color:#7CFC9A">'+(actv().length>1?actv().length+' ACTIVE · ×'+stackMult().toFixed(1).replace(/\.0$/,''):PASS[tr].n)+'</span>':'')+'</div>';
     h+='<div class="card vp s"><div class="top"><img src="'+IMG('shop/vp_sil')+'" alt=""><div><h3>SILVER PASS</h3><div class="sub">Free to play – paid with diamonds you earn</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_crown'),'VIP benefits','×1.2')+row(IMG('ui3/v_idle'),'Idle Rewards','+1 h')+row('img/ticket.webp','Recruit Ticket every day','+1')+row(IMG('ui3/v_dm'),'Diamonds every day','–',1)+row(IMG('ui3/sp_speed'),'Battle Speed ×2','–',1)+
+      row(IMG('ui3/v_crown'),'VIP benefits','×1.2')+row(IMG('ui3/v_idle'),'Idle Rewards','+1 h')+row('img/ticket.webp','Recruit Ticket every day','+1')+row(IMG('ui3/v_dm'),'Diamonds every day','–',1)+row(IMG('ui3/sp_speed'),'Battle Speed ×3','–',1)+
       '</ul><div class="foot">'+btn('sil','',1)+'</div></div>';
     h+='<div class="card vp g"><div class="rib">POPULAR</div><div class="top"><img src="'+IMG('shop/vp_gold')+'" alt=""><div><h3>GOLD PASS</h3><div class="sub">Monthly subscription</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_dm'),'Diamonds right away','300')+row(IMG('ui3/v_dm'),'Diamonds every day','+100')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×1.5')+row(IMG('ui3/v_idle'),'Idle Rewards','+2 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×2','✓')+
+      row(IMG('ui3/v_dm'),'Diamonds right away','300')+row(IMG('ui3/v_dm'),'Diamonds every day','+100')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×1.5')+row(IMG('ui3/v_idle'),'Idle Rewards','+2 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+
       '</ul><div class="tot">In 30 days: 3,300 💎 + 60 tickets ≈ 93 summons</div><div class="foot">'+btn('gold','€5.99')+'</div></div>';
     h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×2','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
+      row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
       '</ul><div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
     h+='<div class="note">VIP Passes stack: you can have Silver, Gold and Platinum at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
   }
@@ -279,7 +279,7 @@ root.addEventListener('click',onClick); foot.addEventListener('click',e=>{ if(e.
 async function buyForever(k){ if(busy||PK()[k]) return; busy=true;
   try{ const ok=await SEC.buy(k); if(!ok) return; PK()[k]=true; t_save();
     if(k==='car'&&T().vtStart) T().vtStart();
-    T().toast(k==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':k==='spd2'?'⏩ Battle Speed ×2 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000); render(); }
+    T().toast(k==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':k==='spd2'?'⏩ Battle Speed ×3 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000); render(); }
   finally{ busy=false; } }
 
 function open(t){ if(t) tab=t; conf=''; el.classList.add('open'); render(); el.scrollTop=0;

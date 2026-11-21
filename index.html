@@ -839,13 +839,16 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 @keyframes spIn{from{transform:scale(.3) rotate(-6deg);opacity:0;filter:brightness(4)}to{transform:none;opacity:1;filter:none}}
 @keyframes spGl{from{filter:brightness(1)}to{filter:brightness(1.5)}}
 @keyframes ulNew{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 #ffd54a)}50%{transform:scale(1.15);filter:drop-shadow(0 0 10px #ffd54a)}}.ulNew{animation:ulNew 1s ease-in-out 6}
+#incH{position:absolute;left:7%;top:100%;margin-top:2px;padding:1px 7px;border-radius:9px;background:rgba(0,0,0,.55);font:900 11px system-ui;color:#7CFC9A;white-space:nowrap;pointer-events:auto;cursor:pointer}#incH:empty{display:none}#money{pointer-events:auto;cursor:pointer}
+.incL{position:relative;cursor:pointer}.incL i{position:absolute;left:0;bottom:0;height:3px;border-radius:2px;background:#7CFC9A;opacity:.7}
+.hbT{display:block;font:800 10px system-ui;color:#7CFC9A;margin-top:1px}.hbT.bad{color:#ff8a80}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
 <div id="fx"></div>
 <div id="hud"><div id="hudBar">
-  <span id="money">$0</span>
+  <span id="money">$0</span><span id="incH"></span>
   <span id="dmH">0</span>
   <div id="repPill"><span id="rep">REP 1</span><span class="rb"><i id="repBar"></i></span></div>
   <span id="sold">0</span>
@@ -1357,7 +1360,7 @@ function startDrive(c,d){
   const t=c.target;c.path=carPathTo(c,t);c.slot=t;c.target=null;c.state='drive';c.driver=d;
   c.onArrive=()=>{c.driver=null;
     if(c.wasSold){c.wasSold=false;c.state='yard';}else arriveSlot(c);
-    const tb=drvBonus(d.pool,d.k);if(tb.tip>0&&Math.random()<tb.tip){const dh=heroIn('d|'+d.pool+'|'+d.k),tp=Math.round((10+8*G.rep)*(1+(dh?dh.gr:0)*.5));G.money+=tp;float(c.x,c.y-22,'💵 TIP +'+fmt(tp),'#a5d6a7');if(dh&&SPRD_OK(dh))d.p.tipT=1.0;}
+    const tb=drvBonus(d.pool,d.k);if(tb.tip>0&&Math.random()<tb.tip){const dh=heroIn('d|'+d.pool+'|'+d.k),tp=Math.round((10+8*G.rep)*(1+(dh?dh.gr:0)*.5));G.money+=tp;incAdd(INFO[d.pool]?d.pool:'parking',tp);float(c.x,c.y-22,'💵 TIP +'+fmt(tp),'#a5d6a7');if(dh&&SPRD_OK(dh))d.p.tipT=1.0;}
     const p=d.p,side=carSide(c);p.x=side.x;p.y=side.y;p.vis=true;p.a=c.a+Math.PI/2;
     p.legs=legsTo(c.slot.loc,side,d.loc,d.loc.homes[d.k],tierOf(d.pool));
     p.onDone=()=>{d.busy=false;d.car=null;p.a=d.loc.homeA;};
@@ -1383,8 +1386,8 @@ function finishInspect(c){
   float(c.x,c.y-30,'✓ '+c.jobs.length+' JOB'+(c.jobs.length>1?'S':'')+' FOUND','#7CFC9A');
   if(np)float(c.x,c.y-14,'📦 '+np+' PART'+(np>1?'S':'')+' ORDERED','#ffcc80');
 }
-function completeJob(c,j){
-  const vb=vipBay(c),mb=bayMB(c),crit=mb.crit>0&&Math.random()<mb.crit;j.done=true;c.value+=ECO*(c.rich?RICH_M:1)*j.pay*c.type.m*(vb?VIP_BOOST:1)*(1+VB('income')+mb.inc+payB(j.st))*(crit?2:1);if(crit)float(c.x,c.y-58,'🎯 DOUBLE PAY!','#ff9800');qAdd('job',1,j.st);cheer(c);if(vb&&DET)float(c.x,c.y-46,'👑 +25%','#ffd54a');
+function completeJob(c,j){const v0=c.value;
+  const vb=vipBay(c),mb=bayMB(c),crit=mb.crit>0&&Math.random()<mb.crit;j.done=true;c.value+=ECO*(c.rich?RICH_M:1)*j.pay*c.type.m*(vb?VIP_BOOST:1)*(1+VB('income')+mb.inc+payB(j.st))*(crit?2:1);(c.inc||(c.inc={}))[j.st]=(c.inc[j.st]||0)+(c.value-v0);if(crit)float(c.x,c.y-58,'🎯 DOUBLE PAY!','#ff9800');qAdd('job',1,j.st);cheer(c);if(vb&&DET)float(c.x,c.y-46,'👑 +25%','#ffd54a');
   const t=c.tune;
   if(j.id==='respray'&&!c.type.liv)c.col=c.newCol;
   if(j.id==='polish'||j.id==='respray')c.dirt=0;
@@ -1399,7 +1402,7 @@ function sales(dt){
   for(let j=0;j<PLV('office');j++){const a=agents[j];
     if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent&&c.rich)||cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
     else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale())*(1+repSale()));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
-      G.money+=price;G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip||c.rich)driveAway(c);else if(Math.random()<BUYER_DRIVE)driveAway(c,1);
+      G.money+=price;incSale(c,price);G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip||c.rich)driveAway(c);else if(Math.random()<BUYER_DRIVE)driveAway(c,1);
       const xp=1+c.jobs.reduce((s,j)=>s+j.xp,0);addXP(xp);
       float(c.x,c.y-30,'+'+fmt(price),'#ffd54a');float(a.p.x,a.p.y-22,'SOLD ONLINE','#b39ddb');save();}}
   }
@@ -1541,7 +1544,7 @@ function guardHome(g){g.mode=g.k?'patrol':'back';g.p.pose='';
   else g.route=[...(g.via||[]).slice().reverse(),{x:PX_R,y:SOUT.y},SOUT,SDOOR,CHAIR];}
 function mkCop(x,y,path,v,mode){const c={id:9000+Math.floor(Math.random()*999),type:POLICE_T,x,y,a:0,col:POLICE_T.col,siren:true,tune:{},jobs:[],dmg:[],dirt:0,lift:0,state:'police',path,v,mode,t:0,acc:'#fff',wrapCol:'#111'};police.push(c);return c;}
 function catchThief(){const T=thief,c=T.car;T.st='caught';T.ct=time;T.p.pose='';c.state=c.prevState;c.alarm=0;
-  const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;G.sec.caught++;G.h.ct++;qAdd('thief',1);
+  const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;incAdd('security',rw);G.sec.caught++;G.h.ct++;qAdd('thief',1);
   float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');toast('👮 Thief caught! Reward +'+fmt(rw)+' · '+CTI+' +1 · The police are coming',4000);
   const road=c.slot.road,lane=offsetPath(route(carG,{x:AV,y:170},road),LN);
   const cop=mkCop(-90,96,roundPath([{x:-90,y:96},{x:lane[0].x,y:96},...lane],18).slice(1),240,'arrest');cop.road=road;T.cop=cop;save();}
@@ -2538,7 +2541,25 @@ function toDistrict(c){const L=SY-LN,x0=XCON-LN;c.path=[];c.sp=105;c.bt=0;c.toX=
 function gasTo(c,pre,lane){const r=xRect('gas'),P=XGAS.p[r.t-1],free=P.map((_,i)=>i).filter(i=>!XS.pumps[i]);if(!free.length)return false;
   const i=free[0],px=r.x+r.w*P[i];c.xk='gas';c.xs='in';c.pi=i;XS.pumps[i]=c;
   c.path=roundPath([...pre,{x:px,y:lane},{x:px,y:r.y+r.h*XGAS.bot[r.t-1]+c.type.L/2-3}],20);return true;}
-function xEarn(n,x,y,txt,col){n=Math.round(n*ECO);G.money+=n;qAdd('earn',n);float(x,y,txt+' +'+fmt(n),col);}
+function xEarn(n,x,y,txt,col,src){n=Math.round(n*ECO);G.money+=n;qAdd('earn',n);incAdd(src,n);float(x,y,txt+' +'+fmt(n),col);}
+// v16-121: GARAGE INCOME PER HOUR (tester feedback): every dollar is booked to the building that earned it; rolling window of the last 20 min of play
+const INC={b:[],t0:Date.now(),hid:0};
+function incAdd(src,n){if(!src||!(n>0))return;const m=Math.floor(Date.now()/6e4);let b=INC.b[INC.b.length-1];if(!b||b.m!==m){b={m,s:{}};INC.b.push(b);while(INC.b.length>21)INC.b.shift();}b.s[src]=(b.s[src]||0)+n;}
+function incSale(c,price){let used=0;const k=c.value>0?price/c.value:0;if(c.inc)for(const st in c.inc){const v=c.inc[st]*k;incAdd(st,v);used+=v;}incAdd('office',price-used);}
+function incRates(){const now=Date.now(),m=Math.floor(now/6e4),mins=Math.max(1,Math.min(20,(now-INC.t0)/6e4)),o={};let tot=0;
+  for(const b of INC.b)if(m-b.m<20)for(const k in b.s)o[k]=(o[k]||0)+b.s[k];for(const k in o){o[k]=o[k]*60/mins;tot+=o[k];}
+  return {r:o,tot,ok:now-INC.t0>9e4};}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)INC.hid=Date.now();else if(INC.hid&&Date.now()-INC.hid>6e4){INC.b=[];INC.t0=Date.now();}}); // away = no garage work → start measuring again
+const XINC={wash:l=>washPay(l)*ECO*3600/WASH_EVERY[l-1],gas:l=>gasPay(l)*ECO*3600/GAS_EVERY[l-1],factory:l=>facPrice(l)*ECO*3600/FAC_EVERY[l-1]}; // fixed income: one customer / car every X s
+const incFac=(id,l)=>!l?0:id==='office'?1+SELL_BONUS[l-1]:id==='security'?SEC_REWARD[l-1]*Math.min(.95,SEC_CATCH[l-1]):Math.sqrt(TIER(l))*SPEED[l-1]*(1+PAYB[l-1]); // more bays help only when cars wait → √
+function incRow(id,lv,nu){if(nu)return '';const top=lv<MAXLV,R=incRates(),now=R.r[id]||0,em=v=>top?'<em>'+fmt(v)+'/h</em>':'';
+  if(XINC[id])return '<div class="row incRow"><span>💰 Income</span><b>'+(lv?'≈ '+fmt(XINC[id](lv))+'/h':'—')+'</b>'+em(XINC[id](lv+1))+'</div>';
+  if(id==='inspect'||id==='parking'||id==='trailer'||id==='parts')return '<div class="row incRow"><span>💰 Income</span><b style="font-size:.85em">no direct money</b><em style="font-size:.85em">'+(top?'more cars for every garage':'')+'</em></div>';
+  if(!(ST[id]||id==='office'||id==='security'))return '';
+  if(!lv)return '<div class="row incRow"><span>💰 Income</span><b>—</b>'+(top?'<em>new jobs</em>':'')+'</div>';
+  if(!R.ok)return '<div class="row incRow"><span>💰 Income</span><b style="font-size:.85em">measuring…</b></div>';
+  let nx=now*incFac(id,lv+1)/incFac(id,lv);if(id==='office'){let sale=0;for(const k in R.r)if(ST[k]||k==='office')sale+=R.r[k];nx=now+sale*(incFac(id,lv+1)/incFac(id,lv)-1);}
+  return '<div class="row incRow"><span>💰 Income now</span><b>'+fmt(now)+'/h</b>'+em(nx)+'</div>';}
 function updateDistrict(dt){
   // --- car factory: a new car leaves the right door every few seconds
   if(G.lv.factory>0){const r=xRect('factory'),lv=G.lv.factory;XS.facT+=dt;
@@ -2546,21 +2567,21 @@ function updateDistrict(dt){
       if(!dcars.some(o=>Math.abs(o.x-dx)<30&&o.y>y0-30&&o.y<y0+60)){XS.facT=0;const c=newCar(false);c.xk='fac';c.xs='out';c.col=pick(VIVID);c.dirt=0;c.dmg=[];c.sp=70;
         if(Math.random()<.5)c.tune[pick(['rims','led','tint','street','lower'])]=true;c.x=dx;c.y=y0;c.a=Math.PI/2;c.fade=0;
         c.path=roundPath([{x:dx,y:y0},{x:dx,y:XLN},{x:W+140,y:XLN}],20);dcars.push(c);
-        const pr=facPrice(lv);xEarn(pr,dx,y0-28,'🏭 NEW CAR','#ffd54a');addXP(1);}}}
+        const pr=facPrice(lv);xEarn(pr,dx,y0-28,'🏭 NEW CAR','#ffd54a','factory');addXP(1);}}}
   for(let i=dcars.length-1;i>=0;i--){const c=dcars[i];if(c.fade!=null&&c.fade<1)c.fade=Math.min(1,c.fade+dt*1.8);
     const done=c.xs==='wash'||c.xs==='fuel'?false:xStep(c,dt);
     if(c.xk==='wash'){const r=xRect('wash'),lx=r.x+r.w*XWASH.lane[r.t-1];
       if(c.xs==='in'&&done){c.xs='wash';c.t=0;}
       else if(c.xs==='wash'){c.t+=dt;c.dirt=Math.max(0,c.dirt-dt*.3);
         if(DET&&parts.length<150&&Math.random()<dt*30){const s=pick([-1,1]);parts.push({x:c.x+s*rnd(10,16),y:c.y+rnd(-22,22),vx:-s*rnd(10,30),vy:rnd(-12,12),life:.6,max:.6,r:rnd(1.4,2.8),col:pick(['#e1f5fe','#ffffff','#81d4fa'])});}
-        if(c.t>=WASH_T){c.xs='out';c.dirt=0;xEarn(washPay(G.lv.wash||1),lx,r.y+r.h*.86,'🫧 WASH','#81d4fa');
+        if(c.t>=WASH_T){c.xs='out';c.dirt=0;xEarn(washPay(G.lv.wash||1),lx,r.y+r.h*.86,'🫧 WASH','#81d4fa','wash');
           const loop=[{x:lx,y:c.y},{x:lx,y:XLANE_Y},{x:XLOOP,y:XLANE_Y},{x:XLOOP,y:XLN}];
           if(!(c.xGas&&G.lv.gas>0&&gasTo(c,loop,XLN)))c.path=roundPath([...loop,{x:W+140,y:XLN}],16);}}}
     if(XS.wash===c&&c.xs!=='wash'&&!(c.xk==='wash'&&c.xs==='in')){const r=xRect('wash');if(c.y<r.y+r.h*.3)XS.wash=null;}
     if(c.xk==='wash'){}
     else if(c.xk==='gas'){const r=xRect('gas');
       if(c.xs==='in'&&done){c.xs='fuel';c.t=0;}
-      else if(c.xs==='fuel'){c.t+=dt;if(c.t>=FUEL_T){c.xs='out';xEarn(gasPay(G.lv.gas||1),c.x,c.y-30,'⛽ DIESEL −50%','#ffb74d');
+      else if(c.xs==='fuel'){c.t+=dt;if(c.t>=FUEL_T){c.xs='out';xEarn(gasPay(G.lv.gas||1),c.x,c.y-30,'⛽ DIESEL −50%','#ffb74d','gas');
         const px=c.x,q=[{x:px,y:XLN-22,rev:1}];for(let k=1;k<=6;k++){const t=k/6,u=1-t;q.push({x:u*u*px+2*u*t*px+t*t*(px-34),y:u*u*(XLN-22)+2*u*t*XLN+t*t*XLN,rev:1});}
         q.push({x:W+140,y:XLN});c.path=q;}}
       else if(c.xs==='out'&&XS.pumps[c.pi]===c&&c.y>r.y+r.h+4)XS.pumps[c.pi]=null;}
@@ -2811,7 +2832,7 @@ const INFO={
 };
 STIDS.forEach(id=>INFO[id]={title:ST[id].icon+' '+ST[id].name,desc:ST[id].desc,rows:stRows(id)});
 const SOON_IDS=['collection','rail'];
-const NOUP=id=>SOON_IDS.includes(id)||id==='export'||id==='yard'||id==='race'||id==='car'||id==='rep'||id==='shop'||id==='vip';
+const NOUP=id=>SOON_IDS.includes(id)||id==='export'||id==='yard'||id==='race'||id==='car'||id==='rep'||id==='shop'||id==='vip'||id==='inc';
 // v15 pacing (tested with a simulator): LV 5–10 cost ×2.5 but are paid in 5 PARTS – every part gives progress (garages: part of the next level's job bonus)
 // v16-40: LV 6-10 cost more and more (2-month test: everything was LV 10 after ~60 days at 2 h/day; target ≈ 3.5 months)
 const EARLY_M=[2,2,6,20]; // v16-73: open / LV2 / LV3 / LV4 cost more (the first hour bought every building up to LV4)
@@ -2819,17 +2840,17 @@ const UPN=5,UPM=2.5,LATE=[1,1,1,1,1,1.15,1.35,1.6,1.9,2.25];for(const id in BLD)
 const UPP=id=>(G.up&&G.up[id])||0;
 const costOf=(id,lv)=>Math.round(BLD[id].cost[lv]*(1-VB('disc'))/(lv>=4?UPN:1));
 const payB=id=>{const l=(G.lv[id]||1);return PAYB[l-1]+(l<10&&l>=4?(PAYB[l]-PAYB[l-1])*UPP(id)/UPN:0);};
-function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');bldSkin(id!=='shop'&&id!=='vip'&&id!=='rep'&&id!=='car');renderPanel();sheet.classList.add('open');}
+function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');bldSkin(id!=='shop'&&id!=='vip'&&id!=='rep'&&id!=='car'&&id!=='inc');renderPanel();sheet.classList.add('open');}
 // v16-47: Shop + VIP use Marius' full-screen pages (img/ui2) – other panels stay bottom sheets
 function skinSheet(n){sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/g,'').trim();const b=$('shBody');b.className='';if(n){sheet.classList.add('skn','skP','sk-'+n);b.className='skB';const im=$('shSkH').querySelector('img');if(!im.src.endsWith(n+'_h.webp'))im.src='img/ui2/'+n+'_h.webp';}}
 // v16-49: building popup = Marius' picture (img/ui3/bld_*): title plate, 10 level lights, rows with the green "next" part, crew bar, orange coin button
 function bldSkin(on){sheet.classList.toggle('bldP',on);const im=$('shSkH').querySelector('img');if(on&&!im.src.endsWith('bld_h.webp'))im.src='img/ui3/bld_h.webp';}
 function closePanel(){sel=null;selCar=null;sheet.classList.remove('open');}
-$('shClose').onclick=closePanel;$('vipBtn').onclick=()=>openPanel('vip');$('dqBtn').onclick=openDQ;$('repPill').onclick=()=>openPanel('rep');$('shopBtn').onclick=()=>S2()?SHOP2.open():openPanel('shop');$('dmH').onclick=()=>toast('💎 Diamonds – earned by playing (campaign, bosses, quests) or in the Shop. 100 💎 = 1 summon.');
+$('shClose').onclick=closePanel;$('vipBtn').onclick=()=>openPanel('vip');$('dqBtn').onclick=openDQ;$('repPill').onclick=()=>openPanel('rep');$('money').onclick=$('incH').onclick=()=>openPanel('inc');$('shopBtn').onclick=()=>S2()?SHOP2.open():openPanel('shop');$('dmH').onclick=()=>toast('💎 Diamonds – earned by playing (campaign, bosses, quests) or in the Shop. 100 💎 = 1 summon.');
 const PACKS=[
  {id:'car',u3:'sp_truck',name:'VIP Truck · Rich Clients',price:'€5.99',img:'vipcar',cw:110,ch:36,thumb:1,desc:'Forever: a golden car carrier arrives at random times and unloads 3-4 luxury cars of rich clients (supercars, limousines, the Royal Hypercar). They get PRIORITY in every garage and pay ×2.'},
  {id:'sub',u3:'sp_vip',name:'VIP Pass · 30 days',price:SUB_PRICE,emoji:'👑',desc:'All your VIP level benefits are ×'+SUB_MULT+' stronger for 30 days. VIP points still come from Daily Quests – for everyone.'},
- {id:'spd2',u3:'sp_speed',name:'Battle Speed ×2',price:'€4.99',emoji:'⏩',desc:'Battles can run at ×2 speed. ×1.5 is free for everyone. Yours forever – every chapter, every stage.'},
+ {id:'spd2',u3:'sp_speed',name:'Battle Speed ×3',price:'€4.99',emoji:'⏩',desc:'Battles can run at ×3 speed. ×1.5 is free for everyone. Yours forever – every chapter, every stage.'},
  {id:'vip',u3:'sp_crew',name:'VIP Crew Boost',price:'€3.99',emoji:'👑',desc:'Forever: EVERY mechanic in every workshop works 25% faster and earns 25% more money. Works together with your heroes.'},
 ];
 $('shStats').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]');if(pk){popPicker(pk.dataset.pick);return;}if(e.target.closest('[data-dq]')){closePanel();openDQ();return;}const b=e.target.closest('[data-buy]');if(!b)return;const id=b.dataset.buy;
@@ -2840,7 +2861,7 @@ $('shStats').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]
   SEC.buy(id).then(ok=>{delete b.dataset.busy;if(!ok)return;
   PK[id]=true;savePacks();lastPanelKey='';renderPanel();
   if(id==='car')VT.t=VT.next=8;
-  toast(id==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':id==='spd2'?'⏩ Battle Speed ×2 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000);});});
+  toast(id==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':id==='spd2'?'⏩ Battle Speed ×3 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000);});});
 $('zin').onclick=()=>zoomBtn(1.35);$('zout').onclick=()=>zoomBtn(1/1.35);
 function jobStatus(c,j){if(j.done)return'✓ done';if(j.parts){const s=j.order?j.order.st:'';return{ordered:'📦 ordered',heli:'🚁 flying in',pad:'🛬 on helipad',truck:'🛻 on the way',done:'✓ parts in stock'}[s]||'needs parts';}return'';}
 function renderPanel(){
@@ -2873,6 +2894,13 @@ function renderPanel(){
       h+='<div class="vlv'+(n===VLV?' cur':n>VLV?' off':'')+'"><b>'+(n<=VLV?U3('v_crown','1.25em'):'🔒')+' VIP '+n+'</b><span>'+VIP_PTS[n]+' pts · '+VIP_BEN.filter(b=>n>=b.from).map(b=>U3(VIP_IMG[b.k],'1.15em')+' '+pctT(benAt(b,n,sub),b.neg)).join(' · ')+(nw.length?'<br><span style="color:#ffd54a">NEW: '+nw.map(b=>b.n).join(', ')+'</span>':'')+'</span></div>';}
     if(SEC.TEST_MODE)h+='<div class="note">🧪 TEST MODE (owner): tapping the price activates the VIP Pass without payment.</div>';
     $('shStats').innerHTML=h;const b=$('shBtn');b.style.display='';b.disabled=false;b.textContent='📋 DAILY QUESTS';return;}
+  if(sel==='inc'){const key='inc'+Math.floor(Date.now()/2e3);if(key===lastPanelKey)return;lastPanelKey=key;const R=incRates(),ks=Object.keys(R.r).sort((a,b)=>R.r[b]-R.r[a]),mx=Math.max(1,...ks.map(k=>R.r[k]));
+    $('shTitle').textContent='💰 Income per hour';$('shDots').innerHTML='<span>'+(R.ok?'≈ '+fmt(R.tot)+' / hour':'measuring… play 1-2 minutes')+'</span>';
+    $('shDesc').textContent='What every building earned in your last 20 minutes of play, per hour. Tap a building on the map to see how much its next upgrade adds.';
+    let h=ks.map(k=>'<div class="row incL" data-inc="'+k+'"><span>'+((INFO[k]&&INFO[k].title)||k)+'</span><b>≈ '+fmt(R.r[k])+'/h</b><em>'+Math.round(R.r[k]*100/Math.max(1,R.tot))+'%</em><i style="width:'+Math.round(R.r[k]*100/mx)+'%"></i></div>').join('')||'<div class="note">No money yet in this session – your garages are still working on the first cars.</div>';
+    h+='<div class="row"><span>😴 While you are away (Idle)</span><b>≈ '+fmt(idleRate())+'/h</b></div><div class="note">Battles, quests and events give extra money that is not counted here.</div>';
+    $('shStats').innerHTML=h;$('shBtn').style.display='none';
+    $('shStats').querySelectorAll('[data-inc]').forEach(el=>el.onclick=()=>{if(INFO[el.dataset.inc]&&!NOUP(el.dataset.inc))openPanel(el.dataset.inc);});return;}
   if(sel==='rep'){const key='rep'+G.xp;if(key===lastPanelKey)return;lastPanelKey=key;
     $('shTitle').textContent='⭐ Reputation '+G.rep;const nx=REP_XP[G.rep];$('shDots').innerHTML='<span>'+(nx?G.xp+' / '+nx+' XP':'MAX – '+G.xp+' XP')+'</span>';
     $('shDesc').textContent='Every sold car gives reputation. Bigger jobs give more. Rep 1-6 bring new workshops, harder repairs and better cars; Rep 7-30 raise your car prices and idle income. Every level up: Recruit +5 & Crew +3 tickets.';
@@ -2880,11 +2908,11 @@ function renderPanel(){
     $('shBtn').style.display='none';return;}
   const inf=INFO[sel],nu=NOUP(sel),lv=nu?1:G.lv[sel],need=nu?1:BLD[sel].rep,locked=!nu&&G.rep<need;
   const cost=(!nu&&lv<MAXLV)?costOf(sel,lv):0,can=G.money>=cost&&!locked;
-  const key=sel+lv+'p'+UPP(sel)+can+locked+G.rep+VLV+VSUB+'h'+HVER+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
+  const key=sel+lv+'p'+UPP(sel)+can+locked+G.rep+VLV+VSUB+'h'+HVER+'i'+Math.floor(Date.now()/5e3)+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
   $('shTitle').textContent=inf.title;
   $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lv?'Level '+lv+' / '+MAXLV:'Not built')+'</span>'+(lv>=4&&lv<MAXLV&&!sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'');
   $('shDesc').textContent=inf.desc;
-  let h=(lv>=4&&lv<MAXLV&&!nu&&sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'')+inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](lv)+'</b>'+(!nu&&lv<MAXLV?'<em>'+(sheet.classList.contains('bldP')?'':'→ ')+r[1](lv+1)+'</em>':'')+'</div>').join('');
+  let h=(lv>=4&&lv<MAXLV&&!nu&&sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'')+incRow(sel,lv,nu)+inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](lv)+'</b>'+(!nu&&lv<MAXLV?'<em>'+(sheet.classList.contains('bldP')?'':'→ ')+r[1](lv+1)+'</em>':'')+'</div>').join('');
   h+=teamRows(sel);
   if(ST[sel]&&sel!=='inspect'){h+='<div class="sec">JOBS</div>'+JOBS.filter(j=>j.st===sel).map(j=>{const ok=G.rep>=j.rep&&(!j.parts||G.lv.parts>0);
     return '<div class="job'+(ok?'':' off')+'"><span class="ic">'+(ok?'✓':'🔒')+'</span><span>'+j.n+(j.parts?' 📦':'')+'</span><span class="st">'+fmt(j.pay)+' · '+j.t+'s'+(ok?'':'<br>'+(G.rep<j.rep?'Rep '+j.rep:'needs Parts Office'))+'</span></div>';}).join('');}
@@ -3571,9 +3599,9 @@ const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV+(S2()?SHOP2.idleH():0); // v16-75: 
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
 function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
-const ccR=()=>window.CC?CC.rates():{dm:0,tk:0,ct:0,gt:0,mon:0};
+const ccR=()=>window.CC?CC.rates():{dm:0,tk:0,ct:0,gt:0,es:0,gp:0,mon:0};
 function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')+ccR().mon));}
-function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*.5*ESS_U()),gp:Math.floor(hrs*.6*GP_U()),full:hrs>=idleMax()};}
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U()),full:hrs>=idleMax()};}
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}
@@ -3614,8 +3642,13 @@ function teamRows(id){let keys=[];const T=[];
   if(drivers[id])for(let k=0;k<PLV(id);k++)keys.push('d|'+id+'|'+k);
   if(!keys.length)return '';
   return '<div class="sec tmSec">👥 TEAM</div>'+keys.map(k=>{const h=heroIn(k);
-    return '<div class="row tmRow" data-pick="'+k+'"><span>'+slotName(k).replace(/^\S+ /,'')+'</span><b>'+(h?'<img class="mini" src="'+portrait(h)+'" style="border-color:'+GRADES[h.gr].c+'"><span style="color:'+GRADES[h.gr].c+'">'+h.n+' +'+own(h.id).s+'</span>':'<span style="color:#5f6f7f">empty</span>')+'</b><em>'+(h?'CHANGE':'+ ADD')+'</em></div>';}).join('');}
+    return '<div class="row tmRow" data-pick="'+k+'"><span>'+slotName(k).replace(/^\S+ /,'')+'</span><b>'+(h?'<img class="mini" src="'+portrait(h)+'" style="border-color:'+GRADES[h.gr].c+'"><span style="color:'+GRADES[h.gr].c+'">'+h.n+' +'+own(h.id).s+'</span>'+heroBonTxt(k,h):'<span style="color:#5f6f7f">empty</span>')+'</b><em>'+(h?'CHANGE':'+ ADD')+'</em></div>';}).join('');}
 
+// v16-121: show what a hero in a building really gives (tester: "I don't see the impact of the heroes in the buildings")
+function heroBonTxt(k,h){const p=k.split('|'),sv=own(h.id).s,pc=v=>'+'+Math.round(v*100)+'%';let t=[];
+  if(p[0]==='m'){if(!(h.sp==='all'||h.sp===p[1]))return '<small class="hbT bad">wrong class · no bonus</small>';t=[['⚡',hv(h,'spd',sv)],['💵',hv(h,'inc',sv)],['🎯',hv(h,'crit',sv)]];}
+  else if(p[0]==='d')t=[['⚡',hv(h,'spd',sv)],['💵 tips',hv(h,'tip',sv)]];else if(p[0]==='g')t=[['👮',hv(h,'cat',sv)],['💰',hv(h,'rew',sv)]];
+  t=t.filter(x=>x[1]>0);return t.length?'<small class="hbT">'+t.map(x=>x[0]+' '+pc(x[1])).join(' · ')+'</small>':'';}
 function bayMB(c){return c.slot&&c.slot.kind==='bay'?mechBonus(c.slot.st,c.slot.j):{spd:0,inc:0,crit:0};}
 heroRefresh();
 
@@ -3631,7 +3664,7 @@ function sideLock(){const first=!Array.isArray(G.ul);if(first)G.ul=[];const nw=[
   for(const u of SIDE_UL){const el=$(u.b);if(!el)continue;const ok=ulOK(u);el.style.display=ok?'':'none';
     if(ok&&!G.ul.includes(u.b)){G.ul.push(u.b);if(!first&&started){nw.push(u.n);el.classList.add('ulNew');setTimeout(()=>el.classList.remove('ulNew'),8000);}}}
   if(first)save();else if(nw.length){save();toast('🔓 NEW: <b>'+nw.join(' · ')+'</b> unlocked!',3500);}}
-let hudN=0;function hud(){hudN++;if(hudN%30===1)sideLock();if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
+let hudN=0;function hud(){hudN++;if(hudN%30===1){sideLock();const R=incRates();$('incH').textContent=R.ok&&R.tot>0?'+'+fmt(R.tot)+'/h':'';}if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
@@ -3659,6 +3692,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[r.vipTo]);vipRefresh();}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:58,d:'Nov 21, 2026',ic:'💰',t:'See your income + faster towers',l:['<b>Income per hour</b>: under your money you now see how much your garage earns per hour. Tap it for every building.','Every building shows <b>💰 Income now → after the upgrade</b>, so you know what is worth upgrading.','Heroes in buildings now show their bonus (⚡ speed · 💵 pay). Wrong class = no bonus – now you can see it.','<b>Towers</b>: AUTO NEXT like the campaign – the next floor starts after 3 s.','<b>Battle Speed pack</b>: now <b>×3</b> (was ×2). Already bought? You have ×3 now.','<b>Classic Collection</b>: the cars now give <b>Essence + Gear Parts</b> for your heroes and fewer diamonds.','New buttons open step by step for new players (News, Crew, VIP, Rank, Events, Chat). Arena and Torque Cup open after stage 1-20.','Less memory: the map loads only the pictures you need – smoother on small phones.','Chapter bosses are a bit weaker (Omega Engine 5-20 was much too strong).']},
  {id:57,d:'Nov 20, 2026',ic:'🛠',t:'Big bug check – every page',l:['A robot tapped every button of every page (about 1,500 taps) to find hidden bugs.','Fixed: <b>SEE MY CREW</b> and the <b>Use Diamonds?</b> window opened behind the HEROES / Summon page.','Fixed: <b>GEAR BAG</b> on the Summon page now opens the bag (it opened the HEROES page).','Fixed: two ✕ buttons on top of each other in the gear window, the ticket number in My Crew going out of the screen, hero ART a bit too wide.']},
  {id:56,d:'Nov 20, 2026',ic:'↩',t:'Same buttons everywhere',l:['Every page now has the <b>same Back button</b> (top left) and every window the <b>same red ✕</b> – no more different styles.','Idle Rewards: the money per hour is shorter (<b>/h</b>) so it always fits.']},
   {id:55,d:'Nov 20, 2026',ic:'🔩',t:'See your Gear Parts',l:['The gear window now shows <b>how many Gear Parts you have</b> (top left), next to the UPGRADE cost.','Under UPGRADE: <b>Cost</b> · <b>You have</b> · and how many you still need.','The BAG page also shows your Gear Parts at the bottom.']},
@@ -3835,7 +3869,7 @@ function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Mat
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
+window.__TE={incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};
