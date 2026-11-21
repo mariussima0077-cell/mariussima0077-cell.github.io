@@ -99,6 +99,11 @@ async function ensure(env) {
     db.prepare('CREATE INDEX IF NOT EXISTS wboss_rank ON wboss(srv, wk, dmg)'),
     db.prepare('CREATE TABLE IF NOT EXISTS evt(uid INTEGER, eid TEXT, srv INTEGER, sc INTEGER DEFAULT 0, t INTEGER, PRIMARY KEY(uid, eid))'),
     db.prepare('CREATE INDEX IF NOT EXISTS evt_rank ON evt(eid, srv, sc)'),
+    // v16-146 RAIL WARS: trains on their way (30 min), daily counters, who hit which train
+    db.prepare('CREATE TABLE IF NOT EXISTS rwtrain(id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, srv INTEGER, g INTEGER, tok INTEGER, cars INTEGER, t0 INTEGER, t1 INTEGER, hits INTEGER DEFAULT 0, lost INTEGER DEFAULT 0, done INTEGER DEFAULT 0)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS rwtrain_srv ON rwtrain(srv, t1)'), db.prepare('CREATE INDEX IF NOT EXISTS rwtrain_uid ON rwtrain(uid, done)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS rwday(uid INTEGER PRIMARY KEY, day TEXT, s INTEGER DEFAULT 0, a INTEGER DEFAULT 0)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS rwhit(tid INTEGER, uid INTEGER, t INTEGER, win INTEGER, steal INTEGER, an TEXT, PRIMARY KEY(tid, uid))'),
   ]);
   try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-122: HIDE VIP (others do not see the VIP level)
   ready = true;
@@ -269,6 +274,62 @@ async function replay(env, id) {
   return {ok:true, id:h.id, kind:h.kind, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pa ? pub(pa) : {name:h.an, icon:ta[0] && ta[0].id, frame:0}, them:pd ? pub(pd) : {name:h.dn, icon:td[0] && td[0].id, frame:0, bot:1}, da:h.da};
 }
 
+// ------------------------------------------------------------------ v16-146 RAIL WARS (Marius, 21 nov 2026)
+// Your full train (grade COMMON…MYTHIC, rolled in the game from the Car Wash / Gas Station / Car Factory levels) is SENT: 30 min on the way.
+// Other players on the same server may attack it (the fight = arena simulation vs. your battle team, decided HERE). A won attack steals 20 %
+// of what is still on the train; a train can be robbed at most 2 times. Per day (UTC): 3 trains sent, 5 attacks. The tokens are Street Tokens.
+const RW_SEND = 3, RW_ATK = 5, RW_TRIP = 30 * 60e3, RW_HITS = 2, RW_STEAL = .2, RW_MAXTOK = 20000;
+async function rwDayRow(env, p, now) { const day = dayKey(now); let d = await env.DB.prepare('SELECT * FROM rwday WHERE uid=?').bind(p.uid).first();
+  if (!d) { await env.DB.prepare('INSERT INTO rwday(uid,day,s,a) VALUES(?,?,0,0)').bind(p.uid, day).run(); d = {uid:p.uid, day, s:0, a:0}; }
+  else if (d.day !== day) { await env.DB.prepare('UPDATE rwday SET day=?, s=0, a=0 WHERE uid=?').bind(day, p.uid).run(); d = {uid:p.uid, day, s:0, a:0}; }
+  return d; }
+async function rwView(env, p, now) {
+  const db = env.DB, d = await rwDayRow(env, p, now);
+  const mine = (await db.prepare('SELECT id,g,tok,cars,t0,t1,hits,lost FROM rwtrain WHERE uid=? AND done=0 ORDER BY id').bind(p.uid).all()).results;
+  const hits = (await db.prepare('SELECT h.t,h.win,h.steal,h.an,t.g FROM rwhit h JOIN rwtrain t ON t.id=h.tid WHERE t.uid=? AND h.t>? ORDER BY h.t DESC LIMIT 15').bind(p.uid, now - 2 * DAY).all()).results;
+  const targets = (await db.prepare(`SELECT t.id,t.g,t.tok,t.lost,t.cars,t.t1,t.hits,p.uid,p.name,p.icon,p.frame,p.cc,p.pow,p.title FROM rwtrain t JOIN prof p ON p.uid=t.uid LEFT JOIN players pl ON pl.pid=p.pid
+    WHERE t.srv=? AND t.uid<>? AND t.done=0 AND t.t1>? AND t.hits<? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_'
+    AND NOT EXISTS(SELECT 1 FROM rwhit h WHERE h.tid=t.id AND h.uid=?) ORDER BY RANDOM() LIMIT 8`).bind(p.srv, p.uid, now + 60e3, RW_HITS, p.uid).all()).results;
+  return {ok:true, now, sends:Math.max(0, RW_SEND - d.s), atks:Math.max(0, RW_ATK - d.a), sendMax:RW_SEND, atkMax:RW_ATK, trip:RW_TRIP, steal:RW_STEAL, hitMax:RW_HITS,
+    mine, hits, targets:targets.map(t => ({id:t.id, g:t.g, left:t.tok - t.lost, cars:t.cars, t1:t.t1, hits:t.hits, who:pub(t)}))};
+}
+async function railWars(env, p, op, b) {
+  const db = env.DB, now = Date.now();
+  if (op === 'rw') return rwView(env, p, now);
+  if (op === 'rwsend') {
+    const g = b.g | 0, tok = b.tok | 0, cars = b.cars | 0; if (g < 0 || g > 5 || tok < 1 || tok > RW_MAXTOK || cars < 1 || cars > 20) return {err:'bad'};
+    const d = await rwDayRow(env, p, now); if (d.s >= RW_SEND) return {err:'no_sends'};
+    if ((await db.prepare('SELECT COUNT(*) n FROM rwtrain WHERE uid=? AND done=0 AND t1>?').bind(p.uid, now).first()).n >= RW_SEND) return {err:'no_sends'};
+    await db.prepare('UPDATE rwday SET s=s+1 WHERE uid=?').bind(p.uid).run();
+    await db.prepare('INSERT INTO rwtrain(uid,srv,g,tok,cars,t0,t1) VALUES(?,?,?,?,?,?,?)').bind(p.uid, p.srv, g, tok, cars, now, now + RW_TRIP).run();
+    return rwView(env, p, now);
+  }
+  if (op === 'rwclaim') {
+    const t = await db.prepare('SELECT * FROM rwtrain WHERE id=? AND uid=?').bind(b.id | 0, p.uid).first(); if (!t || t.done) return {err:'bad'};
+    if (t.t1 > now) return {err:'not_yet'};
+    const r = await db.prepare('UPDATE rwtrain SET done=1 WHERE id=? AND done=0').bind(t.id).run(); if (!(r.meta && r.meta.changes)) return {err:'bad'};
+    return {ok:true, id:t.id, g:t.g, tok:Math.max(0, t.tok - t.lost), lost:t.lost, hits:t.hits};
+  }
+  if (op === 'rwatk') {
+    const d = await rwDayRow(env, p, now); if (d.a >= RW_ATK) return {err:'no_atks'};
+    const t = await db.prepare('SELECT * FROM rwtrain WHERE id=?').bind(b.id | 0).first();
+    if (!t || t.done || t.uid === p.uid || t.srv !== p.srv || t.t1 <= now || t.hits >= RW_HITS) return {err:'gone'};
+    if (await db.prepare('SELECT 1 FROM rwhit WHERE tid=? AND uid=?').bind(t.id, p.uid).first()) return {err:'gone'};
+    const ta = JSON.parse(p.team || '[]'); if (!ta.length) return {err:'no_team'};
+    const dp = await db.prepare('SELECT * FROM prof WHERE uid=?').bind(t.uid).first(); if (!dp) return {err:'gone'};
+    const td = JSON.parse(dp.team || '[]'), seed = (Math.random() * 4294967295) >>> 0, res = td.length ? arenaSim(ta, td, seed) : {win:1, log:[], dur:0};
+    let steal = res.win && !isTst(p.pid) ? Math.floor((t.tok - t.lost) * RW_STEAL) : 0;
+    const ins = await db.prepare('INSERT OR IGNORE INTO rwhit(tid,uid,t,win,steal,an) VALUES(?,?,?,?,?,?)').bind(t.id, p.uid, now, res.win ? 1 : 0, steal, p.name).run();
+    if (!(ins.meta && ins.meta.changes)) return {err:'gone'};
+    await db.prepare('UPDATE rwday SET a=a+1 WHERE uid=?').bind(p.uid).run();
+    if (res.win) { const u = await db.prepare('UPDATE rwtrain SET hits=hits+1, lost=lost+? WHERE id=? AND hits<? AND done=0').bind(steal, t.id, RW_HITS).run(); if (!(u.meta && u.meta.changes)) steal = 0; }
+    const hid = (await db.prepare('INSERT INTO ahist(srv,t,kind,a,d,an,dn,win,da,dd,seed,ta,td) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id')
+      .bind(p.srv, now, 'train', p.uid, t.uid, p.name, dp.name, res.win, steal, -steal, seed, JSON.stringify(ta), JSON.stringify(td)).first()).id;
+    return {ok:true, kind:'train', id:hid, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pub(p), them:pub(dp), steal, g:t.g, atks:Math.max(0, RW_ATK - d.a - 1)};
+  }
+  return {err:'bad'};
+}
+
 // ------------------------------------------------------------------ CUP (weekly knock-out)
 const nextPow2 = n => { let k = 1; while (k < n) k *= 2; return k; };
 function seedOrder(n) { let o = [0]; while (o.length < n) { const m = o.length * 2; o = o.flatMap(x => [x, m - 1 - x]); } return o; }
@@ -363,6 +424,7 @@ async function rewardsTick(env) {
   for (const r of (await db.prepare('SELECT srv, uid FROM prof p WHERE substr(p.pid,1,4)<>\'tst_\' AND best=(SELECT MAX(best) FROM prof q WHERE q.srv=p.srv AND substr(q.pid,1,4)<>\'tst_\') GROUP BY srv').all()).results) await addUnl(env, r.uid, 'king');
   await db.prepare('DELETE FROM chat WHERE t<?').bind(now - 7 * DAY).run();
   await db.prepare('DELETE FROM ahist WHERE t<?').bind(now - 14 * DAY).run();
+  await db.prepare('DELETE FROM rwtrain WHERE t1<?').bind(now - 3 * DAY).run(); await db.prepare('DELETE FROM rwhit WHERE t<?').bind(now - 3 * DAY).run();   // v16-146
   await db.prepare('DELETE FROM inbox WHERE (got=1 AND t<?) OR t<?').bind(now - 7 * DAY, now - 60 * DAY).run();
 }
 export async function onlineCron(env) { await ensure(env);
@@ -464,6 +526,7 @@ export async function online(op, b, env) {
   if (op === 'arena') { if (await isBanned(env, b.pid)) return {banned:1}; return {ok:true, ...(await arenaView(env, p))}; }
   if (op === 'refresh') { const a = await arenaRow(env, p); a.opp = JSON.stringify(await findOpp(env, p, a)); await saveArena(env, a); return {ok:true, opp:await oppView(env, p, a)}; }
   if (op === 'fight') { if (await isBanned(env, b.pid)) return {banned:1}; return fight(env, p, b); }
+  if (op === 'rw' || op === 'rwsend' || op === 'rwatk' || op === 'rwclaim') { if (await isBanned(env, b.pid)) return {banned:1}; return railWars(env, p, op, b); }   // v16-146
   if (op === 'atop') {
     const season = seasonOf(now);
     const rows = (await db.prepare(`SELECT a.pts, a.w, a.l, p.* FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.srv=? AND a.season=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 100`).bind(p.srv, season).all()).results;

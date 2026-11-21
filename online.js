@@ -632,6 +632,7 @@ function playFight(r,replay){
   U.forEach((u,i)=>{u.mhp=u.hp0>0?u.hp0:Math.max(1,kos.has(i)?taken[i]-healed[i]:(taken[i]-healed[i])*1.35+1);u.hp=u.mhp;u.en=0;});
   U.forEach(u=>{if(C()&&C().hasSpr&&C().hasSpr(u.id))C().pose(g,u.id,'idle',0,0,-999,-999,1,1);});
   F={r,U,t:-2.0,i:0,pop:[],fx:[],shake:0,white:0,sk:null,spd:+(LS('te_aspd')||2),done:false,replay,proj:[],v2:A2ON()};
+  if(r.kind==='train'&&!open_){root.classList.add('open');F.trOpen=1;}   // v16-146 RAIL WARS: the fight layer lives inside the hub
   const me=r.me||{},th=r.them||{};
   $('olVs').innerHTML=`<div class="side a"><div class="av">${avf(me.icon,me.frame)}</div><div>${flag(me.cc)} ${esc(me.name||'You')}<small>⚡ ${fmtN(me.pow||0)}</small></div></div><div class="side b"><div>${flag(th.cc)} ${esc(th.name||'Rival')} ${th.bot?'<span class="ai" style="font-size:10px">AI</span>':''}<small>⚡ ${fmtN(th.pow||0)}</small></div><div class="av">${avf(th.icon,th.frame)}</div></div><div class="mid">VS</div>`;
   $('olVs').style.display='flex';$('olRes').classList.remove('on','lose');$('olFx').classList.remove('end');$('olFx').classList.add('on');$('olSpd').textContent='×'+F.spd+' ⏩';
@@ -655,14 +656,15 @@ function applyEv(e,instant){const U=F.U,a=U[e.a];if(!a)return;
     if(instant)go();else setTimeout(go,delay*1000/F.spd);});}
 function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u.dead&&u.side===(r.win?0:1)){u.ps='win';u.pt=0;u.hx=0;}});
   setTimeout(()=>{if(!F)return;const R=$('olRes'),t=r.tier;R.classList.toggle('lose',!r.win);
-    R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
+    R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${r.kind==='train'&&!F.replay?(r.rwH||''):F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
      ${t&&!F.replay?`<div class="lg"><div class="o-bar"><i style="width:${tierPct(t,r.pts-r.da)}%"></i></div><small>${t.name} · ${r.pts} pts</small></div>`:''}
      ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>${DMh} +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>${TKh} +${r.rw.tk} Recruit</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
-    R.classList.add('on');$('olFx').classList.add('end');if(!F.replay){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
+    R.classList.add('on');$('olFx').classList.add('end');if(!F.replay&&r.kind!=='train'){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
       setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
-    $('olCont').onclick=()=>{$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(cur==='olArena'){arData=null;loadArena();}};},1100);}
+    $('olCont').onclick=()=>{const tro=F&&F.trOpen,oe=r.onEnd;$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(tro){root.classList.remove('open');}if(oe){try{oe();}catch(e){}return;}if(cur==='olArena'){arData=null;loadArena();}};},1100);}
 let crowd=null;
-function arenaBg(W,H,t){let gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#12061f');gr.addColorStop(.42,'#3a1858');gr.addColorStop(.6,'#1a1030');gr.addColorStop(1,'#05030a');g.fillStyle=gr;g.fillRect(0,0,W,H);
+function arenaBg(W,H,t){if(F&&F.r&&F.r.bg){const I=im(F.r.bg);if(I.complete&&I.naturalWidth){const k=Math.max(W/I.naturalWidth,H/I.naturalHeight),w=I.naturalWidth*k,h=I.naturalHeight*k;g.drawImage(I,(W-w)/2,(H-h)*.35,w,h);return;}}   // v16-146 RAIL WARS
+  let gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#12061f');gr.addColorStop(.42,'#3a1858');gr.addColorStop(.6,'#1a1030');gr.addColorStop(1,'#05030a');g.fillStyle=gr;g.fillRect(0,0,W,H);
   if(!crowd){crowd=[];for(let i=0;i<140;i++)crowd.push([Math.random(),.3+Math.random()*.15,Math.random()*360,Math.random()*6]);}
   for(const c of crowd){g.fillStyle=`hsl(${c[2]},35%,${16+c[1]*20}%)`;g.beginPath();g.arc(c[0]*W,c[1]*H-Math.abs(Math.sin(t*5+c[3]))*H*.006,W*.017,0,7);g.fill();}
   if(Math.random()<.2){g.fillStyle='#fff';g.globalAlpha=.8;g.beginPath();g.arc(Math.random()*W,H*(.3+Math.random()*.15),W*.006,0,7);g.fill();g.globalAlpha=1;}
