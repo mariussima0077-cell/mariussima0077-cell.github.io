@@ -96,7 +96,7 @@ async def run(a, root):
             if a.wb >= 0:  # v16-134: World Boss fight (0 SCRAPZILLA · 1 CRUSHER KING · 2 INFERNO PISTON · 3 TOW SERPENT)
                 await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.wbSet({a.wb});window.__DEV.wb()')
             else:
-                await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.startBattle({a.stage}'+(','+json.dumps(a.team.split(',')) if a.team else '')+')')
+                await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.hm({1 if a.hard else 0});window.__DEV.startBattle({a.stage}'+(','+json.dumps(a.team.split(',')) if a.team else '')+')')
             await pg.wait_for_timeout(1500); await pg.screenshot(path=f'{a.out}/2_battle_start.png')
             if a.shots:  # v16-95: a screenshot every 0.7 s (to see a hero's skill)
                 for i in range(int(a.secs / .7)): await pg.wait_for_timeout(700); await pg.screenshot(path=f'{a.out}/b_{i:02d}.png')
@@ -119,6 +119,8 @@ def main():
     ap.add_argument('--stage', type=int, default=0)
     ap.add_argument('--wb', type=int, default=-1, help='World Boss fight instead of a stage (0-3)')
     ap.add_argument('--secs', type=int, default=15)
+    ap.add_argument('--full', action='store_true', help='full test account (all heroes) – baseline for --hard')
+    ap.add_argument('--hard', action='store_true', help='v16-138: HARD MODE battle (fire ring + aura on the monsters)')
     ap.add_argument('--team', default='', help='hero ids for the battle, e.g. m5_1,m5_0 (default: best team)')
     ap.add_argument('--shots', action='store_true', help='screenshot every 0.7 s during the battle')
     ap.add_argument('--out', default='/tmp/phone')
@@ -129,7 +131,7 @@ def main():
     shutil.copytree(a.repo, root, ignore=shutil.ignore_patterns('.git', 'store', 'server'))
     sec = os.path.join(root, 'secure.js'); s = open(sec).read()
     s = re.sub(r'^const TEST_MODE = .*$', 'const TEST_MODE = true;', s, flags=re.M)
-    if a.wb >= 0: s = re.sub(r'^const TEST_ACC = .*$', 'const TEST_ACC = true;', s, flags=re.M)  # World Boss needs heroes → full test account
+    if a.wb >= 0 or a.hard or a.full: s = re.sub(r'^const TEST_ACC = .*$', 'const TEST_ACC = true;', s, flags=re.M)  # World Boss needs heroes → full test account
     open(sec, 'w').write(s)
     try:
         rep = asyncio.run(run(a, root))

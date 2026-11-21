@@ -1549,13 +1549,25 @@ function drawSprMon(g,u,t,id){const M=MON[u.t],d=msprLoad(id);if(!msprOK(id)){MD
   const [r,c]=msprFrame(u,t),k=M.h/d.ih;g.save();g.scale(-1,1);if(id==='wasp')g.translate(0,-12-Math.sin(t*5+u.k)*3);else if(M.fly)g.translate(0,-38-Math.sin(t*5+u.k)*4);
   g.drawImage(d.im,c*d.w,r*d.h,d.w,d.h,-d.ax*k,-d.ay*k,d.w*k,d.h*k);g.restore();}
 for(const id in MSPR)MDRAW['spr_'+id]=(g,u,t)=>drawSprMon(g,u,t,id);
+// v16-138: HARD MODE fx (Marius' pictures, tools/hardfx_cut.py): ring 8×300×137 (ring centre at 68% of the height), aura 8×200×238 (base at the bottom)
+function hmUnder(g,u,t,M,big){const R=fxImg('hm_ring'),A=fxImg('hm_aura');const a0=g.globalAlpha;
+  if(A.complete&&A.naturalWidth){const ah=Math.min(M.h*1.3,230),aw=Math.max(ah*.84,big*2.6),f=Math.floor(t*11+u.k*3)%8,fy=M.fly?-38-Math.sin(t*5+u.k)*4:0;
+    g.globalAlpha=a0*.85;g.drawImage(A,f*200,0,200,238,-aw/2,fy-ah+4,aw,ah);}
+  if(!M.fly&&R.complete&&R.naturalWidth){const rw=big*3.1,rh=rw*137/300,f=Math.floor(t*10+u.k)%8;g.globalAlpha=a0*.9;g.drawImage(R,f*300,0,300,137,-rw/2,-rh*.68,rw,rh);}
+  g.globalAlpha=a0;}
+// red heat over the body: the same ember frames, added on top (cheap: no extra canvas, no filter – a tint canvas cost +25% on the budget phone)
+function hmOver(g,u,t,M,big){const A=fxImg('hm_aura');if(!A.complete||!A.naturalWidth)return;const a0=g.globalAlpha,o=g.globalCompositeOperation;
+  const ah=Math.min(M.h*1.1,200),aw=Math.max(ah*.84,big*2.2),f=(Math.floor(t*11+u.k*3)+4)%8,fy=M.fly?-38-Math.sin(t*5+u.k)*4:0;
+  g.globalCompositeOperation='lighter';g.globalAlpha=a0*(.22+.08*Math.sin(t*4+u.k));g.drawImage(A,f*200,0,200,238,-aw/2,fy-ah+2,aw,ah);g.globalCompositeOperation=o;g.globalAlpha=a0;}
 function drawMonster(g,u,t){
-  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);
+  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);if(HM&&B&&!B.tw)g.scale(1.1,1.1);
   const SPM=!!MON[u.t].sp;let alpha=1;if(u.dead){const L8=SPM&&MSPR[MON[u.t].sp].L;alpha=SPM&&!(L8&&L8.d<0)?clamp(1-(u.deadT-.75)*2.6,0,1):clamp(1-u.deadT*1.6,0,1);}
   g.globalAlpha=alpha*GA;const M=MON[u.t],big=M.b==='titan'?70:M.b==='crusher'?34:M.big>1.5?26:16;
   g.fillStyle='rgba(0,0,0,.38)';ell(g,0,0,big,big*.28);
   if(u.mark>0){g.strokeStyle='rgba(80,255,170,.85)';g.lineWidth=1.6;g.beginPath();g.ellipse(0,0,big+4,(big+4)*.3,0,0,TAU);g.stroke();}
   if(u.slow>0){g.fillStyle='rgba(224,69,123,.35)';ell(g,0,0,big+6,(big+6)*.3);}
+  const HMX=HM&&B&&!B.tw&&GA===1; // (not in the white hit-flash pass) v16-138: HARD MODE look – Marius' fire ring under the feet + ember aura behind + red heat on top, 10% bigger
+  if(HMX)hmUnder(g,u,t,M,big);
   if(M.hue!=null&&FILT){// v14 elite colours: draw the monster on its own small canvas, then recolour it once
     const tr=g.getTransform(),ps=Math.max(.5,Math.hypot(tr.a,tr.b)),hw=M.b==='titan'?230:M.b==='crusher'?150:Math.max(64,M.h*1.5*(M.big>1?1.2:1)),top=M.h*(M.b==='titan'?1.45:1.7)+(M.fly?80:0)+60,bot=40;
     const cw=Math.ceil(2*hw*ps),ch=Math.ceil((top+bot)*ps);let oc=u._oc;if(!oc||oc.width<cw||oc.height<ch||oc.width>cw*1.6){oc=u._oc=document.createElement('canvas');oc.width=cw;oc.height=ch;}
@@ -1566,6 +1578,7 @@ function drawMonster(g,u,t){
   g.scale(u.face,1);if(u.dead&&!SPM)g.rotate(-u.deadT*.6);
   if(u.stun>0)g.rotate(Math.sin(t*30)*.04);
   MDRAW[MON[u.t].dr](g,u,t);}
+  if(HMX)hmOver(g,u,t,M,big);
   g.restore();
   if(u.stun>0&&!u.dead){g.save();g.translate(u.sx,u.sy-u.H*u.sc-8);for(let k=0;k<3;k++){const a=t*6+k*2.1;g.fillStyle='#ffd54a';g.font='900 10px Game,system-ui';g.textAlign='center';g.fillText('★',Math.cos(a)*12,Math.sin(a)*4);}g.restore();}
 }
@@ -1588,7 +1601,7 @@ function grit(si){const P=CPX(),st=P.stuck;if(!st||st.si!==si||si!==P.best)retur
 function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=(1+(B.grit||0)+(B.nit||0))*(1+(B.trb||0)); // v16-136: TEAM ROLES bonus (+5/10/15% ATK & HP)
   return {hero:1,h,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,eg:s.eg,
     skK:h.crew?1:1+.06*((TE().skLv?TE().skLv(h.id):1)-1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),shots:0,fcT:3,ekCd:0,swT:0};}
-function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);const m=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);
+function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);if(HM&&!B.tw){fxImg('hm_ring');fxImg('hm_aura');}const m=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);
   return {hero:0,t,k:rnd(0,9),name:M.n,boss:!!M.boss,hp:M.hp*m*1.25,max:M.hp*m*1.25,atk:M.atk*m,def:M.def*(1+Math.min(B.si,19)*.06),mv:M.mv*S,rng:M.rng*S,as:M.as,crit:.05,H:M.h,fly:!!M.fly,
     x:0,d:0,face:-1,st:'walk',ap:0,cd:rnd(.3,1),wph:rnd(0,6),roll:0,stun:0,slow:0,mark:0,weak:0,burn:0,burnT:0,ice:0,tw:0,flash:0,hurt:0,dot:0,dead:false,deadT:0,act:null,
     b:M.b,at:M.at||'',sp1:M.b==='pound'?4:M.b==='crusher'?3:M.b==='titan'?4:0,sp2:M.b==='crusher'?8:M.b==='titan'?9:0,sp3:M.b==='titan'?14:0,pounce:M.pounce?1:0,charge:M.charge?1:0,enr:false};}
@@ -3833,7 +3846,7 @@ const IDLE_ASC_H=.001;
 function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.best||0);if(!(hrs>0)||STAGES[b].c<ASC_CH)return null;
   const it=T.srun('ia',()=>Math.random()<IDLE_ASC_H*hrs?newItem(GSLOT[Math.floor(Math.random()*6)].k,6,rollSet(6)):null);if(it)GR().inv.push(it);return it;}
 window.CAMPAIGN={idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&!h.crew&&lvCan(h.id));}catch(e){return false;}},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={hm:v=>{HM=v?1:0;},getB:()=>B,fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
 
 (function(){const st=document.createElement('style');st.textContent='.dgBn{color:#7CFC9A!important;text-shadow:0 0 6px #00e67688,0 1px 0 #000;margin-left:3px}';document.head.appendChild(st);})();
