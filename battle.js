@@ -144,7 +144,7 @@ css.textContent=`
 #gMoney{background:#24170f;border:1px solid #ffb30066;border-radius:12px;padding:7px 9px;font-weight:900;color:#ffd54a;font-size:13px;white-space:nowrap}
 #gHeroes{display:flex;gap:7px;overflow-x:auto;padding:6px 10px 8px;touch-action:pan-x}
 .gh{position:relative;flex:0 0 62px;height:80px;border:2px solid;border-radius:12px;overflow:hidden;background:#000;opacity:.6}.gh.on{opacity:1;box-shadow:0 0 0 2px #fff,0 0 14px #ffb300}
-.gh>img{width:100%;height:58px;object-fit:cover;display:block}.gh .rb{position:absolute;right:2px;top:2px;width:16px;height:16px}
+.gh>img{width:100%;height:58px;object-fit:cover;display:block}.gh .rr{position:absolute;left:2px;top:2px;width:17px;height:17px;filter:drop-shadow(0 1px 1px #000)}.rTag{display:inline-flex;align-items:center;gap:3px;margin-top:2px;padding:1px 7px 1px 2px;border-radius:10px;background:#0009;box-shadow:0 0 0 1px var(--rc);color:var(--rc);font:400 11px Lilita,Game,system-ui;letter-spacing:.6px;text-shadow:0 1px 0 #000;width:max-content}.gtR{display:flex;align-items:center;gap:8px;margin-top:6px;padding:4px 6px;background:#0007;border-radius:8px}.gtRi{display:flex;gap:3px;flex:none}.gtRi img{width:26px;height:26px;filter:grayscale(1) brightness(.45);opacity:.7}.gtRi img.on{filter:drop-shadow(0 0 4px #ffd54a99);opacity:1}.gtRt{display:flex;flex-direction:column;min-width:0;line-height:1.15}.gtRt b{font:400 12px Lilita,Game,system-ui;color:#ffe082;letter-spacing:.4px}.gtRt em{font:400 12px Lilita,Game,system-ui;color:#7dff8a;font-style:normal}.gtRt em.no{color:#c9b88a}.gtRt small{font:400 10px Game,system-ui;color:#c9b88a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gh .rb{position:absolute;right:2px;top:2px;width:16px;height:16px}
 .gh i{position:absolute;left:2px;top:2px;font-style:normal;font-size:7px;font-weight:900;background:#ffb300;color:#2a1000;border-radius:4px;padding:1px 3px}
 .gh span{position:absolute;bottom:0;left:0;right:0;font-size:8.5px;font-weight:900;text-align:center;background:#000c;padding:3px 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #gMain{display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 10px}
@@ -245,7 +245,7 @@ css.textContent=`
 .gSecH{display:flex;align-items:center;gap:6px;margin:10px 12px 0;font:900 12px Game,system-ui;color:#ffd54a;letter-spacing:1px}.gSecH #gCnt{color:#c9b88a;font-size:10px}.gSecH .gSort{margin-left:auto;display:flex;gap:4px}
 .gSecH .gSort b{font:900 9.5px Game,system-ui;letter-spacing:0;padding:4px 7px;border-radius:7px;background:#1b2330;color:#8fa0b4;border:1px solid #2c3746}.gSecH .gSort b.on{background:linear-gradient(#fff1a8,#ffb300);color:#2a1000;border-color:#7a4a00}
 #gHeroes{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;overflow:visible!important;padding:7px 10px 10px!important;touch-action:pan-y!important}
-#gHeroes .gh{flex:none;height:auto;aspect-ratio:.74;opacity:1}#gHeroes .gh>img{height:74%}
+#gHeroes .gh{flex:none;height:auto;aspect-ratio:.74;opacity:1}#gHeroes .gh>img{height:74%}#gHeroes .gh>img.rr{position:absolute;right:4px;left:auto;top:23px;width:22px!important;height:22px!important;object-fit:contain;filter:drop-shadow(0 1px 2px #000)}
 #gHeroes .gh.on{box-shadow:0 0 0 2.5px #fff,0 0 16px #ffb300;transform:scale(1.04)}
 #gHeroes .gh .pw{position:absolute;left:0;right:0;bottom:15px;font:900 8.5px Game,system-ui;color:#ffe27a;text-align:center;text-shadow:0 1px 2px #000}
 #gHeroes .gh .st{position:absolute;right:2px;bottom:28px;font:900 9px Game,system-ui;color:#fff;background:#000a;border-radius:5px;padding:0 3px}
@@ -794,6 +794,12 @@ const itemById=id=>id?GR().inv.find(i=>i.id===id):null;
 const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
+// v16-129: salvage also gives GARAGE PARTS – set pieces give the parts of their class's role, other gear a random role
+const SALV_PK=[10,20,40,80,150,300,600];
+function salvPk(list){const T=TE(),U=T.PART_U?T.PART_U():1,o={};for(const it of list){const n=Math.round(SALV_PK[Math.min(6,it.r)]*(1+U/10));
+  if(it.set&&CLS2ROLE[it.set])o[CLS2ROLE[it.set]]=(o[CLS2ROLE[it.set]]||0)+n;else{const q=T.pkRoles?T.pkRoles(n):{};for(const k in q)o[k]=(o[k]||0)+q[k];}}return o;}
+function salvPkGive(list){const T=TE(),o=salvPk(list);if(T.pkAdd)for(const k in o)T.pkAdd(k,o[k]);return o;}
+const pkTxt=o=>{const T=TE();return Object.keys(o).map(k=>(T.PKI?T.PKI(k):'')+' +'+T.nf(o[k])).join(' ');};
 const salvageV=it=>Math.max(1,Math.round(4*Math.pow(it.r+1,1.8)*(1+.5*(it.lv-1))*(1+(it.sr||0)))); // v16-99: salvage gives GEAR PARTS (= old money ÷ 10)
 const gpCost=it=>Math.max(1,Math.round(upCost(it)/10)); // v16-99: gear upgrades cost GEAR PARTS, money stays for the garage
 const GPN=n=>TE().GPI+' '+TE().nf(n);
@@ -956,8 +962,17 @@ function myMechs(){const T=TE(),o=[];
   o.sort((a,b)=>pow(b)-pow(a));return o;}
 function stars(h){const o=TE().G.h.own[h.id];return o?o.s:0;}
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
-function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];}
-  return {hp:Math.round(R.hp*m*(1+b.hp/100)),atk:R.atk*m*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100),mv:R.mv,rng:R.rng,as:R.as/(1+softCap(b.aspd,60,150)/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+softCap(b.en,60,120)/100,b};}
+// v16-127 (preview): BATTLE ROLES – every class keeps its name (garages, towers, sets) and gets a role tag (Marius' 5 badges img/ui12/role_*.webp)
+const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},ranger:{n:'RANGER',c:'#b6f25a'},mage:{n:'MAGE',c:'#d59bff'},support:{n:'SUPPORT',c:'#5ef0a0'}};
+const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support'};
+function bRoleOf(h){if(!h||h.crew)return null;return MYTH_ROLE[h.id]||CLS2ROLE[roleOf(h)]||null;}
+const RLI=k=>'img/ui12/role_'+k+'.webp';
+const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
+function teamRoles(tl){const have=new Set(tl.filter(Boolean).map(bRoleOf).filter(Boolean));return {have,n:have.size,bon:TR_BON[have.size]||0};}
+function rTag(h,sz){const k=bRoleOf(h);if(!k)return '';const r=BROLE[k];return `<span class="rTag" style="--rc:${r.c}"><img src="${RLI(k)}" style="width:${sz||'1.35em'};height:${sz||'1.35em'}">${r.n}</span>`;}
+function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
+  const gk=h.crew||!TE().garB?1:1+TE().garB(roleOf(h)); // v16-129: the garage that trains this class (LV 1-100) → +ATK & HP
+  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)),atk:R.atk*m*gk*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100),mv:R.mv,rng:R.rng,as:R.as/(1+softCap(b.aspd,60,150)/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+softCap(b.en,60,120)/100,b};}
 // v16-98: Skill charge / Attack speed – full value up to +60%, then they grow slower and never pass +120% / +150% (max gear made ultimates non-stop)
 function softCap(x,K,C){return x<=K?x:K+(C-K)*(1-Math.exp(-(x-K)/(C-K)));}
 function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+(s.crit-R.crit)*.8)*(1+(s.eg-1)*.25)+s.def*4);}
@@ -2435,11 +2450,12 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
     let sold=0;drops.forEach(d=>{if(d.sold){sold+=d.sold;G.gp=(G.gp||0)+d.sold;}});
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;
     const ct=first?R.ct:0,dmw=first?R.dm:0;if(ct)G.h.ct+=ct;if(dmw)G.dm=(G.dm||0)+dmw;
-    const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?3:S0.mini?1:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3:S0.mini?1.5:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1); // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
+    const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?3:S0.mini?1:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3:S0.mini?1.5:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);
+    const PU=T.PART_U?T.PART_U():1,pkr=T.pkRoles?T.pkRoles(PU*(first?(S0.boss?150:S0.mini?80:50):5)*hk):{},pkb=Math.round(PU*(first?(S0.boss?156:S0.mini?78:52):4)*hk);if(T.pkAdd){for(const k in pkr)T.pkAdd(k,pkr[k]);T.pkAdd('bk',pkb);} // v16-129: garage parts from stages // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
     T.save();if(tk)T.addTickets(tk,'Campaign '+lab);
     const chDone=first&&S0.boss&&S0.c<NCH-1;
     // v16-47: Marius' VICTORY page – stars on the emblem (missing ones greyed), rewards in the 4 slots
-    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(money)],[T.ESI,'+'+T.nf(ess)],[T.GPI,'+'+T.nf(gpw)]];if(tk)rws.push([TKI,'+'+tk]);if(gtk)rws.push([GTKI,'+'+gtk]);if(ct)rws.push(['<img src="img/cticket.webp">','+'+ct]);if(dmw)rws.push([T.DMI,'+'+dmw]);
+    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(money)],[T.ESI,'+'+T.nf(ess)],[T.GPI,'+'+T.nf(gpw)]];if(tk)rws.push([TKI,'+'+tk]);if(gtk)rws.push([GTKI,'+'+gtk]);if(ct)rws.push(['<img src="img/cticket.webp">','+'+ct]);if(dmw)rws.push([T.DMI,'+'+dmw]);if(T.PKI){for(const k in pkr)rws.push([T.PKI(k),'+'+T.nf(pkr[k])]);if(pkb)rws.push([T.PKI('bk'),'+'+T.nf(pkb)]);}
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY">${[0,1,2].map(k=>k<st?'':`<i class="stx s${k}"></i>`).join('')}
       <div class="rsL">STAGE ${lab} · ${S0.n.toUpperCase()}<small>${first?'FIRST CLEAR REWARDS':'REPLAY REWARD'}</small></div>
       ${rws.slice(0,4).map((r,k)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][k]}%">${r[0]}<b>${T.numH?T.numH(r[1],'gold',1.15):r[1]}</b></div>`).join('')}
@@ -2725,20 +2741,20 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const tl=team.map(heroOf),tp=teamPower(tl),si=Math.max(0,Math.min(NST-1,tsi==null?CPX().best:tsi)),ep=enemyPower(si),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
   renderPeds(tl);
   $m('gTeam').innerHTML=`<div class="gtH">⚔️ BATTLE TEAM <span style="color:#c9b88a;font-size:10px;letter-spacing:0">for ALL battles</span><button data-g="best">${IMGI(glyphURL('bolt','#2a1000'))} AUTO BEST</button></div>
-    <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`;
+    <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`+(()=>{const R=teamRoles(tl),miss=Object.keys(BROLE).filter(k=>!R.have.has(k));return `<div class="gtR"><div class="gtRi">${Object.keys(BROLE).map(k=>`<img src="${RLI(k)}" class="${R.have.has(k)?'on':''}" alt="${BROLE[k].n}">`).join('')}</div><div class="gtRt"><b>TEAM ROLES ${R.n}/5</b>${R.bon?`<em>+${Math.round(R.bon*100)}% ATK &amp; HP</em>`:'<em class="no">3 roles = +5%</em>'}<small>${miss.length?'missing: '+miss.map(k=>BROLE[k].n).join(', '):'all roles – max bonus!'}</small></div></div>`;})();
   $m('gBagS').textContent=g.inv.length+'/'+GINV_();
   {const C=collInfo();$m('gColS').textContent=C.reduce((a,c)=>a+c.n,0)+' / '+C.reduce((a,c)=>a+c.tot,0);}
   $m('gCnt').textContent=L.length+' heroes';
   $m('gSort').innerHTML=[['pow','POWER'],['gr','GRADE']].map(([k,n])=>`<b data-sort="${k}" class="${gsort===k?'on':''}">${n}</b>`).join('');
   const fz=T.canFuse?T.canFuse:()=>false;
-  $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">+${stars(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
+  $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${bRoleOf(m)?`<img class="rr" src="${RLI(bRoleOf(m))}">`:''}${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">+${stars(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
   $m('gHSB').innerHTML='<b>HERO SUMMON</b><span><img src="img/ticket.webp" alt="">'+T.G.h.tk.toLocaleString()+'</span>';
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon your first heroes – they fight and wear gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'');
-  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}${h.gr===5?' '+starsH(stars(h)||0,0,1):''}</small><div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
-  $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setPcs(roleOf(h),heroGear(h.id))}${setBlock(roleOf(h),n)}</div>`;})()}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
+  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}${h.gr===5?' '+starsH(stars(h)||0,0,1):''}</small>${rTag(h)}<div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
+  $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setPcs(roleOf(h),heroGear(h.id))}${setBlock(roleOf(h),n)}</div>`;})()}${(()=>{const T=TE();if(!T.garB||h.crew)return '';const c=roleOf(h),gb=T.garB(c),G0={engine:'Engine Shop',tuning:'Tuning',inspect:'Inspection',paint:'Body & Paint',elec:'Electronics',service:'Service'};return `<div class="gSk ps"><b>🏭 GARAGE TRAINING <em style="color:#7dff8a;font-style:normal">+${(gb*100).toFixed(gb<.1?1:0)}% ATK &amp; HP</em></b><span>${c==='all'?'Legend heroes get the average bonus of the 6 battle garages.':`From your <b>${G0[c]}</b> (LV ${T.lvT(T.CLSG[c])}/100) – upgrade it with ${T.PKI(CLS2ROLE[c])} <b>${T.PK_N[CLS2ROLE[c]]}</b>.`}</span></div>`;})()}${window.CC&&CC.battleB&&CC.battleB()?`<div class="gSk ps"><b>🏆 CLASSIC COLLECTION <em style="color:#7dff8a;font-style:normal">+${Math.round(CC.battleB()*100)/100}% ATK &amp; HP</em></b><span>Every classic car you own makes ALL heroes stronger.</span></div>`:''}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
   const inT=team.includes(h.id);
   const lvRdy=T.lvOf(h.id)<T.lvCap(h.id)&&(G.ess||0)>=T.lvCost(T.lvOf(h.id))||T.lvOf(h.id)===T.lvCap(h.id)&&T.lvCap(h.id)<T.LV_MAX&&(G.ess||0)>=T.ascCost(T.ascOf(h.id));
@@ -2790,7 +2806,7 @@ function svList(){const g=GR();return g.inv.filter(it=>!ownerOf(it)&&it.r<6&&svG
 function svFx(n,sum){const T=TE(),b=$('svGo');try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}const o=document.createElement('div');o.className='svFx';o.innerHTML=`<img src="img/ui2/i_scrap.webp"><b>+${GPN(sum)}</b><small>${n} item${n>1?'s':''} salvaged</small>`;$('gSalv').appendChild(o);setTimeout(()=>o.remove(),1700);}
 function renderSalv(){const T=TE();const L=svPick=svList();let sum=0;L.forEach(it=>sum+=salvageV(it));
   $m('svSlots').innerHTML=Array.from({length:20},(_,k)=>{const it=L[k];return `<div class="svS" style="left:${[8.5,25.6,42.7,59.6,76.7][k%5]}%;top:${[33.7,44.3,54.9,65.4][k/5|0]}%">${it?`<div data-sx="${it.id}">${itemCard(it)}</div>`:''}</div>`;}).join('');
-  $m('svInfo').innerHTML=`<div class="svT">${L.length?`<b>${L.length}</b> item${L.length>1?'s':''} · <b class="g">+${GPN(sum)}</b>`:'Nothing to salvage'}</div><div class="svC">${T.GRADES.slice(0,6).map((gr,i)=>`<b data-sv="${i}" class="${svG[i]?'on':''}" style="--c:${gr.c}">${gr.n.toUpperCase()}</b>`).join('')}</div>`;
+  $m('svInfo').innerHTML=`<div class="svT">${L.length?`<b>${L.length}</b> item${L.length>1?'s':''} · <b class="g">+${GPN(sum)}</b> <small style="color:#ffd54a">+ garage parts</small>`:'Nothing to salvage'}</div><div class="svC">${T.GRADES.slice(0,6).map((gr,i)=>`<b data-sv="${i}" class="${svG[i]?'on':''}" style="--c:${gr.c}">${gr.n.toUpperCase()}</b>`).join('')}</div>`;
   $('svGo').innerHTML=L.length?`SALVAGE ${L.length}`:'—';$('svGo').classList.toggle('dis',!L.length);
   $m('svHelp').innerHTML=`<div class="gNote">${IMGI('img/ui2/i_scrap.webp','1.3em','-.35em')} Gear that a hero wears is never salvaged. Tap the grades to choose what goes in · tap an item to keep it${svSkip.size?` · <u data-g="svReset">show kept items (${svSkip.size})</u>`:''}</div>`;}
 function cmpForHero(h,ov,xp,xc){return cmpBlock(unitStats(h),unitStats(h,ov),pow(h),pow(h,ov),xp,xc);}
@@ -2926,10 +2942,10 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
     T.save();renderGear();popItem(it.id,true);const dp=gHero()&&ownerOf(it)===gHero().id?pow(gHero())-p0:0;
     T.toast(a==='star'?'★ STAR UP! '+itemName(it)+' ★'+it.sr+(dp>0?' · Power +'+dp.toLocaleString():''):'✦ ASCENDED! '+itemName(it)+' is now Ascended',2600);return;}
   if(a==='salv'&&it){if(!gsalv){gsalv=1;el.innerHTML=el.closest('.itBt')?'TAP AGAIN<small>to salvage</small>':'TAP AGAIN TO SALVAGE (+'+T.nf(salvageV(it))+' parts)';el.classList.remove('alt');el.classList.add('red');el.style.background='linear-gradient(#ff8a80,#c62828)';el.style.color='#fff';return;}
-    const o=ownerOf(it);if(o)delete GR().eq[o][it.s];const g=GR();g.inv.splice(g.inv.indexOf(it),1);G.gp=(G.gp||0)+salvageV(it);T.save();closePop();renderGear();T.toast('🔨 Salvaged for '+GPN(salvageV(it)),1800);return;}
+    const o=ownerOf(it);if(o)delete GR().eq[o][it.s];const g=GR();g.inv.splice(g.inv.indexOf(it),1);G.gp=(G.gp||0)+salvageV(it);const spk=salvPkGive([it]);T.save();closePop();renderGear();T.toast('🔨 Salvaged for '+GPN(salvageV(it))+' '+pkTxt(spk),1800);return;}
   if(a==='aok'&&h){const ov=autoPlan(h),g=GR();if(!g.eq[h.id])g.eq[h.id]={};for(const sl of GSLOT){if(ov[sl.k])equip(h.id,ov[sl.k]);else delete g.eq[h.id][sl.k];}T.save();closePop();renderGear();return;}
   if(a==='nok'&&h){GR().eq[h.id]={};T.save();closePop();renderGear();return;}
-  if(a==='svok'){const g=GR(),L=(svPick||[]).filter(it=>g.inv.includes(it)&&!ownerOf(it));let sum=0;L.forEach(it=>{sum+=salvageV(it);g.inv.splice(g.inv.indexOf(it),1);});G.gp=(G.gp||0)+sum;T.save();closePop();renderGear();renderSalv();svFx(L.length,sum);return;}});
+  if(a==='svok'){const g=GR(),L=(svPick||[]).filter(it=>g.inv.includes(it)&&!ownerOf(it));let sum=0;const spk=salvPkGive(L);L.forEach(it=>{sum+=salvageV(it);g.inv.splice(g.inv.indexOf(it),1);});G.gp=(G.gp||0)+sum;window.__lastSpk=spk;T.save();closePop();renderGear();renderSalv();svFx(L.length,sum);if(Object.keys(spk).length)T.toast('🔨 Garage parts: '+pkTxt(spk),2800);return;}});
 
 // ---------------------------------------------------------------- v14: GEAR SUMMON (blue Gear Tickets · gear works only in battles)
 const GTKI='<img src="img/gticket.webp" style="height:1.15em;vertical-align:-.25em" onerror="this.replaceWith(\'🎫\')">';
@@ -3031,10 +3047,10 @@ function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],
   const eq=Math.min(NST-1,Math.round(3+f*3.2));
   const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1);
   return {f,w,mod,eq,mul,boss,mini,st:{n:'FLOOR '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
-const EGI=r=>{const T=TE(),a=[];if(r.ess)a.push(T.ESI+' '+T.nf(r.ess));if(r.gp)a.push(T.GPI+' '+T.nf(r.gp));return a;}; // v16-99
-const giveEG=r=>{const G=TE().G;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;};
+const EGI=r=>{const T=TE(),a=[];if(r.ess)a.push(T.ESI+' '+T.nf(r.ess));if(r.gp)a.push(T.GPI+' '+T.nf(r.gp));if(r.pk&&T.PKI)for(const k in r.pk)a.push(T.PKI(k)+' '+T.nf(r.pk[k]));return a;}; // v16-99
+const giveEG=r=>{const G=TE().G;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk&&TE().pkAdd)for(const k in r.pk)TE().pkAdd(k,r.pk[k]);}; // v16-129: + garage parts
 function twRew(f){const F=twFloor(f),r={money:REWARD(F.eq).money,dm:5,tk:0,gtk:0,ct:0};
-  if(f%5===0)r.tk=2;if(f%10===0){r.dm=100;r.gtk=3;r.ct=1;}if(f%50===0)r.dm+=400;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_U());r.gp=Math.round(x*T.GP_U());return r;}
+  if(f%5===0)r.tk=2;if(f%10===0){r.dm=100;r.gtk=3;r.ct=1;}if(f%50===0)r.dm+=400;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_U());r.gp=Math.round(x*T.GP_U());r.pk={bk:Math.round((130+20*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit
 const twG=()=>{const G=TE().G;if(!G.tw)G.tw={b:0};return G.tw;};
 const twOK=()=>TE().G.cp.best>=TW_UNLOCK;
 const TWA={};function twArenaImg(){const k=B&&B.tw&&B.tw.wb?'wb':B&&B.tw&&B.tw.dg?'dg_'+B.tw.dg:'im';if(!TWA[k]){TWA[k]=new Image();TWA[k].decoding='async';TWA[k].src=k==='wb'?'img/wb/wb_arena.webp':k.startsWith('dg_')?'img/dg/bt_'+k.slice(3)+'.webp':'img/ui6/tw_arena.webp';}return TWA[k];}
@@ -3088,7 +3104,7 @@ function anxTower(can,go){const G=TE().G;const show=()=>{const on=G.cp.autoNext!
   start();return ()=>{G.cp.autoNext=G.cp.autoNext===false;TE().save();start();};}
 function twFinish(win,retreat){if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
   if(win&&f===t.b+1){const r=twRew(f);t.b=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;if(r.ct)G.h.ct+=r.ct;T.save();if(r.tk)T.addTickets(r.tk,'Tower floor '+f);
-    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
+    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">TORQUE TOWER · FLOOR ${f}<small>${f>=TW_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
       ${rws.slice(0,4).map((q,k)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][k]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
       <div class="rsU">${rws.length>4?rws.slice(4).map(q=>q[0]+' '+q[1]).join(' · ')+' · ':''}Record: floor ${t.b} / ${TW_N}</div>${f<TW_N?ANX_ROW:''}</div>
@@ -3225,7 +3241,7 @@ function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=
   return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;
 function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/10)*10,dm:3,gtk:0,set:null};
-  if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;const T=TE();r.ess=Math.round(.5*T.ESS_U());r.gp=Math.round(.6*T.GP_U());return r;}
+  if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;const T=TE();r.ess=Math.round(.5*T.ESS_U());r.gp=Math.round(.6*T.GP_U());r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0?2:1))};return r;} // v16-129: Class Tower → the parts of its class (Bruiser Tower → Tank Parts…)
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';});
 function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,5);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)
@@ -3291,7 +3307,7 @@ function ctFinish(win,retreat){const T=TE(),G=T.G,t=ctG(),F=B.tw,k=F.ct,f=F.f;le
   if(win&&f===t[k]+1){const r=ctRew(k,f);t[k]=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;
     let setTxt='';if(r.set){const g=GR(),it=newItem(r.set.s,r.set.r,k);if(g.inv.length>=GINV_()){const v=salvageV(it);G.gp=(G.gp||0)+v;setTxt='BAG FULL → '+GPN(v);}else{g.inv.push(it);setTxt=itemName(it);}}
     T.save();
-    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.set)rws.push([ctSetHtml({k,s:r.set.s,r:r.set.r}),'SET']);
+    const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.set)rws.push([ctSetHtml({k,s:r.set.s,r:r.set.r}),'SET']);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${ROLE[k].n.toUpperCase()} TOWER · FLOOR ${f}<small>${f>=CT_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
       ${rws.slice(0,4).map((q,i)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][i]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
       <div class="rsU">${setTxt?'New set piece: <b>'+setTxt+'</b> · ':''}Record: floor ${t[k]} / ${CT_N}</div>${f<CT_N&&ctOpenK(k)?ANX_ROW:''}</div>

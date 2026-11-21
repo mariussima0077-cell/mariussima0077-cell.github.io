@@ -1076,7 +1076,7 @@ const G={money:300,sold:0,xp:0,rep:1,vip:0,sec:{caught:0,stolen:0},dq:{day:'',q:
 function repFor(xp){let r=1;for(let i=1;i<REP_XP.length;i++)if(xp>=REP_XP[i])r=i+1;return r;}
 function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw&&window.SEC){const sg=localStorage.getItem(SAVE_KEY+'_s');if(sg&&sg!==SEC.sign(raw))SEC.flag('edited_save');}const s=JSON.parse(raw);if(s&&s.lv){G.money=s.money;G.sold=s.sold;G.xp=s.xp||0;Object.assign(G.lv,s.lv);G.vip=s.vip||0;if(s.sec)G.sec=s.sec;if(s.dq&&s.dq.q)G.dq=s.dq;if(s.h)Object.assign(G.h,s.h);/* v16-20: Crew summon (Drivers + Guards) with its own tickets */if(!G.h.pity.c){const a=G.h.pity.g||{e:0,l:0},b=G.h.pity.d||{e:0,l:0};G.h.pity.c={e:Math.max(a.e,b.e),l:Math.max(a.l,b.l)};}if(G.h.ct==null)G.h.ct=0;if(!G.h.ctInit){G.h.ct+=10;G.h.ctInit=1;}if(s.idle)G.idle=s.idle;if(s.cp)G.cp=s.cp;if(s.gear)G.gear=s.gear;if(s.up)G.up=s.up;if(s.ci)G.ci=s.ci;if(s.nw)G.nw=s.nw;if(s.ml)G.ml=s.ml;if(s.dm)G.dm=s.dm;if(s.c5)G.c5=s.c5;/* v16-69 BUG FIX: Torque Tower, Class Towers, Dungeons, World Boss and the Classic Collection were saved but NOT loaded back → lost at every restart/update. Now everything in the save comes back (also future parts of G). */['tw','ct','dg','wb','cc'].forEach(k=>{if(s[k]&&typeof s[k]==='object')G[k]=s[k];});for(const k in s)if(G[k]===undefined&&s[k]!=null)G[k]=s[k];G.rep=repFor(G.xp);}}catch(e){}}
 function save(){if(window.__noSave)return;if(window.EVT)try{EVT.tick();}catch(e){}try{const j=JSON.stringify(G);localStorage.setItem(SAVE_KEY,j);if(window.SEC)localStorage.setItem(SAVE_KEY+'_s',SEC.sign(j));}catch(e){}}
-load();
+load();setTimeout(()=>{try{pkMigrate();save();}catch(e){console.error(e);}},0); // v16-129: garage parts gift / start
 let time=0, started=false, SPD=1;
 
 // =================== VIP (levels 1-20) — points only from Daily Quests ===================
@@ -1449,7 +1449,7 @@ function sales(dt){
   const olv=G.lv.office;
   for(let j=0;j<PLV('office');j++){const a=agents[j];
     if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent&&c.rich)||cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
-    else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale())*(1+repSale()));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
+    else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale())*(1+repSale())*lxInc('office'));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
       G.money+=price;incSale(c,price);G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip||c.rich)driveAway(c);else if(Math.random()<BUYER_DRIVE)driveAway(c,1);
       const xp=1+c.jobs.reduce((s,j)=>s+j.xp,0);addXP(xp);
       float(c.x,c.y-30,'+'+fmt(price),'#ffd54a');float(a.p.x,a.p.y-22,'SOLD ONLINE','#b39ddb');save();}}
@@ -2254,7 +2254,7 @@ function drawGarage(id){
   if(PASS!=='dyn'){X.fillStyle='rgba(0,0,0,.25)';X.fillRect(4,5,GW,GD);}
   if(lv===0){drawConstruction(GW,GD);X.restore();
     const c=L2W(g,150,75);X.textAlign='center';X.fillStyle='#fff';X.font='900 15px Game,system-ui';X.fillText(S.name.toUpperCase(),c.x,c.y-12);
-    X.fillStyle=locked?'#455a64':S.color;rr(c.x-58,c.y-2,116,28,8);X.fill();X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD[id].rep:'BUILD '+fmt(BLD[id].cost[0]),c.x,c.y+17);return;}
+    X.fillStyle=locked?'#455a64':S.color;rr(c.x-58,c.y-2,116,28,8);X.fill();X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD[id].rep:'BUILD · '+PCOST(id,1)+(GROLE[id]?' PARTS':' KITS'),c.x,c.y+17);return;}
   const GI=IMG['g_'+id+gTier(id)];
   if(GART[id]&&GI&&GI.ok){drawGarageNew(id,lv,GI);X.restore();if(PASS==='dyn')return;garageSign(id,lv);
     const A=GA(id);X.font='900 10px Game,system-ui';X.textAlign='center';
@@ -2330,7 +2330,7 @@ function crate(x,y){X.fillStyle='#b07a3c';rr(x-4,y-4,8,8,1);X.fill();X.strokeSty
 function drawPartsBuilding(){
   const lv=G.lv.parts,locked=G.rep<BLD.parts.rep,{x,y,w,h}=PB;if(!inView(x-10,y-20,w+20,h+40))return;
   if(lv===0){if(PASS==='dyn')return;X.fillStyle='rgba(0,0,0,.25)';X.fillRect(x+4,y+30,w,h-30);X.save();X.translate(x,y+26);drawConstruction(w,h-26);X.restore();X.textAlign='center';X.fillStyle='#fff';X.font='900 14px Game,system-ui';X.fillText('PARTS OFFICE',x+w/2,y+h/2);
-    X.fillStyle=locked?'#455a64':'#ef6c00';rr(x+w/2-58,y+h/2+10,116,28,8);X.fill();X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD.parts.rep:'BUILD '+fmt(BLD.parts.cost[0]),x+w/2,y+h/2+29);return;}
+    X.fillStyle=locked?'#455a64':'#ef6c00';rr(x+w/2-58,y+h/2+10,116,28,8);X.fill();X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD.parts.rep:'BUILD · '+PCOST('parts',1)+' KITS',x+w/2,y+h/2+29);return;}
   const t=PLV('parts'),m=PARTART[t],PI=m&&IMG['p_parts'+t];
   if(PASS!=='dyn'){if(PI&&PI.ok){X.drawImage(PI.el,x,y,w,h);picLv(m.lvbox,x,y,w/m.w,lv,'#c62828','#fff');}else{if(IMG.p_parts0.ok)X.drawImage(IMG.p_parts0.el,x,y,w,h);lvTag(x+w-46,y+h*.17+7,lv,'#ef6c00');}}
   if(PASS==='static')return;
@@ -2538,7 +2538,7 @@ const xTier=id=>Math.max(1,PLV(id));
 function xRect(id){const t=xTier(id),a=XART[id+t],m=XM[id];let w,h;if(m.w){w=m.w;h=w*a.h/a.w;}else{h=m.h;w=h*a.w/a.h;}return{x:m.cx-w/2,y:DS_B-h,w,h,t,a,k:w/a.w};}
 const xRepM=()=>RC(IDLE_REP)*(1+repIdle());
 const xWashSale=()=>G.lv.wash?WASH_SALE[G.lv.wash-1]:0, xGasTrl=()=>G.lv.gas?GAS_TRL[G.lv.gas-1]:0;
-const washPay=l=>Math.round(WASH_PAY[l-1]*xRepM()), gasPay=l=>Math.round(GAS_PAY[l-1]*xRepM()), facPrice=l=>Math.round(FAC_PRICE[l-1]*Math.max(1,xRepM()/5));
+const washPay=l=>Math.round(WASH_PAY[l-1]*xRepM()*lxInc('wash')), gasPay=l=>Math.round(GAS_PAY[l-1]*xRepM()*lxInc('gas')), facPrice=l=>Math.round(FAC_PRICE[l-1]*Math.max(1,xRepM()/5)*lxInc('factory'));
 function xPic(id,r,clipH){const I=IMG['x_'+id+r.t];if(!I||!I.ok)return false;const hh=clipH||r.h;
   DI(I,0,0,r.a.w,hh/r.k,r.x,r.y,r.w,hh);if(r.a.lv[3]*r.k<=hh+1)picLv(r.a.lv,r.x,r.y,r.k,Math.max(1,G.lv[id]||1),XM[id].plate,'#ffffff');return true;}
 function drawDistrict(){
@@ -2561,7 +2561,7 @@ function drawDistrict(){
     xPic(id,r);X.fillStyle='rgba(22,30,38,.6)';rr(r.x,r.y,r.w,r.h,14);X.fill();
     const cx=r.x+r.w/2,cy=r.y+r.h*.62;X.textAlign='center';
     X.fillStyle=locked?'#455a64':XM[id].col;rr(cx-64,cy-2,128,28,8);X.fill();X.strokeStyle='rgba(255,255,255,.85)';X.lineWidth=1.5;X.stroke();
-    X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD[id].rep:'BUILD '+fmt(BLD[id].cost[0]),cx,cy+17);
+    X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD[id].rep:'BUILD · '+PCOST(id,1)+(GROLE[id]?' PARTS':' KITS'),cx,cy+17);
     X.font='900 12px Game,system-ui';X.lineWidth=4;X.strokeStyle='rgba(0,0,0,.65)';const nm={wash:'🫧 CAR WASH',gas:'⛽ GAS STATION',factory:'🏭 CAR FACTORY'}[id];X.strokeText(nm,cx,cy-12);X.fillText(nm,cx,cy-12);}
 }
 // ---- customers & produced cars (their own little traffic, separate from the garage cars)
@@ -2600,6 +2600,14 @@ function incRates(){const now=Date.now(),m=Math.floor(now/6e4),mins=Math.max(1,M
 document.addEventListener('visibilitychange',()=>{if(document.hidden)INC.hid=Date.now();else if(INC.hid&&Date.now()-INC.hid>6e4){INC.b=[];INC.t0=Date.now();}}); // away = no garage work → start measuring again
 const XINC={wash:l=>washPay(l)*ECO*3600/WASH_EVERY[l-1],gas:l=>gasPay(l)*ECO*3600/GAS_EVERY[l-1],factory:l=>facPrice(l)*ECO*3600/FAC_EVERY[l-1]}; // fixed income: one customer / car every X s
 const incFac=(id,l)=>!l?0:id==='office'?1+SELL_BONUS[l-1]:id==='security'?SEC_REWARD[l-1]*Math.min(.95,SEC_CATCH[l-1]):Math.sqrt(TIER(l))*SPEED[l-1]*(1+PAYB[l-1]); // more bays help only when cars wait → √
+// v16-129: parts row (you have / this level costs) + extra-level rows (income, battle bonus)
+function pkRow(id,lt,nu,cost,pk){if(nu||lt>=MAXT)return '';const n=pkN(pk),ok=n>=cost;
+  return '<div class="row pkRow"><span>'+PKI(pk,'1.35em')+' '+PK_N[pk]+'</span><b style="color:'+(ok?'#7dff8a':'#ff8a80')+'">'+nfmt(n)+'</b><em>need '+nfmt(cost)+'</em></div>';}
+function xlRows(id,lt,nu){if(nu||!BLD[id])return '';let h='';const x=lvX(id),top=lt<MAXT;
+  if(lt>=10||x)h+='<div class="row"><span>⭐ Extra income (LV 11+)</span><b>+'+Math.round(2*x)+'%</b>'+(top&&lt>=10?'<em>+'+Math.round(2*(x+1))+'%</em>':'')+'</div>';
+  if(GCLS[id]){const c=GCLS[id],b=GB(lt),b2=GB(Math.min(MAXT,lt+1));h+='<div class="row bbRow"><span>'+'<img class="tki" src="img/ui4/cls_'+c+'.webp" alt=""> '+CLS_N[c]+' heroes in battle</span><b>+'+pctB(b)+'</b>'+(top?'<em>+'+pctB(b2)+'</em>':'')+'</div>';}
+  return h;}
+const pctB=v=>(v*100<10?(v*100).toFixed(1):Math.round(v*100))+'%';
 function incRow(id,lv,nu){if(nu)return '';const top=lv<MAXLV,R=incRates(),now=R.r[id]||0,em=v=>top?'<em>'+fmt(v)+'/h</em>':'';
   if(XINC[id])return '<div class="row incRow"><span>💰 Income</span><b>'+(lv?'≈ '+fmt(XINC[id](lv))+'/h':'—')+'</b>'+em(XINC[id](lv+1))+'</div>';
   if(id==='inspect'||id==='parking'||id==='trailer'||id==='parts')return '<div class="row incRow"><span>💰 Income</span><b style="font-size:.85em">no direct money</b><em style="font-size:.85em">'+(top?'more cars for every garage':'')+'</em></div>';
@@ -2887,7 +2895,36 @@ const EARLY_M=[2,2,6,20]; // v16-73: open / LV2 / LV3 / LV4 cost more (the first
 const UPN=5,UPM=2.5,LATE=[1,1,1,1,1,1.15,1.35,1.6,1.9,2.25];for(const id in BLD){const c=BLD[id].cost;if(c)for(let i=0;i<c.length;i++){if(i>=4)c[i]=c[i]*UPM*LATE[i];c[i]=i>=4?Math.round(c[i]*COST_M/1000)*1000:Math.round(c[i]*COST_M*(c[0]?EARLY_M[i]:i?EARLY_M[i]:1)/10)*10;}}
 const UPP=id=>(G.up&&G.up[id])||0;
 const costOf=(id,lv)=>Math.round(BLD[id].cost[lv]*(1-VB('disc'))/(lv>=4?UPN:1));
-const payB=id=>{const l=(G.lv[id]||1);return PAYB[l-1]+(l<10&&l>=4?(PAYB[l]-PAYB[l-1])*UPP(id)/UPN:0);};
+const payB=id=>{const l=(G.lv[id]||1);return PAYB[l-1]+(l<10&&l>=4?(PAYB[l]-PAYB[l-1])*UPP(id)/UPN:0)+.02*lvX(id);}; // v16-129: +2% pay per extra level (11-100)
+// ---------------------------------------------------------------- v16-129 (pending): GARAGE PARTS (Marius 21 nov 2026)
+// Buildings no longer cost money: the 6 battle garages upgrade with the PARTS of their battle role, every other building with the
+// common BUILDER KIT (never mixed). LV 1-10 = the old levels (same pictures + tables), then EXTRA levels 11-100 (G.lx): +2% income each
+// and, for battle garages, a battle bonus for the hero class the garage trains (small at first, big at the end). Money → Classic Collection + Cash Roulette.
+const PK_K=['tank','warrior','ranger','mage','support','bk'];
+const PK_N={tank:'Tank Parts',warrior:'Warrior Parts',ranger:'Ranger Parts',mage:'Mage Parts',support:'Support Parts',bk:'Builder Kit'};
+const PK_C={tank:'#6ec6ff',warrior:'#ff6e5a',ranger:'#b6f25a',mage:'#d59bff',support:'#5ef0a0',bk:'#ffd54a'};
+const PKU=k=>'img/ui12/pk_'+k+'.webp',PKI=(k,sz)=>'<img class="tki pki" src="'+PKU(k)+'"'+(sz?' style="width:'+sz+';height:'+sz+'"':'')+' alt="">';
+const GROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'};   // garage → part (= battle role of its class)
+const GCLS={engine:'engine',tuning:'tuning',inspect:'inspect',paint:'paint',elec:'elec',service:'service'}; // garage → hero class it trains
+const CLSG={engine:'engine',tuning:'tuning',inspect:'inspect',paint:'paint',elec:'elec',service:'service'};  // hero class → garage
+const partOf=id=>GROLE[id]||'bk', MAXT=100;
+const CLS_N={engine:'Bruiser',tuning:'Racer',inspect:'Scanner',paint:'Sprayer',elec:'Shocker',service:'Medic',all:'Legend'};
+const lvX=id=>(G.lx&&G.lx[id])||0, lvT=id=>(G.lv[id]||0)+lvX(id), lxInc=id=>1+.02*lvX(id);
+const upk=()=>G.upk||(G.upk={}), pkN=k=>upk()[k]||0;
+function pkAdd(k,n){n=Math.round(n);if(!n||!PK_K.includes(k))return 0;const u=upk();u[k]=(u[k]||0)+n;return n;}
+const PK_W={tank:1,warrior:1,ranger:1,mage:2,support:1};   // Mage parts serve 2 garages (Paint + Electrical) → drop twice as often
+function pkRoles(n){n=Math.round(n);const o={};if(n<=0)return o;const ks=Object.keys(PK_W),tw=ks.reduce((a,k)=>a+PK_W[k],0);
+  const ch=Math.max(1,Math.ceil(n/6));for(let left=n;left>0;){const c=Math.min(ch,left);let r=Math.random()*tw,k=ks[0];for(const q of ks){r-=PK_W[q];if(r<0){k=q;break;}}o[k]=(o[k]||0)+c;left-=c;}return o;}
+const pkGive0=o=>Object.keys(o).map(k=>PKI(k)+' +'+nfmt(o[k])).join(' ');
+function pkGive(o){const out=[];for(const k in o)if(pkAdd(k,o[k]))out.push(PKI(k)+' +'+nfmt(o[k]));return out.join(' · ');}
+const PCOST=(id,L)=>Math.ceil((2+.7*Math.pow(L,1.55))*13*(id==='factory'?1.5:1)*(1-VB('disc'))/5)*5;   // v16-129b (Marius: ×10 numbers, a bit slower): LV1 40 · LV10 350 · LV50 3,950 · LV100 11,450
+const PART_U=()=>1+Math.min(999,(G.cp&&G.cp.best)||0)/40;   // drops grow with your campaign stage (×1 → ×26)
+const GB=L=>.0001*L*L;   // battle bonus (ATK + HP) of a garage of level L (v16-129b: slower at first): LV10 +1% · LV25 +6% · LV50 +25% · LV75 +56% · LV100 +100%
+function garB(cls){if(CLSG[cls])return GB(lvT(CLSG[cls]));if(cls==='all'){let a=0;for(const k in CLSG)a+=GB(lvT(CLSG[k]));return a/6;}return 0;}   // Legend (Mythic) = average of the 6
+// old saves: levels stay; unfinished money steps (LV 4-10) and the money already in buildings become a small parts gift
+function pkMigrate(){if(G.upkV)return;G.upkV=1;const old=Object.values(G.lv).reduce((a,b)=>a+b,0)>14||G.sold>40;
+  if(old){const g={};for(const id in G.lv){const k=partOf(id),L=G.lv[id]||0;let n=Math.ceil(PCOST(id,Math.min(MAXT,L+1))*1.5);if(UPP(id))n+=Math.ceil(PCOST(id,L+1)*UPP(id)/UPN);g[k]=(g[k]||0)+n;}
+    for(const k in g)pkAdd(k,g[k]);G.pkGift=g;}else{['tank','warrior','ranger','support'].forEach(k=>pkAdd(k,150));pkAdd('mage',300);pkAdd('bk',520);}G.up={};}
 function openPanel(id,car){sel=id;selCar=car||null;lastPanelKey='';skinSheet(id==='shop'||id==='vip'?id:'');bldSkin(id!=='shop'&&id!=='vip'&&id!=='rep'&&id!=='car'&&id!=='inc');renderPanel();sheet.classList.add('open');}
 // v16-47: Shop + VIP use Marius' full-screen pages (img/ui2) – other panels stay bottom sheets
 function skinSheet(n){sheet.className=sheet.className.replace(/\bsk(n|P|-\w+)\b/g,'').trim();const b=$('shBody');b.className='';if(n){sheet.classList.add('skn','skP','sk-'+n);b.className='skB';const im=$('shSkH').querySelector('img');if(!im.src.endsWith(n+'_h.webp'))im.src='img/ui2/'+n+'_h.webp';}}
@@ -2960,31 +2997,31 @@ function renderPanel(){
     $('shStats').innerHTML=(G.rep>6?'<div class="repBon">⭐ Your Rep bonus now: car sale price +'+Math.round(repSale()*100)+'% · idle income +'+Math.round(repIdle()*100)+'%</div>':'')+REP_TXT.map((t,i)=>'<div class="job'+(i<G.rep?' done':' off')+'"><span class="ic">'+(i<G.rep?'⭐':'🔒')+'</span><span><b>Rep '+(i+1)+'</b> – '+t+'</span></div>').join('');
     $('shBtn').style.display='none';return;}
   const inf=INFO[sel],nu=NOUP(sel),lv=nu?1:G.lv[sel],need=nu?1:BLD[sel].rep,locked=!nu&&G.rep<need;
-  const cost=(!nu&&lv<MAXLV)?costOf(sel,lv):0,can=G.money>=cost&&!locked;
-  const key=sel+lv+'p'+UPP(sel)+can+locked+G.rep+VLV+VSUB+'h'+HVER+'i'+Math.floor(Date.now()/5e3)+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
+  const lt=nu?1:lvT(sel),pk=nu?'bk':partOf(sel),cost=(!nu&&lt<MAXT)?PCOST(sel,lt+1):0,can=pkN(pk)>=cost&&!locked; // v16-129: parts, not money
+  const key=sel+lt+'p'+pkN(pk)+can+locked+G.rep+VLV+VSUB+'h'+HVER+'i'+Math.floor(Date.now()/5e3)+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
   $('shTitle').textContent=inf.title;
-  $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lv?'Level '+lv+' / '+MAXLV:'Not built')+'</span>'+(lv>=4&&lv<MAXLV&&!sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'');
+  $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(lt>10?(i<=Math.floor((lt-10)/9)?'on gd':'on'):i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lt?'Level '+lt+' / '+MAXT:'Not built')+'</span>';
   $('shDesc').textContent=inf.desc;
-  let h=(lv>=4&&lv<MAXLV&&!nu&&sheet.classList.contains('bldP')?'<div class="upParts">'+[0,1,2,3,4].map(i=>'<b class="'+(i<UPP(sel)?'on':'')+'"></b>').join('')+'<small>LV '+(lv+1)+' · step '+UPP(sel)+'/'+UPN+'</small></div>':'')+incRow(sel,lv,nu)+inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](lv)+'</b>'+(!nu&&lv<MAXLV?'<em>'+(sheet.classList.contains('bldP')?'':'→ ')+r[1](lv+1)+'</em>':'')+'</div>').join('');
+  let h=pkRow(sel,lt,nu,cost,pk)+incRow(sel,lv,nu)+inf.rows.map(r=>'<div class="row"><span>'+r[0]+'</span><b>'+r[1](Math.max(lv,nu?1:0)||lv)+'</b>'+(!nu&&lv<MAXLV?'<em>'+(sheet.classList.contains('bldP')?'':'→ ')+r[1](lv+1)+'</em>':'')+'</div>').join('')+xlRows(sel,lt,nu);
   h+=teamRows(sel);
   if(ST[sel]&&sel!=='inspect'){h+='<div class="sec">JOBS</div>'+JOBS.filter(j=>j.st===sel).map(j=>{const ok=G.rep>=j.rep&&(!j.parts||G.lv.parts>0);
     return '<div class="job'+(ok?'':' off')+'"><span class="ic">'+(ok?'✓':'🔒')+'</span><span>'+j.n+(j.parts?' 📦':'')+'</span><span class="st">'+fmt(j.pay)+' · '+j.t+'s'+(ok?'':'<br>'+(G.rep<j.rep?'Rep '+j.rep:'needs Parts Office'))+'</span></div>';}).join('');}
   if(sel==='security')h+='<div class="sec">RECORD</div><div class="row"><span>👮 Thieves caught</span><b>'+G.sec.caught+'</b></div><div class="row"><span>🚨 Cars stolen</span><b>'+G.sec.stolen+'</b></div>';
-  if(VB('disc')>0&&!nu&&lv<MAXLV)h+='<div class="note">👑 VIP upgrade discount '+pctT(VB('disc'),1)+' included.</div>';
+  if(VB('disc')>0&&!nu&&lt<MAXT)h+='<div class="note">👑 VIP upgrade discount '+pctT(VB('disc'),1)+' included.</div>';
   if(SOON_IDS.includes(sel))h+='<div class="lock">🚧 Coming soon – nothing to do here yet.</div>';
   if(locked)h+='<div class="lock">🔒 Unlocks at Reputation '+need+'. Sell more cars to grow your reputation.</div>';
-  if(!nu&&!locked&&lv>=4&&lv<MAXLV)h+='<div class="stepNote">⬆️ From LV 4, each level is built in <b>'+UPN+' steps</b>. A step costs only money – no items needed. Every step already adds part of the bonus; after step '+UPN+'/'+UPN+' the building reaches <b>LV '+(lv+1)+'</b>.</div>';
+  if(!nu&&!locked&&lt<MAXT&&!can)h+='<div class="stepNote">'+PKI(pk,'1.3em')+' <b>'+PK_N[pk]+'</b> come from: '+(pk==='bk'?'Idle Rewards, campaign stages, <b>Torque Tower</b>, the Cash Roulette event and packs.':'salvaging gear, Idle Rewards, campaign stages, <b>'+CLS_N[GCLS[sel]]+' Tower</b>, the Cash Roulette event and packs.')+'</div>';
   morph($('shStats'),h);
-  const b=$('shBtn');$('shTitle').parentNode.dataset.lv=nu?'':lv?'LEVEL '+lv+' / '+MAXLV:'NOT BUILT';if(nu){if(sheet.classList.contains('bldP')){b.style.display='';b.disabled=false;b.textContent='OK';}else b.style.display='none';return;}b.style.display='';
-  if(lv>=MAXLV){b.textContent='MAX LEVEL';b.disabled=true;}else if(locked){b.textContent='🔒 REPUTATION '+need+' NEEDED';b.disabled=true;}
-  else{b.textContent=lv>=4?'⬆️ STEP '+(UPP(sel)+1)+'/'+UPN+' · '+fmt(cost):(lv===0?'BUILD ':'UPGRADE ')+fmt(cost);b.disabled=!can;}
+  const b=$('shBtn');$('shTitle').parentNode.dataset.lv=nu?'':lt?'LEVEL '+lt+' / '+MAXT:'NOT BUILT';if(nu){if(sheet.classList.contains('bldP')){b.style.display='';b.disabled=false;b.textContent='OK';}else b.style.display='none';return;}b.style.display='';
+  if(lt>=MAXT){b.textContent='MAX LEVEL';b.disabled=true;}else if(locked){b.textContent='🔒 REPUTATION '+need+' NEEDED';b.disabled=true;}
+  else{b.innerHTML=(lt===0?'BUILD ':'UPGRADE ')+PKI(pk,'1.25em')+' '+nfmt(cost);b.disabled=!can;}
 }
-$('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(sel&&NOUP(sel)&&sheet.classList.contains('bldP')){closePanel();return;}if(!sel||NOUP(sel))return;const lv=G.lv[sel];if(lv>=MAXLV||G.rep<BLD[sel].rep)return;const cost=costOf(sel,lv);if(G.money<cost)return;
-  G.money-=cost;if(lv>=4){G.up=G.up||{};G.up[sel]=UPP(sel)+1;if(G.up[sel]<UPN){qAdd('upgrade',1);save();lastPanelKey='';renderPanel();toast('⬆️ Step '+G.up[sel]+'/'+UPN+' done · LV '+(lv+1)+' after step '+UPN+'/'+UPN,1800);return;}G.up[sel]=0;}
+$('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(sel&&NOUP(sel)&&sheet.classList.contains('bldP')){closePanel();return;}if(!sel||NOUP(sel))return;const lv=G.lv[sel],lt=lvT(sel),pk=partOf(sel);if(lt>=MAXT||G.rep<BLD[sel].rep)return;const cost=PCOST(sel,lt+1);if(pkN(pk)<cost){toast(PKI(pk)+' Not enough '+PK_N[pk]+' ('+nfmt(pkN(pk))+' / '+nfmt(cost)+')',2400);return;}
+  upk()[pk]-=cost;if(lv>=MAXLV){G.lx=G.lx||{};G.lx[sel]=lvX(sel)+1;qAdd('upgrade',1);save();lastPanelKey='';renderPanel();float(AV,300,'LEVEL '+(lt+1)+'!','#ffd54a');return;}
   G.lv[sel]++;qAdd('upgrade',1);relayoutAfterUpgrade(sel);if(sel==='security')secLayout(true);if(sel==='parts')partsLayout();save();lastPanelKey='';renderPanel();
   let fx=AV,fy=300;const g=GAR[sel];
   if(g){const p=L2W(g,150,75);fx=p.x;fy=p.y;}else if(sel==='parts'){fx=PB.x+PB.w/2;fy=PB.y+40;}else if(sel==='trailer'){fx=200;fy=TRAIL_Y-30;}else if(sel==='parking'){fx=600;fy=AY;}else if(sel==='security'){fx=SO_X+SO_W/2;fy=SO_Y+50;}else if(XIDS.includes(sel)){const r=xRect(sel);fx=r.x+r.w/2;fy=r.y+r.h*.4;}
-  float(fx,fy,lv===0?'BUILT!':'LEVEL '+(lv+1)+'!','#ffd54a');
+  float(fx,fy,lv===0?'BUILT!':'LEVEL '+(lt+1)+'!','#ffd54a');
   for(let i=0;i<30;i++)parts.push({x:fx,y:fy,vx:rnd(-80,80),vy:rnd(-80,80),life:.7,max:.7,r:rnd(1.5,3),col:pick(['#ffd54a','#fff','#ff9800'])});};
 // v16-42: refresh a page WITHOUT re-creating its pictures (a re-created <img> blinks for a frame on cheap phones)
 function morph(el,html){const t=document.createElement('template');t.innerHTML=html;mKids(el,t.content);}
@@ -3500,13 +3537,15 @@ const LOCKI='<img class="wLk" src="img/ui5/lock.webp" alt="locked">',OKI='<img s
 function closePop(){popEl.classList.remove('open');popCtx=null;}
 // v16-122 (Marius: "easier to understand"): ONE window that explains every resource – what it is, where to get it, what it is for
 function resHtml(f){const GTI='<img class="tki" src="img/gticket.webp">',KI='<img class="tki" src="img/wb/key.webp">';
-  const R=[['money','💵','Money','Your garage (sold cars) · Idle Rewards','Building upgrades'],
+  const R=[['money','💵','Money','Your garage (sold cars) · Idle Rewards','Classic Collection cars · Cash Roulette event spins'],
    ['dm',DMI,'Diamonds','Campaign bosses · Daily Quests · Check-in · Events · Arena · Shop','100 = 1 summon (you are always asked first) · Silver VIP Pass · name change'],
    ['tk',TKI,'Recruit Tickets','Check-in · Daily Quests · campaign · Idle Rewards · new Reputation / VIP levels','HERO Summon (mechanics who work AND fight)'],
    ['ct',CTI,'Crew Tickets','Check-in · Daily Quest gifts · thieves caught · campaign bosses · Idle Rewards','CREW Summon (drivers and guards for the garage)'],
    ['gt',GTI,'Gear Tickets','Check-in · campaign · Idle Rewards · events','GEAR Summon (equipment for battles)'],
    ['ess',ESI,'Essence','Idle Rewards · campaign · Torque Tower · Class Towers · Dungeons · events · duplicates of maxed heroes','Hero LEVEL UP and ASCENSION (HEROES page)'],
    ['gp',GPI,'Gear Parts','SALVAGE old gear · campaign · Idle Rewards · towers · Dungeons','Gear UPGRADE (tap a piece of gear)'],
+   ['pk',PKI('tank')+PKI('warrior')+PKI('ranger')+PKI('mage')+PKI('support'),'Role Parts (Tank · Warrior · Ranger · Mage · Support) – you have '+['tank','warrior','ranger','mage','support'].map(k=>nfmt(pkN(k))).join(' · '),'SALVAGE gear (set gear = its class) · campaign stages · Idle Rewards · Class Towers (Bruiser Tower → Tank…) · Cash Roulette · packs','Upgrade the battle garages (LV 1-100): Engine = Tank · Tuning = Warrior · Inspection = Ranger · Paint + Electronics = Mage · Service = Support. Every level makes that class stronger in battle.'],
+   ['bk',PKI('bk'),'Builder Kit – you have '+nfmt(pkN('bk')),'Idle Rewards · campaign stages · Torque Tower · Cash Roulette · packs','Upgrade every other building (parking, office, security, transport, car wash, gas station, factory, Parts Office) – LV 1-100'],
    ['key',KI,'Keys','World Boss: 3 a day · Dungeons: 2 free a day each · Key Roulette · Dungeon Pass','One key = one World Boss attack / one Dungeon win'],
    ['vp','⭐','VIP points','Daily Quests (free for everybody)','VIP levels: bigger bonuses for your garage, Idle time and more']];
   return '<div class="wP rsInfo">'+R.map(([k,ic,n,g,u])=>'<div class="rsI'+(k===f?' on':'')+'"><b>'+ic+' '+n+'</b><span><em>GET</em> '+g+'</span><span><em>USE</em> '+u+'</span></div>').join('')+'</div>';}
@@ -3664,7 +3703,7 @@ const IDLE_BASE_H=4, IDLE_VIP_H=1, IDLE_TK_H=2; // v16-122: 4h standard + 1 h pe
 const idleMax=()=>IDLE_BASE_H+IDLE_VIP_H*VLV+(S2()?SHOP2.idleH():0); // v16-75: VIP Pass Silver +1h / Gold +2h / Platinum +4h
 const IDLE_REP=[1,1.5,2.3,3.5,5,7];
 const idlEl=$('idl'),idlBox=$('idlBox');let idlKey='';
-function idleBase(){let lv=0,ex=0;for(const k in G.lv){lv+=G.lv[k];if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle());} // v15: high levels also earn well while you are away
+function idleBase(){let lv=0,ex=0,xs=0;for(const k in G.lv){lv+=G.lv[k];xs+=lvX(k);if(G.lv[k])ex+=8*Math.pow(1.9,G.lv[k]-1);}return Math.max(120+45*lv,ex)*RC(IDLE_REP)*(1+repIdle())*(1+.003*xs);} // v16-129: extra levels +0.3% idle each // v15: high levels also earn well while you are away
 const ccR=()=>window.CC?CC.rates():{dm:0,tk:0,ct:0,gt:0,es:0,gp:0,mon:0};
 function idleRate(){return Math.round(idleBase()*ECO*(1+VB('idle')+ccR().mon));}
 function idleCalc(hrs){const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U())};}
@@ -3673,7 +3712,7 @@ const qiLeft=()=>{const n=VP(VLV).qi;if(!n)return 0;if(!G.qi||G.qi.d!==dayK())re
 function quickIdle(){if(!qiLeft()){toast(VLV?'🎁 No Quick Idle left today – more with a higher VIP level':'👑 Quick Idle opens at VIP 1 (Daily Quests give VIP points)',2800);return;}
   if(!G.qi||G.qi.d!==dayK())G.qi={d:dayK(),n:0};G.qi.n++;const I=idleCalc(2);G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;save();idlKey='';renderIdle();
   toast('🎁 Quick Idle (2 h): +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+' · '+qiLeft()+' left today',3200);}
-function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U()),full:hrs>=idleMax()};}
+function idleNow(){const hrs=Math.min(idleMax(),Math.max(0,(SEC.now()-G.idle)/36e5));const C=ccR();return{hrs,money:Math.floor(idleRate()*hrs),tk:Math.floor(hrs/IDLE_TK_H)+Math.floor(hrs*C.tk),ct:Math.floor(hrs/(IDLE_TK_H*2))+Math.floor(hrs*C.ct),dm:Math.floor(hrs*C.dm),gt:Math.floor(hrs*C.gt),ess:Math.floor(hrs*(.5+(C.es||0))*ESS_U()),gp:Math.floor(hrs*(.6+(C.gp||0))*GP_U()),rp:Math.floor(hrs*20*PART_U()),bk:Math.floor(hrs*65*PART_U()),full:hrs>=idleMax()};} // v16-129: + garage parts (role parts split at random, Builder Kit)
 const hm=h=>{const m=Math.floor(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
 function popIdle(welcome){idlKey='';fit(idlBox,1199,1312);idlEl.classList.add('open');renderIdle();}
 function closeIdle(){idlEl.classList.remove('open');}
@@ -3688,14 +3727,14 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV grn" style="'+box(860,836,265,70)+'">1 every '+IDLE_TK_H+'h</div>';
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
   const cc=(I.dm||I.gt||ccR().dm)?'<br>🏆 <b>Classic cars</b>: '+DMI+' +'+(I.dm||0)+(I.gt?' · '+GTI+' +'+I.gt:'')+' (tickets above include them)':'';
-  h+='<div class="idEG" style="'+box(150,1083,900,34)+'">'+ESI+' Essence <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' Gear Parts <b>+'+nfmt(I.gp)+'</b></div>';
+  h+='<div class="idEG" style="'+box(150,1083,900,34)+'">'+ESI+' <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' <b>+'+nfmt(I.gp)+'</b> &nbsp;·&nbsp; 🔧 Garage parts <b>+'+nfmt(I.rp)+'</b> &nbsp;·&nbsp; '+PKI('bk')+' <b>+'+nfmt(I.bk)+'</b></div>';
   h+='<div class="idQI'+(qiLeft()?'':' off')+'" data-i="qi" style="'+box(330,1222,540,74)+'">🎁 QUICK IDLE 2h · '+(VLV?qiLeft()+' left':'VIP 1')+'</div>';
   h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+cc+'</span></div>';
   morph(idlBox,h);}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='qi')quickIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
-function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;let ia=null;try{ia=window.CAMPAIGN&&CAMPAIGN.idleAsc?CAMPAIGN.idleAsc(I.hrs):null;}catch(e){}G.idle=SEC.now();if(window.EVT)EVT.q('idle',1);save();closeIdle();
-  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+(ia?' · ✦ ASCENDED '+CAMPAIGN.itemName(ia)+'!':''),ia?5000:3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
+function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;const ipk=pkRoles(I.rp);for(const k in ipk)pkAdd(k,ipk[k]);pkAdd('bk',I.bk);let ia=null;try{ia=window.CAMPAIGN&&CAMPAIGN.idleAsc?CAMPAIGN.idleAsc(I.hrs):null;}catch(e){}G.idle=SEC.now();if(window.EVT)EVT.q('idle',1);save();closeIdle();
+  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+(I.rp||I.bk?' · 🔧 '+pkGive0(ipk)+' '+PKI('bk')+' +'+nfmt(I.bk):'')+(ia?' · ✦ ASCENDED '+CAMPAIGN.itemName(ia)+'!':''),ia?5000:3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
 addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open')){teamKey='';renderTeam();}if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
@@ -3762,7 +3801,7 @@ function c5Rw(n){const left=C5_TOTAL-c5Got(n);if(left<=0)return null;const a=Mat
 const ciReady=()=>G.c5.day!==dayKey()&&!!c5Rw(G.c5.n);
 const GTI='<img class="tki" src="img/gticket.webp">';
 function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);if(r.gt)a.push(GTI+' ×'+r.gt);if(r.dm)a.push(DMI+' ×'+r.dm);if(r.vipTo)a.push('👑 VIP '+r.vipTo);return a.join('<br>');}
-function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
+function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
  {id:63,d:'Nov 21, 2026',ic:'🔥',t:'New MYTHIC hero: Ignis, the Iron Phoenix',l:['A third <b>MYTHIC</b> hero joins the Hero Summon: <b>Ignis, the Iron Phoenix</b> – a phoenix-mechanic with burning metal wings and a flaming phoenix staff.','Skill <b>REBIRTH FLAME</b>: a giant fire phoenix dives on the enemies – 200% damage to all, they burn. Heals all your mechanics 35% + 15% over 4s, team −20% damage taken. <b>Once per battle it brings back ALL fallen mechanics</b> with 40% HP.','The Mythic chance in the Hero Summon stays the same (0.08%) – it is now shared by 3 Mythic heroes.']},
@@ -3939,7 +3978,7 @@ function startLoader(){
 // v16-72: what the tutorial (tutorial.js) needs from the map – camera, building areas, panel
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},
   rect:id=>id==='parking'?{x:430,y:110,w:345,h:290}:id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:GAR[id]?{x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32}:null,
-  sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>BLD[id].cost[G.lv[id]||0]||0,TKI:()=>TKI};
+  sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>PCOST(id,lvT(id)+1),upHave:id=>pkN(partOf(id)),upGive:(id,n)=>pkAdd(partOf(id),n),TKI:()=>TKI};
 // v16-99: one-time update of old saves – heroes get the level that fits their campaign progress (so nothing gets harder), Mythic stars above +20 → 💎300 each, workshops keep only their own class
 function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Math.round(expLv(G.cp.best||0)*.9)));
   for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o)continue;if(h.cat==='m'){o.lv=e;o.a=Math.min(ASC_MAX,Math.floor((e-1)/ASC_STEP));}else{o.lv=o.lv||1;o.a=o.a||0;}
@@ -3947,7 +3986,7 @@ function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Mat
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
+window.__TE={idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

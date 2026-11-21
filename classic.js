@@ -22,16 +22,31 @@ const CARS=[
  {id:'dyn',   n:'Golden Dynasty',  gr:5,k:'dynasty', c:['#ffcf40','#7a4a00'],price:40e6, rep:22,r:{dm:4,es:0.4,gp:0.4,tk:1/4,ct:1/6,gt:1/6}},
  {id:'etern', n:'Eternal Torque',  gr:5,k:'eternal', c:['#12051f','#ff3d71'],price:50e6, rep:22,r:{dm:4,es:0.4,gp:0.4,tk:1/4,ct:1/6,gt:1/6}},
 ];
+// v16-129 (pending, Marius 21 nov): the money from cars now goes HERE – 24 more cars (36), more and more expensive (up to ~$260B),
+// no more parking limit (every car you own counts; the 6 best are shown on the map) and every car makes ALL heroes stronger in battle
+// (ATK & HP, small at first, big at the end) + free tickets every hour. b = battle bonus in % · price ×1.42 per car.
+const NEW=[['Copper Clipper','sedan30',['#b87333','#f0dcc0']],['Mint Marauder','muscle',['#98ff98','#1b3d2a']],['Azure Ace','roadster',['#2979ff','#e3f2fd']],['Desert Dart','coupe',['#e0b070','#5d4037']],
+ ['Ivory Imperial','limo',['#f8f4e3','#3e2723']],['Crimson Comet','arrow',['#c62828','#f5f5f5']],['Night Falcon','gull',['#212121','#ffca28']],['Bronze Baron','cruiser',['#8d6e63','#ffe0b2']],
+ ['Jade Jubilee','wagon',['#00a86b','#f1f8e9']],['Plum Prestige','dynasty',['#6a1b9a','#e1bee7']],['Solar Sovereign','eternal',['#ffb300','#4e342e']],['Frost Phantom','limo',['#b3e5fc','#263238']],
+ ['Ruby Regent','dynasty',['#9b111e','#ffd700']],['Obsidian Oracle','gull',['#0d0d0d','#7c4dff']],['Platinum Pharaoh','arrow',['#e5e4e2','#c9a227']],['Emerald Empress','cruiser',['#046307','#f9e79f']],
+ ['Inferno Imperator','muscle',['#ff3d00','#1a0000']],['Starlight Sultan','eternal',['#1a237e','#ffeb3b']],['Diamond Duchess','roadster',['#b9f2ff','#ffffff']],['Titan Tycoon','limo',['#37474f','#ffd54a']],
+ ['Aurora Archon','gull',['#00e5ff','#ea80fc']],['Crown of Torque','dynasty',['#ffd700','#b71c1c']],['Celestial Kaiser','eternal',['#0b0033','#00e5ff']],['The Last Legend','arrow',['#ffffff','#ff1744']]];
+NEW.forEach(([n,k,c],j)=>CARS.push({id:'x'+j,n,gr:j<6?3:j<14?4:j<21?5:6,k,c,price:Math.round(80e6*Math.pow(1.42,j)/1e6)*1e6,rep:Math.min(30,18+Math.floor(j/2)),
+  r:{dm:.3+j*.05,es:.4+j*.04,gp:.4+j*.04,tk:.012*Math.pow(1.1,12+j),gt:.009*Math.pow(1.1,12+j),ct:.006*Math.pow(1.1,12+j)}}));
+CARS.forEach((c,i)=>c.b=Math.round(.15*Math.pow(1.12,i)*100)/100);   // battle bonus % per car: car 1 +0.15% … car 12 +0.5% … car 24 +2% … car 36 +8% (all 36 ≈ +72%)
 const BY={};CARS.forEach(c=>BY[c.id]=c);
 const OPEN_COST=150e3,OPEN_REP=6,SPOTS=6,SPOT_COST=[0,0,500e3,1.5e6,5e6,15e6],FULL_BONUS=.10,SELL_BACK=.5;
 // spot centres on b_collection.webp (560×1033): 2 columns × 3 rows, cars face the middle aisle
 const SPOT=[[130,380],[430,380],[130,558],[430,558],[130,735],[430,735]];
 
-function st(){const G=T().G;if(!G.cc)G.cc={o:0,sp:2,p:['','','','','','']};return G.cc;}
-function parked(){return st().p.filter(Boolean).map(id=>BY[id]).filter(Boolean);}
+function st(){const G=T().G;if(!G.cc)G.cc={o:0,sp:2,p:['','','','','','']};const s=G.cc;if(!s.own)s.own=s.p.filter(Boolean);return s;}   // v16-129: s.own = every car you own (old saves: the parked ones)
+function owned(){return st().own.map(id=>BY[id]).filter(Boolean);}
+function parked(){return owned();}
+function show6(){return owned().slice().sort((a,b)=>b.price-a.price).slice(0,SPOTS);}   // the 6 most expensive are shown on the map
+function battleB(){const s=st();if(!s.o)return 0;return owned().reduce((a,c)=>a+c.b,0);}   // % ATK & HP for every hero
 function rates(){const s=st(),o={dm:0,tk:0,ct:0,gt:0,es:0,gp:0,mon:0};if(!s.o)return o;
   for(const c of parked())for(const k in c.r)o[k]=(o[k]||0)+c.r[k];
-  if(parked().length>=SPOTS)o.mon=FULL_BONUS;return o;}
+  o.mon=owned().length*.01;return o;}   // v16-129: +1% idle money per car owned
 
 // ---------------------------------------------------------------- drawing (nose = +x, centred, length L, width W)
 function rrp(g,x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
@@ -56,7 +71,7 @@ function drawCar(g,m,L,W,t){
   // shadow
   g.fillStyle='rgba(0,0,0,.38)';ellp(g,1.2,1.6,hl+1.5,hw+1);g.fill();
   // rarity glow under the car (Epic+)
-  if(m.gr>=3){const col=['','','','#c86bff','#ffc107','#ff3d71'][m.gr],p=.5+.5*Math.sin(t*2.6+m.gr);g.fillStyle=col;g.globalAlpha=.1+.1*p;ellp(g,0,0,hl+8,hw+7);g.fill();g.globalAlpha=1;}
+  if(m.gr>=3){const col=['','','','#c86bff','#ffc107','#ff3d71','#2ef3ff'][m.gr],p=.5+.5*Math.sin(t*2.6+m.gr);g.fillStyle=col;g.globalAlpha=.1+.1*p;ellp(g,0,0,hl+8,hw+7);g.fill();g.globalAlpha=1;}
   const K=m.k;
   if(K==='bug'){ // round bubble car with fenders
     for(const s of[-1,1])for(const x of[hl*.5,-hl*.5]){g.fillStyle=paint(g,c1,hw);ellp(g,x,s*hw*.72,hl*.3,hw*.36);g.fill();wheel(g,x,s*hw*.92,8,3.6,true);}
@@ -186,10 +201,9 @@ function drawCar(g,m,L,W,t){
 // x,y,w,h = where b_collection is drawn. Returns true when the garage is open (index.html then skips the "coming soon" tape).
 function drawMap(X,x,y,w,h,time){const s=st();if(!s.o)return false;const k=w/560;
   for(let i=0;i<SPOTS;i++){const [sx,sy]=SPOT[i],cx=x+sx*k,cy=y+sy*k;
-    if(i>=s.sp){X.fillStyle='rgba(10,14,20,.6)';X.fillRect(cx-26,cy-22,52,44);X.font='900 9px Game,system-ui';X.textAlign='center';X.fillStyle='#ffd54a';X.fillText('🔒',cx,cy+1);X.font='900 6px Game,system-ui';X.fillText(fmtS(SPOT_COST[i]),cx,cy+10);continue;}
-    const m=BY[s.p[i]];if(!m)continue;X.save();X.translate(cx,cy);if(i%2)X.rotate(Math.PI);drawCar(X,m,52,24,time||0);X.restore();}
+    const m=show6()[i];if(!m)continue;X.save();X.translate(cx,cy);if(i%2)X.rotate(Math.PI);drawCar(X,m,52,24,time||0);X.restore();}
   return true;}
-const fmtS=n=>n>=1e6?'$'+(n/1e6).toFixed(n%1e6?1:0)+'M':'$'+Math.round(n/1e3)+'K';
+const fmtS=n=>n>=1e9?'$'+(n/1e9).toFixed(1)+'B':n>=1e6?'$'+(n/1e6).toFixed(n%1e6?1:0)+'M':'$'+Math.round(n/1e3)+'K';
 
 // ---------------------------------------------------------------- thumbnails for the pages
 const TH={};
@@ -200,9 +214,9 @@ function thumb(id,w,hh){const key=id+'|'+w;if(TH[key])return TH[key];const c=doc
 const el=document.createElement('div');el.id='ccP';el.innerHTML='<div id="ccBox"><div class="ccHd"><button class="ccX" data-cc="x">↩</button><img class="ccT" src="img/cc/head.webp" alt="CLASSIC COLLECTION"><div class="ccMon" id="ccMon"></div></div>'+
   '<div class="ccTabs"><button data-cc="tab:g"><img class="i1" src="img/cc/tg1.webp" alt="MY GARAGE"><img class="i0" src="img/cc/tg0.webp" alt="MY GARAGE"></button><button data-cc="tab:d"><img class="i1" src="img/cc/td1.webp" alt="DEALER"><img class="i0" src="img/cc/td0.webp" alt="DEALER"></button></div><div id="ccBody"></div></div><div id="ccPop"></div>';
 document.body.appendChild(el);let tab='g';
-const GN=['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC'];
+const GN=['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC','ASCENDED'];
 function gc(gr){const G=T().GRADES;return G&&G[gr]?G[gr].c:'#999';}
-function rwLine(r,big){const T0=T(),a=[];const per=v=>v>=1?'+'+Math.round(v*10)/10+' / h':'1 every '+Math.round(1/v)+' h';
+function rwLine(r,big,b){const T0=T(),a=[];if(b)a.push('⚔️ <b style="color:#7dff8a">+'+b+'% ATK &amp; HP</b>');const per=v=>v>=1?'+'+Math.round(v*10)/10+' / h':'1 every '+Math.round(1/v)+' h';
   if(r.dm)a.push(T0.DMI+' '+per(r.dm));if(r.es)a.push(T0.ESI+' +'+T0.fmt(Math.round(r.es*T0.ESS_U())).replace('$','')+' / h');if(r.gp)a.push(T0.GPI+' +'+T0.fmt(Math.round(r.gp*T0.GP_U())).replace('$','')+' / h');if(r.tk)a.push('<img class="tki" src="img/ticket.webp"> '+per(r.tk));if(r.ct)a.push('<img class="tki" src="img/cticket.webp"> '+per(r.ct));if(r.gt)a.push('<img class="tki" src="img/gticket.webp"> '+per(r.gt));
   return a.join(big?'<br>':' · ');}
 function open(t){tab=t||tab;el.classList.add('open');render();}
@@ -214,23 +228,19 @@ function render(){const T0=T(),G=T0.G,s=st();document.getElementById('ccMon').in
     h='<div class="ccClosed"><img src="'+thumb('dyn',260,120)+'"><h3>Open your Collection Garage</h3><p>Buy classic cars from the dealer and park them in your private showroom. Every parked car brings <b>diamonds</b> and <b>tickets</b> while you are away (collect them with <b>IDLE</b>).</p>'+
       '<button class="ccBuy'+(ok&&G.money>=OPEN_COST?'':' off')+'" data-cc="open">'+(ok?'OPEN · '+T0.fmt(OPEN_COST):'🔒 REP '+OPEN_REP)+'</button></div>';
     document.getElementById('ccBody').innerHTML=h;return;}
-  if(tab==='g'){const R=rates(),n=parked().length;
-    h+='<div class="ccSum"><b>IDLE BONUS FROM YOUR CARS</b><div>'+(n?rwLine(R):'Park a car to get diamonds, Essence, Gear Parts and tickets')+'</div>'+
-      '<small>'+n+' / '+SPOTS+' cars'+(R.mon?' · <i>FULL SHOWROOM: idle money +'+Math.round(FULL_BONUS*100)+'%</i>':' · fill all '+SPOTS+' spots: idle money +'+Math.round(FULL_BONUS*100)+'%')+'</small></div><div class="ccGrid">';
-    for(let i=0;i<SPOTS;i++){const m=BY[s.p[i]];
-      if(i>=s.sp){const can=i===s.sp;h+='<div class="ccSp lock'+(can?' nx':'')+'" data-cc="'+(can?'spot':'')+'"><div class="ccGl"><span>🔒</span>'+(can?'<button class="ccBuy'+(G.money>=SPOT_COST[i]?'':' off')+'">UNLOCK · '+T0.fmt(SPOT_COST[i])+'</button>':'<em>unlock spot '+(i)+' first</em>')+'</div><b class="ccPl">SPOT '+(i+1)+'</b></div>';continue;}
-      if(!m){h+='<div class="ccSp empty" data-cc="tab:d"><div class="ccGl"><span>＋</span><em>EMPTY · BUY A CAR</em></div><b class="ccPl">SPOT '+(i+1)+'</b></div>';continue;}
-      h+='<div class="ccSp" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><div class="ccGl"><em>'+GN[m.gr]+'</em><img src="'+thumb(m.id,150,72)+'"><small>'+rwLine(m.r)+'</small></div><b class="ccPl">'+m.n+'</b></div>';}
-    h+='</div>';}
-  else{h+='<div class="ccNote">Every car can be owned <b>once</b>. Rewards are fixed – nothing random. Sell a car back for '+Math.round(SELL_BACK*100)+'% to swap it.</div>';
-    const free=s.p.slice(0,s.sp).some(x=>!x);
-    for(const m of CARS){const own=s.p.includes(m.id),lk=G.rep<m.rep,cant=!own&&(lk||G.money<m.price||!free);
-      h+='<div class="ccRow" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><div class="ccImg"><img src="'+thumb(m.id,150,72)+'"></div><div class="ccInf"><b>'+m.n+'</b><em>'+GN[m.gr]+'</em><small>'+rwLine(m.r)+'</small></div>'+
+  if(tab==='g'){const R=rates(),O=owned(),n=O.length,bb=Math.round(battleB()*100)/100;
+    h+='<div class="ccSum"><b>YOUR COLLECTION · '+n+' / '+CARS.length+' CARS</b><div>⚔️ All heroes in battle: <b style="color:#7dff8a">+'+bb+'% ATK &amp; HP</b></div><div>'+(n?rwLine(R):'Buy a car to get diamonds, Essence, Gear Parts and tickets')+'</div>'+
+      '<small>Idle money +'+n+'% (1% per car) · your 6 most expensive cars are shown in the garage on the map</small></div><div class="ccGrid">';
+    for(const m of O.slice().sort((a,b)=>b.price-a.price))h+='<div class="ccSp" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><div class="ccGl"><em>'+GN[m.gr]+'</em><img src="'+thumb(m.id,150,72)+'"><small>'+rwLine(m.r,0,m.b)+'</small></div><b class="ccPl">'+m.n+'</b></div>';
+    h+='<div class="ccSp empty" data-cc="tab:d"><div class="ccGl"><span>＋</span><em>BUY MORE CARS</em></div><b class="ccPl">DEALER</b></div></div>';}
+  else{h+='<div class="ccNote">Every car can be owned <b>once</b> and counts forever – no parking limit. Rewards are fixed – nothing random.</div>';
+    for(const m of CARS){const own=s.own.includes(m.id),lk=G.rep<m.rep,cant=!own&&(lk||G.money<m.price);
+      h+='<div class="ccRow" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><div class="ccImg"><img src="'+thumb(m.id,150,72)+'"></div><div class="ccInf"><b>'+m.n+'</b><em>'+GN[m.gr]+'</em><small>'+rwLine(m.r,0,m.b)+'</small></div>'+
         '<button class="ccBuy'+(own?' own':cant?' off':'')+'" data-cc="buy:'+m.id+'">'+(own?'✓ OWNED':lk?'🔒 REP '+m.rep:T0.fmt(m.price))+'</button></div>';}}
   document.getElementById('ccBody').innerHTML=h;}
-function pop(id){const T0=T(),G=T0.G,s=st(),m=BY[id],own=s.p.includes(id);
+function pop(id){const T0=T(),G=T0.G,s=st(),m=BY[id],own=s.own.includes(id);
   const P=$p();P.innerHTML='<div class="ccPB" style="--gc:'+gc(m.gr)+'"><button class="ccX" data-cc="px">✕</button><em>'+GN[m.gr]+'</em><h3>'+m.n+'</h3><img src="'+thumb(id,300,140)+'">'+
-    '<div class="ccPR"><b>IDLE REWARDS WHILE PARKED</b><div>'+rwLine(m.r,1)+'</div></div>'+
+    '<div class="ccPR"><b>WHILE YOU OWN IT</b><div>'+rwLine(m.r,1,m.b)+'</div></div>'+
     (own?'<button class="ccBuy sell" data-cc="sell:'+id+'">SELL · '+T0.fmt(m.price*SELL_BACK)+'</button>':'<button class="ccBuy" data-cc="buy:'+id+'">BUY · '+T0.fmt(m.price)+(G.rep<m.rep?' · 🔒 REP '+m.rep:'')+'</button>')+'</div>';
   P.classList.add('open');}
 function act(a){const T0=T(),G=T0.G,s=st();
@@ -240,13 +250,12 @@ function act(a){const T0=T(),G=T0.G,s=st();
     G.money-=OPEN_COST;s.o=1;T0.save();T0.toast('🏆 Collection Garage OPEN! Buy your first classic car at the dealer.',3500);tab='d';return render();}
   if(a==='spot'){const i=s.sp,c=SPOT_COST[i];if(i>=SPOTS)return;if(G.money<c)return T0.toast('Not enough money',2000);G.money-=c;s.sp++;T0.save();T0.toast('🅿️ Spot '+(i+1)+' unlocked',2200);return render();}
   if(a.startsWith('car:'))return pop(a.slice(4));
-  if(a.startsWith('buy:')){const m=BY[a.slice(4)];if(s.p.includes(m.id))return pop(m.id);
-    if(G.rep<m.rep)return T0.toast('🔒 '+m.n+' needs REP '+m.rep,2500);const i=s.p.findIndex((x,j)=>j<s.sp&&!x);
-    if(i<0)return T0.toast('🅿️ No free parking spot – unlock a spot or sell a car',2800);if(G.money<m.price)return T0.toast('Not enough money',2000);
-    T0.payAsk?0:0;G.money-=m.price;s.p[i]=m.id;T0.save();$p().classList.remove('open');T0.toast('🚘 '+m.n+' is parked in spot '+(i+1)+'!',3000);tab='g';return render();}
-  if(a.startsWith('sell:')){const id=a.slice(5),i=s.p.indexOf(id);if(i<0)return;const btn=$p().querySelector('.sell');
+  if(a.startsWith('buy:')){const m=BY[a.slice(4)];if(s.own.includes(m.id))return pop(m.id);
+    if(G.rep<m.rep)return T0.toast('🔒 '+m.n+' needs REP '+m.rep,2500);if(G.money<m.price)return T0.toast('Not enough money',2000);
+    G.money-=m.price;s.own.push(m.id);s.p=show6().map(c=>c.id);T0.save();$p().classList.remove('open');T0.toast('🚘 '+m.n+' joins your collection! All heroes +'+m.b+'% ATK & HP',3200);tab='g';return render();}
+  if(a.startsWith('sell:')){const id=a.slice(5),i=s.own.indexOf(id);if(i<0)return;const btn=$p().querySelector('.sell');
     if(!btn.dataset.sure){btn.dataset.sure=1;btn.textContent='TAP AGAIN TO SELL';return;}
-    G.money+=Math.round(BY[id].price*SELL_BACK);s.p[i]='';T0.save();$p().classList.remove('open');T0.toast('💰 Sold for '+T0.fmt(BY[id].price*SELL_BACK),2500);return render();}}
+    G.money+=Math.round(BY[id].price*SELL_BACK);s.own.splice(i,1);s.p=show6().map(c=>c.id);T0.save();$p().classList.remove('open');T0.toast('💰 Sold for '+T0.fmt(BY[id].price*SELL_BACK),2500);return render();}}
 el.addEventListener('click',e=>{const b=e.target.closest('[data-cc]');if(b&&b.dataset.cc)act(b.dataset.cc);else if(e.target.id==='ccPop')$p().classList.remove('open');});
 setInterval(()=>{if(el.classList.contains('open')){const T0=T();if(T0)document.getElementById('ccMon').innerHTML=T0.fmt(T0.G.money);}},1000);
 
@@ -283,5 +292,5 @@ const css=document.createElement('style');css.textContent=`
 #ccP .tki,#ccPop .tki{height:1.3em;vertical-align:-.3em}
 `;document.head.appendChild(css);
 
-window.CC={CARS,drawMap,drawCar,open,close,rates,st,isOpen:()=>el.classList.contains('open'),sig:()=>{const s=T()&&T().G.cc;return s?s.o+'|'+s.sp+'|'+s.p.join(','):'';}};
+window.CC={CARS,drawMap,drawCar,open,close,rates,st,battleB,isOpen:()=>el.classList.contains('open'),sig:()=>{const s=T()&&T().G.cc;return s?s.o+'|'+(s.own||s.p).join(','):'';}};
 })();

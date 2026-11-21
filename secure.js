@@ -90,7 +90,7 @@ let last = null;
 const rebase = () => { last = null; };   // v16-75: after a purchase the jump is allowed
 function sane(){
   const t=T(); if(!t||!t.G) return; const G=t.G;
-  const lvSum = Object.values(G.lv).reduce((a,b)=>a+b,0);
+  const lvSum = Object.values(G.lv).reduce((a,b)=>a+b,0) + Object.values(G.lx||{}).reduce((a,b)=>a+b,0)*.5;   // v16-129: extra levels (11-100) earn +2% each
   const cur = {m:G.money, tk:G.h.tk, gt:(G.gear&&G.gear.tk)||0, vip:G.vip, t:performance.now()};
   if(last){ const dt=Math.max(1,(cur.t-last.t)/1000);
     // very generous ceilings: 40× the best possible income of these levels

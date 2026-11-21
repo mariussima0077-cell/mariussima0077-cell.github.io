@@ -12,10 +12,10 @@ const today = () => { const d = new Date(now()); return d.getFullYear()+'-'+(d.g
 // ---------------- what is sold ----------------
 // one-time packs, in a chain (the next opens after the previous one is bought)
 const PACKS = [
-  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m3_1', dm:300,  tk:10, money:50000},
-  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m3_5', dm:800,  tk:20, gt:10},
-  {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:7, hero:'m4_0', dm:1500, tk:30, gt:20},
-  {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:6, hero:'m4_5', dm:3000, tk:50, gt:30, ct:20},
+  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m3_1', dm:300,  tk:10, pk:{r:300,bk:1000}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
+  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m3_5', dm:800,  tk:20, gt:10, pk:{r:600,bk:2000}},
+  {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:7, hero:'m4_0', dm:1500, tk:30, gt:20, pk:{r:1200,bk:4000}},
+  {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:6, hero:'m4_5', dm:3000, tk:50, gt:30, ct:20, pk:{r:2500,bk:8000}},
 ];
 const DIAMONDS = [
   {k:'d1', dm:300,   price:'€1.99',  ic:'ui3/v_dm'},
@@ -55,11 +55,11 @@ const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 function rwText(r){ const a=[];
   if(r.hero){ const h=T().HB[r.hero]; a.push((h?h.n:'Hero')); }
   if(r.dm) a.push('💎'+r.dm.toLocaleString('en')); if(r.tk) a.push(r.tk+' Recruit'); if(r.gt) a.push(r.gt+' Gear'); if(r.ct) a.push(r.ct+' Crew');
-  if(r.money) a.push(T().fmt(r.money)); return a.join(' + '); }
+  if(r.money) a.push(T().fmt(r.money)); if(r.pk) a.push(r.pk.r+' of each role part + '+r.pk.bk+' Builder Kit'); return a.join(' + '); }
 function give(r, why){
   const t=T(), G=t.G;
   if(r.hero && t.gain){ t.gain(r.hero); if(t.heroRefresh) t.heroRefresh(); }
-  t.giveRw({dm:r.dm||0, tk:r.tk||0, gt:r.gt||0, ct:r.ct||0, money:r.money||0});
+  t.giveRw({dm:r.dm||0, tk:r.tk||0, gt:r.gt||0, ct:r.ct||0, money:r.money||0, pk:r.pk||null});
   if(window.SEC && SEC.rebase) SEC.rebase();          // big jumps from a purchase are not cheating
   t.save(); if(why) t.toast('🎁 '+why+': '+rwText(r), 4500);
   render();
@@ -215,7 +215,7 @@ function render(){
       PACKS.forEach((p,i)=>{ if(pk[p.k]) return; const lk=i>nxt, hb=t.HB[p.hero];
         h+='<div class="card pk '+p.cls+(lk?' locked':'')+'"><div class="bn"><img src="'+IMG('shop/pk_'+['starter','rookie','pro','elite'][i])+'" alt="'+p.n+'"><img class="hp" src="img/hero/'+p.hero+'.webp" alt="">'+(p.rib&&!lk?'<div class="rib">'+p.rib+'</div>':'')+'</div><div class="sub">'+(lk?'🔒 Opens after the '+PACKS[i-1].n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):(i===3?'The last offer – buy it once.':'Buy it once – then the next pack opens.'))+'</div><div class="items">'+
           item('img/hero/'+p.hero+'.webp', hb?hb.n.split(' ')[0]+(hb.n.split(' ')[1]&&hb.n.split(' ')[0].length<5?' '+hb.n.split(' ')[1]:''):'Hero', p.hero[1]==='4'?'hero lg':'hero ep')+
-          item(IMG('ui3/v_dm'),p.dm.toLocaleString('en'))+item('img/ticket.webp','×'+p.tk)+(p.gt?item('img/gticket.webp','×'+p.gt):'')+(p.ct?item('img/cticket.webp','×'+p.ct):'')+(p.money?item(IMG('ui3/v_coins'),t.fmt(p.money)):'')+
+          item(IMG('ui3/v_dm'),p.dm.toLocaleString('en'))+item('img/ticket.webp','×'+p.tk)+(p.gt?item('img/gticket.webp','×'+p.gt):'')+(p.ct?item('img/cticket.webp','×'+p.ct):'')+(p.money?item(IMG('ui3/v_coins'),t.fmt(p.money)):'')+(p.pk?item('img/ui12/pk_tank.webp','×'+p.pk.r+' each')+item('img/ui12/pk_bk.webp','×'+p.pk.bk):'')+
           '</div><div class="foot"><span class="val"><b>×'+p.val+'</b>VALUE</span>'+(lk?'<button class="buy lock">🔒 '+P(p.k,p.price)+'</button>':'<button class="buy" data-b="'+p.k+'">'+P(p.k,p.price)+'</button>')+'</div></div>'; });
     } else h+='<div class="note">✓ You bought all special offers – thank you!</div>';
     h+='<div class="sec">FOREVER PACKS</div>'+[

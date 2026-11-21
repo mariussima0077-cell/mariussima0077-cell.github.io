@@ -24,11 +24,11 @@ const ATK = p => ARENA_TK + Math.min(3, Math.floor(((p && p.vip) | 0) / 3));   /
 const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena daily reward per league: [diamonds, recruit tickets]
 // v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
-const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew'], B:['ess','dia','wheel','key']};   // v16-120 KEY ROULETTE
+const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew'], B:['ess','dia','wheel','key','cash']};   // v16-120 KEY ROULETTE · v16-129 CASH ROULETTE (added at the END → events 0-3 stay the same)
 const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40, key:40};
 const EV_RW = [[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
-const EV_TKK = {hero:'tk', gear:'gt', crew:'ct', ess:'tk', dia:'tk', wheel:null, key:null};
-const EV_NAME = {hero:'Hero Summon Festival', gear:'Gear Summon Forge', crew:'Crew Summon Rally', ess:'Essence Rush', dia:'Diamond Spree', wheel:'Lucky Wheel', key:'Key Roulette'};
+const EV_TKK = {hero:'tk', gear:'gt', crew:'ct', ess:'tk', dia:'tk', wheel:null, key:null, cash:'tk'};
+const EV_NAME = {hero:'Hero Summon Festival', gear:'Gear Summon Forge', crew:'Crew Summon Rally', ess:'Essence Rush', dia:'Diamond Spree', wheel:'Lucky Wheel', key:'Key Roulette', cash:'Cash Roulette'};
 const evIdx = t => Math.floor((t - EV_E0) / EV_DUR), evKind = (tr, i) => EV_TRK[tr][((i % EV_TRK[tr].length) + EV_TRK[tr].length) % EV_TRK[tr].length];
 const WB_RW = [[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]];
 const WB_DAY = 6;        // max hits per UTC day (3 keys per local day → up to 6 in one UTC day around midnight)
@@ -384,7 +384,7 @@ export async function online(op, b, env) {
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
     const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, team = cleanTeam(b.team), lang = String(b.lang || 'en').slice(0, 12);
-    const best = num(s.best, 0, 1000) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 200) | 0, pw = teamPow(team);
+    const best = num(s.best, 0, 1000) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 1400) | 0, pw = teamPow(team);   // v16-129: garage levels go to 100 (14 buildings → 1400)
     const cl = Array.isArray(b.unl) ? b.unl : [];
     // v16-122: FOUNDER only with a purchase Google confirmed (purchases table) – the test account (tst_…) may claim it
     const fdr = cl.includes('fdr') && (String(b.pid).startsWith('tst_') || !!(await db.prepare("SELECT 1 FROM purchases WHERE sku='founder_pass' AND state='ok' AND pid IN (" + [b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].slice(0, 6).map(() => '?').join(',') + ") LIMIT 1").bind(b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)).first()));
