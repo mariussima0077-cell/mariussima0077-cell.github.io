@@ -1,7 +1,7 @@
 // =====================================================================
 //  TORQUE EMPIRE · CAMPAIGN (battle.js) · v14
 //  Up to 5 mechanics fight monsters built from car parts.
-//  v14: 50 chapters (10 acts × 5 worlds), gear art for every grade, Gear Summon with blue Gear Tickets.
+//  v14: 50 chapters (10 acts × 5 worlds) · v16-139: 75 chapters = 1500 stages (acts 11-15), gear art for every grade, Gear Summon with blue Gear Tickets.
 //  Everything here is drawn from code (except the frames, tickets and portraits frames from img/).
 // =====================================================================
 (function(){
@@ -615,6 +615,12 @@ const MON={
  wraith:{n:'Spark Wraith',dr:'drone',hp:380,atk:62,def:5,mv:90,rng:200,as:1.3,h:40,fly:1,at:'beam',desc:'Shoots spark plugs'},
  brake:{n:'Brake Beast',dr:'tire',hp:900,atk:72,def:22,mv:84,rng:32,as:1.2,h:52,charge:1,desc:'Rolls in like a brake disc'},
  airbag:{n:'Airbag Blob',dr:'brute',hp:1300,atk:50,def:16,mv:62,rng:36,as:1.4,h:50,b:'pound',big:1.4,desc:'Inflates and bursts'},
+ // v16-139: 5 small monsters drawn by Marius (3 rows only: idle · walk · attack)
+ hopper:{n:'Spring Hopper',dr:'spider',hp:520,atk:52,def:8,mv:110,rng:30,as:1.0,h:44,pounce:1,desc:'Jumps on you'},
+ crab:{n:'Caliper Crab',dr:'tire',hp:760,atk:50,def:18,mv:76,rng:30,as:1.2,h:40,desc:'Hard shell, pinching claws'},
+ scorp:{n:'Jack Scorpion',dr:'spider',hp:600,atk:66,def:12,mv:90,rng:34,as:1.1,h:48,desc:'Stinger strike'},
+ goblin:{n:'Filter Goblin',dr:'imp',hp:420,atk:54,def:6,mv:96,rng:180,as:1.5,h:50,at:'acid',desc:'Throws oil bombs'},
+ moth:{n:'Mirror Moth',dr:'drone',hp:340,atk:56,def:5,mv:92,rng:200,as:1.4,h:36,fly:1,at:'beam',desc:'Mirror glare'},
  crusher:{n:'CRUSHER',hp:4600,atk:110,def:24,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#bf5a1e',b:'#5d2a0c',c:'#e07b39',e:'#ff1744',horn:1},desc:'Mini-boss'},
  sludge:{n:'SLUDGE CRUSHER',dr:'crusher',hp:4800,atk:110,def:24,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#4e8a1e',b:'#1d3a0a',c:'#8bc34a',e:'#c6ff00',horn:1},desc:'Mini-boss'},
  frost:{n:'FROST CRUSHER',dr:'crusher',hp:5000,atk:112,def:26,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#5c8db8',b:'#1d3550',c:'#b3e5fc',e:'#80d8ff',horn:1},desc:'Mini-boss'},
@@ -630,6 +636,8 @@ const MON={
 const MSPR={cbrute:{w:281,h:153,ax:140.5,ay:144.5,ih:138.6},crawler:{w:197,h:132,ax:98.5,ay:120.8,ih:115.6},esnake:{w:239,h:119,ax:119.5,ay:113.2,ih:100.0},hound:{w:253,h:119,ax:126.5,ay:112.8,ih:111.2},jtitan:{w:280,h:187,ax:140.0,ay:178.0,ih:176.0},ndragon:{w:294,h:171,ax:147.0,ay:166.0,ih:165.0},pimp:{w:228,h:142,ax:114.0,ay:135.2,ih:130.4},rat:{w:224,h:121,ax:112.0,ay:113.6,ih:109.6},towking:{w:284,h:179,ax:142.0,ay:169.0,ih:159.0},wasp:{w:269,h:163,ax:134.5,ay:145.8,ih:140.4},
  // v16-54: the 13 new sheets (L = 8x6 sheet without hurt/death rows: i idle · w walk · a attack · s skill · d death row or -1)
  gbattery:{w:250,h:158,ax:125,ay:151.3,ih:123.2},gdrone:{w:240,h:153,ax:120,ay:145.8,ih:123.2},gcan:{w:329,h:142,ax:164.5,ay:136.4,ih:118.2},gmantis:{w:279,h:151,ax:139.5,ay:137.7,ih:136},gsaw:{w:218,h:151,ax:109,ay:138.5,ih:137.7},ggolem:{w:261,h:157,ax:130.5,ay:151.2,ih:140.4},gtanker:{w:372,h:172,ax:186,ay:165,ih:147},gbat:{w:247,h:145,ax:123.5,ay:130.9,ih:110.5},ghorn:{w:227,h:155,ax:113.5,ay:146.2,ih:128.4},gomega:{w:316,h:169,ax:158,ay:163.5,ih:161},
+ // v16-139: 3-row sheets (tools/atlas_mon.py <sheet> <id> .75 r3)
+ nhopper:{w:162,h:173,ax:81,ay:168,ih:127.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},ncrab:{w:176,h:132,ax:88,ay:129,ih:95.2,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nscorp:{w:171,h:178,ax:85.5,ay:172.5,ih:140.2,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},ngoblin:{w:162,h:195,ax:81,ay:191.2,ih:160.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nmoth:{w:177,h:147,ax:88.5,ay:137.2,ih:132.4,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},
  gspark:{w:204,h:128,ax:102,ay:119.8,ih:112.2,L:{i:0,w:1,a:2,s:4,s2:3,d:-1}},gbrake:{w:210,h:115,ax:105,ay:108,ih:107.1,L:{i:0,w:1,a:2,s:4,s2:3,d:-1}},gairbag:{w:213,h:146,ax:106.5,ay:137.3,ih:101.1,L:{i:0,w:1,a:2,s:3,s2:4,d:4}}};
 // monster key → [sprite, height in game units, new name, hue (mini-boss colours per world)]
 const MSKIN={spider:['crawler',46,'Bolt Crawler'],tire:['rat',46,'Tire Rat'],imp:['pimp',50,'Piston Imp'],snake:['esnake',42,'Exhaust Snake'],
@@ -638,7 +646,8 @@ const MSKIN={spider:['crawler',46,'Bolt Crawler'],tire:['rat',46,'Tire Rat'],imp
  titan:['jtitan',215,'JUNKYARD TITAN'],wyrm:['ndragon',190,'NITRO DRAGON'],plow:['towking',210,'TOW KING'],
  battery:['gbattery',64,'Battery Golem'],drone:['gdrone',36,'Headlight Drone'],canister:['gcan',48,'Fuel Can Bomber'],wiper:['gmantis',54,'Wiper Mantis'],hubcap:['gsaw',36,'Hubcap Saw'],
  gearbox:['ggolem',92,'Gearbox Golem'],bat:['gbat',38,'Exhaust Bat'],horn:['ghorn',50,'Horn Howler'],tanker:['gtanker',165,'ACID TANKER'],omega:['gomega',180,'OMEGA ENGINE'],
- wraith:['gspark',44,'Spark Wraith'],brake:['gbrake',54,'Brake Beast'],airbag:['gairbag',56,'Airbag Blob']};
+ wraith:['gspark',44,'Spark Wraith'],brake:['gbrake',54,'Brake Beast'],airbag:['gairbag',56,'Airbag Blob'],
+ hopper:['nhopper',44,'Spring Hopper'],crab:['ncrab',40,'Caliper Crab'],scorp:['nscorp',48,'Jack Scorpion'],goblin:['ngoblin',50,'Filter Goblin'],moth:['nmoth',36,'Mirror Moth']};
 for(const k in MSKIN){const [id,h,n,hue]=MSKIN[k],M=MON[k];M.dr0=M.dr||k;M.dr='spr_'+id;M.sp=id;M.h=h;M.sc=1;M.n=n;if(hue!=null){M.hue=hue;M.sat=1.1;}}
 MON.wyrm.lc='#40c4ff';MON.tanker.lz=[150,95];MON.omega.lz=[150,110];MON.titan.lz=[20,120];MON.wyrm.lz=[125,128];MON.plow.lz=[70,150];MON.plow.lc='#ffd740';MON.crusher.desc=MON.sludge.desc=MON.frost.desc=MON.neonc.desc=MON.magma.desc='Mini-boss · stinger dive';
 for(const k in MON){const M=MON[k];M.dr=M.dr||k;M.sc=M.sc||1;M.big=M.big||1;M.b=M.b||'';}
@@ -646,19 +655,19 @@ for(const k in MON){const M=MON[k];M.dr=M.dr||k;M.sc=M.sc||1;M.big=M.big||1;M.b=
 // 5 chapters × 20 stages · 4 zones of 5 stages each
 const CHAP=[
  {n:'Scrapyard Wastes',col:'#ff8f00',bios:[0,1,2,3],zones:['Rusty Junkyard','Smog Valley','Burning Stacks',"Titan's Foundry"],
-  pool:[['imp','tire'],['imp','tire','snake','drone'],['tire','snake','drone','spider'],['spider','drone','snake','brute']],mini:'crusher',boss:'titan',
+  pool:[['imp','tire'],['imp','tire','snake','drone','hopper'],['tire','snake','drone','spider','hopper'],['spider','drone','snake','brute']],mini:'crusher',boss:'titan',
   names:['Rust Gate','Tire Hills','Crushed Row','Bolt Alley','Wreck Ridge','Smog Valley','Muffler Marsh','Oil Lake','Fume Gate','Crusher Pit','Burning Stacks','Magnet Yard','Cinder Walk','Furnace Road','Ember Heap','Slag River','Gear Graveyard','Molten Gate','Foundry Steps',"Titan's Foundry"]},
  {n:'Toxic Refinery',col:'#76ff03',bios:[4,5,6,7],zones:['Acid Swamp','Pipe Maze','Tank Farm','Refinery Core'],
-  pool:[['imp','canister','tire'],['canister','snake','battery','drone'],['battery','canister','spider','drone'],['battery','canister','brute','airbag']],mini:'sludge',boss:'tanker',
+  pool:[['imp','canister','tire'],['canister','snake','battery','drone','crab'],['battery','canister','spider','drone','crab'],['battery','canister','brute','airbag']],mini:'sludge',boss:'tanker',
   names:['Green Gate','Acid Puddles','Rot Marsh','Bubble Bog','Sludge Pond','Pipe Maze','Valve Street','Leaky Joints','Steam Vents','Sludge Pit','Tank Farm','Barrel Hill','Fuel Depot','Pump Station','Chem Lab','Toxic Tower','Flare Stack','Reactor Walk','Core Gate','Acid Throne']},
  {n:'Frozen Pass',col:'#80d8ff',bios:[8,9,10,11],zones:['Snow Road','Ice Bridges','Frost Peaks','Glacier Depot'],
-  pool:[['wiper','imp','tire'],['wiper','hubcap','drone','snake'],['hubcap','wiper','brake','battery'],['wiper','hubcap','brake','airbag']],mini:'frost',boss:'plow',
+  pool:[['wiper','imp','tire'],['wiper','hubcap','drone','snake','scorp'],['hubcap','wiper','brake','battery','scorp'],['wiper','hubcap','brake','airbag']],mini:'frost',boss:'plow',
   names:['Snow Gate','Slush Lane','Chain Road','Frozen Jam','Wiper Woods','Ice Bridge','Black Ice','Salt Barns','Avalanche Turn','Frost Pit','Frost Peaks','Blizzard Pass','Crystal Cave','Pine Hairpin','Summit Garage','Glacier Depot','Plow Yard','Ice Wall','Frozen Gate','Plow King Hall']},
  {n:'Neon Highway',col:'#ff4fd8',bios:[12,13,14,15],zones:['City Lights','Tunnel Run','Skyline Ramp','Turbo Arena'],
-  pool:[['turbo','horn','imp'],['turbo','horn','hubcap','drone'],['turbo','horn','wraith','battery'],['turbo','wraith','gearbox','hubcap']],mini:'neonc',boss:'wyrm',
+  pool:[['turbo','horn','imp'],['turbo','horn','hubcap','drone','goblin'],['turbo','horn','wraith','battery','goblin'],['turbo','wraith','gearbox','hubcap']],mini:'neonc',boss:'wyrm',
   names:['Neon Gate','Taxi Rank','Billboard Row','Night Market','Drift Corner','Tunnel Run','Echo Tube','Toll Booth','Speed Trap','Neon Pit','Skyline Ramp','Overpass','Rooftop Lot','Laser Bridge','Street Race','Turbo Arena','Nitro Lane','Boost Ring','Wyrm Gate','Turbo Wyrm Nest']},
  {n:'Volcano Forge',col:'#ff3d00',bios:[16,17,18,19],zones:['Ash Fields','Lava Rivers','Forge Halls','Omega Core'],
-  pool:[['bat','gearbox','imp'],['bat','gearbox','turbo','canister'],['bat','wraith','brake','horn'],['bat','gearbox','airbag','wraith']],mini:'magma',boss:'omega',
+  pool:[['bat','gearbox','imp'],['bat','gearbox','turbo','canister','moth'],['bat','wraith','brake','horn','moth'],['bat','gearbox','airbag','wraith']],mini:'magma',boss:'omega',
   names:['Ash Gate','Smoke Fields','Ember Road','Cinder Dunes','Lava Bridge','Lava River','Obsidian Ford','Magma Falls','Fire Hollow','Magma Pit','Forge Halls','Anvil Row','Piston Hall','Crank Forge','Cast Yard','Omega Core','Blast Furnace','Molten Heart','Last Gate','Omega Engine']}];
 const BIO=[
  {n:'Rust Gate',sky:['#3f86c6','#f6c98d','#f39a5b'],sun:'#fff1c1',sunY:.42,sunR:.11,far:'#7a5546',far2:'#5e3f33',ga:'#9b7650',gb:'#4f3322',haze:'rgba(255,196,130,.32)',rim:'rgba(255,230,170,.55)',mid:.15},
@@ -698,13 +707,20 @@ const ACTS=[null,
  {n:'Frostbite',bio:{h:175,s:.65,l:1.12,snow:1},mh:175,ms:.9,mb:1.1},
  {n:'Golden',bio:{h:32,s:1.25,l:1.05},mh:42,ms:1.4,mb:1.12},
  {n:'Void',bio:{h:235,s:.7,l:.55,night:1},mh:230,ms:.55,mb:.85},
- {n:'Omega',bio:{h:-12,s:1.3,l:.7,fires:1,lava:1},mh:320,ms:1.5}];
+ {n:'Omega',bio:{h:-12,s:1.3,l:.7,fires:1,lava:1},mh:320,ms:1.5},
+ // v16-139 (Marius: 'more stages, normal and hard'): ACT 11 – 5 new chapters (100 stages), the 5 new small monsters in every zone
+ {n:'Nemesis',bio:{h:150,s:1.15,l:.62,night:1,moon:1,fires:1},mh:140,ms:1.35,mb:.95,nw:['hopper','crab','scorp','goblin','moth']},
+ // v16-139 (Marius: '1500 stages in total, so we know we have enough'): acts 12-15
+ {n:'Apex',bio:{h:-55,s:1.2,l:.9},mh:-70,ms:1.3,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Eclipse',bio:{h:200,s:.8,l:.5,night:1,moon:1},mh:205,ms:1.2,mb:.9,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Chaos',bio:{h:-90,s:1.3,l:.75,rain:1,fires:1},mh:290,ms:1.45,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Legend',bio:{h:40,s:1.35,l:.95,fires:1},mh:48,ms:1.55,mb:1.15,nw:['hopper','crab','scorp','goblin','moth']}];
 const CH_NAMES=[
- ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne'],
- ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery'],
- ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress'],
- ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway'],
- ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno']];
+ ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss','Apex Scrap Peaks','Eclipse Junkyard','Chaos Scrapstorm','Legend Scrap Throne'],
+ ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss','Apex Acid Towers','Eclipse Refinery','Chaos Chem Storm','Legend Oil Kingdom'],
+ ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress','Nemesis Ice Abyss','Apex Glacier','Eclipse Frost Hollow','Chaos Blizzard','Legend Ice Throne'],
+ ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway','Nemesis Night Circuit','Apex Speedway','Eclipse Boulevard','Chaos Raceway','Legend Grand Prix'],
+ ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno','Nemesis Core','Apex Caldera','Eclipse Forge','Chaos Inferno','Legend Core']];
 const CH_COL=['#ff8f00','#76ff03','#80d8ff','#ff4fd8','#ff3d00'];
 function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(...)'
   let r,g2,b,a=null,mm;if(c[0]==='#'){r=parseInt(c.substr(1,2),16);g2=parseInt(c.substr(3,2),16);b=parseInt(c.substr(5,2),16);}
@@ -718,13 +734,14 @@ function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(
 function bioVariant(P,m){const o={};for(const k in P){const v=P[k];o[k]=typeof v==='string'&&k!=='n'?colX(v,m):Array.isArray(v)?v.map(x=>typeof x==='string'?colX(x,m):x):v;}
   ['rain','night','moon','snow','fires','lava'].forEach(f=>{if(m[f])o[f]=1;});if(m.night){o.sunY=.25;o.sunR=.05;}return o;}
 function monClone(k,a){const A=ACTS[a],key=k+'_'+a;if(MON[key])return key;const M=MON[k];
-  let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';
+  let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';if(k==='omega'&&a>=10)n=A.n.toUpperCase()+' ENGINE';
   // bosses of acts 2-10 get the same base stats in every world, so only the stage level decides how hard they are
   const norm=M.b==='titan'?{hp:12500,atk:130,def:28}:M.b==='crusher'?{hp:5000,atk:112,def:26}:{};
-  MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===9?'Final boss':M.desc});return key;}
-for(let a=1;a<10;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb=t+a*5;
+  MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===ACTS.length-1?'Final boss':k==='omega'?'Chapter boss':M.desc});return key;}
+for(let a=1;a<ACTS.length;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb=t+a*5;
   const bios=B0.bios.map(bi=>{BIO.push(Object.assign(bioVariant(BIO[bi],A.bio),{n:A.n+' '+BIO[bi].n}));return BIO.length-1;});
-  const pool=B0.pool.map((pz,z)=>{const p2=pz.map(k=>monClone(k,a));if(a>=2){const ex=CHAP[(t+a)%5].pool[z][(a+z)%CHAP[(t+a)%5].pool[z].length];p2.push(monClone(ex,a));}return p2;});
+  const pool=B0.pool.map((pz,z)=>{const p2=pz.map(k=>monClone(k,a));if(a>=2){const ex=CHAP[(t+a)%5].pool[z][(a+z)%CHAP[(t+a)%5].pool[z].length];p2.push(monClone(ex,a));}
+    if(A.nw){p2.push(monClone(A.nw[(t+z)%5],a),monClone(A.nw[(t+z+2)%5],a));}return p2;});
   CHAP.push({n:CH_NAMES[t][a],col:colX(CH_COL[t],{h:A.mh*.35,s:1.1}),bios,zones:B0.zones.map(z=>z.startsWith(A.n)?z.replace(A.n,'Ultima'):A.n+' '+z),pool,mini:monClone(B0.mini,a),boss:monClone(B0.boss,a),
     names:B0.names.map(x=>x.startsWith(A.n)?x.replace(A.n,'Ultima'):A.n+' '+x),act:a});}
 CHAP.forEach((C,i)=>{C.n=CH_NAMES[i%5][Math.floor(i/5)];});
@@ -741,9 +758,10 @@ CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911
   else w=[mk(n0),mk(Math.min(5,n0+(j%2)))];
   STAGES.push({n:C.names[j],c,j,bio:C.bios[z],w,boss:j===19,mini:j===9});}});
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
-const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345]]; // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
+const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345],[1099,395],[1199,450],[1299,515],[1399,585],[1499,665]]; // v16-139: acts 11-15 (+500 stages) climb at the act-10 pace
+ // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
 // v16-74: the campaign was ~4× faster than planned (2-month test: day 16 = stage 16-20) → chapters 2-12 climb to ×HK_MAX stronger, kept until ch 32, then back to ×1.3 at the end
-const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:HK_MAX-(HK_MAX-1.3)*(i-639)/360;
+const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:i<1000?HK_MAX-(HK_MAX-1.3)*(i-639)/360:1.3;
 // v16-74: HARD MODE – hard chapter N opens when normal chapter N is cleared (and hard N-1); monsters ×HARD_K, rewards ×HARD_RW
 const HARD_K=2.5,HARD_RW=1.5;let HM=0;
 const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{},ch:0};if(!G.cph.stars)G.cph.stars={};return G.cph;};
@@ -2611,7 +2629,7 @@ function hmBtn(){let b=$('cpHM');if(!b){b=document.createElement('button');b.id=
       HM=HM?0:1;G.cp.hm=HM;T.save();showMap();if(HM&&!G.cp.hmSeen){G.cp.hmSeen=1;T.save();popW('HARD MODE','<div style="padding:4px 2px;line-height:1.45">The same chapters with <b style="color:#ff5252">much stronger monsters</b> – and <b style="color:#7CFC9A">×'+HARD_RW+' rewards</b> (money, tickets, diamonds).<br><br>HARD chapter N opens when you clear NORMAL chapter N.</div>');}};}
   b.className=HM?'on':'';const ok=hardOK(),I=(f,c)=>'<img src="img/shop/'+f+'.webp" alt=""'+(c?' class="'+c+'"':'')+'>'; // v16-80: Marius' NORMAL / HARD tabs
   b.innerHTML=I(HM?'hm_n0':'hm_n1')+(!ok?I('hm_h0'):I('hm_h1',HM?'':'off'));}
-function chList(){const T=TE(),G=T.G,cur=curCh();let h=`<div class="pT">${IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')} ALL CHAPTERS</div><div class="pD">10 acts × 5 worlds · ${NCH} chapters · ${NST} stages</div><div class="chL">`;
+function chList(){const T=TE(),G=T.G,cur=curCh();let h=`<div class="pT">${IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')} ALL CHAPTERS</div><div class="pD">${ACTS.length} acts × 5 worlds · ${NCH} chapters · ${NST} stages</div><div class="chL">`;
   const PX=CPX();for(let c=0;c<NCH;c++){const C=CHAP[c],op=chOpen(c),done=Math.max(0,Math.min(SPC,PX.best-c*SPC));let st=0;for(let j=0;j<SPC;j++)st+=PX.stars[c*SPC+j]||0;
     if(c%5===0)h+=`<div class="chAct">ACT ${c/5+1}${c?' · '+ACTS[c/5].n.toUpperCase():' · ORIGINS'}</div>`;
     h+=`<div class="chI${op?'':' lk'}${c===cur?' on':''}" data-ch="${c}" style="border-color:${C.col}"><b style="color:${C.col}">${c+1}</b><span>${C.n}<small>${op?done+'/'+SPC+' · '+st+'⭐':HM&&G.cp.best<(c+1)*SPC?'🔒 clear NORMAL chapter '+(c+1):'🔒 beat '+MON[CHAP[Math.max(0,c-1)].boss].n}</small></span></div>`;}
@@ -3075,7 +3093,7 @@ function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">La
 // most floors have a modifier · monsters are picked (seeded = always the same per floor) from all of Marius' monsters.
 // Strength: floor f fights like campaign stage ≈ 3 + 3.2·f (floor 300 ≈ stage 50-15). Saved in G.tw = {b: floors cleared}.
 const TW_N=300,TW_UNLOCK=10;
-const TW_REG=['imp','tire','snake','drone','spider','brute','battery','canister','wiper','hubcap','horn','turbo','gearbox','bat','wraith','brake','airbag'];
+const TW_REG=['imp','tire','snake','drone','spider','brute','battery','canister','wiper','hubcap','horn','turbo','gearbox','bat','wraith','brake','airbag','hopper','crab','scorp','goblin','moth'];
 const TW_MINI=['crusher','sludge','frost','neonc','magma'],TW_BOSS=['titan','tanker','plow','wyrm','omega'];
 const TW_MOD=[
  {k:'rage',n:'RAGE',d:'Enemies deal <b>+30%</b> damage.'},
@@ -3645,10 +3663,10 @@ const wbCss=document.createElement('style');wbCss.textContent=`
 //  NITRO LAB = NITRO BOOST (+HP & attack for 3 h in Campaign / Torque Tower / Class Towers – not Arena, Cup, World Boss or Dungeons).
 // A key is used only when you WIN (a defeat costs nothing). Gear stats come from a seeded generator → the same item every time.
 const DG_K=['vault','mine','forge','lab'],DG_N=30,DG_UNLOCK=15,DG_FREE=2,DG_PASS=2,DG_DAYS=30,DG_NIT_H=3,DG_PRICE='€2.99';
-const DG={vault:{n:'CASH VAULT',c:'#ffd54a',pool:['hubcap','horn','wiper','imp','gearbox'],mini:'crusher',boss:'titan',r:'CASH',d:'Lots of cash – for buildings, gear upgrades and classic cars.'},
- mine:{n:'SCRAP MINE',c:'#9be7a0',pool:['tire','spider','brute','gearbox','brake'],mini:'sludge',boss:'plow',r:'GEAR',d:'One gear piece every win. The slot changes in a fixed order (Tool → Helmet → … ). Deeper floors = higher grade.'},
- forge:{n:'GEAR FORGE',c:'#ffab40',pool:['canister','turbo','brute','wraith','imp'],mini:'magma',boss:'wyrm',r:'SET PIECES',d:'One SET piece every win. Class and slot change in a fixed order. Deeper floors = higher grade.'},
- lab:{n:'NITRO LAB',c:'#64d8ff',pool:['battery','drone','bat','snake','airbag'],mini:'neonc',boss:'omega',r:'NITRO BOOST',d:'NITRO BOOST: +HP & +attack for '+DG_NIT_H+' hours in Campaign, Torque Tower and Class Towers (not Arena, Cup, World Boss).'}};
+const DG={vault:{n:'CASH VAULT',c:'#ffd54a',pool:['hubcap','horn','wiper','imp','gearbox','goblin'],mini:'crusher',boss:'titan',r:'CASH',d:'Lots of cash – for buildings, gear upgrades and classic cars.'},
+ mine:{n:'SCRAP MINE',c:'#9be7a0',pool:['tire','spider','brute','gearbox','brake','crab'],mini:'sludge',boss:'plow',r:'GEAR',d:'One gear piece every win. The slot changes in a fixed order (Tool → Helmet → … ). Deeper floors = higher grade.'},
+ forge:{n:'GEAR FORGE',c:'#ffab40',pool:['canister','turbo','brute','wraith','imp','scorp'],mini:'magma',boss:'wyrm',r:'SET PIECES',d:'One SET piece every win. Class and slot change in a fixed order. Deeper floors = higher grade.'},
+ lab:{n:'NITRO LAB',c:'#64d8ff',pool:['battery','drone','bat','snake','airbag','moth'],mini:'neonc',boss:'omega',r:'NITRO BOOST',d:'NITRO BOOST: +HP & +attack for '+DG_NIT_H+' hours in Campaign, Torque Tower and Class Towers (not Arena, Cup, World Boss).'}};
 const DGS={k:null,sel:0,ret:0};
 const dgOK=()=>TE().G.cp.best>=DG_UNLOCK;
 function dgG(){const G=TE().G;if(!G.dg)G.dg={d:'',n:{},b:{},c:{mine:0,forge:0},nt:0,np:0};const g=G.dg,d=wbDay();
