@@ -190,9 +190,16 @@ async function integrity(b, env) {
   } catch (e) { return {err:'google'}; }
   const rq = p.requestDetails || {}, ai = p.appIntegrity || {}, di = p.deviceIntegrity || {}, ad = p.accountDetails || {};
   const app = ai.appRecognitionVerdict || '', dev = (di.deviceRecognitionVerdict || []).join(','), lic = ad.appLicensingVerdict || '';
-  const fresh = rq.nonce === b.nonce && String(b.nonce).includes(b.pid.replace(/[^A-Za-z0-9]/g, '').slice(0, 12)) && Math.abs(now - (+rq.timestampMillis || 0)) < 10 * 60e3 && rq.requestPackageName === env.PACKAGE_NAME;
+  // v16-120: Google gives the nonce back RE-ENCODED as base64 (padding '=' added, last characters can change when the
+  // length is not a multiple of 4) → the exact compare failed for every real phone (18 × "old or foreign token").
+  // Now: the first 20 characters (12 = this player's ID + 8 = time of the request) must match, the rest is ignored.
+  const nz = x => String(x || '').replace(/[=\s]/g, '').replace(/-/g, '+').replace(/_/g, '/');
+  const pid12 = b.pid.replace(/[^A-Za-z0-9]/g, '').slice(0, 12), gotN = nz(rq.nonce), myN = nz(b.nonce);
+  const okN = myN.length >= 20 && myN.startsWith(pid12) && gotN.slice(0, 20) === myN.slice(0, 20);
+  const okT = Math.abs(now - (+rq.timestampMillis || 0)) < 10 * 60e3, okP = rq.requestPackageName === env.PACKAGE_NAME;
+  const fresh = okN && okT && okP;
   const good = fresh && app === 'PLAY_RECOGNIZED' && dev.includes('MEETS_DEVICE_INTEGRITY') && lic !== 'UNLICENSED';
-  await save(app, dev, lic, good, fresh ? null : 'old or foreign token');
+  await save(app, dev, lic, good, fresh ? null : 'stale:' + (okN ? '' : ` nonce(got ${String(rq.nonce || '-').slice(0, 26)} want ${String(b.nonce).slice(0, 26)})`) + (okT ? '' : ` time(${Math.round((now - (+rq.timestampMillis || 0)) / 1000)}s)`) + (okP ? '' : ` pkg(${rq.requestPackageName || '-'})`));
   if (!good) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'integ', `app=${app} dev=${dev || 'none'} lic=${lic}${fresh ? '' : ' stale'}`).run();
   return {ok:true, good};
 }
@@ -346,7 +353,7 @@ async function admin(url, env) {
   const buys = await db.prepare("SELECT COUNT(*) n FROM purchases WHERE state='ok'").first();
   await ensureInteg(env); const ig = await db.prepare('SELECT COUNT(*) n, SUM(ok) g FROM integ WHERE t>?').bind(Date.now() - 3 * 864e5).first();
   // v16-120: WHY phones fail Play Integrity (reason → count) + the last 15 checks
-  const igr = (await db.prepare(`SELECT CASE WHEN ok=1 THEN '✅ OK' WHEN err IS NOT NULL AND err<>'old or foreign token' THEN err
+  const igr = (await db.prepare(`SELECT CASE WHEN ok=1 THEN '✅ OK' WHEN err IS NOT NULL AND err NOT LIKE 'stale%' AND err<>'old or foreign token' THEN err
       ELSE 'app=' || COALESCE(NULLIF(app,''),'-') || ' dev=' || COALESCE(NULLIF(dev,''),'none') || ' lic=' || COALESCE(NULLIF(lic,''),'-') || CASE WHEN err IS NULL THEN '' ELSE ' · ' || err END END r,
       COUNT(*) n FROM integ WHERE t>? GROUP BY r ORDER BY n DESC LIMIT 20`).bind(Date.now() - 3 * 864e5).all()).results;
   const igl = (await db.prepare('SELECT pid,t,app,dev,lic,ok,err FROM integ ORDER BY t DESC LIMIT 15').all()).results;
