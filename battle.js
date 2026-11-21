@@ -525,7 +525,9 @@ const HSK={
  m5_0:{sk:'GEAR APOCALYPSE',skd:'Flaming gears crash on every enemy: 320% damage + a giant gear on the biggest group (150%). Team: +30% attack and −20% damage taken for 8s.'},
  m5_1:{sk:'OVERDRIVE',skd:'Full throttle: blasts through ALL enemies – 300% damage, always critical, they burn for 4s. Team: +30% attack speed and +15% crit for 6s.'},
  m5_2:{sk:'REBIRTH FLAME',skd:'A giant fire phoenix dives on the enemies: 200% damage to ALL, they burn for 4s. Heals all mechanics 35% + 15% over 4s, team −20% damage taken for 6s. Once per battle it brings back ALL fallen mechanics with 40% HP.'},
- m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'}};
+ m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
+ m5_4:{sk:'STARFIRE RAIN',skd:'A rain of electric spark-plug arrows falls on the biggest group: 240% damage, slow 50% for 3s and they are MARKED (+35% damage taken) for 6s. Long range.'},
+ m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Long range.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
 const SKP={
  // Bruisers (jump + ground slam)
@@ -985,7 +987,9 @@ function stars(h){const o=TE().G.h.own[h.id];return o?o.s:0;}
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
 // v16-127 (preview): BATTLE ROLES – every class keeps its name (garages, towers, sets) and gets a role tag (Marius' 5 badges img/ui12/role_*.webp)
 const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},ranger:{n:'RANGER',c:'#b6f25a'},mage:{n:'MAGE',c:'#d59bff'},support:{n:'SUPPORT',c:'#5ef0a0'}};
-const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank'};
+const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank',m5_4:'ranger',m5_5:'ranger'};
+// v16-141: the two Mythic RANGERS shoot from far away (Legend class is melee): range + a bit less HP / DEF
+const MYTH_RNG={m5_4:{rng:215,hp:.8,def:.75,as:1,col:'#9be7ff',w:3},m5_5:{rng:235,hp:.78,def:.7,as:1.12,col:'#18ffff',w:5}};
 function bRoleOf(h){if(!h||h.crew)return null;return MYTH_ROLE[h.id]||CLS2ROLE[roleOf(h)]||null;}
 const RLI=k=>'img/ui12/role_'+k+'.webp';
 const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
@@ -993,7 +997,8 @@ function teamRoles(tl){const have=new Set(tl.filter(Boolean).map(bRoleOf).filter
 function rTag(h,sz){const k=bRoleOf(h);if(!k)return '';const r=BROLE[k];return `<span class="rTag" style="--rc:${r.c}"><img src="${RLI(k)}" style="width:${sz||'1.35em'};height:${sz||'1.35em'}">${r.n}</span>`;}
 function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
   const gk=h.crew||!TE().garB?1:1+TE().garB(roleOf(h)); // v16-129: the garage that trains this class (LV 1-100) → +ATK & HP
-  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)),atk:R.atk*m*gk*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100),mv:R.mv,rng:R.rng,as:R.as/(1+softCap(b.aspd,60,150)/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+softCap(b.en,60,120)/100,b};}
+  const MR=MYTH_RNG[h.id]||{}; // v16-141: Mythic rangers
+  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)*(MR.hp||1)),atk:R.atk*m*gk*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100)*(MR.def||1),mv:R.mv,rng:MR.rng||R.rng,as:R.as*(MR.as||1)/(1+softCap(b.aspd,60,150)/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+softCap(b.en,60,120)/100,b};}
 // v16-98: Skill charge / Attack speed – full value up to +60%, then they grow slower and never pass +120% / +150% (max gear made ultimates non-stop)
 function softCap(x,K,C){return x<=K?x:K+(C-K)*(1-Math.exp(-(x-K)/(C-K)));}
 function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+(s.crit-R.crit)*.8)*(1+(s.eg-1)*.25)+s.def*4);}
@@ -1046,6 +1051,8 @@ m4_3:{a:[118.7,246],m:[249.7,117],col:'#ffd54a',fx:'cloud',v8:{cw:175,uw:233.3,a
  m5_0:{a:[210.7,246],m:[316.7,150],v8:{cw:316,uw:421.3,ax:210.7,rows:[[0,206,274.7,269.3],[206,187,249.3,245.3],[393,199,265.3,257.3],[592,302,402.7,384],[894,196,261.3,256],[1090,222,296,290.7]]},fx8:{cw:307,uw:409.3,ax:205.3,rows:[[0,240,320,298.7]]}}, // v16-94: THE TORQUE KING – 8 frames per animation (tools/v8_hero.py)
 m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,5],rows:[[0,197,262.7,258.7],[197,183,244.0,238.7],[380,171,228.0,221.3],[551,223,297.3,286.7],[774,187,249.3,244.0],[961,206,274.7,269.3]]},fx8:{cw:286,uw:381.3,ax:190.7,rows:[[0,186,248.0,237.3]]}}, // v16-95: LADY OVERDRIVE – 8 frames (tools/v8_hero.py m5_1); ck = cast frames 0-3, dsh = dash frames
 m5_3:{a:[170.7,246],m:[300,150],v8:{"cw":243,"uw":324.0,"ax":170.7,"rows":[[0,225,300.0,294.7],[225,226,301.3,296.0],[451,273,364.0,340.0],[724,265,353.3,320.0],[989,220,293.3,286.7],[1209,222,296.0,292.0]],ck:5,pk:[5,6,7]},fx8:{"cw":247,"uw":329.3,"ax":165.3,"rows":[[0,315,420.0,397.3]]}}, // v16-132: GOLIATH, THE IRON BULWARK (new Mythic TANK) – 8 frames (tools/v8_hero.py m5_3); ck = shield slam → hex dome (frame 5), pk = dome holds → idle; fxs = hex shield falls → impact (frame 4) → shatters
+m5_4:{a:[118.7,246],m:[190.7,122],col:'#9be7ff',v8:{"cw":188,"uw":250.7,"ax":118.7,"rows":[[0,191,254.7,250.7],[191,192,256.0,252.0],[383,189,252.0,248.0],[572,222,296.0,290.7],[794,195,260.0,254.7],[989,200,266.7,262.7]],"ck":5,"pk":[5,6,7]},fx8:{"cw":181,"uw":241.3,"ax":121.3,"rows":[[0,243,324.0,293.3]]}}, // v16-141: NOVA, THE STARFIRE HUNTRESS (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_4)
+m5_5:{a:[133.3,246],m:[251.3,128],col:'#18ffff',v8:{"cw":216,"uw":288.0,"ax":133.3,"rows":[[0,216,288.0,284.0],[216,209,278.7,272.0],[425,222,296.0,286.7],[647,206,274.7,269.3],[853,203,270.7,266.7],[1056,211,281.3,277.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":353,"uw":470.7,"ax":234.7,"rows":[[0,189,252.0,240.0]]}}, // v16-141: VEGA, THE RAILGUN ACE (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_5)
 m5_2:{a:[148.0,246],m:[300,150],fire:1,v8:{cw:237,uw:316.0,ax:148.0,rows:[[0,196,261.3,256.0],[196,191,254.7,250.7],[387,221,294.7,289.3],[608,238,317.3,304.0],[846,196,261.3,257.3],[1042,219,292.0,286.7]],ck:5,pk:[5,6,7]},fx8:{cw:233,uw:310.7,ax:154.7,rows:[[0,290,386.7,348.0]]}}, // v16-128: IGNIS, THE IRON PHOENIX (new Mythic) – 8 frames (tools/v8_hero.py m5_2); ck = plants the staff → wings open → rises → BURST (frame 4), pk = lands → idle; fxs = fire phoenix dives → impact (frame 4) → embers
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
  d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
@@ -1880,6 +1887,20 @@ const SKF={
      if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);B.fx.push({type:'ring',x:u.x,y:fy(u.d),t:0,d:.6,r:70*S,col:'#ffca28',ground:1});}
      for(const h of alive(B.heroes))if(h!==u){h.shield=Math.max(h.shield,h.max*.25);if(FX2)fxs('magic_02','#ffd54f',h.x,fy(h.d),{ground:1,d:.9,s0:20*S,s1:80*S,sy:.34,vr:2.5,ease:1});}
      teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
+ m5_4(u){ // v16-141: Nova's STARFIRE RAIN – the arrow rain (fxs) falls on the biggest group; impact = fxs frame 5 = end of her shot up (skill frame 5)
+   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
+   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
+     if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2)fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
+       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
+ m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
+   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
+   if(tg){tg.mark=Math.max(tg.mark,2);if(f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
+   castAct(u,.7,()=>{u.post=.6;shake(12);B.flash=.2;if(!tg)return;
+     const [bx,by]=muzzle(u,40,40),ty=headY(tg)+16*dsc(tg.d);B.fx.push({type:'beam',x0:bx,y0:by,x1:W+40*S,y1:ty,t:0,d:.45,col:'#18ffff',w:9});
+     if(!tg.dead)damage(u,tg,5.5,{skill:1,crit:1});
+     for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S){damage(u,m,1.6,{skill:1});if(FX2)fxs('circle_05','#18ffff',m.x,headY(m)+16*dsc(m.d),{d:.25,s0:14*S,s1:48*S});}
+     sparks(tg.x,ty,16,'#e0ffff');});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
    if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
@@ -1998,7 +2019,8 @@ function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
     for(const k of [0,1,-1,2,-2,3,-3]){const g=gap(k);if(g<0)continue;const sc=Math.min(g,56*S)/S-Math.abs(k-cur)*9-Math.abs(k)*4;if(sc>bs){bs=sc;best=k;}}u.sK=best;}
   const p=at(u.sK);p[1]=clamp(p[1],.02,.98);u.sP=p;return p;}
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
-  if(u.hero){const R=u.role;
+  if(u.hero){const R=u.role,MR=MYTH_RNG[u.h&&u.h.id];
+    if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2)fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');return;} // v16-141: Nova arrow / Vega railgun shot
     if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
     else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
       const sc=pv(u,'elec',1);if(sc&&!tg.dead&&Math.random()*100<sc){tg.stun=Math.max(tg.stun,.6);pasTxt(u,1);}
@@ -2376,7 +2398,7 @@ const FRM=[0,1,2,3,4,5].map(i=>{const im=new Image();im.src='img/fr'+i+'.webp';r
 const FWIN=[[8.5,17.5,83,61.5],[8.5,17.5,83,61.5],[8.5,18,83,61],[15.5,17.5,69,55],[14.5,20.5,71,50],[17.8,21.5,64.4,46.5]]; // window % (same as the Team page)
 const FPLT=[[81,11],[81,11],[81,11],[73.5,9.5],[74.5,9.5],[74.5,9]]; // bottom plate % (top, height)
 const FSTR=[[62,78],[62,78],[62,78],[60,76],[58,74],[96,108]];
-const FACE={m5_3:0.5,m0_0:0.7,m0_1:0.64,m0_2:0.64,m0_3:0.68,m0_4:0.6,m0_5:0.66,m0_6:0.62,m0_7:0.58,m0_8:0.58,m0_9:0.55,m1_0:0.55,m1_1:0.62,m1_2:0.58,m1_3:0.66,m1_4:0.62,m1_5:0.58,m1_6:0.58,m1_7:0.62,m1_8:0.58,m2_0:0.64,m2_1:0.58,m2_2:0.58,m2_3:0.66,m2_4:0.62,m2_5:0.62,m2_6:0.62,m2_7:0.65,m3_0:0.6,m3_1:0.6,m3_2:0.65,m3_3:0.62,m3_4:0.62,m3_5:0.65,m3_6:0.65,m4_0:0.64,m4_1:0.52,m4_2:0.62,m4_3:0.6,m4_4:0.58,m4_5:0.66,m5_0:0.5,m5_1:0.62,m5_2:0.5}; // v16-40: where the face is in each portrait (0-1 of the width) → card window centred on it
+const FACE={m5_4:0.55,m5_5:0.55,m5_3:0.5,m0_0:0.7,m0_1:0.64,m0_2:0.64,m0_3:0.68,m0_4:0.6,m0_5:0.66,m0_6:0.62,m0_7:0.58,m0_8:0.58,m0_9:0.55,m1_0:0.55,m1_1:0.62,m1_2:0.58,m1_3:0.66,m1_4:0.62,m1_5:0.58,m1_6:0.58,m1_7:0.62,m1_8:0.58,m2_0:0.64,m2_1:0.58,m2_2:0.58,m2_3:0.66,m2_4:0.62,m2_5:0.62,m2_6:0.62,m2_7:0.65,m3_0:0.6,m3_1:0.6,m3_2:0.65,m3_3:0.62,m3_4:0.62,m3_5:0.65,m3_6:0.65,m4_0:0.64,m4_1:0.52,m4_2:0.62,m4_3:0.6,m4_4:0.58,m4_5:0.66,m5_0:0.5,m5_1:0.62,m5_2:0.5}; // v16-40: where the face is in each portrait (0-1 of the width) → card window centred on it
 function drawFCard(u,x,y,cw,ch,ready,t){const h=u.h,i=h.crew?0:Math.min(5,h.gr|0),im=FRM[i];
   if(!im.complete||!im.naturalWidth)return false;
   const iw=im.naturalWidth,ih=im.naturalHeight;let s=cw/iw;if(ih*s>ch)s=ch/ih;
