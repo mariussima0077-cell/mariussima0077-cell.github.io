@@ -93,7 +93,9 @@ async def run(a, root):
             rep['map'] = stats(await pg.evaluate('__F.on=false;({d:__F.d,js:__F.js})'))
             rep['mem_map_MB'] = renderer_mb()
             # battle
-            if a.wb >= 0:  # v16-134: World Boss fight (0 SCRAPZILLA · 1 CRUSHER KING · 2 INFERNO PISTON · 3 TOW SERPENT)
+            if a.mon:  # v16-139: one test wave with these monsters (keys from MON), weak (×0.2) so the fight lasts
+                await pg.evaluate('__F.d=[];__F.js=[];__F.on=true;window.__DEV.towerW('+json.dumps(a.mon.split(','))+','+str(a.mul)+')')
+            elif a.wb >= 0:  # v16-134: World Boss fight (0 SCRAPZILLA · 1 CRUSHER KING · 2 INFERNO PISTON · 3 TOW SERPENT)
                 await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.wbSet({a.wb});window.__DEV.wb()')
             else:
                 await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.hm({1 if a.hard else 0});window.__DEV.startBattle({a.stage}'+(','+json.dumps(a.team.split(',')) if a.team else '')+')')
@@ -118,6 +120,8 @@ def main():
     ap.add_argument('--phone', default='budget', choices=PHONES)
     ap.add_argument('--stage', type=int, default=0)
     ap.add_argument('--wb', type=int, default=-1, help='World Boss fight instead of a stage (0-3)')
+    ap.add_argument('--mon', default='', help='test wave of monsters, e.g. hopper,crab,scorp (full test account)')
+    ap.add_argument('--mul', type=float, default=.2, help='monster strength for --mon')
     ap.add_argument('--secs', type=int, default=15)
     ap.add_argument('--full', action='store_true', help='full test account (all heroes) – baseline for --hard')
     ap.add_argument('--hard', action='store_true', help='v16-138: HARD MODE battle (fire ring + aura on the monsters)')
@@ -131,7 +135,7 @@ def main():
     shutil.copytree(a.repo, root, ignore=shutil.ignore_patterns('.git', 'store', 'server'))
     sec = os.path.join(root, 'secure.js'); s = open(sec).read()
     s = re.sub(r'^const TEST_MODE = .*$', 'const TEST_MODE = true;', s, flags=re.M)
-    if a.wb >= 0 or a.hard or a.full: s = re.sub(r'^const TEST_ACC = .*$', 'const TEST_ACC = true;', s, flags=re.M)  # World Boss needs heroes → full test account
+    if a.wb >= 0 or a.hard or a.full or a.mon: s = re.sub(r'^const TEST_ACC = .*$', 'const TEST_ACC = true;', s, flags=re.M)  # World Boss needs heroes → full test account
     open(sec, 'w').write(s)
     try:
         rep = asyncio.run(run(a, root))

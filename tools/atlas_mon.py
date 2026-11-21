@@ -5,6 +5,7 @@ Every picture part goes to the cell holding most of its pixels; a part spread ov
 (effect glued to the next pose) is split pixel by pixel at the cell border, with a soft edge.
 All frames are re-placed in equal cells (feet on one line, centre = cell centre) -> img/mon/<id>.webp + <id>.json
 usage: python3 atlas_mon.py <sheet.png> <id> <scale> [fix]
+fix may contain "r3" (v16-139): 3 rows x 8 frames (idle, walk, attack)
 fix may contain "g8" (v16-54): sheet of 6 rows x 8 frames (no separate hurt/death rows)
 """
 import sys, json, os, numpy as np
@@ -18,10 +19,11 @@ CWS = [256, 192, 192, 192, 256, 256]
 DEF_ROWS = [0, 171, 341, 512, 683, 853, 1024]
 
 
-def row_bounds(mask):
+def row_bounds(mask, nr=6):
     rs = mask.sum(1)
     out = [0]
-    for b in DEF_ROWS[1:-1]:
+    H = mask.shape[0]
+    for b in ([round(H * i / nr) for i in range(1, nr)] if nr != 6 else DEF_ROWS[1:-1]):
         lo, hi = b - 40, b + 40
         seg = rs[lo:hi]
         z = np.where(seg == seg.min())[0] + lo
@@ -50,7 +52,10 @@ def col_bounds(m, n, cw):
 def cut(src, mid, scale, fix=''):
     global NF
     NF = [8] * 6 if 'g8' in fix else [6, 8, 8, 8, 4, 6]
-    if 'i5' in fix: NF[0] = 5      # v16-61 INFERNO PISTON: the idle row has only 5 frames
+    if 'i5' in fix: NF[0] = 5
+    # v16-139 'r3': small monsters with only 3 rows x 8 frames (idle · walk · attack, no skill/hurt/death)
+    NR = 3 if 'r3' in fix else 6
+    if NR == 3: NF = [8, 8, 8]      # v16-61 INFERNO PISTON: the idle row has only 5 frames
     im = np.asarray(Image.open(src).convert('RGB')).astype(float)
     H, W = im.shape[:2]
     rgba = AR.unmix_all(im)
@@ -60,15 +65,15 @@ def cut(src, mid, scale, fix=''):
     soft = (al < .97) & (np.abs(R - B) < 50) & (G < np.minimum(R, B))
     rgba[..., 1] = np.where(soft, (R + B) / 2, G)
     mask = al > .08
-    rows = row_bounds(mask)
+    rows = row_bounds(mask, NR)
     # cell index of every pixel
     yy, xx = np.mgrid[0:H, 0:W]
     rix = np.searchsorted(rows, yy, side='right') - 1
-    rix = np.clip(rix, 0, 5)
+    rix = np.clip(rix, 0, NR - 1)
     # v16-39: frame borders per row from the picture itself (ChatGPT does not keep an exact grid)
     cix = np.zeros((H, W), int)
     XB = []
-    for r in range(6):
+    for r in range(NR):
         xb = col_bounds(al[rows[r]:rows[r + 1]] > .3, NF[r], CWS[r])
         XB.append(xb)
         cix[rows[r]:rows[r + 1]] = np.clip(np.searchsorted(xb, np.arange(W), side='right') - 1, 0, NF[r] - 1)[None, :]
@@ -119,7 +124,7 @@ def cut(src, mid, scale, fix=''):
             b[..., 3] = np.where(big, 0, np.where(soft, b[..., 3] * .45, b[..., 3]))
     frames = {}
     A = rgba[..., 3]
-    for r in range(6):
+    for r in range(NR):
         for c in range(NF[r]):
             k = r * 8 + c
             sel = (owner == k) & (A > 2)
@@ -137,17 +142,17 @@ def cut(src, mid, scale, fix=''):
             frames[k] = dict(pic=pic, x0=x0 - cx, y0=y0, bot=bot, row=r)
     # one baseline per row (median of the frame bottoms) so jumps stay jumps
     base = {}
-    for r in range(6):
+    for r in range(NR):
         b = [f['bot'] for k, f in frames.items() if f and f['row'] == r]
         base[r] = float(np.median(b))
     # v16-62 'norm' (TOW SERPENT): ChatGPT drew some rows smaller/bigger -> every row scaled so its frame 0
     # (neutral pose, solid body only) has the same body width as the idle frame 0
-    K = {r: 1.0 for r in range(6)}
+    K = {r: 1.0 for r in range(NR)}
     if 'norm' in fix:
         def bw(f):
             xs = np.where((f['pic'][..., 3] > 200).sum(0) >= 8)[0]
             return xs.max() - xs.min() + 1
-        for r in range(1, 6):
+        for r in range(1, NR):
             if frames.get(r * 8) and frames.get(0): K[r] = bw(frames[0]) / bw(frames[r * 8])
         print('row scale', {r: round(v, 3) for r, v in K.items()})
     for f in frames.values():
@@ -161,7 +166,7 @@ def cut(src, mid, scale, fix=''):
     hw = int(np.ceil(max(-L, Rr))) + 2
     cwo, cho = int(np.ceil(2 * hw * scale)), int(np.ceil((Bm - T + 2) * scale))
     ay = (-T + 1) * scale
-    atlas = Image.new('RGBA', (cwo * 8, cho * 6), (0, 0, 0, 0))
+    atlas = Image.new('RGBA', (cwo * 8, cho * NR), (0, 0, 0, 0))
     for k, f in frames.items():
         if not f: continue
         r, c = divmod(k, 8)
