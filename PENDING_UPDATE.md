@@ -78,7 +78,7 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - **SWEEP** de la VIP 4: campanie (buton albastru pe cartea etapei deja câștigate, în locul cutiilor 3-4 goale la replay: aceleași recompense ca replay, `cpSweep`) + Dungeons (`dgSw` = Dungeon Pass SAU VIP 4).
 - **Bag** +20 la VIP 3/6/9 (`GINV_()`), **Arena** +1 luptă la VIP 3/6/9 (`ATK(p)` pe server), **chei Dungeon** +1 la VIP 5, +2 la VIP 10 (`dgMax`).
 - **Insigne VIP** în chat, clasament, profil (`vipB` în `online.js`); **HIDE VIP** în profil (`prof.hv`, coloană nouă creată singură; ceilalți primesc `vip:-1` → nicio insignă, tu păstrezi bonusurile). Titluri noi **VIP STAR** (VIP 5) și **VIP LEGEND** (VIP 10); `fdr` (FOUNDER) lipsea din `TITLES` pe server → adăugat.
-- Ramele de profil rămân la VIP 3 și VIP 7 (acum mai greu de luat). Ramă nouă VIP 10 = ar cere poză (nefăcută).
+- Ramele de profil rămân la VIP 3 și VIP 7 (acum mai greu de luat). **Ramă nouă VIP 10** (poza lui Marius, `img/fr8.webp`, `tools/fr8_cut.py`): rama nr. 8, se deblochează la VIP 10 (`frameOk` pe server + `fOk` în `online.js`), poza eroului în gaura ramei (`.p8`). Reparat și mesajul „🔒 …” la ramele blocate (căuta `FR[număr]` → la FOUNDER nu mergea).
 - ⚠️ **Serverul (`server/online.js`, `server/worker.js`) e pe ramura asta** → se publică ÎMPREUNĂ cu jocul (merge în main); altfel profilul/clasamentul ar arăta nivelurile vechi.
 - Test Chrome 360 px: VIP 0→5 = 1.500 💎 + 75 bilete din fiecare + Legendary (Mama Rosa), fără dublare; DAILY/WEEKLY o singură dată; Quick Idle 2/zi la VIP 5; bag 170; SWEEP dă recompensa; cumpărare 99,99 € → +2.000 puncte; 0 erori. NEWS id 61.
 

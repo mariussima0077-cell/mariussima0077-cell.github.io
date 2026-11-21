@@ -141,7 +141,7 @@ async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl 
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
-function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')); }   // v16-122: 7 = FOUNDER (Founder Pass)
+function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
 const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10'];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 

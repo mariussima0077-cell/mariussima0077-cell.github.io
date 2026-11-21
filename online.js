@@ -31,7 +31,8 @@ const TT={vip10:['t5','VIP LEGEND','Reach VIP 10'],vip5:['t3','VIP STAR','Reach 
  boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game']};
 const TORD=['fdr','king','cup','leg','glad','boss','gear','speed','chat','wr','rook'];
 const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
-const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)']];   // v16-122: 7 = FOUNDER (img/fr7 – 6 is the Ascended gear frame)
+const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)'],[8,'VIP 10','Reach VIP 10']];   // v16-122: 8 = VIP 10 frame (Marius' picture, img/fr8)
+//   // v16-122: 7 = FOUNDER (img/fr7 – 6 is the Ascended gear frame)
 const LG=[['BRONZE','#ffd8b0','#d0864a','#5a2a08','#e07a3a'],['SILVER','#ffffff','#b8c4d2','#4a5462','#7fd0ff'],['GOLD','#fffbe6','#ffc23a','#6a3a00','#ff3b3b'],['PLATINUM','#e8fffb','#5fe0c8','#0a4a44','#3fa7ff'],['DIAMOND','#e8f4ff','#5aa8ff','#0a2a6a','#c35cff'],['LEGEND','#fff1d0','#ff5a3c','#5a0a0a','#ffd54a']];
 let bid=0;
 function badge(i,num){i=Math.max(0,Math.min(5,i|0));return `<span class="lgb"><img src="img/ui3/lg${i}.webp" alt="${LG[i][0]}">${num!=null?`<b>${num}</b>`:''}</span>`;} // v16-49: Marius' league shields (img/ui3/lg0-5)
@@ -43,7 +44,7 @@ const GRN=['Common','Uncommon','Rare','Epic','Legendary','Mythic'],GRC=['#b8c2cf
 const hName=id=>{const t=T(),h=t&&t.HB&&t.HB[id];return h&&h.n?h.n:'';};
 const fcard=(id,s,w=60)=>{const g=Math.max(0,Math.min(5,gradeOf(id))),r=FIN5[g],p=FPL5[g];
   return `<div class="hfc" style="width:${w}px"><div style="position:relative;width:100%;aspect-ratio:220/236"><img src="img/fr${g}.webp" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><img src="${HI(id)}" alt="" style="position:absolute;left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%;object-fit:cover;border-radius:5%">${s?`<span style="position:absolute;left:20%;right:20%;top:${p[0]}%;height:${p[1]}%;display:flex;align-items:center;justify-content:center;font:900 10px system-ui;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000">+${s}</span>`:''}</div><small style="display:block;font:800 9px/1.15 system-ui;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hName(id))}</small><small style="display:block;font:800 8px system-ui;color:${GRC[g]}">${GRN[g].toUpperCase()}</small></div>`;};
-const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)===7?7:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p${(f|0)===7?' p7':''}" style="background-image:url(${HI(id)})"></div>`;
+const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)===7||(f|0)===8?f|0:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p${(f|0)===7?' p7':(f|0)===8?' p8':''}" style="background-image:url(${HI(id)})"></div>`;
 const stLab=b=>C()&&C().sLabel?C().sLabel(b):String(b);
 const ICON={trophy:'<svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg>',chat:'<svg viewBox="0 0 64 64"><use href="#olChat"/></svg>',arena:'<svg viewBox="0 0 64 64"><use href="#olSwords"/></svg>',cup:'<svg viewBox="0 0 64 64"><use href="#olCup"/></svg>',user:'<svg viewBox="0 0 64 64"><use href="#olUser"/></svg>'};
 
@@ -86,7 +87,7 @@ const css=`
 @keyframes olPl{50%{opacity:.25;transform:scale(.7)}}
 #onl .o-sub{white-space:nowrap;letter-spacing:0;display:flex;justify-content:space-between;align-items:center;padding:0 12px 2px;font:700 10px system-ui;color:#8fa0b4}
 #onl .av{position:relative;flex:none}
-#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}.av .p.p7{left:17.5%;right:17.5%;top:23.5%;bottom:28.5%}
+#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}.av .p.p7{left:17.5%;right:17.5%;top:23.5%;bottom:28.5%}.av .p.p8{left:21.6%;right:21.6%;top:27.6%;bottom:31.6%;border-radius:9%}
 #onl .av .f{position:absolute;inset:0;background:center/100% 100% no-repeat}
 #onl .ring{position:relative;flex:none;border-radius:11px;background:#111 center/cover;box-shadow:0 0 0 2px var(--c,#555),0 0 8px var(--c,#0000)}
 #onl .ring.r5{--c:#ff3b3b}#onl .ring.r4{--c:#ffc23a}#onl .ring.r3{--c:#c35cff}#onl .ring.r2{--c:#3fa7ff}#onl .ring.r1{--c:#4cd964}#onl .ring.r0{--c:#8a96a5}
@@ -566,7 +567,7 @@ $('olCupB').addEventListener('click',async e=>{const b=e.target.closest('[data-r
 function myHeroes(){const t=T();if(!t)return [];const G=t.G,o=[];for(const id in G.h.own){const h=t.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}o.sort((a,b)=>b.gr-a.gr||(G.h.own[b.id].s||0)-(G.h.own[a.id].s||0));return o;}
 function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty">Loading…</div>';return;}
   const u=new Set(ME.unl||[]),G=T().G,vip=vipLv(G),rep=G.rep||0;
-  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)));
+  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)))||(f===8&&vip>=10);
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
   $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}</div><div class="pvip">${vip?vipB(vip)+' <b>VIP '+vip+'</b>':''}<button class="hvB" data-a="hv">${ME.hv?'🙈 VIP HIDDEN':'👁 VIP VISIBLE'}</button><small>${ME.hv?'Others do not see your VIP level':'Tap to hide your VIP level from others'}</small></div>
@@ -585,7 +586,7 @@ $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
   const ic=e.target.closest('[data-ic]');if(ic){LS('te_icon',ic.dataset.ic);await setProf({icon:ic.dataset.ic});return;}
-  const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+FR[+fr.dataset.fr][2],2500);return;}await setProf({frame:+fr.dataset.fr});return;}
+  const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+((FR.find(x=>x[0]===+fr.dataset.fr)||[])[2]||'Locked'),2500);return;}await setProf({frame:+fr.dataset.fr});return;}
   const tk=e.target.closest('[data-tt]');if(tk){if(tk.classList.contains('o-lock')){toast('🔒 '+TT[tk.dataset.tt][2],2500);return;}await setProf({title:tk.dataset.tt});}});
 function nameModal(){const free=!(ME&&ME.chg>0);
   modal(`<h4>✏️ ${free?'CHOOSE YOUR NAME':'CHANGE NAME'}</h4><input id="olNm" maxlength="14" value="${esc(ME&&!/^Mechanic\d+$/.test(ME.name)?ME.name:'')}" placeholder="Your player name"><p>3–14 letters / numbers ( _ . - allowed) · no bad words · one name per server<br>${free?'<b style="color:#7dff8a">This change is FREE</b>':'This change costs <b style="color:#ffe27a">300 💎</b> (you have '+fmtN(T().G.dm||0)+')'}</p><div class="ok"><button class="btn gray" data-m="no">CANCEL</button><button class="btn shine" data-m="ok">SAVE</button></div>`,
