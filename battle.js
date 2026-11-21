@@ -2734,6 +2734,7 @@ function popLvl(h){const T=TE(),G=T.G,id=h.id,lv=T.lvOf(id),cap=T.lvCap(id),a=T.
   else if(cap<T.LV_MAX){const c=T.ascCost(a);x+=`<div class="lvA"><b>✦ ASCENSION ${a} ➜ ${a+1}</b> – Lv ${lv} is the limit for now.<br>• all stats <b>+3%</b> (power ${p0.toLocaleString()} ➜ <b class="up">${powLv(h,0,1).toLocaleString()}</b>)<br>• skill Lv <b>${T.skLv(id)} ➜ ${T.skLv(id)+1}</b> (+6% skill damage &amp; heal)<br>• max level <b>${cap} ➜ ${cap+T.ASC_STEP}</b></div>
     <button class="cpGo${es>=c?'':' dis'}" data-p="hasc" data-h="${id}"><img class="ascI" src="img/ui9/asc_badge.webp" alt=""> ASCEND · ${T.ESI} ${T.nf(c)}</button>`;}
   else x+=`<div class="lvA" style="text-align:center"><b>MAX LEVEL ${T.LV_MAX}</b> · all ascensions done</div>`;
+  const geq=Object.keys(GR().eq[id]||{}).length;if(lv>1||a>0||geq)x+=`<button class="cpGo red" data-p="hreb" data-h="${id}" style="margin:6px auto 2px">♻ REBIRTH</button>`;
   x+=`<div class="pD" style="text-align:left">${T.ESI} <b>Essence</b> comes from Idle Rewards, campaign stages, Torque Tower, Class Towers, all Dungeons, the Essence event and duplicates of maxed heroes. Levels work in every battle and a little in the garage (+0.1% per level).</div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
 
@@ -2939,6 +2940,12 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
      if(a==='lvN'){ok=T.lvUp(h.id,+el.dataset.n||1);if(!ok){T.toast('Not enough Essence · Dungeons, campaign, Idle Rewards, events',2400);return;}T.toast(T.ESI+' '+h.n+' Lv '+T.lvOf(h.id)+' · Power +'+(pow(h)-p0).toLocaleString(),1800);}
      else{ok=T.ascend(h.id);if(!ok){T.toast('Not enough Essence for the Ascension',2200);return;}T.toast('✦ ASCENSION '+T.ascOf(h.id)+'! '+h.n+' · max Lv '+T.lvCap(h.id)+' · skill Lv '+T.skLv(h.id),2800);}
      renderGear();popLvl(h);return;}
+  if(a==='hreb'){const h=T.HB[el.dataset.h];if(!h)return;const id=h.id,e=T.rebirthVal(id),geq=Object.keys(GR().eq[id]||{}).length;
+     pop(`<div class="pT">♻ REBIRTH · <span style="color:${gcol(h)}">${h.n}</span></div><div class="pD" style="text-align:left">${h.n} goes back to <b>Lv 1</b> with <b>no Ascension</b> (skill Lv 1).<br>• you get back <b>100%</b> of the Essence: ${T.ESI} <b>+${T.nf(e)}</b><br>• ${geq?'<b>'+geq+'</b> gear piece'+(geq>1?'s go':' goes')+' back to the BAG (upgrades and stars stay on the pieces)':'no gear equipped'}<br>• stars <b>+${stars(h)}</b> stay (summons can't be undone)<br>• free · use the Essence on any hero</div>
+       <button class="cpGo red" data-p="hrebOK" data-h="${id}">♻ REBIRTH NOW</button><button class="cpGo alt" data-p="hrebNo" data-h="${id}">CANCEL</button>`);return;}
+  if(a==='hrebNo'){const h=T.HB[el.dataset.h];if(h)popLvl(h);else closePop();return;}
+  if(a==='hrebOK'){const h=T.HB[el.dataset.h];if(!h)return;const g=GR(),n=Object.keys(g.eq[h.id]||{}).length;delete g.eq[h.id];const e=T.rebirth(h.id);T.save();renderGear();closePop();
+     T.toast('♻ '+h.n+' reborn · '+T.ESI+' +'+T.nf(e)+' Essence'+(n?' · '+n+' gear → BAG':''),3000);return;}
   if(a==='tok'){const k=+el.dataset.k,id=el.dataset.id;if(id)tsel[k]=id;else tsel.splice(k,1);tSave();closePop();openTeam.render&&openTeam.render();return;}
   if(a==='bok'){tsel=tBest();tSave();closePop();openTeam.render&&openTeam.render();return;}
   const it=el.dataset.it?itemById(+el.dataset.it):null,h=gHero();
