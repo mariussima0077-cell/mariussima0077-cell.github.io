@@ -42,3 +42,13 @@ tot mai scumpă, limită de rotiri); garaje până la LV 100, la început puțin
 - Cost ×13 (`PCOST` rotunjit la 5): LV1 40 · LV10 350 · LV50 3.950 · LV100 11.450. Piesele primite ×10, Builder Kit ×13 (idle 20·U rol + 65·U kit / oră, stage 50/80/150·U rol + 52/78/156·U kit, salvage 10-600, Class Towers 100+20·etaj, Torque Tower 130+20·etaj kit, ruleta ×10, pachete Starter 300/1000 … Elite 2500/8000, start 150 / 300 Mage / 520 kit).
 - Bonusul de garaj mai mic la început: `GB(L)=0,0001·L²` → LV10 +1% · LV25 +6% · LV50 +25% · LV75 +56% · LV100 +100%.
 - Simulare free 30 zile SEED=7: clădiri 342/1400 (medie LV24), 15 mașini (+6%). Campania: 13-20 (live fără garage parts: 8-20) – DAR simularea e foarte zgomotoasă: aceeași ramură cu bonusul de garaj oprit SAU cu bonusul Collection oprit a ajuns doar la 5-9 / 5-11 în ziua 20. ⚠️ De făcut mai multe simulări (alte SEED) înainte de live.
+
+## 7. Pozele lui Marius (21 nov) – PUSE
+- 6 piese: `img/sheets/parts/parts_src.png` → `tools/parts_cut.py` → `img/ui12/pk_*.webp` 160×160 (verdele din strălucirile Ranger/Support/Builder păstrat).
+- Banner Cash Roulette: `img/sheets/parts/cash_banner_src.png` → `img/ui9/evb_cash.webp` 900×360.
+- **Nu mai lipsește nicio poză pentru garage-parts.**
+
+## CE MAI E DE FĂCUT (pentru chatul nou)
+1. Mai multe simulări (`SEED=3/11/19 python3 tools/sim_player.py free 30 …`) – ritmul campaniei (o rulare a dat 13-20 la ziua 30 față de 8-20 live; zgomot mare). Dacă e prea rapid: micșorează `GB` (index.html) sau `c.b` din classic.js.
+2. OK-ul lui Marius → merge `garage-parts` în `main`: `const V` + `CV`, NEWS (garaje cu piese, LV 100, Collection, Cash Roulette, roluri), `tools/sw_hash.py`, test + `tools/budget_phone.py`. **ÎNAINTE de 2 dec 2026** (rotația eventurilor).
+3. Rolurile: bonusul TEAM ROLES e doar afișat (nu e aplicat în luptă) – de întrebat Marius dacă îl vrea aplicat.
