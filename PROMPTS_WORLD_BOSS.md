@@ -117,3 +117,10 @@ row 5 HURT 4 frames (recoils, sparks fly),
 row 6 ENRAGE 6 frames (roars, red glow and lightning around the body).
 STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechanic theme, glossy cartoon-realistic painted 3D look, bold silhouette, rich lighting, crisp clean edges, no watermark, no real brands or logos.
 ```
+
+## 10 · ANIMAȚII NOI – format 1536×1024, 3×2 cadre de 512×512 (21 nov 2026)
+✅ SCRAPZILLA: pozele în `img/sheets/wb/scrapzilla2/` (integrare încă de făcut).
+➡️ **CRUSHER KING** (trimis 21 nov): 7 poze – intro, idle, attack, skill, fxshock (4 fâșii 1536×256), hit, enrage → `img/sheets/wb/crusher2/crusher_*.webp`. Referința = cadrul 1 din `crusher.webp`.
+Fiecare prompt = antetul comun + rândul „Animation”:
+Antet: Use the attached picture as the character reference (same design, colors, golden rim crown, proportions). Image 1536x1024, pure flat chroma-green background (#00FF00), no shadows on the green, no text, no grid lines, no borders. 6 frames in a 3x2 grid (3 columns, 2 rows, read left to right, top to bottom), each frame 512x512, the boss centered in its cell, same size and same ground line in every frame, nothing touching the cell edges. Character: "CRUSHER KING" … FACING LEFT. + STYLE.
+Apoi: INFERNO PISTON, TOW SERPENT (același format).
