@@ -38,7 +38,7 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - **DIAMOND PASS** – abonament lunar **14,99 €**: 900 💎 la cumpărare + 300 💎/zi + 2 Recruit/zi = 9.900 💎 / 30 zile (≈ 660 💎/€, ca Platinum). Fără bonus VIP / Idle. Se cumulează cu Silver/Gold/Platinum. Cheie `dia`, SKU `vip_pass_diamond` (shop2.js, secure.js, server/worker.js).
 - **FOUNDER PASS** – o singură plată **4,99 €** (Forever Packs): Battle Speed ×3 + cadru FOUNDER (`img/fr7` – 6 e cadrul Ascended de echipament) + titlu FOUNDER. Cheie `fdr`, SKU `founder_pass`. Serverul (server/online.js `sync`) dă cadrul/titlul DOAR dacă Google a confirmat cumpărarea (tabela `purchases`) – contul de test `tst_` poate oricum.
 - Lista veche din index.html: Battle Speed ×3 corectat la **2,99 €** (ca în Play).
-- ⚠️ Poze provizorii (de înlocuit cu ale lui Marius): `img/shop/vp_dia.webp` (=copie vp_plat), `img/shop/founder.webp` (=copie sp_speed), `img/fr7.webp` (=copie fr5).
+- Poze de la Marius (ChatGPT, 21 nov 2026), decupate: `img/shop/vp_dia.webp` 240×279, `img/shop/founder.webp` 200×200, `img/fr7.webp` 300×300 (cadru FOUNDER; are fereastra mai jos → portretul folosește `.p.p7` în online.js).
 
 ### 🛒 De făcut în Play Console la urcare (Marius zice când e la laptop → Claude face automat)
 1. Abonament nou `vip_pass_diamond` „Diamond Pass”, plan de bază `monthly`, lunar, reînnoire automată, **14,99 €**, grație 7 zile.

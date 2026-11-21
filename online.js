@@ -43,7 +43,7 @@ const GRN=['Common','Uncommon','Rare','Epic','Legendary','Mythic'],GRC=['#b8c2cf
 const hName=id=>{const t=T(),h=t&&t.HB&&t.HB[id];return h&&h.n?h.n:'';};
 const fcard=(id,s,w=60)=>{const g=Math.max(0,Math.min(5,gradeOf(id))),r=FIN5[g],p=FPL5[g];
   return `<div class="hfc" style="width:${w}px"><div style="position:relative;width:100%;aspect-ratio:220/236"><img src="img/fr${g}.webp" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><img src="${HI(id)}" alt="" style="position:absolute;left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%;object-fit:cover;border-radius:5%">${s?`<span style="position:absolute;left:20%;right:20%;top:${p[0]}%;height:${p[1]}%;display:flex;align-items:center;justify-content:center;font:900 10px system-ui;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000">+${s}</span>`:''}</div><small style="display:block;font:800 9px/1.15 system-ui;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hName(id))}</small><small style="display:block;font:800 8px system-ui;color:${GRC[g]}">${GRN[g].toUpperCase()}</small></div>`;};
-const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)===7?7:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p" style="background-image:url(${HI(id)})"></div>`;
+const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)===7?7:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p${(f|0)===7?' p7':''}" style="background-image:url(${HI(id)})"></div>`;
 const stLab=b=>C()&&C().sLabel?C().sLabel(b):String(b);
 const ICON={trophy:'<svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg>',chat:'<svg viewBox="0 0 64 64"><use href="#olChat"/></svg>',arena:'<svg viewBox="0 0 64 64"><use href="#olSwords"/></svg>',cup:'<svg viewBox="0 0 64 64"><use href="#olCup"/></svg>',user:'<svg viewBox="0 0 64 64"><use href="#olUser"/></svg>'};
 
@@ -86,7 +86,7 @@ const css=`
 @keyframes olPl{50%{opacity:.25;transform:scale(.7)}}
 #onl .o-sub{white-space:nowrap;letter-spacing:0;display:flex;justify-content:space-between;align-items:center;padding:0 12px 2px;font:700 10px system-ui;color:#8fa0b4}
 #onl .av{position:relative;flex:none}
-#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}
+#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}.av .p.p7{left:17.5%;right:17.5%;top:23.5%;bottom:28.5%}
 #onl .av .f{position:absolute;inset:0;background:center/100% 100% no-repeat}
 #onl .ring{position:relative;flex:none;border-radius:11px;background:#111 center/cover;box-shadow:0 0 0 2px var(--c,#555),0 0 8px var(--c,#0000)}
 #onl .ring.r5{--c:#ff3b3b}#onl .ring.r4{--c:#ffc23a}#onl .ring.r3{--c:#c35cff}#onl .ring.r2{--c:#3fa7ff}#onl .ring.r1{--c:#4cd964}#onl .ring.r0{--c:#8a96a5}

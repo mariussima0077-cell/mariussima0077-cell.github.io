@@ -308,8 +308,6 @@ Machetă: https://mariussima0077-cell.github.io/preview/shop.html · în joc: te
 - **Notița de la v16-82 (18 nov)**: reparat VIP-ul greșit din clasament/chat/profil (se trimiteau punctele, nu nivelul). **Urmează**: Marius verifică clasamentul după ce jucătorii repornesc jocul; accesul API la Play (`/api/diag`); decizia despre nume/adresă. **Lipsesc imagini**: **nimic** (verificat 18 nov 17:05: șoferii d0–d5, paznicii g0–g5 și hoții t0–t3+ au toți sprite sheet-uri, iconița CREW și fundalul GEAR SUMMON sunt din v16-53).
 - **Notița de la v16-83 (18 nov)**: Auto Equip verifică întâi setul clasei (2…6 piese), apoi obiectele normale, și alege ce dă mai mult Power. **Urmează**: Marius testează Auto Equip pe telefon; clasamentul VIP (v16-82); `/api/diag`; decizia nume/adresă. **Lipsesc imagini**: nimic.
 
-## Imagini lipsă (21 nov 2026, ramura pending-v16-120)
-- `img/shop/vp_dia.webp` – iconița cardului DIAMOND PASS
-- `img/shop/founder.webp` – iconița FOUNDER PASS (Forever Packs)
-- `img/fr7.webp` – cadrul de profil FOUNDER
+## Imagini (21 nov 2026, ramura pending-v16-120)
+- Diamond Pass, Founder Pass, cadrul FOUNDER: primite și puse. Nu lipsește nimic pentru ele.
 - Prețuri/produse noi de creat în Play Console: vezi PENDING_UPDATE.md secțiunea 6.
