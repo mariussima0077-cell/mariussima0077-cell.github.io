@@ -657,6 +657,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #sheet.bldP #shDots i.gd{box-shadow:0 0 calc(var(--bw)*.03) #fff3a0}
 #sheet.bldP #shDots i:nth-child(1){left:calc(var(--bw)*217/1113)}#sheet.bldP #shDots i:nth-child(2){left:calc(var(--bw)*286/1113)}#sheet.bldP #shDots i:nth-child(3){left:calc(var(--bw)*354/1113)}#sheet.bldP #shDots i:nth-child(4){left:calc(var(--bw)*423/1113)}#sheet.bldP #shDots i:nth-child(5){left:calc(var(--bw)*491/1113)}#sheet.bldP #shDots i:nth-child(6){left:calc(var(--bw)*560/1113)}#sheet.bldP #shDots i:nth-child(7){left:calc(var(--bw)*629/1113)}#sheet.bldP #shDots i:nth-child(8){left:calc(var(--bw)*698/1113)}#sheet.bldP #shDots i:nth-child(9){left:calc(var(--bw)*767/1113)}#sheet.bldP #shDots i:nth-child(10){left:calc(var(--bw)*836/1113)}
 #sheet.bldP #shClose{position:absolute;right:calc(var(--bw)*15/1113);top:calc(var(--bw)*62/1113);width:calc(var(--bw)*128/1113);height:calc(var(--bw)*128/1113);border-radius:50%;background:none;border:0;box-shadow:none;color:transparent;font-size:1px;z-index:3}
+#sheet.bldP .pkBar{margin:0 3px 6px;padding:4px 4px 5px;border-radius:12px;background:linear-gradient(#162338f2,#0b1424f2);border:1.5px solid #e0aa2599;text-align:center}#sheet.bldP .pkBar>small{display:block;font:900 9.5px Game,system-ui;color:#ffd54a;letter-spacing:1px;text-shadow:0 1px 0 #000}#sheet.bldP .pkBar>div{display:flex;justify-content:space-between;gap:2px}#sheet.bldP .pkBar span{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;border-radius:8px;padding:1px 0}#sheet.bldP .pkBar span.on{background:#ffd54a33;box-shadow:inset 0 0 0 1.5px #ffd54a}#sheet.bldP .pkBar b{font:900 11.5px Game,system-ui;color:#fff;text-shadow:0 1px 0 #000;white-space:nowrap}
 #sheet.bldP #shDesc{color:#c9d6e2;font-size:12.5px;margin:2px 4px 6px;line-height:1.3}
 #sheet.bldP .row{position:relative;border:0;margin:0 0 3px;padding:0 34.5% 0 calc(var(--bw)*.035);gap:4px;height:calc((var(--bw)*989/1113)*90/950);min-height:30px;background:url(img/ui3/bld_row.webp) 0 0/100% 100% no-repeat;font-size:12.5px;font-weight:800;color:#e8f0f8;box-sizing:border-box}
 #sheet.bldP .row>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000}
@@ -2611,7 +2612,9 @@ const XINC={wash:l=>washPay(l)*ECO*3600/WASH_EVERY[l-1],gas:l=>gasPay(l)*ECO*360
 const incFac=(id,l)=>!l?0:id==='office'?1+SELL_BONUS[l-1]:id==='security'?SEC_REWARD[l-1]*Math.min(.95,SEC_CATCH[l-1]):Math.sqrt(TIER(l))*SPEED[l-1]*(1+PAYB[l-1]); // more bays help only when cars wait → √
 // v16-129: parts row (you have / this level costs) + extra-level rows (income, battle bonus)
 function pkRow(id,lt,nu,cost,pk){if(nu||lt>=MAXT)return '';const n=pkN(pk),ok=n>=cost;
-  return '<div class="row pkRow"><span>'+PKI(pk,'1.35em')+' '+PK_N[pk]+'</span><b style="color:'+(ok?'#7dff8a':'#ff8a80')+'">'+nfmt(n)+'</b><em>need '+nfmt(cost)+'</em></div>';}
+  return pkBar(pk)+'<div class="row pkRow"><span>'+PKI(pk,'1.35em')+' '+PK_N[pk]+'</span><b style="color:'+(ok?'#7dff8a':'#ff8a80')+'">have '+nfmt(n)+'</b><em>need '+nfmt(cost)+'</em></div>';}
+// v16-144: YOUR PARTS strip – every garage part you own right now (tester Wazza: "je vois pas les ressources que j'ai")
+function pkBar(cur){return '<div class="pkBar"><small>YOUR PARTS</small><div>'+['tank','warrior','ranger','mage','support','bk'].map(k=>'<span'+(k===cur?' class="on"':'')+'>'+PKI(k,'1.45em')+'<b>'+nfmt(pkN(k))+'</b></span>').join('')+'</div></div>';}
 function xlRows(id,lt,nu){if(nu||!BLD[id])return '';let h='';const x=lvX(id),top=lt<MAXT;
   if(lt>=10||x)h+='<div class="row"><span>⭐ Extra income (LV 11+)</span><b>+'+Math.round(2*x)+'%</b>'+(top&&lt>=10?'<em>+'+Math.round(2*(x+1))+'%</em>':'')+'</div>';
   if(GCLS[id]){const c=GCLS[id],b=GB(lt),b2=GB(Math.min(MAXT,lt+1));h+='<div class="row bbRow"><span>'+'<img class="tki" src="img/ui4/cls_'+c+'.webp" alt=""> '+CLS_N[c]+' heroes in battle</span><b>+'+pctB(b)+'</b>'+(top?'<em>+'+pctB(b2)+'</em>':'')+'</div>';}
@@ -3085,7 +3088,7 @@ function renderPanel(){
     $('shBtn').style.display='none';return;}
   const inf=INFO[sel],nu=NOUP(sel),lv=nu?1:G.lv[sel],need=nu?1:BLD[sel].rep,locked=!nu&&G.rep<need;
   const lt=nu?1:lvT(sel),pk=nu?'bk':partOf(sel),cost=(!nu&&lt<MAXT)?PCOST(sel,lt+1):0,can=pkN(pk)>=cost&&!locked; // v16-129: parts, not money
-  const key=sel+lt+'p'+pkN(pk)+can+locked+G.rep+VLV+VSUB+'h'+HVER+'i'+Math.floor(Date.now()/5e3)+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
+  const key=sel+lt+'p'+['tank','warrior','ranger','mage','support','bk'].map(pkN).join(',')+can+locked+G.rep+VLV+VSUB+'h'+HVER+'i'+Math.floor(Date.now()/5e3)+(sel==='security'?G.sec.caught+'/'+G.sec.stolen:'');if(key===lastPanelKey)return;lastPanelKey=key;
   $('shTitle').textContent=inf.title;
   $('shDots').innerHTML=nu?'':[1,2,3,4,5,6,7,8,9,10].map(i=>'<i class="'+(lt>10?(i<=Math.floor((lt-10)/9)?'on gd':'on'):i<=lv?(i>4?'on gd':'on'):'')+'"></i>').join('')+'<span>'+(lt?'Level '+lt+' / '+MAXT:'Not built')+'</span>';
   $('shDesc').textContent=inf.desc;

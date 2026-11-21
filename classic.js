@@ -260,7 +260,9 @@ el.addEventListener('click',e=>{const b=e.target.closest('[data-cc]');if(b&&b.da
 setInterval(()=>{if(el.classList.contains('open')){const T0=T();if(T0)document.getElementById('ccMon').innerHTML=T0.fmt(T0.G.money);}},1000);
 
 const css=document.createElement('style');css.textContent=`
-#ccP{position:fixed;inset:0;z-index:40;display:none;background:linear-gradient(#0000 0,#0000 18%,#0a0c1499 45%,#0a0c14cc),url(img/cc/bg.webp) center top/cover #0a0c14;color:#fff;font-family:Game,system-ui;overflow:hidden}#ccP.open{display:block}
+/* v16-144: tester screenshot – the map + side buttons showed through the page (no background, text over the map) → own layer + map hidden while open */
+body:has(#ccP.open) #game,body:has(#ccP.open) #side,body:has(#ccP.open) #side2{visibility:hidden}
+#ccP{position:fixed;inset:0;z-index:40;display:none;isolation:isolate;transform:translateZ(0);background:linear-gradient(#0000 0,#0000 18%,#0a0c1499 45%,#0a0c14cc),url(img/cc/bg.webp) center top/cover #0a0c14;color:#fff;font-family:Game,system-ui;overflow:hidden}#ccP.open{display:block}
 #ccBox{position:absolute;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
 .ccHd{position:relative;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 6px) 8px 0}
 .ccHd .ccX{position:absolute;left:8px;top:calc(env(safe-area-inset-top) + 6px);z-index:1}.ccHd .ccMon{margin-top:-4px;z-index:1}
@@ -270,11 +272,11 @@ const css=document.createElement('style');css.textContent=`
 .ccTabs{display:flex;gap:8px;padding:6px 10px 8px}.ccTabs button{flex:1;padding:0;border:0;background:none;aspect-ratio:420/100;position:relative}
 .ccTabs img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px #000a)}.ccTabs .i1{display:none}.ccTabs button.on .i1{display:block}.ccTabs button.on .i0{display:none}
 #ccBody{flex:1;overflow-y:auto;padding:4px 10px 18px;touch-action:pan-y}
-.ccSum{background:linear-gradient(#1f1a33ee,#120f20ee);border:2px solid #e0aa2588;border-radius:14px;padding:10px;text-align:center;margin-bottom:10px}.ccSum b{color:#ffd54a;font-size:12px;letter-spacing:.5px}.ccSum div{margin:6px 0;font:800 13px Game,system-ui}.ccSum small{color:#9fb0c0}.ccSum i{color:#7CFC9A;font-style:normal}
+.ccSum{background:linear-gradient(#1f1a33ee,#120f20ee);border:2px solid #e0aa2588;border-radius:14px;padding:10px;text-align:center;margin-bottom:10px}.ccSum b{color:#ffd54a;font-size:12px;letter-spacing:.5px}.ccSum div{margin:6px 0;font:800 13px Game,system-ui;text-shadow:0 1px 2px #000,0 0 4px #000}.ccSum small{color:#b8c7d6;text-shadow:0 1px 2px #000}.ccSum i{color:#7CFC9A;font-style:normal}
 .ccGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .ccSp{position:relative;aspect-ratio:420/539;background:url(img/cc/card.webp) center/100% 100% no-repeat;text-align:center;container-type:inline-size;filter:drop-shadow(0 4px 8px #000c)}
 .ccGl{position:absolute;left:8%;right:8%;top:12%;height:58%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,var(--gc,#000) 30%,transparent),transparent 70%)}
-.ccGl>img{width:100%}.ccGl em{font:900 7cqw Game,system-ui;color:var(--gc);font-style:normal;text-shadow:0 1px 2px #000}.ccGl small{font:800 6.4cqw/1.3 Game,system-ui;color:#d7e3ff;text-shadow:0 1px 2px #000}.ccGl .tki{height:1.25em;vertical-align:-.3em}
+.ccGl>img{width:88%}.ccGl em{font:900 7cqw Game,system-ui;color:var(--gc);font-style:normal;text-shadow:0 1px 2px #000}.ccGl small{font:800 5.6cqw/1.25 Game,system-ui;color:#d7e3ff;text-shadow:0 1px 2px #000}.ccGl .tki{height:1.25em;vertical-align:-.3em}
 .ccPl{position:absolute;left:17%;right:17%;top:77.5%;height:13%;display:flex;align-items:center;justify-content:center;font:900 italic 7.6cqw Game,system-ui;color:#ffe9a8;text-shadow:0 2px 2px #000;white-space:nowrap;overflow:hidden}
 .ccSp.empty .ccGl span{font:300 30cqw/1 Game,system-ui;color:#ffd54a;text-shadow:0 0 12px #e0aa25}.ccSp.empty .ccGl em{color:#ffd54a}.ccSp.lock{filter:grayscale(.85) brightness(.75) drop-shadow(0 4px 8px #000c)}.ccSp.lock.nx{filter:drop-shadow(0 4px 8px #000c)}.ccSp.lock .ccGl span{font-size:20cqw}.ccSp.lock .ccGl em{color:#aaa}.ccSp.lock .ccBuy{font-size:6.5cqw;padding:5px 7px;filter:none}
 .ccSp:not(.lock) .ccPl{color:#ffe082}
