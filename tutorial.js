@@ -149,7 +149,7 @@ const MG={arena:`<b>ARENA</b>: your battle team fights other players' teams. 5 f
   tower:`<b>TORQUE TOWER</b> is open! Climb floor by floor – every floor is harder and gives better rewards.`,
   class:`<b>CLASS TOWERS</b> are open: a tower for every hero class. Build strong teams for each one!`,
   boss:`<b>WORLD BOSS</b> is open! 3 keys a day: hit the boss as hard as you can and climb the damage ranking.`,
-  dg:`<b>DUNGEONS</b> are open! 2 free keys a day in each dungeon: money, gear and NITRO BOOST.`};
+  dg:`<b>DUNGEONS</b> are open! 2 free keys a day in each dungeon – unused keys stack up. Money, gear and NITRO BOOST.`};
 let hubDone=false; // max one mini-guide each time the Battle Hub is opened
 setInterval(()=>{if(!isOpen('hub')){hubDone=false;return;}if(running||hubDone||!window.__TE)return;
   const open=Object.keys(MG).filter(k=>vis(document.querySelector('#hub.open .hubM[data-hb="'+k+'"]:not(.lk)')));
@@ -165,7 +165,12 @@ const PG={
   summon:{ok:()=>isOpen('sm')&&!isOpen('res'),t:`<b>SUMMON</b>: <b>HERO</b> = mechanics who work AND fight · <b>CREW</b> = drivers and guards for the garage · <b>GEAR</b> = equipment. <b>×10</b> gives 11. A <b>Legendary</b> is guaranteed every 500 summons.`},
   vip:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>VIP</b> is free for everybody: <b>Daily Quests</b> give VIP points. Every VIP level makes your bonuses stronger (income, Idle time…). VIP Passes make them even bigger.`},
   events:{ok:()=>isOpen('ev'),t:`<b>EVENTS</b>: 2 events at the same time, 3 days each. Just play (summon, spend Essence…) to collect points → <b>milestone rewards</b> and <b>TOP 100</b> prizes.`},
-  checkin:{ok:()=>isOpen('xp')&&!!document.getElementById('ciGo'),t:`<b>DAILY CHECK-IN</b>: come back every day for free tickets. Missing a day <b>never resets</b> your progress – you simply continue.`}};
+  checkin:{ok:()=>isOpen('xp')&&!!document.getElementById('ciGo'),t:`<b>DAILY CHECK-IN</b>: come back every day for free tickets. Missing a day <b>never resets</b> your progress – you simply continue.`},
+  // v16-143 (Marius 21 nov: "check the training for everything we added today") – one short guide the first time each new page opens
+  roles:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b>TEAM ROLES</b>: every hero has a role – <b>TANK</b>, <b>WARRIOR</b>, <b>RANGER</b>, <b>MAGE</b>, <b>SUPPORT</b>. 3 different roles in your team = <b>+5%</b>, 4 = <b>+10%</b>, all 5 = <b>+15%</b> attack &amp; HP. ♻ <b>REBIRTH</b> gives back 100% of a hero's Essence.`},
+  bld:{ok:()=>isOpen('sheet')&&document.getElementById('sheet').classList.contains('bldP')&&!['shop','vip','rep','inc','car'].includes(sel0()),t:`<b>BUILDINGS</b> upgrade with <b>PARTS</b>, not money: battle garages use the parts of their <b>role</b> (Engine = Tank, Tuning = Warrior…), all other buildings use the <b>Builder Kit</b>. Up to <b>LV 100</b> – a battle garage also makes its hero class stronger. Car money goes to the <b>Classic Collection</b>.`},
+  dungeons:{ok:()=>isOpen('dg'),t:`<b>DUNGEONS</b>: free keys every day in each dungeon – a key is used only when you <b>win</b>. Keys you do not use <b>stack up</b> day after day (also keys from packs and the Key Roulette). Rewards are fixed: cash, gear, set pieces, NITRO BOOST.`},
+  classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
   MINI='p_'+k;L=[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];

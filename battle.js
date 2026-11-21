@@ -3692,12 +3692,17 @@ const DG={vault:{n:'CASH VAULT',c:'#ffd54a',pool:['hubcap','horn','wiper','imp',
 const DGS={k:null,sel:0,ret:0};
 const dgOK=()=>TE().G.cp.best>=DG_UNLOCK;
 function dgG(){const G=TE().G;if(!G.dg)G.dg={d:'',n:{},b:{},c:{mine:0,forge:0},nt:0,np:0};const g=G.dg,d=wbDay();
-  DG_K.forEach(k=>{if(g.n[k]==null)g.n[k]=0;if(g.b[k]==null)g.b[k]=0;});if(g.d!==d){g.d=d;DG_K.forEach(k=>g.n[k]=0);}return g;}
+  DG_K.forEach(k=>{if(g.n[k]==null)g.n[k]=0;if(g.b[k]==null)g.b[k]=0;});
+  if(g.d!==d){ // v16-143 (Marius): daily keys STACK – the keys not used yesterday (and the days you did not play, max 30) go to your key stock
+    if(g.d){const P=s=>{const a=s.split('-').map(Number);return Date.UTC(a[0],a[1]-1,a[2]);},miss=Math.min(30,Math.max(0,Math.round((P(d)-P(g.d))/864e5)-1)),mx=dgMax();
+      if(!g.x)g.x={};DG_K.forEach(k=>{g.x[k]=(g.x[k]||0)+Math.max(0,mx-g.n[k])+miss*mx;});}
+    g.d=d;DG_K.forEach(k=>g.n[k]=0);}
+  return g;}
 const dgPass=()=>{const P=TE().PK;return !!(P&&P.dg&&P.dg>Date.now());};
 const dgVip=()=>{try{const T=TE();return T.VP?T.VP(T.VLV()):{dkey:0,sweep:false};}catch(e){return {dkey:0,sweep:false};}};
 const dgMax=()=>DG_FREE+(dgPass()?DG_PASS:0)+dgVip().dkey; // v16-122: VIP 5 +1 · VIP 10 +2 keys a day
 const dgSw=()=>dgPass()||dgVip().sweep; // v16-122: SWEEP also from VIP 4
-const dgDay=k=>Math.max(0,dgMax()-dgG().n[k]);   // daily keys left (reset at midnight)
+const dgDay=k=>Math.max(0,dgMax()-dgG().n[k]);   // today's keys left (the unused ones move to the stock at midnight – v16-143)
 const dgBon=k=>{const g=dgG();return Math.max(0,(g.x&&g.x[k])||0);};   // v16-120 KEY ROULETTE bonus keys: they stack, never expire
 const dgKeys=k=>dgDay(k)+dgBon(k);
 function dgUse(k){const g=dgG();if(dgDay(k)>0)g.n[k]++;else if(dgBon(k)>0)g.x[k]--;if(window.EVT)EVT.q('dgk',1);}   // daily keys first, bonus keys after
@@ -3730,7 +3735,7 @@ function dgGive(k,f){const T=TE(),G=T.G,g=dgG(),r=dgRew(k,f),rws=[['<img src="im
     if(gr.inv.length>=GINV_()){const v=salvageV(it);G.gp=(G.gp||0)+v;rws.push([dgItHtml(r.gear),'BAG FULL']);txt+=' · bag full → '+GPN(v);}else{gr.inv.push(it);rws.push([dgItHtml(r.gear),gn]);txt+=' · '+itemName(it)+' ('+gn+')';}}
   if(r.nitro){dgAddNitro(r.nitro);rws.push(['<img src="img/dg/k_lab.webp">','+'+r.nitro+'%']);txt+=' · NITRO +'+r.nitro+'% for '+DG_NIT_H+'h';}
   T.save();if(T.updHud)T.updHud();return {rws,txt};}
-function dgNoKeys(){TE().toast('🔑 No keys left for '+DG[DGS.k].n+' today · new keys at midnight'+(dgPass()?'':' · DUNGEON PASS: +'+DG_PASS+' keys a day'),3000);}
+function dgNoKeys(){TE().toast('🔑 No keys left for '+DG[DGS.k].n+' · new keys at midnight'+(dgPass()?'':' · DUNGEON PASS: +'+DG_PASS+' keys a day'),3000);}
 const dgLeft=()=>{const ms=new Date();ms.setHours(24,0,0,0);const l=ms-Date.now();return Math.floor(l/36e5)+'h '+Math.floor(l%36e5/6e4)+'m';};
 const dgNitTxt=()=>{const p=dgNitro();if(!p)return '';const l=dgG().nt-Date.now();return 'NITRO +'+p+'% · '+Math.floor(l/36e5)+'h '+Math.floor(l%36e5/6e4)+'m';};
 
@@ -3779,7 +3784,7 @@ function dgPower(k,f){const F=dgFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{
 function dgOpen(k){if(!dgOK()){TE().toast('🔒 DUNGEONS open after campaign stage '+sLabel(DG_UNLOCK),2600);return;}
   rootOn();DGS.k=k||null;if(k)DGS.sel=0;dgEl.classList.add('open');dgRender();}
 function dgClose(){dgEl.classList.remove('open');DGS.k=null;if(!backToHub())close();}
-function dgInfo(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>4 dungeons · <b>'+DG_N+' floors</b> each · a boss every 10th floor.</div><div><b>'+DG_FREE+' free keys</b> a day in EVERY dungeon. A key is used <b>only when you win</b>.</div><div>Win a floor to open the next one. You can replay any floor you reached.</div><div>Rewards are <b>fixed</b> – nothing is random. Dungeons never give diamonds or tickets.</div></div>';
+function dgInfo(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>4 dungeons · <b>'+DG_N+' floors</b> each · a boss every 10th floor.</div><div><b>'+DG_FREE+' free keys</b> a day in EVERY dungeon. A key is used <b>only when you win</b>.</div><div>Keys you do not use <b>stay</b> – they stack up day after day (also the keys from packs and the Key Roulette).</div><div>Win a floor to open the next one. You can replay any floor you reached.</div><div>Rewards are <b>fixed</b> – nothing is random. Dungeons never give diamonds or tickets.</div></div>';
   DG_K.forEach(k=>{const D=DG[k];x+='<div class="wS">'+D.n+'</div><div class="wP twMP"><img src="img/dg/k_'+k+'.webp" alt=""><span>'+D.d+'</span></div>';
     x+='<div class="wP">'+[1,10,20,30].map(f=>'Floor '+f+': '+dgRewHtml(k,f,k!=='vault')).join('<br>')+'</div>';});
   x+='<div class="wS">DUNGEON PASS · '+DG_PRICE+' · '+DG_DAYS+' DAYS</div><div class="wP"><div>+'+DG_PASS+' keys a day in every dungeon ('+(DG_FREE+DG_PASS)+' instead of '+DG_FREE+').</div><div>SWEEP: finish a floor you already cleared in one tap.</div><div>No automatic renewal.</div></div>';
