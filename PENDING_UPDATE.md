@@ -55,8 +55,8 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 
 ## 8. Ascended doar din drop (Marius, 21 nov 2026) – gata, testat
 - Scos **ASCEND** (Mythic ★5 + Mythic același slot → Ascended): butonul nu mai apare, acțiunea `asc` nu mai face nimic (`battle.js`). Mythic ★5 = „STARS 5 / 5 · MAX”.
-- Ascended vine DOAR din: **Gear Summon 0,02%** · **Idle Rewards de la capitolul 30** (Marius a corectat: NU și din campanie → `rollR` nu mai dă grad 6, plăcuța de drop a etapei nu mai arată ASC): 0,1% pe fiecare oră din cufăr (`IDLE_ASC_H`, `idleAsc` în `battle.js`, chemat din `claimIdle` în `index.html`), cu sămânță `srun('ia')` → fără reroll. Cufăr de 8 h ≈ 0,8% (~1 piesă la ~1-2 luni cu 3 cufere/zi). Toast „✦ ASCENDED …!”.
-- GEAR GUIDE secțiunea 3 = „ASCENDED · WHERE TO FIND” (cele 2 surse), textul din Gear Rates actualizat.
+- Ascended vine DOAR din: **Gear Summon 0,02%** · **campanie de la capitolul 30** (ca înainte, până la 15% din drop-urile Mythic la cap. 50) · **Idle Rewards de la capitolul 30**: 0,1% pe fiecare oră din cufăr (`IDLE_ASC_H`, `idleAsc` în `battle.js`, chemat din `claimIdle` în `index.html`), cu sămânță `srun('ia')` → fără reroll. Cufăr de 8 h ≈ 0,8% (~1 piesă la ~1-2 luni cu 3 cufere/zi). Toast „✦ ASCENDED …!”.
+- GEAR GUIDE secțiunea 3 = „ASCENDED · WHERE TO FIND” (cele 3 surse), textul din Gear Rates actualizat.
 - Test (Chrome 360 px): jucător etapa 5 → nimic; etapa 700 → piesă r=6 în sac; 2000 cufere de 8 h → 0,55%; claimIdle OK; Mythic ★5 fără buton ASCEND; 0 erori.
 - NEWS id 59.
 
