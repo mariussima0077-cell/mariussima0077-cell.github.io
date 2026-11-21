@@ -30,6 +30,6 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - Eroii din clădiri arată bonusul (⚡ viteză · 💵 plată · 🎯 crit); clasă greșită = „wrong class · no bonus”.
 - **Classic Collection**: 💎 ÷5 (max 16/h în loc de 80/h), în plus Essence + Gear Parts (`es`/`gp` în classic.js, adăugate la Idle). Reparat „+1.0833333 / h”.
 - **Towers**: AUTO NEXT (3 s) la Torque Tower + Class Towers, același buton ON/OFF ca la campanie (`anxTower`).
-- **Battle Speed pack: ×2 → ×3** (cine l-a cumpărat are ×3). Iconiță nouă `img/ui3/b_x3.webp` (făcută din b_x2). ⚠️ La urcare: schimbă numele/descrierea produsului `battle_speed_x2` în Play Console („Battle Speed ×3”) + PLAY_RULES.md.
+- **Battle Speed pack: ×2 → ×3** (cine l-a cumpărat are ×3). Iconiță nouă `img/ui3/b_x3.webp` (de la Marius, ChatGPT). ⚠️ La urcare: schimbă numele/descrierea produsului `battle_speed_x2` în Play Console („Battle Speed ×3”) + PLAY_RULES.md.
 - News id 58 (data de pus la ziua urcării).
 - Test (test mode): 0 erori; telefon buget: hartă 457 MB, încărcare 9,6 s.
