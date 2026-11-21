@@ -862,17 +862,6 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .incL{position:relative;cursor:pointer}.incL i{position:absolute;left:0;bottom:0;height:3px;border-radius:2px;background:#7CFC9A;opacity:.7}
 .hbT{display:block;font:800 10px Game,system-ui;color:#7CFC9A;margin-top:1px}.hbT.bad{color:#ff8a80}
 </style>
-<style id="nextGoal">
-/* v16-140 NEXT GOAL (Marius: approved the mock-up) – one band under the top bar: the most useful next step + GO */
-#ng{position:fixed;left:8px;right:76px;top:58px;height:38px;z-index:5;display:none;align-items:center;gap:6px;box-sizing:border-box;padding:0 4px 0 6px;
- border-style:solid;border-width:0 18px;border-image:url(img/ui8/bar_empty.webp) 0 70 fill stretch;border-image-width:0 18px;cursor:pointer;max-width:420px}
-#ng.on{display:flex;animation:ngIn .35s ease-out}@keyframes ngIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-#ng .ngI{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}#ng .ngI img,#ng .ngI svg{max-width:28px;max-height:28px;object-fit:contain;filter:drop-shadow(0 1px 2px #000)}
-#ng .ngT{flex:1;min-width:0;line-height:1.05}#ng .ngT small{display:block;font:900 9px Game,system-ui;letter-spacing:1px;color:#ffcf5a}
-#ng .ngT b{display:block;font:800 12.5px Game,system-ui;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}#ng .ngT b .tki{height:15px;width:auto;vertical-align:-3px}
-#ng .ngGo{flex:none;width:52px;height:28px;border:0;padding:0;background:url(img/ui8/btn_green_s.webp) center/100% 100% no-repeat;font:900 13px Game,system-ui;color:#fff;text-shadow:0 1px 0 #145a00,0 0 3px #000}
-#ng:active .ngGo{transform:scale(.92)}
-</style>
 </head>
 <body>
 <canvas id="game"></canvas>
@@ -885,7 +874,6 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
   <div id="shopBtn"></div>
 </div></div>
 <div id="toast"></div>
-<div id="ng"><div class="ngI"></div><div class="ngT"><small>NEXT GOAL</small><b></b></div><button class="ngGo">GO</button></div>
 <div id="zoom"><button id="zin">+</button><button id="zout">−</button></div>
 <div id="side"><button id="cpBtn"><img src="img/ui/ic_battle.webp" alt="Battle"></button><button id="heBtn"><img src="img/ui3/n_heroes.webp" alt="Heroes"><i id="heDot"></i></button><button id="smBtn"><img src="img/ui3/n_summon.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/ui3/n_crew.webp" alt="Crew"><i id="rosDot"></i></button><button id="idBtn"><img src="img/ui3/n_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/ui3/n_quests.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small></button></div>
 <div id="side2"><button id="evBtn"><svg viewBox="0 0 40 40"><path d="M20 3l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L20 26.6l-9.3 4.9 1.8-10.3L5 13.9l10.4-1.5z" fill="#ffd54a" stroke="#7a4a00" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="18" r="5" fill="#ff5252"/><path d="M8 34h24" stroke="#ff5252" stroke-width="3" stroke-linecap="round"/></svg><small>EVENTS</small><i id="evDot">!</i></button><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button></div>
@@ -1132,8 +1120,8 @@ function vipChests(){if(G.vipC==null)G.vipC=VLV;const got=[];let dm=0,tk=0;
   const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'👑 VIP '+VLV+'!','#ffd54a');}
 // daily VIP gift (free summons = Recruit tickets + diamonds) and the weekly VIP chest (Monday) – claimed on the VIP page
 const dayK=()=>new Date(SEC.now()).toISOString().slice(0,10),weekK=()=>{const d=new Date(SEC.now());d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));return d.toISOString().slice(0,10);};
-function vipDaily(){if(!VLV||G.vipD===dayK())return;const P=VP(VLV);G.vipD=dayK();G.h.tk+=P.sum;G.dm=(G.dm||0)+P.dm;save();toast('👑 VIP '+VLV+' daily gift: '+TKI+' +'+P.sum+' free summons · '+DMI+' +'+P.dm,3500);lastPanelKey='';}
-function vipWeekly(){if(!VLV||G.vipW===weekK())return;const n=3*VLV;G.vipW=weekK();G.h.tk+=n;G.h.ct+=n;G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+n;try{if(window.DGK)DGK.add(1);}catch(e){}save();toast('👑 VIP weekly chest: '+TKI+' +'+n+' · '+CTI+' +'+n+' · <img class="tki" src="img/gticket.webp"> +'+n+' · 🗝 +1',3500);lastPanelKey='';}
+function vipDaily(){if(!VLV||G.vipD===dayK())return;const P=VP(VLV);G.vipD=dayK();G.h.tk+=P.sum;G.dm=(G.dm||0)+P.dm;save();autoToast('👑 VIP '+VLV+' daily gift: '+TKI+' +'+P.sum+' free summons · '+DMI+' +'+P.dm,3500);lastPanelKey='';}
+function vipWeekly(){if(!VLV||G.vipW===weekK())return;const n=3*VLV;G.vipW=weekK();G.h.tk+=n;G.h.ct+=n;G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+n;try{if(window.DGK)DGK.add(1);}catch(e){}save();autoToast('👑 VIP weekly chest: '+TKI+' +'+n+' · '+CTI+' +'+n+' · <img class="tki" src="img/gticket.webp"> +'+n+' · 🗝 +1',3500);lastPanelKey='';}
 vipRefresh();
 // v16-122 migration: old 20-level saves keep their points – only the steps changed; no chests again for levels already reached
 if(G.vipC==null){G.vipC=VLV;}
@@ -1161,7 +1149,7 @@ function dqCheck(){const k=dayKey();if(G.dq.day===k)return;
   const av=QPOOL.filter(q=>!q.ok||q.ok()),out=[];while(out.length<5&&av.length){const q=av.splice(Math.floor(Math.random()*av.length),1)[0];const g=q.g();out.push({id:q.id,t:q.t,st:q.st||'',ic:q.ic,n:q.n(g),g,p:0,vip:q.vip,cl:0});}
   G.dq={day:k,q:out,gifts:[0,0,0,0]};save();}
 function qAdd(t,n,st){for(const q of G.dq.q){if(q.t!==t||(q.st&&q.st!==st)||q.p>=q.g)continue;q.p=Math.min(q.g,q.p+n);
-  if(q.p>=q.g)toast('📋 Daily quest done: '+q.n+' — claim +'+q.vip+' VIP points!',4000);}}
+  if(q.p>=q.g)autoToast('📋 Daily quest done: '+q.n+' — claim +'+q.vip+' VIP points!',4000);}}
 const dqClaimed=()=>G.dq.q.filter(q=>q.cl).length;
 function dqReady(){return G.dq.q.filter(q=>q.p>=q.g&&!q.cl).length+DQ_GIFTS.filter((g,i)=>dqClaimed()>=g.need&&!G.dq.gifts[i]).length;}
 dqCheck();
@@ -1483,7 +1471,7 @@ function driveAway(c,buyer){const s=c.slot;c.state='leaving';c.siren=!!c.type.li
   float(c.x,c.y-40,c.rich||c.type.vip?'👑 SEE YOU SOON!':c.type.fleet?'🚨 BACK ON DUTY':'🔑 NEW OWNER','#ffd54a');}
 const XP_M=.4; // v16-73: reputation grew too fast (Rep 16 after the first 2 hours) → every sale gives less reputation XP
 function addXP(n){const r0=G.rep;G.xp+=n*XP_M;G.rep=repFor(G.xp);
-  if(G.rep>r0){const gb=repGift(G.rep);G.h.tk+=gb?15:5;G.h.ct+=gb?8:3;G.dm=(G.dm||0)+(gb?200:100);toast('⭐ REPUTATION '+G.rep+'! '+TKI+' +'+(gb?15:5)+' · '+CTI+' +'+(gb?8:3)+' · '+DMI+' +'+(gb?200:100)+' · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
+  if(G.rep>r0){const gb=repGift(G.rep);G.h.tk+=gb?15:5;G.h.ct+=gb?8:3;G.dm=(G.dm||0)+(gb?200:100);autoToast('⭐ REPUTATION '+G.rep+'! '+TKI+' +'+(gb?15:5)+' · '+CTI+' +'+(gb?8:3)+' · '+DMI+' +'+(gb?200:100)+' · '+REP_TXT[G.rep-1],6000);lastPanelKey='';
     const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'REPUTATION '+G.rep+'!','#ffd54a');
     for(let i=0;i<50;i++)parts.push({x:cx,y:cy,vx:rnd(-120,120),vy:rnd(-120,120),life:1,max:1,r:rnd(1.5,3.5),col:pick(['#ffd54a','#fff','#ff9800'])});}}
 
@@ -1593,7 +1581,7 @@ function spawnThief(){const L=theftTargets();if(!L.length)return false;
   else{st=[{x:PX_R+190,y:PY_B+40},{x:PX_R,y:PY_B+16},{x:YXR-6,y:c.y+rnd(-10,10)}];}
   thief.sk='t'+Math.floor(Math.random()*6);p.x=st[0].x;p.y=st[0].y;p.vis=true;p.pose='';thief.route=[...st.slice(1),side];thief.st='sneak';thief.t=0;return true;}
 function alarmStart(){const c=thief.car;c.alarm=1;
-  toast('🚨 A thief is breaking into a car! Your guard is running…',3500);float(c.x,c.y-34,'🚨 THIEF!','#ff5252');
+  autoToast('🚨 A thief is breaking into a car! Your guard is running…',3500);float(c.x,c.y-34,'🚨 THIEF!','#ff5252');
   guards.forEach(g=>{if(!g.p.vis)return;const end=()=>nearThief(g.mode==='desk'?SOUT:g.p);
     let via;if(g.mode==='desk'){via=[SDOOR,SOUT,{x:PX_R,y:SOUT.y}];
       if(c.prevState==='forsale')via.push({x:PX_R,y:PY_T},{x:thief.p.x,y:PY_T});else if(c.x<AV)via.push({x:PX_R,y:PY_T},{x:AV+8,y:PY_T},{x:AV+8,y:thief.p.y});else via.push({x:PX_R,y:thief.p.y});}
@@ -1605,12 +1593,12 @@ function guardHome(g){g.mode=g.k?'patrol':'back';g.p.pose='';
 function mkCop(x,y,path,v,mode){const c={id:9000+Math.floor(Math.random()*999),type:POLICE_T,x,y,a:0,col:POLICE_T.col,siren:true,tune:{},jobs:[],dmg:[],dirt:0,lift:0,state:'police',path,v,mode,t:0,acc:'#fff',wrapCol:'#111'};police.push(c);return c;}
 function catchThief(){const T=thief,c=T.car;T.st='caught';T.ct=time;T.p.pose='';c.state=c.prevState;c.alarm=0;
   const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;incAdd('security',rw);G.sec.caught++;G.h.ct++;qAdd('thief',1);
-  float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');toast('👮 Thief caught! Reward +'+fmt(rw)+' · '+CTI+' +1 · The police are coming',4000);
+  float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');autoToast('👮 Thief caught! Reward +'+fmt(rw)+' · '+CTI+' +1 · The police are coming',4000);
   const road=c.slot.road,lane=offsetPath(route(carG,{x:AV,y:170},road),LN);
   const cop=mkCop(-90,96,roundPath([{x:-90,y:96},{x:lane[0].x,y:96},...lane],18).slice(1),240,'arrest');cop.road=road;T.cop=cop;save();}
 function stealCar(){const T=thief,c=T.car;c.alarm=0;T.p.vis=false;T.st='driving';
   const loss=Math.min(G.money,Math.round((c.price||c.value)*THEFT_LOSS*(1-guardBonus().shield)));G.money-=loss;G.sec.stolen++;
-  float(c.x,c.y-30,'🚨 CAR STOLEN! −'+fmt(loss),'#ff5252');toast('🚨 A car was stolen! −'+fmt(loss)+' · Police chase!',4500);
+  float(c.x,c.y-30,'🚨 CAR STOLEN! −'+fmt(loss),'#ff5252');autoToast('🚨 A car was stolen! −'+fmt(loss)+' · Police chase!',4500);
   const s=c.slot,lane=offsetPath(route(carG,s.road,{x:AV,y:108}),LN),ex=lane[lane.length-1].x;
   const fwd=roundPath([...lane,{x:ex,y:72},{x:W+320,y:72}],18);
   c.stolen=true;c.state='stolen';c.price=0;c.path=[...innR(s),{x:s.entry.x,y:s.entry.y,rev:true},{x:lane[0].x,y:lane[0].y,rev:true,old:s},...fwd.slice(1)];c.slot=null;c.onArrive=()=>{c.gone=true;};save();}
@@ -2012,7 +2000,7 @@ function updateVipTruck(dt){if(!PK.car)return;const n=PLV('parking')*4;
     VT.hold=1;if(cars.some(c=>c.arriving&&c.y<130))return; // hold new arrivals until the highway entrance is clear
     VT.hold=0;
     const k=Math.min(VT_SLOTS,free,3+(Math.random()<.5?1:0));VT.load=[];for(let i=0;i<k;i++)VT.load.push(richCar());
-    VT.st='in';VT.x=-420;VT.v=120;toast('🚚 The VIP Truck is here with '+k+' rich clients! They get priority.',4000);return;}
+    VT.st='in';VT.x=-420;VT.v=120;autoToast('🚚 The VIP Truck is here with '+k+' rich clients! They get priority.',4000);return;}
   if(VT.st==='in'){const d=VT_STOP-VT.x;VT.v=Math.max(18,Math.min(120,d*1.4));VT.x+=VT.v*dt;if(d<1){VT.st='unload';VT.ut=0;}}
   else if(VT.st==='unload'){VT.ut+=dt;
     if(VT.ut>1.6&&VT.load.length){if(cars.some(c=>c.arriving&&c.y<150))return;
@@ -3792,35 +3780,16 @@ const ulOK=u=>(!u.rep||G.rep>=u.rep)&&(!u.st||(G.cp&&G.cp.best||0)>=u.st);
 function sideLock(){const first=!Array.isArray(G.ul);if(first)G.ul=[];const nw=[];
   for(const u of SIDE_UL){const el=$(u.b);if(!el)continue;const ok=ulOK(u);el.style.display=ok?'':'none';
     if(ok&&!G.ul.includes(u.b)){G.ul.push(u.b);if(!first&&started){nw.push(u.n);el.classList.add('ulNew');setTimeout(()=>el.classList.remove('ulNew'),8000);}}}
-  if(first)save();else if(nw.length){save();toast('🔓 NEW: <b>'+nw.join(' · ')+'</b> unlocked!',3500);}}
-let hudN=0;function hud(){hudN++;if(hudN%45===7)ngRender();if(hudN%30===1){sideLock();const R=incRates();$('incH').textContent=R.ok&&R.tot>0?'+'+fmt(R.tot)+'/h':'';}if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
+  if(first)save();else if(nw.length){save();autoToast('🔓 NEW: <b>'+nw.join(' · ')+'</b> unlocked!',3500);}}
+let hudN=0;function hud(){hudN++;if(hudN%30===1){sideLock();const R=incRates();$('incH').textContent=R.ok&&R.tot>0?'+'+fmt(R.tot)+'/h':'';}if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
   if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
-// ---------------------------------------------------------------- v16-140 NEXT GOAL (Marius 21 nov: OK for the mock-up)
-// One band under the top bar with the most useful next step, GO opens the right page. Order = what makes you stronger first.
-// A goal only shows when its button is unlocked (sideLock) – so new players are not sent to closed pages.
-const ngVis=id=>{const e=$(id);return !!(e&&e.style.display!=='none'&&e.offsetParent!==null);};
-const ngIco=id=>{const e=$(id),c=e&&e.querySelector('img,svg');return c?c.outerHTML:'';};
-function ngGoal(){
-  const I=idleNow();if(ngVis('idBtn')&&(I.full||I.hrs>=4))return{i:ngIco('idBtn'),t:'Collect your Idle Rewards ('+Math.floor(I.hrs)+' h)',go:()=>$('idBtn').click()};
-  if(ngVis('ciBtn')&&ciReady())return{i:ngIco('ciBtn'),t:'Daily check-in: free summons waiting',go:()=>$('ciBtn').click()};
-  if(ngVis('heBtn')&&window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot())return{i:ngIco('heBtn'),t:'Level up your heroes',go:()=>$('heBtn').click()};
-  const tk=G.h.tk||0;if(ngVis('smBtn')&&tk>=10)return{i:ngIco('smBtn'),t:'Summon heroes: '+TKI+' ×'+nfmt(tk)+' ready',go:()=>$('smBtn').click()};
-  let bb=null;for(const id in BLD){if(NOUP(id)||!(G.lv[id]>=1)||G.rep<(BLD[id].rep||1))continue;const lt=lvT(id);if(lt>=MAXT)continue;const c=PCOST(id,lt+1);
-    if(pkN(partOf(id))>=c&&(!bb||lt<bb.lt))bb={id,lt};}
-  if(bb)return{i:PKI(partOf(bb.id)),t:'Upgrade '+((INFO[bb.id]&&INFO[bb.id].title)||BLD[bb.id].name||bb.id).replace(/^[^A-Za-z]+/,'')+' to LV '+(bb.lt+1),go:()=>{openPanel(bb.id);}};
-  if(ngVis('dqBtn')&&dqReady())return{i:ngIco('dqBtn'),t:'Claim your Daily Quest rewards',go:()=>$('dqBtn').click()};
-  if(ngVis('cpBtn')){const b=Math.min((G.cp&&G.cp.best)||0,1499);return{i:ngIco('cpBtn'),t:'Beat campaign stage '+(Math.floor(b/20)+1)+'-'+(b%20+1),go:()=>$('cpBtn').click()};}
-  return null;}
-let ngKey='',ngCur=null;
-function ngRender(){const el=$('ng');if(!el)return;const off=!!$('tut')||(!G.tut&&!(G.cp&&G.cp.best));
-  const g=off?null:ngGoal();ngCur=g;const k=g?g.t:'';if(k===ngKey)return;ngKey=k;
-  if(!g){el.classList.remove('on');return;}
-  el.querySelector('.ngI').innerHTML=g.i;el.querySelector('.ngT b').innerHTML=g.t;el.classList.remove('on');void el.offsetWidth;el.classList.add('on');}
-$('ng').onclick=()=>{if(ngCur){try{closePanel();}catch(e){}ngCur.go();ngKey='';setTimeout(ngRender,600);}};
+// v16-141: NEXT GOAL removed + automatic notifications muted (Marius 21 nov)
+function autoToast(){}
+function ngRender(){}
 
 // =================== LOOP ===================
 let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=99,goodT=0,capDPR=9,capHold=0,dprDn=0,bldT=0;
@@ -3844,7 +3813,6 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
- {id:72,d:'Nov 21, 2026',ic:'🎯',t:'NEXT GOAL',l:['A new <b>NEXT GOAL</b> band under the top bar always shows the most useful next step: collect Idle Rewards, daily check-in, level up heroes, summon, upgrade a building, claim quests or beat the next stage.','Tap <b>GO</b> and the right page opens.','Diamonds and tickets now use the same game icon everywhere.']},
  {id:71,d:'Nov 21, 2026',ic:'👾',t:'5 new monsters',l:['New enemies built from car parts: <b>Spring Hopper</b> (jumps on you), <b>Caliper Crab</b> (hard shell), <b>Jack Scorpion</b> (stinger strike), <b>Filter Goblin</b> (throws oil bombs) and <b>Mirror Moth</b> (flying, mirror glare).','You meet them in the Campaign (one in each world), in Torque Tower and in Dungeons.','<b>NEW: 5 NEW ACTS</b> – NEMESIS, APEX, ECLIPSE, CHAOS and LEGEND: 25 new chapters (51-75), <b>500 new stages</b> in NORMAL and HARD – 1500 stages in total. Every zone has the new monsters and a new final boss waits at 75-20: the <b>LEGEND ENGINE</b>.']},
  {id:70,d:'Nov 21, 2026',ic:'🔥',t:'HARD MODE monsters are on fire',l:['In the <b>HARD</b> campaign the monsters now stand in a <b>ring of fire</b>, burn with <b>flames</b> behind them and glow with heat.','They are also <b>10% bigger</b> – you can see at a glance that this is HARD MODE.']},
  {id:69,d:'Nov 21, 2026',ic:'🧩',t:'TEAM ROLES bonus is ON',l:['Your battle team now gets a bonus for <b>different roles</b> (TANK, WARRIOR, RANGER, MAGE, SUPPORT): 3 roles <b>+5%</b> · 4 roles <b>+10%</b> · all 5 roles <b>+15%</b> attack &amp; HP.','It works in every battle and in the Arena. See it on the HEROES page under BATTLE TEAM (lit role icons + the bonus).','A mixed team (a tank in front, a support that heals, mage / ranger for damage) is now better than 5 heroes of the same role.']},

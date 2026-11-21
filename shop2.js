@@ -80,7 +80,7 @@ function passTick(){
   for(const [k,key,f] of [['gold','sub','ge'],['plat','plat','pe'],['dia','dia','de']]){
     const e=PK()[key]||0; if(e>now() && e!==s[f]){ s[f]=e; give({dm:PASS[k].start}, PASS[k].n); } }
   for(const k of actv()){ s.dd=s.dd||{}; if(s.dd[k]!==today()){ s.dd[k]=today(); if(s.day!==today()+k) give(PASS[k].day, PASS[k].n+' · daily gift'); } }   // v16-84: every active pass gives its own gift (s.day = old one-gift key, so no double gift today)
-  if(on('plat') && t.idleNow && t.claimIdle && t.idleMax){ const I=t.idleNow(); if(I.hrs>=t.idleMax()-0.01 && I.money>0){ t.claimIdle(); t.toast('🧰 Platinum Pass: Idle Rewards collected automatically',3000); } }
+  if(on('plat') && t.idleNow && t.claimIdle && t.idleMax){ const I=t.idleNow(); if(I.hrs>=t.idleMax()-0.01 && I.money>0){ t.claimIdle(); } }
 }
 
 // ---------------- buying ----------------
