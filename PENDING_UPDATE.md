@@ -1,4 +1,6 @@
-# Update în așteptare (NU e live) – ramura `pending-v16-120`
+# ✅ PUBLICAT LIVE în v16-123 (21 nov 2026) – fostul update în așteptare de pe ramura `pending-v16-120`
+(Diamond Pass + Founder Pass sunt în cod, dar ascunse în Shop până se creează produsele în Play Console – `NEWP()` în `shop2.js`.)
+
 Marius (20 nov 2026): „nu faci update la joc, doar salvăm și facem mai târziu când avem mai multe strânse”.
 Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js, `python3 tools/sw_hash.py`, test live + `tools/budget_phone.py`.
 
