@@ -26,7 +26,7 @@ const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, 
   mem_edit:100, unpaid_pack:100};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
 // v16-104: pack key in the game → product ID in Play Console (same as SKU in secure.js; consumables are not checked)
 const PACK_SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', plat:'vip_pass_platinum',
-  p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite', fn:'fund_normal', fh:'fund_hard',
+  p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite', p5:'pack_master', p6:'pack_legend', p7:'pack_titan', fn:'fund_normal', fh:'fund_hard',
   dia:'vip_pass_diamond', fdr:'founder_pass'};   // v16-122
 const json = (o, s=200) => new Response(JSON.stringify(o), {status:s, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-headers':'content-type'}});
 
@@ -109,10 +109,11 @@ async function report(b, env) {
     const ps = capPerSec(Math.max(s.lv, old.lv));
     const capMoney = 600 * ps + ps * dt + 22 * 3600 * ps / 20;   // v16-122: + 3 Quick Idle (2 h each)     // + a full idle chest (max 14h at VIP 10)
     if (s.money - old.money > capMoney) { pts += 40; why.push(`money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`); }
-    if (s.tk - old.tk > 100 + dt / 45) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
-    if (s.gtk - old.gtk > 100 + dt / 45) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
     // v16-122: purchases give VIP points (1 € = 20) → allow 2,100 per confirmed purchase since the last report
     const nb = old ? ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(b.pid, old.last - 6e5).first()) || {n:0}).n : 0;
+    // v16-143: a confirmed purchase may bring up to 450 tickets (TITAN PACK)
+    if (s.tk - old.tk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
+    if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
     if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
     if (s.best - old.best > 30 + dt / 90) { pts += 30; why.push(`campaign +${s.best - old.best} stages`); }
     if (s.lv - old.lv > 12 + dt / 600) { pts += 30; why.push(`buildings +${s.lv - old.lv} levels`); }
