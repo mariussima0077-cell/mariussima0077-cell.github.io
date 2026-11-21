@@ -1,7 +1,7 @@
 // =====================================================================
 //  TORQUE EMPIRE · CAMPAIGN (battle.js) · v14
 //  Up to 5 mechanics fight monsters built from car parts.
-//  v14: 50 chapters (10 acts × 5 worlds) · v16-139: 55 chapters (act 11 NEMESIS), gear art for every grade, Gear Summon with blue Gear Tickets.
+//  v14: 50 chapters (10 acts × 5 worlds) · v16-139: 75 chapters = 1500 stages (acts 11-15), gear art for every grade, Gear Summon with blue Gear Tickets.
 //  Everything here is drawn from code (except the frames, tickets and portraits frames from img/).
 // =====================================================================
 (function(){
@@ -709,13 +709,18 @@ const ACTS=[null,
  {n:'Void',bio:{h:235,s:.7,l:.55,night:1},mh:230,ms:.55,mb:.85},
  {n:'Omega',bio:{h:-12,s:1.3,l:.7,fires:1,lava:1},mh:320,ms:1.5},
  // v16-139 (Marius: 'more stages, normal and hard'): ACT 11 – 5 new chapters (100 stages), the 5 new small monsters in every zone
- {n:'Nemesis',bio:{h:150,s:1.15,l:.62,night:1,moon:1,fires:1},mh:140,ms:1.35,mb:.95,nw:['hopper','crab','scorp','goblin','moth']}];
+ {n:'Nemesis',bio:{h:150,s:1.15,l:.62,night:1,moon:1,fires:1},mh:140,ms:1.35,mb:.95,nw:['hopper','crab','scorp','goblin','moth']},
+ // v16-139 (Marius: '1500 stages in total, so we know we have enough'): acts 12-15
+ {n:'Apex',bio:{h:-55,s:1.2,l:.9},mh:-70,ms:1.3,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Eclipse',bio:{h:200,s:.8,l:.5,night:1,moon:1},mh:205,ms:1.2,mb:.9,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Chaos',bio:{h:-90,s:1.3,l:.75,rain:1,fires:1},mh:290,ms:1.45,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Legend',bio:{h:40,s:1.35,l:.95,fires:1},mh:48,ms:1.55,mb:1.15,nw:['hopper','crab','scorp','goblin','moth']}];
 const CH_NAMES=[
- ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss'],
- ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss'],
- ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress','Nemesis Ice Abyss'],
- ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway','Nemesis Night Circuit'],
- ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno','Nemesis Core']];
+ ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss','Apex Scrap Peaks','Eclipse Junkyard','Chaos Scrapstorm','Legend Scrap Throne'],
+ ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss','Apex Acid Towers','Eclipse Refinery','Chaos Chem Storm','Legend Oil Kingdom'],
+ ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress','Nemesis Ice Abyss','Apex Glacier','Eclipse Frost Hollow','Chaos Blizzard','Legend Ice Throne'],
+ ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway','Nemesis Night Circuit','Apex Speedway','Eclipse Boulevard','Chaos Raceway','Legend Grand Prix'],
+ ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno','Nemesis Core','Apex Caldera','Eclipse Forge','Chaos Inferno','Legend Core']];
 const CH_COL=['#ff8f00','#76ff03','#80d8ff','#ff4fd8','#ff3d00'];
 function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(...)'
   let r,g2,b,a=null,mm;if(c[0]==='#'){r=parseInt(c.substr(1,2),16);g2=parseInt(c.substr(3,2),16);b=parseInt(c.substr(5,2),16);}
@@ -729,7 +734,7 @@ function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(
 function bioVariant(P,m){const o={};for(const k in P){const v=P[k];o[k]=typeof v==='string'&&k!=='n'?colX(v,m):Array.isArray(v)?v.map(x=>typeof x==='string'?colX(x,m):x):v;}
   ['rain','night','moon','snow','fires','lava'].forEach(f=>{if(m[f])o[f]=1;});if(m.night){o.sunY=.25;o.sunR=.05;}return o;}
 function monClone(k,a){const A=ACTS[a],key=k+'_'+a;if(MON[key])return key;const M=MON[k];
-  let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';if(k==='omega'&&a===10)n='NEMESIS ENGINE';
+  let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';if(k==='omega'&&a>=10)n=A.n.toUpperCase()+' ENGINE';
   // bosses of acts 2-10 get the same base stats in every world, so only the stage level decides how hard they are
   const norm=M.b==='titan'?{hp:12500,atk:130,def:28}:M.b==='crusher'?{hp:5000,atk:112,def:26}:{};
   MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===ACTS.length-1?'Final boss':k==='omega'?'Chapter boss':M.desc});return key;}
@@ -753,7 +758,7 @@ CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911
   else w=[mk(n0),mk(Math.min(5,n0+(j%2)))];
   STAGES.push({n:C.names[j],c,j,bio:C.bios[z],w,boss:j===19,mini:j===9});}});
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
-const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345],[1099,395]]; // v16-139: act 11 (+100 stages) climbs at the act-10 pace
+const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345],[1099,395],[1199,450],[1299,515],[1399,585],[1499,665]]; // v16-139: acts 11-15 (+500 stages) climb at the act-10 pace
  // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
 // v16-74: the campaign was ~4× faster than planned (2-month test: day 16 = stage 16-20) → chapters 2-12 climb to ×HK_MAX stronger, kept until ch 32, then back to ×1.3 at the end
 const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:i<1000?HK_MAX-(HK_MAX-1.3)*(i-639)/360:1.3;
