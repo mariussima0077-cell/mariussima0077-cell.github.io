@@ -43,6 +43,8 @@ const SPC = 20;                           // stages per chapter (battle.js)
 const PK = () => T().PK;
 const S = () => { const G=T().G; if(!G.shop) G.shop={fx:{}, day:'', ge:0, pe:0, fn:[], fh:[]}; const s=G.shop; s.fx=s.fx||{}; s.fn=s.fn||[]; s.fh=s.fh||[]; return s; };
 const on = k => (PK()[k]||0) > now();
+// v16-123: Diamond Pass + Founder Pass are shown only after their products exist in Play Console (Marius does it before the opening)
+const NEWP = () => !!(window.SEC && SEC.TEST_MODE) || !!window.TE_NEWP;
 const expKey = {sil:'sil', gold:'sub', plat:'plat', dia:'dia'};
 function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; if(on('dia')) return 'dia'; return null; }   // the best active one (name / colour)
 const actv = () => ['sil','gold','plat','dia'].filter(k=>on(expKey[k]));                       // v16-84: every active pass
@@ -217,11 +219,12 @@ function render(){
           '</div><div class="foot"><span class="val"><b>×'+p.val+'</b>VALUE</span>'+(lk?'<button class="buy lock">🔒 '+P(p.k,p.price)+'</button>':'<button class="buy" data-b="'+p.k+'">'+P(p.k,p.price)+'</button>')+'</div></div>'; });
     } else h+='<div class="note">✓ You bought all special offers – thank you!</div>';
     h+='<div class="sec">FOREVER PACKS</div>'+[
-      ['fdr','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99'],
+      ...(NEWP()?[['fdr','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99']]:[]),
+      ['fdr_old','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99'],
       ['car','ui3/sp_truck','VIP Truck · Rich Clients','Forever: rich clients, priority in every garage, pay ×2.','€5.99'],
       ['vip','ui3/sp_crew','VIP Crew Boost','Forever: every mechanic +25% speed &amp; money.','€3.99'],
       ['spd2','ui3/sp_speed','Battle Speed ×3','Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins>','€2.99'],
-    ].map(([k,i,n,d,pr])=>'<div class="pack"><div class="th"><img src="'+IMG(i)+'" alt=""></div><div class="tx"><b>'+n+'</b>'+d+'</div>'+(pk[k]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,pr)+'</button>')+'</div>').join('')+
+    ].filter(r=>r[0]!=='fdr_old').map(([k,i,n,d,pr])=>'<div class="pack"><div class="th"><img src="'+IMG(i)+'" alt=""></div><div class="tx"><b>'+n+'</b>'+d+'</div>'+(pk[k]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,pr)+'</button>')+'</div>').join('')+
       '<div class="pack"><div class="th"><img src="img/ui2/i_key.webp" alt=""></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day in every dungeon + SWEEP.'+(on('dg')?' <ins>Active – '+daysLeft('dg')+' days left.</ins>':'')+'</div><button class="buy" data-a="dg">'+P('dg','€2.99')+'</button></div>';
     h+=(SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping a price gives it without payment.<br>'+(SEC.TEST_ACC?'<a href="?tacc=0" style="color:#ffd54a">↩ Back to my normal account</a>':'<a href="?tacc=1" style="color:#ffd54a">🧪 Open the FULL TEST ACCOUNT (hidden from rankings)</a>')+'</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>');
   }
@@ -246,10 +249,10 @@ function render(){
     h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
       '</ul><div class="tot">In 30 days: 6,600 💎 + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
-    h+='<div class="card vp d"><div class="rib">MOST 💎</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
+    if(NEWP())h+='<div class="card vp d"><div class="rib">MOST 💎</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
       row(IMG('ui3/v_dm'),'Diamonds right away','900')+row(IMG('ui3/v_dm'),'Diamonds every day','+300')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','–',1)+row(IMG('ui3/v_idle'),'Idle Rewards','–',1)+
       '</ul><div class="tot">In 30 days: 9,900 💎 + 60 tickets ≈ 159 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
-    h+='<div class="note">VIP Passes stack: you can have Silver, Gold, Platinum and Diamond at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
+    h+='<div class="note">VIP Passes stack: you can have Silver, Gold, Platinum'+(NEWP()?' and Diamond':'')+' at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
   }
   if(tab==='tf'){
     h+='<div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>';
