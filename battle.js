@@ -1,7 +1,7 @@
 // =====================================================================
 //  TORQUE EMPIRE · CAMPAIGN (battle.js) · v14
 //  Up to 5 mechanics fight monsters built from car parts.
-//  v14: 50 chapters (10 acts × 5 worlds), gear art for every grade, Gear Summon with blue Gear Tickets.
+//  v14: 50 chapters (10 acts × 5 worlds) · v16-139: 55 chapters (act 11 NEMESIS), gear art for every grade, Gear Summon with blue Gear Tickets.
 //  Everything here is drawn from code (except the frames, tickets and portraits frames from img/).
 // =====================================================================
 (function(){
@@ -707,13 +707,15 @@ const ACTS=[null,
  {n:'Frostbite',bio:{h:175,s:.65,l:1.12,snow:1},mh:175,ms:.9,mb:1.1},
  {n:'Golden',bio:{h:32,s:1.25,l:1.05},mh:42,ms:1.4,mb:1.12},
  {n:'Void',bio:{h:235,s:.7,l:.55,night:1},mh:230,ms:.55,mb:.85},
- {n:'Omega',bio:{h:-12,s:1.3,l:.7,fires:1,lava:1},mh:320,ms:1.5}];
+ {n:'Omega',bio:{h:-12,s:1.3,l:.7,fires:1,lava:1},mh:320,ms:1.5},
+ // v16-139 (Marius: 'more stages, normal and hard'): ACT 11 – 5 new chapters (100 stages), the 5 new small monsters in every zone
+ {n:'Nemesis',bio:{h:150,s:1.15,l:.62,night:1,moon:1,fires:1},mh:140,ms:1.35,mb:.95,nw:['hopper','crab','scorp','goblin','moth']}];
 const CH_NAMES=[
- ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne'],
- ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery'],
- ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress'],
- ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway'],
- ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno']];
+ ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss'],
+ ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss'],
+ ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress','Nemesis Ice Abyss'],
+ ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway','Nemesis Night Circuit'],
+ ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno','Nemesis Core']];
 const CH_COL=['#ff8f00','#76ff03','#80d8ff','#ff4fd8','#ff3d00'];
 function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(...)'
   let r,g2,b,a=null,mm;if(c[0]==='#'){r=parseInt(c.substr(1,2),16);g2=parseInt(c.substr(3,2),16);b=parseInt(c.substr(5,2),16);}
@@ -727,13 +729,14 @@ function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(
 function bioVariant(P,m){const o={};for(const k in P){const v=P[k];o[k]=typeof v==='string'&&k!=='n'?colX(v,m):Array.isArray(v)?v.map(x=>typeof x==='string'?colX(x,m):x):v;}
   ['rain','night','moon','snow','fires','lava'].forEach(f=>{if(m[f])o[f]=1;});if(m.night){o.sunY=.25;o.sunR=.05;}return o;}
 function monClone(k,a){const A=ACTS[a],key=k+'_'+a;if(MON[key])return key;const M=MON[k];
-  let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';
+  let n=M.boss?A.n.toUpperCase()+' '+M.n:A.n+' '+M.n;if(k==='omega'&&a===9)n='ULTIMA ENGINE';if(k==='omega'&&a===10)n='NEMESIS ENGINE';
   // bosses of acts 2-10 get the same base stats in every world, so only the stage level decides how hard they are
   const norm=M.b==='titan'?{hp:12500,atk:130,def:28}:M.b==='crusher'?{hp:5000,atk:112,def:26}:{};
-  MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===9?'Final boss':M.desc});return key;}
-for(let a=1;a<10;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb=t+a*5;
+  MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===ACTS.length-1?'Final boss':k==='omega'?'Chapter boss':M.desc});return key;}
+for(let a=1;a<ACTS.length;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb=t+a*5;
   const bios=B0.bios.map(bi=>{BIO.push(Object.assign(bioVariant(BIO[bi],A.bio),{n:A.n+' '+BIO[bi].n}));return BIO.length-1;});
-  const pool=B0.pool.map((pz,z)=>{const p2=pz.map(k=>monClone(k,a));if(a>=2){const ex=CHAP[(t+a)%5].pool[z][(a+z)%CHAP[(t+a)%5].pool[z].length];p2.push(monClone(ex,a));}return p2;});
+  const pool=B0.pool.map((pz,z)=>{const p2=pz.map(k=>monClone(k,a));if(a>=2){const ex=CHAP[(t+a)%5].pool[z][(a+z)%CHAP[(t+a)%5].pool[z].length];p2.push(monClone(ex,a));}
+    if(A.nw){p2.push(monClone(A.nw[(t+z)%5],a),monClone(A.nw[(t+z+2)%5],a));}return p2;});
   CHAP.push({n:CH_NAMES[t][a],col:colX(CH_COL[t],{h:A.mh*.35,s:1.1}),bios,zones:B0.zones.map(z=>z.startsWith(A.n)?z.replace(A.n,'Ultima'):A.n+' '+z),pool,mini:monClone(B0.mini,a),boss:monClone(B0.boss,a),
     names:B0.names.map(x=>x.startsWith(A.n)?x.replace(A.n,'Ultima'):A.n+' '+x),act:a});}
 CHAP.forEach((C,i)=>{C.n=CH_NAMES[i%5][Math.floor(i/5)];});
@@ -750,9 +753,10 @@ CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911
   else w=[mk(n0),mk(Math.min(5,n0+(j%2)))];
   STAGES.push({n:C.names[j],c,j,bio:C.bios[z],w,boss:j===19,mini:j===9});}});
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
-const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345]]; // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
+const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345],[1099,395]]; // v16-139: act 11 (+100 stages) climbs at the act-10 pace
+ // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
 // v16-74: the campaign was ~4× faster than planned (2-month test: day 16 = stage 16-20) → chapters 2-12 climb to ×HK_MAX stronger, kept until ch 32, then back to ×1.3 at the end
-const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:HK_MAX-(HK_MAX-1.3)*(i-639)/360;
+const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:i<1000?HK_MAX-(HK_MAX-1.3)*(i-639)/360:1.3;
 // v16-74: HARD MODE – hard chapter N opens when normal chapter N is cleared (and hard N-1); monsters ×HARD_K, rewards ×HARD_RW
 const HARD_K=2.5,HARD_RW=1.5;let HM=0;
 const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{},ch:0};if(!G.cph.stars)G.cph.stars={};return G.cph;};
@@ -2620,7 +2624,7 @@ function hmBtn(){let b=$('cpHM');if(!b){b=document.createElement('button');b.id=
       HM=HM?0:1;G.cp.hm=HM;T.save();showMap();if(HM&&!G.cp.hmSeen){G.cp.hmSeen=1;T.save();popW('HARD MODE','<div style="padding:4px 2px;line-height:1.45">The same chapters with <b style="color:#ff5252">much stronger monsters</b> – and <b style="color:#7CFC9A">×'+HARD_RW+' rewards</b> (money, tickets, diamonds).<br><br>HARD chapter N opens when you clear NORMAL chapter N.</div>');}};}
   b.className=HM?'on':'';const ok=hardOK(),I=(f,c)=>'<img src="img/shop/'+f+'.webp" alt=""'+(c?' class="'+c+'"':'')+'>'; // v16-80: Marius' NORMAL / HARD tabs
   b.innerHTML=I(HM?'hm_n0':'hm_n1')+(!ok?I('hm_h0'):I('hm_h1',HM?'':'off'));}
-function chList(){const T=TE(),G=T.G,cur=curCh();let h=`<div class="pT">${IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')} ALL CHAPTERS</div><div class="pD">10 acts × 5 worlds · ${NCH} chapters · ${NST} stages</div><div class="chL">`;
+function chList(){const T=TE(),G=T.G,cur=curCh();let h=`<div class="pT">${IMGI(glyphURL('swords','#ffcc80'),'1em','-.12em')} ALL CHAPTERS</div><div class="pD">${ACTS.length} acts × 5 worlds · ${NCH} chapters · ${NST} stages</div><div class="chL">`;
   const PX=CPX();for(let c=0;c<NCH;c++){const C=CHAP[c],op=chOpen(c),done=Math.max(0,Math.min(SPC,PX.best-c*SPC));let st=0;for(let j=0;j<SPC;j++)st+=PX.stars[c*SPC+j]||0;
     if(c%5===0)h+=`<div class="chAct">ACT ${c/5+1}${c?' · '+ACTS[c/5].n.toUpperCase():' · ORIGINS'}</div>`;
     h+=`<div class="chI${op?'':' lk'}${c===cur?' on':''}" data-ch="${c}" style="border-color:${C.col}"><b style="color:${C.col}">${c+1}</b><span>${C.n}<small>${op?done+'/'+SPC+' · '+st+'⭐':HM&&G.cp.best<(c+1)*SPC?'🔒 clear NORMAL chapter '+(c+1):'🔒 beat '+MON[CHAP[Math.max(0,c-1)].boss].n}</small></span></div>`;}
