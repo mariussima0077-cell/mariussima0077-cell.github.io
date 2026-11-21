@@ -96,7 +96,7 @@ const DMG=new Image();DMG.src='img/ui/diamond.svg';
 const CWI={};['tank','warrior','ranger','mage','support','bk'].forEach(k=>{const i=new Image();i.src='img/ui12/pk_'+k+'.webp';CWI[k]=i;});
 const KIM={};['vault','mine','forge','lab','pass'].forEach(k=>{const i=new Image();i.src='img/dg/k_'+k+'.webp';KIM[k]=i;});
 // v16-120: Key Roulette pictures (optional – until Marius sends them the Lucky Wheel frame/disc are used)
-const KWI={};['kwheel','kwheel_disc'].forEach(k=>{const i=new Image();i.onload=()=>{if(!spinning)drawWheel(document.getElementById('evWh'));};i.src='img/ui9/'+k+'.webp';KWI[k]=i;});
+const KWI={};['kwheel','kwheel_disc','kwheel_pin'].forEach(k=>{const i=new Image();i.onload=()=>{if(!spinning)drawWheel(document.getElementById('evWh'));};i.src='img/ui9/'+k+'.webp';KWI[k]=i;});
 const WF={w:550,h:601,cx:275,cy:296,r:218.5,top:44};   // frame size + disc centre / radius in the frame picture
 let wKind='wheel';
 function drawWheel(cv){if(!cv)return;const KR=wKind==='key',SW=SL(wKind),okI=x=>x&&x.complete&&x.naturalWidth,FR=KR&&okI(KWI.kwheel)?KWI.kwheel:WI.wheel,DS=KR&&okI(KWI.kwheel_disc)?KWI.kwheel_disc:WI.wheel_disc;const d=Math.min(2,devicePixelRatio||1),cw=cv.clientWidth||260,ch=cw*(WF.h+WF.top)/WF.w;
@@ -115,7 +115,8 @@ function drawWheel(cv){if(!cv)return;const KR=wKind==='key',SW=SL(wKind),okI=x=>
     const s=R*.17;if(ok(DMG))g.drawImage(DMG,-s/2,-R*.53-s/2,s,s);else{g.font='900 '+(R*.1)+'px Game,system-ui';g.fillText('💎',0,-R*.53);}g.restore();}
   g.restore();
   if(ok(FR))g.drawImage(FR,0,WF.top*k,WF.w*k,WF.h*k);
-  if(ok(WI.wheel_pin)){const pw=82*k,ph=pw*WI.wheel_pin.naturalHeight/WI.wheel_pin.naturalWidth;g.drawImage(WI.wheel_pin,X-pw/2,4*k,pw,ph);}
+  const PN=KR&&ok(KWI.kwheel_pin)?KWI.kwheel_pin:WI.wheel_pin; // v16-137: Key Roulette has its own key pointer
+  if(ok(PN)){const pw=82*k,ph=pw*PN.naturalHeight/PN.naturalWidth;g.drawImage(PN,X-pw/2,4*k,pw,ph);}
   else{g.beginPath();g.moveTo(X-R*.09,Y-R*1.05);g.lineTo(X+R*.09,Y-R*1.05);g.lineTo(X,Y-R*.85);g.closePath();g.fillStyle='#ff1744';g.fill();}}
 function shade(c){const n=parseInt(c.slice(1),16),f=v=>Math.round(v*.45);return 'rgb('+f(n>>16)+','+f(n>>8&255)+','+f(n&255)+')';}
 // ---------------- page
