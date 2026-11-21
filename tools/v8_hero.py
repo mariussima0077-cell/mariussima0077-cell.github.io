@@ -44,10 +44,10 @@ HEROES = {
   'm5_2': ('ignis', {'idle': 433, 'run': 381, 'attack': 350, 'skill': 327, 'hitko': 390, 'win': 377, 'fx': 300}),
   # v16-132 (21 nov): GOLIATH, THE IRON BULWARK (new Mythic TANK m5_3). REF = frame 1 hair-top → feet; fx = falling hex shield ~1.2× his height
   'm5_3': ('goliath', {'idle': 361, 'run': 327, 'attack': 302, 'skill': 288, 'hitko': 331, 'win': 364, 'fx': 275}),
-  # v16-141 (21 nov): NOVA, THE STARFIRE HUNTRESS (Mythic RANGER m5_4). REF = frame 1 top of hair bun → feet. No WIN sheet yet → win = idle copy
-  'm5_4': ('nova', {'idle': 448, 'run': 383, 'attack': 404, 'skill': 366, 'hitko': 396, 'win': 448, 'fx': 380}),
-  # v16-141 (21 nov): VEGA, THE RAILGUN ACE (Mythic RANGER m5_5). REF = frame 1 hair-top → feet. No IDLE sheet yet → idle = attack frame 1 with breathing (made by Claude)
-  'm5_5': ('vega', {'idle': 374, 'run': 359, 'attack': 374, 'skill': 358, 'hitko': 382, 'win': 394, 'fx': 300}),
+  # v16-141 (21 nov): NOVA, THE STARFIRE HUNTRESS (Mythic RANGER m5_4). REF = frame 1 top of hair bun → feet. WIN sheet came later (same chat)
+  'm5_4': ('nova', {'idle': 448, 'run': 383, 'attack': 404, 'skill': 366, 'hitko': 396, 'win': 439, 'fx': 380}),
+  # v16-141 (21 nov): VEGA, THE RAILGUN ACE (Mythic RANGER m5_5). REF = frame 1 hair-top → feet. IDLE sheet came later (railgun on the shoulder)
+  'm5_5': ('vega', {'idle': 396, 'run': 359, 'attack': 374, 'skill': 358, 'hitko': 382, 'win': 394, 'fx': 300}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
@@ -123,7 +123,7 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
        'm5_2': {('attack', 3): 'fade:R', ('attack', 2): 'fade:T', ('fx', 1): 'fadeS', ('fx', 4): 'fade', ('win', 3): 'fade:T',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_3': {('attack', 3): 'fade:R', ('skill', 4): 'fadeS', ('skill', 5): 'fadeS', ('skill', 3): 'fadeS', ('skill', 2): 'none', ('fx', 4): 'fade', ('fx', 5): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
-       'm5_4': {**{('attack', i): 'none' for i in range(8)}, ('attack', 3): 'fade:R', ('skill', 1): 'none', ('skill', 5): 'none', ('hitko', 2): 'none', ('skill', 4): 'fade:T', ('fx', 0): 'fade:T', ('fx', 1): 'fade:T', ('fx', 2): 'fade:T', ('fx', 3): 'fade:T', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
+       'm5_4': {**{('attack', i): 'none' for i in range(8)}, ('win', 2): 'fade', ('win', 1): 'fade:R', ('attack', 3): 'fade:R', ('skill', 1): 'none', ('skill', 5): 'none', ('hitko', 2): 'none', ('skill', 4): 'fade:T', ('fx', 0): 'fade:T', ('fx', 1): 'fade:T', ('fx', 2): 'fade:T', ('fx', 3): 'fade:T', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_5': {('attack', 3): 'fade:R', ('attack', 4): 'fade:R', ('skill', 3): 'fade:R', ('skill', 4): 'fade:R', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
@@ -172,7 +172,7 @@ def extend(c, mode=None):
 
 # v16-96: heroes whose poses / thrown weapons cross the 384-px columns (Rosa's wrench swooshes) → wide cells:
 # every picture part goes to the column its centre is in (no neighbour leaking, nothing cut at the column line)
-WIDE = {'m4_1': 90, 'm5_5': {'skill': 90, 'win': 90, 'attack': 90, 'hitko': 90}, 'm5_3': {'run': 90, 'attack': 90, 'hitko': 90, 'win': 90}, 'm5_2': {'run': 90, 'attack': 90, 'hitko': 90, 'win': 90}, 'm3_6': {'hitko': 90}, 'm3_0': {'attack': 90, 'hitko': 90}, 'm3_1': {'idle': 90, 'skill': 90, 'hitko': 90, 'win': 90, 'attack': 90}, 'm3_3': {'hitko': 90}, 'm3_5': {'hitko': 90, 'attack': 90}}   # v16-109 Ohm: only his KO sheet (lying body crosses the column line)
+WIDE = {'m4_1': 90, 'm5_5': {'skill': 90, 'win': 90, 'attack': 90, 'hitko': 90, 'idle': 90}, 'm5_3': {'run': 90, 'attack': 90, 'hitko': 90, 'win': 90}, 'm5_2': {'run': 90, 'attack': 90, 'hitko': 90, 'win': 90}, 'm3_6': {'hitko': 90}, 'm3_0': {'attack': 90, 'hitko': 90}, 'm3_1': {'idle': 90, 'skill': 90, 'hitko': 90, 'win': 90, 'attack': 90}, 'm3_3': {'hitko': 90}, 'm3_5': {'hitko': 90, 'attack': 90}}   # v16-109 Ohm: only his KO sheet (lying body crosses the column line)
 def cells(n):
     im = np.asarray(Image.open(SRC % n).convert('RGB')).astype(float)
     a = despill(unmix(im), n).astype(np.float32)
