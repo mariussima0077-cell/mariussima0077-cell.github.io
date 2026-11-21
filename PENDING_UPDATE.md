@@ -51,4 +51,4 @@ Când se urcă: merge în `main`, apoi `const V` în sw.js + `CV` în online.js,
 - Roata dă DOAR chei de Dungeon: Vault/Mine/Forge/Lab ×1 (17% fiecare), 2 chei la un dungeon aleator 14%, 1 cheie în TOATE 10%, 3 chei la un dungeon aleator 6%, **JACKPOT 3 chei în TOATE 2%**. Anti-reroll: `srun('kw')`.
 - **Cheile câștigate = BONUS (`G.dg.x`)**: se adună, NU expiră la miezul nopții; se folosesc după cheile zilnice (`dgUse`). Afișare: „2/2 +5” pe cartea dungeonului, „+5 BONUS” în pagina lui, total în Battle Hub.
 - Server (`server/online.js`): `EV_TRK.B` + `key`, `EV_CAP/EV_TKK/EV_NAME`, `evKind` cu lungimea listei (A are 3, B are 4). ⚠️ Serverul trebuie urcat odată cu jocul.
-- Poze: banner provizoriu `img/ui9/evb_key.webp` (făcut din bannerul roții + cheile din Dungeons); discul = discul roții colorat albastru în cod. Opțional de la Marius: `evb_key.webp` 900×360 + `kwheel_disc.webp` 441×441 (dacă există, jocul le folosește singur). Prompturi în `PROMPTS_EVENTS.md`.
+- Poze: pozele lui Marius integrate (21 nov) – `img/ui9/evb_key.webp` 900×360 + `img/ui9/kwheel_disc.webp` 441×441 (verdele scos). Rama și săgeata = cele ale Lucky Wheel. Testat: 0 erori.
