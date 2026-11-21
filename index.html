@@ -21,6 +21,7 @@
 <script src="secure.js"></script>
 <script src="xfer.js"></script>
 <style>
+@font-face{font-family:Lilita;src:url(assets/fonts/lilita.woff2) format('woff2');font-display:swap} /* v16-120 UI11 game font (Lilita One, SIL OFL – assets/fonts/LILITA_OFL.txt) */
 html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 #game{position:fixed;inset:0;width:100%;height:100%;display:block}
 #hud{position:fixed;left:0;right:0;top:0;height:52px;display:flex;gap:6px;padding:8px 8px;box-sizing:border-box;justify-content:space-between;align-items:center;pointer-events:none;z-index:5;background:linear-gradient(#0d141bee,#0d141b99)}
@@ -3406,7 +3407,7 @@ function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=ro
   // v16-49: the 3 tabs are on Marius' MY CREW picture (wrench · shield · scooter)
   $('rsTabsH').innerHTML=CATK.map(c=>{const n=Object.keys(G.h.own).filter(id=>HB[id].cat===c).length;return '<button class="rsTab rsT'+c+(c===cat?' on':'')+'" data-ro="cat" data-c="'+c+'"><span>'+CATS[c].n+' <small>'+n+'</small></span>'+(rosHint(c)?'<i></i>':'')+'</button>';}).join('');
   let x='';
-  x+='<div class="rsAct"><button class="rsA gold" data-ro="auto">⚡ AUTO BEST</button><button class="rsA" data-ro="coll">📖 Collection</button><button class="rsA blue" data-ro="sum">'+TKI+' Summon</button></div>';
+  x+='<div class="rsAct"><button class="rsA gold" data-ro="auto">AUTO BEST</button><button class="rsA" data-ro="coll">COLLECTION</button><button class="rsA blue" data-ro="sum">'+TKI+' SUMMON</button></div>';
   const bonusTxt=(k,id)=>{const v=slotStats(k,id);return SLOTL[k[0]][0].split(' ')[0]+' '+pctS(v[0]);};
   // working now
   const groups={};slotsOf(cat).forEach(k=>{const g=cat==='g'?'security':k.split('|')[1];(groups[g]=groups[g]||[]).push(k);});
@@ -3928,6 +3929,35 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 #dqBox>[data-close]::before,.dgPX::before,.winSk>.wX::before,#idlBox>[data-i="x"]::before{left:-50%;right:-6%}
 #tmBox [data-t="x"]::before{left:-10%;right:-10%;top:-5%;bottom:-5%}
 .dgPX{position:absolute}
+</style>
+<style id="ui11">
+/* v16-120 UI11 (21 nov) – Marius: "nu-mi place scrisul și ramele din cod" → his pictures img/ui10 + game font Lilita */
+#gBody .gSumRow{gap:5px;padding:0 8px}
+#gBody .gSumRow .gsGo{position:relative;flex:1!important;min-width:0;aspect-ratio:300/181;height:auto!important;min-height:0!important;margin:0!important;padding:11% 10% 12%!important;border:0;border-radius:0!important;box-shadow:none!important;background:url(img/ui10/hs_btn_blue.webp) center/100% 100% no-repeat!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:0;font:400 11.5px/1 Lilita,system-ui!important;letter-spacing:.3px!important;color:#fff!important;text-shadow:0 2px 0 #062050}
+#gBody .gSumRow .gsGo.hs{background-image:url(img/ui10/hs_btn_gold.webp)!important;color:#3a1600!important;text-shadow:0 1px 0 #ffe9a0}
+#gBody .gSumRow .gsGo.bag{background-image:url(img/ui10/hs_btn_bag.webp)!important;color:#ffe082!important;text-shadow:0 2px 0 #000;flex:1!important}
+#gBody .gSumRow .gsGo b{font-weight:400;display:block;padding:0!important}
+#gBody .gSumRow .gsGo span{display:flex!important;align-items:center;gap:3px;padding:0!important;font:400 13.5px Lilita,system-ui!important;color:inherit!important;opacity:1!important}
+#gBody .gSumRow .gsGo span img{height:1.15em;width:auto;vertical-align:0}
+#gBody .gSumRow .gsGo.bag img{position:static!important;transform:none!important;width:auto!important;height:20px;margin:-4px 0 0}
+#gBody .gSumRow .gsGo.bag span{color:#fff!important;font-size:13px!important}
+#gBody .gsGo.col{aspect-ratio:860/134;height:auto!important;min-height:0!important;margin:7px 8px 0!important;width:calc(100% - 16px)!important;padding:0 5% 0 23%!important;border:0;border-radius:0!important;box-shadow:none!important;background:url(img/ui10/hc_btn.webp) center/100% 100% no-repeat!important;justify-content:center;gap:10px;font:400 19px Lilita,system-ui!important;letter-spacing:1px;color:#fff!important;text-shadow:0 2px 0 #1a0638,0 0 10px #c58cff}
+#gBody .gsGo.col img{display:none}#gBody .gsGo.col b{font-weight:400}#gBody .gsGo.col span{font:400 14px Lilita,system-ui!important;color:#ffe082!important}
+#gTeam{margin:10px 6px 4px!important;padding:34px 26px 22px!important;border-radius:0!important;background:none!important;box-shadow:none!important;border:0 solid transparent;border-image:url(img/ui10/bt_panel.webp) 100 140 fill/40px 56px/0 stretch}
+#gTeam .gtH{justify-content:space-between!important;white-space:nowrap;font:400 15px Lilita,system-ui!important;letter-spacing:1px!important;color:#ffe082!important;text-shadow:0 2px 0 #000;margin:0 0 6px!important}
+#gTeam .gtH span{display:none;flex:1;min-width:0;overflow:hidden;margin-left:6px;white-space:nowrap;font:400 10px Lilita,system-ui!important;color:#c9b88a!important;letter-spacing:.3px!important}
+#gTeam .gtH button{--bh:28px;height:28px;flex:none;white-space:nowrap;padding:0 10px!important;border-radius:0!important;box-shadow:none!important;background:none!important;border-style:solid!important;border-color:transparent!important;border-width:0!important;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch!important;font:400 11.5px Lilita,system-ui!important;color:#2a1000!important;text-shadow:0 1px 0 #ffe9a0}
+#gTeam .gtH button.tEd{border-image-source:url(img/ui8/btn_green_s.webp)!important;color:#062a0a!important}
+#gTeam .gtP{font:400 14px Lilita,system-ui!important;color:#ffe27a!important;text-shadow:0 2px 0 #000;letter-spacing:.3px;align-items:flex-end!important}
+#gTeam .gtP small{font:400 11px Lilita,system-ui!important;color:#c9b88a!important}
+#gTeam .gtP{flex-direction:column;align-items:flex-start!important;gap:2px}#gTeam .gtP>span{white-space:nowrap}#gTeam .gtP>span:last-child{font-size:14px}#gTeam .gtP small{font-size:10px!important}
+.gSecH{font:400 15px Lilita,system-ui!important;letter-spacing:1px!important;text-shadow:0 2px 0 #000}
+.gSecH .gSort b{--bh:26px;display:inline-flex;align-items:center;height:26px;padding:0 9px!important;border-radius:0!important;background:none!important;border-style:solid!important;border-color:transparent!important;border-width:0!important;border-image:url(img/ui8/btn_grey_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;font:400 12px Lilita,system-ui!important;color:#d6dde4!important;text-shadow:0 1px 0 #000}
+.gSecH .gSort b.on{border-image-source:url(img/ui8/btn_gold_s.webp);color:#2a1000!important;text-shadow:0 1px 0 #ffe9a0}
+.rsAct .rsA{--bh:46px;height:46px;border-radius:0;box-shadow:none;background:none;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_grey_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;font:400 15.5px Lilita,system-ui;font-style:normal;letter-spacing:.3px;color:#fff;text-shadow:0 2px 0 #000}
+.rsAct .rsA.gold{border-image-source:url(img/ui8/btn_gold_s.webp);color:#2a1600;text-shadow:0 1px 0 #ffe9a0;font-size:16px}
+.rsAct .rsA.blue{border-image-source:url(img/ui8/btn_blue_s.webp);color:#fff;text-shadow:0 2px 0 #062050}
+.rsAct .rsA img{height:1.2em;vertical-align:-.25em}
 </style>
 </body>
 </html>

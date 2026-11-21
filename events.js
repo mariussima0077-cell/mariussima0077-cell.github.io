@@ -27,6 +27,7 @@ const EV={
  wheel:{bn:'wheel',n:'LUCKY WHEEL',ic:'🎡',col:'#ffd54a',d:'Spin the wheel – it gives ONLY diamonds. Free spins come from the event quests below (no buying).',u:'spins',tkk:'dm',
    m:[[3,{tk:1}],[6,{dm:100}],[9,{tk:2,gt:1}],[12,{dm:250}],[15,{tk:3,ct:2}]]}};
 // ranking prizes (sent by Mail by the server when the event ends) – the same table is in server/online.js (EV_RW)
+const MED=n=>n<=1?1:n<=3?2:n<=10?3:n<=50?4:5,MDL=(n,t)=>'<i class="rkm" style="background-image:url(img/ui10/rk_'+MED(n)+'.webp)">'+(t||n)+'</i>'; // v16-120 UI11 rank medals
 const RANKRW=[[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
 const WHEEL=[[20,30],[30,25],[50,18],[80,12],[100,8],[150,4.5],[300,2],[1000,.5]];
 // KEY ROULETTE slices: [dungeon ('any' = one random dungeon, 'all' = every dungeon), keys, chance %]
@@ -117,7 +118,26 @@ const css=`#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716
 #ev .evS{margin:12px 0 4px;font:900 13px system-ui;letter-spacing:1px;color:#c9b6ff}#ev .evP{font:700 11.5px system-ui;color:#b9a8d8;line-height:1.45}#ev .evP .tki{height:1.25em;vertical-align:-.3em}
 #ev .evW{display:flex;flex-direction:column;align-items:center}#ev #evWh{width:min(78vw,300px);height:calc(min(78vw,300px)*645/550);filter:drop-shadow(0 8px 16px #000)}
 #ev .evSpin{margin:8px 0;border:0;border-radius:16px;padding:12px 40px;font:900 20px system-ui;background:linear-gradient(#ffe27a,#ffb300 55%,#e08a00);color:#3a1c00;box-shadow:0 4px 0 #6b3d00,0 0 18px #ffb30088}#ev .evSpin.dis{filter:grayscale(1) brightness(.6)}
-#ev .evNx{margin-top:12px;font:800 12px system-ui;color:#9d8cc0;text-align:center}`;
+#ev .evNx{margin-top:12px;font:800 12px system-ui;color:#9d8cc0;text-align:center}
+/* v16-120 UI11 – Marius' pictures (img/ui10) + game font */
+#ev .evTi,#ev .evTabs b,#ev .evBan h3,#ev .evSc,#ev .evM .g,#ev .evM .r,#ev .evM button,#ev .evRk,#ev .evS,#ev .evPr,#ev .evL,#ev .evT,#ev .evSpin,#ev .evNx{font-family:Lilita,system-ui;font-weight:400;letter-spacing:.3px}
+#ev .evTabs{gap:4px;padding:0 6px}#ev .evTabs b{display:flex;align-items:center;justify-content:center;min-height:50px;box-sizing:border-box;padding:6px 18px 4px;border-radius:0;box-shadow:none;background:none;border-style:solid;border-color:transparent;border-width:14px 34px 10px;border-image:url(img/ui10/ev_tab_off.webp) 70 170 50 fill/14px 34px 10px stretch;margin:0;font-size:13px;line-height:1;color:#d9c8ff;text-shadow:0 2px 0 #000}
+#ev .evTabs b{padding:0}#ev .evTabs b.on{border-image-source:url(img/ui10/ev_tab_on.webp);color:#3a1600;text-shadow:0 1px 0 #ffe9a0;filter:drop-shadow(0 0 8px #ffb30088)}
+#ev .evSc{position:relative;margin:10px auto 6px;width:100%;aspect-ratio:860/166;display:flex;align-items:center;justify-content:center;gap:10px;background:url(img/ui10/ev_score.webp) center/100% 100% no-repeat;font-size:16px;color:#e8dcff;text-shadow:0 2px 0 #000}
+#ev .evSc b{font-size:28px;color:#fff;text-shadow:0 2px 0 #000,0 0 12px var(--c);font-weight:400}
+#ev .evS{display:flex;align-items:center;justify-content:center;height:34px;margin:14px 0 6px;box-sizing:border-box;border-style:solid;border-color:transparent;border-width:0 52px;border-image:url(img/ui10/ev_title.webp) 0 150 fill/0 52px stretch;font-size:15px;letter-spacing:1px;color:#ffe082;text-shadow:0 2px 0 #000}
+#ev .evSn{margin:-3px 0 6px;text-align:center;font:700 11px system-ui;color:#a998cf}
+#ev .evM{position:relative;box-sizing:border-box;width:100%;aspect-ratio:860/182;margin:6px 0;padding:0 5.5% 0 28%;gap:6px;border-radius:0;box-shadow:none!important;opacity:1!important;background:url(img/ui10/ev_row_lock.webp) center/100% 100% no-repeat!important}
+#ev .evM.ok{background-image:url(img/ui10/ev_row_ready.webp)!important}#ev .evM.done{background-image:url(img/ui10/ev_row_done.webp)!important}
+#ev .evM .g{position:absolute;left:10.6%;width:15.4%;top:19%;bottom:18%;min-width:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#ffe082;text-shadow:0 2px 0 #000;white-space:nowrap}
+#ev .evM .r{min-width:0;font-size:15px;text-shadow:0 2px 0 #000;white-space:nowrap}#ev .evM.done .r{opacity:.6}
+#ev .evM button{width:84px;height:38px;font-size:15px;font-style:normal}#ev .evM.done button{visibility:hidden}
+#ev .evRk{display:block;width:100%;aspect-ratio:860/183;height:auto;margin:12px 0 4px;padding:0 6% 0 24%;border-radius:0;box-shadow:none;background:url(img/ui10/ev_rank_btn.webp) center/100% 100% no-repeat;font-size:21px;color:#fff;text-shadow:0 2px 0 #062050,0 0 10px #4fc3ff}
+#ev .evRk:active{transform:scale(.97)}
+#ev .evPz{display:flex;flex-direction:column;gap:5px}#ev .evPr{display:flex;align-items:center;gap:10px;padding:4px 10px 4px 6px;border-radius:12px;background:linear-gradient(90deg,#2a1f44ee,#150f2499);box-shadow:inset 0 0 0 1px #5d4a8566;font-size:15px;color:#f0e6ff;text-shadow:0 2px 0 #000}
+#ev .evPr .tki,#ev .evL .tki{height:1.25em;vertical-align:-.3em}
+#ev i.rkm{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:50px;min-width:0;background:center/contain no-repeat;font:400 13px Lilita,system-ui;font-style:normal;color:#fff;text-shadow:0 0 3px #000,0 1px 0 #000,0 0 6px #000;padding-bottom:4px;box-sizing:border-box}
+#ev .evL{padding:3px 10px 3px 4px;font-size:15px}#ev .evL b{font-weight:400;color:#ffe082}`;
 let el,tab='A',view='main';
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);el=document.createElement('div');el.id='ev';
   el.innerHTML='<div class="evTop"><button class="evX" data-e="x">↩</button><div class="evTi">EVENTS</div></div><div class="evTabs" id="evTabs"></div><div class="evB" id="evBody"></div>';document.body.appendChild(el);
@@ -134,17 +154,17 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
-  h+='<div class="evSc">YOUR '+E.u.toUpperCase()+': <b>'+T().nf(sc)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
+  h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+T().nf(sc)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
   if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
-    h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="r">'+x[1]+'<div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><div class="g">'+v+'/'+x[2]+'</div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
+    h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+v+'/'+x[2]+'</div><div class="r">'+x[1]+'<div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
   h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+T().nf(g)+'</div><div class="r">'+rwHtml(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
-  h+='<button class="evRk" data-e="rk">🏆 TOP 100 RANKING</button>'+rkPrizes(st);
+  h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
   const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+EV[nx.k].ic+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div>';
   body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
-function rkPrizes(st){const k=EV[st.k].tkk,ic=k==='gt'?GT:k==='ct'?CT:k==='tk'?TK:'';return '<div class="evS">RANKING PRIZES (by Mail when the event ends)</div><div class="evP">'+RANKRW.map(r=>'#'+(r[0]===r[1]?r[0]:r[0]+'-'+r[1])+': '+DM()+' '+(k==='dm'?r[2]*1.5:r[2])+(ic?' + '+ic+' '+r[3]:'')).join('<br>')+'</div>';}
+function rkPrizes(st){const k=EV[st.k].tkk,ic=k==='gt'?GT:k==='ct'?CT:k==='tk'?TK:'';return '<div class="evS">RANKING PRIZES</div><div class="evSn">sent by Mail when the event ends</div><div class="evPz">'+RANKRW.map(r=>'<div class="evPr">'+MDL(r[0],r[0]===r[1]?r[0]:r[0]+'-'+r[1])+'<span>'+DM()+' '+(k==='dm'?r[2]*1.5:r[2])+(ic?' &nbsp;+&nbsp; '+ic+' '+r[3]:'')+'</span></div>').join('')+'</div>';}
 async function showRank(){const r=await rank(tab),L=document.getElementById('evRkL');if(!L)return;if(!r){L.innerHTML='<div class="evP" style="text-align:center;margin:20px">The ranking needs internet. Your score is saved and sent later.</div>';return;}
   rk[S()[tab].id]={rank:r.rank,t:Date.now()};
-  L.innerHTML=(r.top.length?r.top.map((p,i)=>'<div class="evL'+(p.uid===r.me?' me':'')+'"><i>#'+(i+1)+'</i><span>'+esc(p.name||'Mechanic')+'</span><b>'+T().nf(p.sc)+'</b></div>').join(''):'<div class="evP" style="text-align:center;margin:20px">Nobody yet – be the first!</div>')+(r.rank?'<div class="evL me"><i>#'+r.rank+'</i><span>YOU</span><b>'+T().nf(r.sc)+'</b></div>':'');}
+  L.innerHTML=(r.top.length?r.top.map((p,i)=>'<div class="evL'+(p.uid===r.me?' me':'')+'">'+MDL(i+1)+'<span>'+esc(p.name||'Mechanic')+'</span><b>'+T().nf(p.sc)+'</b></div>').join(''):'<div class="evP" style="text-align:center;margin:20px">Nobody yet – be the first!</div>')+(r.rank?'<div class="evL me">'+MDL(r.rank)+'<span>YOU</span><b>'+T().nf(r.sc)+'</b></div>':'');}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function open(){build();S();view='main';el.classList.add('open');render();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}if(!spinning&&view==='main')render();},30000);}
 window.EVT={add,q,tick,open,dot,state:S,cur};

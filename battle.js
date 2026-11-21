@@ -2678,7 +2678,7 @@ function gHero(){const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=
 function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(CPX().best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
 function lvCan(id){const T=TE(),G=T.G,l=T.lvOf(id),c=T.lvCap(id),e=G.ess||0;return l<c?e>=T.lvCost(l):c<T.LV_MAX&&e>=T.ascCost(T.ascOf(id));}
 function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
-  $m('gGSB').innerHTML=GTKI0+' <b>GEAR SUMMON</b> <span>'+GSD().tk+' tickets</span>';
+  $m('gGSB').innerHTML='<b>GEAR SUMMON</b><span><img src="img/gticket.webp" alt="">'+GSD().tk.toLocaleString()+'</span>';
   $m('gMoney').innerHTML=T.ESI+' '+T.nf(G.ess||0)+' &nbsp;'+T.GPI+' '+T.nf(G.gp||0); // v16-99: Essence (hero levels) + Gear Parts (gear upgrades)
   tsel=curTeamList().map(x=>x.id);const team=tsel;let L=myMechs();
   if(gsort==='pow')L=L.slice().sort((a,b)=>pow(b)-pow(a));else if(gsort==='gr')L=L.slice().sort((a,b)=>(b.gr||0)-(a.gr||0)||stars(b)-stars(a));
@@ -2693,7 +2693,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gSort').innerHTML=[['pow','POWER'],['gr','GRADE']].map(([k,n])=>`<b data-sort="${k}" class="${gsort===k?'on':''}">${n}</b>`).join('');
   const fz=T.canFuse?T.canFuse:()=>false;
   $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">+${stars(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
-  $m('gHSB').innerHTML='🎟️ <b>HERO SUMMON</b><span>'+T.G.h.tk+' tickets</span>';
+  $m('gHSB').innerHTML='<b>HERO SUMMON</b><span><img src="img/ticket.webp" alt="">'+T.G.h.tk.toLocaleString()+'</span>';
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon mechanics first – the Rookie Crew can't use gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
