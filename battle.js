@@ -750,7 +750,8 @@ const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{
 const hardOK=()=>TE().G.cp.best>=SPC;
 const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K:1);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
-const stageMul0=i=>stageMulB(i)*GK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
+const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a normal team has 3-4 roles (+5-10%) → monsters +7% (from stage 15); 5 roles = a bit easier, 1-2 roles = a bit harder
+const stageMul0=i=>stageMulB(i)*GK(i)*TRK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
 const stageMulB=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
 // v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
 const CP_MON=.25; // v16-99: .35→.25 – gear does not cost money any more (Gear Parts), money is only for the garage
@@ -983,7 +984,7 @@ function crewHero(k){return {id:'crew'+k,crew:true,n:CREW_NAMES[k],gr:0,cat:'m',
 function teamHeroes(){const T=TE(),ids=(T.G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&T.G.h.own[id]);
   return ids.slice(0,5).map(id=>id.startsWith('crew')?crewHero(+id.slice(4)):T.HB[id]);}
 function bestTeam(){return myMechs().slice(0,5).map(h=>h.id);} // v16-122 (Marius): no more old 'Rookie Crew' helpers – only your real heroes
-function teamPower(list){return list.reduce((a,h)=>a+pow(h),0);}
+function teamPower(list){const L=list.filter(Boolean),k=1+teamRoles(L.filter(h=>!h.crew)).bon;return Math.round(L.reduce((a,h)=>a+pow(h)*(h.crew?1:k),0));} // v16-136: + TEAM ROLES bonus
 // v15: early bosses are easier (no long wall at the start of the game)
 const BEASE=c=>[.42,.55,.68,.8,.8][c]??.72; // v16-40: 2-month test – chapter bosses were walls of 7-13 days (5-20 .9→.8, chapter 6+ 1→.72)
 const stEase=i=>{const s=STAGES[i];return s.boss?BEASE(s.c):s.mini?(1+BEASE(s.c))/2:1;};
@@ -1584,7 +1585,7 @@ function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(2,window.devic
 // v16-40: no wall longer than ~2 days (Marius' rule) – after 2 days the training grows faster: +15% every 6 h, up to +300%
 const GRIT_N=24,gritK=n=>n<=8?n*.075:.6+(n-8)*.15,gritStep=n=>n<8?.075:.15;
 function grit(si){const P=CPX(),st=P.stuck;if(!st||st.si!==si||si!==P.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
-function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=1+(B.grit||0)+(B.nit||0);
+function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=(1+(B.grit||0)+(B.nit||0))*(1+(B.trb||0)); // v16-136: TEAM ROLES bonus (+5/10/15% ATK & HP)
   return {hero:1,h,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,eg:s.eg,
     skK:h.crew?1:1+.06*((TE().skLv?TE().skLv(h.id):1)-1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),shots:0,fcT:3,ekCd:0,swT:0};}
 function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);const m=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);
@@ -1609,6 +1610,7 @@ function startBattle(si,team,tw){
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
   B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)TE().toast('⚡ NITRO BOOST: +'+Math.round(B.nit*100)+'% HP & attack',2400);},B.grit?2700:0);
   B.lowRes=LOWRES;if(!bsize())buildBG();
+  B.trb=teamRoles(team).bon;
   B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr){sprLoad(u.spr);warmIm(u.spr.im);warmIm(u.spr.fi);warmIm(u.spr.bi);}});if(!window.__SIM)for(const k in FXIM)warmIm(FXIM[k]);
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
   spawnWave();
@@ -2771,7 +2773,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const tl=team.map(heroOf),tp=teamPower(tl),si=Math.max(0,Math.min(NST-1,tsi==null?CPX().best:tsi)),ep=enemyPower(si),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
   renderPeds(tl);
   $m('gTeam').innerHTML=`<div class="gtH">⚔️ BATTLE TEAM <span style="color:#c9b88a;font-size:10px;letter-spacing:0">for ALL battles</span><button data-g="best">${IMGI(glyphURL('bolt','#2a1000'))} AUTO BEST</button></div>
-    <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`+(()=>{const R=teamRoles(tl),miss=Object.keys(BROLE).filter(k=>!R.have.has(k));return `<div class="gtR"><div class="gtRi">${Object.keys(BROLE).map(k=>`<img src="${RLI(k)}" class="${R.have.has(k)?'on':''}" alt="${BROLE[k].n}">`).join('')}</div><div class="gtRt"><b>TEAM ROLES ${R.n}/5</b><small>${miss.length?'missing: '+miss.map(k=>BROLE[k].n).join(', '):'all roles – max bonus!'}</small></div></div>`;})();
+    <div class="gtP"><span>${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <small>team power</small></span><span style="color:${col}">${tp>=ep*1.15?'EASY':tp>=ep*.85?'EVEN':'HARD'} <small>vs stage ${sLabel(si)} · ${ep.toLocaleString()}</small></span></div>`+(()=>{const R=teamRoles(tl),miss=Object.keys(BROLE).filter(k=>!R.have.has(k));return `<div class="gtR"><div class="gtRi">${Object.keys(BROLE).map(k=>`<img src="${RLI(k)}" class="${R.have.has(k)?'on':''}" alt="${BROLE[k].n}">`).join('')}</div><div class="gtRt"><b>TEAM ROLES ${R.n}/5 · <span style="color:${R.bon?'#66ff99':'#c9b88a'}">${R.bon?'+'+Math.round(R.bon*100)+'% ATK &amp; HP':'no bonus'}</span></b><small>${miss.length?'missing: '+miss.map(k=>BROLE[k].n).join(', ')+' · 3 roles +5% · 4 +10% · 5 +15%':'all 5 roles – max bonus!'}</small></div></div>`;})();
   $m('gBagS').textContent=g.inv.length+'/'+GINV_();
   {const C=collInfo();$m('gColS').textContent=C.reduce((a,c)=>a+c.n,0)+' / '+C.reduce((a,c)=>a+c.tot,0);}
   $m('gCnt').textContent=L.length+' heroes';
@@ -3412,7 +3414,7 @@ function mini(X,id,an,t,x,y,hgt,face,ph){const d=SPRD[id];if(!sprOK(d))return fa
   sprBlit(X,d,row,c,k);X.restore();return true;}
 
 // v16-45: ARENA (online PvP) – the battle team as numbers for the server (stats incl. gear) + a pose drawer for the arena fight
-function arenaTeam(){return curTeamList().filter(Boolean).map(h=>{const s=unitStats(h),R=ROLE[roleOf(h)];
+function arenaTeam(){const L=curTeamList().filter(Boolean),tb=1+teamRoles(L.filter(h=>!h.crew)).bon;return L.map(h=>{const s=unitStats(h),R=ROLE[roleOf(h)];if(!h.crew&&tb>1){s.hp=Math.round(s.hp*tb);s.atk*=tb;} // v16-136: TEAM ROLES bonus also in the Arena
   return {id:h.id,n:h.n,gr:h.gr||0,s:stars(h),role:roleOf(h),hp:s.hp,atk:Math.round(s.atk*10)/10,def:Math.round(s.def*10)/10,as:Math.round(s.as*1000)/1000,crit:Math.round(s.crit*1000)/1000,rng:s.rng,eg:Math.round(s.eg*100)/100,pw:powS(s,R)};});}
 // pose: idle · walk · atk · skill · hurt · ko · win ; k = 0..1 progress of one-shot poses
 function pose(X,id,ps,t,k,x,y,hgt,face){const d=SPRD[id];if(!sprOK(d))return false;const R=d.R||[0,1,2,3,4,5];let f;
