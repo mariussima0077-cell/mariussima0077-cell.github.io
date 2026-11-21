@@ -124,4 +124,5 @@ STYLE: premium mobile game art (AFK Arena quality), Torque Empire garage-mechani
 Fiecare prompt = antetul comun + rândul „Animation”:
 Antet: Use the attached picture as the character reference (same design, colors, golden rim crown, proportions). Image 1536x1024, pure flat chroma-green background (#00FF00), no shadows on the green, no text, no grid lines, no borders. 6 frames in a 3x2 grid (3 columns, 2 rows, read left to right, top to bottom), each frame 512x512, the boss centered in its cell, same size and same ground line in every frame, nothing touching the cell edges. Character: "CRUSHER KING" … FACING LEFT. + STYLE.
 ➡️ **INFERNO PISTON** (trimis 21 nov): 7 poze – intro, idle, attack, skill „V12 ERUPTION”, fxlava (4 fâșii 1536×256 = val de lavă cu stâlpi de foc spre stânga), hit, enrage → `img/sheets/wb/inferno2/inferno_*.webp`. Referința = cadrul 1 din `inferno.webp`.
-Apoi: TOW SERPENT (același format).
+➡️ **TOW SERPENT** (trimis 21 nov): 7 poze – intro, idle, attack, skill „CHAIN STORM”, fxchain (4 fâșii 1536×256 = lanț cu cârlig de macara care zboară spre stânga + scântei), hit, enrage → `img/sheets/wb/tow2/tow_*.webp`. Referința = cadrul 1 din `tow.webp`.
+Toate cele 4 World Boss au acum prompturi în formatul nou.
