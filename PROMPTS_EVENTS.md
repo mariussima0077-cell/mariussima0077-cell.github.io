@@ -49,3 +49,18 @@ Când vin pozele: originale în `img/sheets/ui10/`, Claude decupează în `img/u
 ## KEY ROULETTE (21 nov 2026) – 2 poze opționale
 1. **Banner** `img/ui9/evb_key.webp` – în joc 900×360 (2,5:1, lățimea paginii pe 360 px ×2,5). ChatGPT 1536x1024, apoi decupat la 2,5:1. Referință: bannerul LUCKY WHEEL (aceeași ramă, aceeași poziție a titlului: jumătatea stângă rămâne liberă pentru text).
 2. **Disc** `img/ui9/kwheel_disc.webp` – în joc 441×441 (discul se învârte în rama roții). ChatGPT 1024x1024, fond verde, decupat rotund. 8 felii goale, FĂRĂ text/iconițe (cheile și cifrele le pune jocul). Referință: discul LUCKY WHEEL.
+
+## UI11 (21 nov 2026) – Marius: „nu-mi place scrisul și ramele din cod” (Events + HEROES + My Crew)
+Promptuile 1-5 de mai sus (EVENTS) NU au fost încă făcute (`img/ui10/` nu există) → rămân valabile. În plus:
+
+### 6 · Tab-urile EVENTS (activ / inactiv) → `img/ui10/ev_tab_on.webp`, `ev_tab_off.webp`
+În joc: 165×46 px (3,6:1). În poză: 2 tab-uri ~1300×340 una sub alta, ChatGPT 1536x1024. Referință: `ev_bg`.
+
+### 7 · Butoanele HERO SUMMON / GEAR SUMMON / BAG → `img/ui10/hs_btn_gold.webp`, `hs_btn_blue.webp`, `hs_btn_bag.webp`
+În joc: ~108×58 px fiecare (1,9:1). În poză: 3 butoane ~460×250 unul lângă altul, ChatGPT 1536x1024. Referință: `heroes_h`. Iconița biletului și a sacului le pune jocul (regula „o singură iconiță”).
+
+### 8 · Rama BATTLE TEAM + butonul HERO COLLECTION → `img/ui10/bt_panel.webp`, `hc_btn.webp`
+În joc: rama 340×155 px (2,2:1, 9-slice), butonul 340×52 (6,5:1). În poză: rama ~1440×620 sus, butonul ~1440×220 jos, ChatGPT 1536x1024. Referință: `heroes_h`.
+
+Fără poze noi (se folosesc pozele lui deja în joc `img/ui8/btn_*`): POWER/GRADE, AUTO BEST mic, rândul My Crew (AUTO BEST / Collection / Summon).
+Scrisul: font de joc gros (Lilita One, gratuit OFL, pus local) pentru titluri/butoane/cifre – Claude arată înainte/după.

@@ -311,3 +311,4 @@ Machetă: https://mariussima0077-cell.github.io/preview/shop.html · în joc: te
 ## Imagini (21 nov 2026, ramura pending-v16-120)
 - Diamond Pass, Founder Pass, cadrul FOUNDER: primite și puse. Nu lipsește nimic pentru ele.
 - Prețuri/produse noi de creat în Play Console: vezi PENDING_UPDATE.md secțiunea 6.
+- **UI11 (21 nov) – LIPSESC 8 poze** (ramele/butoanele încă din cod pe EVENTS, HEROES, My Crew): prompturile 1-8 în `PROMPTS_EVENTS.md` (1-5 EVENTS vechi + 6 tab-uri EVENTS, 7 butoanele summon/BAG, 8 rama BATTLE TEAM + HERO COLLECTION). + font de joc (Lilita One) cu înainte/după.
