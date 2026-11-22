@@ -116,7 +116,9 @@ async function report(b, env) {
     if (s.tk - old.tk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
     if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
     if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
-    if (s.best - old.best > 30 + dt / 90) { pts += 30; why.push(`campaign +${s.best - old.best} stages`); }
+    // v16-151 (Wazza4ever banned 22 nov): AUTO NEXT (v16-25) + battle speed x3 + a strong team clear easy stages in ~8 s each
+    // while the game is just left ON → old limit (30 + 1 per 90 s) banned honest players. Now ~1 stage per 5 s, only 15 pts.
+    if (s.best - old.best > 30 + dt / 5) { pts += 15; why.push(`campaign +${s.best - old.best} stages`); }
     // v16-150 (server): since v16-129 garages are upgraded with PARTS (LV1-10 = 40-350 parts, ~350 parts per new stage at stage 100,
     // + the parts gift for old saves) → +30 levels in one session is normal. Old rule (12 + 1 per 10 min, 30 pts) flagged honest testers.
     // Now: only a huge jump (most of the map at once) and only 15 pts (never a ban by itself; max total is ~140).
@@ -148,6 +150,8 @@ async function scan(env) {
     if (r.m1 - r.m0 > capPerSec(p.lv) * dt / 4 + 5e7) why.push('24h money too high');
     const nb24 = ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(p.pid, now - day).first()) || {n:0}).n;   // v16-122
     if (r.v1 - r.v0 > 400 + nb24 * 2100 && !isGift(p.pid)) why.push('24h VIP points too high');
+    // v16-151: the bot runs every 10 min – a 24h rule may add points only ONCE per 24h (before: +50 every 10 min = ban in 20 min)
+    if (why.length && await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'bot:%'").bind(p.pid, now - day).first()) continue;
     if (why.length) {
       const score = p.score + 50, ban = score >= BAN_AT ? 1 : 0;
       await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, why.join(' · '), p.pid).run();
@@ -166,6 +170,18 @@ async function scan(env) {
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(e.pid, now, p.banned && !ban ? 'unban' : 'fix', `buildings rule recalibrated: -${30 * e.n} pts`).run();
     }
     await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'fix', 'v16-150 buildings').run();
+  }
+  // a3) v16-151 (server, once): same for the old 'campaign +N stages' rule (AUTO NEXT + speed x3 banned Wazza4ever on 22 nov)
+  if (!(await db.prepare("SELECT 1 FROM events WHERE kind='fix' AND detail='v16-151 campaign'").first())) {
+    const ev = (await db.prepare("SELECT pid, COUNT(*) n FROM events WHERE kind IN ('flag','ban') AND t>? AND detail LIKE 'campaign +%' AND detail NOT LIKE '%·%' GROUP BY pid").bind(now - 7 * day).all()).results;
+    for (const e of ev) {
+      const p = await db.prepare('SELECT score, banned, reason FROM players WHERE pid=?').bind(e.pid).first();
+      if (!p || /by admin/.test(p.reason || '')) continue;
+      const score = Math.max(0, p.score - 30 * e.n), ban = p.banned && score >= BAN_AT ? 1 : 0;
+      await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, score ? p.reason : null, e.pid).run();
+      await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(e.pid, now, p.banned && !ban ? 'unban' : 'fix', `campaign rule recalibrated: -${30 * e.n} pts`).run();
+    }
+    await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'fix', 'v16-151 campaign').run();
   }
   // b) the same purchase token used by different players = shared / stolen purchase
   const dup = (await db.prepare('SELECT token, COUNT(DISTINCT pid) n FROM purchase_use GROUP BY token HAVING n>2').all()).results;
