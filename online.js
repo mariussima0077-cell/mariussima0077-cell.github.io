@@ -16,7 +16,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=151;
+const CV=152;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -663,7 +663,9 @@ function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u
       setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
     $('olCont').onclick=()=>{const tro=F&&F.trOpen,oe=r.onEnd;$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(tro){root.classList.remove('open');}if(oe){try{oe();}catch(e){}return;}if(cur==='olArena'){arData=null;loadArena();}};},1100);}
 let crowd=null;
-function arenaBg(W,H,t){if(F&&F.r&&F.r.bg){const I=im(F.r.bg);if(I.complete&&I.naturalWidth){const k=Math.max(W/I.naturalWidth,H/I.naturalHeight),w=I.naturalWidth*k,h=I.naturalHeight*k;g.drawImage(I,(W-w)/2,(H-h)*.35,w,h);return;}}   // v16-146 RAIL WARS
+// v16-152: moving floodlight beams over the Arena picture (cheap: 4 gradients)
+function arenaLights(W,H,t){g.save();g.globalCompositeOperation='lighter';for(let k=0;k<4;k++){const sx=W*(k<2?.08+k*.12:.92-(k-2)*.12),a=(k<2?.35:-.35)+Math.sin(t*.7+k*1.7)*.22;g.save();g.translate(sx,H*.04);g.rotate(a);const lg=g.createLinearGradient(0,0,0,H*.6);lg.addColorStop(0,k%2?'#ff7af02a':'#7ad8ff2a');lg.addColorStop(1,'#0000');g.fillStyle=lg;g.beginPath();g.moveTo(-W*.012,0);g.lineTo(W*.012,0);g.lineTo(W*.11,H*.6);g.lineTo(-W*.11,H*.6);g.fill();g.restore();}g.restore();}
+function arenaBg(W,H,t){{const I=im(F&&F.r&&F.r.bg||'img/arena/ar_battle.webp');if(I.complete&&I.naturalWidth){const k=Math.max(W/I.naturalWidth,H/I.naturalHeight),w=I.naturalWidth*k,h=I.naturalHeight*k;g.drawImage(I,(W-w)/2,(H-h)*.35,w,h);if(!(F&&F.r&&F.r.bg))arenaLights(W,H,t);return;}}   // v16-146 RAIL WARS
   let gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#12061f');gr.addColorStop(.42,'#3a1858');gr.addColorStop(.6,'#1a1030');gr.addColorStop(1,'#05030a');g.fillStyle=gr;g.fillRect(0,0,W,H);
   if(!crowd){crowd=[];for(let i=0;i<140;i++)crowd.push([Math.random(),.3+Math.random()*.15,Math.random()*360,Math.random()*6]);}
   for(const c of crowd){g.fillStyle=`hsl(${c[2]},35%,${16+c[1]*20}%)`;g.beginPath();g.arc(c[0]*W,c[1]*H-Math.abs(Math.sin(t*5+c[3]))*H*.006,W*.017,0,7);g.fill();}
@@ -673,7 +675,7 @@ function arenaBg(W,H,t){if(F&&F.r&&F.r.bg){const I=im(F.r.bg);if(I.complete&&I.n
   g.lineWidth=W*.008;g.strokeStyle=`hsl(${280+Math.sin(t*2)*30},100%,70%)`;g.shadowColor='#c35cff';g.shadowBlur=W*.03;g.beginPath();g.arc(0,0,W*.5,0,7);g.stroke();g.strokeStyle='#ffd54a99';g.beginPath();g.arc(0,0,W*.18,0,7);g.stroke();
   g.rotate(t*.3);g.strokeStyle='#ffd54a55';g.lineWidth=W*.004;g.shadowBlur=0;for(let k=0;k<12;k++){g.rotate(Math.PI/6);g.beginPath();g.moveTo(W*.2,0);g.lineTo(W*.48,0);g.stroke();}g.restore();
   g.font=`italic 900 ${W*.06}px Game,system-ui`;g.textAlign='center';const tg=g.createLinearGradient(0,H*.2,0,H*.26);tg.addColorStop(0,'#fffbe6');tg.addColorStop(1,'#e08a00');g.fillStyle=tg;g.shadowColor='#ffb300';g.shadowBlur=W*.03;g.fillText('TORQUE ARENA',W/2,H*.255);g.shadowBlur=0;}
-function drawU(u,W,H){const p=upos(u,W,H),S=H*.15,face=u.side?-1:1;const c=C();
+function drawU(u,W,H){const p=upos(u,W,H),S=H*.125,face=u.side?-1:1;const c=C();
   g.fillStyle='#0009';g.beginPath();g.ellipse(p.x,p.y,S*.3,S*.07,0,0,7);g.fill();
   if(u.ps==='skill'){g.globalCompositeOperation='lighter';const r=S*(.45+u.pt*.7);const rg=g.createRadialGradient(p.x,p.y-S*.4,0,p.x,p.y-S*.4,r);rg.addColorStop(0,'#ffd54a99');rg.addColorStop(1,'#ffd54a00');g.fillStyle=rg;g.beginPath();g.arc(p.x,p.y-S*.4,r,0,7);g.fill();g.globalCompositeOperation='source-over';}
   const k=u.ps==='atk'?Math.min(1,u.pt/.45):u.ps==='skill'?Math.min(1,u.pt/.8):u.ps==='ko'?Math.min(1,u.pt/.6):0;
@@ -713,7 +715,7 @@ const A2RING=[[.42,0],[.36,-.075],[.36,.075],[.62,-.04],[.62,.04]];   // v16-149
 const A2SL={m:[[.37,.63],[.33,.77],[.39,.51],[.31,.89],[.41,.70]],r:[[.18,.58],[.14,.74],[.21,.87],[.16,.47],[.23,.66]]};
 const RCOL={engine:'#ff8a3d',tuning:'#ff4a2a',inspect:'#3de0ff',service:'#7dff8a',paint:'#ff5ce1',elec:'#9fd8ff',all:'#ffd54a',crew:'#ffd54a'};
 const SPI=id=>(C()&&C().spr&&C().spr(id))||null;
-function a2Init(){const W=fc.width,H=fc.height,S=H*.165;F.S=S;F.q=[];F.pt=[];F.dec=[];F.bm=[];F.cam={z:1,x:W/2,y:H*.62};F.hs=0;F.ia=0;F.cine=null;
+function a2Init(){const W=fc.width,H=fc.height,S=H*.135;F.S=S;   /* v16-152: heroes ~18% smaller (Marius) */F.q=[];F.pt=[];F.dec=[];F.bm=[];F.cam={z:1,x:W/2,y:H*.62};F.hs=0;F.ia=0;F.cine=null;
   const ml=F.U.map(()=>[0,0]);F.r.log.forEach(e=>{if(e.k==='m')ml[e.a][0]++;else if(e.k==='r')ml[e.a][1]++;});
   const cnt=[{m:0,r:0},{m:0,r:0}];
   F.U.forEach((u,i)=>{u.mel=ml[i][0]>=ml[i][1]&&(ml[i][0]>0||u.role==='engine'||u.role==='tuning');const k=u.mel?'m':'r',L=A2SL[k][cnt[u.side][k]++%5];
