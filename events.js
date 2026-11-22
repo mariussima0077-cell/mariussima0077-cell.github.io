@@ -8,7 +8,8 @@
 (function(){
 const T=()=>window.__TE;
 const E0=Date.UTC(2026,10,20),DUR=3*864e5;
-const TRK={A:['hero','gear','crew'],B:['ess','dia','wheel','key','cash']};   // v16-129: CASH ROULETTE added at the end (same order as the server)
+const TRK={A:['hero','gear','crew','dgr'],   // v16-161: DUNGEON RUSH added at the END of track A (events A0-A2 stay the same)
+B:['ess','dia','wheel','key','cash']};   // v16-129: CASH ROULETTE added at the end (same order as the server)
 const TK='<img class="tki" src="img/ticket.webp" alt="">',CT='<img class="tki" src="img/cticket.webp" alt="">',GT='<img class="tki" src="img/gticket.webp" alt="">';
 const DM=()=>T().DMI,ES=()=>T().ESI;
 const EV={
@@ -24,6 +25,9 @@ const EV={
    m:[[300,{tk:2}],[800,{dm:80}],[1500,{tk:3,gt:2}],[3000,{dm:250}],[5000,{tk:5,ct:3}],[8000,{dm:500}],[12000,{tk:8,gt:5}],[20000,{dm:1200,tk:10}]]},
  key:{bn:'key',n:'KEY ROULETTE',ic:'🔑',col:'#4fc3f7',d:'Spin the roulette – it gives ONLY Dungeon keys. Won keys are BONUS keys: they stack, never expire and wait for you (daily keys are used first). Free spins come only from the event quests below (no buying).',u:'spins',tkk:'dm',
    m:[[3,{tk:1}],[6,{dm:100}],[9,{tk:2,gt:1}],[12,{dm:250}],[15,{tk:3,ct:2}]]},
+ // v16-161 (Marius 22 nov): DUNGEON RUSH – every Dungeon key used (win or SWEEP) counts
+ dgr:{bn:'dgr',n:'DUNGEON RUSH',ic:'🔑',col:'#26a69a',d:'Use Dungeon keys (a victory or a SWEEP). Every key used counts – your stacked bonus keys too!',u:'keys used',tkk:'tk',
+   m:[[5,{dm:50}],[10,{tk:2}],[15,{dm:100}],[20,{gt:2}],[30,{dm:200}],[40,{tk:4}],[60,{dm:400,gt:3}],[90,{dm:600,tk:6}]]},
  // v16-129 (Marius 21 nov): CASH ROULETTE – NO quests: spins are bought with garage CASH, every spin costs more, max CW_MAX spins per event. Wins garage upgrade parts + Dungeon keys.
  cash:{bn:'cash',n:'CASH ROULETTE',ic:'💰',col:'#ffb300',d:'Spend your garage CASH on spins – win garage upgrade PARTS and Dungeon keys. No quests: every spin costs more than the one before, max 25 spins per event.',u:'spins',tkk:'tk',
    m:[[3,{tk:1}],[6,{dm:100}],[10,{tk:2,gt:1}],[15,{dm:250}],[20,{tk:3,ct:2}],[25,{dm:400,tk:5}]]},
@@ -63,8 +67,8 @@ async function rank(tr){const st=S()[tr];if(!window.ONLINE||!ONLINE.call)return 
 // ---------------- rewards
 // v16-125 (Marius: "nothing in the frames, only text"): rewards as big icons + gold number pictures, the event's own icon in the left box
 const NH=(v,em)=>T().numH?T().numH(String(v),'gold',em||1.05):String(v);
-const evTabIc=E=>['hero','gear','crew','ess','dia','key'].includes(E.bn)?evIc(E):E.ic; // v16-140: one icon per resource (no 🎟/💎 emoji)
-const evIc=E=>E.u==='essence'?ES():E.u==='diamonds'?DM():E.bn==='key'?'<img class="tki" src="img/wb/key.webp" alt="">':E.tkk==='gt'?GT:E.tkk==='ct'?CT:TK;
+const evTabIc=E=>['hero','gear','crew','ess','dia','key','dgr'].includes(E.bn)?evIc(E):E.ic; // v16-140: one icon per resource (no 🎟/💎 emoji)
+const evIc=E=>E.u==='essence'?ES():E.u==='diamonds'?DM():E.bn==='key'||E.bn==='dgr'?'<img class="tki" src="img/wb/key.webp" alt="">':E.tkk==='gt'?GT:E.tkk==='ct'?CT:TK;
 function rwBig(r){const a=[];if(r.dm)a.push([DM(),r.dm]);if(r.tk)a.push([TK,r.tk]);if(r.gt)a.push([GT,r.gt]);if(r.ct)a.push([CT,r.ct]);if(r.ess)a.push([ES(),T().nf(r.ess)]);return a.map(([i,v])=>'<span class="evRw">'+i+NH((typeof v==='number'?'×':'')+v,1)+'</span>').join('');}
 function rwHtml(r){const a=[];if(r.dm)a.push(DM()+' '+r.dm);if(r.tk)a.push(TK+' '+r.tk);if(r.gt)a.push(GT+' '+r.gt);if(r.ct)a.push(CT+' '+r.ct);if(r.ess)a.push(ES()+' '+T().nf(r.ess));return a.join(' ');}
 function realRw(st,r){const o={...r};if(o.ess)o.ess=Math.round(o.ess*(st.b||300));return o;}
@@ -168,6 +172,9 @@ const css=`#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716
 #ev .evPz{gap:2px}#ev .evPr{position:relative;box-sizing:border-box;width:100%;aspect-ratio:860/150;padding:0 5% 0 28%;border-radius:0;box-shadow:none;background:url(img/ui10/ev_row_lock.webp) center/100% 100% no-repeat}
 #ev .evPr .rkm{position:absolute;left:18.3%;top:50%;transform:translate(-50%,-50%) scale(1.15)}#ev .evPr .pz{display:flex;align-items:center;flex-wrap:nowrap}
 #ev i.rkm{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:50px;min-width:0;background:center/contain no-repeat;font:400 13px Lilita,Game,system-ui;font-style:normal;color:#fff;text-shadow:0 0 3px #000,0 1px 0 #000,0 0 6px #000;padding-bottom:4px;box-sizing:border-box}
+#ev .evSch{display:block;width:100%;margin:10px 0 4px;padding:11px;border:0;border-radius:14px;background:linear-gradient(#3a2d5c,#1d1533);box-shadow:inset 0 0 0 2px #ffd54a,0 4px 10px #0008;font:400 16px Lilita,Game,system-ui;color:#ffe082;text-shadow:0 2px 0 #000}
+#ev .evCal{display:flex;align-items:center;gap:10px;margin:5px 0;padding:8px 10px;border-radius:12px;background:linear-gradient(90deg,#2a1f44,#150f24);box-shadow:inset 4px 0 0 var(--c),inset 0 0 0 1px #5d4a8588}#ev .evCal.on{box-shadow:inset 4px 0 0 var(--c),inset 0 0 0 2px #ffd54a;background:linear-gradient(90deg,#3d2c10,#1a1230)}
+#ev .evCal i{flex:none;width:30px;text-align:center;font-style:normal;font-size:20px}#ev .evCal i .tki{height:28px;width:auto}#ev .evCal div{flex:1;min-width:0}#ev .evCal b{display:block;font:400 14.5px Lilita,Game,system-ui;color:#fff;letter-spacing:.3px}#ev .evCal small{display:block;font:700 11px Game,system-ui;color:#c9b6ff}#ev .evCal em{flex:none;font:400 12px Lilita,Game,system-ui;font-style:normal;color:#ffd54a;text-align:right;max-width:30%}
 #ev .evL{padding:3px 10px 3px 4px;font-size:15px}#ev .evL b{font-weight:400;color:#ffe082}`;
 let el,tab='A',view='main';
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);el=document.createElement('div');el.id='ev';
@@ -178,11 +185,13 @@ function build(){if(el)return;const st=document.createElement('style');st.textCo
     else if(a==='cl')claim(t.dataset.t,+t.dataset.i);
     else if(a==='rk'){view='rank';render();showRank();}
     else if(a==='spin')spin();
+    else if(a==='sch'){view='sched';render();}
     else if(a==='wq'){const B=S().B,w=B.w,x=QL(B.k).find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast((B.k==='key'?'🔑':'🎡')+' +'+x[3]+' free spin',1800);render();}});}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+evTabIc(EV[s[tr].k])+' '+EV[s[tr].k].n+'</b>').join('');
   const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
+  if(view==='sched'){body.innerHTML=schedHtml();return;}
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
   h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+NH(T().nf(sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
@@ -191,12 +200,17 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
     h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
   h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evIc(E)+NH(T().nf(g),T().nf(g).length>5?.85:1.1)+'</div><div class="r'+(Object.values(realRw(st,m[1])).filter(Boolean).length>1?' two':'')+'">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
-  const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div>';
+  const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div><button class="evSch" data-e="sch">📅 EVENT CALENDAR</button>';
   body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
 function rkPrizes(st){const k=EV[st.k].tkk,ic=k==='gt'?GT:k==='ct'?CT:k==='tk'?TK:'';return '<div class="evS">RANKING PRIZES</div><div class="evSn">sent by Mail when the event ends</div><div class="evPz">'+RANKRW.map(r=>'<div class="evPr">'+MDL(r[0],r[0]===r[1]?r[0]:r[0]+'-'+r[1])+'<span class="pz">'+rwBig(Object.assign({dm:k==='dm'?r[2]*1.5:r[2]},ic?{[k]:r[3]}:{}))+'</span></div>').join('')+'</div>';}
 async function showRank(){const r=await rank(tab),L=document.getElementById('evRkL');if(!L)return;if(!r){L.innerHTML='<div class="evP" style="text-align:center;margin:20px">The ranking needs internet. Your score is saved and sent later.</div>';return;}
   rk[S()[tab].id]={rank:r.rank,t:Date.now()};
   L.innerHTML=(r.top.length?r.top.map((p,i)=>'<div class="evL'+(p.uid===r.me?' me':'')+'">'+MDL(i+1)+'<span>'+esc(p.name||'Mechanic')+'</span><b>'+T().nf(p.sc)+'</b></div>').join(''):'<div class="evP" style="text-align:center;margin:20px">Nobody yet – be the first!</div>')+(r.rank?'<div class="evL me">'+MDL(r.rank)+'<span>YOU</span><b>'+T().nf(r.sc)+'</b></div>':'');}
+// v16-161 (Marius 22 nov): EVENT CALENDAR – the next events of both tracks with their exact dates (phone time)
+const DTF=t=>new Date(t).toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+function schedHtml(){const now=Date.now(),L=[];for(const tr of ['A','B']){let t=now;for(let n=0;n<6;n++){const c=cur(tr,t);L.push({tr,...c});t=c.end+1000;}}
+  L.sort((a,b)=>a.start-b.start||a.tr.localeCompare(b.tr));
+  return '<div class="evS">EVENT CALENDAR</div><div class="evSn">2 events at the same time · each one lasts 3 days · your phone time</div>'+L.map(e=>{const E=EV[e.k],on=e.start<=now;return '<div class="evCal'+(on?' on':'')+'" style="--c:'+E.col+'"><i>'+evTabIc(E)+'</i><div><b>'+E.n+'</b><small>'+DTF(e.start)+' → '+DTF(e.end)+'</small></div><em>'+(on?'NOW · '+left(e.end-now)+' left':'in '+left(e.start-now))+'</em></div>';}).join('')+'<button class="evSch" data-e="x">↩ BACK</button>';}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function open(){build();S();view='main';el.classList.add('open');render();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}if(!spinning&&view==='main')render();},30000);}
 window.EVT={add,q,tick,open,dot,state:S,cur};

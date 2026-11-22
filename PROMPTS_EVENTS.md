@@ -64,3 +64,6 @@ Promptuile 1-5 de mai sus (EVENTS) NU au fost încă făcute (`img/ui10/` nu exi
 
 Fără poze noi (se folosesc pozele lui deja în joc `img/ui8/btn_*`): POWER/GRADE, AUTO BEST mic, rândul My Crew (AUTO BEST / Collection / Summon).
 Scrisul: font de joc gros (Lilita One, gratuit OFL, pus local) pentru titluri/butoane/cifre – Claude arată înainte/după.
+
+## DUNGEON RUSH (22 nov 2026, v16-161) – 1 poză
+**Banner** `img/ui9/evb_dgr.webp` – în joc 900×360 (2,5:1, lățimea paginii pe 360 px ×2,5). ChatGPT **1536x1024**, apoi Claude decupează o bandă 1536×614 (2,5:1) din mijloc. Referință atașată: bannerul KEY ROULETTE (`evb_key`). Până vine poza, jocul folosește o copie a bannerului KEY ROULETTE.

@@ -3127,7 +3127,7 @@ function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">La
 // 300 floors · one fight per floor · FIXED rewards (first clear only, nothing random) · boss every 10 floors (mini-boss X10, big boss X20)
 // most floors have a modifier · monsters are picked (seeded = always the same per floor) from all of Marius' monsters.
 // Strength: floor f fights like campaign stage ≈ 3 + 3.2·f (floor 300 ≈ stage 50-15). Saved in G.tw = {b: floors cleared}.
-const TW_N=300,TW_UNLOCK=10;
+const TW_N=500,TW_UNLOCK=10; // v16-161 (Marius 22 nov): 300 → 500 floors (floor 500 ≈ campaign stage 1500)
 const TW_REG=['imp','tire','snake','drone','spider','brute','battery','canister','wiper','hubcap','horn','turbo','gearbox','bat','wraith','brake','airbag','hopper','crab','scorp','goblin','moth'];
 const TW_MINI=['crusher','sludge','frost','neonc','magma'],TW_BOSS=['titan','tanker','plow','wyrm','omega'];
 const TW_MOD=[
@@ -3139,7 +3139,7 @@ const TW_MOD=[
  {k:'crit',n:'SHARP EDGES',d:'Enemies get <b>+25%</b> critical chance.'}];
 const TWS={ret:0};root.appendChild($('tw'));root.appendChild($('cpPop')); // #cpPop too, so its windows also show over the tower page // (the #tw div sits in the HTML after #gSum, which is inside #cpGear → move it to the top level)
 function twModMon(m){const k=B.mod;if(k==='rage')m.atk*=1.3;else if(k==='armor'){m.def*=1.6;m.hp*=1.15;m.max*=1.15;}else if(k==='speed'){m.mv*=1.25;m.as*=.85;}else if(k==='crit')m.crit+=.25;}
-function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],act=Math.min(9,Math.floor((f-1)/30)),cl=k=>act?monClone(k,act):k;
+function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],act=Math.min(ACTS.length-1,Math.floor((f-1)/30)),cl=k=>act?monClone(k,act):k;
   const pool=[];while(pool.length<4){const m=pk(TW_REG);if(!pool.includes(m))pool.push(m);}
   const n=Math.min(5,3+Math.floor(f/45)),one=()=>cl(pk(pool)),mk=k=>{const w=[];for(let i=0;i<k;i++)w.push(one());return w;};
   const boss=f%20===0,mini=f%20===10;let w;
@@ -3148,13 +3148,13 @@ function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],
   else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];
   else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=5?-1:(boss||mini||R()<.6)?Math.floor(R()*6):-1;
-  const eq=Math.min(NST-1,Math.round(3+f*3.2));
+  const eq=Math.min(NST-1,Math.round(f<=300?3+f*3.2:963+(f-300)*2.68)); // v16-161: floors 1-300 unchanged, 301-500 climb to stage ~1499
   const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1);
   return {f,w,mod,eq,mul,boss,mini,st:{n:'FLOOR '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 const EGI=r=>{const T=TE(),a=[];if(r.ess)a.push(T.ESI+' '+T.nf(r.ess));if(r.gp)a.push(T.GPI+' '+T.nf(r.gp));if(r.pk&&T.PKI)for(const k in r.pk)a.push(T.PKI(k)+' '+T.nf(r.pk[k]));return a;}; // v16-99
 const giveEG=r=>{const G=TE().G;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk&&TE().pkAdd)for(const k in r.pk)TE().pkAdd(k,r.pk[k]);}; // v16-129: + garage parts
-function twRew(f){const F=twFloor(f),r={money:REWARD(F.eq).money,dm:5,tk:0,gtk:0,ct:0};
-  if(f%5===0)r.tk=2;if(f%10===0){r.dm=100;r.gtk=3;r.ct=1;}if(f%50===0)r.dm+=400;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_U());r.gp=Math.round(x*T.GP_U());r.pk={bk:Math.round((130+20*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit
+function twRew(f){const F=twFloor(f),r={money:REWARD(F.eq).money,dm:5+2*Math.floor(f/100),tk:0,gtk:0,ct:0}; // v16-161 (Marius): every reward grows with the floor
+  if(f%5===0)r.tk=2+Math.floor(f/150);if(f%10===0){r.dm=Math.round((100+f/5)/10)*10;r.gtk=3+Math.floor(f/150);r.ct=1+Math.floor(f/200);}if(f%50===0)r.dm+=400+f;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_Ui(F.eq));r.gp=Math.round(x*T.GP_Ui(F.eq));r.pk={bk:Math.round((130+20*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit · v16-161: Essence / Gear Parts by the floor's stage (not yours)
 const twG=()=>{const G=TE().G;if(!G.tw)G.tw={b:0};return G.tw;};
 const twOK=()=>TE().G.cp.best>=TW_UNLOCK;
 const TWA={};function twArenaImg(){const k=B&&B.tw&&B.tw.wb?'wb':B&&B.tw&&B.tw.dg?'dg_'+B.tw.dg:'im';if(!TWA[k]){TWA[k]=new Image();TWA[k].decoding='async';TWA[k].src=k==='wb'?'img/wb/wb_arena.webp':k.startsWith('dg_')?'img/dg/bt_'+k.slice(3)+'.webp':'img/ui6/tw_arena.webp';}return TWA[k];}
@@ -3324,7 +3324,7 @@ function backToHub(){if(HUBS.from){HUBS.from=0;hubEl.classList.add('open');hubRe
 // only heroes of that class (+ Legend heroes) may fight. Each tower is open on 2 days a week, Sunday all are open.
 // FIXED rewards on the first clear (nothing random): 💎 + coins every floor, a SET PIECE of that class every 5th floor
 // (slot in a fixed order, grade Rare → Epic → Legendary → Mythic), 💎 + gear ticket every 10th. Saved in G.ct = {class: floors cleared}.
-const CT_K=['engine','tuning','inspect','service','paint','elec'],CT_N=100,CT_UNLOCK=20;
+const CT_K=['engine','tuning','inspect','service','paint','elec'],CT_N=500,CT_UNLOCK=20; // v16-161 (Marius 22 nov): 100 → 500 floors
 const AR_UNLOCK=20,arOK=()=>TE().G.cp.best>=AR_UNLOCK; // v16-120: ARENA + TORQUE CUP open with the Class Towers (end of chapter 1) – new players are not thrown into PvP
 const CT_DAYS={engine:[1,4],tuning:[1,4],inspect:[2,5],service:[2,5],paint:[3,6],elec:[3,6]};
 const DAYN=['SUN','MON','TUE','WED','THU','FRI','SAT'],DAYL=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
@@ -3334,18 +3334,18 @@ const ctOpenK=k=>ctDay()===0||CT_DAYS[k].includes(ctDay());
 const ctToday=()=>CT_K.filter(ctOpenK);
 const ctG=()=>{const G=TE().G;if(!G.ct)G.ct={};CT_K.forEach(k=>{if(!G.ct[k])G.ct[k]=0;});return G.ct;};
 const CTS={k:null};
-function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=>a[Math.floor(R()*a.length)],act=Math.min(9,Math.floor((f-1)/10)),cl=m=>act?monClone(m,act):m;
+function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=>a[Math.floor(R()*a.length)],act=f<=100?Math.min(9,Math.floor((f-1)/10)):Math.min(ACTS.length-1,9+Math.floor((f-101)/80)),cl=m=>act?monClone(m,act):m;
   const pool=[];while(pool.length<4){const m=pk(TW_REG);if(!pool.includes(m))pool.push(m);}
   const n=Math.min(5,3+Math.floor(f/30)),one=()=>cl(pk(pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
   const boss=f%20===0,mini=f%20===10;let w;
   if(boss)w=[mk(n),[cl(TW_BOSS[(f/20-1+ci)%5])]];else if(mini)w=[mk(n),[cl(TW_MINI[((f-10)/20+ci)%5]),one(),one()]];
   else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=10?-1:(boss||mini||R()<.4)?Math.floor(R()*6):-1;
-  const eq=Math.min(NST-1,Math.round(2+f*2.4)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85;
+  const eq=Math.min(NST-1,Math.round(f<=100?2+f*2.4:242+(f-100)*3.14)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85;
   return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
-const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;
-function ctRew(k,f){const r={money:Math.round(REWARD(ctFloor(k,f).eq).money*.5/10)*10,dm:3,gtk:0,set:null};
-  if(f%5===0)r.set={s:GSLOT[(f/5-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=50;r.gtk=1;}if(f%50===0)r.dm+=200;const T=TE();r.ess=Math.round(.5*T.ESS_U());r.gp=Math.round(.6*T.GP_U());r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0?2:1))};return r;} // v16-129: Class Tower → the parts of its class (Bruiser Tower → Tank Parts…)
+const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;const ctSetF=f=>f<=100?f%5===0:f%10===0; // v16-161: after floor 100 a Mythic set piece every 10 floors
+function ctRew(k,f){const F=ctFloor(k,f),r={money:Math.round(REWARD(F.eq).money*.5/10)*10,dm:3+Math.floor(f/100),gtk:0,set:null}; // v16-161 (Marius): every reward grows with the floor
+  if(ctSetF(f))r.set={s:GSLOT[(f<=100?f/5-1:20+(f-100)/10-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=Math.round((50+f/10)/5)*5;r.gtk=1+Math.floor(f/200);}if(f%50===0)r.dm+=200+Math.round(f/2);const T=TE(),x=f>100&&f%5===0&&f%10?2:1;r.ess=Math.round(.5*x*T.ESS_Ui(F.eq));r.gp=Math.round(.6*x*T.GP_Ui(F.eq));r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0?2:x))};return r;} // v16-129: Class Tower → the parts of its class · v16-161: Essence / Gear Parts by the floor's stage; floors 105, 115… (no set piece) give ×2
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';});
 function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,5);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)
@@ -3392,10 +3392,10 @@ function ctOpen(k){if(!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign
 function ctClose(){ctEl.classList.remove('open');if(!backToHub())close();}
 function ctRules(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>6 towers, one per class · <b>'+CT_N+' floors</b> each.</div><div>Only heroes of that class + <b>Legend</b> heroes fight (your best 5).</div><div>Each tower is open on 2 days a week · <b>SUNDAY all towers are open</b>.</div></div><div class="wS">SCHEDULE</div>';
   CT_K.forEach(k=>x+=wRowB(CT_K.indexOf(k)%6,'<b>'+ROLE[k].n.toUpperCase()+'</b>',null,ctDaysTxt(k)));
-  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Every 10th floor (boss): '+T.DMI+' <b>50</b> · '+GTKI+' <b>1</b></div><div>Every 50th floor: + '+T.DMI+' <b>200</b></div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
+  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Floors 1-100, every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Floors 101-500: a <b>MYTHIC SET PIECE</b> every 10th floor</div><div>Every 10th floor (boss): '+T.DMI+' <b>50+</b> · '+GTKI+' <b>1+</b></div><div>Every 50th floor: + '+T.DMI+' <b>200+</b></div><div>The higher the floor, the bigger every reward.</div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
   popW('CLASS TOWERS',x);}
 function ctTRew(k){const t=ctG();let x='<div class="wS">'+ROLE[k].n.toUpperCase()+' TOWER · NEXT SET PIECES</div>';
-  for(let f=Math.ceil((t[k]+1)/5)*5,n=0;f<=CT_N&&n<8;f+=5,n++){const r=ctRew(k,f),it=SETS[k].p[GSLOT.findIndex(s=>s.k===r.set.s)];
+  for(let f=Math.ceil((t[k]+1)/5)*5,n=0;f<=CT_N&&n<8;f+=5){const r=ctRew(k,f);if(!r.set)continue;n++;const it=SETS[k].p[GSLOT.findIndex(s=>s.k===r.set.s)];
     x+=wRowB(r.set.r,'<b>FLOOR '+f+'</b> '+it,null,ctRewHtml(k,r));}
   x+='<div class="wS">SET · '+SETS[k].n.toUpperCase()+'</div><div class="wP">'+SETS[k].t.map((q,i)=>'<div>'+(i+2)+' pieces: '+setTierTxt(q)+'</div>').join('')+'<div>The bonus works only on '+ROLE[k].n+' heroes.</div></div>';
   popW(ROLE[k].n.toUpperCase()+' TOWER',x);}
@@ -3718,7 +3718,7 @@ const dgSw=()=>dgPass()||dgVip().sweep; // v16-122: SWEEP also from VIP 4
 const dgDay=k=>Math.max(0,dgMax()-dgG().n[k]);   // today's keys left (the unused ones move to the stock at midnight – v16-143)
 const dgBon=k=>{const g=dgG();return Math.max(0,(g.x&&g.x[k])||0);};   // v16-120 KEY ROULETTE bonus keys: they stack, never expire
 const dgKeys=k=>dgDay(k)+dgBon(k);
-function dgUse(k){const g=dgG();if(dgDay(k)>0)g.n[k]++;else if(dgBon(k)>0)g.x[k]--;if(window.EVT)EVT.q('dgk',1);}   // daily keys first, bonus keys after
+function dgUse(k){const g=dgG();if(dgDay(k)>0)g.n[k]++;else if(dgBon(k)>0)g.x[k]--;if(window.EVT){EVT.q('dgk',1);EVT.add('dgr',1);}}   // v16-161: + DUNGEON RUSH   // daily keys first, bonus keys after
 function dgAddKeys(k,n){const g=dgG();if(!g.x)g.x={};g.x[k]=(g.x[k]||0)+n;}
 window.DGK={add:dgAddKeys,keys:dgKeys,bon:dgBon,K:DG_K,ok:()=>dgOK()};
 const dgNitro=()=>{try{const g=dgG();return g.nt>Date.now()?g.np:0;}catch(e){return 0;}};
