@@ -1311,10 +1311,15 @@ function eye(g,x,y,r,col,t,k){g.fillStyle=col;circ(g,x,y,r);g.fillStyle='rgba(25
 // v16-161 (Marius): AWAKENING in battle – Awakened III+ = aura in the tier color behind the hero, Awakened V = brighter aura + light sparks when it attacks / casts. One cached glow picture per color (cheap for budget phones).
 const AWC=['','#ffe082','#ff5252','#c77dff','#7cf9ff','#ffb300'],AWG={};
 function awGlow(c){if(AWG[c])return AWG[c];const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,c+'cc');gr.addColorStop(.45,c+'55');gr.addColorStop(1,c+'00');x.fillStyle=gr;x.fillRect(0,0,64,64);return AWG[c]=cv;}
-function drawAwk(g,u,t){if(!u.awk||u.awk<3||u.dead)return;const c=AWC[u.awk],G0=awGlow(c),p=.85+.15*Math.sin(t*4+u.k),k=u.awk>=5?1.25:1;
-  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);g.globalCompositeOperation='lighter';g.globalAlpha=.55*p;g.drawImage(G0,-46*k,-78*k,92*k,92*k);g.globalAlpha=.7*p;g.drawImage(G0,-34*k,-12,68*k,22);g.restore();
-  if(u.awk>=5&&(u.st==='atk'||u.st==='cast')&&t-(u._aw||0)>.3){u._aw=t;sparks(u.sx+u.face*14*u.sc,u.sy-34*u.sc,2,c,120);}}
-function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;if(u.hero&&u.awk>=3)drawAwk(g,u,t);f(g,u,t);
+function drawAwk(g,u,t){if(!u.awk||u.dead)return;const A=u.awk,c=AWC[A],p=.85+.15*Math.sin(t*(A>=4?6:4)+u.k);
+  // I: thin colored ring at the feet · II: + small light motes rising · III: + aura behind the body · IV: bigger, pulsing aura · V: gold, biggest aura + sparks when it attacks
+  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);g.globalCompositeOperation='lighter';
+  g.globalAlpha=(A>=3?.8:.7)*p;g.strokeStyle=c;g.lineWidth=A>=4?2.6:2;g.beginPath();g.ellipse(0,0,22+A*2,7+A*.6,0,0,TAU);g.stroke();
+  if(A>=3){const G0=awGlow(c),k=A>=5?1.3:A>=4?1.15:1;g.globalAlpha=(A>=4?.62:.5)*p;g.drawImage(G0,-46*k,-78*k,92*k,92*k);g.globalAlpha=.7*p;g.drawImage(G0,-34*k,-12,68*k,22);}
+  g.restore();
+  if(A>=2&&t-(u._am||0)>(A>=4?.35:.6)){u._am=t;part({x:u.sx+rnd(-14,14)*u.sc,y:u.sy-rnd(4,30)*u.sc,vy:-rnd(20,45),life:rnd(.6,1),r:rnd(1,1.8),col:c,type:'spark'});}
+  if(A>=5&&(u.st==='atk'||u.st==='cast')&&t-(u._aw||0)>.3){u._aw=t;sparks(u.sx+u.face*14*u.sc,u.sy-34*u.sc,2,c,120);}}
+function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;if(u.hero&&u.awk)drawAwk(g,u,t);f(g,u,t);
   if(u.flash>0&&!u.dead){g.save();g.globalCompositeOperation='lighter';GA=Math.min(1,u.flash)*.75;f(g,u,t);GA=1;g.restore();}}
 const MDRAW={
  imp(g,u,t){const ph=u.wph,lunge=u.st==='atk'?Math.sin(u.ap*Math.PI)*8:0;g.translate(lunge,0);
