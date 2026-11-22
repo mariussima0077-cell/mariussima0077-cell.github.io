@@ -1647,7 +1647,7 @@ function startBattle(si,team,tw){
   B={si,stage:tw?tw.st:STAGES[si],tw:tw||null,mod:tw&&tw.mod>=0?TW_MOD[tw.mod].k:'',wave:0,heroes:[],mons:[],proj:[],fx:[],parts:[],nums:[],tele:[],t:0,real:0,ts:1,slowT:0,spd:spdOK(TE().G.cp.spd),auto:TE().G.cp.auto!==false,
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
   B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)TE().toast('⚡ NITRO BOOST: +'+Math.round(B.nit*100)+'% HP & attack',2400);},B.grit?2700:0);
-  B.lowRes=LOWRES;B.lowRes2=LOWRES&&LOWRES2;if(!bsize())buildBG();
+  {const q=window.TE_GFX||'auto';B.lowRes=q==='low'?true:q==='high'?false:LOWRES;B.lowRes2=q==='low'?true:q==='high'?false:LOWRES&&LOWRES2;}if(!bsize())buildBG(); // v16-154: GRAPHICS setting
   B.trb=teamRoles(team).bon;
   B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr){sprLoad(u.spr);warmIm(u.spr.im);warmIm(u.spr.fi);warmIm(u.spr.bi);}});if(!window.__SIM)for(const k in FXIM)warmIm(FXIM[k]);
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
@@ -2506,7 +2506,7 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-las
   const t0=performance.now();render();
   // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".
   // Now: the first 2 s are ignored (on phones the drawing happens on the graphics chip, so the frame time must count too), and lower quality starts at the next wave change (hidden by the march) or next battle.
-  if(B.real>2){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}else if(a>40&&B.lowRes&&!LOWRES2){LOWRES2=true;try{sessionStorage.setItem('te_lowres2','1');}catch(e){}}}}
+  if(B.real>2&&(window.TE_GFX||'auto')==='auto'){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}else if(a>40&&B.lowRes&&!LOWRES2){LOWRES2=true;try{sessionStorage.setItem('te_lowres2','1');}catch(e){}}}}
   if(LOWRES&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}
   // v16-153 (perf): still slow (>40 ms a frame; Google counts frames under 20 FPS as slow) → one more step down at the next march
   if(LOWRES2&&B.lowRes&&!B.lowRes2&&B.phase==='march'&&B.phT<.2){B.lowRes2=true;bsize(true);}}

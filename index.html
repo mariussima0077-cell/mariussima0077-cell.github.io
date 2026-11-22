@@ -2912,7 +2912,7 @@ function render(){
   if(G.lv.parts>0)drawPerson(clerk);
   for(const id in drivers)for(const d of drivers[id])if(onScreen(d.p.x,d.p.y,20))drawDriver(d);
   drawSecPeople();drawHeroBadges();
-  for(const p of parts){if(!onScreen(p.x,p.y,10))continue;X.globalAlpha=Math.max(0,p.life/p.max)*(p.grow?.45:.85);X.fillStyle=p.col;circ(p.x,p.y,p.r);}X.globalAlpha=1;
+  if(window.TE_GFX!=='low')for(const p of parts){if(!onScreen(p.x,p.y,10))continue;X.globalAlpha=Math.max(0,p.life/p.max)*(p.grow?.45:.85);X.fillStyle=p.col;circ(p.x,p.y,p.r);}X.globalAlpha=1;
   gates.forEach(drawBarrier);
   drawTrees();
   for(const c of cars)if(onScreen(c.x,c.y,40))drawCarUI(c);
@@ -2934,7 +2934,7 @@ function zoomAt(ns,sx,sy){const wx=sx/Z+camX,wy=(sy-TOP)/Z+camY;Z=clampS(ns);cam
 function resize(){
   const cx=camInit?camX+VW/Z/2:AV,cy=camInit?camY+(VH-TOP)/Z/2:520;
   DPR=Math.min(DPR||MAXDPR,MAXDPR);VW=innerWidth;VH=innerHeight;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);
-  if(!camInit){DPR=MAXDPR;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);Z=clampS(baseS());camX=cx-VW/Z/2;camY=cy-(VH-TOP)/Z/2;camInit=true;}
+  if(!camInit){DPR=window.TE_GFX==='low'?Math.min(MAXDPR,1):MAXDPR;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);Z=clampS(baseS());camX=cx-VW/Z/2;camY=cy-(VH-TOP)/Z/2;camInit=true;}
   else{Z=clampS(Z);camX=cx-VW/Z/2;camY=cy-(VH-TOP)/Z/2;}
   clampCam();}
 addEventListener('resize',resize);
@@ -3918,6 +3918,11 @@ function ngRender(){}
 let last=performance.now(),panelT=0,perfT=0,perfN=0,perfSum=0,perfJS=0,perfMin=99,goodT=0,capDPR=9,capHold=0,dprDn=0,bldT=0;
 // never go below this: on sharp phone screens 1x looked foggy when zoomed in
 const MINDPR=()=>Math.min(MAXDPR,(window.devicePixelRatio||1)>=2?1.5:1);
+// v16-154 (Marius): GRAPHICS setting in Profile – AUTO (adjusts itself, as before) · HIGH (always sharp, never lowered) · LOW (old phones: sharpness ×1, max 30 fps, no smoke)
+window.TE_GFX=(()=>{try{const v=localStorage.getItem('te_gfx');return v==='high'||v==='low'?v:'auto';}catch(e){return 'auto';}})();
+function gfxSet(v){window.TE_GFX=v;try{localStorage.setItem('te_gfx',v);}catch(e){}dprDn=0;capDPR=9;goodT=0;
+  DPR=v==='low'?Math.min(MAXDPR,1):MAXDPR;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);if(started)render();}
+window.GFX={get:()=>window.TE_GFX,set:gfxSet};
 // v16-27: less work for the phone – max 60 fps (120 Hz phones drew 120×/s), 30 fps when nobody touches the map,
 // ~6 fps behind see-through pages (Quests, Summon, Team…) and nothing behind the Campaign (it covers everything).
 
@@ -3936,6 +3941,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:76,d:'Nov 22, 2026',ic:'⚙️',t:'New: GRAPHICS setting',l:['Open your <b>PROFILE</b> → <b>GRAPHICS</b>: <b>AUTO</b> (adjusts itself, recommended), <b>HIGH</b> (always the sharpest picture) or <b>LOW</b> (for older phones: less lag, heat and battery).','If the game feels slow or your phone gets hot, try <b>LOW</b>.']},
  {id:75,d:'Nov 22, 2026',ic:'🔑',t:'Dungeon keys stack up + Legendary heroes in the packs',l:['<b>DUNGEONS</b>: daily keys you do not use are now <b>kept</b> – they stack up day after day (also on the days you do not play, up to 30 days).','The <b>STARTER PACK</b> now gives <b>Mama Rosa</b> and the <b>ROOKIE PACK</b> gives <b>Sofia Lightning</b> – both <b>LEGENDARY</b> heroes.','New short guides the first time you open the building upgrades, Dungeons, Team Roles and the Classic Collection.']},
  {id:74,d:'Nov 21, 2026',ic:'🚆',t:'NEW: RAIL WARS + Rail Terminal',l:['Build the <b>RAIL TERMINAL</b> next to your Car Factory. Every hour the factory makes <b>EXPORT cars</b>: they fuel at the Gas Station, get washed at the Car Wash and go up on your train.','A full train is sent from the <b>RAIL WARS</b> page (button next to the terminal): <b>3 trains a day</b>, 30 min on the way. Its <b>GRADE</b> (Common → Mythic) depends on your Car Wash, Gas Station and Car Factory levels – you can refresh it <b>2 times</b>.','Other players can <b>ATTACK</b> your train (a fight like the Arena) and steal <b>20%</b> of it – a train can be robbed 2 times. You have <b>5 attacks a day</b> too!','Your trains bring <b>STREET TOKENS</b> – spend them in the <b>STREET SHOP</b>: every ticket and every Dungeon key for 500.']},
  {id:73,d:'Nov 21, 2026',ic:'🏹',t:'2 new MYTHIC heroes: Nova & Vega',l:['Two new <b>MYTHIC RANGERS</b> join the Hero Summon – the first Mythic heroes who fight from far away.','<b>Nova, the Starfire Huntress</b> – skill <b>STARFIRE RAIN</b>: a rain of electric spark-plug arrows: 240% damage, slow and +35% damage taken for 6s.','<b>Vega, the Railgun Ace</b> – skill <b>OVERDRIVE RAILSHOT</b>: his hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage (always critical) and 160% to every enemy in its lane.','With 6 Mythic heroes you can now build a full Mythic team with all 5 roles.']},
@@ -4058,7 +4064,7 @@ const MAPCOV=['dq','sm','pop','team','idl','ros','xp','ccP'].map(id=>document.ge
 cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListener('pointermove',()=>{touchT=performance.now();},{passive:true});
 function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;const o=document.getElementById('onl');if(o&&o.classList.contains('open'))return 2;const sw=document.getElementById('st');if(sw&&sw.classList.contains('open'))return 1;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
 function frame(now){
-  if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle?31:14.5)){requestAnimationFrame(frame);return;}}
+  if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle||window.TE_GFX==='low'?31:14.5)){requestAnimationFrame(frame);return;}}
   const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);
   if(started){let left=dt*SPD;while(left>0){const s=Math.min(.05,left);update(s);left-=s;}}
   if(zAnim){zAnim.t=Math.min(1,zAnim.t+dt/.22);const e=1-Math.pow(1-zAnim.t,3);zoomAt(zAnim.from+(zAnim.to-zAnim.from)*e,zAnim.ax!=null?zAnim.ax:VW/2,zAnim.ay!=null?zAnim.ay:TOP+(VH-TOP)/2);if(zAnim.t>=1)zAnim=null;}
@@ -4076,7 +4082,7 @@ function frame(now){
   if(perfT>1.5){
     // if the phone itself caps the screen at 30 fps (battery saver), long frames are not lag: judge only our own work
     const capped=perfMin>26,avg=capped?perfJS/perfN*1.6:perfSum/perfN;
-    if(perfN<20){}
+    if(perfN<20||window.TE_GFX!=='auto'){}
     else if(avg>(capped?40:26)&&DPR>MINDPR()){DPR=Math.max(MINDPR(),DPR-.25);capDPR=DPR;capHold=0;dprDn++;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}
     // going back up only after 15 s of smooth play, and never again after it had to go down twice (stops the up/down ping-pong)
     else if(avg<(capped?24:19)&&DPR<MAXDPR&&dprDn<2){goodT+=perfT;capHold+=perfT;if(capHold>60)capDPR=9;
