@@ -584,6 +584,33 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .idEG{display:flex;align-items:center;justify-content:center;gap:4px;font:800 calc(var(--u,1px)*22) Game,system-ui;color:#e8dcff;text-shadow:0 2px 3px #000;white-space:nowrap}.idEG b{color:#d6b4ff}.idEG .tki{height:1.3em;vertical-align:-.3em}
 @media (max-height:700px){#side2 button{width:46px!important;height:51px!important}}
 
+
+/* v16-156 CHECK-IN v2 = Marius' pictures (img/ci2/*) */
+.ci2Top{width:100%;aspect-ratio:980/304;background:url(img/ci2/top.webp) center/100% 100% no-repeat;border-radius:10px;margin:0 0 4px}
+.ci2Day{position:relative;width:100%;aspect-ratio:1100/726;background:url(img/ci2/today.webp) center/100% 100% no-repeat;padding:23% 8% 6%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.ci2Tk{display:flex;justify-content:space-around;width:100%}
+.ci2T{display:flex;flex-direction:column;align-items:center;width:31%}
+.ci2T img{width:62%;filter:drop-shadow(0 0 8px #ffb300aa);animation:ci2F 2.4s ease-in-out infinite}.ci2T:nth-child(2) img{animation-delay:-.8s}.ci2T:nth-child(3) img{animation-delay:-1.6s}
+@keyframes ci2F{50%{transform:translateY(-3px)}}
+.ci2T b{font:900 9px/1.05 Game,system-ui;color:#fff;text-align:center;margin:2px 0 3px;text-shadow:0 1px 0 #000}
+.ci2T span{font:900 15px Game,system-ui;color:#fff;background:linear-gradient(#6a4a10,#2a1a04);border:1.5px solid #ffc23a;border-radius:9px;padding:1px 14px;text-shadow:0 2px 0 #000}
+.ci2Go{width:78%;padding:9px 0;border:2px solid #ffe08a;border-radius:12px;background:linear-gradient(#ffb74d,#ff8f00 50%,#e65100);color:#fff;font:900 22px Game,system-ui;letter-spacing:1px;text-shadow:0 2px 0 #7a2a00,0 0 6px #7a2a00;box-shadow:0 4px 0 #7a2a00,0 0 16px #ff9800aa;animation:ci2P 1.6s ease-in-out infinite}
+.ci2Go:disabled{background:linear-gradient(#5a5f68,#30343a);border-color:#8a8f98;font-size:14px;box-shadow:0 4px 0 #1a1c20;animation:none;color:#d6d9de}
+.ci2Go:active{transform:translateY(2px)}@keyframes ci2P{50%{box-shadow:0 4px 0 #7a2a00,0 0 26px #ffb300}}
+.ci2Wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;margin:6px 0 2px}
+.ci2D{position:relative;aspect-ratio:200/270;background:center/100% 100% no-repeat;display:flex;flex-direction:column;align-items:center;padding-top:34%;box-sizing:border-box}
+.ci2D.nrm{background-image:url(img/ci2/d_n.webp)}.ci2D.now{background-image:url(img/ci2/d_c.webp);transform:scale(1.08);z-index:1}.ci2D.done{background-image:url(img/ci2/d_d.webp)}.ci2D.big{background-image:url(img/ci2/d_g.webp)}
+.ci2D b{font:900 8.5px Game,system-ui;color:#ffe27a;text-shadow:0 1px 0 #000;white-space:nowrap}.ci2D.done b{color:#9aa3ad}
+.ci2D i{display:flex;margin:3px 0 0;height:15px}.ci2D i img{height:15px;margin:0 -5px;filter:drop-shadow(0 1px 1px #000)}
+.ci2D span{font:900 14px Game,system-ui;color:#fff;text-shadow:0 2px 0 #000,0 0 4px #000}
+.ci2Pr{margin-top:6px;padding:8px 6px 6px;border-radius:12px;background:linear-gradient(#1a2030,#0b0e15);box-shadow:0 0 0 2px #3a4250,0 0 0 3.5px #c99520,inset 0 0 14px #000}
+.ci2Cnt{display:flex;align-items:center;justify-content:center;gap:5px;font:900 14px Game,system-ui;color:#fff}.ci2Cnt img{height:20px}.ci2Cnt b{color:#ffd54a;font-size:18px}
+.ci2Bar{height:9px;margin:6px 4px 4px;border-radius:5px;background:#05070b;box-shadow:inset 0 0 0 1.5px #4a3a18;overflow:hidden}.ci2Bar i{display:block;height:100%;background:linear-gradient(90deg,#ff6d00,#ffd54a);box-shadow:0 0 8px #ff9800}
+.ci2Ms{display:flex;align-items:flex-end;justify-content:space-between}
+.ci2M{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.ci2M .nd{width:26px;height:26px;background:center/contain no-repeat;display:flex;align-items:center;justify-content:center;color:#2e7d32;font:900 13px Game,system-ui;text-shadow:0 0 3px #fff}
+.ci2M.fin .nd{width:44px;height:42px}
+.ci2M small{font:900 7.5px Game,system-ui;color:#e0c6ad;margin-top:2px;white-space:nowrap}.ci2M.fin small{color:#ffd54a;font-size:9px}
 /* v16-49 CHECK-IN (5000 free summons) day tiles = Marius' pictures (img/ui3/ci_*) */
 .c5Grid{gap:3px!important;grid-template-columns:repeat(6,minmax(0,1fr))!important}
 .c5D{min-width:0;background:url(img/ui3/ci_n.webp) center/100% 100% no-repeat!important;box-shadow:none!important;border-radius:0!important;padding:9px 1px 4px!important;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -4029,15 +4056,18 @@ function xpOpen(m){xpMode=m;xpMail='';if(m==='news'){G.nw=NEWS[0].id;save();}xpE
 function xpClose(){if(xpMode==='mail'&&xpMail){xpMail='';renderXP();return;}xpEl.classList.remove('open');xpMode='';updX();}
 $('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').onclick=()=>xpOpen('news');$('mlBtn').onclick=()=>xpOpen('mail');
 function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTML=TKI+' '+G.h.tk;
-  if(xpMode==='ci'){T.textContent='5000 FREE SUMMONS';const n=G.c5.n,rd=ciReady(),got=c5Got(n),blk=Math.floor((rd?n:Math.max(0,n-1))/30)*30;
+  if(xpMode==='ci'){T.textContent='5000 FREE SUMMONS';const n=G.c5.n,rd=ciReady(),got=c5Got(n),cur=rd?n:Math.max(0,n-1),wk=Math.floor(cur/7)*7;
     S.textContent=got>=C5_TOTAL?'ALL 5000 TICKETS COLLECTED!':'DAY '+(rd?n+1:n)+' OF '+C5_DAYS+' · LOG IN EVERY DAY';
-    let h='<div class="c5Top"><div class="c5Big">'+got.toLocaleString()+'<small> / '+C5_TOTAL.toLocaleString()+'</small></div><div class="c5Lbl">FREE SUMMON TICKETS COLLECTED</div><div class="c5Bar"><i style="width:'+(got/C5_TOTAL*100).toFixed(1)+'%"></i></div>'+
-      '<div class="c5Each">Every day: '+TKI+' ×10 Recruit · '+CTI+' ×10 Crew · '+GTI+' ×10 Gear</div></div>';
-    h+='<div class="c5Grid">';for(let d=blk;d<Math.min(blk+30,C5_DAYS);d++){const done=d<n,now=rd&&d===n,r=c5Rw(d);
-      h+='<div class="c5D'+(done?' done':'')+(now?' now':'')+((d+1)%30===0||d===C5_DAYS-1?' big':'')+'"><b>DAY '+(d+1)+'</b><span>'+(done?'✓':(r?(r.tk+r.ct+r.gt):0))+'</span></div>';}
-    h+='</div>';
-    const r=c5Rw(n);h+='<button class="xBtn" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'✅ CLAIM DAY '+(n+1)+' · +'+(r.tk+r.ct+r.gt)+' TICKETS':got>=C5_TOTAL?'🏆 All collected':'✓ Claimed today – come back tomorrow')+'</button>';
-    h+='<div class="xNote">Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.</div>';
+    const r=c5Rw(n)||{tk:0,ct:0,gt:0},TI=['img/ticket.webp','img/cticket.webp','img/gticket.webp'],TN=['RECRUIT','CREW','GEAR'],TV=[r.tk,r.ct,r.gt];
+    let h='<div class="ci2Top"></div><div class="ci2Day"><div class="ci2Tk">';
+    for(let i=0;i<3;i++)h+='<div class="ci2T"><img src="'+TI[i]+'"><b>'+TN[i]+'<br>TICKET</b><span>x'+TV[i]+'</span></div>';
+    h+='</div><button class="ci2Go" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'CLAIM':got>=C5_TOTAL?'ALL COLLECTED':'COME BACK TOMORROW')+'</button></div>';
+    h+='<div class="ci2Wk">';for(let d=wk;d<Math.min(wk+7,C5_DAYS);d++){const done=d<n,now=rd&&d===n,big=(d+1)%7===0||d===C5_DAYS-1,q=c5Rw(d);
+      h+='<div class="ci2D '+(done?'done':now?'now':big?'big':'nrm')+'"><b>DAY '+(d+1)+'</b>'+(done?'':'<i><img src="'+TI[0]+'"><img src="'+TI[1]+'"><img src="'+TI[2]+'"></i><span>'+(q?q.tk+q.ct+q.gt:0)+'</span>')+'</div>';}
+    h+='</div><div class="ci2Pr"><div class="ci2Cnt"><img src="'+TI[0]+'"><b>'+got.toLocaleString()+'</b> / '+C5_TOTAL.toLocaleString()+' TICKETS</div>'+
+      '<div class="ci2Bar"><i style="width:'+(got/C5_TOTAL*100).toFixed(1)+'%"></i></div><div class="ci2Ms">';
+    for(let k=1;k<=10;k++){const g=k*500,ok=got>=g;h+='<div class="ci2M'+(k===10?' fin':'')+'"><div class="nd" style="background-image:url(img/ci2/m_'+(k===10?'trophy':ok?'on':'lock')+'.webp)">'+(ok&&k<10?'✓':'')+'</div><small>'+g.toLocaleString()+'</small></div>';}
+    h+='</div></div><div class="xNote">Every day: 10 Recruit · 10 Crew · 10 Gear tickets. Fixed rewards – nothing random. Missing a day never resets your progress.</div>';
     B.innerHTML=h;const g=$('ciGo');if(g)g.onclick=()=>{if(!ciReady())return;const r=c5Rw(G.c5.n);giveRw(r);G.c5.n++;G.c5.day=dayKey();save();
       toast('📅 Day '+G.c5.n+': '+rwHtml(r).replace(/<br>/g,' · '),3500);renderXP();updX();};return;}
   if(xpMode==='news'){T.textContent='NEWS';S.textContent='LATEST UPDATES';
