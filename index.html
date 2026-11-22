@@ -2789,8 +2789,12 @@ function rwRoll(min){const w=rwW();let r=Math.random()*w.reduce((a,b)=>a+b,0),g=
 // v16-155 RAIL PASS (Marius 22 nov 2026, 4.99 €/month, PK.rail = end of the subscription): train fills in 45 min instead of 1 h, 3 refreshes, Street Tokens ×1.3, golden locomotive
 const RPON=()=>(+PK.rail||0)>Date.now(), rwFill=()=>RPON()?2700:RW_FILL, rwRfMax=()=>RPON()?3:2;
 const rwTok=(g,n)=>Math.round(RW_TOK[g]*n/4*(RPON()?1.3:1));
-const rwNext=()=>{const s=RWS(),cap=rCap();if(s.n>=cap)return 0;if(dcars.some(c=>c.exp)||RT.park.some(Boolean)||RT.mv.length)return -1;return Math.max(0,rwFill()/cap-(s.acc||0));};   // v16-147
-const rwNextTxt=()=>{const t=rwNext();if(t<0)return 'car on the way';const m=t/60|0,x=t%60|0;return m+':'+String(x).padStart(2,'0');};
+// v16-167: seconds until the NEXT car is on the train (Alex: show how long it takes) – a car on the way uses the measured trip time (factory → gas → wash → train)
+const rwTrip=()=>{const t=RWS().trip;return t>5&&t<600?t:45;};
+const rwNext=()=>{const s=RWS(),cap=rCap();if(s.n>=cap)return 0;const tr=rwTrip();let a=-1;for(const c of dcars)if(c.exp)a=Math.max(a,c.age||0);for(const c of RT.park)if(c)a=Math.max(a,tr-1.4+(c.pt||0));if(RT.mv.length)return 1;
+  if(a>=0)return Math.max(1,Math.ceil(tr-a));return Math.max(1,Math.ceil(Math.max(0,rwFill()/cap-(s.acc||0))+tr));};
+const rwOnWay=()=>dcars.some(c=>c.exp)||RT.park.some(Boolean)||RT.mv.length>0;
+const rwNextTxt=()=>{const t=rwNext(),m=t/60|0,x=t%60|0;return (rwOnWay()?'car on the way · ':'')+m+':'+String(x).padStart(2,'0');};
 const RT={park:[],mv:[],cars:[],st:'dock',x:0,v:0,t:0,g:0,nOn:0,boot:0};
 function RWS(){if(!G.rw)G.rw={g:-1,rf:0,n:0,acc:0,ft:Date.now()};const s=G.rw;if(s.g<0)s.g=rwRoll(0);
   if(!RT.boot){RT.boot=1;RT.g=s.g;RT.x=rStop();const cap=rCap();   // offline: the factory kept filling the train
@@ -2822,13 +2826,14 @@ function rwCar(i){while(RT.cars.length<=i){const c=newCar(false);c.col=pick(VIVI
 function updateRail(dt){
   if(!(G.lv.rail>0))return;const s=RWS(),cap=rCap(),stop=rStop();s.ft=Date.now();
   for(const c of RT.park)if(c&&c.fade<1)c.fade=Math.min(1,c.fade+dt*2);
+  for(const c of dcars)if(c.exp)c.age=(c.age||0)+dt;   // v16-167: trip timer
   // export cars from the factory (one train ≈ 1 hour)
   const fly=dcars.filter(c=>c.exp).length+RT.park.filter(Boolean).length+RT.mv.length;
   if(G.lv.factory>0&&s.n+fly<cap){const iv=rwFill()/cap;if(s.n===0&&fly===0&&RT.st==='dock'&&(s.acc||0)<iv)s.acc=iv;   // v16-147: the 1st car of a new train comes at once
     s.acc=(s.acc||0)+dt;if(s.acc>=iv&&rwSpawn())s.acc=0;}
   // parked cars go up on the train
   if(RT.st==='dock')RT.park.forEach((c,k)=>{if(!c)return;c.pt+=dt;if(c.pt>1.4&&s.n+RT.mv.length<cap){const r=rRect(),p=rSpot(r,k);RT.park[k]=null;RT.mv.push({c,x0:p.x,y0:p.y,s0:r.a.s,s:s.n+RT.mv.length,t:0});}});
-  for(let i=RT.mv.length-1;i>=0;i--){const m=RT.mv[i];m.t+=dt/.8;if(m.t>=1){RT.cars[m.s]=m.c;s.n=Math.min(cap,s.n+1);RT.mv.splice(i,1);}}
+  for(let i=RT.mv.length-1;i>=0;i--){const m=RT.mv[i];m.t+=dt/.8;if(m.t>=1){RT.cars[m.s]=m.c;s.n=Math.min(cap,s.n+1);const ag=(m.c.age||0)+(m.c.pt||0)+.8;if(m.c.age&&ag<600)s.trip=s.trip?Math.round((s.trip*.7+ag*.3)*10)/10:Math.round(ag);RT.mv.splice(i,1);}}
   if(RT.st==='leave'){RT.v=Math.min(330,RT.v+dt*110);RT.x+=RT.v*dt;if(RT.x-rLen()>W+150){RT.st='away';RT.t=0;RT.cars=[];}}
   else if(RT.st==='away'){RT.t+=dt;if(RT.t>4){RT.st='arrive';RT.x=-160;RT.g=s.g;RT.nOn=0;}}
   else if(RT.st==='arrive'){RT.v=Math.max(35,Math.min(300,(stop-RT.x)*1.5));RT.x+=RT.v*dt;if(RT.x>=stop-.5){RT.x=stop;RT.st='dock';}}
