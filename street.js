@@ -44,7 +44,7 @@ const css=`#st{position:fixed;inset:0;z-index:59;display:none;flex-direction:col
 #st .rwr .mini{width:74px;flex:none}#st .rwr .who{flex:1;min-width:0;font-size:14px;line-height:1.15}#st .rwr .who small{display:block;font:700 11px Game,system-ui;color:#b0bec5}
 #st .rwr .who .gn{color:var(--gc)}#st .rwr button{width:92px;flex:none}
 #st .hl{font:700 12px Game,system-ui;color:#cfd8dc;padding:5px 8px;border-bottom:1px solid #ffffff14}#st .hl b{color:#ff8a80}#st .hl b.ok{color:#a5d6a7}
-#st .stSh{display:grid;grid-template-columns:1fr 1fr;gap:8px}#st .stI{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 8px;border-radius:14px;background:linear-gradient(#1a2c3af0,#0f1922f0);box-shadow:inset 0 0 0 1.5px #3a5d72,0 4px 8px #0007}
+#st .stCf{position:absolute;inset:0;z-index:5;background:#05070ccc;display:flex;align-items:center;justify-content:center;padding:20px}#st .stCf .box{width:100%;max-width:300px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 14px;border-radius:16px;background:linear-gradient(#1a2c3a,#0f1922);box-shadow:inset 0 0 0 2px #e0a82e,0 8px 20px #000a;color:#fff;text-align:center}#st .stCf .ic img{height:54px}#st .stCf b{font-size:16px}#st .stCf span{font-size:13px;color:#cfd8e3}#st .stCf .bt{display:flex;gap:10px;width:100%;margin-top:8px}#st .stCf .bt button{flex:1;padding:10px 4px;border:0;border-radius:999px;font:900 13px Game,system-ui;background:#2b3a52;color:#fff}#st .stCf .bt button.g{background:linear-gradient(#ffd54a,#ff9800);color:#1a1200}#st .stSh{display:grid;grid-template-columns:1fr 1fr;gap:8px}#st .stI{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 8px;border-radius:14px;background:linear-gradient(#1a2c3af0,#0f1922f0);box-shadow:inset 0 0 0 1.5px #3a5d72,0 4px 8px #0007}
 #st .stI .ic .tki{height:50px;filter:drop-shadow(0 3px 3px #000)}#st .stI .nm{font-size:14px;text-align:center;line-height:1.1}#st .stI button{width:100%;max-width:130px}#st .stI button .tki{height:1.25em}
 #st .off{text-align:center;padding:16px;color:#ffcc80;font-size:15px}
 #st .rpAd{position:relative;margin:0 0 6px;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #ffd36b,0 6px 14px #000a}#st .rpAd img{display:block;width:100%;aspect-ratio:3/1;object-fit:cover;object-position:60% 55%}
@@ -71,9 +71,19 @@ async function attack(id){if(busy)return;if(D&&D.atks<=0)return T().toast('⚔�
   if(r.steal)give(r.steal);
   r.bg='img/rw/rw_battle.webp';r.rwH=r.win?(r.steal?'<div class="rw2"><div>'+TI()+' +'+T().nf(r.steal)+' stolen</div></div>':''):'<div class="pts" style="font-size:15px;color:#ffab91">The train got away</div>';
   r.onEnd=()=>{open();load(true);};el.classList.remove('open');O().play(r,false);}
+// v16-169 (Marius 22 nov, Alex 700→200): the Street Shop asks YES / NO before it spends, keeps the last 20 purchases
+// (shown under the shop) and tells the server (event 'stshop' on the player card in /admin).
 function buy(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it)return;if(s.tok<it[1])return T().toast(TI()+' Not enough Street Tokens ('+T().nf(it[1])+')',2200);
+  if(!el||el.querySelector('.stCf'))return;const c=document.createElement('div');c.className='stCf';
+  c.innerHTML='<div class="box"><div class="ic">'+itIcon(k)+'</div><b>Buy 1 '+itName(k)+'?</b><span>for '+TI()+' '+T().nf(it[1])+' Street Tokens</span><div class="bt"><button data-c="0">NO</button><button class="g" data-c="1">YES, BUY</button></div></div>';
+  c.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-c]');if(!b&&e.target!==c)return;c.remove();if(b&&b.dataset.c==='1')buyNow(k);});el.appendChild(c);}
+function buyNow(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it||s.tok<it[1])return;
   s.tok-=it[1];if(k[0]==='k'){if(window.DGK)DGK.add(k.slice(2),1);}else if(k==='ess')T().giveRw({ess:essN()});else T().giveRw({[k]:1});
-  T().save();T().toast(itIcon(k)+' +1 '+itName(k),2200);render();}
+  (s.log=s.log||[]).unshift([Date.now(),k,it[1],s.tok]);s.log=s.log.slice(0,20);
+  T().save();T().toast(itIcon(k)+' +1 '+itName(k),2200);render();
+  try{if(O())O().call('stbuy',{k,p:it[1],left:s.tok});}catch(e){}}
+function logH(st){if(!st.log||!st.log.length)return '';const d=t=>new Date(t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  return '<div class="stS">YOUR PURCHASES</div><div class="card">'+st.log.map(([t,k,p,l])=>'<div class="hl">'+d(t)+' · '+itName(k)+' · −'+TI()+' '+T().nf(p)+' <small>(left '+T().nf(l)+')</small></div>').join('')+'</div>';}
 function trainImg(g,w,me){return '<img class="tr" src="img/rw/'+(me&&RP()?'loco_gold':'loco'+g)+'.webp" alt=""'+(w?' style="width:'+w+'"':'')+'>';}
 function render(){if(!el||!el.classList.contains('open'))return;const G=T().G,body=document.getElementById('stBody'),now=Date.now(),st=S();let h='';
   h+='<div class="stBal">'+TI()+'<b>'+T().nf(st.tok)+'</b><span>STREET TOKENS<br>for the Street Shop</span></div>';
@@ -97,7 +107,7 @@ function render(){if(!el||!el.classList.contains('open'))return;const G=T().G,bo
   h+='<div class="btns"><button class="y" data-s="list">🔄 NEW TRAINS</button></div>';
   if(D.hits.length){h+='<div class="stS">ATTACKS ON YOUR TRAINS</div><div class="card">'+D.hits.map(x=>'<div class="hl">'+esc(x.an)+' attacked your <span style="color:'+GC(x.g)+'">'+GN(x.g)+'</span> train – '+(x.win?'<b>stole '+T().nf(x.steal)+'</b>':'<b class="ok">your team won</b>')+'</div>').join('')+'</div>';}
   body.innerHTML=h+shopH(st);}
-function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'+SHOP.map(([k,p])=>'<div class="stI"><div class="ic">'+itIcon(k)+'</div><div class="nm">'+itName(k)+'</div><button class="g'+(st.tok<p?' dis':'')+'" data-s="buy" data-k="'+k+'">'+TI()+' '+T().nf(p)+'</button></div>').join('')+'</div>';}
+function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'+SHOP.map(([k,p])=>'<div class="stI"><div class="ic">'+itIcon(k)+'</div><div class="nm">'+itName(k)+'</div><button class="g'+(st.tok<p?' dis':'')+'" data-s="buy" data-k="'+k+'">'+TI()+' '+T().nf(p)+'</button></div>').join('')+'</div>'+logH(st);}
 function open(){build();el.classList.add('open');render();load();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}
   const now=Date.now();if(D&&D.mine&&D.mine.some(t=>t.t1<=now))load(true);else render();},1000);}
 // a row for the building panels (Car Wash, Gas Station, Car Factory, Rail Terminal)

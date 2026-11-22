@@ -604,6 +604,10 @@ export async function online(op, b, env) {
   if (op === 'arena') { if (await isBanned(env, b.pid)) return {banned:1}; return {ok:true, ...(await arenaView(env, p))}; }
   if (op === 'refresh') { const a = await arenaRow(env, p); a.opp = JSON.stringify(await findOpp(env, p, a)); await saveArena(env, a); return {ok:true, opp:await oppView(env, p, a)}; }
   if (op === 'fight') { if (await isBanned(env, b.pid)) return {banned:1}; return fight(env, p, b); }
+  if (op === 'stbuy') {   // v16-169: Street Shop purchase log (shown on the player card in /admin, kind 'stshop'); max 60 a day
+    const k = String(b.k || '').replace(/[^a-z0-9_]/gi, '').slice(0, 12), pr = b.p | 0, left = b.left | 0; if (!k) return {err:'bad'};
+    if ((await db.prepare("SELECT COUNT(*) n FROM events WHERE pid=? AND kind='stshop' AND t>?").bind(b.pid, now - DAY).first()).n >= 60) return {ok:true};
+    await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'stshop', `Street Shop: ${k} −${pr} (left ${left})`).run(); return {ok:true}; }
   if (op === 'rw' || op === 'rwsend' || op === 'rwatk' || op === 'rwclaim') { if (await isBanned(env, b.pid)) return {banned:1}; return railWars(env, p, op, b); }   // v16-146
   if (op === 'atop') {
     const season = seasonOf(now);

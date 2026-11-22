@@ -581,7 +581,7 @@ async function admin(url, env) {
   if (ban) { await db.prepare('UPDATE players SET banned=1, score=999, reason=? WHERE pid=?').bind('banned by admin', ban).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
   const tot = await db.prepare('SELECT COUNT(*) n, SUM(last>?) d FROM players').bind(Date.now() - 864e5).first();
   const bad = (await db.prepare('SELECT * FROM players WHERE score>0 ORDER BY banned DESC, score DESC LIMIT 100').all()).results;
-  const ev = (await db.prepare("SELECT * FROM events WHERE kind NOT IN ('review','dual','multi') ORDER BY t DESC LIMIT 40").all()).results;
+  const ev = (await db.prepare("SELECT * FROM events WHERE kind NOT IN ('review','dual','multi','stshop') ORDER BY t DESC LIMIT 40").all()).results;
   const rv = (await db.prepare("SELECT * FROM events WHERE kind IN ('review','dual','multi') AND t>? ORDER BY t DESC LIMIT 30").bind(Date.now() - 3 * 864e5).all()).results;
   // last battle receipt of every flagged player: team power vs. monsters
   const lastR = {}; for (const p of bad) { const r = await db.prepare('SELECT * FROM rcpt WHERE pid=? ORDER BY t DESC LIMIT 1').bind(p.pid).first(); if (r) lastR[p.pid] = r; }
