@@ -82,40 +82,89 @@ async def main():
             n[0] += 1; fn = f'{OUTD}/{n[0]:03d}.png'; await pg.screenshot(path=fn)
             res = measure(Image.open(fn).convert('RGB'), items)
             report.append({'screen': label, 'png': fn, 'texts': res}); print(n[0], label, len(res), flush=True)
+            open(f'{OUTD}/report.jsonl', 'a').write(json.dumps({'screen': label, 'png': fn, 'texts': res}, ensure_ascii=False) + '\n')
         await snap('map')
-        await pg.evaluate(G['JS'])
-        top = await pg.evaluate("__A.cands()")
-        keys = [('c', c) for c in top] + [('p', k) for k in await pg.evaluate("[...__AUD.STIDS,...__AUD.XIDS,'office','export','parking','parts','security','yard','collection','rail','shop','vip']")]
-        done = set()
-        for kind, c in keys:
-            lab = ('panel:' + c) if kind == 'p' else (c.get('txt') or c['k'])
-            if lab in done: continue
-            done.add(lab)
-            try:
-                await cx.reload()
-                await pg.evaluate(G['JS'])
-                if kind == 'p': await pg.evaluate(f"__AUD.openPanel({json.dumps(c)})")
+        seen = set(['map']); MAXS = int(os.environ.get('TA_MAX', '220'))
+        async def nog():   # close the first-time mini-guides (Mama Rosa) so they do not hide the page
+            for _ in range(3):
+                if not await pg.evaluate("(()=>{const b=document.querySelector('#tut button.nx');if(b&&b.offsetParent){b.click();return 1}return 0})()"): break
+                await pg.wait_for_timeout(500)
+        async def go(path):
+            await cx.reload(); await pg.evaluate(G['JS'])
+            for st in path:
+                if st[0] == 'p': await pg.evaluate(f"__AUD.openPanel({json.dumps(st[1])})")
                 else:
+                    cs = await pg.evaluate("__A.cands()"); m = [x for x in cs if x['k'] == st[1]]
+                    if not m: return False
+                    await pg.mouse.click(m[0]['x'], m[0]['y'])
+                await pg.wait_for_timeout(1100); await nog(); await pg.evaluate(G['JS'])
+            return True
+        async def explore(path, label, depth):
+            if depth >= DEPTH or n[0] >= MAXS: return
+            if not await go(path): return
+            cands = await pg.evaluate("__A.cands()")
+            for c in cands[:24]:
+                if n[0] >= MAXS: return
+                try:
+                    if not await go(path): return
                     cs = await pg.evaluate("__A.cands()"); m = [x for x in cs if x['k'] == c['k']]
                     if not m: continue
-                    await pg.mouse.click(m[0]['x'], m[0]['y'])
-                await pg.wait_for_timeout(1200); await pg.evaluate(G['JS'])
-                sig = await pg.evaluate("__A.topLayer()")
-                if sig == 'map' and kind == 'c': continue
-                await snap(lab)
-                if DEPTH >= 2 and sig != 'map':
+                    await pg.mouse.click(m[0]['x'], m[0]['y']); await pg.wait_for_timeout(1200); await nog(); await pg.evaluate(G['JS'])
+                    tl = await pg.evaluate("__A.topLayer()")
+                    if tl == 'map' and path: continue
+                    sg = tl + '|' + (await pg.evaluate("__A.sig()"))[:60]
+                    if sg in seen: continue
+                    seen.add(sg); lab = label + ' > ' + (c.get('txt') or c['k'])[:30]
+                    await snap(lab)
+                    await explore(path + [('c', c['k'])], lab, depth + 1)
+                except Exception as e: print('skip', label, str(e)[:100])
+        if os.environ.get('TA_MODE') == 'targets':
+            # v2: every main button of the map → its page → every button there (depth 2), back with ✕/↩ instead of reloading
+            tops = [c for c in await pg.evaluate("__A.cands()") if c['k'].startswith('#') or c.get('txt')]
+            SKIP = set(x for x in os.environ.get('TA_SKIP', '').split(',') if x)
+            if os.environ.get('TA_START'): n[0] = int(os.environ['TA_START'])
+            for t in tops:
+                lab0 = t.get('txt') or t['k']
+                if lab0 in SKIP or t['k'] in SKIP: continue
+                try:
+                    if not await go([('c', t['k'])]): print('nogo', lab0, flush=True); continue
+                    tl = await pg.evaluate("__A.topLayer()")
+                    if tl == 'map': continue
+                    s0 = tl + '|' + (await pg.evaluate("__A.sig()"))[:60]
+                    if s0 not in seen: seen.add(s0); await snap(lab0)
                     sub = await pg.evaluate("__A.cands()")
-                    base = await pg.evaluate("__A.sig()")
-                    for s2 in sub[:14]:
-                        cs = await pg.evaluate("__A.cands()"); m = [x for x in cs if x['k'] == s2['k']]
-                        if not m: break
-                        await pg.mouse.click(m[0]['x'], m[0]['y']); await pg.wait_for_timeout(1000); await pg.evaluate(G['JS'])
-                        s = await pg.evaluate("__A.sig()")
-                        if s != base and (lab + '>' + s[:30]) not in done:
-                            done.add(lab + '>' + s[:30]); await snap(lab + ' > ' + (s2.get('txt') or s2['k']))
-                            base = s
-            except Exception as e:
-                print('skip', lab, str(e)[:120])
+                    for c in sub[:30]:
+                        if n[0] >= MAXS: break
+                        cs = await pg.evaluate("__A.cands()"); m = [x for x in cs if x['k'] == c['k']]
+                        if not m:
+                            if not await go([('c', t['k'])]): break
+                            cs = await pg.evaluate("__A.cands()"); m = [x for x in cs if x['k'] == c['k']]
+                            if not m: continue
+                        await pg.mouse.click(m[0]['x'], m[0]['y']); await pg.wait_for_timeout(1200); await nog(); await pg.evaluate(G['JS'])
+                        tl = await pg.evaluate("__A.topLayer()")
+                        if tl == 'map': await go([('c', t['k'])]); continue
+                        sg = tl + '|' + (await pg.evaluate("__A.sig()"))[:60]
+                        if sg != s0 and sg not in seen:
+                            seen.add(sg); await snap(lab0 + ' > ' + (c.get('txt') or c['k'])[:30])
+                            # one level deeper: the first 8 buttons of this page
+                            sub2 = await pg.evaluate("__A.cands()")
+                            for c2 in sub2[:8]:
+                                cs = await pg.evaluate("__A.cands()"); m2 = [x for x in cs if x['k'] == c2['k']]
+                                if not m2: break
+                                await pg.mouse.click(m2[0]['x'], m2[0]['y']); await pg.wait_for_timeout(1100); await nog(); await pg.evaluate(G['JS'])
+                                tl2 = await pg.evaluate("__A.topLayer()"); sg2 = tl2 + '|' + (await pg.evaluate("__A.sig()"))[:60]
+                                if tl2 != 'map' and sg2 not in seen: seen.add(sg2); await snap(lab0 + ' > ' + (c.get('txt') or c['k'])[:20] + ' > ' + (c2.get('txt') or c2['k'])[:20])
+                                if tl2 == 'map' or sg2 != sg: break
+                        await go([('c', t['k'])])
+                except Exception as e: print('skip', lab0, str(e)[:100])
+            await br.close(); json.dump(report, open(f'{OUTD}/report.json', 'w'), indent=1, ensure_ascii=False); return
+        await explore([], 'map', 0)
+        for k in await pg.evaluate("[...__AUD.STIDS,...__AUD.XIDS,'office','export','parking','parts','security','yard','collection','rail','shop','vip']"):
+            try:
+                await go([('p', k)]); sg = 'panel:' + k
+                if sg in seen: continue
+                seen.add(sg); await snap(sg); await explore([('p', k)], sg, 1)
+            except Exception as e: print('skip', k, str(e)[:100])
         await br.close()
     json.dump(report, open(f'{OUTD}/report.json', 'w'), indent=1, ensure_ascii=False)
 asyncio.run(main())
