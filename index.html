@@ -8,7 +8,8 @@
 <meta name="theme-color" content="#0b1019">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>
+<script>window.PWI='<img class="tki pwi" src="img/ui/power.webp" alt="">'; // v16-178: POWER icon (Marius)
+
 // v16-12: old Chrome / WebView (e.g. Chrome 95 on Android 12) can't read colors like #fff1c1cc (#RRGGBBAA) in canvas → crashed the battle.
 // If the phone doesn't understand them, translate them to rgba() automatically.
 (function(){try{const t=document.createElement('canvas').getContext('2d');t.fillStyle='#ff000080';if(/^rgba/.test(t.fillStyle))return;
