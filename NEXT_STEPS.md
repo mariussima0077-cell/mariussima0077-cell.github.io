@@ -424,4 +424,4 @@ Machetă: https://mariussima0077-cell.github.io/preview/shop.html · în joc: te
 
 ## 22 nov 2026 – v16-183
 - Fix afișaj: rândul „Income now” = măsurătoare LIVE (20 min); de la LV 11 arată câștigul exact al upgrade-ului (+x% pay) + mesaj „LEVEL N! +x% pay”.
-- DE DECIS (Marius): piesele de garaj vin prea repede – testerul Wazza e la LV 37 Service cu 47,4K Support Parts (ajung până la LV ~51) și 106K Builder Kit. Propunere: costuri ×3 de la LV 11 în sus SAU mai puține piese din idle/salvage. Nu e schimbat încă.
+- v16-184 (live, Marius OK fără simulare): piese de garaj – multiplicatorul de campanie PART_U plafonat la ×5 (era ×26) + costuri ×2 de la LV 11. Motiv: Wazza LV 50 într-o săptămână. De urmărit la testeri.

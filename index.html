@@ -3109,8 +3109,8 @@ function pkRoles(n){n=Math.round(n);const o={};if(n<=0)return o;const ks=Object.
   const ch=Math.max(1,Math.ceil(n/6));for(let left=n;left>0;){const c=Math.min(ch,left);let r=Math.random()*tw,k=ks[0];for(const q of ks){r-=PK_W[q];if(r<0){k=q;break;}}o[k]=(o[k]||0)+c;left-=c;}return o;}
 const pkGive0=o=>Object.keys(o).map(k=>PKI(k)+' +'+nfmt(o[k])).join(' ');
 function pkGive(o){const out=[];for(const k in o)if(pkAdd(k,o[k]))out.push(PKI(k)+' +'+nfmt(o[k]));return out.join(' · ');}
-const PCOST=(id,L)=>Math.ceil((2+.7*Math.pow(L,1.55))*13*(id==='factory'?1.5:1)*(1-VB('disc'))/5)*5;   // v16-129b (Marius: ×10 numbers, a bit slower): LV1 40 · LV10 350 · LV50 3,950 · LV100 11,450
-const PART_U=()=>1+Math.min(999,(G.cp&&G.cp.best)||0)/40;   // drops grow with your campaign stage (×1 → ×26)
+const PCOST=(id,L)=>Math.ceil((2+.7*Math.pow(L,1.55))*13*(id==='factory'?1.5:1)*(L>10?2:1)*(1-VB('disc'))/5)*5;   // v16-184: LV 11+ ×2 (Wazza LV 50 in a week)   // v16-129b (Marius: ×10 numbers, a bit slower): LV1 40 · LV10 350 · LV50 3,950 · LV100 11,450
+const PART_U=()=>1+Math.min(160,(G.cp&&G.cp.best)||0)/40;   // drops grow with your campaign stage (×1 → max ×5; v16-184 was ×26 – too fast)
 const GB=L=>.0001*L*L;   // battle bonus (ATK + HP) of a garage of level L (v16-129b: slower at first): LV10 +1% · LV25 +6% · LV50 +25% · LV75 +56% · LV100 +100%
 function garB(cls){if(CLSG[cls])return GB(lvT(CLSG[cls]));if(cls==='all'){let a=0;for(const k in CLSG)a+=GB(lvT(CLSG[k]));return a/6;}return 0;}   // Legend (Mythic) = average of the 6
 // old saves: levels stay; unfinished money steps (LV 4-10) and the money already in buildings become a small parts gift
