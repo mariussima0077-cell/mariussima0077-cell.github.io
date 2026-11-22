@@ -62,6 +62,7 @@
 7. **Testul închis**: 12 testeri trebuie să rămână înscriși 14 zile LA RÂND (numărătoarea pornește când al 12-lea s-a înscris). Nu scoate pe nimeni; apoi cerere de Production.
 8. ✅ (v16-123 deblocare treptată + v16-140 NEXT GOAL) Pentru jucători noi: harta are 11 iconițe din prima secundă (Battle, Heroes, Summon, Crew, Idle, Rank, Chat, Events, Check-in, News, Mail) și acoperă garajele din stânga → de luat în calcul deblocare treptată (ex. Chat/Rank/Events de la REP 3).
 9. ✅ (v16-140) emoji 💎/🎟 înlocuite cu iconițele jocului; rămân doar emoji-urile de titlu din News și desenele pe canvas.
+10. **⚠️ Cloudflare Workers Paid (~5 $/lună) – de activat ÎNAINTE de Production** (Marius 22 nov: „ține minte, să nu avem surprize”). Planul gratuit: 100.000 cereri/zi, D1 100.000 scrieri/zi, 10 ms CPU/cerere → la sute/mii de jucători activi se blochează online-ul (arenă, chat, cloud, bot) până a doua zi. Marius: contul Cloudflare torqueempirehelp@gmail.com → Workers & Pages → Plans → Workers Paid (Claude ghidează). Codul nu se schimbă.
 
 ## ✅ CE E GATA (12 noiembrie 2026, seara)
 ### Jocul
