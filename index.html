@@ -804,7 +804,7 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #olPod .av .f,#olPod .av .p{position:absolute;inset:0;background-size:contain;background-repeat:no-repeat;background-position:center}#olPod .av .p{inset:16%;border-radius:50%;background-size:cover;z-index:-1}
 #olPod .crown{position:absolute;left:50%;top:-16%;width:38%;transform:translateX(-50%);z-index:2;filter:drop-shadow(0 2px 3px #000)}
 #olPod .pn{background:#000d;border-radius:8px;padding:3px 4px;box-shadow:0 0 0 1px #ffd54a99,0 2px 6px #000;margin:2px -22% 0}
-#olPod .pn b{display:block;font:900 11.5px Game,system-ui;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#olPod .pn small{display:block;font:900 10.5px Game,system-ui;color:#ffe27a}
+#olPod .pn b{display:block;font:900 11.5px Game,system-ui;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#olPod .pn b{display:flex;align-items:center;justify-content:center;gap:3px}#olPod .pn .pnm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#olPod .pn .vipB{flex:none;height:1.5em;width:auto;filter:drop-shadow(0 1px 1px #000)}/* v16-170: VIP badge on the podium */#olPod .pn small{display:block;font:900 10.5px Game,system-ui;color:#ffe27a}
 #olPod .pd:not([data-uid]){opacity:.35}
 #onl .sk-chat .inp{position:absolute;left:calc(var(--pw)*30/941);right:calc(var(--pw)*30/941);bottom:calc(var(--pw)*24/941);height:calc(var(--pw)*118/941);padding:0 6px;box-sizing:border-box;display:flex;align-items:center;gap:6px;background:none!important;border:0!important}
 #onl .sk-chat .inp input{flex:1;min-width:0;background:#0006!important;border:0!important}
@@ -3220,7 +3220,9 @@ function mKids(a,b){const an=a.childNodes,bn=[...b.childNodes];
     for(const at of n.attributes)if(o.getAttribute(at.name)!==at.value)o.setAttribute(at.name,at.value);
     mKids(o,n);}
   while(an.length>bn.length)a.removeChild(a.lastChild);}
-let toastTO=0;function toast(t,ms,hint){const el=$('toast');el.innerHTML=t;el.style.opacity=1;el.classList.toggle('mapHint',!!hint);clearTimeout(toastTO);toastTO=setTimeout(()=>el.style.opacity=0,ms||3500);}
+// v16-170 (Marius: „nu vreau să mai văd nicio notificare”): a message shows ONLY as the answer to a tap (≤2.5 s after it) – automatic notices never show
+let lastTap=0;addEventListener('pointerdown',()=>{lastTap=performance.now();},true);
+let toastTO=0;function toast(t,ms,hint){if(performance.now()-lastTap>2500)return;const el=$('toast');el.innerHTML=t;el.style.opacity=1;el.classList.toggle('mapHint',!!hint);clearTimeout(toastTO);toastTO=setTimeout(()=>el.style.opacity=0,ms||3500);}
 // v16-113: the map hint ("Drag to move…") disappears at the first touch – it no longer stays on top of the page you open
 addEventListener('pointerdown',()=>{const el=$('toast');if(el&&el.classList.contains('mapHint')){el.classList.remove('mapHint');el.style.opacity=0;}},true);
 
@@ -4227,7 +4229,7 @@ function startLoader(){
   (function lf(now){if(started)return;const t=(now-t0)/1000;
     const cap=assetsDone()?100:88;lp=Math.min(cap,lp+.9);if(lp>=100&&!lready){lready=true;if(window.CLOUD){CLOUD.mountStart($('lpanel'));$('lpanel').classList.add('on');}}
     drawLoader(t);requestAnimationFrame(lf);})(t0);
-  $('loader').onclick=()=>{if(!lready||started||window.__UPD)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;try{IMG.loading.el=null;IMG.loading._ok=false;IMG.loading.bad=true;}catch(e){}},1500);setTimeout(()=>{for(const id in GAR){try{if(G.lv[id]>0)void IMG['g_'+id+gTier(id)].ok;}catch(e){}}},2500);/* v16-120: garages outside the screen get their current level picture a bit later *//* v16-115: free the loading canvas (~5 MB) */last=performance.now();setTimeout(()=>toast('Drag to move · pinch to zoom · tap a building or a car',4500,1),600);if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
+  $('loader').onclick=()=>{if(!lready||started||window.__UPD)return;$('loader').classList.add('hide');started=true;removeEventListener('resize',sizeLoader);setTimeout(()=>{lcv.width=lcv.height=1;try{IMG.loading.el=null;IMG.loading._ok=false;IMG.loading.bad=true;}catch(e){}},1500);setTimeout(()=>{for(const id in GAR){try{if(G.lv[id]>0)void IMG['g_'+id+gTier(id)].ok;}catch(e){}}},2500);/* v16-120: garages outside the screen get their current level picture a bit later *//* v16-115: free the loading canvas (~5 MB) */last=performance.now();/* v16-170: map hint removed (Marius: no notifications) */if(Date.now()-G.idle>6e5&&idleNow().money>0)setTimeout(()=>popIdle(true),900);};
 }
 // v16-72: what the tutorial (tutorial.js) needs from the map – camera, building areas, panel
 window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX=x;camY=y;vX=vY=0;clampCam();},

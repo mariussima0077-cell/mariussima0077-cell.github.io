@@ -16,7 +16,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=169;
+const CV=170;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -432,10 +432,10 @@ async function loadRank(first){
   const subv=p=>rkBy==='best'?'⚡ '+fmtN(p.pow):'⚔️ '+stLab(p.best);
   const L=r.list;
   // v16-47: top 3 stand on the podium of Marius' ranking page (header)
-  {const P=$('olPod');P.innerHTML=[1,0,2].map(i=>{const p=L[i];return `<div class="pd p${i+1}" ${p?`data-uid="${p.uid}"`:''}>${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}<div class="av">${p?avf(p.icon,p.frame):''}</div><div class="pn"><b>${p?flag(p.cc)+' '+esc(p.name):'—'}</b><small>${p?val(p):''}</small></div></div>`;}).join('');}
+  {const P=$('olPod');P.innerHTML=[1,0,2].map(i=>{const p=L[i];return `<div class="pd p${i+1}" ${p?`data-uid="${p.uid}"`:''}>${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}<div class="av">${p?avf(p.icon,p.frame):''}</div><div class="pn"><b>${p?'<span class="pnm">'+flag(p.cc)+' '+esc(p.name)+'</span>'+vipB(p.vip):'—'}</b><small>${p?val(p):''}</small></div></div>`;}).join('');}
   if(first||!B.querySelector('#olRows')){
     const pod=[1,0,2].map(i=>{const p=L[i];if(!p)return `<div class="g g${i+1}" style="opacity:.25">${medal(i+1)}<div class="av">${avf('m0_0',0)}</div><div class="o-n">—</div></div>`;
-      return `<div class="g g${i+1}" data-uid="${p.uid}">${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}${medal(i+1)}<div class="av">${avf(p.icon,p.frame)}</div><div class="o-n">${flag(p.cc)} ${esc(p.name)}</div>${tt(p.title)}<div class="o-st" data-v>${val(p)}</div><div class="ps">${subv(p)}</div></div>`;}).join('');
+      return `<div class="g g${i+1}" data-uid="${p.uid}">${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}${medal(i+1)}<div class="av">${avf(p.icon,p.frame)}</div><div class="o-n">${flag(p.cc)} ${esc(p.name)} ${vipB(p.vip)}</div>${tt(p.title)}<div class="o-st" data-v>${val(p)}</div><div class="ps">${subv(p)}</div></div>`;}).join('');
     B.innerHTML=`<div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
 
   const rows=$('olRows');const html=L.slice(3).map((p,i)=>{const ch=rkPrev[p.uid]!==undefined&&rkPrev[p.uid]!==p[rkBy];

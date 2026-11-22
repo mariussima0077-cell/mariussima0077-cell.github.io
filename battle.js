@@ -1684,14 +1684,14 @@ function startBattle(si,team,tw){
   team=(team||[]).filter(h=>h&&!h.crew);if(!team.length){const T=TE();T.toast('🦸 You have no heroes yet – summon your first heroes!',3000);try{if(T.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T.openSummon('m');}}catch(e){}return;}
   B={si,stage:tw?tw.st:STAGES[si],tw:tw||null,mod:tw&&tw.mod>=0?TW_MOD[tw.mod].k:'',wave:0,heroes:[],mons:[],proj:[],fx:[],parts:[],nums:[],tele:[],t:0,real:0,ts:1,slowT:0,spd:spdOK(TE().G.cp.spd),auto:TE().G.cp.auto!==false,
     phase:'intro',phT:0,scroll:0,scrollV:0,shake:0,banner:null,flash:0,paused:false,deaths:0,bossBar:null,lowRes:false,perf:[],fx2:[],hs:0,sx:0,sy:0};if(FX2)fxPre();
-  B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)TE().toast('⚡ NITRO BOOST: +'+Math.round(B.nit*100)+'% HP & attack',2400);},B.grit?2700:0);
+  B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)0;B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)0;},B.grit?2700:0);
   B.lowRes=LOWRES;B.lowRes2=LOWRES&&LOWRES2;if(!bsize())buildBG();
   B.trb=teamRoles(team).bon;
   B.w0=Date.now();try{B.pw0=Math.round(teamPower(team)*(1+(B.grit||0))*(1+(B.nit||0)));}catch(e){B.pw0=0;} // v16-157: battle receipt (anti-cheat)
   B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr){sprLoad(u.spr);warmIm(u.spr.im);warmIm(u.spr.fi);warmIm(u.spr.bi);}});if(!window.__SIM)for(const k in FXIM)warmIm(FXIM[k]);
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
   spawnWave();
-  $('bt').classList.add('open');window.__BATTLE_ON=true;if(!window.__SIM){let n=0;try{n=+localStorage.getItem('te_bhint')||0;localStorage.setItem('te_bhint',n+1);}catch(e){}if(n<3)setTimeout(()=>{if(B&&!B.res)TE().toast('🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',4200);},2600);}running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
+  $('bt').classList.add('open');window.__BATTLE_ON=true;if(!window.__SIM){let n=0;try{n=+localStorage.getItem('te_bhint')||0;localStorage.setItem('te_bhint',n+1);}catch(e){}}running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
 function spawnWave(){const w=B.stage.w[B.wave];
   w.forEach((t,i)=>{const m=mkMon(t,i);if(B.mod)twModMon(m);const n=w.length;
     if(m.b==='titan'){m.x=W*.78;m.d=.42;m.st='idle';}
