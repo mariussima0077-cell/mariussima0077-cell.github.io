@@ -4,6 +4,7 @@
 'use strict';
 const T=()=>window.__TE, C=()=>window.CAMPAIGN, $=id=>document.getElementById(id);
 // v16-140: the game's icons instead of 💎 / 🎟 / ⚙️ / 🎫 emoji (one icon per resource everywhere)
+const PWh=window.PWI||'⚡';
 const DMh='<img class="tki" src="img/ui/diamond.svg" alt="">',TKh='<img class="tki" src="img/ticket.webp" alt="">',GTh='<img class="tki" src="img/gticket.webp" alt="">',CTh='<img class="tki" src="img/cticket.webp" alt="">';
 const API=()=>window.SEC&&SEC.api(), PID=()=>window.SEC&&SEC.PID;
 const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}};
@@ -16,7 +17,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=175;
+const CV=176;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -349,6 +350,20 @@ const css=`
 #onl .mt .sd div.cf.w{background-color:transparent}#onl .mt .sd div.cf.w:after{content:'WIN';margin-left:auto;font:900 11px Game,system-ui;color:#7CFC9A}
 #onl #olCupT b{background:url(img/ui3/cup_pb.webp) center/100% 100% no-repeat!important;padding:9px 16px!important}#onl #olCupT b.on{background-image:url(img/ui3/cup_po.webp)!important;color:#fff!important;text-shadow:0 1px 0 #6a2a00}
 
+/* v16-176: opponent hero window (tap a hero on a profile) */
+#onl .pkTap{cursor:pointer;transition:transform .12s}#onl .pkTap:active{transform:scale(.92)}
+#onl .pkHint{display:block;margin-top:4px;color:#ffd54a;font-size:11px;opacity:.85}
+#onl .pkM .box{width:92%}
+#onl .pkH{display:flex;gap:12px;align-items:center;text-align:left;margin:4px 0 8px}#onl .pkC{flex:0 0 96px}
+#onl .pkT{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}#onl .pkT>b{font-size:18px;line-height:1.1}#onl .pkT small{font-size:11px;color:#cfd8e3}
+#onl .pkL{font:900 13px Game,system-ui;color:#fff}#onl .pkP{font:900 19px Game,system-ui;color:#ffd54a;text-shadow:0 1px 2px #000}#onl .pkP .tki{height:1.15em;vertical-align:-.22em}
+#onl .pkSt{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;text-align:left}#onl .pkSt>div{font-size:10.5px}
+#onl .pkSk{margin:8px 0;padding:8px 10px;border-radius:10px;background:#0006;box-shadow:inset 0 0 0 1px #ffd54a55;text-align:left}#onl .pkSk b{display:block;color:#ffd54a;font-size:13px}#onl .pkSk small{font-size:11px;color:#dfe6ee;line-height:1.3}
+#onl .pkG{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;margin-top:4px}
+#onl .pkI{display:flex;flex-direction:column;align-items:center;min-width:0}#onl .pkI .gi{width:72px}#onl .pkI .fc{aspect-ratio:220/236}
+#onl .pkN{font:900 10px/1.15 Game,system-ui;margin-top:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#onl .pkS{font-size:9.5px;color:#cfd8e3;white-space:nowrap}#onl .pkC .hfc>:not(:first-child){display:none!important}#onl .pkSk small{display:block;line-height:1.35!important;margin-top:2px}#onl .pkS b{color:#7CFC9A}
+#onl .pkI.off .pkE{width:72px;aspect-ratio:220/236;border-radius:10px;border:2px dashed #ffffff33;display:flex;align-items:center;justify-content:center;font-size:10px;color:#8fa0b4}
 `;
 
 // ------------------------------------------------------------------ DOM
@@ -441,8 +456,8 @@ async function loadRank(first){
   const r=await call('rank',{by:rkBy});const B=$('olRkB');
   if(!r.ok){if(first)B.innerHTML=`<div class="empty">📶 Could not reach the server.<br>Check your internet and try again.</div>`;return;}
   $('olUpd').textContent=`${r.total} player${r.total===1?'':'s'} · ${new Date(r.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
-  const val=p=>rkBy==='best'?stLab(p.best):rkBy==='pow'?'⚡ '+fmtN(p.pow):'🏗️ '+p.lv;
-  const subv=p=>rkBy==='best'?'⚡ '+fmtN(p.pow):'⚔️ '+stLab(p.best);
+  const val=p=>rkBy==='best'?stLab(p.best):rkBy==='pow'?PWh+' '+fmtN(p.pow):'🏗️ '+p.lv;
+  const subv=p=>rkBy==='best'?PWh+' '+fmtN(p.pow):'⚔️ '+stLab(p.best);
   const L=r.list;
   // v16-47: top 3 stand on the podium of Marius' ranking page (header)
   {const P=$('olPod');P.innerHTML=[1,0,2].map(i=>{const p=L[i];return `<div class="pd p${i+1}" ${p?`data-uid="${p.uid}"`:''}>${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}<div class="av">${p?avf(p.icon,p.frame):''}</div><div class="pn"><b>${p?'<span class="pnm">'+flag(p.cc)+' '+esc(p.name)+'</span>'+vipB(p.vip):'—'}</b><small>${p?val(p):''}</small></div></div>`;}).join('');}
@@ -511,7 +526,7 @@ async function loadArena(){const B=$('olArB');if(!arData)B.innerHTML='<div class
   arData=r;arenaTk=r.tk;dots();const t=r.tier;
   B.innerHTML=`<div class="ahero ah3"><div class="badge">${badge(t.lg,t.div||'★')}</div><div class="t"><b>${t.name}</b><small>🏅 ${r.pts} points · rank #${r.rank} · ${r.w}W / ${r.l}L</small><div class="o-bar"><i style="width:0"></i></div><small>${t.next?`${t.next-r.pts} pts to the next division`:'Top league!'} · season ${r.season} ends in <span id="olSeason">${dur(r.end-Date.now())}</span></small></div></div>
    <div class="tk"><span>⚔️ Arena fights <b id="olTk">${r.tk}</b> / ${r.tkMax} <span id="olTkN"></span></span><span>🎁 daily reward 22:00</span></div>
-   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ⚡ ${fmtN(o.pow)}</small></div><button class="fight f3 ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}"><small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
+   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ${PWh} ${fmtN(o.pow)}</small></div><button class="fight f3 ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}"><small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
    <div class="btns"><div class="shine" data-a="def">🛡️ MY TEAM</div><div class="shine" data-a="ref">🔄 NEW RIVALS</div></div>
    <div class="leag">${LG.map((l,i)=>`<div class="${i===t.lg?'on':''}">${badge(i)}${l[0]}</div>`).join('')}</div>
    <div class="o-note">Fights are automatic: your <b>battle team</b> (with gear) against the other player's team – he does not need to be online. Win = up to +${win(r.pts,r.pts+400)} points. When others attack you, you lose a few points only if they win.<br>Rivals marked <span class="ai">AI</span> are training rivals while the server is still filling up.</div>
@@ -531,7 +546,7 @@ $('olArB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(!a)return;
   if(a.dataset.a==='ref'){const r=await call('refresh',{});if(r.ok&&arData){arData.opp=r.opp;loadArena();}}
   if(a.dataset.a==='def'){const c=C();const tm=c&&c.arenaTeam?c.arenaTeam():[];
-    modal(`<h4>🛡️ My Arena team</h4><p>Your Arena team is your <b>battle team</b> from the Campaign (with its gear). It attacks and it also defends you when others attack.</p><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0">${tm.map(h=>fcard(h.id,h.s,52)).join('')}</div><p style="text-align:center">⚡ Power <b style="color:#ffe27a">${fmtN(c&&c.teamPower?c.teamPower():0)}</b></p><div class="ok"><button class="btn gray" data-m="no">CLOSE</button><button class="btn" data-m="ok">⚔️ HEROES PAGE</button></div>`,
+    modal(`<h4>🛡️ My Arena team</h4><p>Your Arena team is your <b>battle team</b> from the Campaign (with its gear). It attacks and it also defends you when others attack.</p><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0">${tm.map(h=>fcard(h.id,h.s,52)).join('')}</div><p style="text-align:center">${PWh} Power <b style="color:#ffe27a">${fmtN(c&&c.teamPower?c.teamPower():0)}</b></p><div class="ok"><button class="btn gray" data-m="no">CLOSE</button><button class="btn" data-m="ok">⚔️ HEROES PAGE</button></div>`,
       b=>{if(b==='ok'){closeHub();if(c){c.open();setTimeout(()=>c.openGear(),50);}}});}});
 async function doFight(key){if(fightBusy)return;fightBusy=true;await sync();const r=await call('fight',{key});fightBusy=false;
   if(!r.ok){toast({no_tickets:'⚔️ No Arena fights left',old_opponents:'🔄 Rivals changed – try again',no_team:'⚔️ You need a battle team first',network:'📶 No connection',banned:'🚫 Account blocked'}[r.err]||'⚠️ Could not start the fight',3000);loadArena();return;}
@@ -586,7 +601,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
   $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}</div><div class="pvip">${vip?vipB(vip)+' <b>VIP '+vip+'</b>':''}<button class="hvB" data-a="hv">${ME.hv?'🙈 VIP HIDDEN':'👁 VIP VISIBLE'}</button><small>${ME.hv?'Others do not see your VIP level':'Tap to hide your VIP level from others'}</small></div>
-    <div class="pst s1">CAMPAIGN<b>⚔️ ${stLab(ME.best)}</b></div><div class="pst s2">TEAM POWER<b>⚡ ${fmtN(ME.pow)}</b></div><div class="pst s3">GARAGE · CUP<b>🏗️ ${ME.lv} · 🏆 ${ME.cupw||0}</b></div>`;
+    <div class="pst s1">CAMPAIGN<b>⚔️ ${stLab(ME.best)}</b></div><div class="pst s2">TEAM POWER<b>${PWh} ${fmtN(ME.pow)}</b></div><div class="pst s3">GARAGE · CUP<b>🏗️ ${ME.lv} · 🏆 ${ME.cupw||0}</b></div>`;
   B.innerHTML=`   ${/^Mechanic\d+$/.test(ME.name)?`<div class="btns" style="margin-bottom:10px"><div class="shine" data-a="name">✏️ CHOOSE YOUR PLAYER NAME (FREE)</div></div>`:''}
    <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
    <h3>FRAME</h3><div class="frames">${FR.map(f=>`<div class="${f[0]===ME.frame?'sel':''} ${fOk(f[0])?'':'o-lock'}" data-fr="${f[0]}"><div class="av">${avf(ME.icon,f[0])}</div><small>${f[1]}<br>${fOk(f[0])?(f[0]===ME.frame?'✅ in use':'tap to use'):'🔒 '+f[2]}</small></div>`).join('')}</div>
@@ -615,9 +630,18 @@ function nameModal(){const free=!(ME&&ME.chg>0);
   setTimeout(()=>{const i=$('olNm');if(i)i.focus();},200);}
 async function viewProfile(uid){const r=await call('view',{uid});if(!r.ok){toast('⚠️ Could not load the profile');return;}const p=r.p;
   modal(`<div class="av" style="width:110px;height:118px;margin:0 auto">${avf(p.icon,p.frame)}</div><h4 style="margin:4px 0">${flag(p.cc)} ${esc(p.name)}</h4><div>${tt(p.title)}</div>
-   <div class="stats" style="margin-top:10px;text-align:left"><div>Campaign<b>⚔️ ${stLab(p.best)}</b></div><div>Team power<b>⚡ ${fmtN(p.pow)}</b></div><div>Arena<b>${p.arena?p.arena.tier.name:'—'}</b></div><div>VIP · Cup wins<b>${p.vip} · 🏆 ${p.cupw}</b></div></div>
-   <h3>BATTLE TEAM</h3><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${(p.team||[]).map(h=>fcard(h.id,h.s,52)).join('')||'<small style="color:#8fa0b4">No battle team yet</small>'}</div>
-   <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,()=>true);}
+   <div class="stats" style="margin-top:10px;text-align:left"><div>Campaign<b>⚔️ ${stLab(p.best)}</b></div><div>Team power<b>${PWh} ${fmtN(p.pow)}</b></div><div>Arena<b>${p.arena?p.arena.tier.name:'—'}</b></div><div>VIP · Cup wins<b>${p.vip} · 🏆 ${p.cupw}</b></div></div>
+   <h3>BATTLE TEAM</h3><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${(p.team||[]).map((h,i)=>`<div data-m="h${i}" class="pkTap">${fcard(h.id,h.s,52)}</div>`).join('')||'<small style="color:#8fa0b4">No battle team yet</small>'}</div>${(p.team||[]).length?'<small class="pkHint">Tap a hero to see the gear</small>':''}
+   <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,b=>{if(b[0]==='h'){const h=(p.team||[])[+b.slice(1)];if(h)peekHero(h,p);return false;}return true;});}
+// v16-176 (Marius): tap a hero on another player's profile → level, power, stats, skill and gear
+function peekHero(h,p){const c=C(),g=Math.max(0,Math.min(5,gradeOf(h.id))),nm=hName(h.id)||h.n||'Hero',sk=c&&c.peekSkill?c.peekSkill(h.id):null,old=!h.eq&&!h.lv;
+  const st=[['❤️ HP',fmtN(h.hp||0)],['⚔️ ATK',fmtN(h.atk||0)],['🛡️ DEF',fmtN(h.def||0)],['🎯 CRIT',h.crit!=null?Math.round(h.crit*1000)/10+'%':'—'],['⏱️ SPEED',h.as?Math.round(100/h.as)/100+'/s':'—']];
+  modal(`<div class="pkH"><div class="pkC">${fcard(h.id,h.s,96)}</div><div class="pkT"><b style="color:${GRC[g]}">${esc(nm)}</b><small>${GRN[g]}${c&&c.roleOfId&&c.roleOfId(h.id)?' · '+esc(c.roleOfId(h.id)):''}</small>
+     <div class="pkL">${[h.lv?'Lv '+h.lv:'',h.s?'+'+h.s:''].filter(Boolean).join(' · ')}</div><div class="pkP">${PWh} ${fmtN(h.pw||0)}</div><small style="color:#8fa0b4">${esc(p.name)}'s hero</small></div></div>
+   <div class="stats pkSt">${st.map(x=>`<div>${x[0]}<b>${x[1]}</b></div>`).join('')}</div>
+   ${sk&&sk.n?`<div class="pkSk"><b>✨ ${esc(sk.n)}</b><small>${esc(sk.d)}</small></div>`:''}
+   <h3>GEAR</h3>${old?'<small style="color:#8fa0b4;display:block;text-align:center">This player must open the game with the new version to show the gear.</small>':(c&&c.peekGear?c.peekGear(h.eq):'')}
+   <div class="ok"><button class="btn" data-m="ok">BACK</button></div>`,()=>true).classList.add('pkM');}
 
 // ------------------------------------------------------------------ INBOX (Arena / Cup rewards)
 async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 No connection');return;}
@@ -649,7 +673,7 @@ function playFight(r,replay){
   F={r,U,t:-2.0,i:0,pop:[],fx:[],shake:0,white:0,sk:null,spd:+(LS('te_aspd')||2),done:false,replay,proj:[],v2:A2ON()};
   if(r.kind==='train'&&!open_){root.classList.add('open');F.trOpen=1;}   // v16-146 RAIL WARS: the fight layer lives inside the hub
   const me=r.me||{},th=r.them||{};
-  $('olVs').innerHTML=`<div class="side a"><div class="av">${avf(me.icon,me.frame)}</div><div>${flag(me.cc)} ${esc(me.name||'You')}<small>⚡ ${fmtN(me.pow||0)}</small></div></div><div class="side b"><div>${flag(th.cc)} ${esc(th.name||'Rival')} ${th.bot?'<span class="ai" style="font-size:10px">AI</span>':''}<small>⚡ ${fmtN(th.pow||0)}</small></div><div class="av">${avf(th.icon,th.frame)}</div></div><div class="mid">VS</div>`;
+  $('olVs').innerHTML=`<div class="side a"><div class="av">${avf(me.icon,me.frame)}</div><div>${flag(me.cc)} ${esc(me.name||'You')}<small>${PWh} ${fmtN(me.pow||0)}</small></div></div><div class="side b"><div>${flag(th.cc)} ${esc(th.name||'Rival')} ${th.bot?'<span class="ai" style="font-size:10px">AI</span>':''}<small>${PWh} ${fmtN(th.pow||0)}</small></div><div class="av">${avf(th.icon,th.frame)}</div></div><div class="mid">VS</div>`;
   $('olVs').style.display='flex';$('olRes').classList.remove('on','lose');$('olFx').classList.remove('end');$('olFx').classList.add('on');$('olSpd').textContent='×'+F.spd+' ⏩';
   const rs=()=>{const k=Math.min(1.5,devicePixelRatio||1);fc.width=Math.round(innerWidth*k);fc.height=Math.round(innerHeight*k);};rs();if(F.v2)a2Init();
   setTimeout(()=>{if(F)$('olVs').style.display='none';},1900);
@@ -856,5 +880,5 @@ function addButtons(){
     const cp=$('cpBtn');if(cp&&cp.nextSibling)sd.insertBefore(b,cp.nextSibling);else sd.appendChild(b);b.onclick=()=>openHub('olArena');}
   dots();}
 addButtons();
-window.ONLINE={open:openHub,close:closeHub,sync,play:playFight,call};
+window.ONLINE={open:openHub,close:closeHub,sync,play:playFight,call,view:viewProfile};
 })();

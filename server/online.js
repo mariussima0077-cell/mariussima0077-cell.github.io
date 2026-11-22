@@ -124,14 +124,18 @@ const CUP_Q = 4 * DAY + 21 * HOUR, CUP_R1 = 5 * DAY + 9 * HOUR, CUP_STEP = 3 * H
 // ------------------------------------------------------------------ helpers
 const num = (v, lo, hi) => { v = +v; return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : lo; };
 const ROLES = ['engine','tuning','inspect','service','paint','elec','all','crew'];
+const EQ_SL = ['tool', 'helm', 'vest', 'glove', 'boots', 'chip'];   // v16-176: gear shown on the opponent profile
+function cleanEq(e) { if (!Array.isArray(e)) return []; const seen = new Set();
+  return e.slice(0, 6).map(i => i && ({s:EQ_SL.includes(i.s) ? i.s : '', r:num(i.r, 0, 6) | 0, lv:num(i.lv, 1, 60) | 0, sr:num(i.sr, 0, 20) | 0, set:String(i.set || '').replace(/[^a-z0-9_]/g, '').slice(0, 12)})).filter(i => i && i.s && !seen.has(i.s) && seen.add(i.s)); }
 function cleanTeam(t) {
   if (!Array.isArray(t)) return [];
   return t.slice(0, 5).map(u => ({id:String(u.id || '').replace(/[^a-z0-9_]/g, '').slice(0, 12), n:clean(u.n).slice(0, 24), gr:num(u.gr, 0, 5) | 0, s:num(u.s, 0, 50) | 0,
     role:ROLES.includes(u.role) ? u.role : 'crew', hp:num(u.hp, 1, 5e7), atk:num(u.atk, 1, 5e6), def:num(u.def, 0, 5e4), as:num(u.as, .25, 3), crit:num(u.crit, 0, .75),
-    rng:num(u.rng, 20, 300), eg:num(u.eg, 1, 3)})).filter(u => u.id);
+    rng:num(u.rng, 20, 300), eg:num(u.eg, 1, 3), pw:num(u.pw, 0, 5e8) | 0, lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
 }
 const teamPow = t => Math.round(t.reduce((a, s) => a + s.hp * .25 + s.atk * 6 * (1 / s.as) + s.def * 4, 0));
 const pubTeam = t => (t || []).map(u => ({id:u.id, n:u.n, gr:u.gr, s:u.s, role:u.role, hp:Math.round(u.hp)}));
+const viewTeam = t => (t || []).map(u => ({id:u.id, n:u.n, gr:u.gr, s:u.s, role:u.role, hp:Math.round(u.hp), atk:Math.round(u.atk), def:Math.round(u.def), as:u.as, crit:u.crit, pw:u.pw | 0, lv:u.lv | 0, a:u.a | 0, eq:u.eq || []}));   // v16-176: full hero card on the profile
 function ccOf(lang) {
   const m = String(lang || '').match(/^([a-z]{2,3})(?:[-_]([A-Za-z]{2}))?/); if (!m) return '';
   if (m[2]) return m[2].toUpperCase();
@@ -514,7 +518,7 @@ export async function online(op, b, env) {
   if (op === 'replay') return replay(env, b.id);
   if (op === 'view') { const p = await db.prepare('SELECT * FROM prof WHERE uid=?').bind(b.uid | 0).first(); if (!p) return {err:'not found'};
     const a = await db.prepare('SELECT pts, w, l, season FROM arena WHERE uid=?').bind(p.uid).first();
-    return {ok:true, p:pub(p, {team:pubTeam(JSON.parse(p.team || '[]')), arena:a && a.season === seasonOf(now) ? {pts:a.pts, w:a.w, l:a.l, tier:tierOf(a.pts)} : null})}; }
+    return {ok:true, p:pub(p, {team:viewTeam(JSON.parse(p.team || '[]')), arena:a && a.season === seasonOf(now) ? {pts:a.pts, w:a.w, l:a.l, tier:tierOf(a.pts)} : null})}; }
   let p = await profOf(env, b.pid);
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
