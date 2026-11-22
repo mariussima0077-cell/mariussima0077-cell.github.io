@@ -167,8 +167,9 @@ export async function giftDm(env, pid, uid) {
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
-function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
-const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail'];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
+function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10) || (f === 9 && u.has('raid')) || (f === 10 && u.has('tw3')) || (f === 11 && u.has('bhunt')) || (f === 12 && u.has('dgm')) || (f === 13 && u.has('call')) || (f === 14 && u.has('awk')); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
+const NEWT = ['sky','awk','bhunt','dgm','trny','raid','hard','coll','lucky','twr','gty','daily'];   // v16-174: 12 new titles (claimed by the game, like wr/boss/speed)
+const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail', ...NEWT];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 
 // ------------------------------------------------------------------ ARENA FIGHT (decided by the server, seeded → the same fight can be replayed)
@@ -526,7 +527,7 @@ export async function online(op, b, env) {
     const ids = [b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)];
     const rpx = !cl.includes('rail') ? 0 : String(b.pid).startsWith('tst_') ? now + DAY
       : (((await db.prepare("SELECT MAX(expiry) e FROM purchases WHERE sku='rail_pass_monthly' AND state='ok' AND pid IN (" + ids.map(() => '?').join(',') + ")").bind(...ids).first()) || {}).e || 0);
-    const cunl = cl.filter(k => ['wr','boss','gear','speed','f1'].includes(k) || (k === 'fdr' && fdr)).join(',');
+    const cunl = cl.filter(k => ['wr','boss','gear','speed','f1','tw3','call', ...NEWT].includes(k) || (k === 'fdr' && fdr)).join(',');
     const icon = String(b.icon || (team[0] && team[0].id) || 'm0_0').replace(/[^a-z0-9_]/g, '').slice(0, 12), dk = dayKey(now);
     if (!p) {
       await db.prepare(`INSERT INTO prof(pid,srv,name,nlow,icon,cc,lang,vip,rep,best,bday,bd0,pow,lv,team,t,created,cunl) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)

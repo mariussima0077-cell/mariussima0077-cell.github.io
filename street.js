@@ -58,7 +58,8 @@ function build(){if(el)return;const st=document.createElement('style');st.textCo
 function close(){if(el)el.classList.remove('open');clearInterval(open.t);}
 async function load(force){if(!O()){D={err:'offline'};render();return;}if(busy&&!force)return;busy=true;if(RP()&&!load.sy){load.sy=1;await O().sync();}const r=await O().call('rw',{});busy=false;D=r;if(r&&r.ok)await claimAll();render();}
 async function claimAll(){if(!D||!D.mine)return;const now=Date.now();for(const t of D.mine.filter(t=>t.t1<=now)){const r=await O().call('rwclaim',{id:t.id});
-  if(r&&r.ok){give(r.tok);T().toast('🚆 Your '+GN(r.g)+' train arrived: +'+T().nf(r.tok)+' '+TI()+(r.lost?' (robbed: −'+T().nf(r.lost)+')':''),3200);D.mine=D.mine.filter(x=>x.id!==t.id);}}}
+  if(r&&r.ok){give(r.tok);{const G=T().G;G.st=G.st||{};G.st.ar=(G.st.ar||0)+1;}   // v16-174: trains sent (TRAIN TYCOON)
+    T().toast('🚆 Your '+GN(r.g)+' train arrived: +'+T().nf(r.tok)+' '+TI()+(r.lost?' (robbed: −'+T().nf(r.lost)+')':''),3200);D.mine=D.mine.filter(x=>x.id!==t.id);}}}
 function refresh(){const s=T().RWS(),mx=RFM();if(s.rf>=mx)return T().toast('🔒 This train grade is locked ('+mx+' refreshes used)',2200);const g0=s.g;T().rwRefresh();
   T().toast(s.g>g0?'✨ Upgraded to '+GN(s.g)+'!':'🔄 Still '+GN(s.g)+' – '+(mx-s.rf)+' refresh left',2200);render();}
 async function send(){const s=T().RWS(),cap=T().rCap();if(s.n<cap)return T().toast('🚆 The train is not full yet ('+s.n+' / '+cap+' cars)',2200);
@@ -68,6 +69,7 @@ async function send(){const s=T().RWS(),cap=T().rCap();if(s.n<cap)return T().toa
   T().rwSend();D=r;T().toast('🚆 '+GN(r.mine[r.mine.length-1].g)+' train sent! Back in 30 min – keep it safe!',2600);render();}
 async function attack(id){if(busy)return;if(D&&D.atks<=0)return T().toast('⚔️ No attacks left today ('+AMX()+' a day)',2200);busy=true;await O().sync();const r=await O().call('rwatk',{id});busy=false;
   if(!r||!r.ok){T().toast({no_atks:'⚔️ No attacks left today ('+AMX()+' a day)',gone:'🚆 That train is gone – pick another',no_team:'⚔️ You need a battle team first',network:'📶 No connection'}[r&&r.err]||'⚠️ Could not attack',2600);load(true);return;}
+  if(r.win){const G=T().G;G.st=G.st||{};G.st.w=(G.st.w||0)+1;T().save();}   // v16-174: attacks won (RAIL RAIDER)
   if(r.steal)give(r.steal);
   r.bg='img/rw/rw_battle.webp';r.rwH=r.win?(r.steal?'<div class="rw2"><div>'+TI()+' +'+T().nf(r.steal)+' stolen</div></div>':''):'<div class="pts" style="font-size:15px;color:#ffab91">The train got away</div>';
   r.onEnd=()=>{open();load(true);};el.classList.remove('open');O().play(r,false);}

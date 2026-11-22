@@ -16,7 +16,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=173;
+const CV=174;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -30,10 +30,15 @@ function needUpd(){if(document.getElementById('updNeed'))return;const d=document
 
 // ------------------------------------------------------------------ titles, frames, leagues
 const TT={vip10:['t5','VIP LEGEND','Reach VIP 10'],vip5:['t3','VIP STAR','Reach VIP 5'],fdr:['t5','FOUNDER','Founder Pass (Shop)'],rail:['t4','RAIL BARON','Rail Pass active (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
- boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game']};
-const TORD=['fdr','rail','king','cup','leg','glad','boss','gear','speed','chat','wr','rook'];
+ boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game'],
+ // v16-174: 12 new titles (Marius: more titles on the profile) – kept forever once reached (G.ttl)
+ sky:['t5','SKY BREAKER','Reach floor 500 in Torque Tower'],awk:['t5','AWAKENED','Awaken a Mythic hero'],bhunt:['t4','BOSS HUNTER','Claim the last World Boss reward of a day'],dgm:['t4','DUNGEON MASTER','Reach floor 50 in all 4 Dungeons'],
+ trny:['t4','TRAIN TYCOON','Send 100 trains in Rail Wars'],raid:['t4','RAIL RAIDER','Win 50 train attacks in Rail Wars'],hard:['t4','HARDCORE','Reach HARD MODE stage 5-20'],coll:['t3','COLLECTOR','Own 10 classic cars in the Collection Garage'],
+ lucky:['t3','LUCKY STAR','Own a Mythic hero'],twr:['t3','TOWER CLIMBER','Reach floor 100 in Torque Tower'],gty:['t3','GARAGE TYCOON','Get a building to level 50'],daily:['t2','DAILY GRINDER','Check in 30 days']};
+const TORD=['fdr','rail','king','cup','sky','awk','leg','bhunt','dgm','trny','raid','hard','glad','coll','lucky','twr','gty','boss','gear','speed','daily','chat','wr','rook'];
 const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
-const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)'],[8,'VIP 10','Reach VIP 10']];   // v16-122: 8 = VIP 10 frame (Marius' picture, img/fr8)
+const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)'],[8,'VIP 10','Reach VIP 10'],
+ [9,'Rail Baron','Win 50 train attacks in Rail Wars'],[10,'Tower Climber','Reach floor 300 in Torque Tower'],[11,'Boss Hunter','Claim the last World Boss reward of a day'],[12,'Dungeon Master','Reach floor 50 in all 4 Dungeons'],[13,'Collector','Own all 12 classic cars'],[14,'Awakened','Awaken a Mythic hero']];   // v16-174: 6 new frames (Marius' pictures, img/fr9-14)   // v16-122: 8 = VIP 10 frame (Marius' picture, img/fr8)
 //   // v16-122: 7 = FOUNDER (img/fr7 – 6 is the Ascended gear frame)
 const LG=[['BRONZE','#ffd8b0','#d0864a','#5a2a08','#e07a3a'],['SILVER','#ffffff','#b8c4d2','#4a5462','#7fd0ff'],['GOLD','#fffbe6','#ffc23a','#6a3a00','#ff3b3b'],['PLATINUM','#e8fffb','#5fe0c8','#0a4a44','#3fa7ff'],['DIAMOND','#e8f4ff','#5aa8ff','#0a2a6a','#c35cff'],['LEGEND','#fff1d0','#ff5a3c','#5a0a0a','#ffd54a']];
 let bid=0;
@@ -46,7 +51,7 @@ const GRN=['Common','Uncommon','Rare','Epic','Legendary','Mythic'],GRC=['#b8c2cf
 const hName=id=>{const t=T(),h=t&&t.HB&&t.HB[id];return h&&h.n?h.n:'';};
 const fcard=(id,s,w=60)=>{const g=Math.max(0,Math.min(5,gradeOf(id))),r=FIN5[g],p=FPL5[g];
   return `<div class="hfc" style="width:${w}px"><div style="position:relative;width:100%;aspect-ratio:220/236"><img src="img/fr${g}.webp" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><img src="${HI(id)}" alt="" style="position:absolute;left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%;object-fit:cover;border-radius:5%">${s?`<span style="position:absolute;left:20%;right:20%;top:${p[0]}%;height:${p[1]}%;display:flex;align-items:center;justify-content:center;font:900 10px Game,system-ui;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000">+${s}</span>`:''}</div><small style="display:block;font:800 9px/1.15 Game,system-ui;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hName(id))}</small><small style="display:block;font:800 8px Game,system-ui;color:${GRC[g]}">${GRN[g].toUpperCase()}</small></div>`;};
-const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)===7||(f|0)===8?f|0:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p${(f|0)===7?' p7':(f|0)===8?' p8':''}" style="background-image:url(${HI(id)})"></div>`;
+const avf=(id,f)=>`<div class="f" style="background-image:url(img/fr${(f|0)>=7&&(f|0)<=14?f|0:Math.max(0,Math.min(5,f|0))}.webp)"></div><div class="p${(f|0)>=7&&(f|0)<=14?' p'+(f|0):''}" style="background-image:url(${HI(id)})"></div>`;
 const stLab=b=>C()&&C().sLabel?C().sLabel(b):String(b);
 const ICON={trophy:'<svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg>',chat:'<svg viewBox="0 0 64 64"><use href="#olChat"/></svg>',arena:'<svg viewBox="0 0 64 64"><use href="#olSwords"/></svg>',cup:'<svg viewBox="0 0 64 64"><use href="#olCup"/></svg>',user:'<svg viewBox="0 0 64 64"><use href="#olUser"/></svg>'};
 
@@ -89,7 +94,7 @@ const css=`
 @keyframes olPl{50%{opacity:.25;transform:scale(.7)}}
 #onl .o-sub{white-space:nowrap;letter-spacing:0;display:flex;justify-content:space-between;align-items:center;padding:0 12px 2px;font:700 10px Game,system-ui;color:#8fa0b4}
 #onl .av{position:relative;flex:none}
-#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}.av .p.p7{left:17.5%;right:17.5%;top:23.5%;bottom:28.5%}.av .p.p8{left:21.6%;right:21.6%;top:27.6%;bottom:31.6%;border-radius:9%}
+#onl .av .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}.av .p.p7{left:17.5%;right:17.5%;top:23.5%;bottom:28.5%}.av .p.p8{left:21.6%;right:21.6%;top:27.6%;bottom:31.6%;border-radius:9%}.av .p.p9{left:21%;right:21.3%;top:28.3%;bottom:29.7%;border-radius:9%}.av .p.p10{left:22%;right:22.3%;top:27%;bottom:31.3%;border-radius:9%}.av .p.p11{left:19%;right:19.3%;top:29.7%;bottom:27%;border-radius:9%}.av .p.p12{left:20%;right:20.3%;top:28.3%;bottom:30.7%;border-radius:9%}.av .p.p13{left:19.7%;right:20%;top:28%;bottom:29.7%;border-radius:9%}.av .p.p14{left:21%;right:22%;top:33.3%;bottom:30%;border-radius:9%}
 #onl .av .f{position:absolute;inset:0;background:center/100% 100% no-repeat}
 #onl .ring{position:relative;flex:none;border-radius:11px;background:#111 center/cover;box-shadow:0 0 0 2px var(--c,#555),0 0 8px var(--c,#0000)}
 #onl .ring.r5{--c:#ff3b3b}#onl .ring.r4{--c:#ffc23a}#onl .ring.r3{--c:#c35cff}#onl .ring.r2{--c:#3fa7ff}#onl .ring.r1{--c:#4cd964}#onl .ring.r0{--c:#8a96a5}
@@ -384,7 +389,15 @@ const st=document.createElement('style');st.textContent=css;document.head.append
 let ME=null,inboxN=0,chatLast=+(LS('te_chat_seen')||0),chatSrvLast=0,cur='',open_=false,polls={},rkBy='best',rkPrev={},chCh='w',chSince=0,chList=[],arTab='fight',arData=null;
 let autoTr=LS('te_tr')!=='0';const mutes=new Set(JSON.parse(LS('te_mutes')||'[]'));
 function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.cp.best:0;if(b>=40)o.push('wr');if(b>=80)o.push('boss');if((G.rep||0)>=10)o.push('speed');if((G.rep||0)>=5)o.push('f1');if(T().PK&&T().PK.fdr)o.push('fdr');if(T().PK&&(+T().PK.rail||0)>Date.now())o.push('rail');
-  if(G.gear&&(G.gear.inv||[]).some(it=>it.r>=4))o.push('gear');return o;}
+  if(G.gear&&(G.gear.inv||[]).some(it=>it.r>=4))o.push('gear');
+  // v16-174: new titles – once reached they stay (G.ttl is saved with the game)
+  try{const X=G.ttl||(G.ttl={}),ok=(k,c)=>{if(c)X[k]=1;},tw=(G.tw&&G.tw.b)||0,own=(G.h&&G.h.own)||{},t=T();
+    ok('trny',((G.st&&G.st.ar)||0)>=100);ok('raid',((G.st&&G.st.w)||0)>=50);ok('twr',tw>=100);ok('sky',tw>=500);
+    ok('dgm',!!G.dg&&['vault','mine','forge','lab'].every(k=>((G.dg.b||{})[k]||0)>=50));ok('bhunt',!!G.wb&&(G.wb.cl||[]).includes(5));
+    ok('coll',!!G.cc&&(G.cc.own||[]).length>=10);ok('hard',!!G.cph&&(G.cph.best||0)>=100);ok('daily',!!G.ci&&(G.ci.n||0)>=30);
+    ok('lucky',Object.keys(own).some(k=>/^m5_/.test(k)));ok('awk',!!t.mTier&&Object.keys(own).some(k=>/^m5_/.test(k)&&t.mTier((own[k]||{}).s||0)>=1));
+    ok('tw3',tw>=300);ok('call',!!G.cc&&(G.cc.own||[]).length>=12);ok('gty',Math.max(0,...Object.values(G.lv||{}).map(v=>+v||0))>=50);for(const k in X)if(X[k])o.push(k);}catch(e){}
+  return o;}
 // v16-82: G.vip = VIP POINTS; the server and the profile need the VIP LEVEL (0-10 since v16-122)
 // v16-122: VIP badge pictures (img/vip/v1-10) next to names; -1 = the player hides his VIP
 const vipB=n=>n>0?`<img class="vipB" src="img/vip/v${Math.min(10,n)}.webp" alt="VIP ${n}">`:'';
@@ -569,7 +582,7 @@ $('olCupB').addEventListener('click',async e=>{const b=e.target.closest('[data-r
 function myHeroes(){const t=T();if(!t)return [];const G=t.G,o=[];for(const id in G.h.own){const h=t.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}o.sort((a,b)=>b.gr-a.gr||(G.h.own[b.id].s||0)-(G.h.own[a.id].s||0));return o;}
 function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty">Loading…</div>';return;}
   const u=new Set(ME.unl||[]),G=T().G,vip=vipLv(G),rep=G.rep||0;
-  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)))||(f===8&&vip>=10);
+  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)))||(f===8&&vip>=10)||[[9,'raid'],[10,'tw3'],[11,'bhunt'],[12,'dgm'],[13,'call'],[14,'awk']].some(x=>x[0]===f&&u.has(x[1]));
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
   $('olPrH').innerHTML=`<div class="pa">${avf(ME.icon,ME.frame)}</div><div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}</div><div class="pvip">${vip?vipB(vip)+' <b>VIP '+vip+'</b>':''}<button class="hvB" data-a="hv">${ME.hv?'🙈 VIP HIDDEN':'👁 VIP VISIBLE'}</button><small>${ME.hv?'Others do not see your VIP level':'Tap to hide your VIP level from others'}</small></div>
