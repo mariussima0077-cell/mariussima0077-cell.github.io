@@ -22,6 +22,10 @@ const LEGACY_T = Date.parse('2026-11-18T00:00:00Z');   // v16-125: before this, 
 // v16-71: Alex was banned by mistake for the gift (VIP 20 jump) → unbanned automatically at his next check-in (only until this date)
 const GIFT_UNBAN_UNTIL = Date.parse('2026-11-24T00:00:00Z');
 const TESTER_UNBAN = ['03245000-cda3-4e5c-9e6d-d388955218a8'];   // v16-103: one-time unban (Wazza4ever)
+// v16-162 (22 nov 2026, Marius): personal DIAMOND gift sent once as an in-game Mail (server inbox) at the player's next check-in.
+// The ledger rule does not count these diamonds as cheating for 7 days (he wants to spend them on hero summons).
+const GIFT_DM = [{p:'1d3eb4a8', dm:100000, id:'gift_dm_1d3eb4a8_v16-162', until:Date.parse('2026-12-01T00:00:00Z')}];
+const isGiftDm = pid => GIFT_DM.some(g => String(pid).startsWith(g.p) && Date.now() < g.until);
 const PARTS_T = Date.parse('2026-11-21T00:00:00Z');   // v16-129: garages upgraded with parts (buildings rule recalibrated in v16-150)
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20,
@@ -112,6 +116,16 @@ async function report(b, env) {
       old.banned = 0; old.score = 0;
     }
   }
+  // v16-162: personal diamond gift from Marius → one Mail in the game inbox (only once, needs the online profile)
+  for (const g of GIFT_DM) if (b.pid.startsWith(g.p) && now < g.until && !(old && old.banned)) {
+    try { if (!(await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='gift' AND detail=?").bind(b.pid, g.id).first())) {
+      const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(b.pid).first();
+      if (pr && pr.uid > 0) {
+        await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(pr.uid, now, '🎁', 'A gift from Torque Studios',
+          'Thank you for playing Torque Empire! Here are ' + g.dm.toLocaleString('en') + ' Diamonds for your hero summons. Good luck!', JSON.stringify({dm:g.dm})).run();
+        await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'gift', g.id).run();
+      } } } catch (e) {}
+  }
   let pts = 0; const why = [];
   // 0) v16-104: packs without a purchase confirmed by Google (only in the Play app; the browser test mode is free on purpose)
   let pkCheck = false;
@@ -200,7 +214,7 @@ async function report(b, env) {
     let mailDm = 0; try { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(b.pid).first();
       if (pr) for (const m of (await db.prepare('SELECT rw FROM inbox WHERE uid=? AND t>?').bind(pr.uid, now - 2 * 864e5).all()).results) mailDm += +(JSON.parse(m.rw || '{}').dm || 0); } catch (e) {}
     const capDm = 10000 + 40 * Math.max(0, bmax - (L.b0 || 0)) + 25000 * nbD + mailDm;
-    if (L.dm > capDm && !isGift(b.pid) && !(await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'ledger:%'").bind(b.pid, now - 864e5).first()))
+    if (L.dm > capDm && !isGift(b.pid) && !isGiftDm(b.pid) && !(await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'ledger:%'").bind(b.pid, now - 864e5).first()))
       add(25, 'econ', `ledger: +${L.dm} diamonds today (max possible ~${capDm})`);
   }
   const score = Math.min(999, (old ? old.score : 0) + pts);
