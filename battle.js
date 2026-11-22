@@ -415,7 +415,8 @@ const css3=document.createElement('style');css3.textContent=`
 .gcRow .gb{grid-column:1/-1;font:800 12px Game,system-ui;color:#c9d6e2}.gcRow .gb b{color:#7CFC9A}
 .gcRow.ok{box-shadow:inset 0 0 0 2px var(--c),0 0 14px var(--c),0 3px 0 #000a}.gcRow.ok .gk::after{content:' ✓';color:#7CFC9A}
 .gcHs{grid-column:1/-1;display:flex;gap:5px;flex-wrap:wrap}
-.gcHs img{width:40px;height:40px;border-radius:8px;border:2px solid var(--c);object-fit:cover;background:#000}.gcHs img.no{filter:grayscale(1) brightness(.5) contrast(1.1);opacity:.85;border-color:#4a5260}
+.gcHs img{width:40px;height:40px;border-radius:8px;border:2px solid var(--c);object-fit:cover;background:#000}.gPrevN{grid-column:1/-1;width:100%;text-align:center;font:900 11px Game,system-ui;color:#ffb74d;padding:4px 0}.gPrevT{display:inline-block;background:#5a1d1d;color:#ffd0d0;border:1px solid #ff6b6b;border-radius:6px;padding:1px 8px;font:900 10px Game,system-ui;letter-spacing:1px;margin-bottom:2px}
+.gcHs img.no{filter:grayscale(1) brightness(.5) contrast(1.1);opacity:.85;border-color:#4a5260}
 .gcTot{margin:12px 4px 0;padding:10px 12px;border-radius:12px;background:#0b1424;box-shadow:inset 0 0 0 2px #ffb300;font:800 12.5px Game,system-ui;color:#ffe9a8;text-align:center}
 .gcTot b{color:#7CFC9A}
 /*UI3MORE*/
@@ -2817,9 +2818,10 @@ function popLvl(h){const T=TE(),G=T.G,id=h.id,lv=T.lvOf(id),cap=T.lvCap(id),a=T.
   pop(x);}
 
 // ---------------------------------------------------------------- GEAR page (separate page · gear works only in battles)
+let gPrev=null;   // v16-158: hero page preview of a hero you don't own (from Hero Collection)
 let gRet=null,gsel=null,gfil='all',gsalv=0,gsort='pow',gpgFrom='';
 function cleanGear(){const T=TE(),g=GR();for(const hid in g.eq){if(!T.G.h.own[hid]){delete g.eq[hid];continue;}for(const s in g.eq[hid])if(!itemById(g.eq[hid][s]))delete g.eq[hid][s];}}
-function gHero(){const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=>h.id===gsel))gsel=L[0].id;return TE().HB[gsel];}
+function gHero(){if(gPrev&&TE().HB[gPrev])return TE().HB[gPrev];const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=>h.id===gsel))gsel=L[0].id;return TE().HB[gsel];}
 function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(CPX().best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
 function lvCan(id){const T=TE(),G=T.G,l=T.lvOf(id),c=T.lvCap(id),e=G.ess||0;return l<c?e>=T.lvCost(l):c<T.LV_MAX&&e>=T.ascCost(T.ascOf(id));}
 function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
@@ -2849,6 +2851,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const inT=team.includes(h.id);
   const lvRdy=T.lvOf(h.id)<T.lvCap(h.id)&&(G.ess||0)>=T.lvCost(T.lvOf(h.id))||T.lvOf(h.id)===T.lvCap(h.id)&&T.lvCap(h.id)<T.LV_MAX&&(G.ess||0)>=T.ascCost(T.ascOf(h.id));
   $m('gBtns').innerHTML=`<button class="cpGo gLvB${lvRdy?' rdy':''}" data-g="lvl">${T.ESI} LEVEL UP · Lv ${T.lvOf(h.id)}${lvRdy?' ▲':''}</button><button class="cpGo ${inT?'tmo':'tm'}" data-g="${inT?'tout':'tin'}">${inT?'✖ LEAVE TEAM':'➕ ADD TO TEAM'}</button><button class="cpGo" data-g="auto">${IMGI('img/ui2/i_energy.webp','1.4em','-.4em')} AUTO EQUIP</button><button class="cpGo alt" data-g="none">UNEQUIP ALL</button>`;
+  if(gPrev===h.id){$m('gBtns').innerHTML=`<div class="gPrevN">🔒 NOT IN YOUR COLLECTION · stats at Lv 1, no gear</div><button class="cpGo" data-g="hsum">${TKI} GET IT FROM HERO SUMMON</button>`;$('gHName').insertAdjacentHTML('afterbegin','<div class="gPrevT">PREVIEW</div>');}
   renderBag(h);if(gpg==='salv')renderSalv();if(gpg==='coll')renderColl();}
 function renderBag(h){const T=TE(),g=GR();
   $m('gFil').innerHTML=[['all','ALL','bag'],...GSLOT.map(s=>[s.k,s.n,s.ic])].map(([k,n,ic])=>`<button class="gf${gfil===k?' on':''}" data-f="${k}"><img src="${glyphURL(ic,gfil===k?'#2a1000':'#ffd54a')}" alt="${n}"></button>`).join('');
@@ -2982,7 +2985,10 @@ function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
 $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr],[data-hx]');if(!el)return;
-  if(el.dataset.hx){const h=T.HB[el.dataset.hx];if(h)T.toast('🔒 '+h.n+' ('+T.GRADES[h.gr].n.toUpperCase()+') – not in your collection yet. Get it from HERO SUMMON',3000);return;}
+  if(el.dataset.hx){if(T.HB[el.dataset.hx]){gPrev=el.dataset.hx;renderGear();gPage('hero');}return;}
+  if(gPrev&&(el.dataset.g==='hback'||el.dataset.g==='back')){const ph=T.HB[gPrev];gPrev=null;renderGear();gPage('coll');setTimeout(()=>{const r=ph&&$('gcr'+ph.gr);if(r)r.scrollIntoView({block:'center'});},60);return;}
+  if(gPrev&&el.dataset.g==='hsum'){gPrev=null;renderGear();gPage('coll');}
+  if(gPrev&&el.dataset.g!=='hsum'&&el.dataset.g!=='art'&&!el.dataset.f){T.toast('🔒 You don\'t own this hero yet – get it from HERO SUMMON',2200);return;}
   if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(gRet){const f=gRet;gRet=null;f();return;}if(TWS.ret){TWS.ret=0;twOpen();return;}if(WBS.ret){WBS.ret=0;wbOpen();return;}if(DGS.ret){DGS.ret=0;rootOn();dgEl.classList.add('open');dgRender();return;}if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
   if(el.dataset.g==='auto'){popAuto();return;}if(el.dataset.g==='none'){popNone();return;}
   if(el.dataset.g==='best'){popAutoBest();return;}
