@@ -940,7 +940,10 @@ const PAD={x:1410,y:360}, EBULB={x:1300,y:360}, WBULB={x:938,y:360};
 const TRK={x0:20,y0:440,x1:345,y1:1320+DY};     // race track (coming soon)
 
 // =================== IMAGES (img/ folder) ===================
-const ISC={loading:.8};
+// v16-150 (memory): map pictures are kept in memory only as big as the map can ever show them (measured at MAX zoom on a
+// DPR-2 phone, ×1.5 for DPR-3 screens). Only pictures drawn with DI() / a full-size drawImage (never with source crops).
+const ISC={loading:.8,b_office:.35,b_office0:.35,b_arrivals:.45,b_arrivals0:.45,b_security:.6,b_security2:.6,b_security3:.6,b_security4:.6};
+['rail',.9,'factory',.75,'gas',.65,'wash',.6].forEach((v,i,a)=>{if(i%2===0)[1,2,3,4].forEach(t=>ISC['x_'+v+t]=a[i+1]);});
 let PASS='all'; // 'static' = painted once into the cached map tiles, 'dyn' = drawn every frame
 function DI(o,sx,sy,sw,sh,dx,dy,dw,dh){const k=o.sc||1;X.drawImage(o.el,sx*k,sy*k,sw*k,sh*k,dx,dy,dw,dh);}
 const IMG={};['garage','mech','vip','loading','b_arrivals','b_arrivals0','b_office','b_office0','b_yard','b_arm','b_security','b_security2','b_security3','b_security4','b_ysign',...['paint','elec','inspect','tuning','engine'].flatMap(g=>[2,3,4].map(t=>'g_'+g+t)),'s_paint','s_elec','s_inspect','s_tuning','s_engine','p_parts0','p_parts2','p_parts3','p_parts4','b_collection',...XIDS.flatMap(g=>[1,2,3,4].map(t=>'x_'+g+t)),...[1,2,3,4].map(t=>'x_rail'+t)].forEach(n=>{
