@@ -148,13 +148,14 @@ async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl 
   const s = new Set((p.unl || '').split(',').filter(Boolean)); if (s.has(k)) return; s.add(k); await env.DB.prepare('UPDATE prof SET unl=? WHERE uid=?').bind([...s].join(','), uid).run(); }
 // v16-162 (22 nov 2026, Marius): personal DIAMOND gift, sent ONCE as an inbox Mail (at the anti-cheat check-in or at the online sync,
 // whichever comes first). The ledger rule in worker.js does not count these diamonds as cheating until 'until'.
-const GIFT_DM = [{p:'1d3eb4a8', dm:100000, id:'gift_dm_1d3eb4a8_v16-162', until:Date.parse('2026-12-01T00:00:00Z')}];
+const GIFT_DM = [{p:'1d3eb4a8', dm:100000, send:false, id:'gift_dm_1d3eb4a8_v16-162', until:Date.parse('2026-12-01T00:00:00Z')}];
 export const isGiftDm = pid => GIFT_DM.some(g => String(pid).startsWith(g.p) && Date.now() < g.until);
 export async function giftDm(env, pid, uid) {
   for (const g of GIFT_DM) if (String(pid).startsWith(g.p) && Date.now() < g.until) { try {
-    if (await env.DB.prepare("SELECT 1 FROM events WHERE pid=? AND kind='gift' AND detail=?").bind(pid, g.id).first()) continue;
     if (!uid) { const pr = await env.DB.prepare('SELECT uid FROM prof WHERE pid=?').bind(pid).first(); uid = pr && pr.uid; }
     if (!(uid > 0)) continue;
+    if (g.send === false) { await env.DB.prepare('DELETE FROM inbox WHERE uid=? AND got=0 AND title=?').bind(uid, 'A gift from Torque Studios').run(); continue; }   // 22 nov: gift moved to the game's own Mail (no double gift)
+    if (await env.DB.prepare("SELECT 1 FROM events WHERE pid=? AND kind='gift' AND detail=?").bind(pid, g.id).first()) continue;
     await env.DB.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(pid, Date.now(), 'gift', g.id).run();
     await mail(env, uid, '🎁', 'A gift from Torque Studios', 'Thank you for playing Torque Empire! Here are ' + g.dm.toLocaleString('en') + ' Diamonds for your hero summons. Good luck!', {dm:g.dm});
   } catch (e) {} }
