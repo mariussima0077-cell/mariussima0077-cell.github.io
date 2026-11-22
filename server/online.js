@@ -105,7 +105,8 @@ async function ensure(env) {
     db.prepare('CREATE TABLE IF NOT EXISTS rwday(uid INTEGER PRIMARY KEY, day TEXT, s INTEGER DEFAULT 0, a INTEGER DEFAULT 0)'),
     db.prepare('CREATE TABLE IF NOT EXISTS rwhit(tid INTEGER, uid INTEGER, t INTEGER, win INTEGER, steal INTEGER, an TEXT, PRIMARY KEY(tid, uid))'),
   ]);
-  try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-122: HIDE VIP (others do not see the VIP level)
+  try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}
+  try { await db.prepare('ALTER TABLE prof ADD COLUMN rp INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-155: RAIL PASS – subscription end (ms), checked against Google purchases at every sync   // v16-122: HIDE VIP (others do not see the VIP level)
   ready = true;
 }
 const kvGet = async (env, k) => { const r = await env.DB.prepare('SELECT v FROM kv WHERE k=?').bind(k).first(); return r ? r.v : null; };
@@ -140,14 +141,14 @@ function pub(p, extra) {
 const isTst = pid => String(pid || '').startsWith('tst_');   // v16-91: owner's FULL TEST ACCOUNT (hidden from rankings)
 async function profOf(env, pid) { return pid && typeof pid === 'string' ? env.DB.prepare('SELECT * FROM prof WHERE pid=?').bind(pid.slice(0, 64)).first() : null; }
 async function isBanned(env, pid) { const r = await env.DB.prepare('SELECT banned FROM players WHERE pid=?').bind(pid).first(); return !!(r && r.banned); }
-const unlocks = p => new Set([...(p.unl || '').split(','), ...(p.cunl || '').split(','), ...((p.vip | 0) >= 5 ? ['vip5'] : []), ...((p.vip | 0) >= 10 ? ['vip10'] : [])].filter(Boolean));   // v16-122: VIP titles
+const unlocks = p => new Set([...(p.unl || '').split(','), ...(p.cunl || '').split(','), ...((p.vip | 0) >= 5 ? ['vip5'] : []), ...((p.vip | 0) >= 10 ? ['vip10'] : []), ...(RP(p) ? ['rail'] : [])].filter(Boolean));   // v16-155: RAIL BARON title while the Rail Pass is active   // v16-122: VIP titles
 async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl FROM prof WHERE uid=?').bind(uid).first(); if (!p) return;
   const s = new Set((p.unl || '').split(',').filter(Boolean)); if (s.has(k)) return; s.add(k); await env.DB.prepare('UPDATE prof SET unl=? WHERE uid=?').bind([...s].join(','), uid).run(); }
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
 function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
-const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10'];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
+const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail'];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 
 // ------------------------------------------------------------------ ARENA FIGHT (decided by the server, seeded → the same fight can be replayed)
@@ -279,6 +280,9 @@ async function replay(env, id) {
 // Other players on the same server may attack it (the fight = arena simulation vs. your battle team, decided HERE). A won attack steals 20 %
 // of what is still on the train; a train can be robbed at most 2 times. Per day (UTC): 3 trains sent, 5 attacks. The tokens are Street Tokens.
 const RW_SEND = 3, RW_ATK = 5, RW_TRIP = 30 * 60e3, RW_HITS = 2, RW_STEAL = .2, RW_MAXTOK = 20000;
+// v16-155 RAIL PASS (Marius 22 nov 2026, 4.99 €/month, rail_pass_monthly): +1 train a day, +2 attacks a day, a robbed train loses only half
+const RP = p => !!p && (+p.rp || 0) > Date.now();
+const rwSendMax = p => RW_SEND + (RP(p) ? 1 : 0), rwAtkMax = p => RW_ATK + (RP(p) ? 2 : 0);
 async function rwDayRow(env, p, now) { const day = dayKey(now); let d = await env.DB.prepare('SELECT * FROM rwday WHERE uid=?').bind(p.uid).first();
   if (!d) { await env.DB.prepare('INSERT INTO rwday(uid,day,s,a) VALUES(?,?,0,0)').bind(p.uid, day).run(); d = {uid:p.uid, day, s:0, a:0}; }
   else if (d.day !== day) { await env.DB.prepare('UPDATE rwday SET day=?, s=0, a=0 WHERE uid=?').bind(day, p.uid).run(); d = {uid:p.uid, day, s:0, a:0}; }
@@ -290,7 +294,7 @@ async function rwView(env, p, now) {
   const targets = (await db.prepare(`SELECT t.id,t.g,t.tok,t.lost,t.cars,t.t1,t.hits,p.uid,p.name,p.icon,p.frame,p.cc,p.pow,p.title FROM rwtrain t JOIN prof p ON p.uid=t.uid LEFT JOIN players pl ON pl.pid=p.pid
     WHERE t.srv=? AND t.uid<>? AND t.done=0 AND t.t1>? AND t.hits<? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_'
     AND NOT EXISTS(SELECT 1 FROM rwhit h WHERE h.tid=t.id AND h.uid=?) ORDER BY RANDOM() LIMIT 8`).bind(p.srv, p.uid, now + 60e3, RW_HITS, p.uid).all()).results;
-  return {ok:true, now, sends:Math.max(0, RW_SEND - d.s), atks:Math.max(0, RW_ATK - d.a), sendMax:RW_SEND, atkMax:RW_ATK, trip:RW_TRIP, steal:RW_STEAL, hitMax:RW_HITS,
+  return {ok:true, now, sends:Math.max(0, rwSendMax(p) - d.s), atks:Math.max(0, rwAtkMax(p) - d.a), sendMax:rwSendMax(p), atkMax:rwAtkMax(p), rp:RP(p) ? +p.rp : 0, trip:RW_TRIP, steal:RW_STEAL, hitMax:RW_HITS,
     mine, hits, targets:targets.map(t => ({id:t.id, g:t.g, left:t.tok - t.lost, cars:t.cars, t1:t.t1, hits:t.hits, who:pub(t)}))};
 }
 async function railWars(env, p, op, b) {
@@ -298,8 +302,8 @@ async function railWars(env, p, op, b) {
   if (op === 'rw') return rwView(env, p, now);
   if (op === 'rwsend') {
     const g = b.g | 0, tok = b.tok | 0, cars = b.cars | 0; if (g < 0 || g > 5 || tok < 1 || tok > RW_MAXTOK || cars < 1 || cars > 20) return {err:'bad'};
-    const d = await rwDayRow(env, p, now); if (d.s >= RW_SEND) return {err:'no_sends'};
-    if ((await db.prepare('SELECT COUNT(*) n FROM rwtrain WHERE uid=? AND done=0 AND t1>?').bind(p.uid, now).first()).n >= RW_SEND) return {err:'no_sends'};
+    const d = await rwDayRow(env, p, now); if (d.s >= rwSendMax(p)) return {err:'no_sends'};
+    if ((await db.prepare('SELECT COUNT(*) n FROM rwtrain WHERE uid=? AND done=0 AND t1>?').bind(p.uid, now).first()).n >= rwSendMax(p)) return {err:'no_sends'};
     await db.prepare('UPDATE rwday SET s=s+1 WHERE uid=?').bind(p.uid).run();
     await db.prepare('INSERT INTO rwtrain(uid,srv,g,tok,cars,t0,t1) VALUES(?,?,?,?,?,?,?)').bind(p.uid, p.srv, g, tok, cars, now, now + RW_TRIP).run();
     return rwView(env, p, now);
@@ -311,21 +315,21 @@ async function railWars(env, p, op, b) {
     return {ok:true, id:t.id, g:t.g, tok:Math.max(0, t.tok - t.lost), lost:t.lost, hits:t.hits};
   }
   if (op === 'rwatk') {
-    const d = await rwDayRow(env, p, now); if (d.a >= RW_ATK) return {err:'no_atks'};
+    const d = await rwDayRow(env, p, now); if (d.a >= rwAtkMax(p)) return {err:'no_atks'};
     const t = await db.prepare('SELECT * FROM rwtrain WHERE id=?').bind(b.id | 0).first();
     if (!t || t.done || t.uid === p.uid || t.srv !== p.srv || t.t1 <= now || t.hits >= RW_HITS) return {err:'gone'};
     if (await db.prepare('SELECT 1 FROM rwhit WHERE tid=? AND uid=?').bind(t.id, p.uid).first()) return {err:'gone'};
     const ta = JSON.parse(p.team || '[]'); if (!ta.length) return {err:'no_team'};
     const dp = await db.prepare('SELECT * FROM prof WHERE uid=?').bind(t.uid).first(); if (!dp) return {err:'gone'};
     const td = JSON.parse(dp.team || '[]'), seed = (Math.random() * 4294967295) >>> 0, res = td.length ? arenaSim(ta, td, seed) : {win:1, log:[], dur:0};
-    let steal = res.win && !isTst(p.pid) ? Math.floor((t.tok - t.lost) * RW_STEAL) : 0;
+    let steal = res.win && !isTst(p.pid) ? Math.floor((t.tok - t.lost) * RW_STEAL * (RP(dp) ? .5 : 1)) : 0;   // v16-155: Rail Pass owner loses half
     const ins = await db.prepare('INSERT OR IGNORE INTO rwhit(tid,uid,t,win,steal,an) VALUES(?,?,?,?,?,?)').bind(t.id, p.uid, now, res.win ? 1 : 0, steal, p.name).run();
     if (!(ins.meta && ins.meta.changes)) return {err:'gone'};
     await db.prepare('UPDATE rwday SET a=a+1 WHERE uid=?').bind(p.uid).run();
     if (res.win) { const u = await db.prepare('UPDATE rwtrain SET hits=hits+1, lost=lost+? WHERE id=? AND hits<? AND done=0').bind(steal, t.id, RW_HITS).run(); if (!(u.meta && u.meta.changes)) steal = 0; }
     const hid = (await db.prepare('INSERT INTO ahist(srv,t,kind,a,d,an,dn,win,da,dd,seed,ta,td) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id')
       .bind(p.srv, now, 'train', p.uid, t.uid, p.name, dp.name, res.win, steal, -steal, seed, JSON.stringify(ta), JSON.stringify(td)).first()).id;
-    return {ok:true, kind:'train', id:hid, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pub(p), them:pub(dp), steal, g:t.g, atks:Math.max(0, RW_ATK - d.a - 1)};
+    return {ok:true, kind:'train', id:hid, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pub(p), them:pub(dp), steal, g:t.g, atks:Math.max(0, rwAtkMax(p) - d.a - 1)};
   }
   return {err:'bad'};
 }
@@ -450,6 +454,10 @@ export async function online(op, b, env) {
     const cl = Array.isArray(b.unl) ? b.unl : [];
     // v16-122: FOUNDER only with a purchase Google confirmed (purchases table) – the test account (tst_…) may claim it
     const fdr = cl.includes('fdr') && (String(b.pid).startsWith('tst_') || !!(await db.prepare("SELECT 1 FROM purchases WHERE sku='founder_pass' AND state='ok' AND pid IN (" + [b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].slice(0, 6).map(() => '?').join(',') + ") LIMIT 1").bind(b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)).first()));
+    // v16-155: RAIL PASS only with a subscription Google confirmed and not yet ended (test account: 1 day while it says so)
+    const ids = [b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)];
+    const rpx = !cl.includes('rail') ? 0 : String(b.pid).startsWith('tst_') ? now + DAY
+      : (((await db.prepare("SELECT MAX(expiry) e FROM purchases WHERE sku='rail_pass_monthly' AND state='ok' AND pid IN (" + ids.map(() => '?').join(',') + ")").bind(...ids).first()) || {}).e || 0);
     const cunl = cl.filter(k => ['wr','boss','gear','speed','f1'].includes(k) || (k === 'fdr' && fdr)).join(',');
     const icon = String(b.icon || (team[0] && team[0].id) || 'm0_0').replace(/[^a-z0-9_]/g, '').slice(0, 12), dk = dayKey(now);
     if (!p) {
@@ -463,6 +471,7 @@ export async function online(op, b, env) {
         .bind(srv, ccOf(lang), langOf(lang), vip, rep, best, dk, bd0, pw, lv, JSON.stringify(team), now, cunl, p.uid).run();
       p = await profOf(env, b.pid);
     }
+    if ((+p.rp || 0) !== rpx) { await db.prepare('UPDATE prof SET rp=? WHERE uid=?').bind(rpx, p.uid).run(); p.rp = rpx; }   // v16-155
     if (team.length) await db.prepare('INSERT OR IGNORE INTO arena(uid,srv,season,pts,w,l,tk,tkt,opp,peak,t) VALUES(?,?,?,?,0,0,?,?,?,?,0)').bind(p.uid, p.srv, seasonOf(now), START_PTS, ARENA_TK, now, '[]', START_PTS).run();
     const inbox = (await db.prepare('SELECT COUNT(*) n FROM inbox WHERE uid=? AND got=0').bind(p.uid).first()).n;
     const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();

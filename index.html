@@ -2734,13 +2734,15 @@ const RW_FILL=3600, RW_GN=['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC
 const rwScore=()=>(G.lv.wash>0?lvT('wash'):0)+(G.lv.gas>0?lvT('gas'):0)+(G.lv.factory>0?lvT('factory'):0);
 function rwW(){const q=Math.min(1,rwScore()/150);return [60-50*q,25,10+10*q,4+12*q,1+8*q,.2+4*q];}
 function rwRoll(min){const w=rwW();let r=Math.random()*w.reduce((a,b)=>a+b,0),g=0;for(;g<5;g++){r-=w[g];if(r<0)break;}return Math.max(min||0,g);}
-const rwTok=(g,n)=>Math.round(RW_TOK[g]*n/4);
-const rwNext=()=>{const s=RWS(),cap=rCap();if(s.n>=cap)return 0;if(dcars.some(c=>c.exp)||RT.park.some(Boolean)||RT.mv.length)return -1;return Math.max(0,RW_FILL/cap-(s.acc||0));};   // v16-147
+// v16-155 RAIL PASS (Marius 22 nov 2026, 4.99 €/month, PK.rail = end of the subscription): train fills in 45 min instead of 1 h, 3 refreshes, Street Tokens ×1.3, golden locomotive
+const RPON=()=>(+PK.rail||0)>Date.now(), rwFill=()=>RPON()?2700:RW_FILL, rwRfMax=()=>RPON()?3:2;
+const rwTok=(g,n)=>Math.round(RW_TOK[g]*n/4*(RPON()?1.3:1));
+const rwNext=()=>{const s=RWS(),cap=rCap();if(s.n>=cap)return 0;if(dcars.some(c=>c.exp)||RT.park.some(Boolean)||RT.mv.length)return -1;return Math.max(0,rwFill()/cap-(s.acc||0));};   // v16-147
 const rwNextTxt=()=>{const t=rwNext();if(t<0)return 'car on the way';const m=t/60|0,x=t%60|0;return m+':'+String(x).padStart(2,'0');};
 const RT={park:[],mv:[],cars:[],st:'dock',x:0,v:0,t:0,g:0,nOn:0,boot:0};
 function RWS(){if(!G.rw)G.rw={g:-1,rf:0,n:0,acc:0,ft:Date.now()};const s=G.rw;if(s.g<0)s.g=rwRoll(0);
   if(!RT.boot){RT.boot=1;RT.g=s.g;RT.x=rStop();const cap=rCap();   // offline: the factory kept filling the train
-    if(G.lv.rail>0&&G.lv.factory>0&&s.n<cap){const add=Math.floor((Date.now()-(s.ft||Date.now()))/1000/(RW_FILL/cap));if(add>0)s.n=Math.min(cap,s.n+add);}}
+    if(G.lv.rail>0&&G.lv.factory>0&&s.n<cap){const add=Math.floor((Date.now()-(s.ft||Date.now()))/1000/(rwFill()/cap));if(add>0)s.n=Math.min(cap,s.n+add);}}
   return s;}
 const rStop=()=>SOON.rail.x+SOON.rail.w-14, rWag=()=>Math.ceil(rCap()/2), rLen=()=>146+rWag()*126;
 const RWI={};const rwI=n=>{if(!RWI[n]){RWI[n]=new Image();RWI[n].src='img/rw/'+n+'.webp';}return RWI[n];};
@@ -2761,7 +2763,7 @@ function rwAfterGas(c){const px=c.x,L=SY-LN,q=[{x:px,y:L-22,rev:1}];for(let k=1;
 function rwAfterWash(c,loop){rwToRail(c,loop);}
 function railPark(c){let k=c.spot;if(k==null||k<0||RT.park[k])k=RT.park.findIndex((v,i)=>!v&&i<rCap());if(k<0)k=RT.park.length;RT.park[k]=c;c.path=[];c.fade=0;c.pt=0;}
 function rwSend(){const s=RWS();RT.g=s.g;RT.nOn=s.n;RT.st='leave';RT.v=20;s.n=0;s.rf=0;s.g=rwRoll(0);s.acc=0;save();}
-function rwRefresh(){const s=RWS();if(s.rf>=2)return false;s.rf++;s.g=rwRoll(s.g);if(RT.st==='dock')RT.g=s.g;save();return true;}
+function rwRefresh(){const s=RWS();if(s.rf>=rwRfMax())return false;s.rf++;s.g=rwRoll(s.g);if(RT.st==='dock')RT.g=s.g;save();return true;}
 const rSlot=(s)=>{const w=Math.floor(s/2),x0=RT.x-146-(w+1)*126;return {x:x0+(s%2?93:33),y:SOON.railY+5-rwWH()*.6};};
 const rwWH=()=>{const I=rwI('wag'+RT.g);return I.complete&&I.naturalWidth?124*I.naturalHeight/I.naturalWidth:30;};
 function rwCar(i){while(RT.cars.length<=i){const c=newCar(false);c.col=pick(VIVID);c.dirt=0;c.dmg=[];RT.cars.push(c);}return RT.cars[i];}
@@ -2770,7 +2772,7 @@ function updateRail(dt){
   for(const c of RT.park)if(c&&c.fade<1)c.fade=Math.min(1,c.fade+dt*2);
   // export cars from the factory (one train ≈ 1 hour)
   const fly=dcars.filter(c=>c.exp).length+RT.park.filter(Boolean).length+RT.mv.length;
-  if(G.lv.factory>0&&s.n+fly<cap){const iv=RW_FILL/cap;if(s.n===0&&fly===0&&RT.st==='dock'&&(s.acc||0)<iv)s.acc=iv;   // v16-147: the 1st car of a new train comes at once
+  if(G.lv.factory>0&&s.n+fly<cap){const iv=rwFill()/cap;if(s.n===0&&fly===0&&RT.st==='dock'&&(s.acc||0)<iv)s.acc=iv;   // v16-147: the 1st car of a new train comes at once
     s.acc=(s.acc||0)+dt;if(s.acc>=iv&&rwSpawn())s.acc=0;}
   // parked cars go up on the train
   if(RT.st==='dock')RT.park.forEach((c,k)=>{if(!c)return;c.pt+=dt;if(c.pt>1.4&&s.n+RT.mv.length<cap){const r=rRect(),p=rSpot(r,k);RT.park[k]=null;RT.mv.push({c,x0:p.x,y0:p.y,s0:r.a.s,s:s.n+RT.mv.length,t:0});}});
@@ -2785,7 +2787,7 @@ const rwBtn=()=>{const r=rRect();return {x:r.x+r.w+46,y:r.y+r.h*.42,r:34};};
 function drawRailDyn(){
   if(!(G.lv.rail>0))return;const r=rRect();if(!onScreen(r.x+r.w/2,r.y+r.h/2,r.w*.6+600))return;const s=RWS(),ry=SOON.railY,cap=rCap();
   RT.park.forEach((c,k)=>{if(!c||k>=cap)return;const p=rSpot(r,k);drawCarAt(c,p.x,p.y,-Math.PI/2,r.a.s,c.fade);});
-  if(RT.st!=='away'){const x1=RT.x,L=rwI('loco'+RT.g),Wg=rwI('wag'+RT.g),wh=rwWH(),n=RT.st==='leave'?RT.nOn:s.n;
+  if(RT.st!=='away'){const x1=RT.x,L=(()=>{const g=RPON()&&rwI('loco_gold');return g&&g.complete&&g.naturalWidth?g:rwI('loco'+RT.g);})(),Wg=rwI('wag'+RT.g),wh=rwWH(),n=RT.st==='leave'?RT.nOn:s.n;
     X.fillStyle='rgba(0,0,0,.28)';X.fillRect(x1-rLen(),ry+2,rLen(),6);
     for(let w=0;w<rWag();w++){const wx=x1-146-(w+1)*126;if(Wg.complete&&Wg.naturalWidth)X.drawImage(Wg,wx,ry+5-wh,124,wh);else{X.fillStyle='#37474f';X.fillRect(wx,ry-6,124,10);}}
     for(let i=0;i<n;i++){const p=rSlot(i);drawCarAt(rwCar(i),p.x,p.y,0,.5,1);}
@@ -4129,7 +4131,7 @@ function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Mat
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
+window.__TE={RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

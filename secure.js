@@ -11,11 +11,12 @@ const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip
   plat:'vip_pass_platinum', p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite', p5:'pack_master', p6:'pack_legend', p7:'pack_titan',
   d1:'diamonds_300', d2:'diamonds_800', d3:'diamonds_1700', d4:'diamonds_3600', d5:'diamonds_9500', d6:'diamonds_20000',
   fn:'fund_normal', fh:'fund_hard',
-  dia:'vip_pass_diamond', fdr:'founder_pass'};   // v16-122: Diamond Pass (subscription 14.99) · Founder Pass (one-time 4.99)
+  dia:'vip_pass_diamond', fdr:'founder_pass',
+  rail:'rail_pass_monthly'};   // v16-155: Rail Pass (subscription 4.99, Rail Wars)   // v16-122: Diamond Pass (subscription 14.99) · Founder Pass (one-time 4.99)
 // v16-122 (Marius): every purchase gives VIP points – price in € × VIP_EUR (index.html, 20 points per €)
-const EURO = {car:5.99, vip:3.99, spd2:2.99, sub:5.99, dg:2.99, plat:9.99, p1:.99, p2:2.99, p3:5.99, p4:9.99, p5:19.99, p6:49.99, p7:99.99, d1:1.99, d2:4.99, d3:9.99, d4:19.99, d5:49.99, d6:99.99, fn:9.99, fh:9.99, dia:14.99, fdr:4.99};
+const EURO = {car:5.99, vip:3.99, spd2:2.99, sub:5.99, dg:2.99, plat:9.99, p1:.99, p2:2.99, p3:5.99, p4:9.99, p5:19.99, p6:49.99, p7:99.99, d1:1.99, d2:4.99, d3:9.99, d4:19.99, d5:49.99, d6:99.99, fn:9.99, fh:9.99, dia:14.99, fdr:4.99, rail:4.99};
 function vipBuy(k){ try{ const t=T(); if(!t||!t.addVip||!EURO[k]) return; const n=Math.round(EURO[k]*(t.VIP_EUR||20)); rebase(); t.addVip(n); rebase(); t.toast('👑 +'+n+' VIP points',2500); }catch(e){} }
-const SUBS = k => k==='sub'||k==='plat'||k==='dia';                    // subscriptions
+const SUBS = k => k==='sub'||k==='plat'||k==='dia'||k==='rail';                    // subscriptions
 const CONS = k => k==='dg'||/^d\d$/.test(k);                // consumables (can be bought again) // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
 const PLAY = 'https://play.google.com/billing';
 

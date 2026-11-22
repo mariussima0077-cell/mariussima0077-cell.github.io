@@ -18,6 +18,9 @@ function give(n){if(!(n>0))return;S().tok+=n;T().save();}
 const left=ms=>{const s=Math.max(0,ms/1000|0),h=s/3600|0,m=(s%3600)/60|0,x=s%60;return h?h+'h '+String(m).padStart(2,'0')+'m':m+':'+String(x).padStart(2,'0');};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const GN=g=>T().RW_GN[g], GC=g=>T().RW_GC[g];
+// v16-155 RAIL PASS (4.99 €/month): +1 train & +2 attacks a day (server), 3 refreshes, 45 min fill, ×1.3 tokens, robbed = lose half, golden loco
+const RP=()=>!!(T().RPON&&T().RPON()), RFM=()=>T().rwRfMax?T().rwRfMax():2, SMX=()=>D&&D.ok?D.sendMax:(RP()?4:3), AMX=()=>D&&D.ok?D.atkMax:(RP()?7:5);
+const RPV=()=>!!(window.SHOP2&&SHOP2.railVis&&SHOP2.railVis());
 // ---------------- page
 const css=`#st{position:fixed;inset:0;z-index:59;display:none;flex-direction:column;background:#060c1c url(img/rw/rw_bg.webp) center top/100% auto no-repeat;color:#fff;font-family:Lilita,Game,system-ui;overflow:hidden}
 #st.open{display:flex}#st .stTop{flex:none;display:flex;align-items:center;padding:calc(env(safe-area-inset-top) + 8px) 8px 0}
@@ -43,41 +46,46 @@ const css=`#st{position:fixed;inset:0;z-index:59;display:none;flex-direction:col
 #st .hl{font:700 12px Game,system-ui;color:#cfd8dc;padding:5px 8px;border-bottom:1px solid #ffffff14}#st .hl b{color:#ff8a80}#st .hl b.ok{color:#a5d6a7}
 #st .stSh{display:grid;grid-template-columns:1fr 1fr;gap:8px}#st .stI{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 8px;border-radius:14px;background:linear-gradient(#1a2c3af0,#0f1922f0);box-shadow:inset 0 0 0 1.5px #3a5d72,0 4px 8px #0007}
 #st .stI .ic .tki{height:50px;filter:drop-shadow(0 3px 3px #000)}#st .stI .nm{font-size:14px;text-align:center;line-height:1.1}#st .stI button{width:100%;max-width:130px}#st .stI button .tki{height:1.25em}
-#st .off{text-align:center;padding:16px;color:#ffcc80;font-size:15px}`;
+#st .off{text-align:center;padding:16px;color:#ffcc80;font-size:15px}
+#st .rpAd{position:relative;margin:0 0 6px;border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #ffd36b,0 6px 14px #000a}#st .rpAd img{display:block;width:100%;aspect-ratio:3/1;object-fit:cover;object-position:60% 55%}
+#st .rpAd div{position:absolute;left:0;right:0;bottom:0;padding:16px 10px 6px;background:linear-gradient(#0000,#000c);text-align:center}#st .rpAd b{display:block;font-weight:400;font-size:15px;color:#ffe082;text-shadow:0 2px 0 #000}#st .rpAd em{font:700 12px Game,system-ui;font-style:normal;color:#fff}
+#st .rpOn{display:flex;align-items:center;gap:8px;margin:0 0 6px;padding:6px 10px;border-radius:14px;background:linear-gradient(#5a1a10e8,#2a0d08e8);box-shadow:inset 0 0 0 2px #ffd36b}#st .rpOn img{width:46px;flex:none}#st .rpOn b{font-weight:400;color:#ffe082;font-size:15px}#st .rpOn small{display:block;font:700 11px Game,system-ui;color:#ffe0b2}`;
 let el,D=null,busy=false;
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);el=document.createElement('div');el.id='st';
   el.innerHTML='<div class="stTop"><button class="stX" data-s="x">↩</button></div><div class="stB" id="stBody"></div>';document.body.appendChild(el);
   el.addEventListener('click',e=>{const t=e.target.closest('[data-s]');if(!t)return;const a=t.dataset.s;
-    if(a==='x')close();else if(a==='rf')refresh();else if(a==='send')send();else if(a==='atk')attack(+t.dataset.i);else if(a==='list')load(true);else if(a==='buy')buy(t.dataset.k);});}
+    if(a==='x')close();else if(a==='rf')refresh();else if(a==='send')send();else if(a==='atk')attack(+t.dataset.i);else if(a==='list')load(true);else if(a==='buy')buy(t.dataset.k);else if(a==='rp'){close();if(window.SHOP2)SHOP2.open('tv');}});}
 function close(){if(el)el.classList.remove('open');clearInterval(open.t);}
-async function load(force){if(!O()){D={err:'offline'};render();return;}if(busy&&!force)return;busy=true;const r=await O().call('rw',{});busy=false;D=r;if(r&&r.ok)await claimAll();render();}
+async function load(force){if(!O()){D={err:'offline'};render();return;}if(busy&&!force)return;busy=true;if(RP()&&!load.sy){load.sy=1;await O().sync();}const r=await O().call('rw',{});busy=false;D=r;if(r&&r.ok)await claimAll();render();}
 async function claimAll(){if(!D||!D.mine)return;const now=Date.now();for(const t of D.mine.filter(t=>t.t1<=now)){const r=await O().call('rwclaim',{id:t.id});
   if(r&&r.ok){give(r.tok);T().toast('🚆 Your '+GN(r.g)+' train arrived: +'+T().nf(r.tok)+' '+TI()+(r.lost?' (robbed: −'+T().nf(r.lost)+')':''),3200);D.mine=D.mine.filter(x=>x.id!==t.id);}}}
-function refresh(){const s=T().RWS();if(s.rf>=2)return T().toast('🔒 This train grade is locked (2 refreshes used)',2200);const g0=s.g;T().rwRefresh();
-  T().toast(s.g>g0?'✨ Upgraded to '+GN(s.g)+'!':'🔄 Still '+GN(s.g)+' – '+(2-s.rf)+' refresh left',2200);render();}
+function refresh(){const s=T().RWS(),mx=RFM();if(s.rf>=mx)return T().toast('🔒 This train grade is locked ('+mx+' refreshes used)',2200);const g0=s.g;T().rwRefresh();
+  T().toast(s.g>g0?'✨ Upgraded to '+GN(s.g)+'!':'🔄 Still '+GN(s.g)+' – '+(mx-s.rf)+' refresh left',2200);render();}
 async function send(){const s=T().RWS(),cap=T().rCap();if(s.n<cap)return T().toast('🚆 The train is not full yet ('+s.n+' / '+cap+' cars)',2200);
-  if(D&&D.ok&&D.sends<=0)return T().toast('🚆 No trains left today (3 a day)',2200);if(busy)return;busy=true;
+  if(D&&D.ok&&D.sends<=0)return T().toast('🚆 No trains left today ('+SMX()+' a day)',2200);if(busy)return;busy=true;
   await O().sync();const r=await O().call('rwsend',{g:s.g,tok:T().rwTok(s.g,s.n),cars:s.n});busy=false;
-  if(!r||!r.ok)return T().toast({no_sends:'🚆 No trains left today (3 a day)',offline:'📶 Rail Wars needs internet',network:'📶 No connection',update:'⬆️ Update the game first'}[r&&r.err]||'⚠️ Could not send the train',2600);
+  if(!r||!r.ok)return T().toast({no_sends:'🚆 No trains left today ('+SMX()+' a day)',offline:'📶 Rail Wars needs internet',network:'📶 No connection',update:'⬆️ Update the game first'}[r&&r.err]||'⚠️ Could not send the train',2600);
   T().rwSend();D=r;T().toast('🚆 '+GN(r.mine[r.mine.length-1].g)+' train sent! Back in 30 min – keep it safe!',2600);render();}
-async function attack(id){if(busy)return;if(D&&D.atks<=0)return T().toast('⚔️ No attacks left today (5 a day)',2200);busy=true;await O().sync();const r=await O().call('rwatk',{id});busy=false;
-  if(!r||!r.ok){T().toast({no_atks:'⚔️ No attacks left today (5 a day)',gone:'🚆 That train is gone – pick another',no_team:'⚔️ You need a battle team first',network:'📶 No connection'}[r&&r.err]||'⚠️ Could not attack',2600);load(true);return;}
+async function attack(id){if(busy)return;if(D&&D.atks<=0)return T().toast('⚔️ No attacks left today ('+AMX()+' a day)',2200);busy=true;await O().sync();const r=await O().call('rwatk',{id});busy=false;
+  if(!r||!r.ok){T().toast({no_atks:'⚔️ No attacks left today ('+AMX()+' a day)',gone:'🚆 That train is gone – pick another',no_team:'⚔️ You need a battle team first',network:'📶 No connection'}[r&&r.err]||'⚠️ Could not attack',2600);load(true);return;}
   if(r.steal)give(r.steal);
   r.bg='img/rw/rw_battle.webp';r.rwH=r.win?(r.steal?'<div class="rw2"><div>'+TI()+' +'+T().nf(r.steal)+' stolen</div></div>':''):'<div class="pts" style="font-size:15px;color:#ffab91">The train got away</div>';
   r.onEnd=()=>{open();load(true);};el.classList.remove('open');O().play(r,false);}
 function buy(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it)return;if(s.tok<it[1])return T().toast(TI()+' Not enough Street Tokens ('+T().nf(it[1])+')',2200);
   s.tok-=it[1];if(k[0]==='k'){if(window.DGK)DGK.add(k.slice(2),1);}else if(k==='ess')T().giveRw({ess:essN()});else T().giveRw({[k]:1});
   T().save();T().toast(itIcon(k)+' +1 '+itName(k),2200);render();}
-function trainImg(g,w){return '<img class="tr" src="img/rw/loco'+g+'.webp" alt=""'+(w?' style="width:'+w+'"':'')+'>';}
+function trainImg(g,w,me){return '<img class="tr" src="img/rw/'+(me&&RP()?'loco_gold':'loco'+g)+'.webp" alt=""'+(w?' style="width:'+w+'"':'')+'>';}
 function render(){if(!el||!el.classList.contains('open'))return;const G=T().G,body=document.getElementById('stBody'),now=Date.now(),st=S();let h='';
   h+='<div class="stBal">'+TI()+'<b>'+T().nf(st.tok)+'</b><span>STREET TOKENS<br>for the Street Shop</span></div>';
+  if(RP())h+='<div class="rpOn"><img src="img/rw/rail_baron.webp" alt=""><div><b>RAIL PASS ACTIVE</b><small>4 trains · 7 attacks · 3 refreshes · 45 min fill · ×1.3 tokens · robbed = lose half</small></div></div>';
+  else if(RPV())h+='<div class="rpAd" data-s="rp"><img src="img/rw/rail_pass_bnr.webp" alt=""><div><b>+1 TRAIN · +2 ATTACKS · ×1.3 TOKENS</b><em>RAIL PASS · €4.99 / month ›</em></div></div>';
   if(!(G.lv.rail>0)){body.innerHTML=h+'<div class="card off">🚆 Build the RAIL TERMINAL (next to the Car Factory) to join RAIL WARS.</div>'+shopH(st);return;}
   const s=T().RWS(),cap=T().rCap(),full=s.n>=cap,w=T().rwW(),ws=w.reduce((a,b)=>a+b,0);
-  h+='<div class="stS">YOUR TRAIN</div><div class="card" style="--gc:'+GC(s.g)+'">'+trainImg(s.g)+'<div class="gr">'+GN(s.g)+'</div>';
+  h+='<div class="stS">YOUR TRAIN</div><div class="card" style="--gc:'+GC(s.g)+'">'+trainImg(s.g,0,1)+'<div class="gr">'+GN(s.g)+'</div>';
   h+='<div class="bar"><i style="width:'+(s.n/cap*100)+'%"></i></div><div class="ln"><span>Cars</span><b>'+s.n+' / '+cap+(full?' · FULL':' · next: '+T().rwNextTxt())+'</b></div>';
   h+='<div class="ln"><span>Brings when full</span><b>'+TI()+' '+T().nf(T().rwTok(s.g,cap))+'</b></div>';
   h+='<div class="ln"><span>Sends today</span><b>'+(D&&D.ok?D.sends+' / '+D.sendMax:'–')+'</b></div>';
-  h+='<div class="btns"><button class="y'+(s.rf>=2?' dis':'')+'" data-s="rf">'+(s.rf>=2?'🔒 LOCKED':'🔄 REFRESH '+(2-s.rf)+'/2')+'</button><button class="g'+(full&&!(D&&D.ok&&D.sends<=0)?'':' dis')+'" data-s="send">🚆 SEND</button></div>';
+  const mx=RFM();h+='<div class="btns"><button class="y'+(s.rf>=mx?' dis':'')+'" data-s="rf">'+(s.rf>=mx?'🔒 LOCKED':'🔄 REFRESH '+(mx-s.rf)+'/'+mx)+'</button><button class="g'+(full&&!(D&&D.ok&&D.sends<=0)?'':' dis')+'" data-s="send">🚆 SEND</button></div>';
   h+='<div class="stN" style="margin:8px 0 0">Grade chances (Car Wash + Gas Station + Car Factory levels): '+w.map((x,i)=>'<span style="color:'+GC(i)+'">'+(x/ws*100).toFixed(i>3?1:0)+'%</span>').join(' · ')+'</div></div>';
   if(!D){body.innerHTML=h+'<div class="card off">📶 Loading…</div>'+shopH(st);return;}
   if(!D.ok){body.innerHTML=h+'<div class="card off">'+({offline:'📶 Rail Wars needs internet',update:'⬆️ Update the game to play Rail Wars',banned:'🚫 Account blocked'}[D.err]||'📶 No connection – try again later')+'</div>'+shopH(st);return;}
