@@ -82,6 +82,12 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## 🔴 v16-171 (22 nov 2026) – cadou Mythic pentru contul lui Marius (26875f9c)
+- Mail personal `p_26875f9c_myth` (doar pentru Player ID 26875f9c): toți cei 6 eroi Mythic (Lv 1, +0, doar cei pe care nu-i are) + câte un set complet Ascended (Lv 1, ★0) pe rolul fiecăruia: Torque King → Thunder Coil, Lady Overdrive → Nitro Rush, Ignis → Field Medic, Goliath → Iron Piston, Nova / Vega → Laser Scope.
+- Prin sistemul de Mail (nu editare de salvare) → Torque Guard nu-l vede ca trișare (max 10 Mythic, puterea mai mare nu e semnalată).
+- Contul rămâne VIZIBIL în clasamente; pentru ascuns: /admin → fișa jucătorului → hide (shadow).
+- Imagini lipsă: nimic.
+
 ## 🚀 LANSARE – CE MAI LIPSEȘTE (check general 20 nov 2026, v16-115)
 1. **Capturile din magazin sunt din v15** (eroi vechi pixelați, UI vechi) + textul STORE_LISTING vorbește de Fusion „+50” (închis) și nu spune nimic de Arenă/PvP, World Boss, Towers, Dungeons, chat → capturi noi 1080×1920 (Claude le poate face cu contul de test full) + text nou. Opțional: video promo (trailer) cu site-ul de pre-înregistrare.
 2. **Prima instalare descarcă ~76 MB** (service worker pune în cache toate cele 827 de fișiere, chiar și eroii/monștrii pe care jucătorul nou nu-i vede încă). Jocul pornește cu ~12 MB, restul în fundal. Recomandare: cache doar pentru nucleu + harta, restul la cerere (economie de date + spațiu pe telefoane mici). Cu Capacitor pozele pot veni în APK.
