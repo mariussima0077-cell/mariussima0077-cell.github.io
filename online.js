@@ -17,7 +17,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=176;
+const CV=177;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -408,7 +408,7 @@ function unlocksLocal(){const G=T()&&T().G;if(!G)return [];const o=[],b=G.cp?G.c
   // v16-174: new titles – once reached they stay (G.ttl is saved with the game)
   try{const X=G.ttl||(G.ttl={}),ok=(k,c)=>{if(c)X[k]=1;},tw=(G.tw&&G.tw.b)||0,own=(G.h&&G.h.own)||{},t=T();
     ok('trny',((G.st&&G.st.ar)||0)>=100);ok('raid',((G.st&&G.st.w)||0)>=50);ok('twr',tw>=100);ok('sky',tw>=500);
-    ok('dgm',!!G.dg&&['vault','mine','forge','lab'].every(k=>((G.dg.b||{})[k]||0)>=50));ok('bhunt',!!G.wb&&(G.wb.cl||[]).includes(5));
+    ok('dgm',!!G.dg&&['vault','mine','forge','lab'].every(k=>((G.dg.b||{})[k]||0)>=50));ok('bhunt',!!G.wb&&(G.wb.cl||[]).includes(G.wb.tv===2?11:5));
     ok('coll',!!G.cc&&(G.cc.own||[]).length>=10);ok('hard',!!G.cph&&(G.cph.best||0)>=100);ok('daily',!!G.ci&&(G.ci.n||0)>=30);
     ok('lucky',Object.keys(own).some(k=>/^m5_/.test(k)));ok('awk',!!t.mTier&&Object.keys(own).some(k=>/^m5_/.test(k)&&t.mTier((own[k]||{}).s||0)>=1));
     ok('tw3',tw>=300);ok('call',!!G.cc&&(G.cc.own||[]).length>=12);ok('gty',Math.max(0,...Object.values(G.lv||{}).map(v=>+v||0))>=50);for(const k in X)if(X[k])o.push(k);}catch(e){}

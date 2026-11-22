@@ -58,7 +58,7 @@ css.textContent=`
 .rw span{background:#0008;border:1px solid #ffd54a55;border-radius:10px;padding:6px 10px;font-weight:900;color:#ffd54a;font-size:14px}
 .cpGo{display:block;width:100%;margin-top:14px;height:52px;border:0;border-radius:14px;font-size:20px;font-weight:900;color:#2a1000;background:linear-gradient(#ffe082,#ffa000 60%,#e65100);box-shadow:0 5px 0 #7a2e00;letter-spacing:1px}
 .cpGo.alt{background:linear-gradient(#5d4a3a,#3a2c22);color:#ffd9b0;box-shadow:0 5px 0 #1a120c}
-.cpRow{display:flex;gap:8px}.cpRow .cpGo{flex:1}
+.cpRow{display:flex;gap:8px}.cpRow .cpGo{flex:1}.cpRow.n3{flex-wrap:wrap;row-gap:0}.cpRow.n3 .cpGo{flex:1 1 40%;min-width:0}.cpRow.n3 .cpGo.nf{flex:1 1 100%}
 .anx{display:flex;align-items:center;gap:8px;margin:12px 0 -4px;padding:8px 12px;border-radius:12px;border:1.5px solid #ffb30055;background:#1e140d;font-weight:900;font-size:13px;color:#ffd9b0;letter-spacing:.5px}
 .anx i{flex:1;text-align:right;font-style:normal;font-size:12px;color:#ffe082}.anx b{min-width:42px;text-align:center;padding:4px 0;border-radius:9px;background:#3a2c22;color:#a1887f;font-size:12px}
 .anx.on{border-color:#66bb6a;box-shadow:0 0 12px #66bb6a44}.anx.on b{background:linear-gradient(#81c784,#388e3c);color:#fff}
@@ -3581,7 +3581,9 @@ const WBOSS=[{k:'scrap',sp:'scrapzilla2',n:'SCRAPZILLA',weak:'elec',d:'A giganti
   {k:'crushk',sp:'crusher2',n:'CRUSHER KING',weak:'inspect',d:'A giant golem built from a car-crusher press: huge hydraulic punches and frequent ground slams that hit everyone close to it. No ranged attack. It ENRAGES in the last 20 seconds.'},
   {k:'infp',sp:'inferno2',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'},
   {k:'tows',sp:'tow2',n:'TOW SERPENT',weak:'tuning',d:'A giant serpent made of heavy chains and crane hooks with a tow-truck head: fast lunges along the ground that hit everyone in front of it, many times. No ranged attack. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 · v16-62 boss 4
-const WB_TIER=[{b:1,dm:20},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:8,dm:40,tk:1},{b:12,dm:50,gt:1,ct:1},{b:18,dm:80,tk:2,gt:1}];
+// v16-176 (Marius): 12 daily tiers instead of 6 (the old 6 thresholds are kept: 1·3·5·8·12·18 bars) + 2 harder ones (22 · 26 bars)
+const WB_TIER=[{b:1,dm:20},{b:2,dm:10},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:6,dm:20,ct:1},{b:8,dm:40,tk:1},{b:10,dm:25,gt:1},{b:12,dm:50,gt:1,ct:1},{b:15,dm:30,tk:1},{b:18,dm:80,tk:2,gt:1},{b:22,dm:60,tk:1,gt:1,ct:1},{b:26,dm:100,tk:2,gt:2,ct:1}];
+const WB_OLDB=[1,3,5,8,12,18]; // claimed indexes of the old 6-tier list → new indexes (same day)
 const WB_RANK=[[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]]; // same table in server/online.js (WB_RW)
 MON.scrap={n:'SCRAPZILLA',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[58,155],dr:'spr_scrapzilla',dr0:'titan',sp:'scrapzilla',sc:1,desc:'World boss'};
 MSPR.scrapzilla={w:288,h:192,ax:144,ay:187.5,ih:157,wb:{pr:2,ni:6}};MDRAW.spr_scrapzilla=(g,u,t)=>drawSprMon(g,u,t,'scrapzilla');
@@ -3619,6 +3621,7 @@ const wbLayer=()=>Math.max(500,Math.round(teamPower(bestTeam().map(heroOf).filte
 function wbG(){const G=TE().G;if(!G.wb)G.wb={d:'',n:0,dmg:0,best:0,cl:[],L:0,wk:'',wd:0,wbest:0,pend:[]};const w=G.wb,d=wbDay();
   if(w.d!==d){w.d=d;w.n=0;w.dmg=0;w.best=0;w.cl=[];w.L=wbLayer();}
   if(!w.L)w.L=wbLayer();
+  if(w.tv!==2){w.tv=2;w.cl=(w.cl||[]).map(i=>WB_TIER.findIndex(q=>q.b===WB_OLDB[i])).filter(i=>i>=0);}
   if(w.wk!==wbWeek()){w.wk=wbWeek();w.wd=0;w.wbest=0;}
   return w;}
 const wbKeys=()=>Math.max(0,WB_KEYS-wbG().n);
@@ -3643,13 +3646,14 @@ function wbRender(){const T=TE(),w=wbG(),Bo=WBOSS[wbCur()],M=wbMap(),bx=$('wbBox
   const ms=new Date();ms.setHours(24,0,0,0);const left=ms-Date.now();
   h+='<div class="wbK" style="'+gbx(112,972,800,70)+'">'+[0,1,2].map(i=>'<img src="img/wb/key.webp" alt="" class="'+(i<wbKeys()?'':'off')+'">').join('')+'<span><b>'+wbKeys()+'/'+WB_KEYS+'</b> BOSS KEYS · new in '+Math.floor(left/36e5)+'h '+Math.floor(left%36e5/6e4)+'m</span></div>';
   h+='<img class="wbTD" src="img/wb/t_daily.webp" alt="DAILY REWARDS" style="'+gbx(172,1046,680,108)+'">';
-  h+='<div class="wbList" style="'+gbx(56,1160,912,200)+'">';
+  h+='<div class="wbList" style="'+gbx(56,1160,912,182)+'">';
   WB_TIER.forEach((q,i)=>{const st=wbTierSt(i);
     h+='<div class="wbRow s'+st+'" data-wt="'+i+'"><img class="wbRI" src="img/wb/row_'+['l','r','c'][st]+'.webp" alt=""><div class="wbRT"><b>DAMAGE '+fmtD(q.b*w.L)+' <i>· '+q.b+' BAR'+(q.b>1?'S':'')+'</i></b><span>'+wbRwHtml(q)+'</span></div>'+(st===1?'<em>CLAIM</em>':'')+'</div>';});
   h+='</div>';
-  h+='<div class="wbRk" data-wb="rank" style="'+gbx(26,1382,500,80)+'"><img src="img/wb/t_rank.webp" alt="DAMAGE RANKING"></div>';
+  const sw=wbSwOK();h+='<div class="wbSw'+(sw?'':' dis')+'" data-wb="sweep" style="'+gbx(40,1346,470,112)+'"><img src="img/dg/b_sweep.webp" alt="SWEEP"><small>'+(w.wbest?'⚡ '+fmtD(w.wbest)+' · best hit this week':'attack once this week first')+'</small></div>';
+  h+='<div class="wbRk" data-wb="rank" style="'+gbx(26,1458,500,58)+'"><img src="img/wb/t_rank.webp" alt="DAMAGE RANKING"></div>';
   h+='<div class="wbA'+(wbKeys()?'':' dis')+'" data-wb="go" style="'+gbx(540,1352,460,178)+'"><img src="img/wb/atk.webp" alt=""><b>'+(wbKeys()?'ATTACK':'NO KEYS')+'<small>'+KEYI('1.2em')+' '+wbKeys()+'/'+WB_KEYS+' · 60 s</small></b></div>';
-  h+='<div class="wbWk" style="'+gbx(26,1470,500,52)+'">THIS WEEK '+fmtD(w.wd)+(WBS.rank&&WBS.rank.rank?' · #'+WBS.rank.rank:'')+'</div>';
+  h+='<div class="wbWk" style="'+gbx(26,1504,500,30)+'">THIS WEEK '+fmtD(w.wd)+(WBS.rank&&WBS.rank.rank?' · #'+WBS.rank.rank:'')+'</div>';
   GYM=null;bx.innerHTML=h;wbAnim();}
 // the boss idles on the page (12 fps, only while the page is open)
 function wbAnim(){cancelAnimationFrame(WBS.raf);const sp=WBOSS[wbCur()].sp,d=msprLoad(sp),ni=MSPR[sp].wb.ni;let last=0;
@@ -3663,7 +3667,7 @@ function wbOpen(){if(!wbOK()){TE().toast('🔒 WORLD BOSS opens after campaign s
 function wbClose(){wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);if(!backToHub())close();}
 function wbInfo(){const Bo=WBOSS[wbCur()],w=wbG();
   let x='<div class="wS">'+Bo.n+' · THIS WEEK\'S BOSS</div><div class="wP">'+Bo.d+'</div><div class="wP twMP"><img src="'+CLSU(Bo.weak)+'" alt=""><span><b>WEAK TO '+ROLE[Bo.weak].n.toUpperCase()+'</b><br>'+ROLE[Bo.weak].n+' heroes deal <b>+30%</b> damage to it.</span></div>';
-  x+='<div class="wS">HOW IT WORKS</div><div class="wP"><div>'+KEYI()+' <b>3 BOSS KEYS</b> a day – one key = one attack of <b>60 seconds</b> with your battle team.</div><div>The boss cannot be killed: every bar you empty fills again. Only your <b>damage</b> counts.</div><div>One HP bar = <b>'+fmtD(w.L)+'</b> today (it grows with your heroes).</div><div>Daily rewards are <b>fixed</b> – nothing is random.</div></div>';
+  x+='<div class="wS">HOW IT WORKS</div><div class="wP"><div>'+KEYI()+' <b>3 BOSS KEYS</b> a day – one key = one attack of <b>60 seconds</b> with your battle team.</div><div>The boss cannot be killed: every bar you empty fills again. Only your <b>damage</b> counts.</div><div>One HP bar = <b>'+fmtD(w.L)+'</b> today (it grows with your heroes).</div><div>Daily rewards are <b>fixed</b> – nothing is random.</div><div>⚡ <b>SWEEP</b>: uses one key, no fight – deals your <b>best hit of this week</b>.</div></div>';
   x+='<div class="wS">WEEKLY DAMAGE RANKING · REWARDS BY MAIL</div>'+WB_RANK.map((r,i)=>wRowB(5-i,'<b>'+(r[0]===r[1]?'#'+r[0]:'#'+r[0]+' – '+r[1])+'</b>',null,wbRwHtml(r[2]))).join('');
   x+='<div class="wP">The week ends on Monday 00:00 UTC (01:00 Paris). A new boss comes every week.</div>';
   popW('WORLD BOSS',x);}
@@ -3676,6 +3680,13 @@ function wbGo0(team){const w=wbG();if(w.n>=WB_KEYS)return;if(!team||!team.length
   w.n++;TE().save();wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);
   try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad(WBOSS[wbCur()].sp);
   safeStart(wbEq(),team,wbFight());if(!(B&&B.wbB&&running)){w.n--;TE().save();}}
+// v16-176 (Marius): SWEEP = one key, no fight, deals your BEST HIT of this week (same boss all week; needs one real attack this week)
+const wbSwOK=()=>wbKeys()>0&&wbG().wbest>0;
+function wbSweep(){const T=TE(),w=wbG();if(!wbKeys()){T.toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
+  if(!w.wbest){T.toast('⚔ Attack the boss once this week – SWEEP then repeats your best hit',2800);return;}
+  const dmg=Math.round(w.wbest),before=w.dmg;w.n++;w.dmg+=dmg;w.best=Math.max(w.best,dmg);w.wd+=dmg;w.pend.push({d:dmg,t:Date.now()});T.save();wbSend();
+  const nt=WB_TIER.filter(q=>before<q.b*w.L&&w.dmg>=q.b*w.L).length;
+  T.toast('⚡ SWEEP · '+fmtD(dmg)+' damage ('+(dmg/w.L).toFixed(1)+' bars)'+(nt?' · 🎁 '+nt+' new reward'+(nt>1?'s':''):''),2800);wbRender();}
 async function wbSend(){const w=wbG();if(!w.pend.length||!window.ONLINE||!ONLINE.call||WBS.sending)return;WBS.sending=1;
   try{while(w.pend.length){const q=w.pend[0];if(q.t<wbWS()){w.pend.shift();continue;}const r=await ONLINE.call('wbhit',{dmg:q.d,t:q.t,boss:WBOSS[wbCur()].k});
       if(r&&r.ok){w.pend.shift();WBS.rank=r;TE().save();}else if(r&&(r.err==='limit'||r.err==='bad'||r.banned)){w.pend.shift();TE().save();}else break;}}
@@ -3705,7 +3716,7 @@ function wbFinish(win,retreat){const T=TE(),w=wbG(),dmg=Math.round(B.wbD||0),bef
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('cpResBox').classList.remove('wbSk');$('bt').classList.remove('open');
     showMap();if(a==='team'){WBS.ret=1;openGear();}else wbOpen();};}
 wbEl.addEventListener('click',e=>{const el=e.target.closest('[data-wb]');
-  if(el){const a=el.dataset.wb;if(a==='back')wbClose();else if(a==='info')wbInfo();else if(a==='rank')wbRank();else if(a==='go')wbGo();return;}
+  if(el){const a=el.dataset.wb;if(a==='back')wbClose();else if(a==='info')wbInfo();else if(a==='rank')wbRank();else if(a==='go')wbGo();else if(a==='sweep')wbSweep();return;}
   const r=e.target.closest('[data-wt]');if(r){const i=+r.dataset.wt;if(wbTierSt(i)===1)wbClaim(i);else{const q=WB_TIER[i],w=wbG();TE().toast(wbTierSt(i)===2?'✅ Already claimed today':'Deal '+fmtD(q.b*w.L)+' damage today ('+fmtD(Math.max(0,q.b*w.L-w.dmg))+' to go)',2400);}}});
 // battle HUD: Marius' boss bar (frame + fill), bars left (x N), the damage plate and the timer
 const WBI={};['bar','fill','dmg','key'].forEach(k=>{const im=new Image();im.src='img/wb/'+k+'.webp';WBI[k]=im;});
@@ -3751,11 +3762,11 @@ const wbCss=document.createElement('style');wbCss.textContent=`
 .wbRT span{font:900 calc(var(--u)*30) Game,system-ui;color:#e3ebff;white-space:nowrap;text-shadow:0 calc(var(--u)*2) 0 #000}.wbRT span img{height:1.3em!important;width:auto!important;vertical-align:-.3em!important}
 .wbRow.s0 .wbRT{opacity:.85}.wbRow.s2 .wbRT b{color:#b9f6ca}
 .wbRow em{position:absolute;right:calc(var(--u)*60);top:50%;transform:translateY(-50%);font:900 italic calc(var(--u)*38) Game,system-ui;color:#3a1d00;background:linear-gradient(#ffe082,#ffb300);padding:calc(var(--u)*8) calc(var(--u)*20);border-radius:calc(var(--u)*14);box-shadow:0 0 0 calc(var(--u)*3) #7a4a00}
-.wbRk{cursor:pointer}.wbRk img{width:100%;height:100%;object-fit:contain}.wbRk:active,.wbA:active{transform:scale(.96)}
+.wbSw{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}.wbSw img{height:76%;width:auto}.wbSw small{font:900 calc(var(--u)*24) Game,system-ui;color:#ffe082;text-shadow:0 calc(var(--u)*3) 0 #000;white-space:nowrap}.wbSw.dis{filter:grayscale(.85) brightness(.75)}.wbSw:active{transform:scale(.96)}.wbRk{cursor:pointer}.wbRk img{width:100%;height:100%;object-fit:contain}.wbRk:active,.wbA:active{transform:scale(.96)}
 .wbA{cursor:pointer}.wbA>img{position:absolute;inset:0;width:100%;height:100%}.wbA.dis{filter:grayscale(.85) brightness(.75)}
 .wbA>b{position:absolute;left:24%;right:8%;top:22%;bottom:12%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 italic calc(var(--u)*54) Game,system-ui;color:#fff;text-shadow:0 calc(var(--u)*4) 0 #5a0000;line-height:1.05}
 .wbA>b small{font:900 calc(var(--u)*26) Game,system-ui;color:#ffe082;font-style:normal}
-.wbWk{display:flex;align-items:center;justify-content:center;font:900 calc(var(--u)*28) Game,system-ui;color:#ffe082;text-shadow:0 calc(var(--u)*3) 0 #000}
+.wbWk{display:flex;align-items:center;justify-content:center;font:900 calc(var(--u)*24) Game,system-ui;color:#ffe082;text-shadow:0 calc(var(--u)*3) 0 #000}
 #cpResBox.wbSk{width:min(96vw,420px)!important;background:linear-gradient(#141c30f2,#070a14f2)!important;border:3px solid #e0aa25!important;border-radius:18px!important;padding:12px 12px 14px!important;text-align:center}
 .wbRes .wbRT{position:static;display:block;width:88%;margin:-4px auto 0}.wbRK{font:900 italic 26px Game,system-ui;color:#ff8a65;text-shadow:0 3px 0 #000;margin:2px 0 6px}
 .wbRD{position:relative;width:92%;aspect-ratio:640/149;margin:0 auto 6px}.wbRD>img{position:absolute;inset:0;width:100%;height:100%}.wbRD>div{position:absolute;left:26%;right:6%;top:14%;bottom:14%;display:flex;flex-direction:column;justify-content:center;text-align:left;line-height:1.05}
@@ -3896,8 +3907,8 @@ function dgFinish(win,retreat){const T=TE(),g=dgG(),F=B.tw,k=F.dg,f=F.f,D=DG[k];
   if(win){const first=f>g.b[k];if(first)g.b[k]=f;dgUse(k);const R=dgGive(k,f),ky=dgKeys(k);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${D.n} · FLOOR ${f}<small>${first&&f<DG_N?'FLOOR '+(f+1)+' IS OPEN':f>=DG_N&&first?'ALL FLOORS CLEARED!':'KEYS LEFT TODAY: '+ky}</small></div>
       ${R.rws.slice(0,4).map((q,i)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][i]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
-      <div class="rsU">${R.txt.includes(' · ')?R.txt.slice(R.txt.indexOf(' · ')+3)+' · ':''}Best: floor ${g.b[k]} / ${DG_N} · keys ${ky}/${dgMax()}</div></div>
-      <div class="rsM"><div class="cpRow">${ky&&f<DG_N&&f+1<=g.b[k]+1?'<button class="cpGo nf" data-a="dgnext">NEXT FLOOR ▶</button>':''}${ky?'<button class="cpGo alt" data-a="dgagain">AGAIN</button>':''}<button class="cpGo alt" data-a="dg">DUNGEON</button></div></div>`;}
+      <div class="rsU">Best: floor ${g.b[k]} / ${DG_N} · ${ky} key${ky===1?'':'s'} left</div></div>
+      <div class="rsM"><div class="cpRow${ky&&f<DG_N?' n3':''}">${ky&&f<DG_N&&f+1<=g.b[k]+1?'<button class="cpGo nf" data-a="dgnext">NEXT FLOOR ▶</button>':''}${ky?'<button class="cpGo alt" data-a="dgagain">AGAIN</button>':''}<button class="cpGo alt" data-a="dg">DUNGEON</button></div></div>`;}
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">${D.n} · FLOOR ${f}<small>NO KEY USED – tap one to get stronger</small></div>
       <div class="rsDB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>Scrap Mine + Gear Forge give gear</span></div>
       <div class="rsDB b1" data-a="hsum">${TKI}<span><b>Summon more mechanics</b>higher color = much stronger · duplicates +1 star</span></div>
