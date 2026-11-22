@@ -368,6 +368,9 @@ const css3=document.createElement('style');css3.textContent=`
 .setBl>div b{position:absolute;left:-43px;top:50%;margin-top:-14px;width:28px!important;height:28px!important;background:none!important;color:#cfd8e3!important;font:900 15px Game,system-ui!important;text-shadow:0 1px 2px #000}
 .setBl>div.on b{left:-40px;color:#3a1d00!important;text-shadow:0 1px 0 #fff8}
 .setBl>div i{display:none}.setBl>div span{padding:0 4px;font-size:11.5px;line-height:1.15}
+/* v16-161 AUTO SALVAGE */
+.svAuto{display:block;width:calc(100% - 20px);margin:8px 10px;padding:9px 8px;border:0;border-radius:12px;background:linear-gradient(#3a3f4a,#1c2028);box-shadow:inset 0 0 0 1.5px #6b7686;font:400 15px Lilita,Game,system-ui;color:#e6ecf3;letter-spacing:.3px}.svAuto small{display:block;font:700 10.5px Game,system-ui;color:#b8c4d2;margin-top:2px}.svAuto.on{background:linear-gradient(#2f7a34,#174a1b);box-shadow:inset 0 0 0 1.5px #7ee787;color:#fff}.svAuto.on small{color:#d8ffd8}
+#svInfo .svC b{cursor:pointer}
 /* v16-161 STAR COLLECTION */
 .scT{margin-top:14px!important}.scP{margin:2px 10px 8px;font:700 11.5px/1.35 Game,system-ui;color:#c9d6e6;text-align:center}
 .scR{margin:7px 6px;padding:7px 8px 8px;border-radius:12px;background:linear-gradient(#141c2b,#0a0e17);box-shadow:inset 0 0 0 1.5px var(--c)}
@@ -829,7 +832,7 @@ function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.ke
 function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,5,30,45,20];return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
 const GMAXR=[10,15,20,30,40,50,60],gMax=it=>GMAXR[it.r];
 function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;k=Math.min(5,k);if(k===5&&c>=ASC_CH&&Math.random()<.15*Math.min(1,(c-ASC_CH+1)/21))k=6;return k;}
-function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(g.inv.length>=GINV_()){return {it,sold:salvageV(it)};}g.inv.push(it);return {it};}
+function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(svAuto(it)){salvPkGive([it]);return {it,sold:salvageV(it),auto:1};}if(g.inv.length>=GINV_()){return {it,sold:salvageV(it)};}g.inv.push(it);return {it};}
 const itemById=id=>id?GR().inv.find(i=>i.id===id):null;
 const ASC_K=1.2,subV=(it,v)=>it.r>=6?Math.round(v*ASC_K*10)/10:v; // v16-161 (Marius): ASCENDED gear +20% (main + extra stats)
 const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K:1)*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
@@ -2577,7 +2580,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
       ${rws.slice(0,4).map((r,k)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][k]}%">${r[0]}<b>${T.numH?T.numH(r[1],'gold',1.15):r[1]}</b></div>`).join('')}
       <div class="rsU">${rws.length>4?rws.slice(4).map(r=>r[0]+' '+r[1]).join(' · ')+' · ':''}${st<3?'⭐⭐⭐ = no mechanic knocked out':'Perfect! No mechanic was knocked out.'}</div></div>
       <div class="rsM">${chDone?`<div class="chUn">CHAPTER ${S0.c+1} CLEARED!<br><small>Chapter ${S0.c+2} · ${CHAP[S0.c+1].n} is now open</small></div>`:''}
-      ${drops.length?`<div class="cpSec">${IMGI(itemIconURL('tool',4))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">Bag full (${GINV_()}) – salvaged for ${GPN(sold)}</div>`:''}`:''}
+      ${drops.length?`<div class="cpSec">${IMGI(itemIconURL('tool',4))} GEAR FOUND</div><div class="gDrop">${drops.map(d=>itemCard(d.it,`<i>${itemName(d.it)}</i>`)).join('')}</div>${sold?`<div class="sub">${drops.some(d=>d.auto)?'AUTO SALVAGE':'Bag full ('+GINV_()+')'} – salvaged for ${GPN(sold)}</div>`:''}`:''}
       ${si<NST-1?'<div class="anx" data-a="atog"><span>⟳ AUTO NEXT</span><i id="anxC"></i><b id="anxS"></b></div>':''}
       <div class="cpRow">${si<NST-1?'<button class="cpGo" data-a="next">NEXT ▶</button>':''}<button class="cpGo alt" data-a="map">CAMPAIGN</button></div>${gtk?'<button class="cpGo alt" data-a="gsum">'+GTKI+' GEAR SUMMON</button>':''}${drops.length?'<button class="cpGo alt" data-a="gear">'+IMGI(glyphURL('bag','#ffd9b0'))+' EQUIP GEAR</button>':''}</div>`;}
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">STAGE ${lab} · ${S0.n.toUpperCase()}<small>HOW TO GET STRONGER – tap one</small></div>
@@ -2924,14 +2927,17 @@ function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n
   morph($('gcW'),x);}
 function gPage(p){gpg=p;['gHero','gBag','gSalv','gColl'].forEach(id=>$(id).classList.toggle('open',id==={hero:'gHero',bag:'gBag',salv:'gSalv',coll:'gColl'}[p]));if(p==='coll'){renderColl();$('gColl').scrollTop=0;}if(p==='bag')$('gInv').scrollTop=0;if(p==='hero')$('gHero').scrollTop=0;if(p==='salv'){svPick=null;renderSalv();}renderPeds(pedList);pedGo();}
 // v16-47: SALVAGE page – up to 20 free (not worn) items at once, auto-picked by grade; tap an item to keep it
-let svG=[1,1,0,0,0,0],svPick=null,svSkip=new Set();
-function svList(){const g=GR();return g.inv.filter(it=>!ownerOf(it)&&it.r<6&&svG[it.r]&&!svSkip.has(it.id)).sort((a,b)=>a.r-b.r||a.lv-b.lv).slice(0,20);}
+// v16-161 (tester Wazza4ever: "I can only salvage Common/Uncommon, one by one is annoying"): the grade chips and "tap to keep" had no click handler → fixed;
+// the chosen grades are saved, SALVAGE ALL takes every free piece of those grades (not only 20), AUTO SALVAGE salvages new campaign drops of those grades (set pieces never)
+let svPick=null,svSkip=new Set();const svGG=()=>{const g=GR();if(!g.svG)g.svG=[1,1,0,0,0,0];return g.svG;};
+function svList(all){const g=GR(),G0=svGG(),L=g.inv.filter(it=>!ownerOf(it)&&it.r<6&&G0[it.r]&&!svSkip.has(it.id)).sort((a,b)=>a.r-b.r||a.lv-b.lv);return all?L:L.slice(0,20);}
+const svAuto=it=>{const g=GR();return !!g.asv&&it.r<6&&!it.set&&svGG()[it.r];};
 function svFx(n,sum){const T=TE(),b=$('svGo');try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}const o=document.createElement('div');o.className='svFx';o.innerHTML=`<img src="img/ui2/i_scrap.webp"><b>+${GPN(sum)}</b><small>${n} item${n>1?'s':''} salvaged</small>`;$('gSalv').appendChild(o);setTimeout(()=>o.remove(),1700);}
-function renderSalv(){const T=TE();const L=svPick=svList();let sum=0;L.forEach(it=>sum+=salvageV(it));
+function renderSalv(){const T=TE(),svG=svGG();const L=svList(),A=svPick=svList(1);let sum=0;A.forEach(it=>sum+=salvageV(it));
   $m('svSlots').innerHTML=Array.from({length:20},(_,k)=>{const it=L[k];return `<div class="svS" style="left:${[8.5,25.6,42.7,59.6,76.7][k%5]}%;top:${[33.7,44.3,54.9,65.4][k/5|0]}%">${it?`<div data-sx="${it.id}">${itemCard(it)}</div>`:''}</div>`;}).join('');
-  $m('svInfo').innerHTML=`<div class="svT">${L.length?`<b>${L.length}</b> item${L.length>1?'s':''} · <b class="g">+${GPN(sum)}</b> <small style="color:#ffd54a">+ garage parts</small>`:'Nothing to salvage'}</div><div class="svC">${T.GRADES.slice(0,6).map((gr,i)=>`<b data-sv="${i}" class="${svG[i]?'on':''}" style="--c:${gr.c}">${gr.n.toUpperCase()}</b>`).join('')}</div>`;
-  $('svGo').innerHTML=L.length?`SALVAGE ${L.length}`:'—';$('svGo').classList.toggle('dis',!L.length);
-  $m('svHelp').innerHTML=`<div class="gNote">${IMGI('img/ui2/i_scrap.webp','1.3em','-.35em')} Gear that a hero wears is never salvaged. Tap the grades to choose what goes in · tap an item to keep it${svSkip.size?` · <u data-g="svReset">show kept items (${svSkip.size})</u>`:''}</div>`;}
+  $m('svInfo').innerHTML=`<div class="svT">${A.length?`<b>${A.length}</b> item${A.length>1?'s':''} · <b class="g">+${GPN(sum)}</b> <small style="color:#ffd54a">+ garage parts</small>`:'Nothing to salvage'}</div><div class="svC">${T.GRADES.slice(0,6).map((gr,i)=>`<b data-sv="${i}" class="${svG[i]?'on':''}" style="--c:${gr.c}">${gr.n.toUpperCase()}</b>`).join('')}</div>`;
+  $('svGo').innerHTML=A.length?`SALVAGE ALL ${A.length}`:'—';$('svGo').classList.toggle('dis',!A.length);
+  $m('svHelp').innerHTML=`<div class="gNote">${IMGI('img/ui2/i_scrap.webp','1.3em','-.35em')} Gear that a hero wears is never salvaged. <b>Tap the grades</b> to choose what goes in (saved) · tap an item to keep it${svSkip.size?` · <u data-g="svReset">show kept items (${svSkip.size})</u>`:''}</div><button class="svAuto${GR().asv?' on':''}" data-g="svAuto">AUTO SALVAGE · ${GR().asv?'ON':'OFF'}<small>new campaign drops of the chosen grades are salvaged at once · set pieces never</small></button>`;}
 function cmpForHero(h,ov,xp,xc){return cmpBlock(unitStats(h),unitStats(h,ov),pow(h),pow(h,ov),xp,xc);}
 let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)return;const h=gHero(),sl=GS[it.s],st=GSTAT[sl.st],o=ownerOf(it),oh=o&&T.HB[o];gsalv=0;gstar='';
   // v16-47: Marius' item card (img/ui2/item_f.webp): icon · name plate · 4 stat lines · EQUIP (green) / UPGRADE (blue) / SALVAGE (orange)
@@ -3014,7 +3020,10 @@ function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(
   x+=cmpForHero(h,ov,[],[])+`<button class="cpGo" data-p="aok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`;pop(x);}
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
-$('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr],[data-hx]');if(!el)return;
+$('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr],[data-hx],[data-sv],[data-sx]');if(!el)return;
+  if(el.dataset.sv!=null){const v=svGG(),i=+el.dataset.sv;v[i]=v[i]?0:1;T.save();renderSalv();return;}   // v16-161
+  if(el.dataset.sx!=null){const id=+el.dataset.sx;svSkip.add(isNaN(id)?el.dataset.sx:id);renderSalv();return;}
+  if(el.dataset.g==='svAuto'){const g=GR();g.asv=!g.asv;T.save();renderSalv();T.toast(g.asv?'AUTO SALVAGE ON · '+T.GRADES.slice(0,6).filter((x,i)=>svGG()[i]).map(x=>x.n).join(', '):'AUTO SALVAGE OFF',2600);return;}
   if(el.dataset.hx){if(T.HB[el.dataset.hx]){gPrev=el.dataset.hx;renderGear();gPage('hero');}return;}
   if(gPrev&&(el.dataset.g==='hback'||el.dataset.g==='back')){const ph=T.HB[gPrev];gPrev=null;renderGear();gPage('coll');setTimeout(()=>{const r=ph&&$('gcr'+ph.gr);if(r)r.scrollIntoView({block:'center'});},60);return;}
   if(gPrev&&el.dataset.g==='hsum'){gPrev=null;renderGear();gPage('coll');}
