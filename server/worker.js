@@ -525,6 +525,13 @@ function powLine(r) {
   const ic = ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅';
   return `<small>⚔️ team <b>${fmtN(r.pw)}</b> / stage ${lab} <b>${fmtN(r.ep)}</b> ${ic}${r.ms ? ` · ${(r.ms / 1000).toFixed(1)}s${r.ms < RCPT_MIN_MS ? ' ❌' : ''}` : ''}</small>`;
 }
+// v16-179: player names (online profile) for /admin – pid → name
+async function pnames(db, pids) {
+  const m = {}, u = [...new Set(pids.filter(x => x && x !== '-'))];
+  try { for (let i = 0; i < u.length; i += 90) { const c = u.slice(i, i + 90);
+    for (const r of (await db.prepare(`SELECT pid,name FROM prof WHERE pid IN (${c.map(() => '?').join(',')})`).bind(...c).all()).results) if (r.name) m[r.pid] = r.name; } } catch (e) {}
+  return m;
+}
 // small line chart (SVG) – an honest player climbs smoothly, a cheater has vertical jumps
 function chart(title, pts, col, log) {
   if (pts.length < 2) return `<div class=c><b>${title}</b><br><small>not enough data yet</small></div>`;
@@ -544,9 +551,10 @@ async function playerCard(url, env, pid) {
   const dv = (await db.prepare('SELECT dk, t FROM devs WHERE pid=? ORDER BY t DESC LIMIT 5').bind(pid).all()).results;
   const same = p.dk ? (await db.prepare('SELECT pid, t FROM devs WHERE dk=? AND pid<>? ORDER BY t DESC LIMIT 10').bind(p.dk, pid).all()).results : [];
   const lg = (await db.prepare('SELECT * FROM ledg WHERE pid=? ORDER BY day DESC LIMIT 7').bind(pid).all()).results;
-  const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Player ${esc(pid.slice(0, 8))}</title>
+  const NM = await pnames(db, [pid, ...same.map(x => x.pid)]), nm = NM[pid];
+  const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>${nm ? esc(nm) : 'Player ' + esc(pid.slice(0, 8))}</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:20px}h3{margin:14px 0 4px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}a{color:#9fd3ff}small{color:#9fb0c0}table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:3px 2px;border-top:1px solid #ffffff14;text-align:left}</style>
-<a href="/admin?key=${k}">← back</a><h1>📈 Player ${esc(pid.slice(0, 13))}…</h1>
+<a href="/admin?key=${k}">← back</a><h1>📈 ${nm ? `${esc(nm)}</h1><small>${esc(pid)}</small>` : `Player ${esc(pid.slice(0, 13))}…</h1><small>no name yet (no online profile)</small>`}
 <div class=c>${p.banned ? '🚫 <b style="color:#ff8a80">BANNED</b>' : `⚠️ score <b>${p.score}</b>`}${p.shadow ? ` · 👻 hidden${p.shadow === 2 ? ' (by you)' : ''}` : ''} · kinds: <b>${esc(p.sig || '–')}</b><br>${esc(p.reason || '')}<br>
 <small>first seen ${d(p.first)} · last ${d(p.last)} · app ${p.app ? 'Play' : 'browser'} · stage ${p.best} (best ever ${Math.max(p.bmax || 0, p.best)}) · buildings lv ${p.lv} · heroes ${p.heroes} (${p.mythic} Mythic)</small><br>
 ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(pid)}">clear</a> · ${p.shadow ? `<a href="?key=${k}&unshadow=${encodeURIComponent(pid)}">👁️ show again</a>` : `<a href="?key=${k}&shadow=${encodeURIComponent(pid)}">👻 hide (shadow)</a>`}`}</div>
@@ -555,7 +563,7 @@ ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('�
 <h3>⚔️ Battle receipts (new stages won)</h3><div class=c>${rc.length ? `<table><tr><th>when</th><th>stage</th><th>team</th><th>monsters</th><th></th><th>time</th></tr>${rc.map(r => { const ratio = r.ep / Math.max(1, r.pw);
   return `<tr><td>${d(r.t).slice(6)}</td><td>${r.h ? 'H ' : ''}${Math.floor(r.si / 20) + 1}-${r.si % 20 + 1}</td><td>${fmtN(r.pw)}</td><td>${fmtN(r.ep)}</td><td>${ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅'}</td><td>${(r.ms / 1000).toFixed(1)}s${r.ms && r.ms < RCPT_MIN_MS ? '❌' : ''} ×${r.sp}</td></tr>`; }).join('')}</table>` : '<small>none yet (needs the new game version)</small>'}</div>
 <h3>📒 Ledger – what the game gave (per day)</h3><div class=c>${lg.length ? `<table><tr><th>day</th><th>💎</th><th>🎟️</th><th>crew</th><th>gear</th><th>VIP</th></tr>${lg.map(r => `<tr><td>${r.day.slice(5)}</td><td>${fmtN(r.dm)}</td><td>${fmtN(r.tk)}</td><td>${fmtN(r.ct)}</td><td>${fmtN(r.gtk)}</td><td>${fmtN(r.vip)}</td></tr>`).join('')}</table>` : '<small>none yet</small>'}</div>
-<h3>📱 Phones</h3><div class=c>${dv.map(x => `<small>${esc(x.dk).slice(0, 9)}… last ${d(x.t)}</small>`).join('<br>') || '<small>none yet</small>'}${same.length ? `<br><b>Other accounts on this phone:</b><br>${same.map(x => `<a href="?key=${k}&p=${encodeURIComponent(x.pid)}">${esc(x.pid).slice(0, 13)}</a> <small>${d(x.t)}</small>`).join('<br>')}` : ''}</div>
+<h3>📱 Phones</h3><div class=c>${dv.map(x => `<small>${esc(x.dk).slice(0, 9)}… last ${d(x.t)}</small>`).join('<br>') || '<small>none yet</small>'}${same.length ? `<br><b>Other accounts on this phone:</b><br>${same.map(x => `<a href="?key=${k}&p=${encodeURIComponent(x.pid)}">${NM[x.pid] ? esc(NM[x.pid]) : esc(x.pid).slice(0, 13)}</a> <small>${d(x.t)}</small>`).join('<br>')}` : ''}</div>
 <h3>📜 Events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>none</div>'}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
 }
@@ -571,6 +579,11 @@ async function admin(url, env) {
   if (shw) { await db.prepare('UPDATE players SET shadow=2 WHERE pid=?').bind(shw).run(); await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(shw, Date.now(), 'flag', 'hidden (shadow) by admin').run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(shw), 302); }
   if (ush) { await db.prepare('UPDATE players SET shadow=0 WHERE pid=?').bind(ush).run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(ush), 302); }
   if (url.searchParams.get('p')) return playerCard(url, env, url.searchParams.get('p'));
+  const q = (url.searchParams.get('q') || '').trim().toLowerCase().slice(0, 20);   // v16-179: search a player by name
+  if (q) { let rs = []; try { rs = (await db.prepare('SELECT pid,name,best,lv,t FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 30').bind('%' + q + '%').all()).results; } catch (e) {}
+    const e2 = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    return new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Search</title><style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:14px}a{color:#9fd3ff}small{color:#9fb0c0}</style>
+<a href="/admin?key=${k}">← back</a><h2>🔎 “${e2(q)}”</h2>${rs.map(r => `<div class=c><a href="?key=${k}&p=${encodeURIComponent(r.pid)}"><b>${e2(r.name)}</b></a><br><small>${e2(r.pid)} · stage ${r.best} · lv ${r.lv}</small></div>`).join('') || '<div class=c>nobody with this name</div>'}`, {headers:{'content-type':'text/html;charset=utf-8'}}); }
   const del = url.searchParams.get('delete');          // "Delete my data" e-mail: /admin?key=…&delete=PLAYER_ID (first 8 characters are enough)
   if (del && del.length >= 8) { await ensureCloud(env); const like = del + '%';
     await db.prepare('DELETE FROM accounts WHERE pid LIKE ?').bind(like).run(); await db.prepare('DELETE FROM snaps WHERE pid LIKE ?').bind(like).run();
@@ -585,6 +598,7 @@ async function admin(url, env) {
   const rv = (await db.prepare("SELECT * FROM events WHERE kind IN ('review','dual','multi') AND t>? ORDER BY t DESC LIMIT 30").bind(Date.now() - 3 * 864e5).all()).results;
   // last battle receipt of every flagged player: team power vs. monsters
   const lastR = {}; for (const p of bad) { const r = await db.prepare('SELECT * FROM rcpt WHERE pid=? ORDER BY t DESC LIMIT 1').bind(p.pid).first(); if (r) lastR[p.pid] = r; }
+  const NM = await pnames(db, [...bad.map(p => p.pid), ...rv.map(e => e.pid), ...ev.map(e => e.pid)]), who = id => NM[id] ? `<b style="color:#fff">${esc(NM[id])}</b>` : '<small>(no name)</small>';
   const buys = await db.prepare("SELECT COUNT(*) n FROM purchases WHERE state='ok'").first();
   await ensureInteg(env); const ig = await db.prepare('SELECT COUNT(*) n, SUM(ok) g FROM integ WHERE t>?').bind(Date.now() - 3 * 864e5).first();
   // v16-120: WHY phones fail Play Integrity (reason → count) + the last 15 checks
@@ -601,13 +615,13 @@ async function admin(url, env) {
 <small>“Active” is counted from the day this update went live (older days show “–”). “New” works for the past too (players inactive 180+ days are removed).</small></div>`;
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
-<h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
+<h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
 ${stats}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
 <h3>Flagged / banned</h3><small>👻 = hidden (shadow): plays normally but is out of rankings, opponents and prizes. Ban needs a PROOF or 2 different kinds of signs. Points go down 10 a day with honest play.</small>${bad.map(p => { const r = lastR[p.pid], pv = r ? powLine(r) : '';
-  return `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b>${p.shadow ? ' 👻' : ''} · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>kinds: <b>${esc(p.sig || '–')}</b>${(p.sig || '').includes('proof') || (p.sig || '').split(',').length >= 2 ? ' (ban possible)' : ' (1 kind → no automatic ban)'} · flags: ${esc(p.flags)}</small><br>${pv ? pv + '<br>' : ''}<small>money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br><a href="?key=${k}&p=${encodeURIComponent(p.pid)}">📈 player card</a> · ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`; }).join('') || '<div class=c>Nobody flagged 👍</div>'}
-<h3>🔎 To check (no points, 3 days)</h3>${rv.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${e.pid !== '-' ? `<a href="?key=${k}&p=${encodeURIComponent(e.pid)}">${esc(e.pid).slice(0, 10)}</a>` : ''}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>Nothing 👍</div>'}
-<h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
+  return `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b>${p.shadow ? ' 👻' : ''} · ${who(p.pid)} <small>${esc(p.pid).slice(0, 13)}…</small><br>${esc(p.reason)}<br><small>kinds: <b>${esc(p.sig || '–')}</b>${(p.sig || '').includes('proof') || (p.sig || '').split(',').length >= 2 ? ' (ban possible)' : ' (1 kind → no automatic ban)'} · flags: ${esc(p.flags)}</small><br>${pv ? pv + '<br>' : ''}<small>money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br><a href="?key=${k}&p=${encodeURIComponent(p.pid)}">📈 player card</a> · ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`; }).join('') || '<div class=c>Nobody flagged 👍</div>'}
+<h3>🔎 To check (no points, 3 days)</h3>${rv.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${e.pid !== '-' ? `<a href="?key=${k}&p=${encodeURIComponent(e.pid)}">${NM[e.pid] ? esc(NM[e.pid]) : esc(e.pid).slice(0, 10)}</a>` : ''}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>Nothing 👍</div>'}
+<h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${NM[e.pid] ? esc(NM[e.pid]) : esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
 }
