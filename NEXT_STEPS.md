@@ -383,3 +383,5 @@ Machetă: https://mariussima0077-cell.github.io/preview/shop.html · în joc: te
 
 ## HD graphics (22 nov 2026) – LIVE în v16-156
 - Profil → GRAPHICS: AUTO (implicit, ca înainte) / HD (până la ×3, nu scade singur calitatea; bătălii + hartă). Cheie `te_hd=1`. Test WB HD: ~+40-70 MB memorie. v16-157: buton HD și pe hartă (deasupra +/−, 2 atingeri = schimbare + repornire). Hero Collection: eroii pe care nu-i ai se văd în gri închis (v16-158: atingere = pagina eroului în PREVIEW: skill-uri, statistici Lv 1, buton HERO SUMMON; restul blocat).
+
+- **v16-165 (22 nov) – FIX REBIRTH – LIVE**: butonul ♻ REBIRTH NOW nu mergea (`rebirth` lipsea din `window.__TE` → eroare „T.rebirth is not a function”, echipamentul ieșea dar eroul rămânea la nivel). Adăugat în export; testat: Lv 300 → 1, Essence 100% înapoi, fără erori. Lipsesc imagini: nimic.

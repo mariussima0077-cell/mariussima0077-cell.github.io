@@ -10,3 +10,4 @@
 - **Regula lui Marius (20 nov 2026): când trimiți prompturi pentru poze, verifică ÎNTÂI dimensiunea** – cât de mare e elementul în joc (px pe telefon de 360 px, ×3 pentru ecrane bune), raportul lățime/înălțime, ce mărime ChatGPT (1024x1024 / 1536x1024 / 1024x1536) și cum se decupează (9-slice = ornamente doar la colțuri). Scrie mărimea lângă fiecare prompt.
 - **Regula lui Marius (20 nov 2026): NU-i mai trimite linkuri de descărcat pentru pozele de atașat** – trimite poza direct în chat (SendUserFile, convertită în .jpg/.png ca s-o poată pune în ChatGPT), chiar lângă promptul ei.
 - **Regula lui Marius (21 nov 2026): simulările (`tools/sim_player.py`) se fac DOAR când cere el.** Nu porni simulări din proprie inițiativă.
+- **Regula lui Marius (22 nov 2026): fără zonă de test / ramură separată – tot ce facem urcă repede LIVE pe `main`** (după testele obișnuite). Înlocuiește regula din 20 nov cu „ramura pending”.
