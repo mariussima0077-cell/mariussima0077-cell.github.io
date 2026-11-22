@@ -1793,14 +1793,17 @@ function bodyPath(hl,hw,T,wd){const rf=T.rf,rb=T.rb,fw=hw*T.tf,bw=hw*T.tb,w=hw+w
 function drawCar(c){
   if(c.type.vip||X!==mainX||!c.type.L)return drawCarRaw(c);
   const sc=Z*DPR,T=c.type,mx=T.L/2+40,my=T.W/2+24;let e=c._cc;
-  if(!e||e.det!==DET||e.det2!==DET2||time-e.t>.085||time<e.t||sc/e.sc>1.35||sc/e.sc<.74){
+  // v16-148: only a car being worked on changes its look quickly (scanner, paint, parts); the others are redrawn ~2× a second
+  // (before: every car 12× a second → with 20+ cars in the garage the map got slower and slower after a few seconds)
+  const iv=c.state==='work'?.085:.5;
+  if(!e||e.det!==DET||e.det2!==DET2||time-e.t>iv||time<e.t||sc/e.sc>1.35||sc/e.sc<.74){
     const w=Math.ceil(2*mx*sc),h=Math.ceil(2*my*sc);
     if(!e){e=c._cc={cv:document.createElement('canvas'),t:time-Math.random()*.08};}
     if(e.cv.width!==w||e.cv.height!==h){e.cv.width=w;e.cv.height=h;}else{const g=e.cv.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);}
     const g=e.cv.getContext('2d');g.setTransform(sc,0,0,sc,mx*sc,my*sc);
     const sX=X,ox=c.x,oy=c.y,oa=c.a;X=g;c.x=0;c.y=0;c.a=0;
     try{drawCarRaw(c);}catch(err){console.error(err);}
-    X=sX;c.x=ox;c.y=oy;c.a=oa;e.sc=sc;e.det=DET;e.det2=DET2;if(time-e.t>.085||time<e.t)e.t=time;
+    X=sX;c.x=ox;c.y=oy;c.a=oa;e.sc=sc;e.det=DET;e.det2=DET2;if(time-e.t>iv||time<e.t)e.t=time;
   }
   X.save();X.translate(c.x,c.y);X.rotate(c.a);X.drawImage(e.cv,-mx,-my,2*mx,2*my);X.restore();
 }
@@ -4033,7 +4036,7 @@ function updX(){$('ciDot').classList.toggle('on',ciReady());$('nwDot').classList
 updX();setInterval(updX,5000);
 const MAPCOV=['dq','sm','pop','team','idl','ros','xp','ccP'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
 cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListener('pointermove',()=>{touchT=performance.now();},{passive:true});
-function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;const o=document.getElementById('onl');if(o&&o.classList.contains('open'))return 2;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
+function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;const o=document.getElementById('onl');if(o&&o.classList.contains('open'))return 2;const sw=document.getElementById('st');if(sw&&sw.classList.contains('open'))return 1;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
 function frame(now){
   if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle?31:14.5)){requestAnimationFrame(frame);return;}}
   const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);
