@@ -863,6 +863,34 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #incH{position:absolute;left:7%;top:100%;margin-top:2px;padding:1px 7px;border-radius:9px;background:rgba(0,0,0,.55);font:900 11px Game,system-ui;color:#7CFC9A;white-space:nowrap;pointer-events:auto;cursor:pointer}#incH:empty{display:none}#money{pointer-events:auto;cursor:pointer}
 .incL{position:relative;cursor:pointer}.incL i{position:absolute;left:0;bottom:0;height:3px;border-radius:2px;background:#7CFC9A;opacity:.7}
 .hbT{display:block;font:800 10px Game,system-ui;color:#7CFC9A;margin-top:1px}.hbT.bad{color:#ff8a80}
+/* v16-160 READABILITY (Marius 22 nov: "scrisul nu se vede / e prea mic") – min. 10 px on a 360 px phone + dark outline on gold */
+#rep{text-shadow:0 1px 0 #5a2c00,0 0 2px #3a1a00,0 0 4px #3a1a00}
+small#vipTxt{color:#fff!important;text-shadow:0 1px 0 #3a1a00,0 0 2px #2a1400,0 0 4px #2a1400!important}
+.dqT{font-size:max(10.5px,calc(var(--u)*21))}
+.dqP{font-size:max(10px,calc(var(--u)*21))}
+.dqC{font-size:max(11px,calc(var(--u)*24));color:#e3ecf5}
+.idEG{font-size:max(10px,calc(var(--u,1px)*22));white-space:normal;flex-wrap:wrap;row-gap:2px}
+.rsTi small{font-size:9.5px!important;color:#3a1f00!important;font-weight:900}
+/* v16-160 part 2 – every page checked (tools/text_audit.py): small labels → 9.5-10 px, grey on dark → lighter */
+html body .c5D b{font-size:9px!important;letter-spacing:0}
+html body .gPed span{font-size:9.5px}
+html body .idEG{font-size:max(10px,calc(var(--u,1px)*22))!important}
+html body .wbD small{font-size:max(9px,calc(var(--u)*19))!important}
+html body .twRw{font-size:max(10px,calc(var(--u)*26))!important}
+html body .gcBar2 span{font-size:max(10px,2.6cqw)!important}
+html body .smL small{font-size:max(10px,.72em)}
+html body .pBar span{font-size:max(10px,calc(var(--u)*22))}
+html body .rsC .pl{font-size:10px;color:#c3d0dc}
+html body .abB small{font-size:10px!important;color:#c3d0dc!important}
+html body .dqR small{font-size:max(9px,calc(var(--u)*20))}
+html body .itSet{font-size:9.5px!important}
+html body .itHave small{font-size:9.5px}
+html body #olNav b{font-size:10px!important}
+html body #olNav b:not(.on){color:#b7c6d8!important}
+html body .ttl h1 small{font-size:10px!important}
+html body #cpGearB small{font-size:9px!important}
+html body .gh em.gc,html body .gh em.lv{font-size:9.5px!important}
+html body .dgPS span{font-size:10px!important}
 </style>
 </head>
 <body>
@@ -3612,7 +3640,7 @@ function popAutoBest(){const cat=rosCat,plan=autoPlan(cat),keys=slotsOf(cat);let
   const L=SLOTL[cat][0];
   // v16-49: Marius' AUTO BEST picture – one row per change: before | ➜ | after | gain in the green box
   let x='<div class="pD abD">Puts every '+CATS[cat].one.toLowerCase()+' where he helps most. Nothing changes until you confirm.</div><div class="abL2">';
-  const nm=id=>id?'<b style="color:'+GRADES[HB[id].gr].c+'">'+HB[id].n+'</b>':'<i>empty</i>';
+  const nm=id=>id?'<b style="color:'+GRADES[HB[id].gr].c+'">'+String(HB[id].n).split(',')[0]+'</b>':'<i>empty</i>';   // v16-160: short name (Ignis, Nova…) – the long one was shrunk to ~7 px
   ch.forEach(([k,b,a])=>{const d=slotStats(k,a)[0]-slotStats(k,b)[0];
     x+='<div class="abR"><span class="abB">'+nm(b)+'<small>'+slotName(k)+'</small></span><span class="abA">'+nm(a)+'</span><em class="'+(d>0.0005?'up':d<-0.0005?'dn':'')+'">'+(Math.abs(d)<0.0005?'=':pctS(d))+'</em></div>';});
   x+='</div><div class="abT">'+L+' (all places together)<br><b>'+pctS(sb)+'</b> ➜ <b class="up">'+pctS(sa)+'</b> <span class="'+(sa-sb>=0?'up':'dn')+'">('+(sa-sb>=0?'▲ ':'▼ ')+pctS(sa-sb)+')</span></div>';

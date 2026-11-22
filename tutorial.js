@@ -26,7 +26,7 @@ const css=document.createElement('style');css.textContent=`
 #tut .bub .pt img{position:absolute;left:0;bottom:0;width:104px;height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
 #tut .bub .bx{flex:1;min-width:0;min-height:96px;border:solid transparent;border-width:22px 22px 22px 26px;border-image:url(img/shop/dlg_box.webp) 74 74 74 80 fill / 22px 22px 22px 26px stretch;padding:4px 2px 0 12px;color:#2a1a00;filter:drop-shadow(0 6px 10px rgba(0,0,0,.55));position:relative}
 #tut .bub .nm{display:inline-block;margin:-36px 0 4px -10px;background:url(img/shop/dlg_name.webp) center/100% 100% no-repeat;color:#fff;text-shadow:0 1px 0 #5e3d00,0 0 3px #5e3d00;padding:7px 22px 9px;font-weight:900;font-size:12px;letter-spacing:.5px;white-space:nowrap}
-#tut .bub .nm small{font-weight:800;opacity:.9;font-size:9.5px;margin-left:4px}
+#tut .bub .nm small{font-weight:800;opacity:1;font-size:10.5px;margin-left:4px}
 #tut .bub .tx{font-size:15px;line-height:1.3;font-weight:700}
 #tut .bub .tx b{color:#c62828}
 #tut .bub .bt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;min-height:30px;padding-right:14px}

@@ -2861,7 +2861,7 @@ function renderBag(h){const T=TE(),g=GR();
   const inv=g.inv.filter(it=>gfil==='all'||it.s===gfil).sort((a,b)=>b.r-a.r||b.lv-a.lv||a.s.localeCompare(b.s));
   $m('gInv').innerHTML=inv.length?'<div class="gGrid">'+inv.map(it=>{const o=ownerOf(it);const oh=o&&T.HB[o];return '<div class="gSlot">'+itemCard(it,o?`<img class="own" src="${portraitURL(oh)}" style="border-color:${gcol(oh)}">`:'',h&&o===h.id?'mine':o?'used':'')+'</div>';}).join('')+'</div>':'<div class="gEmpty">No gear here yet. Win battles to find gear!</div>';}
 // v16-47: the 5 battle-team heroes stand on the pedestals of Marius' HEROES page (animated idle pose)
-function renderPeds(tl){const T=TE();let x='';for(let k=0;k<5;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${[12.4,31.2,50,68.8,87.5][k]}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${h.n}</span><i>${h.crew?'CREW':'+'+stars(h)}</i>`:'<b>+</b>'}</div>`;}
+function renderPeds(tl){const T=TE();let x='';for(let k=0;k<5;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${[12.4,31.2,50,68.8,87.5][k]}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${String(h.n).split(',')[0]}</span><i>${h.crew?'CREW':'+'+stars(h)}</i>`:'<b>+</b>'}</div>`;}
   $m('gPeds').innerHTML=x;pedList=tl;}
 let pedList=[],pedRaf=0,gpg='',pedT0=0;
 function pedLoop(t){pedRaf=0;const cg=$('cpGear');if(!cg.classList.contains('open'))return;pedRaf=requestAnimationFrame(pedLoop);if(t-pedT0<50)return;pedT0=t;const s=t/1000;
