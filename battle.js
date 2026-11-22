@@ -3776,12 +3776,12 @@ const wbCss=document.createElement('style');wbCss.textContent=`
 .wbRes .cpRow{margin-top:10px}
 `;document.head.appendChild(wbCss);
 // ---------------------------------------------------------------- v16-63: DUNGEONS (Marius' pictures in img/dg/, cut by tools/dg_cut.py)
-// 4 dungeons · 30 floors each · 2 free keys a day per dungeon (DUNGEON PASS: +2 keys and SWEEP, 30 days, real money).
+// 4 dungeons · 100 floors each (v16-176, was 30) · 2 free keys a day per dungeon (DUNGEON PASS: +2 keys and SWEEP, 30 days, real money).
 // Rewards are FIXED and never diamonds or tickets (Play: the pass is paid → nothing random, nothing that buys a summon):
 //  CASH VAULT = cash · SCRAP MINE = one gear piece (slot in a fixed order) · GEAR FORGE = one SET piece (class + slot in a fixed order)
 //  NITRO LAB = NITRO BOOST (+HP & attack for 3 h in Campaign / Torque Tower / Class Towers – not Arena, Cup, World Boss or Dungeons).
 // A key is used only when you WIN (a defeat costs nothing). Gear stats come from a seeded generator → the same item every time.
-const DG_K=['vault','mine','forge','lab'],DG_N=30,DG_UNLOCK=15,DG_FREE=2,DG_PASS=2,DG_DAYS=30,DG_NIT_H=3,DG_PRICE='€2.99';
+const DG_K=['vault','mine','forge','lab'],DG_N=100,DG_UNLOCK=15,DG_FREE=2,DG_PASS=2,DG_DAYS=30,DG_NIT_H=3,DG_PRICE='€2.99';
 const DG={vault:{n:'CASH VAULT',c:'#ffd54a',pool:['hubcap','horn','wiper','imp','gearbox','goblin'],mini:'crusher',boss:'titan',r:'CASH',d:'Lots of cash – for buildings, gear upgrades and classic cars.'},
  mine:{n:'SCRAP MINE',c:'#9be7a0',pool:['tire','spider','brute','gearbox','brake','crab'],mini:'sludge',boss:'plow',r:'GEAR',d:'One gear piece every win. The slot changes in a fixed order (Tool → Helmet → … ). Deeper floors = higher grade.'},
  forge:{n:'GEAR FORGE',c:'#ffab40',pool:['canister','turbo','brute','wraith','imp','scorp'],mini:'magma',boss:'wyrm',r:'SET PIECES',d:'One SET piece every win. Class and slot change in a fixed order. Deeper floors = higher grade.'},
@@ -3806,18 +3806,23 @@ function dgUse(k){const g=dgG();if(dgDay(k)>0)g.n[k]++;else if(dgBon(k)>0)g.x[k]
 function dgAddKeys(k,n){const g=dgG();if(!g.x)g.x={};g.x[k]=(g.x[k]||0)+n;}
 window.DGK={add:dgAddKeys,keys:dgKeys,bon:dgBon,K:DG_K,ok:()=>dgOK()};
 const dgNitro=()=>{try{const g=dgG();return g.nt>Date.now()?g.np:0;}catch(e){return 0;}};
-const dgEq=f=>Math.min(NST-1,Math.round(6+f*f*.95));
-const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:4,forge:f=>f<=10?2:f<=20?3:4},DG_NIT=f=>f<=10?10:f<=20?15:20;
-function dgFloor(k,f){const D=DG[k],ki=DG_K.indexOf(k),R=seeded(9001+ki*1013+f*89),pk=a=>a[Math.floor(R()*a.length)],act=Math.min(9,Math.floor((f-1)/3)),cl=m=>act?monClone(m,act):m;
+// v16-179 (Marius 22 nov: "more floors here, harder, and rewards"): 30 → 100 floors. Floors 1-30 stay EXACTLY the same;
+// 31-100 climb to the end of the campaign (stage 1500) and then past it with DG_X → floor 100 ≈ the strongest possible team.
+const dgEq=f=>Math.min(NST-1,Math.round(f<=30?6+f*f*.95:861+(f-30)*9.2));
+const DG_X=f=>f<=30?1:Math.pow(1+DGXA,f-30);const DGXA=.031;
+// v16-176: floors 61-100 give MYTHIC gear / MYTHIC set pieces (never Ascended – Marius 21 nov), NITRO up to +30%
+const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:f<=60?4:5,forge:f=>f<=10?2:f<=20?3:f<=60?4:5},DG_NIT=f=>f<=10?10:f<=20?15:f<=30?20:f<=60?25:30;
+const DG_RX=f=>(f>30?1+(f-30)/35:1)*(f>30&&f%10===0?2:1),DG_RM=f=>(1+f/30)*DG_RX(f);   // v16-176: Essence / Gear Parts climb faster after floor 30 · boss floors 40, 50 … 100 = ×2
+function dgFloor(k,f){const D=DG[k],ki=DG_K.indexOf(k),R=seeded(9001+ki*1013+f*89),pk=a=>a[Math.floor(R()*a.length)],act=f<=30?Math.min(9,Math.floor((f-1)/3)):Math.min(ACTS.length-1,9+Math.ceil((f-30)/14)),cl=m=>act?monClone(m,act):m;
   const n=Math.min(5,3+Math.floor(f/12)),one=()=>cl(pk(D.pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
   const boss=f%10===0,mini=f%5===0&&!boss;let w;
   if(boss)w=[mk(n),[cl(D.boss)]];else if(mini)w=[mk(n),[cl(D.mini),one(),one()]];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
-  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9/Math.sqrt(PK(eq)); // v16-161 (Marius 13:19: "dungeons a bit easier"): Dungeons take only half of the new PK increase
+  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9/Math.sqrt(PK(eq))*DG_X(f); // v16-161 (Marius 13:19: "dungeons a bit easier"): Dungeons take only half of the new PK increase
   return {dg:k,f,w,mod:-1,eq,mul,boss,mini,st:{n:D.n+' · FLOOR '+f,bio:18,w,boss,mini}};}
-function dgRew(k,f){const m=REWARD(dgEq(f)).money,g=dgG(),r={money:Math.round(m*(k==='vault'?5:.6)/10)*10};
+function dgRew(k,f){const m=REWARD(dgEq(f)).money,g=dgG(),r={money:Math.round(m*(k==='vault'?5:.6)*DG_RX(f)/10)*10};
   if(k==='mine')r.gear={s:GSLOT[g.c.mine%6].k,r:DG_GR.mine(f)};
   if(k==='forge'){const c=g.c.forge;r.gear={s:GSLOT[c%6].k,r:DG_GR.forge(f),set:CT_K[Math.floor(c/6)%6]};}
-  if(k==='lab')r.nitro=DG_NIT(f);const T=TE();r.ess=Math.round(.8*T.ESS_U()*(1+f/30));r.gp=Math.round(T.GP_U()*(k==='mine'?3:k==='forge'?1:.5)*(1+f/30));return r;} // v16-99: every dungeon also gives Essence + Gear Parts
+  if(k==='lab')r.nitro=DG_NIT(f);const T=TE();r.ess=Math.round(.8*T.ESS_U()*DG_RM(f));r.gp=Math.round(T.GP_U()*(k==='mine'?3:k==='forge'?1:.5)*DG_RM(f));return r;} // v16-99: every dungeon also gives Essence + Gear Parts
 const dgItHtml=q=>'<img src="'+itemIconURL(q.s,q.r,q.set)+'" alt="" style="border-radius:4px;background:'+GRC[q.r]+'55;box-shadow:0 0 0 2px '+GRC[q.r]+'">';
 function dgRewHtml(k,f,big){const T=TE(),r=dgRew(k,f),a=EGI(r);
   if(r.gear)a.push(dgItHtml(r.gear)+' <b style="color:'+GRC[r.gear.r]+'">'+GG(r.gear.r).n.toUpperCase()+(r.gear.set?' SET':'')+'</b>');
@@ -3881,7 +3886,7 @@ function dgPower(k,f){const F=dgFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{
 function dgOpen(k){if(!dgOK()){TE().toast('🔒 DUNGEONS open after campaign stage '+sLabel(DG_UNLOCK),2600);return;}
   rootOn();DGS.k=k||null;if(k)DGS.sel=0;dgEl.classList.add('open');dgRender();}
 function dgClose(){dgEl.classList.remove('open');DGS.k=null;if(!backToHub())close();}
-function dgInfo(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>4 dungeons · <b>'+DG_N+' floors</b> each · a boss every 10th floor.</div><div><b>'+DG_FREE+' free keys</b> a day in EVERY dungeon. A key is used <b>only when you win</b>.</div><div>Keys you do not use <b>stay</b> – they stack up day after day (also the keys from packs and the Key Roulette).</div><div>Win a floor to open the next one. You can replay any floor you reached.</div><div>Rewards are <b>fixed</b> – nothing is random. Dungeons never give diamonds or tickets.</div></div>';
+function dgInfo(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>4 dungeons · <b>'+DG_N+' floors</b> each · a boss every 10th floor.</div><div><b>'+DG_FREE+' free keys</b> a day in EVERY dungeon. A key is used <b>only when you win</b>.</div><div>Keys you do not use <b>stay</b> – they stack up day after day (also the keys from packs and the Key Roulette).</div><div>Win a floor to open the next one. You can replay any floor you reached.</div><div>Floors <b>31-100</b> are much harder – and pay much more: <b style="color:#ff6b6b">MYTHIC</b> gear from floor 61, NITRO up to +30%, more Essence and Gear Parts, <b>×2</b> cash, Essence and Gear Parts on boss floors 40, 50 … 100.</div><div>Rewards are <b>fixed</b> – nothing is random. Dungeons never give diamonds or tickets.</div></div>';
   DG_K.forEach(k=>{const D=DG[k];x+='<div class="wS">'+D.n+'</div><div class="wP twMP"><img src="img/dg/k_'+k+'.webp" alt=""><span>'+D.d+'</span></div>';
     x+='<div class="wP">'+[1,10,20,30].map(f=>'Floor '+f+': '+dgRewHtml(k,f,k!=='vault')).join('<br>')+'</div>';});
   x+='<div class="wS">DUNGEON PASS · '+DG_PRICE+' · '+DG_DAYS+' DAYS</div><div class="wP"><div>+'+DG_PASS+' keys a day in every dungeon ('+(DG_FREE+DG_PASS)+' instead of '+DG_FREE+').</div><div>SWEEP: finish a floor you already cleared in one tap.</div><div>No automatic renewal.</div></div>';

@@ -5,7 +5,7 @@ What it does (1-2 minutes, headless Chrome on a COPY of the repo with the full t
   1. measures the STRONGEST POSSIBLE TEAM (5 best heroes at their max: Lv 300 + 14 ascensions, max stars / Awakened V,
      a full ASCENDED ★20 class set, every garage LV 100, both hero collections complete),
   2. measures 2 normal teams (mid-game and strong) – the same copies / levels before and after a change,
-  3. measures the FINALS: campaign NORMAL 1500, HARD 1500, Torque Tower 500, the hardest Class Tower 500, Dungeons floor 30,
+  3. measures the FINALS: campaign NORMAL 1500, HARD 1500, Torque Tower 500, the hardest Class Tower 500, Dungeons floor 30 (+ floors 31-100, v16-179),
   4. proposes the EG values (battle.js `const EG=…`, the ENDGAME RAMP) so the finals stay above the max:
         NORMAL 1500 = 0.69 × max · HARD 1500 = 1.5 × max · Torque Tower 500 = 1.03 × max · Class Towers 500 = 0.63 × max
      (Marius 22 nov: 60 / 130 / 90 / 55 M when the max was ~87 M). Only campaign 1000-1500 and towers 300-500 change.
@@ -46,7 +46,7 @@ PAGE_JS = r"""async()=>{const P=__PW,T=__TE,G=T.G,g=P.gr(),out={};
  mech.forEach(h=>{const o=own(h.id);o.s=h.gr===4?10:h.gr===5?2:h.gr===3?20:30;});lv(250,12);for(const k in G.lv)G.lv[k]=60;team([...lg,...my]);dress([...lg,...my],5,3);out.strong=P.tp();
  // ---- FINALS
  P.hm(0);out.camp=P.ep(P.NST-1);P.hm(1);out.hard=P.ep(P.NST-1);P.hm(0);
- out.tw=P.tw(500);out.ct={};P.CT_K.forEach(k=>out.ct[k]=P.ct(k,500));out.dg={};P.DGK.forEach(k=>out.dg[k]=P.dg(k,30));
+ out.tw=P.tw(500);out.ct={};P.CT_K.forEach(k=>out.ct[k]=P.ct(k,500));out.dg={};P.DGK.forEach(k=>out.dg[k]=P.dg(k,30));out.dg100=[31,40,50,60,70,80,90,100].map(f=>Math.max(...P.DGK.map(k=>P.dg(k,f))));
  out.EG=P.EG?Object.assign({},P.EG):null;Math.random=R0;return out;}"""
 
 
@@ -99,6 +99,7 @@ def report(name, r):
     print(f"  Torque Tower 500       {M(r['tw'])}  = {r['tw']/r['max']:.2f} × max")
     print(f"  Class Towers 500 (max) {M(ct)}  = {ct/r['max']:.2f} × max")
     print(f"  Dungeons floor 30      {M(min(r['dg'].values()))} – {M(max(r['dg'].values()))}")
+    print('  Dungeons 31..100', [M(x) for x in r.get('dg100',[])])
     if r.get('EG'): print(f"  EG now                 {r['EG']}")
     if r['errors']: print('  ERRORS:', r['errors'][:5])
 
