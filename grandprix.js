@@ -1,4 +1,4 @@
-// Torque Empire v16-185 (22 nov 2026, Marius) · v16-186: the page opens ABOVE the Events page (z-index; Marius: "LET'S RACE → nothing opens"): TORQUE GRAND PRIX – a ONE-TIME big event, 28 days (4 themed weeks).
+// Torque Empire v16-185 (22 nov 2026, Marius) · v16-188: animations on the LEGENDS prizes + Royal Entrance / Diamond Rain previews · v16-186: the page opens ABOVE the Events page (z-index; Marius: "LET'S RACE → nothing opens"): TORQUE GRAND PRIX – a ONE-TIME big event, 28 days (4 themed weeks).
 // Everyone earns GP TOKENS from missions (daily / weekly / event) → GRAND PRIX ROAD (50 tiers, FREE lane: a MYTHIC of your choice at tier 50)
 // + GP SHOP (tokens → tickets, keys, Essence, Builder Kits, weekly limits) + a FREE weekly Pit-Stop chest.
 // LEGENDS = live TOP 100 of the server (Road points). PATRONS = SERVER GOAL: every player's points add up, each step = a gift for ALL.
@@ -139,6 +139,34 @@ const css=`#gpx{position:fixed;inset:0;z-index:59;display:none;background:#0b0f1
 .gpChamp .ped{margin-top:-26px;aspect-ratio:400/177;background:url(img/gp/ped.webp) center/100% 100% no-repeat}.gpChamp .tx{font:12px system-ui;color:#ffe9c8;line-height:1.45}.gpChamp .tx b{color:#ffd54a}
 #gpPop{position:fixed;inset:0;z-index:62;display:none;place-items:center;background:#000b}#gpPop.on{display:grid}#gpPop .box{width:90%;max-width:400px;max-height:86vh;overflow-y:auto;border-radius:18px;padding:16px;background:linear-gradient(#2c2148,#140f24);box-shadow:0 0 0 2px #ffcf5a}
 #gpPop p{font:13px system-ui;color:#ddd;line-height:1.5}#gpPop p b{color:#ffd54a}
+.gpChamp .st{overflow:visible}.gpChamp .fig{animation:gpGold 3s ease-in-out infinite}
+@keyframes gpGold{50%{filter:sepia(1) saturate(4) hue-rotate(-8deg) contrast(1.25) brightness(1.25)}}
+.gpChamp .sw{position:absolute;left:0;right:0;top:0;height:140px;z-index:2;pointer-events:none;overflow:hidden;-webkit-mask:radial-gradient(ellipse 60% 70% at 50% 55%,#000 60%,transparent 72%);mask:radial-gradient(ellipse 60% 70% at 50% 55%,#000 60%,transparent 72%)}
+.gpChamp .sw::after{content:'';position:absolute;top:-20%;bottom:-20%;width:40%;left:-60%;background:linear-gradient(100deg,transparent,#fff8 50%,transparent);transform:skewX(-15deg);animation:gpSweep 3.2s ease-in-out infinite}
+@keyframes gpSweep{0%,40%{left:-60%}80%,100%{left:130%}}
+.gpChamp .rays{position:absolute;left:50%;top:70px;width:170px;height:170px;margin:-85px 0 0 -85px;z-index:0;background:repeating-conic-gradient(#ffd54a33 0 10deg,transparent 10deg 30deg);border-radius:50%;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:gpSpin 14s linear infinite}
+@keyframes gpSpin{to{transform:rotate(360deg)}}
+.gpRw>div{position:relative;overflow:hidden}.gpRw>div[data-g]{cursor:pointer}.gpRw u{color:#ffd54a;font:800 10.5px system-ui;display:block;margin-top:3px}
+.gpAn-sw{animation:gpSwing 2s ease-in-out infinite;transform-origin:50% 90%}@keyframes gpSwing{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) scale(1.06)}}
+.gpAn-pu{animation:gpPuls 1.6s ease-in-out infinite}@keyframes gpPuls{50%{transform:scale(1.12);filter:drop-shadow(0 0 8px #ffd54a)}}
+.gpAn-bo{animation:gpBob 1.4s ease-in-out infinite}@keyframes gpBob{50%{transform:translateY(-6px)}}
+.gpAn-sh{animation:gpShk 3s ease-in-out infinite}@keyframes gpShk{0%,80%,100%{transform:rotate(0)}84%{transform:rotate(-12deg)}88%{transform:rotate(12deg)}92%{transform:rotate(-8deg)}96%{transform:rotate(6deg)}}
+.gpAn-fl{animation:gpFlag 1s ease-in-out infinite;transform-origin:20% 90%}@keyframes gpFlag{50%{transform:rotate(-10deg) skewY(-6deg)}}
+.gpCar{position:relative;height:34px;margin-bottom:3px}.gpCar i{position:absolute;top:2px;font-size:26px;font-style:normal;animation:gpDrive 3s linear infinite}
+.gpCar i::after{content:'💨';position:absolute;left:100%;top:4px;font-size:14px;opacity:.7}
+@keyframes gpDrive{0%{left:110%}100%{left:-40%}}
+.gpGn{font:15px Game,system-ui;background:linear-gradient(90deg,#fff3a8,#ffbf1a,#fff8d0,#ffbf1a,#fff3a8);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gpShine 2.2s linear infinite;display:block;margin:4px 0 6px}
+@keyframes gpShine{to{background-position:-250% 0}}
+.gpFr{position:relative;width:52px;height:57px;margin:0 auto 3px}.gpFr::before{content:'';position:absolute;left:13%;right:13%;top:21%;bottom:15%;border-radius:6px;background:url(img/hero/splash_m5_0.webp) center 18%/cover}
+.gpFr img{position:absolute;inset:0;width:100%;height:100%!important;margin:0!important;animation:gpFrG 1.6s ease-in-out infinite}@keyframes gpFrG{50%{filter:drop-shadow(0 0 7px #ffd54a) brightness(1.25)}}
+.gpDr{position:absolute;inset:0;pointer-events:none}.gpDr i{position:absolute;top:-20px;width:14px;height:14px;background:url(img/ui/diamond.svg) center/contain no-repeat;animation:gpFall 2.4s linear infinite}
+@keyframes gpFall{to{transform:translateY(150px) rotate(200deg)}}
+#gpEnt{position:fixed;left:50%;top:-160px;transform:translateX(-50%);width:94%;max-width:450px;aspect-ratio:860/183;background:url(img/ui10/ev_rank_btn.webp) center/100% 100%;z-index:66;display:flex;align-items:center;padding-left:24%;font:16px Game,system-ui;color:#fff;text-shadow:0 2px 0 #001a5a;transition:top .5s cubic-bezier(.2,1.5,.4,1);pointer-events:none}
+#gpEnt.on{top:80px}#gpEnt small{display:block;font:800 11px system-ui;color:#ffe9a8;text-shadow:none}
+.gpCf{position:fixed;top:70px;width:7px;height:12px;z-index:65;pointer-events:none;animation:gpCf linear forwards}@keyframes gpCf{to{transform:translateY(105vh) rotate(540deg)}}
+.gpDia{position:fixed;top:-40px;width:34px;height:34px;background:url(img/ui/diamond.svg) center/contain no-repeat;z-index:65;filter:drop-shadow(0 0 6px #6cf);animation:gpCf linear forwards}
+#gpRc{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:67;white-space:nowrap;font:22px Game,system-ui;color:#9fe8ff;text-shadow:0 2px 0 #003,0 0 14px #4af;pointer-events:none;display:none}
+@media (prefers-reduced-motion:reduce){#gpx *{animation:none!important}}
 body:has(#gpx.open) #toast{z-index:65}
 .gpEntry{position:relative;display:block;margin:6px 0 10px;border-radius:14px;overflow:hidden;height:96px;background:url(img/gp/bg.webp) center 30%/cover;box-shadow:0 0 0 2px #ffcf5a,0 0 14px #ffb30066;cursor:pointer}
 .gpEntry img{position:absolute;left:50%;top:50%;height:86%;transform:translate(-50%,-50%);filter:drop-shadow(0 3px 6px #000)}.gpEntry span{position:absolute;right:6px;bottom:5px;font:900 10px system-ui;background:#e2213b;color:#fff;border-radius:6px;padding:2px 6px}`;
@@ -153,7 +181,7 @@ function act(t){const a=t.dataset.g;
   else if(a==='go'){const l=t.dataset.l;T().toast(l==='e'?'Progress counts everything you do during the event':'Play the game – it counts by itself',1800);}
   else if(a==='tier')claimTier(+t.dataset.i);else if(a==='pick')pick();else if(a==='myth')takeMyth(t.dataset.id);
   else if(a==='buy')buy(t.dataset.id);else if(a==='chest')chest();else if(a==='goal')claimGoal(+t.dataset.i);
-  else if(a==='pack')T().toast('🏁 Grand Prix Packs are coming very soon!',2200);else if(a==='ok')closePop();else if(a==='info')intro(1);}
+  else if(a==='pack')T().toast('🏁 Grand Prix Packs are coming very soon!',2200);else if(a==='ok')closePop();else if(a==='info')intro(1);else if(a==='entry')entryFx();else if(a==='rain')rainFx();}
 function pop(h){build();document.getElementById('gpPopB').innerHTML=h;popEl.classList.add('on');}
 function closePop(){if(popEl)popEl.classList.remove('on');}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
@@ -183,10 +211,13 @@ function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(
     if(!RK)h+='<div class="gpNote" style="text-align:center">'+(window.ONLINE&&ONLINE.call?'Loading the ranking…':'Go online to see the ranking.')+'</div>';
     else{h+=(RK.top||[]).slice(0,100).map((r,i)=>'<div class="gpRk'+(r.uid===RK.me?' me':'')+'">'+(i<4?'<img src="img/ui10/rk_'+(i+1)+'.webp">':'<div class="num">'+(i+1)+'</div>')+'<div class="nm'+(i<10?' g':'')+'">'+String(r.name||'Mechanic').replace(/[<>&]/g,'')+'</div><div class="pt">'+t.nf(r.sc)+'</div></div>').join('');
       if(RK.rank>100)h+='<div class="gpRk me"><div class="num">'+RK.rank+'</div><div class="nm">You</div><div class="pt">'+t.nf(s.pts)+'</div></div>';}
-    h+='<div class="gpSec">👑 CHAMPION · #1 WHEN THE EVENT ENDS</div><div class="gpChamp"><div class="st"><div class="fig"></div><div class="ped"></div></div><div class="tx"><b style="font:16px Game,system-ui;display:block">Golden Statue</b>Your favourite hero as a gold statue in the Arena &amp; Battle Hub – <b>forever</b>, seen by every player.</div></div>';
-    h+='<div class="gpRw" style="margin-top:8px"><div><img src="img/gp/trophy.webp"><b>Trophy #1</b>“The only Grand Prix Champion”</div><div><span class="e">📣</span><b>Royal Entrance</b>the whole server sees you log in</div><div><span class="e">💎</span><b>Diamond Rain</b>1× a day you rain gifts in chat</div></div>';
-    h+='<div class="gpSec">PRESTIGE REWARDS</div><div class="gpRw"><div><img src="img/gp/frame.webp"><b>Grand Prix Frame</b>animated · TOP 1-3</div><div><span class="e">🏎️</span><b>Legend Car “1 of 1”</b>your name on it · TOP 1-3</div><div><span class="e">✨</span><b>Golden Name</b>chat &amp; ranks · TOP 1-10</div>'+
-      '<div><span class="e">🏁</span><b>“GP Champion”</b>title · TOP 1-10</div><div><img src="img/gp/patron.webp"><b>Patron Badge</b>coming with the packs</div><div><span class="e">🔒</span><b>Never again</b>one-time event</div></div><div class="gpNote">Prizes are given when the event ends. Nothing here gives battle power.</div>';}
+    const nm=String((window.ONLINE&&ONLINE.name&&ONLINE.name())||'Your Name').replace(/[<>&]/g,'');
+    h+='<div class="gpSec">👑 CHAMPION · #1 WHEN THE EVENT ENDS</div><div class="gpChamp"><div class="st"><div class="rays"></div><div class="fig"></div><div class="sw"></div><div class="ped"></div></div><div class="tx"><b style="font:16px Game,system-ui;display:block">Golden Statue</b>Your favourite hero as a gold statue in the Arena &amp; Battle Hub – <b>forever</b>, seen by every player.</div></div>';
+    h+='<div class="gpRw" style="margin-top:8px"><div><img class="gpAn-sw" src="img/gp/trophy.webp"><b>Trophy #1</b>“The only Grand Prix Champion”</div>'+
+      '<div data-g="entry"><span class="e gpAn-pu">📣</span><b>Royal Entrance</b>the whole server sees you log in<u>▶ preview</u></div>'+
+      '<div data-g="rain"><div class="gpDr"><i style="left:15%"></i><i style="left:45%;animation-delay:.8s"></i><i style="left:75%;animation-delay:1.6s"></i></div><span class="e gpAn-bo">💎</span><b>Diamond Rain</b>1× a day you rain gifts in chat<u>▶ preview</u></div></div>';
+    h+='<div class="gpSec">PRESTIGE REWARDS</div><div class="gpRw"><div><div class="gpFr"><img src="img/gp/frame.webp" alt=""></div><b>Grand Prix Frame</b>animated · TOP 1-3</div><div><div class="gpCar"><i>🏎️</i></div><b>Legend Car “1 of 1”</b>your name on it · TOP 1-3</div><div><span class="gpGn">'+nm+'</span><b>Golden Name</b>chat &amp; ranks · TOP 1-10</div>'+
+      '<div><span class="e gpAn-fl">🏁</span><b>“GP Champion”</b>title · TOP 1-10</div><div><img class="gpAn-bo" src="img/gp/patron.webp"><b>Patron Badge</b>coming with the packs</div><div><span class="e gpAn-sh">🔒</span><b>Never again</b>one-time event</div></div><div class="gpNote">Prizes are given when the event ends. Nothing here gives battle power.</div>';}
   else if(tab==='pt'){const tot=RK?RK.tot||0:0,mx=GOAL[GOAL.length-1][0];h+='<div class="gpGoal"><div class="h"><span>🌍 SERVER GOAL</span><span style="color:#fff">'+t.nf(tot)+' / '+t.nf(mx)+'</span></div><div class="gpBar" style="height:12px;margin:10px 0"><i style="width:'+Math.min(100,tot/mx*100)+'%;background:linear-gradient(90deg,#4aa3ff,#a76bff)"></i></div>'+
       GOAL.map((g,i)=>{const got=s.gs.includes(i),ok=tot>=g[0];return '<div class="gpGr"><span>'+(got?'✅':ok?'🎁':'🔒')+'</span><span class="t">'+t.nf(g[0])+' pts · '+rwTxt(g[1])+'</span>'+(got?'<button class="gpBtn x">TAKEN</button>':ok?'<button class="gpBtn g" data-g="goal" data-i="'+i+'">CLAIM</button>':'')+'</div>';}).join('')+
       '<div class="gpNote" style="margin-bottom:0">Every player’s Road points on your server add up. Each step unlocks a gift for <b>ALL players</b>.</div></div>';
@@ -197,6 +228,14 @@ function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(
       '<div class="p"><div class="n" style="color:#e3d2ff">PLATINUM</div><ul><li>Premium Road ×3</li><li>+30% GP Tokens</li><li>+1 copy of your Mythic</li></ul><button class="gpBtn x" data-g="pack">SOON</button></div></div></div>';}
   h+='</div></div>';sc.innerHTML=h;sc.scrollTop=y;
   if(tab==='rd'){const r=document.getElementById('gpTr');if(r&&!render.rdS){render.rdS=1;r.scrollLeft=Math.max(0,(Math.min(tr,TIERS-1)-2)*92);}}}
+let fxT=0;function entryFx(){if(fxT)return;fxT=1;const nm=String((window.ONLINE&&ONLINE.name&&ONLINE.name())||'Champion').replace(/[<>&]/g,'');let e=document.getElementById('gpEnt');if(!e){e=document.createElement('div');e.id='gpEnt';document.body.appendChild(e);}
+  e.innerHTML='<div>👑 '+nm+' entered the server!<small>Grand Prix Champion</small></div>';requestAnimationFrame(()=>e.classList.add('on'));
+  for(let i=0;i<30;i++){const c=document.createElement('div');c.className='gpCf';c.style.left=Math.random()*100+'vw';c.style.background=['#ffd54a','#ff6a00','#a76bff','#fff'][i%4];c.style.animationDuration=(1.5+Math.random()*1.5)+'s';c.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3600);}
+  setTimeout(()=>{e.classList.remove('on');fxT=0;},3200);}
+function rainFx(){if(fxT)return;fxT=1;let n=0,r=document.getElementById('gpRc');if(!r){r=document.createElement('div');r.id='gpRc';document.body.appendChild(r);}r.style.display='block';r.textContent='💎 Diamond Rain!';
+  for(let i=0;i<22;i++){const d=document.createElement('div');d.className='gpDia';d.style.left=(5+Math.random()*85)+'vw';d.style.animationDuration=(2.2+Math.random()*1.8)+'s';d.style.animationDelay=Math.random()*2.5+'s';
+    d.style.pointerEvents='auto';d.onclick=()=>{n+=5;r.textContent='+'+n+' 💎 (preview)';d.remove();};document.body.appendChild(d);setTimeout(()=>d.remove(),7000);}
+  setTimeout(()=>{r.style.display='none';fxT=0;},6500);}
 function intro(force){const s=S();if(s.intro&&!force)return;s.intro=1;T().save();
   pop('<img src="img/gp/logo.webp" style="width:80%;display:block;margin:0 auto">'+
    '<p>🏁 A <b>ONE-TIME</b> event: 28 days, then it never comes back.</p><p>📋 Do <b>missions</b> (daily, weekly, event) → earn '+TOKI+' <b>GP Tokens</b>.</p>'+
