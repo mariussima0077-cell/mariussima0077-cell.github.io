@@ -14,25 +14,26 @@ const TK='<img class="tki" src="img/ticket.webp" alt="">',CT='<img class="tki" s
 const DM=()=>T().DMI,ES=()=>T().ESI;
 const EV={
  hero:{bn:'hero',n:'HERO SUMMON FESTIVAL',ic:'🎟️',col:'#ff7043',d:'Summon Mechanics (Recruit tickets or diamonds). Every summon counts.',u:'summons',tkk:'tk',
-   m:[[10,{dm:50}],[30,{tk:2}],[60,{dm:100}],[100,{tk:3}],[150,{dm:200}],[250,{tk:5}],[400,{dm:400,tk:5}],[600,{dm:600,tk:8}]]},
+   m:[[5,{dm:30}],[10,{dm:50}],[20,{tk:2}],[30,{dm:100}],[50,{tk:3}],[75,{dm:150}],[100,{tk:3}],[150,{dm:200}],[200,{tk:4}],[300,{dm:300,tk:3}],[450,{dm:400,tk:5}],[600,{dm:600,tk:8}]]},
  gear:{bn:'gear',n:'GEAR SUMMON FORGE',ic:'⚙️',col:'#42a5f5',d:'Summon gear (Gear tickets or diamonds). Every piece counts.',u:'summons',tkk:'gt',
-   m:[[10,{dm:50}],[30,{gt:2}],[60,{dm:100}],[100,{gt:3}],[150,{dm:200}],[250,{gt:5}],[400,{dm:400,gt:5}],[600,{dm:600,gt:8}]]},
+   m:[[5,{dm:30}],[10,{dm:50}],[20,{gt:2}],[30,{dm:100}],[50,{gt:3}],[75,{dm:150}],[100,{gt:3}],[150,{dm:200}],[200,{gt:4}],[300,{dm:300,gt:3}],[450,{dm:400,gt:5}],[600,{dm:600,gt:8}]]},
  crew:{bn:'crew',n:'CREW SUMMON RALLY',ic:'🎖️',col:'#ab47bc',d:'Summon Drivers + Guards (Crew tickets or diamonds). Every summon counts.',u:'summons',tkk:'ct',
-   m:[[10,{dm:50}],[30,{ct:2}],[60,{dm:100}],[100,{ct:3}],[150,{dm:200}],[250,{ct:5}],[400,{dm:400,ct:5}],[600,{dm:600,ct:8}]]},
+   m:[[5,{dm:30}],[10,{dm:50}],[20,{ct:2}],[30,{dm:100}],[50,{ct:3}],[75,{dm:150}],[100,{ct:3}],[150,{dm:200}],[200,{ct:4}],[300,{dm:300,ct:3}],[450,{dm:400,ct:5}],[600,{dm:600,ct:8}]]},
  ess:{bn:'ess',n:'ESSENCE RUSH',ic:'💜',col:'#b388ff',d:'Spend Essence on hero LEVEL UP and ASCENSION. Every Essence spent counts.',u:'essence',tkk:'tk',rel:1,
-   m:[[5,{dm:50}],[15,{tk:2}],[30,{dm:100,ess:5}],[60,{tk:3}],[100,{dm:200,ess:10}],[160,{tk:5}],[250,{dm:400,ess:20}],[400,{dm:600,tk:8}]]},
+   m:[[3,{dm:40}],[5,{ess:3}],[10,{tk:2}],[15,{dm:100}],[30,{ess:5,tk:1}],[45,{tk:3}],[60,{dm:200}],[100,{dm:100,ess:10}],[130,{tk:4}],[160,{dm:300,ess:5}],[250,{dm:400,ess:20}],[400,{dm:700,tk:8}]]},
  dia:{bn:'dia',n:'DIAMOND SPREE',ic:'💎',col:'#4dd0e1',d:'Spend diamonds anywhere (summons, name change …). Every diamond spent counts.',u:'diamonds',tkk:'tk',
-   m:[[300,{tk:2}],[800,{dm:80}],[1500,{tk:3,gt:2}],[3000,{dm:250}],[5000,{tk:5,ct:3}],[8000,{dm:500}],[12000,{tk:8,gt:5}],[20000,{dm:1200,tk:10}]]},
+   m:[[150,{dm:20}],[300,{tk:2}],[500,{dm:50}],[800,{gt:2}],[1200,{dm:100}],[1500,{tk:3,gt:2}],[3000,{ct:3}],[4000,{dm:250}],[5000,{tk:5,ct:3}],[8000,{dm:500,tk:3}],[12000,{tk:8,gt:5}],[20000,{dm:1200,tk:10}]]},
  key:{bn:'key',n:'KEY ROULETTE',ic:'🔑',col:'#4fc3f7',d:'Spin the roulette – it gives ONLY Dungeon keys. Won keys are BONUS keys: they stack, never expire and wait for you (daily keys are used first). Free spins come only from the event quests below (no buying).',u:'spins',tkk:'dm',
-   m:[[3,{tk:1}],[6,{dm:100}],[9,{tk:2,gt:1}],[12,{dm:250}],[15,{tk:3,ct:2}]]},
+   m:[[2,{tk:1}],[3,{dm:50}],[5,{gt:1}],[6,{dm:100}],[8,{ct:1,tk:1}],[9,{tk:2,gt:1}],[11,{dm:150}],[12,{dm:250}],[14,{tk:2,ct:1}],[15,{tk:3,ct:2}]]},
+ // v16-173 (Marius 22 nov): MORE milestones (12 per event, 10 for the wheels) and a bit richer (~+30%)
  // v16-161 (Marius 22 nov): DUNGEON RUSH – every Dungeon key used (win or SWEEP) counts
  dgr:{bn:'dgr',n:'DUNGEON RUSH',ic:'🔑',col:'#26a69a',d:'Use Dungeon keys (a victory or a SWEEP). Every key used counts – your stacked bonus keys too!',u:'keys used',tkk:'tk',
-   m:[[5,{dm:50}],[10,{tk:2}],[15,{dm:100}],[20,{gt:2}],[30,{dm:200}],[40,{tk:4}],[60,{dm:400,gt:3}],[90,{dm:600,tk:6}]]},
+   m:[[3,{dm:30}],[5,{dm:50}],[10,{tk:2}],[15,{dm:100}],[20,{gt:2}],[25,{ct:2}],[30,{dm:200}],[40,{tk:4}],[50,{dm:250,gt:2}],[60,{dm:400,gt:3}],[75,{tk:5,ct:3}],[90,{dm:700,tk:6}]]},
  // v16-129 (Marius 21 nov): CASH ROULETTE – NO quests: spins are bought with garage CASH, every spin costs more, max CW_MAX spins per event. Wins garage upgrade parts + Dungeon keys.
  cash:{bn:'cash',n:'CASH ROULETTE',ic:'💰',col:'#ffb300',d:'Spend your garage CASH on spins – win garage upgrade PARTS and Dungeon keys. No quests: every spin costs more than the one before, max 25 spins per event.',u:'spins',tkk:'tk',
-   m:[[3,{tk:1}],[6,{dm:100}],[10,{tk:2,gt:1}],[15,{dm:250}],[20,{tk:3,ct:2}],[25,{dm:400,tk:5}]]},
+   m:[[2,{tk:1}],[3,{dm:50}],[5,{gt:1}],[6,{dm:100}],[8,{ct:2}],[10,{tk:2,gt:1}],[12,{dm:150}],[15,{dm:250}],[18,{tk:2,gt:2}],[20,{tk:3,ct:2}],[23,{dm:300}],[25,{dm:500,tk:5}]]},
  wheel:{bn:'wheel',n:'LUCKY WHEEL',ic:'🎡',col:'#ffd54a',d:'Spin the wheel – it gives ONLY diamonds. Free spins come from the event quests below (no buying).',u:'spins',tkk:'dm',
-   m:[[3,{tk:1}],[6,{dm:100}],[9,{tk:2,gt:1}],[12,{dm:250}],[15,{tk:3,ct:2}]]}};
+   m:[[2,{tk:1}],[3,{dm:50}],[5,{gt:1}],[6,{dm:100}],[8,{ct:1,tk:1}],[9,{tk:2,gt:1}],[11,{dm:150}],[12,{dm:250}],[14,{tk:2,ct:1}],[15,{tk:3,ct:2}]]}};
 // ranking prizes (sent by Mail by the server when the event ends) – the same table is in server/online.js (EV_RW)
 const MED=n=>n<=1?1:n<=3?2:n<=10?3:n<=50?4:5,MDL=(n,t)=>'<i class="rkm" style="background-image:url(img/ui10/rk_'+MED(n)+'.webp)">'+(t||n)+'</i>'; // v16-120 UI11 rank medals
 const RANKRW=[[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
@@ -51,9 +52,11 @@ const cur=(tr,t)=>{const i=Math.floor(((t||Date.now())-E0)/DUR);return {i,k:TRK[
 const day=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
 function S(){const G=T().G;if(!G.ev)G.ev={};const s=G.ev;
   for(const tr of ['A','B']){const c=cur(tr);if(!s[tr]||s[tr].id!==c.id){s[tr]={id:c.id,k:c.k,sc:0,cl:[],b:0,sent:0};}}
+  for(const tr of ['A','B']){const st=s[tr];if(st.mv!==171){st.mv=171;if(st.cl.length){const og=OLDG[st.k]||[],mx=Math.max(...st.cl.map(i=>og[i]||0));st.cl=EV[st.k].m.map((m,i)=>m[0]<=mx?i:-1).filter(i=>i>=0);}}}  // v16-173: old claims → new milestone list (nothing claimed twice)
   const B=s.B;if(B.k==='ess'&&!B.b)B.b=T().ESS_U?T().ESS_U():300;  // essence goals grow with your stage (fixed for this event)
   if(isW(B.k)){if(!B.w)B.w={sp:0,used:0,won:0,d:'',q:{},got:{}};if(B.k==='cash'&&!B.w.base)B.w.base=cwBase();const w=B.w;if(w.d!==day()){w.d=day();w.q={login:1};w.got={};}}
   return s;}
+const OLDG={hero:[10,30,60,100,150,250,400,600],gear:[10,30,60,100,150,250,400,600],crew:[10,30,60,100,150,250,400,600],ess:[5,15,30,60,100,160,250,400],dia:[300,800,1500,3000,5000,8000,12000,20000],key:[3,6,9,12,15],wheel:[3,6,9,12,15],dgr:[5,10,15,20,30,40,60,90],cash:[3,6,10,15,20,25]};
 const goal=(st,m)=>EV[st.k].rel?m*st.b:m;
 function add(kind,n){if(!n||!T()||!T().G)return;const s=S();for(const tr of ['A','B']){const st=s[tr];if(st.k===kind){st.sc+=n;dirty();}}}
 function q(kind,n){if(!T()||!T().G)return;const s=S(),B=s.B;if(!isW(B.k))return;B.w.q[kind]=(B.w.q[kind]||0)+n;dot();}
@@ -67,7 +70,10 @@ async function rank(tr){const st=S()[tr];if(!window.ONLINE||!ONLINE.call)return 
 // ---------------- rewards
 // v16-125 (Marius: "nothing in the frames, only text"): rewards as big icons + gold number pictures, the event's own icon in the left box
 const NH=(v,em)=>T().numH?T().numH(String(v),'gold',em||1.05):String(v);
-const evTabIc=E=>['hero','gear','crew','ess','dia','key','dgr'].includes(E.bn)?evIc(E):E.ic; // v16-140: one icon per resource (no 🎟/💎 emoji)
+const evTabIc=E=>['hero','gear','crew','ess','dia','key','dgr'].includes(E.bn)?evIc(E):E.ic;
+// v16-173 (Marius 22 nov: "no tickets in the milestone frames – something else for every event"): each event has its own emblem img/ui13/evg_<event>.webp (old icon only until the picture exists)
+const EGI={};Object.keys(EV).forEach(k=>{const i=new Image();i.onload=()=>render();i.src='img/ui13/evg_'+k+'.webp';EGI[k]=i;});
+const evGoalIc=E=>{const i=EGI[E.bn];return i&&i.complete&&i.naturalWidth?'<img class="tki evg" src="img/ui13/evg_'+E.bn+'.webp" alt="">':evIc(E);}; // v16-140: one icon per resource (no 🎟/💎 emoji)
 const evIc=E=>E.u==='essence'?ES():E.u==='diamonds'?DM():E.bn==='key'||E.bn==='dgr'?'<img class="tki" src="img/wb/key.webp" alt="">':E.tkk==='gt'?GT:E.tkk==='ct'?CT:TK;
 function rwBig(r){const a=[];if(r.dm)a.push([DM(),r.dm]);if(r.tk)a.push([TK,r.tk]);if(r.gt)a.push([GT,r.gt]);if(r.ct)a.push([CT,r.ct]);if(r.ess)a.push([ES(),T().nf(r.ess)]);return a.map(([i,v])=>'<span class="evRw">'+i+NH((typeof v==='number'?'×':'')+v,1)+'</span>').join('');}
 function rwHtml(r){const a=[];if(r.dm)a.push(DM()+' '+r.dm);if(r.tk)a.push(TK+' '+r.tk);if(r.gt)a.push(GT+' '+r.gt);if(r.ct)a.push(CT+' '+r.ct);if(r.ess)a.push(ES()+' '+T().nf(r.ess));return a.join(' ');}
@@ -160,7 +166,7 @@ const css=`#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716
 #ev .evM.ok{background-image:url(img/ui10/ev_row_ready.webp)!important}#ev .evM.done{background-image:url(img/ui10/ev_row_done.webp)!important}
 #ev .evM .g{position:absolute;left:10.6%;width:15.4%;top:19%;bottom:18%;min-width:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#ffe082;text-shadow:0 2px 0 #000;white-space:nowrap}
 #ev .evM .r{min-width:0;font-size:15px;text-shadow:0 2px 0 #000;white-space:nowrap}
-#ev .evM .g{flex-direction:column;gap:1px;font-size:15px}#ev .evM .g .tki{height:1.55em;width:auto;filter:drop-shadow(0 2px 2px #000)}#ev .evM .g .numP{font-size:15px}
+#ev .evM .g{flex-direction:column;gap:1px;font-size:15px}#ev .evM .g .tki{height:1.55em;width:auto;filter:drop-shadow(0 2px 2px #000)}#ev .evM .g .numP{font-size:15px}#ev .evM .g .evg{height:2.15em;margin:-4px 0 -2px}
 #ev .evRw{display:inline-flex;align-items:center;gap:3px;margin-right:10px;font-size:16px}#ev .evRw .tki{height:1.75em!important;width:auto;vertical-align:middle;filter:drop-shadow(0 2px 2px #000)}#ev .evRw .numP{font-size:16px}#ev .evM.done .r{opacity:.6}
 #ev .evM button{width:84px;height:38px;font-size:15px;font-style:normal}#ev .evM.done button{visibility:hidden}
 #ev .evRk{display:block;width:100%;aspect-ratio:860/183;height:auto;margin:12px 0 4px;padding:0 6% 0 24%;border-radius:0;box-shadow:none;background:url(img/ui10/ev_rank_btn.webp) center/100% 100% no-repeat;font-size:21px;color:#fff;text-shadow:0 2px 0 #062050,0 0 10px #4fc3ff}
@@ -198,7 +204,7 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   if(st.k==='cash'){const w=st.w,p=cwPrice(w),can=!spinning&&w.used<CW_MAX&&T().G.money>=p;h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">'+(w.used>=CW_MAX?'MAX SPINS':'SPIN · '+T().fmt(p))+'</button><div class="evP">Spins: <b>'+w.used+' / '+CW_MAX+'</b> · your cash: <b>'+T().fmt(T().G.money)+'</b> · next spin costs ×1.15</div><div class="evP">Prizes grow with your campaign stage. Parts upgrade your garages (LV 1-100).</div></div>';}
   else if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
     h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
-  h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evIc(E)+NH(T().nf(g),T().nf(g).length>5?.85:1.1)+'</div><div class="r'+(Object.values(realRw(st,m[1])).filter(Boolean).length>1?' two':'')+'">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
+  h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evGoalIc(E)+NH(T().nf(g),T().nf(g).length>5?.85:1.1)+'</div><div class="r'+(Object.values(realRw(st,m[1])).filter(Boolean).length>1?' two':'')+'">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
   const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div><button class="evSch" data-e="sch">📅 EVENT CALENDAR</button>';
   body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
