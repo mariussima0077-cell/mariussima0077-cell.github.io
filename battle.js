@@ -468,6 +468,12 @@ const css3=document.createElement('style');css3.textContent=`
 #gHero #gHName .gPow{font-size:16px!important;padding:1px 12px!important;margin-top:3px!important;border-radius:11px!important}
 #gHero .gArt2{position:absolute;right:2%;top:.8%;width:42px;height:42px;border-radius:12px;border:2px solid #ffd54a;background:linear-gradient(#ffe082,#ff8f00);color:#2a1000;font:900 15px/1 Game,system-ui;padding:0;pointer-events:auto;box-shadow:0 2px 0 #5e3d00,0 0 10px #ff6d00;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 #gHero .gArt2 small{font:900 9px Game,system-ui;letter-spacing:.5px}
+/* v16-175 (Marius 22 nov): arrows + swipe to go to the next / previous hero without going back */
+#gHero .gNav{position:absolute;top:52%;width:40px;height:40px;border-radius:50%;border:2px solid #ffd54a;background:radial-gradient(circle at 50% 35%,#3a4a66,#101826 75%);color:#ffd54a;font:900 22px/1 Game,system-ui;padding:0;pointer-events:auto;box-shadow:0 2px 0 #5e3d00,0 0 10px #000c;display:flex;align-items:center;justify-content:center;z-index:3;opacity:.92}
+#gHero .gNav:active{transform:scale(.9)}#gHero .gNav.l{left:24.5%}#gHero .gNav.r{right:24.5%}
+#gHero .gNav small{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font:900 9px Game,system-ui;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap}
+#gHeroCv.slL{animation:gSlL .22s ease-out}#gHeroCv.slR{animation:gSlR .22s ease-out}
+@keyframes gSlL{from{transform:translateX(40px);opacity:.2}to{transform:none;opacity:1}}@keyframes gSlR{from{transform:translateX(-40px);opacity:.2}to{transform:none;opacity:1}}
 #gHero #gStats{gap:0 12px!important}
 #gHero #gStats>div{flex-wrap:wrap!important;white-space:nowrap;min-width:0;gap:0 6px!important;padding:2px 0!important;align-content:center}
 #gHero #gStats>div>span{flex:1 0 100%!important;font-size:11px!important;color:#c9d7ea!important;line-height:1.2}
@@ -506,7 +512,7 @@ root.innerHTML=`
 <div class="skH"><img class="hi" src="img/ui2/heroes_h.webp" alt=""><canvas id="gPedCv"></canvas><div id="gPeds"></div><div class="gTop2"><button class="cpB" data-g="back">↩</button><img class="gTi" src="img/ui/t_heroes.webp" alt="HEROES"><div id="gMoney"></div></div></div>
 <div class="skB" id="gBody"><div class="gSumRow"><button class="gsGo hs" id="gHSB" data-g="hsum"></button><button class="gsGo" id="gGSB"></button><button class="gsGo bag" data-g="bag"><img src="img/ui2/i_scrap.webp" alt=""><b>BAG</b><span id="gBagS"></span></button></div><div class="gSumRow2"><button class="gsGo col" data-g="coll"><img src="img/ui3/g_book.webp" alt=""><b>HERO COLLECTION</b><span id="gColS"></span></button></div>
 <div id="gTeam"></div><div class="gSecH">ALL HEROES <span id="gCnt"></span><span class="gSort" id="gSort"></span></div><div id="gHeroes"></div></div>
-<div id="gHero" class="gPg"><div class="skBg" style="background-image:url(img/ui2/equip_f.webp)"></div><div class="eqW"><img class="hi" src="img/ui2/equip_f.webp" alt=""><canvas id="gHeroCv"></canvas><div id="gHName"></div><div id="gMain"></div><div id="gStats"></div><button class="cpB gBk" data-g="hback">↩</button></div><div id="gBtns"></div><div id="gInfo"></div></div>
+<div id="gHero" class="gPg"><div class="skBg" style="background-image:url(img/ui2/equip_f.webp)"></div><div class="eqW"><img class="hi" src="img/ui2/equip_f.webp" alt=""><canvas id="gHeroCv"></canvas><div id="gHName"></div><div id="gMain"></div><div id="gStats"></div><button class="cpB gBk" data-g="hback">↩</button><button class="gNav l" id="gNavL" data-g="hprev">❮</button><button class="gNav r" id="gNavR" data-g="hnext">❯<small id="gNavC"></small></button></div><div id="gBtns"></div><div id="gInfo"></div></div>
 <div id="gBag" class="skP sk-bag"><div class="skBg"></div><div class="skH"><img class="hi" src="img/ui2/bag_h.webp" alt=""><div id="gFil"></div><button class="cpB gBk" data-g="bback">↩</button><div id="gBagFor"></div></div><div class="skB" id="gInv"></div><div class="gBagBar"><span id="gBagN"></span><button data-g="salvP"><img src="img/ui2/i_scrap.webp" alt="">SALVAGE</button></div></div>
 <div id="gSalv" class="gPg"><div class="skBg" style="background-image:url(img/ui2/salvage_f.webp)"></div><div class="eqW sv"><img class="hi" src="img/ui2/salvage_f.webp" alt=""><button class="cpB gBk" data-g="sback">↩</button><div id="svSlots"></div><div id="svInfo"></div><button id="svGo" data-g="salvGo"></button></div><div id="svHelp"></div></div>
 <div id="gColl" class="gPg"><div class="skBg"></div><div class="gcW" id="gcW"></div></div>
@@ -2861,6 +2867,11 @@ function cleanGear(){const T=TE(),g=GR();for(const hid in g.eq){if(!T.G.h.own[hi
 function gHero(){if(gPrev&&TE().HB[gPrev])return TE().HB[gPrev];const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=>h.id===gsel))gsel=L[0].id;return TE().HB[gsel];}
 function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(CPX().best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
 function lvCan(id){const T=TE(),G=T.G,l=T.lvOf(id),c=T.lvCap(id),e=G.ess||0;return l<c?e>=T.lvCost(l):c<T.LV_MAX&&e>=T.ascCost(T.ascOf(id));}
+// v16-175: hero in the battle team → cycle through the team; otherwise through all heroes (same order as the list)
+function gNavList(){const h=gHero();if(!h||gPrev)return [];const tm=curTeamList().map(x=>x.id);if(tm.includes(h.id))return tm;let L=myMechs();
+  if(gsort==='pow')L=L.slice().sort((a,b)=>pow(b)-pow(a));else if(gsort==='gr')L=L.slice().sort((a,b)=>(b.gr||0)-(a.gr||0)||stars(b)-stars(a));return L.map(x=>x.id);}
+function gNav(d){if(gpg!=='hero')return;const L=gNavList();if(L.length<2)return;const i=Math.max(0,L.indexOf(gHero().id));gsel=L[(i+d+L.length)%L.length];
+  const pg=$('gHero'),sc=pg.scrollTop;renderGear();gPage('hero');pg.scrollTop=sc;const cv=$('gHeroCv');cv.classList.remove('slL','slR');void cv.offsetWidth;cv.classList.add(d>0?'slL':'slR');}
 function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gGSB').innerHTML='<b>GEAR SUMMON</b><span><img src="img/gticket.webp" alt="">'+GSD().tk.toLocaleString()+'</span>';
   $m('gMoney').innerHTML=T.ESI+' '+T.nf(G.ess||0)+' &nbsp;'+T.GPI+' '+T.nf(G.gp||0);{const gm=$('gMoney');if(gm&&!gm.dataset.ri){gm.dataset.ri=1;gm.style.pointerEvents='auto';gm.style.cursor='pointer';gm.onclick=()=>popW('RESOURCES',TE().resHtml('ess'));}} // v16-99: Essence (hero levels) + Gear Parts (gear upgrades)
@@ -2889,6 +2900,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   const lvRdy=T.lvOf(h.id)<T.lvCap(h.id)&&(G.ess||0)>=T.lvCost(T.lvOf(h.id))||T.lvOf(h.id)===T.lvCap(h.id)&&T.lvCap(h.id)<T.LV_MAX&&(G.ess||0)>=T.ascCost(T.ascOf(h.id));
   $m('gBtns').innerHTML=`<button class="cpGo gLvB${lvRdy?' rdy':''}" data-g="lvl">${T.ESI} LEVEL UP · Lv ${T.lvOf(h.id)}${lvRdy?' ▲':''}</button><button class="cpGo ${inT?'tmo':'tm'}" data-g="${inT?'tout':'tin'}">${inT?'✖ LEAVE TEAM':'➕ ADD TO TEAM'}</button><button class="cpGo" data-g="auto">${IMGI('img/ui2/i_energy.webp','1.4em','-.4em')} AUTO EQUIP</button><button class="cpGo alt" data-g="none">UNEQUIP ALL</button>`;
   if(gPrev===h.id){$m('gBtns').innerHTML=`<div class="gPrevN">🔒 NOT IN YOUR COLLECTION · stats at Lv 1, no gear</div><button class="cpGo" data-g="hsum">${TKI} GET IT FROM HERO SUMMON</button>`;$('gHName').insertAdjacentHTML('afterbegin','<div class="gPrevT">PREVIEW</div>');}
+  {const NL=gNavList(),on=NL.length>1,tm=on&&curTeamList().some(x=>x.id===h.id);['gNavL','gNavR'].forEach(id=>{const e=$(id);if(e)e.style.display=on?'':'none';});const c=$('gNavC');if(c)c.textContent=on?(tm?'TEAM ':'')+(NL.indexOf(h.id)+1)+'/'+NL.length:'';}
   renderBag(h);if(gpg==='salv')renderSalv();if(gpg==='coll')renderColl();}
 function renderBag(h){const T=TE(),g=GR();
   $m('gFil').innerHTML=[['all','ALL','bag'],...GSLOT.map(s=>[s.k,s.n,s.ic])].map(([k,n,ic])=>`<button class="gf${gfil===k?' on':''}" data-f="${k}"><img src="${glyphURL(ic,gfil===k?'#2a1000':'#ffd54a')}" alt="${n}"></button>`).join('');
@@ -3035,6 +3047,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.hx){if(T.HB[el.dataset.hx]){gPrev=el.dataset.hx;renderGear();gPage('hero');}return;}
   if(gPrev&&(el.dataset.g==='hback'||el.dataset.g==='back')){const ph=T.HB[gPrev];gPrev=null;renderGear();gPage('coll');setTimeout(()=>{const r=ph&&$('gcr'+ph.gr);if(r)r.scrollIntoView({block:'center'});},60);return;}
   if(gPrev&&el.dataset.g==='hsum'){gPrev=null;renderGear();gPage('coll');}
+  if(el.dataset.g==='hprev'||el.dataset.g==='hnext'){gNav(el.dataset.g==='hnext'?1:-1);return;}
   if(gPrev&&el.dataset.g!=='hsum'&&el.dataset.g!=='art'&&!el.dataset.f){T.toast('🔒 You don\'t own this hero yet – get it from HERO SUMMON',2200);return;}
   if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(gRet){const f=gRet;gRet=null;f();return;}if(TWS.ret){TWS.ret=0;twOpen();return;}if(WBS.ret){WBS.ret=0;wbOpen();return;}if(DGS.ret){DGS.ret=0;rootOn();dgEl.classList.add('open');dgRender();return;}if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
   if(el.dataset.g==='auto'){popAuto();return;}if(el.dataset.g==='none'){popNone();return;}
@@ -3522,6 +3535,8 @@ function gsSalv(){const sm=document.getElementById('sm');if(root.classList.conta
 function gsBag(){const sm=document.getElementById('sm');if(root.classList.contains('open')){sm.classList.remove('open');sm.style.zIndex='';}else{open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gpgFrom='';gfil='all';renderGear();gPage('bag');} /* v16-119: GEAR BAG opens the bag itself (was: the HEROES page) */
 $('cpGSB').onclick=gsOpenSm;$('gGSB').onclick=gsOpenSm;
 $('cpChN').onclick=()=>chList();
+{const w=document.querySelector('#gHero .eqW');let sx=null,sy=0;if(w){w.addEventListener('touchstart',e=>{const t=e.touches[0];sx=e.touches.length===1?t.clientX:null;sy=t.clientY;},{passive:true});
+  w.addEventListener('touchend',e=>{if(sx==null)return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)gNav(dx<0?1:-1);},{passive:true});}} // v16-175: swipe ← → = next / previous hero
 $('cpBack').onclick=()=>{if(!backToHub())close();};$('cpPrev').onclick=()=>chGo(-1);$('cpNext').onclick=()=>chGo(1);$('cpGearB').onclick=()=>openGear();
 // v15: GEAR title is the player's picture
 $('cpGearB').innerHTML=IMGI(glyphURL('bag','#ffd54a'),'1.25em','-.3em')+'<small>HEROES</small>';

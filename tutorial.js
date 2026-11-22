@@ -180,6 +180,8 @@ const PG={
   bagfull:{ok:()=>isOpen('gBag')&&!isOpen('cpPop'),t:`<b>🎒 GEAR BAG</b>: battles never lose gear – the bag can go <b>over its limit</b>. When the counter is <b style="color:#ff6b6b">red</b>, only <b>GEAR SUMMON</b> is locked until you <b>SALVAGE</b>. Turn on <b>AUTO SALVAGE</b> to keep the bag clean.`},
   // v16-166
   mythset:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&vis(document.querySelector('#gInfo'))&&/MYTHIC: the/.test((document.getElementById('gInfo')||{}).textContent||''),t:`<b style="color:#ff6b6b">MYTHIC SETS</b>: a Mythic hero gets the bonus of the <b>Torque King</b> set <b>or</b> of the set of its <b>role</b> (Goliath → Iron Piston, Ignis → Field Medic …) – the one with more pieces counts.`},
+  // v16-175
+  hswipe:{ok:()=>isOpen('gHero')&&!isOpen('cpPop')&&vis(document.getElementById('gNavR')),t:`<b>❮ ❯ NEXT HERO</b>: tap the arrows or <b>swipe left / right</b> on the hero to go to the next one – no need to go back. In your team you go through the <b>5 team heroes</b>.`},
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
