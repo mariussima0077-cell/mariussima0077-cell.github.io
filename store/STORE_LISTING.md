@@ -6,39 +6,33 @@ Torque Empire: Garage Tycoon
 ## Short description (79/80)
 Build your garage empire: fix cars, upgrade shops & battle with your mechanics!
 
-## Full description
+## Full description (actualizată 22 nov 2026, urcată în Play Console)
 Start with a small garage and a few broken cars – and turn it into a TORQUE EMPIRE!
 
-Buy damaged cars, inspect them, repair them and sell them for profit. Expand your base with new workshops, hire more drivers and mechanics, and watch your business grow on a big map you can move and zoom freely.
+Buy damaged cars, inspect them, repair them and sell them for profit. Expand your base with new workshops, a Car Wash, a Gas Station, a Car Factory and a Rail Terminal, all on a big map you can move and zoom freely.
 
 🔧 BUILD YOUR GARAGE BUSINESS
-• Inspection, Paint & Body, Electrical, Engine and Tuning garages
-• Every building upgrades up to level 10 – with visible changes on the map
-• Drivers move cars between garages and return on scooters
-• Export parking with car transporter trucks
-• Parts Office for urgent parts deliveries
+• Inspection, Paint, Electrical, Engine and Tuning garages – up to level 100
+• Your heroes work in the garages and make them faster
+• Rich clients, city fleet cars and rare classic cars for your Classic Collection
+• Send full trains of export cars in RAIL WARS – and raid other players' trains
 
-🚗 MANY CARS TO REPAIR
-• Dozens of car types: city cars, sports cars, SUVs, police cars, ambulances and more
-• Small repairs at first, engine swaps and full tuning later
-• Restore rare classic cars for collectors who pay much more
+⚔️ EPIC HERO BATTLES
+• 46 heroes from Common to Mythic, each with their own skill
+• Team roles: Tank, Warrior, Ranger, Mage and Support
+• 1500 campaign stages in Normal and Hard mode
+• Torque Tower, Class Towers, Dungeons and World Boss fights
+• Gear from Common to Ascended, with set bonuses
 
-🛡️ PROTECT YOUR BASE
-• Upgrade your security with guards and cameras
-• Thieves sometimes try to steal your cars – catch them with the police!
-
-⚔️ CAMPAIGN BATTLES
-• Your mechanics become heroes and fight monsters made of car parts
-• 50+ chapters full of animations, skills and special moves
-• Summon new mechanics, fuse them up to +50 and equip them with gear from Standard to Mythic
+🏆 PLAY WITH OTHERS
+• Arena PvP against real players' teams – climb from Bronze to Legend
+• Torque Cup every weekend, live rankings and a world chat with auto-translation
 
 🎁 REWARDS EVERY DAY
-• Daily Quests and VIP levels up to VIP 20
+• Daily check-in, quests and events
 • Idle Rewards – your garage earns even while you're away
-
-Easy to start, deep to master: months of progress without frustrating walls.
 
 Open your first garage today and build your Torque Empire!
 
 ## Capturi (1080×1920, gata de urcat)
-store/play-screenshot-1.png … play-screenshot-6.png
+store/play-screenshot-1.png … play-screenshot-8.png (22 nov 2026: harta, luptă cu Mythici, campania 1500, Summon, Arena, World Boss, Battle Hub, Torque Tower)
