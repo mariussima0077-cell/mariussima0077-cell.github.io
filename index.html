@@ -2924,7 +2924,9 @@ function render(){
 }
 
 // =================== CAMERA & INPUT ===================
-let zAx=-1,zAy=-1,DPR=1,MAXDPR=Math.min(2,window.devicePixelRatio||1),VW=0,VH=0,Z=1,camX=0,camY=0,vX=0,vY=0,camInit=false,zAnim=null;
+// v16-156 HD graphics (player choice in Profile → GRAPHICS): up to 3x on good screens, never lowers the quality by itself
+const HDM=(()=>{try{return localStorage.getItem('te_hd')==='1';}catch(e){return false;}})();
+let zAx=-1,zAy=-1,DPR=1,MAXDPR=Math.min(HDM?3:2,window.devicePixelRatio||1),VW=0,VH=0,Z=1,camX=0,camY=0,vX=0,vY=0,camInit=false,zAnim=null;
 const baseS=()=>VW/600;
 const minS=()=>Math.min(VW/W,(VH-TOP)/H)*.95;
 const maxS=()=>baseS()*3.2;
@@ -3938,6 +3940,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:76,d:'Nov 22, 2026',ic:'✨',t:'NEW: HD graphics',l:['<b>PROFILE → GRAPHICS</b>: choose <b>AUTO</b> (best for every phone) or <b>HD</b> – the sharpest picture on good phones, in battles and on the garage map.','HD never lowers the quality by itself. It uses a bit more battery and memory – if the game gets slow, go back to AUTO.']},
  {id:75,d:'Nov 22, 2026',ic:'🔑',t:'Dungeon keys stack up + Legendary heroes in the packs',l:['<b>DUNGEONS</b>: daily keys you do not use are now <b>kept</b> – they stack up day after day (also on the days you do not play, up to 30 days).','The <b>STARTER PACK</b> now gives <b>Mama Rosa</b> and the <b>ROOKIE PACK</b> gives <b>Sofia Lightning</b> – both <b>LEGENDARY</b> heroes.','New short guides the first time you open the building upgrades, Dungeons, Team Roles and the Classic Collection.']},
  {id:74,d:'Nov 21, 2026',ic:'🚆',t:'NEW: RAIL WARS + Rail Terminal',l:['Build the <b>RAIL TERMINAL</b> next to your Car Factory. Every hour the factory makes <b>EXPORT cars</b>: they fuel at the Gas Station, get washed at the Car Wash and go up on your train.','A full train is sent from the <b>RAIL WARS</b> page (button next to the terminal): <b>3 trains a day</b>, 30 min on the way. Its <b>GRADE</b> (Common → Mythic) depends on your Car Wash, Gas Station and Car Factory levels – you can refresh it <b>2 times</b>.','Other players can <b>ATTACK</b> your train (a fight like the Arena) and steal <b>20%</b> of it – a train can be robbed 2 times. You have <b>5 attacks a day</b> too!','Your trains bring <b>STREET TOKENS</b> – spend them in the <b>STREET SHOP</b>: every ticket and every Dungeon key for 500.']},
  {id:73,d:'Nov 21, 2026',ic:'🏹',t:'2 new MYTHIC heroes: Nova & Vega',l:['Two new <b>MYTHIC RANGERS</b> join the Hero Summon – the first Mythic heroes who fight from far away.','<b>Nova, the Starfire Huntress</b> – skill <b>STARFIRE RAIN</b>: a rain of electric spark-plug arrows: 240% damage, slow and +35% damage taken for 6s.','<b>Vega, the Railgun Ace</b> – skill <b>OVERDRIVE RAILSHOT</b>: his hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage (always critical) and 160% to every enemy in its lane.','With 6 Mythic heroes you can now build a full Mythic team with all 5 roles.']},
@@ -4079,7 +4082,7 @@ function frame(now){
     // if the phone itself caps the screen at 30 fps (battery saver), long frames are not lag: judge only our own work
     const capped=perfMin>26,avg=capped?perfJS/perfN*1.6:perfSum/perfN;
     if(perfN<20){}
-    else if(avg>(capped?40:26)&&DPR>MINDPR()){DPR=Math.max(MINDPR(),DPR-.25);capDPR=DPR;capHold=0;dprDn++;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}
+    else if(!HDM&&avg>(capped?40:26)&&DPR>MINDPR()){DPR=Math.max(MINDPR(),DPR-.25);capDPR=DPR;capHold=0;dprDn++;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}
     // going back up only after 15 s of smooth play, and never again after it had to go down twice (stops the up/down ping-pong)
     else if(avg<(capped?24:19)&&DPR<MAXDPR&&dprDn<2){goodT+=perfT;capHold+=perfT;if(capHold>60)capDPR=9;
       if(goodT>15&&DPR<capDPR){DPR=Math.min(MAXDPR,DPR+.25);cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);goodT=0;render();}}
