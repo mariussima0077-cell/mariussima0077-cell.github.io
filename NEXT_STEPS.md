@@ -385,3 +385,10 @@ Machetă: https://mariussima0077-cell.github.io/preview/shop.html · în joc: te
 - Profil → GRAPHICS: AUTO (implicit, ca înainte) / HD (până la ×3, nu scade singur calitatea; bătălii + hartă). Cheie `te_hd=1`. Test WB HD: ~+40-70 MB memorie. v16-157: buton HD și pe hartă (deasupra +/−, 2 atingeri = schimbare + repornire). Hero Collection: eroii pe care nu-i ai se văd în gri închis (v16-158: atingere = pagina eroului în PREVIEW: skill-uri, statistici Lv 1, buton HERO SUMMON; restul blocat).
 
 - **v16-165 (22 nov) – FIX REBIRTH – LIVE**: butonul ♻ REBIRTH NOW nu mergea (`rebirth` lipsea din `window.__TE` → eroare „T.rebirth is not a function”, echipamentul ieșea dar eroul rămânea la nivel). Adăugat în export; testat: Lv 300 → 1, Essence 100% înapoi, fără erori. Lipsesc imagini: nimic.
+
+## Social media / Metricool (22 nov 2026)
+- Metricool conectat la Claude (brand `blogId 8286183`, cont torqueempirehelp@gmail.com, fus Europe/Paris). Rețele legate: Instagram `torqueempireidle2026`, TikTok `torqueempireidle`. **Facebook încă neconectat.**
+- Fișierele promo stau în `promo/` pe site (NU sunt în `FILES` din `sw.js`, jucătorii nu le descarcă). Metricool cere un URL public → `https://mariussima0077-cell.github.io/promo/...`.
+- Test A/B 22 nov: 15:50 `clip2.mp4` (hook „I am a car mechanic with ZERO game dev experience… so I made my own game” + CTA FOLLOW 3 s), 16:50 `post1.jpg` (Ignis), 18:00 `clip1.mp4` (hook „5 MYTHIC HEROES vs WORLD BOSS”), 19:00 `story1.jpg` (IG story). De comparat vizualizările → hook-ul câștigător = stilul botului zilnic.
+- Reguli: hook în primele 1-2 s, stil „om real” nu anunț de studio, CTA mare 3 s, întrebare în descriere; postări marcate AI-generated + own brand; muzica pe video NU se poate pune automat (doar pe poze TikTok). Înregistrare clip: Playwright 540x960 DPR2 + CDP screencast, World Boss `__DEV.wbSet(2);__DEV.wb()` cu cont test full, HD on; scripturi în chat (de refăcut în `tools/` când facem botul).
+- Urmează: comparat rezultatele → bot zilnic (sarcină programată: clip nou din joc, altă scenă, postat prin Metricool la ora recomandată).
