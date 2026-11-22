@@ -1,3 +1,4 @@
+import {EP_N} from './ept.js';   // v16-167: bot teams follow the enemy power of their stage
 // TORQUE ONLINE – part of the Torque Guard bot (Cloudflare Worker + D1). v16-45
 //   • profiles (name / icon / frame / title)      • live battle ranking per server (campaign · power · garage)
 //   • world chat with automatic translation (Cloudflare Workers AI, free daily quota) + bad-word filter, report, admin delete/mute
@@ -107,7 +108,8 @@ async function ensure(env) {
     db.prepare('CREATE TABLE IF NOT EXISTS rwhit(tid INTEGER, uid INTEGER, t INTEGER, win INTEGER, steal INTEGER, an TEXT, PRIMARY KEY(tid, uid))'),
   ]);
   try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}
-  try { await db.prepare('ALTER TABLE prof ADD COLUMN rp INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-155: RAIL PASS – subscription end (ms), checked against Google purchases at every sync   // v16-122: HIDE VIP (others do not see the VIP level)
+  try { await db.prepare('ALTER TABLE prof ADD COLUMN rp INTEGER DEFAULT 0').run(); } catch (e) {}
+  try { await db.prepare("ALTER TABLE prof ADD COLUMN bot TEXT DEFAULT ''").run(); } catch (e) {}   // v16-167: filler bots (JSON plan)   // v16-155: RAIL PASS – subscription end (ms), checked against Google purchases at every sync   // v16-122: HIDE VIP (others do not see the VIP level)
   ready = true;
 }
 const kvGet = async (env, k) => { const r = await env.DB.prepare('SELECT v FROM kv WHERE k=?').bind(k).first(); return r ? r.v : null; };
@@ -365,7 +367,7 @@ async function cupTick(env) {
     if (!d && now >= ws + CUP_Q) {                       // qualification: the best 64 of the Arena (played in the last 3 days)
       const season = seasonOf(now);
       const rows = (await db.prepare(`SELECT a.uid, a.pts, p.name, p.icon, p.frame, p.pow FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid
-        WHERE a.srv=? AND a.season=? AND (a.t>? OR p.t>?) AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 64`).bind(srv, season, now - 3 * DAY, now - 3 * DAY).all()).results;
+        WHERE a.srv=? AND a.season=? AND (a.t>? OR p.t>?) AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>'bot_' AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 64`).bind(srv, season, now - 3 * DAY, now - 3 * DAY).all()).results;
       if (!rows.length) continue;
       const n = Math.min(64, nextPow2(Math.max(8, rows.length))), P = rows.map(r => ({uid:r.uid, name:r.name, icon:r.icon, frame:r.frame, pow:r.pow, pts:r.pts}));
       let k = 0; while (P.length < n) { const ref = rows[Math.min(rows.length - 1, P.length - rows.length + Math.floor(rows.length / 2))] || rows[0];
@@ -414,12 +416,12 @@ async function rewardsTick(env) {
   const db = env.DB, now = env.TEST_NOW ? +env.TEST_NOW : Date.now(), dk = dayKey(now), h = new Date(now).getUTCHours();
   if (h >= 21 && (await kvGet(env, 'daily')) !== dk) {             // 21:00 UTC = 22:00 Paris
     await kvSet(env, 'daily', dk); const season = seasonOf(now);
-    const rows = (await db.prepare('SELECT a.uid, a.pts FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50').bind(season, now - 2 * DAY).all()).results;
+    const rows = (await db.prepare('SELECT a.uid, a.pts FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'bot_\'').bind(season, now - 2 * DAY).all()).results;
     for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = DAILY[lg]; await mail(env, r.uid, '⚔️', 'Arena daily reward', `Your league today: ${tierOf(r.pts).name}.`, {dm, tk}); }
   }
   const season = seasonOf(now), last = +(await kvGet(env, 'season') || 0);
   if (last && last < season) {                                      // the week is over: season rewards + soft reset happens when each player comes back
-    const rows = (await db.prepare('SELECT a.uid, a.pts, a.peak FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50').bind(last, now - 9 * DAY).all()).results;
+    const rows = (await db.prepare('SELECT a.uid, a.pts, a.peak FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'bot_\'').bind(last, now - 9 * DAY).all()).results;
     for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = SEASON_RW[lg]; await mail(env, r.uid, '🏅', `Arena season ${last} ended`, `Final league: ${tierOf(r.pts).name}. A new season has started – your points were partly reset.`, {dm, tk}); }
     await db.prepare('UPDATE arena SET peak=pts').run();
   }
@@ -427,7 +429,7 @@ async function rewardsTick(env) {
   // WORLD BOSS: the week is over → mail the top 100 of each server
   const wk = dayKey(weekStart(now)), wlast = await kvGet(env, 'wbwk');
   if (wlast && wlast !== wk) {
-    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
+    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'bot_\' AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
     let srv = -1, n = 0;
     for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue;
       const t = WB_RW.find(q => n >= q[0] && n <= q[1]); if (t) await mail(env, r.uid, '👹', 'World Boss – weekly ranking', `Your rank last week: #${n} (damage ${r.dmg.toLocaleString('en-US')}).`, t[2]); }
@@ -437,7 +439,7 @@ async function rewardsTick(env) {
   // v16-99 TIME EVENTS: an event is over → mail the top 100 of each server
   for (const tr of ['A', 'B']) { const ci = evIdx(now), key = 'ev_' + tr, li = await kvGet(env, key);
     if (li !== null && +li < ci) { const eid = tr + li, k = evKind(tr, +li), tkk = EV_TKK[k];
-      const rows = (await db.prepare('SELECT e.uid, e.srv, e.sc FROM evt e LEFT JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.srv, e.sc DESC, e.t ASC').bind(eid).all()).results;
+      const rows = (await db.prepare('SELECT e.uid, e.srv, e.sc FROM evt e LEFT JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'bot_\' AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.srv, e.sc DESC, e.t ASC').bind(eid).all()).results;
       let srv = -1, n = 0;
       for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue; const q = EV_RW.find(x => n >= x[0] && n <= x[1]); if (!q) continue;
         const rw = {dm: tkk ? q[2] : Math.round(q[2] * 1.5)}; if (tkk) rw[tkk] = q[3];
@@ -453,7 +455,53 @@ async function rewardsTick(env) {
 }
 export async function onlineCron(env) { await ensure(env);
   try { await env.DB.prepare(`UPDATE prof SET vip=(SELECT ${VIP_SQL} FROM players pl WHERE pl.pid=prof.pid) WHERE pid IN (SELECT pid FROM players)`).run(); } catch (e) {}   // v16-85: fix every profile
-  await rewardsTick(env); await cupTick(env); }
+  await rewardsTick(env); await cupTick(env); try { await botTick(env); } catch (e) {} }
+
+// ------------------------------------------------------------------ v16-167: FILLER BOTS (Marius 22 nov: "a few bots, one by one, so players have someone to play with")
+// A few bot profiles (pid 'bot_…') on server 1: they show in rankings and are Arena opponents, climb slowly for some days to a LOW stage (20-120), then stop.
+// They NEVER get prizes (Arena daily/season, Cup, World Boss, events – the prize queries skip 'bot_'), never chat, never spend, have no Rail Wars train.
+// A new bot comes at most every 12 h while there are fewer than BOT_MAX; once there are BOT_REAL active real players, about one bot a day goes away.
+const BOT_MAX = 6, BOT_EVERY = 12 * HOUR, BOT_REAL = 30;
+const BOT_NAMES = ['TurboTom','NitroNico','GearHead88','LucasRPM','Mecha_Mia','DriftKing','Piston_Pete','RoadRunnerX','JulesGarage','ChromeJack','Andrei_V8','Kev_Wrench','SparkyLou','DieselDan','Sofi_Turbo','BoltBoss','RedlineRay','MaxTorque7','EmmaRev','OilyOscar'];
+const BOT_CC = ['FR','RO','GB','DE','ES','IT','PL','US','BR','PH','PT','NL'];
+const BOT_RO = [ // [hero name, class] per grade 0-3 (same order as ROSTER in index.html → id m<grade>_<i>)
+ [['Rusty Joe','service'],['Benny Bolt','service'],['Tom Wrench','engine'],['Ollie Oil','engine'],['Mia Brush','paint'],['Dan Dent','paint'],['Sam Spark','elec'],['Pete Gauge','inspect'],['Kim Tablet','inspect'],['Ricky Rev','tuning']],
+ [['Gina Gear','engine'],['Bruno Piston','engine'],['Marco Torque','service'],['Leo Lift','service'],['Hank Hammer','paint'],['Vic Spray','paint'],['Ivy Volt','elec'],['Nora Check','inspect'],['Axel Grind','tuning']],
+ [['Diesel Dave','engine'],['Carlos Clutch','engine'],['Max Brake','service'],['Rafael Chrome','paint'],['Elena Spark','elec'],['Lena Wire','elec'],['Kenji Scan','inspect'],['Tess Turbo','tuning']],
+ [['Viktor the Surgeon','engine'],['Big Mo','service'],['Gloria Gloss','paint'],['Professor Ohm','elec'],['Hawk-Eye Hugo','inspect'],['Aria Neon','tuning'],['Nitro Nina','tuning']]];
+const bRnd = (a, b) => a + Math.random() * (b - a), bPick = a => a[Math.floor(Math.random() * a.length)];
+function fillTeam(stage, seed) {   // 5 heroes whose team power ≈ the enemy power of that stage (a bit under)
+  const P = Math.max(1200, ...EP_N.slice(0, Math.max(1, Math.min(EP_N.length, stage + 1)))) * .9, mx = stage < 25 ? 1 : stage < 60 ? 2 : 3, t = [];
+  for (let k = 0; k < 5; k++) { const gr = Math.max(0, Math.min(mx, ((seed >> (k * 2)) & 3) % (mx + 1))), L = BOT_RO[gr], i = (seed + k * 7) % L.length, [n, role] = L[i], sh = P / 5;
+    t.push({id:'m' + gr + '_' + i, n, gr, s:Math.min(10, (seed >> k) % 4 + (stage / 30 | 0)), role, hp:Math.round(sh * .5 / .25), atk:Math.round(sh * .5 / 6), def:Math.round(8 + stage * .3), as:1, crit:.1, rng:role === 'inspect' ? 160 : 45, eg:1}); }
+  return t;
+}
+async function botTick(env) {
+  const db = env.DB, now = Date.now();
+  const bots = (await db.prepare("SELECT uid, pid, name, created, bot FROM prof WHERE substr(pid,1,4)='bot_'").all()).results;
+  const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>?").bind(now - 3 * DAY).first()).n;
+  if (real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];   // ~1 a day (cron every 10 min)
+      await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); } }
+  else if (bots.length < BOT_MAX && !bots.some(b => b.created > now - BOT_EVERY)) {
+    const used = new Set((await db.prepare('SELECT nlow FROM prof WHERE srv=1').all()).results.map(r => r.nlow)), names = BOT_NAMES.filter(n => !used.has(n.toLowerCase()));
+    if (names.length) { const name = bPick(names), seed = Math.floor(Math.random() * 1e6), plan = {tg:Math.round(bRnd(20, 120)), life:Math.round(bRnd(3, 8) * DAY), seed, act:Math.round(bRnd(10, 21) * DAY)}, team = fillTeam(1, seed);
+      const pid = 'bot_' + seed.toString(36) + now.toString(36);
+      await db.prepare(`INSERT INTO prof(pid,srv,name,nlow,icon,cc,lang,vip,rep,best,bday,bd0,pow,lv,team,t,created,cunl,bot) VALUES(?,1,?,?,?,?,'en',?,?,1,?,1,?,?,?,?,?,'',?)`)
+        .bind(pid, name, name.toLowerCase(), team[0].id, bPick(BOT_CC), Math.random() < .3 ? 1 : 0, 1, dayKey(now), teamPow(team), 14, JSON.stringify(team), now, now, JSON.stringify(plan)).run();
+      const p = await profOf(env, pid);
+      await db.prepare('INSERT OR IGNORE INTO arena(uid,srv,season,pts,w,l,tk,tkt,opp,peak,t) VALUES(?,1,?,?,0,0,0,?,?,?,0)').bind(p.uid, seasonOf(now), START_PTS, now, '[]', START_PTS).run(); } }
+  for (const b of bots) {   // climb slowly to the target stage, then stop (after 'act' days they are not "active" any more: they leave the active rankings, stay as Arena opponents)
+    let pl; try { pl = JSON.parse(b.bot || '{}'); } catch (e) { continue; }
+    await db.prepare('UPDATE arena SET season=?, pts=?, peak=?, w=0, l=0, opp=? WHERE uid=? AND season<>?').bind(seasonOf(now), START_PTS, START_PTS, '[]', b.uid, seasonOf(now)).run();   // new Arena season → bots stay opponents
+    const age = now - b.created; if (!pl.tg || age > pl.act) continue;
+    const f = Math.min(1, age / pl.life), stage = Math.max(1, Math.round(pl.tg * Math.pow(f, .7))), team = fillTeam(stage, pl.seed), dk = dayKey(now);
+    const on = f < 1 || Math.random() < .02;   // still climbing = online now; after that only a short "visit" now and then
+    if (!on) continue;
+    const cur = await db.prepare('SELECT best, bday, bd0 FROM prof WHERE uid=?').bind(b.uid).first(); if (!cur) continue;
+    const bd0 = cur.bday === dk ? cur.bd0 : cur.best;
+    await db.prepare('UPDATE prof SET best=?, bday=?, bd0=?, pow=?, lv=?, team=?, icon=?, t=? WHERE uid=?').bind(stage, dk, bd0, teamPow(team), Math.min(200, 14 + stage), JSON.stringify(team), team[0].id, now, b.uid).run();
+  }
+}
 
 // ------------------------------------------------------------------ the API
 export async function online(op, b, env) {
