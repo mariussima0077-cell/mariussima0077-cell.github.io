@@ -204,6 +204,29 @@ button{font-family:inherit;cursor:pointer}
 #s2 .ms div.cl{background:linear-gradient(#ffcb3d,#ee7a00);color:#3a1c00;box-shadow:0 0 10px #ffb300;animation:s2p 1s infinite alternate}#s2 .ms div.cl b{color:#3a1c00}#s2 .ms div.cl small{color:#3a1c00}
 #s2 .ms div.dn{opacity:.45}#s2 .ms div.dn::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;color:#7CFC9A;text-shadow:0 2px 3px #000}
 @keyframes s2p{to{transform:scale(1.06)}}
+#s2 img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-shadow(0 1px 1px #000)}
+#s2 .card.fc{padding:0;margin:0 auto 14px;max-width:440px;aspect-ratio:2/3;border-radius:0;box-shadow:none;background:url(img/shop/fc_n.webp) center/100% 100% no-repeat;overflow:visible;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
+#s2 .card.fc.h{background-image:url(img/shop/fc_h.webp)}
+#s2 .fc>*{position:absolute}
+#s2 .fc .ft{left:41%;right:20%;top:4.5%;height:16%;display:flex;flex-direction:column;justify-content:center}
+#s2 .fc .ft h3{font-size:16px;line-height:1.05}#s2 .fc .ft h3 em{display:block;font-style:normal;font-size:26px;color:var(--c)}
+#s2 .fc .ft .act{margin:4px 0 0;align-self:flex-start}
+#s2 .fc .frb{right:-1%;top:6.5%;transform:rotate(45deg);font:900 11px Game,system-ui;color:#fff;text-shadow:0 1px 2px #000;width:31%;text-align:center}
+#s2 .fc .fs{left:7%;right:7%;top:25.5%;padding:4px 8px;border-radius:8px;background:rgba(0,0,0,.55);font-size:11px;line-height:1.3;color:#e8f0f8;text-align:center}
+#s2 .fc .ms{left:7.5%;right:7.5%;bottom:20.5%;margin:0;gap:4px}
+#s2 .fc .ms div{aspect-ratio:1;background:url(img/shop/ft_n_l.webp) center/100% 100% no-repeat;box-shadow:none;border-radius:0;padding:0;display:flex;flex-direction:column;justify-content:center;color:#ffe08a;text-shadow:0 1px 2px #000,0 0 3px #000;font-size:9.5px}
+#s2 .fc.h .ms div{background-image:url(img/shop/ft_h_l.webp)}
+#s2 .fc .ms div.cl{background:url(img/shop/ft_n_r.webp) center/112% 112% no-repeat;color:#fff;box-shadow:none;animation:s2p 1s infinite alternate}#s2 .fc.h .ms div.cl{background-image:url(img/shop/ft_h_r.webp)}
+#s2 .fc .ms div.cl b,#s2 .fc .ms div.cl small{color:#fff}
+#s2 .fc .ms div.dn{opacity:1;background-image:url(img/shop/ft_n_c.webp)}#s2 .fc.h .ms div.dn{background-image:url(img/shop/ft_h_c.webp)}#s2 .fc .ms div.dn::after{content:none}
+#s2 .fc .ms div.dn>*{opacity:.55}
+#s2 .fc .ms div.no{filter:brightness(.8)}
+#s2 .fc .ms div.rd{box-shadow:none;color:#7CFC9A}
+#s2 .fc .ms div b{font-size:12px}#s2 .fc .ms div small{font-size:9px;color:#d7ecff;flex-wrap:nowrap;gap:0;letter-spacing:-.3px}#s2 .fc .ms div small img{width:10px;height:10px}
+#s2 .fc .ms div>span{align-self:flex-start;margin-left:14%;font-size:9px}#s2 .fc .ms div.cl>span{align-self:center;margin:0}
+#s2 .fc .fb{left:13.5%;right:11%;bottom:6.3%;height:10.5%;display:flex;align-items:center;justify-content:space-between;gap:6px}
+#s2 .fc .fb .tot{margin:0;font-size:10.5px;line-height:1.3}#s2 .fc .fb .tot small{display:block;color:#cfe3f5;font:700 10px Game,system-ui}
+#s2 .fc .fb .val b{font-size:16px}#s2 .fc .fb .buy{flex:none;min-width:0;padding:8px 12px;font-size:15px}
 `;
 const css = css0.replace(/#s2 /g,'').replace(/padding-bottom:40px;/,'');
 const st=document.createElement('style'); st.textContent=cssDoc; document.head.appendChild(st);
@@ -276,10 +299,13 @@ function render(){
     h+='<div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>';
     for(const k of ['fn','fh']){ const F=FUND[k], own=pk[k], done=chDone(F.hard), s=S()[k];
       const tot=F.ms.reduce((a,m)=>({dm:a.dm+m.dm,tk:a.tk+m.tk,gt:a.gt+(m.gt||0)}),{dm:0,tk:0,gt:0});
-      h+='<div class="card fund'+(F.hard?' h':'')+'">'+(F.hard?'<div class="rib">HARD ×1.5</div>':'')+'<div class="top"><img src="'+IMG('shop/fund_'+(F.hard?'h':'n'))+'" alt=""><div><h3>'+F.n+(own?'<span class="act">OWNED</span>':'')+'</h3><div class="sub">'+(F.hard?'Rewards at every 5th chapter of HARD MODE – bigger rewards.':'Rewards at every 5th chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward to claim it.':'')+'</div></div></div><div class="ms">'+
+      const NM=F.hard?'HARD':'NORMAL', CH=F.hard?'H ':'CH ';   // v16-182: new Campaign Fund cards (Marius' images)
+      h+='<div class="card fund fc'+(F.hard?' h':'')+'"><div class="frb">'+(F.hard?'HARD ×1.5':'×6 VALUE')+'</div>'+
+        '<div class="ft"><h3>CAMPAIGN FUND<em>'+NM+'</em></h3>'+(own?'<span class="act">OWNED</span>':'')+'</div>'+
+        '<div class="fs">'+(F.hard?'Rewards at every 5th chapter of HARD MODE – bigger rewards.':'Rewards at every 5th chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward!':'')+'</div><div class="ms">'+
         F.ms.map((m,i)=>{ const rd=done>=(i+1)*5, dn=s.includes(i), cl=own&&rd&&!dn;
-          return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'>'+(F.hard?'H ':'CH ')+((i+1)*5)+'<b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
-        '</div><div class="tot">Total: '+tot.dm.toLocaleString('en')+' '+DMh+' + '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · your progress: '+(F.hard?'H ':'CH ')+done+'</div><div class="foot"><span class="val"><b>×'+(F.hard?9:6)+'</b>VALUE</span>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }
+          return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'no')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'><span>'+CH+((i+1)*5)+'</span><b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
+        '</div><div class="fb"><div class="tot">Total: '+tot.dm.toLocaleString('en')+' '+DMh+'<small>+ '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · progress: '+CH+done+'</small></div>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }
   }
   h+='</div></div>';
   root.innerHTML='<style>'+css+'</style>'+h; el.scrollTop=sc;
