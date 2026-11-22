@@ -175,6 +175,29 @@ span.numP{display:inline-flex;align-items:flex-end;white-space:nowrap;line-heigh
 .pBar{position:relative;width:100%;height:100%;border-radius:calc(var(--u)*18);background:#0b1118;box-shadow:inset 0 0 0 calc(var(--u)*2) #6b5420;overflow:hidden}
 .pBar i{position:absolute;left:0;top:0;bottom:0;border-image:url(img/ui5/fill_g.webp) 0 40 fill/0 calc(var(--u)*16) stretch;min-width:calc(var(--u)*32)}.pBar i[style^="width:0"]{display:none}
 .pBar span{position:relative;display:flex;height:100%;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:calc(var(--u)*22);text-shadow:0 1px 2px #000}
+/* v16-161: AWAKENING stars on the cards, MYTHIC pity bar, WISH, the WOW overlay */
+.fs.awk{display:flex;align-items:center;justify-content:center;gap:1%}.fs.awk .awS{height:78%;width:auto;filter:drop-shadow(0 1px 1px #000)}
+.awS{height:1.1em;width:auto;vertical-align:-.2em}.awL{white-space:nowrap}
+#pop .awL img.awS,.awL img.awS{height:1.15em!important;width:auto!important;max-width:none!important;display:inline!important;vertical-align:-.2em;margin:0 1px}
+.fc .fs.awk img.awS{height:78%!important;width:auto!important}.awL b{color:#ff6b6b}
+.pBar i.pm{filter:hue-rotate(-45deg) saturate(1.6) brightness(1.05)}.smWish{cursor:pointer}.smWish .wImg{height:150%;width:auto;margin-right:.3em;border-radius:50%;box-shadow:0 0 0 calc(var(--u)*2) #ff3b3b}
+.wishG>div.wOn .hc{box-shadow:0 0 0 3px #ff3b3b,0 0 14px #ff3b3b}
+i.up.awk{background:linear-gradient(90deg,#ff3b3b,#c77dff)!important;color:#fff!important}
+#awkFx{position:fixed;inset:0;z-index:99;display:none;overflow:hidden;font-family:Lilita,Game,system-ui;color:#fff}#awkFx.open{display:block}
+#awkFx .awBg{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,#3a1030 0,#000d 55%,#000 100%);background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--ac) 45%,#000) 0,#000d 55%,#000 100%);animation:awFade .5s ease-out}
+#awkFx .awRays{position:absolute;left:50%;top:42%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(from 0deg,#fff3 0 6deg,transparent 6deg 18deg);background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--ac) 55%,transparent) 0 6deg,transparent 6deg 18deg);opacity:.55;animation:awSpin 9s linear infinite,awFade .8s ease-out;mask:radial-gradient(circle,#000 0,#0000 60%);-webkit-mask:radial-gradient(circle,#000 0,#0000 60%)}
+#awkFx .awRing{position:absolute;left:50%;top:42%;width:40vmin;height:40vmin;margin:-20vmin 0 0 -20vmin;border-radius:50%;box-shadow:0 0 0 .8vmin var(--ac),0 0 6vmin var(--ac),inset 0 0 6vmin var(--ac);animation:awRing 1.1s ease-out both}#awkFx .awRing.b{animation-delay:.35s}
+#awkFx .awSh{position:absolute;left:50%;top:42%;width:min(100vw,66vh);aspect-ratio:3/4;transform:translate(-50%,-50%) scale(1.25);background:url(img/fx/awaken.webp) 0 0/400% 200% no-repeat;mix-blend-mode:screen;transition:opacity .4s}
+#awkFx .awHero{position:absolute;left:50%;top:42%;width:min(70vw,52vh);transform:translate(-50%,-50%);filter:drop-shadow(0 0 3vmin var(--ac));animation:awHero 1s cubic-bezier(.2,1.4,.4,1) both}
+#awkFx .awTx{position:absolute;left:0;right:0;top:66%;text-align:center;animation:awUp .6s .45s ease-out both}#awkFx .awTx small{display:block;font-size:4.2vmin;color:#fff;text-shadow:0 2px 0 #000}
+#awkFx .awTx b{display:block;font-weight:400;font-size:min(10vw,7vh);letter-spacing:.5px;background:linear-gradient(#fff,var(--ac));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 10px var(--ac))}
+#awkFx .awSt{margin:1vh 0}#awkFx .awSt .awS{height:min(9vw,6vh);margin:0 .5vw;animation:awStar .45s ease-out both}#awkFx .awSt .awS:nth-child(2){animation-delay:.75s}#awkFx .awSt .awS:nth-child(3){animation-delay:.85s}#awkFx .awSt .awS:nth-child(4){animation-delay:.95s}#awkFx .awSt .awS:nth-child(5){animation-delay:1.05s}#awkFx .awSt .awS:first-child{animation-delay:.65s}
+#awkFx .awTx em{display:block;font-style:normal;font-size:3.6vmin;color:var(--ac);text-shadow:0 2px 0 #000}#awkFx .awTap{position:absolute;left:0;right:0;bottom:5vh;text-align:center;font-size:3.4vmin;color:#fffa;animation:awFade 1s 1.2s both}
+#awkFx.t5 .awHero{animation:awHero 1s cubic-bezier(.2,1.4,.4,1) both,awGlow 1.6s 1s ease-in-out infinite alternate}
+@keyframes awSpin{to{transform:rotate(360deg)}}@keyframes awFade{from{opacity:0}}@keyframes awRing{from{transform:scale(.2);opacity:1}to{transform:scale(2.6);opacity:0}}
+@keyframes awHero{from{transform:translate(-50%,-50%) scale(.3);opacity:0;filter:brightness(4) drop-shadow(0 0 3vmin var(--ac))}60%{filter:brightness(2) drop-shadow(0 0 5vmin var(--ac))}}
+@keyframes awUp{from{transform:translateY(4vh) scale(.8);opacity:0}}@keyframes awStar{from{transform:scale(3) rotate(-90deg);opacity:0}}@keyframes awSheet{to{background-position:100% 0}}
+@keyframes awGlow{to{filter:drop-shadow(0 0 6vmin var(--ac)) brightness(1.15)}}
 /* v16-93: empty bar = Marius' picture img/ui8/bar_empty.webp (9-slice), the fill sits in its groove */
 .pBar{background:none!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important}
 .pBar::before{content:'';position:absolute;left:calc(var(--u)*-4);right:calc(var(--u)*-4);top:calc(var(--u)*-13);bottom:calc(var(--u)*-13);border-style:solid;border-color:transparent;border-width:calc(var(--u)*17) calc(var(--u)*40);border-image:url(img/ui8/bar_empty.webp) 30 72 fill/calc(var(--u)*17) calc(var(--u)*40) stretch;pointer-events:none}
@@ -3268,7 +3291,8 @@ const GRADES=[
  {n:'Mythic',c:'#ff3b3b',d:'#7f0000'},
  {n:'???',c:'#8fa3b8',d:'#1b2735'}];
 const RATES=[.55,.28,.1172,.04,.012,.0008], PITY_E=0, // v16-99: rates lower, Mythic 0.08% from summon (Fusion removed)
-  PITY_L=500, MAXS=50, STAR_K=.2, STAR_K2=.04, FUSE_S=5;
+  PITY_L=100, PITY_M=1500, MAXS=50, // v16-161 (Marius): Legendary pity 500 → 100 · new MYTHIC pity 1500 (Hero summon, you choose the Mythic = WISH)
+  STAR_K=.2, STAR_K2=.04, FUSE_S=5;
 const CATS={
  m:{n:'Mechanics',one:'Mechanic',ic:'🔧',title:'MECHANIC',sub:'Recruit skilled Mechanics for your Garage!'},
  g:{n:'Guards',one:'Guard',ic:'🛡️',title:'GUARD',sub:'Hire tough Guards to stop the car thieves!'},
@@ -3331,10 +3355,18 @@ const spName=sp=>sp==='all'?'🌟 All workshops':(ST[sp]?ST[sp].icon+' '+ST[sp].
 // v11: +1…+5 = +20% of base each, +6…+50 = +4% each (+50 = ×3.8)
 // v16-40: stars after +5 give less on low grades (an Uncommon +50 was stronger than a Legendary)
 const STAR_KG=[.01,.012,.018,.025,.04,.05];
-const starK=(s,gr)=>gr===5?(1+STAR_K*Math.min(s,5)+.12*Math.max(0,Math.min(s,20)-5))*Math.pow(1.05,Math.min(4,Math.floor(s/5))):1+STAR_K*Math.min(s,5)+(gr==null?STAR_K2:STAR_KG[gr])*Math.max(0,s-5); // v16-99: Mythic max +20, every +5 = new star color (+5% everything)
+const starKo=(s,gr)=>gr===5?(1+STAR_K*Math.min(s,5)+.12*Math.max(0,Math.min(s,20)-5))*Math.pow(1.05,Math.min(4,Math.floor(s/5))):1+STAR_K*Math.min(s,5)+(gr==null?STAR_K2:STAR_KG[gr])*Math.max(0,s-5); // v16-99: Mythic max +20, every +5 = new star color (+5% everything)
+// v16-161 (Marius 22 nov): LEGENDARY max +10 (+6…+10 = +46% of base each → +10 ×4.3 ≈ 2× an Epic +50) · MYTHIC = AWAKENING I-V (copies 1+1+2+2+3 = 9; Awakened V = the old Mythic +20)
+const MYTH_CUM=[1,2,4,6,9],MYTH_EQ=[0,4,8,12,16,20],LEG_MAXS=10,ROM=['','I','II','III','IV','V'];
+const mTier=s=>MYTH_CUM.filter(c=>(s||0)>=c).length;
+const starK=(s,gr)=>gr===5?starKo(MYTH_EQ[mTier(s)],5):gr===4?(s<=5?1+STAR_K*(s||0):2+.46*(Math.min(s,LEG_MAXS)-5)):starKo(s,gr);
 // ===== v16-99 (20 nov 2026, Marius): HERO LEVELS 1-300 with ESSENCE · ASCENSION every 20 levels (more stats + skill level) · GEAR PARTS for gear upgrades (money stays for the garage) · Mythic +20 · no Fusion =====
 const LV_MAX=300,ASC_STEP=20,ASC_MAX=LV_MAX/ASC_STEP-1; // 14 ascensions: at Lv 20, 40 … 280
-const MYTH_MAXS=20,hMaxS=h=>h&&h.gr===5?MYTH_MAXS:MAXS,mythT=s=>Math.min(4,Math.floor((s||0)/5));
+const MYTH_MAXS=9,MYTH_MAXC=20,isAwk=h=>!!h&&h.gr===5&&h.cat==='m',hMaxS=h=>!h?MAXS:h.cat==='m'?(h.gr===5?MYTH_MAXS:h.gr===4?LEG_MAXS:MAXS):h.gr===5?MYTH_MAXC:MAXS,mythT=s=>Math.max(0,mTier(s)-1); // v16-161: Mythic heroes = copies 0-9 (AWAKENING), Legendary heroes max +10 · crew Mythic keep +20
+const awkNeed=s=>{const t=mTier(s);return t>=5?null:{t:t+1,have:(s||0)-(t?MYTH_CUM[t-1]:0),need:MYTH_CUM[t]-(t?MYTH_CUM[t-1]:0)};};
+const STCOL=['gold','red','purple','rainbow','rainbow'];
+function sStars(t,cls){let x='';for(let i=0;i<t;i++)x+='<img class="awS'+(cls?' '+cls:'')+'" src="img/ui9/star_'+STCOL[t-1]+'.webp" alt="★">';return x;} // Awakening tier = n stars, the color climbs (gold → red → purple → rainbow)
+function sLbl(h,s,long){if(!isAwk(h))return '+'+(s||0);const t=mTier(s);return t?(long?'AWAKENED ':'AWK ')+ROM[t]:'+0';}
 const ESI='<img class="tki" src="img/ui9/essence.webp" alt="Essence">',GPI='<img class="tki" src="img/ui9/gparts.webp" alt="Gear Parts">';
 const lvO=id=>G.h.own[id]||{lv:1,a:0,s:0};
 const lvOf=id=>lvO(id).lv||1, ascOf=id=>lvO(id).a||0;
@@ -3477,15 +3509,16 @@ function srun(st,fn){const H=G.h;if(!H.rs)H.rs=(fnv32('te-rs|'+((window.SEC&&SEC
   if(!H.rc)H.rc={};const n=H.rc[st]||0;H.rc[st]=n+1;let a=fnv32(H.rs+'|'+st+'|'+n);
   const R0=Math.random;Math.random=()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};
   try{return fn();}finally{Math.random=R0;}}
-function rollGrade(P){P.e++;P.l++;let gr;
-  if(P.l>=PITY_L)gr=4; // v16-37: only one pity – a Legendary every 500 summons (Marius)
+function rollGrade(P,cat){P.e++;P.l++;const MP=cat==='m';if(MP)P.m=(P.m||0)+1;let gr;
+  if(MP&&P.m>=PITY_M){gr=5;P.mp=1;}   // v16-161: MYTHIC pity (Hero summon) – the WISH hero
+  else if(P.l>=PITY_L)gr=4; // v16-161: a Legendary every 100 summons (was 500)
   else{let r=Math.random(),a=0;gr=0;for(let i=0;i<RATES.length;i++){a+=RATES[i];if(r<a){gr=i;break;}}}
-  if(gr>=4)P.l=0;if(gr>=3)P.e=0;return gr;}
-function gain(id){const h=HB[id],o=own(id);let r;
-  if(!o){G.h.own[id]={s:0,lv:1,a:0};r='new';}else if(o.s<hMaxS(h)){o.s++;r='star';}else{r='max';}
-  G.h.disc[id]=1;const res={id,r};if(r==='max'){const q=DUPX[h.gr]||DUPX[0];if(q.e){res.ess=Math.round(q.e*ESS_U());G.ess=(G.ess||0)+res.ess;}else{res.dm=q.d;G.dm=(G.dm||0)+q.d;}}return res;} // v16-99: no money any more
+  if(gr>=4)P.l=0;if(gr>=3)P.e=0;if(MP&&gr>=5)P.m=0;return gr;}
+function gain(id){const h=HB[id],o=own(id);let r,awk=0;
+  if(!o){G.h.own[id]={s:0,lv:1,a:0};r='new';}else if(o.s<hMaxS(h)){const t0=mTier(o.s);o.s++;r='star';if(isAwk(h)&&mTier(o.s)>t0)awk=mTier(o.s);}else{r='max';}
+  G.h.disc[id]=1;const res={id,r};if(awk)res.awk=awk;if(r==='max'){const q=DUPX[h.gr]||DUPX[0];if(q.e){res.ess=Math.round(q.e*ESS_U());G.ess=(G.ess||0)+res.ess;}else{res.dm=q.d;G.dm=(G.dm||0)+q.d;}}return res;} // v16-99: no money any more
 function summon(cat,n){const P=G.h.pity[cat],out=[];
-  for(let i=0;i<n;i++){const id=srun('h'+cat,()=>{const gr=rollGrade(P),L=heroesOf(cat,gr);return pick(L).id;});const res=gain(id);out.push(res);G.h.hist.unshift({c:cat,id:res.id,r:res.r,t:Date.now()});}
+  for(let i=0;i<n;i++){const id=srun('h'+cat,()=>{const gr=rollGrade(P,cat),L=heroesOf(cat,gr);if(gr===5&&P.mp){P.mp=0;const w=G.h.wish&&HB[G.h.wish];if(w&&L.includes(w))return w.id;}return pick(L).id;});const res=gain(id);out.push(res);G.h.hist.unshift({c:cat,id:res.id,r:res.r,t:Date.now()});}
   G.h.hist.length=Math.min(G.h.hist.length,60);if(window.EVT){EVT.add(cat==='m'?'hero':'crew',out.length);EVT.q('sum',out.length);}save();heroRefresh();return out;}
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
@@ -3502,7 +3535,7 @@ const TILE2=[112,255,394,531,670,811];
 const dmS=n=>n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=100000?Math.floor(n/1000)+'K':n.toLocaleString(); // v16-113: 1.00M, not 1000K
 function renderSm(){if(!smEl.classList.contains('open'))return;
   if(smCat==='gear'){renderSmGear();return;}
-  const P=G.h.pity[smCat],key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+(G.dm||0)+HVER;if(key===smKey)return;smKey=key;const C=CATS[smCat],cr=smCat==='c';
+  const P=G.h.pity[smCat],key=smCat+G.h.tk+'/'+G.h.ct+P.e+P.l+'/'+(P.m||0)+(G.h.wish||'')+(G.dm||0)+HVER;if(key===smKey)return;smKey=key;const C=CATS[smCat],cr=smCat==='c';
   const M=smMap();BXM=M;let h=TALL.bg(M,'img/ui4/sum_bg.webp',0,150,921,1381.5);
   // portraits standing on the portal of the background (best Mythic / Legendary of this summon)
   const pool=HEROES.filter(x=>inCat(x,smCat)&&!x.soon),top=[...pool.filter(x=>x.gr===5),...pool.filter(x=>x.gr===4),...pool.filter(x=>x.gr===3)].slice(0,5);
@@ -3530,12 +3563,15 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
   h+='<div class="smL smBig" data-a="sum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+TIK(smCat)+' 1</span></div>';
   h+='<div class="smL smBig gold" data-a="sum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+TIK(smCat)+' 10</span></div>';
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
-  h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
+  if(smCat==='m'){const w=G.h.wish&&HB[G.h.wish]; // v16-161: 2 pity bars – LEGENDARY 100 + MYTHIC 1500 (tap = WISH)
+    h+='<div class="smPity" style="'+box(60,1279,392,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
+    h+='<div class="smPity smWish" data-a="wish" style="'+box(469,1279,392,32)+'pointer-events:auto"><div class="pBar"><i class="pm" style="--p:'+Math.min(1,(P.m||0)/PITY_M).toFixed(3)+'"></i><span>'+(w?'<img class="wImg" src="'+portrait(w)+'" alt="">':'')+'MYTHIC <b>'+(P.m||0)+' / '+PITY_M+'</b> · WISH</span></div></div>';}
+  else h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
   h+='<div class="smL smCol" data-a="coll" style="'+box(150,1356,620,128)+'pointer-events:auto">'+(cr?'CREW':'HERO')+' COLLECTION<small>'+discCount(smCat)+' / '+pool.length+' collected</small></div>';
   BXM=null;smBox.innerHTML=h;}
 // v16-91 (Marius): GEAR SUMMON lives on the same SUMMON page as HERO and CREW (no other page opens) – same background, gear header, gear tickets
 function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.innerHTML='';return;}const g=GSx.d(),p=g.pity,dm=G.dm||0;
-  const key='gear'+g.tk+'/'+p.l+'/'+g.inv.length+'/'+dm;if(key===smKey)return;smKey=key;
+  const key='gear'+g.tk+'/'+p.l+'/'+(p.m||0)+'/'+g.inv.length+'/'+dm;if(key===smKey)return;smKey=key;
   const M=smMap();BXM=M;let h=TALL.bg(M,'img/ui5/gsum_bg2.webp',0,150,921,1381.5);const GT=GSx.GTKI; // v16-93: forge scene (Marius' picture) on the Hero Summon panels
   // best gear floating on the portal
   const pos=[[350,372,220],[180,406,176],[565,406,176],[32,446,146],[743,446,146]],its=[['chip',5],['tool',5],['vest',5],['helm',4],['boots',4]];
@@ -3557,11 +3593,13 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   h+='<div class="smL smBig" data-a="gsum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+GT+' 1</span></div>';
   h+='<div class="smL smBig gold" data-a="gsum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+GT+' 10</span></div>';
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
-  h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,p.l/GSx.PITY).toFixed(3)+'"></i><span>LEGENDARY PITY <b>'+p.l+' / '+GSx.PITY+'</b></span></div></div>';
+  h+='<div class="smPity" style="'+box(60,1279,392,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,p.l/GSx.PITY).toFixed(3)+'"></i><span>LEGENDARY <b>'+p.l+' / '+GSx.PITY+'</b></span></div></div>';
+  h+='<div class="smPity" style="'+box(469,1279,392,32)+'"><div class="pBar"><i class="pm" style="--p:'+Math.min(1,(p.m||0)/GSx.PITYM).toFixed(3)+'"></i><span>MYTHIC <b>'+(p.m||0)+' / '+GSx.PITYM+'</b></span></div></div>';  // v16-161
   h+='<div class="smL smCol" data-a="gbag" style="'+box(150,1356,620,128)+'pointer-events:auto">GEAR BAG<small>'+g.inv.length+' / '+GSx.INV+' · EQUIP YOUR HEROES</small></div>';
   BXM=null;smBox.innerHTML=h;}
 smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
   if(a==='back')closeSummon();
+  else if(a==='wish')popWish();
   else if(a==='tkinfo')popTickets();
   else if(a==='arrow'){const i=(SMK.indexOf(smCat)+(+t.dataset.d)+SMK.length)%SMK.length;smCat=SMK[i];smKey='';renderSm();}
   else if(a==='cat'){smCat=t.dataset.c;smKey='';renderSm();}
@@ -3593,7 +3631,8 @@ const resEl=$('res');
 // v16-94: full-screen splash art of a Mythic hero (tap to close). Shown when a hero with a splash is summoned + ART button on the HEROES page
 const SPLASH={m5_4:'img/hero/splash_m5_4.webp',m5_5:'img/hero/splash_m5_5.webp',m5_3:'img/hero/splash_m5_3.webp',m5_2:'img/hero/splash_m5_2.webp',m3_0:'img/hero/splash_m3_0.webp',m3_1:'img/hero/splash_m3_1.webp',m3_6:'img/hero/splash_m3_6.webp',m3_5:'img/hero/splash_m3_5.webp',m3_3:'img/hero/splash_m3_3.webp',m3_4:'img/hero/splash_m3_4.webp',m3_2:'img/hero/splash_m3_2.webp',m4_0:'img/hero/splash_m4_0.webp',m4_1:'img/hero/splash_m4_1.webp',m4_2:'img/hero/splash_m4_2.webp',m4_3:'img/hero/splash_m4_3.webp',m4_4:'img/hero/splash_m4_4.webp',m4_5:'img/hero/splash_m4_5.webp',m5_0:'img/hero/splash_m5_0.webp',m5_1:'img/hero/splash_m5_1.webp'};
 function showSplash(id,then){const H=HB[id],el=$('splash');if(!SPLASH[id]||!H||!el){if(then)then();return;}
-  el.innerHTML='<div class="spW"><img src="'+SPLASH[id]+'"><div class="spT">'+(GRADES[H.gr]?GRADES[H.gr].n.toUpperCase():'')+'</div><div class="spN">'+H.n+'<small>Tap to continue</small></div></div>';
+  const src=(isAwk(H)&&own(id)&&mTier(own(id).s)>=5&&AWK_ART[id])||SPLASH[id]; // v16-161: Awakened V portrait when Marius sends it
+  el.innerHTML='<div class="spW"><img src="'+src+'"><div class="spT">'+(GRADES[H.gr]?GRADES[H.gr].n.toUpperCase():'')+'</div><div class="spN">'+H.n+'<small>Tap to continue</small></div></div>';
   el.className='open';el.onclick=()=>{el.className='';el.innerHTML='';if(then)then();};}
 window.showSplash=showSplash;
 // v11: rarity frames (my pictures) — portrait sits inside the frame window
@@ -3603,19 +3642,19 @@ const FPL=[[81,11],[81,11],[81,11],[73.5,9.5],[74.5,9.5],[74.5,9],[73.5,9]];
 FIN.forEach((_,i)=>{(new Image()).src='img/fr'+i+'.webp';});
 function fbox(h,sil,s){const i=FRI(h.gr),r=FIN[i],p=FPL[i];
   return '<div class="fc"><img class="ff" src="img/fr'+i+'.webp"><img class="fp" src="'+portrait(h,sil)+'" style="left:'+r[0]+'%;top:'+r[1]+'%;width:'+r[2]+'%;height:'+r[3]+'%">'+
-    (s!=null?'<span class="fs" style="top:'+p[0]+'%;height:'+p[1]+'%">+'+s+'</span>':'')+'</div>';}
+    (s!=null?'<span class="fs'+(isAwk(h)&&mTier(s)?' awk':'')+'" style="top:'+p[0]+'%;height:'+p[1]+'%">'+(isAwk(h)&&mTier(s)?sStars(mTier(s)):'+'+s)+'</span>':'')+'</div>';}
 function card(h,o,extra,big){const g=GRADES[h.gr];
   return '<div class="hc'+(big?' big':'')+'" style="--gc:'+g.c+';--gd:'+g.d+'">'+fbox(h,0,o?o.s:null)+'<b>'+h.n+'</b>'+(extra||'')+'</div>';}
 function stars(s){return '<span class="stn">★+'+s+'</span>';}
 function showResults(res,cat,n){
   let h='<div class="resT">'+CATS[cat].ic+' '+CATS[cat].title+' SUMMON ×'+res.length+'</div><div class="resG'+(res.length>1?' many':'')+'">';
   res.forEach((r,i)=>{const H=HB[r.id],o=own(r.id);
-    const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?'<i class="up">+'+o.s+' ★</i>':'<i class="mx">MAX '+(r.dm?DMI+'+'+r.dm:ESI+'+'+nfmt(r.ess||0))+'</i>';
+    const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?(isAwk(H)?(r.awk?'<i class="up awk">AWAKENED '+ROM[r.awk]+'!</i>':'<i class="up">COPY '+awkNeed(o.s).have+'/'+awkNeed(o.s).need+'</i>'):'<i class="up">+'+o.s+' ★</i>'):'<i class="mx">MAX '+(r.dm?DMI+'+'+r.dm:ESI+'+'+nfmt(r.ess||0))+'</i>';
     h+='<div class="rc g'+H.gr+'" style="animation-delay:'+(i*.16)+'s">'+card(H,o,tagT)+'</div>';});
   const best=Math.max(...res.map(r=>HB[r.id].gr));
   h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TIK(cat)+'1</button><button data-r="10" class="gold">Summon ×10 · '+TIK(cat)+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TIK(cat)+' '+tkN(cat)+' tickets left</div>';
   resEl.innerHTML=h;resEl.dataset.first=res[0]?res[0].id:'';resEl.className='open best'+best;liftZ(resEl);
-  const sp=res.find(r=>SPLASH[r.id]&&r.r==='new');if(sp)showSplash(sp.id);
+  const sp=res.find(r=>SPLASH[r.id]&&r.r==='new'),aw=res.filter(r=>r.awk);if(sp)showSplash(sp.id,()=>awakenFx(aw));else awakenFx(aw); // v16-161: AWAKENING WOW after the summon
   if(best>=5)toast('🔥 MYTHIC '+CATS[cat].one.toUpperCase()+'!',3000);else if(best>=4)toast('💛 LEGENDARY '+CATS[cat].one.toUpperCase()+'!',3000);}
 resEl.addEventListener('click',e=>{const c=e.target.closest('[data-crew]');if(c){const f=HB[resEl.dataset.first];openRoster(c.dataset.crew==='c'?(f?f.cat:'d'):c.dataset.crew);return;}const b=e.target.closest('[data-r]');if(b){doSummon(+b.dataset.r);return;}if(!e.target.closest('.rc'))resEl.className='';});
 
@@ -3720,8 +3759,26 @@ function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*10000)/100
   const row=(i,pct,right)=>wRow(i,'<b style="color:'+GRADES[i].c+'">'+GRADES[i].n+'</b>',pct,right);
   popW('SUMMON RATES','<div class="wS">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</div>'+RATES.map((r,i)=>row(i,pc(r),heroesOf(smCat,i).length+' heroes')).join('')+
   wRow(-1,LOCKI+' ???','—','coming soon')+
-  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+'). There is no other pity.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> (up to <b>+'+MAXS+'</b>, <b style="color:#ff3b3b">Mythic</b> up to <b>+'+MYTH_MAXS+'</b> – new star color every +5). Already at the max → <b>Common–Rare: '+ESI+' Essence</b>, <b>Epic: '+DMI+' 30</b>, <b>Legendary: '+DMI+' 150</b>, <b>Mythic: '+DMI+' 1,000</b>.</div><div>'+ESI+' Heroes level up (Lv 1 → '+LV_MAX+') with <b>Essence</b>, not with duplicates.</div></div><button class="wHist" onclick="window.__smHist()">📜 SUMMON HISTORY</button>');}
+  '<div class="wP"><div>💛 A <b>Legendary</b> is guaranteed every <b>'+PITY_L+'</b> summons (now: '+P.l+'/'+PITY_L+').</div>'+(smCat==='m'?'<div>❤️ A <b>Mythic</b> is guaranteed every <b>'+PITY_M+'</b> Hero summons (now: '+(P.m||0)+'/'+PITY_M+') – it is the Mythic you chose with <b>WISH</b> (no wish = a random Mythic). A Mythic from luck also starts the count again.</div>':'')+'<div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> (1,000 = ×10). You are always asked first.</div><div>🔟 Summon ×10 gives <b>11</b> heroes.</div>'+(smCat==='c'?'<div>🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.</div>':'')+'<div>📈 A hero you already own gets <b>+1</b> '+(smCat==='m'?'(up to <b>+'+MAXS+'</b>, <b style="color:#ffb300">Legendary</b> up to <b>+'+LEG_MAXS+'</b>; a <b style="color:#ff3b3b">Mythic</b> copy goes into <b>AWAKENING I → V</b>, 9 copies).':'(up to <b>+'+MAXS+'</b>, <b style="color:#ff3b3b">Mythic</b> up to <b>+'+MYTH_MAXC+'</b>).')+' Already at the max → <b>Common–Rare: '+ESI+' Essence</b>, <b>Epic: '+DMI+' 30</b>, <b>Legendary: '+DMI+' 150</b>, <b>Mythic: '+DMI+' 1,000</b>.</div><div>'+ESI+' Heroes level up (Lv 1 → '+LV_MAX+') with <b>Essence</b>, not with duplicates.</div></div><button class="wHist" onclick="window.__smHist()">📜 SUMMON HISTORY</button>');}
 window.__smHist=()=>popHist();
+// v16-161 (Marius): MYTHIC WISH – the Mythic pity (every PITY_M Hero summons) gives the Mythic you choose here
+function popWish(){const P=G.h.pity.m,L=heroesOf('m',5).filter(h=>!h.soon);
+  popW('MYTHIC WISH','<div class="wP"><div>Every <b>'+PITY_M+'</b> Hero summons the <b style="color:#ff3b3b">MYTHIC PITY</b> gives you a Mythic. Choose <b>which one</b> – collect copies of your favourite for <b>AWAKENING</b>.</div><div>Now: <b>'+(P.m||0)+' / '+PITY_M+'</b> · you can change your wish any time.</div></div><div class="hg wishG">'+
+    L.map(h=>{const on=G.h.wish===h.id,o=own(h.id);return '<div data-p="wpick" data-id="'+h.id+'" class="'+(on?'wOn':'')+'">'+card(h,o,on?'<i class="up">WISH ❤</i>':(o&&mTier(o.s)?'<i class="up">'+sLbl(h,o.s)+'</i>':''))+'</div>';}).join('')+'</div>'+(G.h.wish?'<button class="wHist" data-p="wpick" data-id="">✕ NO WISH (random Mythic)</button>':''));}
+window.popWish=popWish;window.popHero=popHero;window.popRates=popRates; // (also used by the test tools)
+// v16-161 (Marius): AWAKENING "WOW" – light burst + rays + the hero + new stars + AWAKENED n. Marius' sprite sheet img/fx/awaken.webp (8 frames in a row) is used when it exists; until then everything is drawn with CSS. Loaded only here.
+const AWK_ART={}; // id → 'img/heroes/awk/<id>.webp' (Awakened portraits, when Marius sends them)
+let awkSheet=null;const AWK_SHEET=false; // → true when Marius' sheet img/fx/awaken.webp is in the game
+function awakenFx(list,done){if(!list||!list.length){if(done)done();return;}const r=list[0],h=HB[r.id];if(!h){awakenFx(list.slice(1),done);return;}
+  if(!awkSheet){awkSheet=new Image();if(AWK_SHEET)awkSheet.src='img/fx/awaken.webp';}
+  let el=$('awkFx');if(!el){el=document.createElement('div');el.id='awkFx';document.body.appendChild(el);}
+  const t=r.awk,col=['#ffd54a','#ff5252','#c77dff','#7cf9ff','#ffffff'][t-1],art=AWK_ART[h.id]&&t>=5?AWK_ART[h.id]:(SPLASH[h.id]||portrait(h));
+  el.style.setProperty('--ac',col);
+  el.innerHTML='<div class="awBg"></div><div class="awRays"></div>'+(awkSheet.complete&&awkSheet.naturalWidth?'<div class="awSh" id="awSh"></div>':'<div class="awRing"></div><div class="awRing b"></div>')+
+    '<img class="awHero" src="'+art+'" alt=""><div class="awTx"><small>'+h.n+'</small><b>AWAKENED '+ROM[t]+'</b><div class="awSt">'+sStars(t)+'</div><em>'+(t===2?'+1 SKILL LEVEL · POWER UP':t===3?'BATTLE AURA UNLOCKED':t===4?'ULTIMATE POWER UP':t===5?'FULLY AWAKENED · GLOWING WEAPON':'POWER UP')+'</em></div><div class="awTap">Tap to continue</div>';
+  el.className='open t'+t;liftZ(el);const sh=$('awSh');if(sh){let f=0;sh.style.backgroundPosition='0 0';const it=setInterval(()=>{f++;if(f>7||!el.classList.contains('open')){clearInterval(it);sh.style.opacity=0;return;}sh.style.backgroundPosition=(f%4)*100/3+'% '+(f>3?100:0)+'%';},95);} // sheet = 4×2 frames (384×512 each, 1536×1024)try{if(navigator.vibrate)navigator.vibrate([40,40,120]);}catch(e){}
+  const end=()=>{el.className='';el.innerHTML='';awakenFx(list.slice(1),done);};let ok=0;setTimeout(()=>ok=1,900);el.onclick=()=>{if(ok)end();};}
+window.awakenFx=awakenFx;
 function popHist(){const L=G.h.hist;popW('SUMMON HISTORY','<div class="wS">Last '+L.length+' summons</div>'+(L.length?L.map(r=>{const H=HB[r.id];const d=new Date(r.t);
   return wRow(H.gr,CATS[r.c].ic+' <b style="color:'+GRADES[H.gr].c+'">'+H.n+'</b>',null,(r.r==='new'?'NEW':r.r==='star'?'+1 ★':'MAX')+' · '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'));}).join(''):'<div class="wP">No summons yet.</div>'));}
 function popTier(cat,gr){const L=heroesOf(cat,gr);
@@ -3729,12 +3786,13 @@ function popTier(cat,gr){const L=heroesOf(cat,gr);
     return '<div data-p="hero" data-id="'+h.id+'" class="'+(d?'':'sil')+'">'+(d?card(h,o,(w?'<i class="wk">📍</i>':'')+(o?'':'<i class="gone">used</i>')):silCard(h))+'</div>';}).join('')+'</div>');}
 function silCard(h){const g=GRADES[h.gr];return '<div class="hc" style="--gc:'+g.c+';--gd:'+g.d+'">'+fbox(h,1,null)+'<b>'+(h.soon?'SOON':'???')+'</b></div>';}
 function popHero(id){const h=HB[id],o=own(id),G0=GRADES[h.gr],w=whereIs(id),s=o?o.s:0;
-  popBox.style.setProperty('--hg',G0.c);let x='<div class="hcard"></div><div class="hd" style="--gc:'+G0.c+';--gd:'+G0.d+'"><div class="hdF">'+fbox(h,0,o?s:null)+'</div><div><div class="pT" style="color:'+G0.c+'">'+h.n+'</div><div class="pD"><b style="color:'+G0.c+'">◆ '+G0.n+' '+CATS[h.cat].one+'</b>'+(h.cat==='m'?'<br>'+spName(h.sp):'')+'<br>'+(o?stars(s)+' <span style="color:#9fb0c0">/ +'+hMaxS(h)+'</span>'+(h.cat==='m'?' · <b style="color:#b9f">Lv '+lvOf(id)+'/'+lvCap(id)+'</b>':''):'not owned')+'</div>'+
-    (o?'<div class="sbar"><i style="width:'+(s/hMaxS(h)*100)+'%"></i></div>':'')+'</div></div>';
-  x+='<div class="sec">STATS'+(o&&s<hMaxS(h)?' <span style="color:#9fb0c0;letter-spacing:0">(→ at +'+(s+1)+')</span>':'')+'</div>';
-  const now=statLines(h,s),nx=o&&s<hMaxS(h)?statLines(h,s+1):null;
+  popBox.style.setProperty('--hg',G0.c);let x='<div class="hcard"></div><div class="hd" style="--gc:'+G0.c+';--gd:'+G0.d+'"><div class="hdF">'+fbox(h,0,o?s:null)+'</div><div><div class="pT" style="color:'+G0.c+'">'+h.n+'</div><div class="pD"><b style="color:'+G0.c+'">◆ '+G0.n+' '+CATS[h.cat].one+'</b>'+(h.cat==='m'?'<br>'+spName(h.sp):'')+'<br>'+(o?(isAwk(h)?'<span class="awL">'+(mTier(s)?sStars(mTier(s))+' ':'')+'<b>'+(mTier(s)?'AWAKENED '+ROM[mTier(s)]:'NOT AWAKENED')+'</b></span>':stars(s)+' <span style="color:#9fb0c0">/ +'+hMaxS(h)+'</span>')+(h.cat==='m'?' · <b style="color:#b9f">Lv '+lvOf(id)+'/'+lvCap(id)+'</b>':''):'not owned')+'</div>'+
+    (o?'<div class="sbar"><i style="width:'+((isAwk(h)?mTier(s)/5:s/hMaxS(h))*100)+'%"></i></div>':'')+'</div></div>';
+  const s1=isAwk(h)?(mTier(s)<5?MYTH_CUM[mTier(s)]:null):(s<hMaxS(h)?s+1:null); // v16-161: Mythic → next AWAKENING tier
+  x+='<div class="sec">STATS'+(o&&s1!=null?' <span style="color:#9fb0c0;letter-spacing:0">(→ '+(isAwk(h)?'AWAKENED '+ROM[mTier(s1)]:'at +'+s1)+')</span>':'')+'</div>';
+  const now=statLines(h,s),nx=o&&s1!=null?statLines(h,s1):null;
   x+=now.map((t,i)=>'<div class="pR"><span>'+t+'</span>'+(nx?'<em>→ '+nx[i].split(' ')[1]+'</em>':'')+'</div>').join('');
-  x+='<div class="pD">'+(h.gr===5?'Every duplicate summon gives <b>+1 ★</b> (max +'+MYTH_MAXS+'). Every +5 the stars change color (gold → red → purple → rainbow): +5% to everything and +1 skill level.':'Every duplicate summon gives <b>+1</b> (max +'+MAXS+'). Each + adds stats: +1…+5 = +20% of base each, +6…+50 = +4% each.')+(h.cat==='m'?' Levels: HEROES page → LEVEL UP with '+ESI+' Essence.':'')+'</div>';
+  x+='<div class="pD">'+(isAwk(h)?'<b style="color:#ff6b6b">AWAKENING</b>: duplicate copies wake the hero up – <b>Awakened I → V</b> (copies 1 · 1 · 2 · 2 · 3 = 9). Every tier: much stronger, +1 skill level from II, a battle aura from III, a glowing weapon at V.'+(o&&mTier(s)<5?' Next tier: <b>'+awkNeed(s).have+' / '+awkNeed(s).need+'</b> copies.':'')+' Mythic Pity: you choose the Mythic (WISH on the Summon page).':h.gr===5?'Every duplicate summon gives <b>+1 ★</b> (max +'+MYTH_MAXC+'). Every +5 the stars change color (gold → red → purple → rainbow): +5% to everything and +1 skill level.':(h.cat==='m'&&h.gr===4?'Every duplicate summon gives <b>+1</b> (max <b>+'+LEG_MAXS+'</b>). +1…+5 = +20% of base each, +6…+10 = <b>+46%</b> each (a Legendary +10 ≈ 2× an Epic +50).':'Every duplicate summon gives <b>+1</b> (max +'+MAXS+'). Each + adds stats: +1…+5 = +20% of base each, +6…+50 = +4% each.'))+(h.cat==='m'?' Levels: HEROES page → LEVEL UP with '+ESI+' Essence.':'')+'</div>';
   if(h.cat==='m'&&!h.soon&&window.CAMPAIGN&&CAMPAIGN.passives){const sk=CAMPAIGN.skill(h);x+='<div class="sec">IN BATTLE · '+CAMPAIGN.roleName(h).toUpperCase()+'</div><div class="pD" style="text-align:left"><b style="color:#ffd54a">⚔️ '+sk.sk+'</b> (skill) – '+sk.skd+'</div>'+CAMPAIGN.passives(h).map(p=>'<div class="pD" style="text-align:left"><b style="color:#ffe082">'+p.ic+' '+p.n+'</b> (passive, automatic) – '+p.d+'</div>').join('');}
   if(h.cat==='m'&&h.sp!=='all')x+='<div class="pD">🏁 Works only in <b>'+spName(h.sp)+'</b> (every workshop has its own class).</div>';
   if(h.cat==='g')x+='<div class="pD">Guards work in the Security office: the desk guard and (Security LV 3+) the patrol guard.</div>';
@@ -3779,7 +3837,7 @@ function popPicker(key){const cat=key[0],cur=heroIn(key),st=cat==='m'?key.split(
   if(cat==='m'){ // v16-49: Marius' CHOOSE MECHANIC picture (portrait window · info · shield with the +)
     let x='<div class="kpT">'+slotName(key)+'</div><div class="pD kpD">Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="kpR" data-p="put" data-k="'+key+'" data-id=""><div class="kpI"><b>— Remove '+cur.n+' —</b></div></div>':'');
     x+=L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=h.sp==='all'||h.sp===st;
-      return '<div class="kpR'+(w===key?' on':'')+'" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><img class="kpP" src="'+portrait(h)+'" style="box-shadow:0 0 0 2px '+GRADES[h.gr].c+'"><div class="kpI"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b><small>'+spName(h.sp)+' ✓ · Lv '+lvOf(id)+'</small>'+(w===key?'<small style="color:#eaffd0">★ works here</small>':(w?'<small>at '+slotName(w)+'</small>':'')+cmpHint(key,id))+'</div><div class="kpS">+'+o.s+'</div></div>';}).join('')
+      return '<div class="kpR'+(w===key?' on':'')+'" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><img class="kpP" src="'+portrait(h)+'" style="box-shadow:0 0 0 2px '+GRADES[h.gr].c+'"><div class="kpI"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b><small>'+spName(h.sp)+' ✓ · Lv '+lvOf(id)+'</small>'+(w===key?'<small style="color:#eaffd0">★ works here</small>':(w?'<small>at '+slotName(w)+'</small>':'')+cmpHint(key,id))+'</div><div class="kpS">'+sLbl(h,o.s)+'</div></div>';}).join('')
      :'<div class="pD">No '+(CAMPAIGN_CLS[st]||'')+' mechanics for this workshop yet · every workshop takes only its own class (Legend = all).</div>';
     pop(x,null,'chSk');popBox.insertAdjacentHTML('beforeend',L.length?'<button class="pB kpB" data-p="x">CLOSE</button>':'<button class="pB kpB" data-p="gosum" data-c="m">'+TKI+' GO TO SUMMON</button>');return;}
   pop('<div class="pT">'+slotName(key)+'</div><div class="pD">Choose a '+CATS[cat].one.toLowerCase()+'. Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="pR pk" data-p="put" data-k="'+key+'" data-id=""><span>— Remove '+cur.n+' —</span></div>':'')+
@@ -3788,6 +3846,7 @@ function popPicker(key){const cat=key[0],cur=heroIn(key),st=cat==='m'?key.split(
     :'<div class="pD">You have no '+CATS[cat].n.toLowerCase()+' yet.</div><button class="pB" data-p="gosum" data-c="'+cat+'">'+TKI+' GO TO SUMMON</button>'));}
 popEl.addEventListener('click',e=>{if(e.target===popEl){closePop();return;}const t=e.target.closest('[data-p]');if(!t)return;const a=t.dataset.p;
   if(a==='x')closePop();
+  else if(a==='wpick'){G.h.wish=t.dataset.id||null;save();smKey='';renderSm();popWish();toast(G.h.wish?'❤️ WISH: '+HB[G.h.wish].n:'WISH cleared – the Mythic pity gives a random Mythic',2400);}
   else if(a==='hero'){if(G.h.disc[t.dataset.id])popHero(t.dataset.id);}
   else if(a==='slots')popSlots(t.dataset.id);
   else if(a==='unas'){const w=whereIs(t.dataset.id);if(w)assign(w,null);popHero(t.dataset.id);teamKey='';}
@@ -3972,6 +4031,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:77,d:'Nov 22, 2026',ic:'🌟',t:'AWAKENING, new pity, 500-floor towers & Dungeon Rush',l:['<b style="color:#ff6b6b">MYTHIC AWAKENING</b>: copies of a Mythic wake it up – <b>Awakened I → V</b> (9 copies): much more power, skill levels, a battle aura and a glowing weapon. Your old Mythic stars were turned into Awakening tiers (nobody gets weaker).','<b>Legendary</b> heroes now go to <b>+10</b> – every + after +5 is much stronger (a Legendary +10 ≈ 2× an Epic +50). Extra stars became 💎.','<b>PITY</b>: a <b>Legendary every 100</b> summons (was 500) and a new <b>MYTHIC pity</b>: Hero 1500 – you choose the Mythic with <b>WISH</b> – Gear 750.','<b>MYTHIC +15%</b> and <b>ASCENDED gear +20%</b>. The <b>HERO COLLECTION</b> bonuses are stronger and the new <b>★ STAR COLLECTION</b> gives bonuses when all heroes of a color reach a step.','<b>TORQUE TOWER</b> and every <b>CLASS TOWER</b> now have <b>500 floors</b> – bigger rewards the higher you climb, Mythic set pieces and a full <b>ASCENDED SET</b> at the top of the Class Towers.','New event <b>DUNGEON RUSH</b> and the <b>📅 EVENT CALENDAR</b> with the exact dates of the next events.']},
  {id:76,d:'Nov 22, 2026',ic:'✨',t:'NEW: HD graphics',l:['Tap the new <b>HD</b> button (above the zoom buttons) or <b>PROFILE → GRAPHICS</b>: choose <b>AUTO</b> (best for every phone) or <b>HD</b> – the sharpest picture on good phones, in battles and on the garage map.','<b>HERO COLLECTION</b>: heroes you don\'t have yet are shown in grey – tap one to see its page (skills, stats at Lv 1).','HD never lowers the quality by itself. It uses a bit more battery and memory – if the game gets slow, go back to AUTO.']},
  {id:75,d:'Nov 22, 2026',ic:'🔑',t:'Dungeon keys stack up + Legendary heroes in the packs',l:['<b>DUNGEONS</b>: daily keys you do not use are now <b>kept</b> – they stack up day after day (also on the days you do not play, up to 30 days).','The <b>STARTER PACK</b> now gives <b>Mama Rosa</b> and the <b>ROOKIE PACK</b> gives <b>Sofia Lightning</b> – both <b>LEGENDARY</b> heroes.','New short guides the first time you open the building upgrades, Dungeons, Team Roles and the Classic Collection.']},
  {id:74,d:'Nov 21, 2026',ic:'🚆',t:'NEW: RAIL WARS + Rail Terminal',l:['Build the <b>RAIL TERMINAL</b> next to your Car Factory. Every hour the factory makes <b>EXPORT cars</b>: they fuel at the Gas Station, get washed at the Car Wash and go up on your train.','A full train is sent from the <b>RAIL WARS</b> page (button next to the terminal): <b>3 trains a day</b>, 30 min on the way. Its <b>GRADE</b> (Common → Mythic) depends on your Car Wash, Gas Station and Car Factory levels – you can refresh it <b>2 times</b>.','Other players can <b>ATTACK</b> your train (a fight like the Arena) and steal <b>20%</b> of it – a train can be robbed 2 times. You have <b>5 attacks a day</b> too!','Your trains bring <b>STREET TOKENS</b> – spend them in the <b>STREET SHOP</b>: every ticket and every Dungeon key for 500.']},
@@ -4162,11 +4222,15 @@ window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX
 // v16-99: one-time update of old saves – heroes get the level that fits their campaign progress (so nothing gets harder), Mythic stars above +20 → 💎300 each, workshops keep only their own class
 function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Math.round(expLv(G.cp.best||0)*.9)));
   for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o)continue;if(h.cat==='m'){o.lv=e;o.a=Math.min(ASC_MAX,Math.floor((e-1)/ASC_STEP));}else{o.lv=o.lv||1;o.a=o.a||0;}
-    if(h.gr===5&&o.s>MYTH_MAXS){const x=o.s-MYTH_MAXS;o.s=MYTH_MAXS;G.dm=(G.dm||0)+x*300;}}
+    if(h.gr===5&&h.cat!=='m'&&o.s>MYTH_MAXC){const x=o.s-MYTH_MAXC;o.s=MYTH_MAXC;G.dm=(G.dm||0)+x*300;}}
   for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
 try{migr99();heroRefresh();}catch(e){console.error(e);}
-window.__TE={ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
+// v16-161 (Marius): Legendary heroes max +10 (extra +11…+50 → 💎150 each), Mythic heroes = AWAKENING with 9 copies (extra copies → 💎1000 each). Nobody gets weaker: +6…+10 and every Awakening tier are stronger than before.
+function migr161(){if(G.m161)return;G.m161=1;let dm=0;for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o||h.cat!=='m')continue;const mx=hMaxS(h),k=h.gr===5?1000:h.gr===4?150:0;if(k&&o.s>mx){dm+=(o.s-mx)*k;o.s=mx;}}
+  if(dm){G.dm=(G.dm||0)+dm;setTimeout(()=>toast('💎 +'+dm.toLocaleString()+' · extra hero stars → diamonds (new AWAKENING / Legendary +10)',4200),4000);}save();}
+try{migr161();}catch(e){console.error(e);}
+window.__TE={hMaxS,sLbl,mTier,isAwk,ROM,sStars,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

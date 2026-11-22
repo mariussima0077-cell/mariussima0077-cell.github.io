@@ -144,7 +144,7 @@ async function report(b, env) {
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'dual', 'same account on 2 phones at the same time (info only)').run(); }
   const bmaxOld = old ? Math.max(old.bmax || 0, old.best || 0) : 0, bmax = Math.max(bmaxOld, s.best | 0);
   // 2) impossible numbers
-  if (s.mythic > 6 || s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 1500 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
+  if (s.mythic > 10 ||  /* v16-161: 6 Mythic heroes + 2 Mythic drivers + 2 Mythic guards (was 6 → a full collection could be flagged) */ s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 1500 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
   // 3) compared with the last report
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);

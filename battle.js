@@ -368,6 +368,14 @@ const css3=document.createElement('style');css3.textContent=`
 .setBl>div b{position:absolute;left:-43px;top:50%;margin-top:-14px;width:28px!important;height:28px!important;background:none!important;color:#cfd8e3!important;font:900 15px Game,system-ui!important;text-shadow:0 1px 2px #000}
 .setBl>div.on b{left:-40px;color:#3a1d00!important;text-shadow:0 1px 0 #fff8}
 .setBl>div i{display:none}.setBl>div span{padding:0 4px;font-size:11.5px;line-height:1.15}
+/* v16-161 STAR COLLECTION */
+.scT{margin-top:14px!important}.scP{margin:2px 10px 8px;font:700 11.5px/1.35 Game,system-ui;color:#c9d6e6;text-align:center}
+.scR{margin:7px 6px;padding:7px 8px 8px;border-radius:12px;background:linear-gradient(#141c2b,#0a0e17);box-shadow:inset 0 0 0 1.5px var(--c)}
+.scH{display:flex;justify-content:space-between;align-items:center;gap:6px;font:400 14px Lilita,Game,system-ui;color:var(--c);letter-spacing:.3px}.scH span{font:800 10.5px Game,system-ui;color:#9ff0a8;text-align:right}
+.scS{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;margin-top:5px}.scS i{display:flex;flex-direction:column;align-items:center;padding:3px 1px;border-radius:8px;background:#0b1424;box-shadow:inset 0 0 0 1px #34465f;font-style:normal;opacity:.8}
+.scS i b{font:400 12px Lilita,Game,system-ui;color:#fff}.scS i small{font:800 9.5px/1.15 Game,system-ui;color:#9fb0c0;text-align:center}
+.scS i.ok{background:linear-gradient(#1f4a1f,#0e2410);box-shadow:inset 0 0 0 1.5px #66bb6a;opacity:1}.scS i.ok small{color:#b9f6ca}.scS i.nx{box-shadow:inset 0 0 0 1.5px #ffd54a;opacity:1}.scS i.nx small{color:#ffe9a8}
+.scN{margin-top:5px;font:700 10.5px Game,system-ui;color:#c9d6e6;text-align:center}.scN.ok{color:#9ff0a8}
 /* v16-53 HERO COLLECTION: rainbow fill, check / lock on the chests, grade rows from the INFO WINDOW kit */
 .gcBar2 i{background:none!important;opacity:1!important;border-image:url(img/ui5/fill_r.webp) 0 38 fill/0 1.6cqw stretch;min-width:3.2cqw}
 .gcCh .gcOk{position:absolute;right:-3%;bottom:-8%;width:44%;height:auto;filter:drop-shadow(0 .4cqw .6cqw #000)}.gcCh:not(.ok) .gcOk{width:34%;opacity:.95}
@@ -514,7 +522,8 @@ const ROLE={
  elec:{n:'Shocker',ic:'⚡',hp:730,atk:90,def:10,mv:80,rng:205,as:1.25,crit:.1,sk:'OVERVOLT',skd:'Chain lightning jumps 6 times: 200% damage and stun 1.5s.'},
  all:{n:'Legend',ic:'🌟',hp:1350,atk:112,def:26,mv:92,rng:42,as:.9,crit:.15,sk:'TORQUE STORM',skd:'Giant gears rain on every enemy: 300% damage. All mechanics +30% attack for 6s.'},
  crew:{n:'Crew',ic:'🔩',hp:700,atk:50,def:8,mv:84,rng:30,as:1.1,crit:.06,sk:'WRENCH THROW',skd:'Throws a spinning wrench: 250% damage.'}};
-const GMUL=[1,1.4,1.95,2.75,4.1,5.6]; // v16-134 (Marius: bigger gaps between grades): was [1,1.32,1.75,2.3,3.4,4.4] – ~×1.4 per grade; monsters follow with GK(i) // v16-40: Legendary 3.0→3.4, Mythic 3.9→4.4 (a new Legendary now beats an Uncommon +50)
+const GMUL=[1,1.4,1.95,2.75,4.1,6.44]; // v16-161 (Marius): Mythic +15% (5.6 → 6.44)
+ // v16-134 (Marius: bigger gaps between grades): was [1,1.32,1.75,2.3,3.4,4.4] – ~×1.4 per grade; monsters follow with GK(i) // v16-40: Legendary 3.0→3.4, Mythic 3.9→4.4 (a new Legendary now beats an Uncommon +50)
 // v16-14: unique skills (each Legendary / Mythic has its own skill; the others still use their class skill)
 const HSK={
  m4_0:{sk:'IRON QUAKE',skd:'Smashes the ground: a wall of rocks rolls through ALL enemies – 230% damage and stun 1.6s. Gains a 30% shield and taunts enemies.'},
@@ -769,7 +778,11 @@ const HK_MAX=1.75,HK=i=>i<20?1:i<240?1+(HK_MAX-1)*(i-19)/220:i<640?HK_MAX:i<1000
 const HARD_K=2.5,HARD_RW=1.5;let HM=0;
 const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{},ch:0};if(!G.cph.stars)G.cph.stars={};return G.cph;};
 const hardOK=()=>TE().G.cp.best>=SPC;
-const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K:1);
+// v16-161 (Marius): ENDGAME RAMP – only the TOP (campaign 1000-1500, towers 300-500) climbs so the finals stay above the strongest possible team.
+// EG = how much stronger the very last stage / floor is than before. Computed by tools/endgame.py (python3 tools/endgame.py --apply) – re-run it after new content that raises power.
+const EG={camp:6.343,hard:0.87,tw:11.916,ct:7.183}; // EG-LINE (written by tools/endgame.py)
+const EGK=(K,x,a,b)=>K===1||x<=a?1:Math.pow(K,Math.min(1,(x-a)/(b-a)));
+const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499):1)*EGK(EG.camp,i,999,1499);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
 const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a normal team has 3-4 roles (+5-10%) → monsters +7% (from stage 15); 5 roles = a bit easier, 1-2 roles = a bit harder
 const stageMul0=i=>stageMulB(i)*GK(i)*TRK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
@@ -815,7 +828,8 @@ const GMAXR=[10,15,20,30,40,50,60],gMax=it=>GMAXR[it.r];
 function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;k=Math.min(5,k);if(k===5&&c>=ASC_CH&&Math.random()<.15*Math.min(1,(c-ASC_CH+1)/21))k=6;return k;}
 function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(g.inv.length>=GINV_()){return {it,sold:salvageV(it)};}g.inv.push(it);return {it};}
 const itemById=id=>id?GR().inv.find(i=>i.id===id):null;
-const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
+const ASC_K=1.2,subV=(it,v)=>it.r>=6?Math.round(v*ASC_K*10)/10:v; // v16-161 (Marius): ASCENDED gear +20% (main + extra stats)
+const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K:1)*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
 // v16-129: salvage also gives GARAGE PARTS – set pieces give the parts of their class's role, other gear a random role
@@ -849,12 +863,18 @@ const setTierTxt=t=>t.map(([k,v])=>GSTAT[k].n+' +'+v+'%').join(' · ');
 function setPcs(k,items){return '<div class="setPc">'+GSLOT.map((sl,i)=>{const on=(items||[]).some(it=>it.set===k&&it.s===sl.k);return `<div class="${on?'on':''}"><img src="img/ui4/st_${k}_${sl.k}.webp" alt=""><small>${SETS[k].p[i]}</small></div>`;}).join('')+'</div>';}
 function setBlock(k,n){return '<div class="setBl">'+SETS[k].t.map((t,i)=>`<div class="${n>=i+2?'on':''}"><b>${i+2}</b><span>${setTierTxt(t)}</span><i>${n>=i+2?'✓':'🔒'}</i></div>`).join('')+'</div>';}
 // v16-51: HERO COLLECTION = battle bonus (replaces the old Mechanics collection income bonus). Complete a color → all battle heroes get it
-const CBON=[[['hp',3]],[['atk',3]],[['def',5]],[['hp',5]],[['atk',6]],[['hp',5],['atk',5],['def',5]]];
+const CBON=[[['hp',5]],[['atk',5]],[['def',8]],[['hp',8]],[['atk',10]],[['hp',8],['atk',8],['def',8]]]; // v16-161 (Marius): stronger (was 3/3/5/5/6/5)
+// v16-161 (Marius): STAR COLLECTION – when ALL battle heroes of a grade reach a step, every battle hero gets the bonus (Common–Epic: +5…+50 · Legendary: +2…+10 · Mythic: Awakened I…V)
+const SC_TH=[[5,10,20,30,40,50],[5,10,20,30,40,50],[5,10,20,30,40,50],[5,10,20,30,40,50],[2,4,6,8,10],[1,2,3,4,5]];
+const SC_B=[[['hp',[1,1,2,2,2,3]]],[['atk',[1,1,2,2,2,3]]],[['def',[2,2,2,3,3,3]]],[['crit',[1,1,1,1,1,2]]],[['atk',[3,3,4,4,6]],['hp',[3,3,4,4,6]]],[['atk',[3,3,4,5,5]],['hp',[3,3,4,5,5]],['def',[3,3,4,5,5]]]];
+function scInfo(){const T=TE(),L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon);return [0,1,2,3,4,5].map(gr=>{const a=L.filter(h=>h.gr===gr),v=a.map(h=>{const o=T.G.h.own[h.id];return !o?-1:gr===5?T.mTier(o.s):o.s;}),mn=a.length?Math.min(...v):-1;
+  return {gr,tot:a.length,mn,steps:SC_TH[gr].filter(t=>mn>=t).length,next:SC_TH[gr].find(t=>mn<t),low:a.filter((h,i)=>v[i]===mn).length};});}
 let cbK='',cbV=null;
 function collInfo(){const T=TE(),L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon);return [0,1,2,3,4,5].map(gr=>{const a=L.filter(h=>h.gr===gr);return {gr,tot:a.length,n:a.filter(h=>T.G.h.disc[h.id]).length};});}
-function collBon(){const T=TE(),k=Object.keys(T.G.h.disc).length;if(k===cbK&&cbV)return cbV;const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};
-  collInfo().forEach(c=>{if(c.tot&&c.n>=c.tot)CBON[c.gr].forEach(([s,v])=>b[s]+=v);});cbK=k;cbV=b;return b;}
-function gearBon(items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};for(const it of items){b[GS[it.s].st]+=mainV(it);for(const [k,v] of it.sub)b[k]+=v;}return b;}
+function collBon(){const T=TE(),O=T.G.h.own;let ss=0;for(const id in O)ss+=O[id].s||0;const k=Object.keys(T.G.h.disc).length+'/'+Object.keys(O).length+'/'+ss;if(k===cbK&&cbV)return cbV;const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};
+  collInfo().forEach(c=>{if(c.tot&&c.n>=c.tot)CBON[c.gr].forEach(([s,v])=>b[s]+=v);});
+  scInfo().forEach(c=>SC_B[c.gr].forEach(([st,a])=>{for(let i=0;i<c.steps;i++)b[st]+=a[i];}));cbK=k;cbV=b;return b;}
+function gearBon(items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};for(const it of items){b[GS[it.s].st]+=mainV(it);for(const [k,v] of it.sub)b[k]+=subV(it,v);}return b;}
 // item picture: rarity glow + drawn glyph
 // ---------------------------------------------------------------- v14: item pictures – every grade has its own drawing (36 items)
 const IMAT=[{b:'#8d6e57',h:'#c9a68a',l:'#4a3527',a:'#b5562a',t:'#d9c3a5'},{b:'#8fa3a0',h:'#eef6f3',l:'#4d5d59',a:'#43c463',t:'#2e7d32'},{b:'#3f7fd6',h:'#d6ecff',l:'#123a78',a:'#40c4ff',t:'#82b1ff'},
@@ -985,6 +1005,7 @@ function myMechs(){const T=TE(),o=[];
   for(const id in T.G.h.own){const h=T.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}
   o.sort((a,b)=>pow(b)-pow(a));return o;}
 function stars(h){const o=TE().G.h.own[h.id];return o?o.s:0;}
+const SL=(h,long)=>TE().sLbl?TE().sLbl(h,stars(h),long):'+'+stars(h); // v16-161: Mythic = AWAKENED I-V
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
 // v16-127 (preview): BATTLE ROLES – every class keeps its name (garages, towers, sets) and gets a role tag (Marius' 5 badges img/ui12/role_*.webp)
 const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},ranger:{n:'RANGER',c:'#b6f25a'},mage:{n:'MAGE',c:'#d59bff'},support:{n:'SUPPORT',c:'#5ef0a0'}};
@@ -1287,7 +1308,13 @@ function drawHero(g,u,t){
 // ---------------------------------------------------------------- monsters (drawn facing right, mirrored when needed)
 let GA=1;
 function eye(g,x,y,r,col,t,k){g.fillStyle=col;circ(g,x,y,r);g.fillStyle='rgba(255,255,255,.85)';circ(g,x-r*.3,y-r*.3,r*.3);g.globalAlpha*=.35;g.fillStyle=col;circ(g,x,y,r*2.2+Math.sin(t*6+k)*.6);g.globalAlpha=Math.min(1,g.globalAlpha/.35);}
-function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;f(g,u,t);
+// v16-161 (Marius): AWAKENING in battle – Awakened III+ = aura in the tier color behind the hero, Awakened V = brighter aura + light sparks when it attacks / casts. One cached glow picture per color (cheap for budget phones).
+const AWC=['','#ffd54a','#ff5252','#c77dff','#7cf9ff','#ffffff'],AWG={};
+function awGlow(c){if(AWG[c])return AWG[c];const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,c+'cc');gr.addColorStop(.45,c+'55');gr.addColorStop(1,c+'00');x.fillStyle=gr;x.fillRect(0,0,64,64);return AWG[c]=cv;}
+function drawAwk(g,u,t){if(!u.awk||u.awk<3||u.dead)return;const c=AWC[u.awk],G0=awGlow(c),p=.85+.15*Math.sin(t*4+u.k),k=u.awk>=5?1.25:1;
+  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);g.globalCompositeOperation='lighter';g.globalAlpha=.55*p;g.drawImage(G0,-46*k,-78*k,92*k,92*k);g.globalAlpha=.7*p;g.drawImage(G0,-34*k,-12,68*k,22);g.restore();
+  if(u.awk>=5&&(u.st==='atk'||u.st==='cast')&&t-(u._aw||0)>.3){u._aw=t;sparks(u.sx+u.face*14*u.sc,u.sy-34*u.sc,2,c,120);}}
+function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;if(u.hero&&u.awk>=3)drawAwk(g,u,t);f(g,u,t);
   if(u.flash>0&&!u.dead){g.save();g.globalCompositeOperation='lighter';GA=Math.min(1,u.flash)*.75;f(g,u,t);GA=1;g.restore();}}
 const MDRAW={
  imp(g,u,t){const ph=u.wph,lunge=u.st==='atk'?Math.sin(u.ap*Math.PI)*8:0;g.translate(lunge,0);
@@ -1627,7 +1654,7 @@ function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(HD?3:2,window.
 const GRIT_N=24,gritK=n=>n<=8?n*.075:.6+(n-8)*.15,gritStep=n=>n<8?.075:.15;
 function grit(si){const P=CPX(),st=P.stuck;if(!st||st.si!==si||si!==P.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
 function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=(1+(B.grit||0)+(B.nit||0))*(1+(B.trb||0)); // v16-136: TEAM ROLES bonus (+5/10/15% ATK & HP)
-  return {hero:1,h,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,eg:s.eg,
+  return {hero:1,h,awk:!h.crew&&h.gr===5&&TE().mTier?TE().mTier(stars(h)):0,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,eg:s.eg,
     skK:h.crew?1:1+.06*((TE().skLv?TE().skLv(h.id):1)-1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),shots:0,fcT:3,ekCd:0,swT:0};}
 function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);if(HM&&!B.tw){fxImg('hm_ring');fxImg('hm_aura');}const m=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);
   return {hero:0,t,k:rnd(0,9),name:M.n,boss:!!M.boss,hp:M.hp*m*1.25,max:M.hp*m*1.25,atk:M.atk*m,def:M.def*(1+Math.min(B.si,19)*.06),mv:M.mv*S,rng:M.rng*S,as:M.as,crit:.05,H:M.h,fly:!!M.fly,
@@ -2432,7 +2459,7 @@ function drawFCard(u,x,y,cw,ch,ready,t){const h=u.h,i=h.crew?0:Math.min(5,h.gr|0
   g.restore();
   // role badge (top-left of the window) · +stars on the bottom plate
   const rb=Math.min(18,ww*.34);g.drawImage(roleBadgeCv(u.role),wx+1,wy+1,rb*1.25,rb*1.25);
-  const P=FPLT[i],py=Y((P[0]+P[1]/2)/100*ih),st=h.crew?'CREW':'+'+stars(h);
+  const P=FPLT[i],py=Y((P[0]+P[1]/2)/100*ih),st=h.crew?'CREW':SL(h);
   g.font='900 '+Math.max(7,Math.min(10,fw/7))+'px Game,system-ui';g.textAlign='center';g.lineWidth=2.5;g.strokeStyle='#000';g.strokeText(st,fx+fw/2,py+3.5);g.fillStyle=GR.c;g.fillText(st,fx+fw/2,py+3.5);
   if(ready){g.font='900 '+Math.round(cw/4.6)+'px Game,system-ui';g.lineWidth=3;g.strokeStyle='#000';g.strokeText('TAP!',x+cw/2,wy+wh*.42);g.fillStyle='#fff3c4';g.fillText('TAP!',x+cw/2,wy+wh*.42);}
   if(u.dead){g.globalAlpha=1;g.font='900 22px Game,system-ui';g.fillText('💀',x+cw/2,wy+wh*.42);}
@@ -2709,7 +2736,7 @@ function pop(html){popHost();$('cpPopBox').className='cpBox';$('cpPopBox').inner
 function closePop(){$('cpPop').classList.remove('open');}
 const heroOf=id=>!id?null:id.startsWith('crew')?crewHero(+id.slice(4)):TE().HB[id];
 const gcol=h=>h.crew?'#8d6e63':TE().GRADES[h.gr].c;
-function heroLine(h,right){return `<div class="hl"><img class="mp" src="${portraitURL(h)}" style="border-color:${gcol(h)}"><span><b style="color:${gcol(h)}">${h.n}</b> ${h.crew?'':'<small>+'+stars(h)+'</small>'}<br><small>${IMGI(roleBadge(roleOf(h)),'1.25em')} ${ROLE[roleOf(h)].n}</small></span><em>${right||''}</em></div>`;}
+function heroLine(h,right){return `<div class="hl"><img class="mp" src="${portraitURL(h)}" style="border-color:${gcol(h)}"><span><b style="color:${gcol(h)}">${h.n}</b> ${h.crew?'':'<small>'+SL(h)+'</small>'}<br><small>${IMGI(roleBadge(roleOf(h)),'1.25em')} ${ROLE[roleOf(h)].n}</small></span><em>${right||''}</em></div>`;}
 function miniCard(h,lab){if(!h)return `<div class="mc"><div class="mcI empty">—</div><b>empty</b><small>${lab}</small></div>`;
   return `<div class="mc"><div class="mcI" style="border-color:${gcol(h)}"><img src="${portraitURL(h)}"><img class="rb" src="${roleBadge(roleOf(h))}"></div><b style="color:${gcol(h)}">${h.n}</b><small>${lab}</small></div>`;}
 const bigN=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e9?(v/1e9).toFixed(2)+'B':a>=1e6?(v/1e6).toFixed(2)+'M':v.toLocaleString();}; // v16-113: 1.67M instead of 1 668 436 (fits on a phone)
@@ -2778,7 +2805,7 @@ function popAutoBest(){const T=TE(),nb=tBest(),Lb=tsel.map(heroOf),La=nb.map(her
    <button class="cpGo" data-p="bok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
 function openTeam(si,cx){const T=TE(),G=T.G;tsi=si;TCX=cx||null;cleanGear();tsel=TCX?TCX.get():curTeamList().map(h=>h.id);
   const render=()=>{const pool=tPool();const list=tsel.map(heroOf);
-    const card=(h,cls,extra,k)=>`<div class="${cls}" style="border-color:${gcol(h)}" ${k!=null?'data-slot="'+k+'"':'data-id="'+h.id+'"'}><img src="${portraitURL(h)}"><span class="r" style="color:${gcol(h)}">${h.crew?'CREW':'+'+stars(h)+' <small style="color:#e2c6ff">Lv'+TE().lvOf(h.id)+'</small>'}</span><img class="rl" src="${roleBadge(roleOf(h))}">${extra||''}<span class="n">${h.n}</span></div>`;
+    const card=(h,cls,extra,k)=>`<div class="${cls}" style="border-color:${gcol(h)}" ${k!=null?'data-slot="'+k+'"':'data-id="'+h.id+'"'}><img src="${portraitURL(h)}"><span class="r" style="color:${gcol(h)}">${h.crew?'CREW':SL(h)+' <small style="color:#e2c6ff">Lv'+TE().lvOf(h.id)+'</small>'}</span><img class="rl" src="${roleBadge(roleOf(h))}">${extra||''}<span class="n">${h.n}</span></div>`;
     let sl='';for(let k=0;k<5;k++){const h=list[k];sl+=h?card(h,'slot f','',k):'<div class="slot">+</div>';}
     const ep=tEP(),tp=teamPower(list),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
     $('cpTeamBox').innerHTML=`<button class="stX" data-a="back" aria-label="close">✕</button><h2>${TCX&&TCX.done?'EDIT BATTLE TEAM':'CHOOSE YOUR TEAM'}</h2><div class="sub">${TCX?TCX.t:'STAGE '+sLabel(si)} · max 5 · ${TCX&&TCX.done?'tap a mechanic below to add him · tap a team slot to change him':'tap a hero in the team to change him'}</div><div class="cpSec">TEAM</div><div class="slots">${sl}</div>
@@ -2840,13 +2867,13 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gCnt').textContent=L.length+' heroes';
   $m('gSort').innerHTML=[['pow','POWER'],['gr','GRADE']].map(([k,n])=>`<b data-sort="${k}" class="${gsort===k?'on':''}">${n}</b>`).join('');
   const fz=T.canFuse?T.canFuse:()=>false;
-  $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${bRoleOf(m)?`<img class="rr" src="${RLI(bRoleOf(m))}">`:''}${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">+${stars(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
+  $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(roleOf(m))}">${bRoleOf(m)?`<img class="rr" src="${RLI(bRoleOf(m))}">`:''}${team.includes(m.id)?'<i>TEAM</i>':''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">${SL(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
   $m('gHSB').innerHTML='<b>HERO SUMMON</b><span><img src="img/ticket.webp" alt="">'+T.G.h.tk.toLocaleString()+'</span>';
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon your first heroes – they fight and wear gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it):''}</div>`;};
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'');
-  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>+${stars(h)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}${h.gr===5?' '+starsH(stars(h)||0,0,1):''}</small>${rTag(h)}<div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
+  $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>${SL(h,1)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(roleOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[roleOf(h)].n}${h.gr===5?' '+starsH(stars(h)||0,0,1):''}</small>${rTag(h)}<div class="gPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${pow(h).toLocaleString()}</div>`;
   $m('gInfo').innerHTML=`<div class="gSk"><b>${IMGI(glyphURL('bolt','#ffd54a'),'1em','-.15em')} ${skOf(h).sk}</b>${HSK[h.id]?`<span>${HSK[h.id].skd}</span>`:''}</div>${pasOf(h).map(p=>`<div class="gSk ps"><b>${p.ic} ${p.n}</b><span>${p.d}</span></div>`).join('')}${(()=>{const S=SETS[roleOf(h)];if(!S)return '';const n=setCount(h,heroGear(h.id));return `<div class="gSk ps"><b>${IMGI(roleBadge(roleOf(h)),'1.2em','-.3em')} ${S.n.toUpperCase()} SET <em style="color:#ffd54a;font-style:normal">${n}/6</em></b><span>${n?'':'Set pieces drop from Rare up (campaign + Gear Summon). '}Only ${ROLE[roleOf(h)].n} heroes get this bonus.</span>${setPcs(roleOf(h),heroGear(h.id))}${setBlock(roleOf(h),n)}</div>`;})()}${(()=>{const T=TE();if(!T.garB||h.crew)return '';const c=roleOf(h),gb=T.garB(c),G0={engine:'Engine Shop',tuning:'Tuning',inspect:'Inspection',paint:'Body & Paint',elec:'Electronics',service:'Service'};return `<div class="gSk ps"><b>🏭 GARAGE TRAINING <em style="color:#7dff8a;font-style:normal">+${(gb*100).toFixed(gb<.1?1:0)}% ATK &amp; HP</em></b><span>${c==='all'?'Legend heroes get the average bonus of the 6 battle garages.':`From your <b>${G0[c]}</b> (LV ${T.lvT(T.CLSG[c])}/100) – upgrade it with ${T.PKI(CLS2ROLE[c])} <b>${T.PK_N[CLS2ROLE[c]]}</b>.`}</span></div>`;})()}${window.CC&&CC.battleB&&CC.battleB()?`<div class="gSk ps"><b>🏆 CLASSIC COLLECTION <em style="color:#7dff8a;font-style:normal">+${Math.round(CC.battleB()*100)/100}% ATK &amp; HP</em></b><span>Every classic car you own makes ALL heroes stronger.</span></div>`:''}<div class="gNote">${IMGI(glyphURL('swords','#ffb300'),'1em','-.15em')} Gear works <b>only in battles</b> (not in the garage) · tap a slot to change it</div>`;
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
   const inT=team.includes(h.id);
@@ -2861,7 +2888,7 @@ function renderBag(h){const T=TE(),g=GR();
   const inv=g.inv.filter(it=>gfil==='all'||it.s===gfil).sort((a,b)=>b.r-a.r||b.lv-a.lv||a.s.localeCompare(b.s));
   $m('gInv').innerHTML=inv.length?'<div class="gGrid">'+inv.map(it=>{const o=ownerOf(it);const oh=o&&T.HB[o];return '<div class="gSlot">'+itemCard(it,o?`<img class="own" src="${portraitURL(oh)}" style="border-color:${gcol(oh)}">`:'',h&&o===h.id?'mine':o?'used':'')+'</div>';}).join('')+'</div>':'<div class="gEmpty">No gear here yet. Win battles to find gear!</div>';}
 // v16-47: the 5 battle-team heroes stand on the pedestals of Marius' HEROES page (animated idle pose)
-function renderPeds(tl){const T=TE();let x='';for(let k=0;k<5;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${[12.4,31.2,50,68.8,87.5][k]}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${String(h.n).split(',')[0]}</span><i>${h.crew?'CREW':'+'+stars(h)}</i>`:'<b>+</b>'}</div>`;}
+function renderPeds(tl){const T=TE();let x='';for(let k=0;k<5;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${[12.4,31.2,50,68.8,87.5][k]}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${String(h.n).split(',')[0]}</span><i>${h.crew?'CREW':SL(h)}</i>`:'<b>+</b>'}</div>`;}
   $m('gPeds').innerHTML=x;pedList=tl;}
 let pedList=[],pedRaf=0,gpg='',pedT0=0;
 function pedLoop(t){pedRaf=0;const cg=$('cpGear');if(!cg.classList.contains('open'))return;pedRaf=requestAnimationFrame(pedLoop);if(t-pedT0<50)return;pedT0=t;const s=t/1000;
@@ -2886,8 +2913,12 @@ function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n
      <div class="gcL gcK${ok?' ok':''}" style="${cP(381,y-31,96,62)}">${c.n}/${c.tot}</div>
      <div class="gcL gcB${ok?' ok':''}" style="${cP(500,y-31,308,62)}"><b>${cbTxt(CBON[c.gr])}</b><small>${ok?'✓ ACTIVE · ALL HEROES':c.gr===5?'LOCKED · MYTHIC = SUMMON':'LOCKED · ALL HEROES'}</small></div>
      <div class="gcCh${ok?' ok':''}" style="${cP(835,y-52,138,104)}"><img class="gcOk" src="img/ui5/${ok?'ok':'lock'}.webp" alt="${ok?'done':'locked'}"></div>`;});
-  x+=`<div class="gcL gcGo" data-g="hsum" style="${cP(200,1352,624,92)}">HERO SUMMON</div></div>
-   <div class="gcSub">YOUR HEROES · tap a color above to jump to it</div>`;
+  x+=`<div class="gcL gcGo" data-g="hsum" style="${cP(200,1352,624,92)}">HERO SUMMON</div></div>`;
+  // v16-161: STAR COLLECTION
+  x+=`<div class="gcSub scT">★ STAR COLLECTION</div><div class="scP">When <b>ALL</b> your heroes of a color reach a step, <b>every battle hero</b> gets the bonus. Missing heroes count as not reached.</div>`;
+  scInfo().forEach(c=>{const g=T.GRADES[c.gr],B=SC_B[c.gr],tot=B.map(([st,a])=>GSH[st]+' +'+a.slice(0,c.steps).reduce((p,q)=>p+q,0)+'%').join(' · ');
+    x+=`<div class="scR" style="--c:${g.c}"><div class="scH"><b>◆ ${g.n.toUpperCase()}</b><span>${c.steps?'ACTIVE: '+tot:'no step yet'}</span></div><div class="scS">${SC_TH[c.gr].map((t,i)=>{const ok=i<c.steps,nx=!ok&&i===c.steps;return `<i class="${ok?'ok':nx?'nx':''}"><b>${c.gr===5?'AWK '+TE().ROM[t]:'+'+t}</b><small>${B.map(([st,a])=>GSH[st]+' +'+a[i]+'%').join('<br>')}</small></i>`;}).join('')}</div>${c.next!=null&&c.tot?`<div class="scN">Next: all ${c.tot} heroes at <b>${c.gr===5?'Awakened '+TE().ROM[c.next]:'+'+c.next}</b> · ${c.low} hero${c.low>1?'es':''} still below</div>`:c.tot?'<div class="scN ok">✓ COMPLETE</div>':''}</div>`;});
+  x+=`<div class="gcSub">YOUR HEROES · tap a color above to jump to it</div>`;
   C.forEach(c=>{const g=T.GRADES[c.gr],L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon&&h.gr===c.gr);
     x+=`<div class="gcRow${c.tot&&c.n>=c.tot?' ok':''}" id="gcr${c.gr}" style="--c:${g.c};--c3:${g.c}33"><div class="wR g${c.gr} gcHd"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}${c.tot&&c.n>=c.tot?' <img src="img/ui5/ok.webp" alt="">':''}</span></div>
      <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${portraitURL(h)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:d?'':`data-hx="${h.id}"`} alt="">`;}).join('')}</div></div>`;});
@@ -2906,7 +2937,7 @@ function renderSalv(){const T=TE();const L=svPick=svList();let sum=0;L.forEach(i
 function cmpForHero(h,ov,xp,xc){return cmpBlock(unitStats(h),unitStats(h,ov),pow(h),pow(h,ov),xp,xc);}
 let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)return;const h=gHero(),sl=GS[it.s],st=GSTAT[sl.st],o=ownerOf(it),oh=o&&T.HB[o];gsalv=0;gstar='';
   // v16-47: Marius' item card (img/ui2/item_f.webp): icon · name plate · 4 stat lines · EQUIP (green) / UPGRADE (blue) / SALVAGE (orange)
-  const rows=[`<div class="iSt main">${IMGI(glyphURL(st.ic,st.col),'1.1em','-.22em')} ${st.n} <b>+${mainV(it)}%</b></div>`,...it.sub.map(([k,v])=>`<div class="iSt">${IMGI(glyphURL(GSTAT[k].ic,GSTAT[k].col),'1.1em','-.22em')} ${GSTAT[k].n} <b>+${v}%</b></div>`)];
+  const rows=[`<div class="iSt main">${IMGI(glyphURL(st.ic,st.col),'1.1em','-.22em')} ${st.n} <b>+${mainV(it)}%</b></div>`,...it.sub.map(([k,v])=>`<div class="iSt">${IMGI(glyphURL(GSTAT[k].ic,GSTAT[k].col),'1.1em','-.22em')} ${GSTAT[k].n} <b>+${subV(it,v)}%</b></div>`)];
   while(rows.length<3)rows.push('<div class="iSt e">—</div>');
   rows.push(oh?`<div class="iSt ow">${IMGI(portraitURL(oh),'1.4em','-.4em')} worn by <b style="color:${gcol(oh)}">${oh.n}</b></div>`:`<div class="iSt ow">${IMGI('img/ui2/i_key.webp','1.2em','-.3em')} free · in the bag</div>`);
   const mx=it.lv>=gMax(it),c=mx?0:gpCost(it);
@@ -2942,7 +2973,7 @@ let gdBack='';function gearGuide(back){gdBack=back||'';const T=TE(),sl='tool',st
    <div class="gdT">Put a <b>second identical piece</b> (same grade + same slot, free in the bag) into it = <b>+1 star</b>.<br>Every star = <b>+${GSTAR_K*100}% main stat</b>. Works for every grade.</div>
    <div class="gdL">${L}</div></div>
   <div class="gdS"><div class="gdH"><i>3</i>${STI('asc')} <span style="color:${ASC.c}">ASCENDED · WHERE TO FIND</span></div>
-   <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from chapter ${ASC_CH+1} (more and more up to chapter 50)<br>• <b>Idle Rewards</b> from chapter ${ASC_CH+1} (small chance for every hour in the chest)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open any piece ➜ <b>${STI('on')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
+   <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from chapter ${ASC_CH+1} (more and more up to chapter 50)<br>• <b>Idle Rewards</b> from chapter ${ASC_CH+1} (small chance for every hour in the chest)<br>• <b>Class Towers</b> floors 350 · 380 · 410 · 440 · 470 · 500 (a full Ascended set of the class)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open any piece ➜ <b>${STI('on')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
   <div class="cpRow">${gdBack?'<button class="cpGo alt" data-p="gdback">↩ BACK</button>':''}<button class="cpGo" data-p="x">GOT IT</button></div></div>`;
   pop(x);}
 // v16-42: GEAR UPGRADE animation (Marius: "I see nothing when I upgrade – only after I leave and come back")
@@ -3027,7 +3058,7 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
      else{ok=T.ascend(h.id);if(!ok){T.toast('Not enough Essence for the Ascension',2200);return;}T.toast('✦ ASCENSION '+T.ascOf(h.id)+'! '+h.n+' · max Lv '+T.lvCap(h.id)+' · skill Lv '+T.skLv(h.id),2800);}
      renderGear();popLvl(h);return;}
   if(a==='hreb'){const h=T.HB[el.dataset.h];if(!h)return;const id=h.id,e=T.rebirthVal(id),geq=Object.keys(GR().eq[id]||{}).length;
-     pop(`<div class="pT">♻ REBIRTH · <span style="color:${gcol(h)}">${h.n}</span></div><div class="pD" style="text-align:left">${h.n} goes back to <b>Lv 1</b> with <b>no Ascension</b> (skill Lv 1).<br>• you get back <b>100%</b> of the Essence: ${T.ESI} <b>+${T.nf(e)}</b><br>• ${geq?'<b>'+geq+'</b> gear piece'+(geq>1?'s go':' goes')+' back to the BAG (upgrades and stars stay on the pieces)':'no gear equipped'}<br>• stars <b>+${stars(h)}</b> stay (summons can't be undone)<br>• free · use the Essence on any hero</div>
+     pop(`<div class="pT">♻ REBIRTH · <span style="color:${gcol(h)}">${h.n}</span></div><div class="pD" style="text-align:left">${h.n} goes back to <b>Lv 1</b> with <b>no Ascension</b> (skill Lv 1).<br>• you get back <b>100%</b> of the Essence: ${T.ESI} <b>+${T.nf(e)}</b><br>• ${geq?'<b>'+geq+'</b> gear piece'+(geq>1?'s go':' goes')+' back to the BAG (upgrades and stars stay on the pieces)':'no gear equipped'}<br>• stars <b>${SL(h)}</b> stay (summons can't be undone)<br>• free · use the Essence on any hero</div>
        <button class="cpGo red" data-p="hrebOK" data-h="${id}">♻ REBIRTH NOW</button><button class="cpGo alt" data-p="hrebNo" data-h="${id}">CANCEL</button>`);return;}
   if(a==='hrebNo'){const h=T.HB[el.dataset.h];if(h)popLvl(h);else closePop();return;}
   if(a==='hrebOK'){const h=T.HB[el.dataset.h];if(!h)return;const g=GR(),n=Object.keys(g.eq[h.id]||{}).length;delete g.eq[h.id];const e=T.rebirth(h.id);T.save();renderGear();closePop();
@@ -3053,13 +3084,13 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
 
 // ---------------------------------------------------------------- v14: GEAR SUMMON (blue Gear Tickets · gear works only in battles)
 const GTKI='<img src="img/gticket.webp" style="height:1.15em;vertical-align:-.25em" onerror="this.replaceWith(\'🎫\')">';
-const GS_RATE=[50,28,14.5,5.5,1.6,.38,.02], GS_PITY={l:500}; // v16-99 (Marius): lower rates, ASCENDED in the summon (0.02%) // v16-37: only one pity – Legendary every 500 (Marius)
+const GS_RATE=[50,28,14.5,5.5,1.6,.38,.02], GS_PITY={l:100,m:750}; // v16-161 (Marius): Legendary every 100 + MYTHIC every 750 gear summons // v16-99 (Marius): lower rates, ASCENDED in the summon (0.02%) // v16-37: only one pity – Legendary every 500 (Marius)
 const GS_NAMES=['Common','Uncommon','Rare','Epic','Legendary','Mythic','Ascended'];
-function GSD(){const g=GR();if(g.tk==null)g.tk=10;if(!g.pity)g.pity={e:0,l:0,m:0};if(!g.hist)g.hist=[];if(g.sum==null)g.sum=0;return g;}
+function GSD(){const g=GR();if(g.tk==null)g.tk=10;if(!g.pity)g.pity={e:0,l:0,m:0};if(!g.p161){g.p161=1;g.pity.m=0;} /* v16-161: the old m counter was never used → start the new MYTHIC pity at 0 */if(!g.hist)g.hist=[];if(g.sum==null)g.sum=0;return g;}
 function addGTk(n,why){const g=GSD();g.tk+=n;TE().save();if(why)TE().toast(GTKI+' +'+n+' Gear Ticket'+(n>1?'s':'')+' · '+why,2600);gsBadge();}
 function gsRoll(){const g=GSD(),p=g.pity;p.e++;p.l++;p.m++;let x=Math.random()*100,r=0;for(;r<6;r++){x-=GS_RATE[r];if(x<0)break;}r=Math.min(6,r);
-  if(p.l>=GS_PITY.l&&r<4)r=4;
-  if(r>=4)p.l=0;return r;}
+  if(p.m>=GS_PITY.m&&r<5)r=5;else if(p.l>=GS_PITY.l&&r<4)r=4;
+  if(r>=4)p.l=0;if(r>=5)p.m=0;return r;}
 function gsummon(n,paid){const T=TE(),g=GSD();
   if(!paid&&g.tk<n){const have=g.tk;T.payAsk(have,n,GTKI,'Gear Tickets',()=>{g.tk-=have;T.G.dm-=(n-have)*T.DM_SUM;gsummon(n,1);},pop);return;}
   if(!paid)g.tk-=n;const cnt=n===10?11:1,res=[];let sold=0;
@@ -3109,7 +3140,7 @@ function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
   h+='<div class="gsL gsBig gold'+(g.tk+Math.floor(dm/T.DM_SUM)<10?' dis':'')+'" data-gs="10" style="'+gbx(530,1400,400,130)+'">SUMMON ×10<span>'+GTKI+' 10</span></div>';
   h+='<div class="gsL gsRib" style="'+gbx(868,1412,72,40)+'">+1</div>';
   h+='<i class="gsFill" style="'+gbx(99,1570,Math.max(pc?54:0,832*pc/100).toFixed(1),47)+'"></i>';
-  h+='<div class="gsL" style="'+gbx(90,1562,850,63)+'font-size:'+GSU(28)+'">LEGENDARY PITY&nbsp;<b style="color:#ffd54a">'+p.l+' / '+GS_PITY.l+'</b></div>';
+  h+='<div class="gsL" style="'+gbx(90,1562,850,63)+'font-size:'+GSU(28)+'">LEGENDARY&nbsp;<b style="color:#ffd54a">'+p.l+' / '+GS_PITY.l+'</b>&nbsp;· MYTHIC&nbsp;<b style="color:#ff6b6b">'+(p.m||0)+' / '+GS_PITY.m+'</b></div>';
   h+='<div class="gsL gsCol" data-gs="gear" style="'+gbx(150,1660,725,135)+'">BAG '+g.inv.length+' / '+GINV_()+'<small>EQUIP YOUR HEROES</small></div>';
   GYM=null;$('gsBox').innerHTML=h;}
 function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r));
@@ -3119,7 +3150,7 @@ function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r))
    <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}" style="white-space:nowrap;overflow:hidden;padding:0 12px 0 22px">AGAIN ×${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
 function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+GG(r).c+'">'+GS_NAMES[r]+'</b>',p+'%','Lv '+GMAXR[r]+(GSUBN[r]?' · +'+GSUBN[r]+' stat'+(GSUBN[r]>1?'s':''):''))).join('')+
-  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons (no other pity).</div><div>★ <b>Stars</b>: merge 2 identical pieces (same slot + same grade) → ★1…★5, each star +20% main stat.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic): 0.02% in the summon, or it drops in campaign battles and Idle Rewards from chapter 30. Ascended pieces go up to <b>★20</b>: every 5 stars a new star color (gold → red → purple → rainbow) + a new bonus stat.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
+  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons and a <b style="color:#ff3b3b">Mythic</b> every ${GS_PITY.m} summons (now ${GSD().pity.l||0}/${GS_PITY.l} · ${GSD().pity.m||0}/${GS_PITY.m}).</div><div>★ <b>Stars</b>: merge 2 identical pieces (same slot + same grade) → ★1…★5, each star +20% main stat.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic): 0.02% in the summon, or it drops in campaign battles and Idle Rewards from chapter 30. Ascended pieces go up to <b>★20</b>: every 5 stars a new star color (gold → red → purple → rainbow) + a new bonus stat.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
   <div class="wS">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="wP">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div><button class="wHist" data-p="gsHist">📜 SUMMON HISTORY</button>`);}
 function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">Last '+g.hist.length+' of '+g.sum+' gear summons</div>'+(g.hist.length?g.hist.map(o=>wRowB(o.r,'<img src="'+itemIconURL(o.s,o.r)+'" alt=""> <b style="color:'+GG(o.r).c+'">'+GNAMES[o.s][o.r]+'</b>',null,GS_NAMES[o.r])).join(''):'<div class="wP">Nothing yet.</div>'));}
 
@@ -3149,7 +3180,7 @@ function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],
   else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=5?-1:(boss||mini||R()<.6)?Math.floor(R()*6):-1;
   const eq=Math.min(NST-1,Math.round(f<=300?3+f*3.2:963+(f-300)*2.68)); // v16-161: floors 1-300 unchanged, 301-500 climb to stage ~1499
-  const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1);
+  const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*EGK(EG.tw,f,300,500); // v16-161: endgame ramp floors 300-500
   return {f,w,mod,eq,mul,boss,mini,st:{n:'FLOOR '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 const EGI=r=>{const T=TE(),a=[];if(r.ess)a.push(T.ESI+' '+T.nf(r.ess));if(r.gp)a.push(T.GPI+' '+T.nf(r.gp));if(r.pk&&T.PKI)for(const k in r.pk)a.push(T.PKI(k)+' '+T.nf(r.pk[k]));return a;}; // v16-99
 const giveEG=r=>{const G=TE().G;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk&&TE().pkAdd)for(const k in r.pk)TE().pkAdd(k,r.pk[k]);}; // v16-129: + garage parts
@@ -3341,11 +3372,13 @@ function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=
   if(boss)w=[mk(n),[cl(TW_BOSS[(f/20-1+ci)%5])]];else if(mini)w=[mk(n),[cl(TW_MINI[((f-10)/20+ci)%5]),one(),one()]];
   else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=10?-1:(boss||mini||R()<.4)?Math.floor(R()*6):-1;
-  const eq=Math.min(NST-1,Math.round(f<=100?2+f*2.4:242+(f-100)*3.14)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85;
+  const eq=Math.min(NST-1,Math.round(f<=100?2+f*2.4:242+(f-100)*3.14)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85*EGK(EG.ct,f,300,500); // v16-161: endgame ramp floors 300-500
+ 
   return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
-const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:5;const ctSetF=f=>f<=100?f%5===0:f%10===0; // v16-161: after floor 100 a Mythic set piece every 10 floors
+const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:f<=300?5:6;const ctSetF=f=>f<=100?f%5===0:f<=300?f%20===0:f>=350&&(f-350)%30===0; // v16-161 (Marius): 101-300 a MYTHIC set piece every 20 floors (10) · 350, 380 … 500 = the 6 pieces of an ASCENDED set
+const ctSlot=f=>f<=100?f/5-1:f<=300?(f-100)/20-1:(f-350)/30;
 function ctRew(k,f){const F=ctFloor(k,f),r={money:Math.round(REWARD(F.eq).money*.5/10)*10,dm:3+Math.floor(f/100),gtk:0,set:null}; // v16-161 (Marius): every reward grows with the floor
-  if(ctSetF(f))r.set={s:GSLOT[(f<=100?f/5-1:20+(f-100)/10-1)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=Math.round((50+f/10)/5)*5;r.gtk=1+Math.floor(f/200);}if(f%50===0)r.dm+=200+Math.round(f/2);const T=TE(),x=f>100&&f%5===0&&f%10?2:1;r.ess=Math.round(.5*x*T.ESS_Ui(F.eq));r.gp=Math.round(.6*x*T.GP_Ui(F.eq));r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0?2:x))};return r;} // v16-129: Class Tower → the parts of its class · v16-161: Essence / Gear Parts by the floor's stage; floors 105, 115… (no set piece) give ×2
+  if(ctSetF(f))r.set={s:GSLOT[ctSlot(f)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=Math.round((50+f/10)/5)*5;r.gtk=1+Math.floor(f/200);}if(f%50===0)r.dm+=200+Math.round(f/2);const T=TE(),x=f>100&&f%5===0&&!ctSetF(f)?2:1;r.ess=Math.round(.5*x*T.ESS_Ui(F.eq));r.gp=Math.round(.6*x*T.GP_Ui(F.eq));r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0||x>1?2:1))};return r;} // v16-129: Class Tower → the parts of its class · v16-161: Essence / Gear Parts by the floor's stage; floors 101+ every 5th floor without a set piece give ×2
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>{const r=roleOf(h);return r===k||r==='all';});
 function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,5);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)
@@ -3392,7 +3425,7 @@ function ctOpen(k){if(!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign
 function ctClose(){ctEl.classList.remove('open');if(!backToHub())close();}
 function ctRules(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>6 towers, one per class · <b>'+CT_N+' floors</b> each.</div><div>Only heroes of that class + <b>Legend</b> heroes fight (your best 5).</div><div>Each tower is open on 2 days a week · <b>SUNDAY all towers are open</b>.</div></div><div class="wS">SCHEDULE</div>';
   CT_K.forEach(k=>x+=wRowB(CT_K.indexOf(k)%6,'<b>'+ROLE[k].n.toUpperCase()+'</b>',null,ctDaysTxt(k)));
-  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Floors 1-100, every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Floors 101-500: a <b>MYTHIC SET PIECE</b> every 10th floor</div><div>Every 10th floor (boss): '+T.DMI+' <b>50+</b> · '+GTKI+' <b>1+</b></div><div>Every 50th floor: + '+T.DMI+' <b>200+</b></div><div>The higher the floor, the bigger every reward.</div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
+  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Floors 1-100, every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Floors 101-300: a <b>MYTHIC SET PIECE</b> every 20th floor</div><div>Floors 350 · 380 · 410 · 440 · 470 · 500: the 6 pieces of an <b style="color:#2ef3ff">ASCENDED SET</b> of that class</div><div>Every 10th floor (boss): '+T.DMI+' <b>50+</b> · '+GTKI+' <b>1+</b></div><div>Every 50th floor: + '+T.DMI+' <b>200+</b></div><div>The higher the floor, the bigger every reward.</div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
   popW('CLASS TOWERS',x);}
 function ctTRew(k){const t=ctG();let x='<div class="wS">'+ROLE[k].n.toUpperCase()+' TOWER · NEXT SET PIECES</div>';
   for(let f=Math.ceil((t[k]+1)/5)*5,n=0;f<=CT_N&&n<8;f+=5){const r=ctRew(k,f);if(!r.set)continue;n++;const it=SETS[k].p[GSLOT.findIndex(s=>s.k===r.set.s)];
@@ -3409,7 +3442,7 @@ function ctGo(k,direct){const t=ctG();if(t[k]>=CT_N)return;if(!ctOpenK(k)){TE().
   const f=t[k]+1;CTS.k=k;ctEl.classList.remove('open');const F=ctFloor(k,f);safeStart(F.eq,ctTeam(k),F);}
 function ctFinish(win,retreat){const T=TE(),G=T.G,t=ctG(),F=B.tw,k=F.ct,f=F.f;let html;
   if(win&&f===t[k]+1){const r=ctRew(k,f);t[k]=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;
-    let setTxt='';if(r.set){const g=GR(),it=newItem(r.set.s,r.set.r,k);if(g.inv.length>=GINV_()){const v=salvageV(it);G.gp=(G.gp||0)+v;setTxt='BAG FULL → '+GPN(v);}else{g.inv.push(it);setTxt=itemName(it);}}
+    let setTxt='';if(r.set){const g=GR(),it=newItem(r.set.s,r.set.r,k);if(g.inv.length>=GINV_()&&r.set.r<6){ /* v16-161: an ASCENDED piece is never salvaged – it goes into the bag even when it is full */const v=salvageV(it);G.gp=(G.gp||0)+v;setTxt='BAG FULL → '+GPN(v);}else{g.inv.push(it);setTxt=itemName(it);}}
     T.save();
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.set)rws.push([ctSetHtml({k,s:r.set.s,r:r.set.r}),'SET']);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${ROLE[k].n.toUpperCase()} TOWER · FLOOR ${f}<small>${f>=CT_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
@@ -3890,7 +3923,7 @@ function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
   if(!first){T.save();return false;}
   G.tacc=1;G.tut=1;G.vip=Math.max(G.vip||0,28000);G.xp=Math.max(G.xp||0,179900);G.rep=30;G.sold=Math.max(G.sold||0,5000);
   Object.keys(G.lv).forEach(k=>G.lv[k]=10);
-  T.HEROES.forEach(h=>{if(h.soon)return;G.h.own[h.id]={s:h.gr===5?20:50,lv:300,a:14};G.h.disc[h.id]=1;});G.t99=1;G.m99=1;
+  T.HEROES.forEach(h=>{if(h.soon)return;G.h.own[h.id]={s:T.hMaxS?T.hMaxS(h):(h.gr===5?20:50),lv:300,a:14};G.h.disc[h.id]=1;});G.t99=1;G.m99=1;
   G.cp.best=NST;for(let i=0;i<NST;i++)G.cp.stars[i]=3;G.cph={best:NST,stars:{},ch:0};for(let i=0;i<NST;i++)G.cph.stars[i]=3;
   // gear: a full Ascended ★5 Lv 60 class set for every Legendary + Mythic battle hero + a few Mythic pieces to try STAR UP / ASCEND
   const hs=myMechs().filter(h=>h.gr>=4);g.inv=[];g.eq={};
@@ -3906,7 +3939,8 @@ function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.b
 // v16-153 (perf): called 20 s after the game went to the background – drops the hero / monster sheets (7-13 MB each in memory)
 // unless a fight is running; they load again by themselves the next time they are drawn.
 function freeMem(){if(running||window.__BATTLE_ON)return;for(const id in SPRD){const d=SPRD[id];if(d.im){d.im=null;d.bi=null;d.fi=null;}}for(const id in MSPR){if(MSPR[id].im)MSPR[id].im=null;}}
-window.CAMPAIGN={freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&!h.crew&&lvCan(h.id));}catch(e){return false;}},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+window.CAMPAIGN={freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&!h.crew&&lvCan(h.id));}catch(e){return false;}},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__PW={ep:enemyPower,tw:twPower,ct:ctPower,dg:dgPower,tp:()=>teamPower(curTeamList()),pw:h=>pow(h),hm:v=>{HM=v?1:0;},ni:newItem,eqp:equip,GSLOT,GMAXR,rol:h=>roleOf(h),SETS,hof:id=>heroOf(id),gr:GR,EG,CT_K,DGK:DG_K,NST,twR:twRew,ctR:ctRew,coll:()=>collBon()}; // v16-161: for tools/endgame.py
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={hm:v=>{HM=v?1:0;},getB:()=>B,fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
 
