@@ -50,7 +50,7 @@ const PK = () => T().PK;
 const S = () => { const G=T().G; if(!G.shop) G.shop={fx:{}, day:'', ge:0, pe:0, fn:[], fh:[]}; const s=G.shop; s.fx=s.fx||{}; s.fn=s.fn||[]; s.fh=s.fh||[]; return s; };
 const on = k => (PK()[k]||0) > now();
 // v16-123: Diamond Pass + Founder Pass are shown only after their products exist in Play Console (Marius does it before the opening)
-const NEWP = () => !!(window.SEC && SEC.TEST_MODE) || !!window.TE_NEWP;
+const NEWP = () => true;   // v16-150 (22 nov 2026): founder_pass, vip_pass_diamond, pack_master/legend/titan are now active in Play Console
 const expKey = {sil:'sil', gold:'sub', plat:'plat', dia:'dia'};
 function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; if(on('dia')) return 'dia'; return null; }   // the best active one (name / colour)
 const actv = () => ['sil','gold','plat','dia'].filter(k=>on(expKey[k]));                       // v16-84: every active pass
