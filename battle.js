@@ -456,6 +456,7 @@ const css3=document.createElement('style');css3.textContent=`
 #cpTeamBox .tmRow{position:sticky;bottom:-2px;z-index:5;margin:10px -6px -4px;padding:8px 6px 6px;background:linear-gradient(#0a0e1700,#0a0e17 30%)}
 #gTeam .tEd{background:linear-gradient(#7dff8a,#2e9d3a)!important;color:#062a0a!important;margin-right:6px}
 .cpGo.alt{background:none!important;box-shadow:none!important}
+.cpRow .cpGo.nf{white-space:nowrap;font-size:clamp(12px,4vw,16px)!important;padding:0 calc(var(--bh)*.5)!important;letter-spacing:0}
 #gBtns .cpGo{font-size:14.5px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic}#gHName .gLvC{display:block;margin:5px auto 0;pointer-events:auto;border:2px solid #ffd54a;border-radius:12px;padding:5px 14px;font:900 13px Game,system-ui;color:#fff;background:linear-gradient(#9c4dff,#5a1aa8);box-shadow:0 3px 0 #2a0a55,0 0 10px #000}#gHName .gLvC.rdy{background:linear-gradient(#5ee06c,#1f8a2c);box-shadow:0 3px 0 #0b3a12,0 0 12px #7CFC9A}#gHName .gLvC .tki{height:1.3em;vertical-align:-.35em}
 #gBtns .gLvB{flex-basis:100%!important;font-size:17px!important}#gBtns .gLvB.rdy{filter:drop-shadow(0 0 8px #7CFC9A)}
 #gHero #gBtns{padding:10px 10px 6px!important}
@@ -3258,8 +3259,8 @@ function twFinish(win,retreat){if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.d
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">TORQUE TOWER · FLOOR ${f}<small>${f>=TW_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
       ${rws.slice(0,4).map((q,k)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][k]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
-      <div class="rsU">${rws.length>4?rws.slice(4).map(q=>q[0]+' '+q[1]).join(' · ')+' · ':''}Record: floor ${t.b} / ${TW_N}</div>${f<TW_N?ANX_ROW:''}</div>
-      <div class="rsM"><div class="cpRow">${f<TW_N?'<button class="cpGo" data-a="twnext">NEXT FLOOR ▶</button>':''}<button class="cpGo alt" data-a="tw">TOWER</button></div></div>`;}
+      <div class="rsU">${rws.length>4?rws.slice(4).map(q=>q[0]+' '+q[1]).join(' · ')+' · ':''}Record: floor ${t.b} / ${TW_N}</div></div>
+      <div class="rsM">${f<TW_N?ANX_ROW:''}<div class="cpRow">${f<TW_N?'<button class="cpGo nf" data-a="twnext">NEXT FLOOR ▶</button>':''}<button class="cpGo alt" data-a="tw">TOWER</button></div></div>`;}
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">TORQUE TOWER · FLOOR ${f}<small>HOW TO GET STRONGER – tap one</small></div>
       <div class="rsDB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>works only in battles</span></div>
       <div class="rsDB b1" data-a="hsum">${TKI}<span><b>Summon more mechanics</b>higher color = much stronger · duplicates +1 star</span></div>
@@ -3463,8 +3464,8 @@ function ctFinish(win,retreat){const T=TE(),G=T.G,t=ctG(),F=B.tw,k=F.ct,f=F.f;le
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.set)rws.push([ctSetHtml({k,s:r.set.s,r:r.set.r}),'SET']);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${ROLE[k].n.toUpperCase()} TOWER · FLOOR ${f}<small>${f>=CT_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
       ${rws.slice(0,4).map((q,i)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][i]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
-      <div class="rsU">${setTxt?'New set piece: <b>'+setTxt+'</b> · ':''}Record: floor ${t[k]} / ${CT_N}</div>${f<CT_N&&ctOpenK(k)?ANX_ROW:''}</div>
-      <div class="rsM"><div class="cpRow">${f<CT_N&&ctOpenK(k)?'<button class="cpGo" data-a="ctnext">NEXT FLOOR ▶</button>':''}<button class="cpGo alt" data-a="ct">TOWER</button></div></div>`;}
+      <div class="rsU">${setTxt?'New set piece: <b>'+setTxt+'</b> · ':''}Record: floor ${t[k]} / ${CT_N}</div></div>
+      <div class="rsM">${f<CT_N&&ctOpenK(k)?ANX_ROW:''}<div class="cpRow">${f<CT_N&&ctOpenK(k)?'<button class="cpGo nf" data-a="ctnext">NEXT FLOOR ▶</button>':''}<button class="cpGo alt" data-a="ct">TOWER</button></div></div>`;}
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">${ROLE[k].n.toUpperCase()} TOWER · FLOOR ${f}<small>HOW TO GET STRONGER – tap one</small></div>
       <div class="rsDB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>set pieces of this class help a lot</span></div>
       <div class="rsDB b1" data-a="hsum">${TKI}<span><b>Summon more ${ROLE[k].n} heroes</b>only this class (+ Legend) fights here</span></div>
@@ -3876,7 +3877,7 @@ function dgFinish(win,retreat){const T=TE(),g=dgG(),F=B.tw,k=F.dg,f=F.f,D=DG[k];
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">${D.n} · FLOOR ${f}<small>${first&&f<DG_N?'FLOOR '+(f+1)+' IS OPEN':f>=DG_N&&first?'ALL FLOORS CLEARED!':'KEYS LEFT TODAY: '+ky}</small></div>
       ${R.rws.slice(0,4).map((q,i)=>`<div class="rsS" style="left:${[10.7,31.3,51.6,72][i]}%">${q[0]}<b>${q[1]}</b></div>`).join('')}
       <div class="rsU">${R.txt.includes(' · ')?R.txt.slice(R.txt.indexOf(' · ')+3)+' · ':''}Best: floor ${g.b[k]} / ${DG_N} · keys ${ky}/${dgMax()}</div></div>
-      <div class="rsM"><div class="cpRow">${ky&&f<DG_N&&f+1<=g.b[k]+1?'<button class="cpGo" data-a="dgnext">NEXT FLOOR ▶</button>':''}${ky?'<button class="cpGo alt" data-a="dgagain">AGAIN</button>':''}<button class="cpGo alt" data-a="dg">DUNGEON</button></div></div>`;}
+      <div class="rsM"><div class="cpRow">${ky&&f<DG_N&&f+1<=g.b[k]+1?'<button class="cpGo nf" data-a="dgnext">NEXT FLOOR ▶</button>':''}${ky?'<button class="cpGo alt" data-a="dgagain">AGAIN</button>':''}<button class="cpGo alt" data-a="dg">DUNGEON</button></div></div>`;}
   else{html=`<div class="rsD"><img class="hi" src="img/ui2/defeat.webp" alt="DEFEAT">${retreat?'<div class="rsR">RETREAT</div>':''}<div class="rsL">${D.n} · FLOOR ${f}<small>NO KEY USED – tap one to get stronger</small></div>
       <div class="rsDB b0" data-a="gear"><img src="img/ui2/i_forge.webp"><span><b>Equip & upgrade gear</b>Scrap Mine + Gear Forge give gear</span></div>
       <div class="rsDB b1" data-a="hsum">${TKI}<span><b>Summon more mechanics</b>higher color = much stronger · duplicates +1 star</span></div>
