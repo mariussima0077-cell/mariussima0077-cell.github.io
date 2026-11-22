@@ -34,6 +34,16 @@ const css=`#st{position:fixed;inset:0;z-index:59;display:none;flex-direction:col
 #st .card{position:relative;padding:10px;border-radius:16px;background:linear-gradient(#18243cf0,#0c1322f0);box-shadow:inset 0 0 0 2px var(--gc,#3a5d72),0 6px 14px #000a}
 #st .tr{display:block;width:100%;max-width:330px;margin:2px auto 0;filter:drop-shadow(0 4px 4px #000)}
 #st .gr{text-align:center;font-size:22px;color:var(--gc);text-shadow:0 2px 0 #000,0 0 14px var(--gc)}
+#st .card.rfSpin{animation:rfGlow .25s ease-in-out infinite alternate}#st .card.rfSpin .tr{animation:rfShake .09s linear infinite;filter:brightness(1.35) drop-shadow(0 0 12px var(--gc))}#st .card.rfSpin .gr{animation:rfBlink .12s linear infinite}
+#st .card.rfLand .tr{animation:rfPop .45s cubic-bezier(.2,1.6,.4,1)}#st .card.rfUp .tr{animation:rfPop .6s cubic-bezier(.2,1.8,.4,1)}#st .card.rfUp .gr{animation:rfPop .6s .1s cubic-bezier(.2,1.8,.4,1) both}
+#st .card.rfUp:after{content:"";position:absolute;inset:-6px;border-radius:18px;pointer-events:none;background:radial-gradient(circle at 50% 40%,#fff 0,var(--gc) 25%,transparent 65%);animation:rfBoom .9s ease-out forwards}
+#st .rfTx{position:absolute;left:0;right:0;top:12%;text-align:center;font-size:30px;color:#fff;text-shadow:0 3px 0 #000,0 0 18px var(--gc),0 0 30px var(--gc);pointer-events:none;animation:rfTx 1.6s ease-out forwards}
+@keyframes rfShake{0%{transform:translate(0,0)}25%{transform:translate(-3px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,2px)}100%{transform:translate(0,0)}}
+@keyframes rfGlow{from{box-shadow:inset 0 0 0 2px var(--gc),0 0 8px var(--gc)}to{box-shadow:inset 0 0 0 3px var(--gc),0 0 26px var(--gc)}}
+@keyframes rfBlink{50%{opacity:.45;transform:scale(1.08)}}
+@keyframes rfPop{0%{transform:scale(.7)}100%{transform:scale(1)}}
+@keyframes rfBoom{0%{opacity:.95;transform:scale(.3)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes rfTx{0%{opacity:0;transform:scale(2.4)}15%{opacity:1;transform:scale(1)}70%{opacity:1;transform:translateY(-10px)}100%{opacity:0;transform:translateY(-34px)}}
 #st .bar{height:14px;margin:6px 4px;border-radius:7px;background:#0008;overflow:hidden;box-shadow:inset 0 0 0 1px #fff3}#st .bar i{display:block;height:100%;background:linear-gradient(90deg,#26c6da,#ffe082)}
 #st .ln{display:flex;justify-content:space-between;gap:6px;font-size:13.5px;padding:2px 4px}#st .ln b{font-weight:400;color:#80deea}
 #st .btns{display:flex;gap:8px;margin-top:8px}#st .btns button{flex:1}
@@ -60,8 +70,18 @@ async function load(force){if(!O()){D={err:'offline'};render();return;}if(busy&&
 async function claimAll(){if(!D||!D.mine)return;const now=Date.now();for(const t of D.mine.filter(t=>t.t1<=now)){const r=await O().call('rwclaim',{id:t.id});
   if(r&&r.ok){give(r.tok);{const G=T().G;G.st=G.st||{};G.st.ar=(G.st.ar||0)+1;}   // v16-174: trains sent (TRAIN TYCOON)
     T().toast('🚆 Your '+GN(r.g)+' train arrived: +'+T().nf(r.tok)+' '+TI()+(r.lost?' (robbed: −'+T().nf(r.lost)+')':''),3200);D.mine=D.mine.filter(x=>x.id!==t.id);}}}
-function refresh(){const s=T().RWS(),mx=RFM();if(s.rf>=mx)return T().toast('🔒 This train grade is locked ('+mx+' refreshes used)',2200);const g0=s.g;T().rwRefresh();
-  T().toast(s.g>g0?'✨ Upgraded to '+GN(s.g)+'!':'🔄 Still '+GN(s.g)+' – '+(mx-s.rf)+' refresh left',2200);render();}
+// v16-186: REFRESH animation (Marius 22 nov) – the locomotive + grade spin like a slot machine, then land (burst + UPGRADE! when the grade goes up)
+let rfBusy=false;
+function refresh(){if(rfBusy)return;const s=T().RWS(),mx=RFM();if(s.rf>=mx)return T().toast('🔒 This train grade is locked ('+mx+' refreshes used)',2200);const g0=s.g;T().rwRefresh();const g1=s.g;
+  const card=el&&el.querySelector('.card'),img=card&&card.querySelector('img.tr'),gr=card&&card.querySelector('.gr'),bt=el&&el.querySelector('[data-s="rf"]');
+  const end=()=>{rfBusy=false;render();const c2=el&&el.querySelector('.card');if(c2){c2.classList.add(g1>g0?'rfUp':'rfLand');if(g1>g0)c2.insertAdjacentHTML('beforeend','<div class="rfTx">⬆ UPGRADE!</div>');}
+    T().toast(g1>g0?'✨ Upgraded to '+GN(g1)+'!':'🔄 Still '+GN(g1)+' – '+(mx-s.rf)+' refresh left',2200);};
+  if(!card){end();return;}
+  rfBusy=true;if(bt){bt.classList.add('dis');bt.textContent='🎰 ...';}card.classList.add('rfSpin');
+  const N=(T().RW_GN||[]).length||6,STEPS=14;let k=0;for(let g=0;g<N;g++){const im=new Image();im.src='img/rw/loco'+g+'.webp';}
+  const tick=()=>{if(k>=STEPS){card.classList.remove('rfSpin');end();return;}k++;const g=k===STEPS?g1:(g0+k)%N;
+    if(img&&!RP())img.src='img/rw/loco'+g+'.webp';if(gr)gr.textContent=GN(g);card.style.setProperty('--gc',GC(g));setTimeout(tick,40+k*k*1.1);};
+  tick();}
 async function send(){const s=T().RWS(),cap=T().rCap();if(s.n<cap)return T().toast('🚆 The train is not full yet ('+s.n+' / '+cap+' cars)',2200);
   if(D&&D.ok&&D.sends<=0)return T().toast('🚆 No trains left today ('+SMX()+' a day)',2200);if(busy)return;busy=true;
   await O().sync();const r=await O().call('rwsend',{g:s.g,tok:T().rwTok(s.g,s.n),cars:s.n});busy=false;
@@ -87,7 +107,7 @@ function buyNow(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it||s.tok<it[1])ret
 function logH(st){if(!st.log||!st.log.length)return '';const d=t=>new Date(t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
   return '<div class="stS">YOUR PURCHASES</div><div class="card">'+st.log.map(([t,k,p,l])=>'<div class="hl">'+d(t)+' · '+itName(k)+' · −'+TI()+' '+T().nf(p)+' <small>(left '+T().nf(l)+')</small></div>').join('')+'</div>';}
 function trainImg(g,w,me){return '<img class="tr" src="img/rw/'+(me&&RP()?'loco_gold':'loco'+g)+'.webp" alt=""'+(w?' style="width:'+w+'"':'')+'>';}
-function render(){if(!el||!el.classList.contains('open'))return;const G=T().G,body=document.getElementById('stBody'),now=Date.now(),st=S();let h='';
+function render(){if(!el||!el.classList.contains('open')||rfBusy)return;const G=T().G,body=document.getElementById('stBody'),now=Date.now(),st=S();let h='';
   h+='<div class="stBal">'+TI()+'<b>'+T().nf(st.tok)+'</b><span>STREET TOKENS<br>for the Street Shop</span></div>';
   if(RP())h+='<div class="rpOn"><img src="img/rw/rail_baron.webp" alt=""><div><b>RAIL PASS ACTIVE</b><small>4 trains · 7 attacks · 3 refreshes · 45 min fill · ×1.3 tokens · robbed = lose half</small></div></div>';
   else if(RPV())h+='<div class="rpAd" data-s="rp"><img src="img/rw/rail_pass_bnr.webp" alt=""><div><b>+1 TRAIN · +2 ATTACKS · ×1.3 TOKENS</b><em>RAIL PASS · €4.99 / month ›</em></div></div>';
