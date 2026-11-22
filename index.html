@@ -2831,9 +2831,15 @@ function bgDraw(L,sc,budget,onlyHave,count){
     else{const x0=Math.round(ox+i*TP*k),y0=Math.round(oy+j*TP*k),x1=Math.round(ox+(i+1)*TP*k),y1=Math.round(oy+(j+1)*TP*k);X.drawImage(c,x0,y0,x1-x0,y1-y0);}}
   return miss;}
 function drawBG(){
-  const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+Object.values(IMG).filter(i=>i._ok).length+'|'+(window.CC?CC.sig():'');
+  // v16-148: a picture that finishes loading no longer wipes the map at once (each wipe = whole map redrawn = 0.1-0.6 s freeze
+  // on cheap phones, several in a row after the start = "the map moves only after a few seconds"). The redraw waits until
+  // the fingers are off and the map stands still, and several pictures loaded close together cause ONE redraw.
+  const now=performance.now(),nImg=Object.values(IMG).filter(i=>i._ok).length;
+  const sig=JSON.stringify(G.lv)+G.rep+'|'+(PK.vip?1:0)+'|'+(window.CC?CC.sig():'');
+  if(nImg!==BG.nImgS){if(nImg!==BG.nImg){BG.nImg=nImg;BG.imgT=now;}
+    if(BG.nImgS==null||now-BG.imgT>450&&!gest&&!pts.size&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>400){BG.nImgS=nImg;BG.lvP=null;}}
   if(BG.lvP!==sig||!OV.c){BG.lv.clear();BG.cur=null;BG.lvP=sig;ovBuild();}
-  const sc=Z*DPR,det=DET,now=performance.now();BG.now=now;
+  const sc=Z*DPR,det=DET;BG.now=now;
   if(sc!==BG.lastSc){BG.lastSc=sc;BG.stableT=now;}
   const zooming=now-BG.stableT<250,C=BG.cur&&BG.lv.get(BG.cur);
   X.setTransform(1,0,0,1,0,0);
