@@ -17,7 +17,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=179;
+const CV=180;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -634,7 +634,7 @@ async function viewProfile(uid){const r=await call('view',{uid});if(!r.ok){toast
    <h3>BATTLE TEAM</h3><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${(p.team||[]).map((h,i)=>`<div data-m="h${i}" class="pkTap">${fcard(h.id,h.s,52)}</div>`).join('')||'<small style="color:#8fa0b4">No battle team yet</small>'}</div>${(p.team||[]).length?'<small class="pkHint">Tap a hero to see the gear</small>':''}
    <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,b=>{if(b[0]==='h'){const h=(p.team||[])[+b.slice(1)];if(h)peekHero(h,p);return false;}return true;});}
 // v16-176 (Marius): tap a hero on another player's profile → level, power, stats, skill and gear
-function peekHero(h,p){const c=C(),g=Math.max(0,Math.min(5,gradeOf(h.id))),nm=hName(h.id)||h.n||'Hero',sk=c&&c.peekSkill?c.peekSkill(h.id):null,old=!h.eq&&!h.lv;
+function peekHero(h,p){const c=C(),g=Math.max(0,Math.min(5,gradeOf(h.id))),nm=hName(h.id)||h.n||'Hero',sk=c&&c.peekSkill?c.peekSkill(h.id):null,old=!(h.eq&&h.eq.length)&&!h.lv;/* v16-180: the server always sends eq:[] and lv:0 → an empty list = team saved by an old version */
   const st=[['❤️ HP',fmtN(h.hp||0)],['⚔️ ATK',fmtN(h.atk||0)],['🛡️ DEF',fmtN(h.def||0)],['🎯 CRIT',h.crit!=null?Math.round(h.crit*1000)/10+'%':'—'],['⏱️ SPEED',h.as?Math.round(100/h.as)/100+'/s':'—']];
   modal(`<div class="pkH"><div class="pkC">${fcard(h.id,h.s,96)}</div><div class="pkT"><b style="color:${GRC[g]}">${esc(nm)}</b><small>${GRN[g]}${c&&c.roleOfId&&c.roleOfId(h.id)?' · '+esc(c.roleOfId(h.id)):''}</small>
      <div class="pkL">${[h.lv?'Lv '+h.lv:'',h.s?'+'+h.s:''].filter(Boolean).join(' · ')}</div><div class="pkP">${PWh} ${fmtN(h.pw||0)}</div><small style="color:#8fa0b4">${esc(p.name)}'s hero</small></div></div>
