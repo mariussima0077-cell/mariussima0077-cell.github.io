@@ -10,6 +10,7 @@ const API=()=>window.SEC&&SEC.api(), PID=()=>window.SEC&&SEC.PID;
 const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}};
 const LANG=(navigator.language||'en');
 const esc=s=>String(s??'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+const onD=p=>p&&p.on?'<i class="ond" title="online now"></i>':'';   // v16-189: green dot = online now (active in the last 10 min)
 const flag=cc=>cc&&/^[A-Z]{2}$/.test(cc)?String.fromCodePoint(...[...cc].map(c=>127397+c.charCodeAt(0))):'';
 const fmtN=n=>n>=1e9?(n/1e9).toFixed(n>=1e10?0:1)+'B':n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+'M':n>=1e4?Math.round(n/1e3)+'K':String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
 const toast=(m,d)=>{const t=T();if(t&&t.toast)t.toast(m,d||2600);};
@@ -17,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=188;
+const CV=189;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -95,6 +96,7 @@ const css=`
 @keyframes olSh{0%,55%{left:-60%}100%{left:130%}}
 #onl .body{flex:1;overflow:auto;padding:0 10px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #onl .body::-webkit-scrollbar{display:none}
+#onl .ond{display:inline-block;width:9px;height:9px;border-radius:50%;background:#3dff5a;box-shadow:0 0 6px #3dff5a;margin-right:4px;vertical-align:1px;animation:olPl 1.6s infinite}
 #onl .live{display:inline-flex;align-items:center;gap:5px;font:900 10px Game,system-ui;color:#7dff8a;letter-spacing:1px}
 #onl .live:before{content:"";width:8px;height:8px;border-radius:50%;background:#3dff5a;box-shadow:0 0 8px #3dff5a;animation:olPl 1.2s infinite}
 @keyframes olPl{50%{opacity:.25;transform:scale(.7)}}
@@ -469,11 +471,11 @@ async function loadRank(first){
   {const P=$('olPod');P.innerHTML=[1,0,2].map(i=>{const p=L[i];return `<div class="pd p${i+1}" ${p?`data-uid="${p.uid}"`:''}>${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}<div class="av">${p?avf(p.icon,p.frame):''}</div><div class="pn"><b>${p?'<span class="pnm">'+flag(p.cc)+' '+esc(p.name)+'</span>'+vipB(p.vip):'—'}</b><small>${p?val(p):''}</small></div></div>`;}).join('');}
   if(first||!B.querySelector('#olRows')){
     const pod=[1,0,2].map(i=>{const p=L[i];if(!p)return `<div class="g g${i+1}" style="opacity:.25">${medal(i+1)}<div class="av">${avf('m0_0',0)}</div><div class="o-n">—</div></div>`;
-      return `<div class="g g${i+1}" data-uid="${p.uid}">${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}${medal(i+1)}<div class="av">${avf(p.icon,p.frame)}</div><div class="o-n">${flag(p.cc)} ${esc(p.name)} ${vipB(p.vip)}</div>${tt(p.title)}<div class="o-st" data-v>${val(p)}</div><div class="ps">${subv(p)}</div></div>`;}).join('');
+      return `<div class="g g${i+1}" data-uid="${p.uid}">${i===0?'<svg class="crown" viewBox="0 0 64 48"><use href="#olCrown"/></svg>':''}${medal(i+1)}<div class="av">${avf(p.icon,p.frame)}</div><div class="o-n">${flag(p.cc)} ${onD(p)}${esc(p.name)} ${vipB(p.vip)}</div>${tt(p.title)}<div class="o-st" data-v>${val(p)}</div><div class="ps">${subv(p)}</div></div>`;}).join('');
     B.innerHTML=`<div id="olRows"></div><div class="o-note">Top 100 of your server · tap a player to see his profile</div>`;}
 
   const rows=$('olRows');const html=L.slice(3).map((p,i)=>{const ch=rkPrev[p.uid]!==undefined&&rkPrev[p.uid]!==p[rkBy];
-    return `<div class="o-row rk3 ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${fav(p.icon,p.frame)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)} ${vipB(p.vip)}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
+    return `<div class="o-row rk3 ${first?'in':''} ${ch?'flash':''} ${p.uid===r.me.uid?'me':''}" style="${first?`animation-delay:${Math.min(.8,.25+i*.05)}s`:''}" data-uid="${p.uid}"><span class="k">${i+4}</span>${fav(p.icon,p.frame)}<div class="o-nm"><b>${flag(p.cc)} ${onD(p)}${esc(p.name)} ${vipB(p.vip)}</b><small>${tt(p.title)} ${subv(p)}</small></div><div class="v">${val(p)}<small>${rkBy==='best'&&p.today?`<span class="o-up">▲${p.today}</span> today`:''}</small></div></div>`;}).join('');
   rows.innerHTML=html;
   L.forEach(p=>rkPrev[p.uid]=p[rkBy]);
   const m=r.me;$('olRkMe').innerHTML=`<div class="o-row rk3 me" data-uid="${m.uid}"><span class="k">${r.myRank}</span>${fav(m.icon,m.frame)}<div class="o-nm"><b>⭐ ${esc(m.name)} ${vipB(m.vip)}</b><small>${tt(m.title)} ${subv(m)}</small></div><div class="v">${val(m)}<small>${rkBy==='best'&&m.today?`<span class="o-up">▲${m.today}</span> today`:''}</small></div></div>`;}
@@ -542,7 +544,7 @@ const win=(a,b)=>{const E=1/(1+Math.pow(10,(b-a)/400));return Math.max(6,Math.ro
 function arenaTick(){if(!arData||arTab!=='fight')return;const s=$('olSeason');if(s)s.textContent=dur(arData.end-Date.now());const n=$('olTkN');if(n)n.textContent=arData.tkNext?'· +1 in '+dur(arData.tkNext-Date.now()):'';
   if(arData.tkNext&&Date.now()>arData.tkNext+1500){arData.tkNext=0;loadArena();}}
 async function arTop(){const B=$('olArB');const r=await call('atop',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not load.</div>';return;}
-  B.innerHTML=r.list.length?r.list.map((p,i)=>`<div class="o-row ar3 in ${ME&&p.uid===ME.uid?'me':''}" style="animation-delay:${Math.min(.6,i*.04)}s" data-uid="${p.uid}"><span class="k">${i+1}</span>${fav(p.icon,p.frame)}<div class="o-nm"><b>${flag(p.cc)} ${esc(p.name)}</b><small>${tt(p.title)} ${p.w}W / ${p.l}L</small></div><div style="width:30px">${badge(p.tier.lg)}</div><div class="v">${p.pts}<small>${p.tier.name}</small></div></div>`).join(''):'<div class="empty">Nobody in the Arena yet – be the first!</div>';}
+  B.innerHTML=r.list.length?r.list.map((p,i)=>`<div class="o-row ar3 in ${ME&&p.uid===ME.uid?'me':''}" style="animation-delay:${Math.min(.6,i*.04)}s" data-uid="${p.uid}"><span class="k">${i+1}</span>${fav(p.icon,p.frame)}<div class="o-nm"><b>${flag(p.cc)} ${onD(p)}${esc(p.name)}</b><small>${tt(p.title)} ${p.w}W / ${p.l}L</small></div><div style="width:30px">${badge(p.tier.lg)}</div><div class="v">${p.pts}<small>${p.tier.name}</small></div></div>`).join(''):'<div class="empty">Nobody in the Arena yet – be the first!</div>';}
 async function arHist(){const B=$('olArB');const r=await call('hist',{});if(!r.ok){B.innerHTML='<div class="empty">📶 Could not load.</div>';return;}
   B.innerHTML=r.list.length?r.list.map(h=>`<div class="hrow ${h.win?'hw':'hl'}"><b class="w ${h.win?'o-y':'o-n'}">${h.win?'WIN':'LOSS'}</b><span>${h.kind==='cup'?'🏟️':h.atk?'⚔️ you attacked':'🛡️ attacked you:'} <b>${esc(h.other)}</b><br><small>${new Date(h.t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${h.d>0?'+':''}${h.d} pts</small></span><button class="play" data-replay="${h.id}">▶ WATCH</button></div>`).join(''):'<div class="empty">No fights yet.</div>';}
 $('olArT').onclick=e=>{const b=e.target.closest('b');if(!b)return;arTab=b.dataset.t;$('olArT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));arData=null;loadArena();};
@@ -635,7 +637,7 @@ function nameModal(){const free=!(ME&&ME.chg>0);
      return false;});
   setTimeout(()=>{const i=$('olNm');if(i)i.focus();},200);}
 async function viewProfile(uid){const r=await call('view',{uid});if(!r.ok){toast('⚠️ Could not load the profile');return;}const p=r.p;
-  modal(`<div class="av" style="width:110px;height:118px;margin:0 auto">${avf(p.icon,p.frame)}</div><h4 style="margin:4px 0">${flag(p.cc)} ${esc(p.name)}</h4><div>${tt(p.title)}</div>
+  modal(`<div class="av" style="width:110px;height:118px;margin:0 auto">${avf(p.icon,p.frame)}</div><h4 style="margin:4px 0">${flag(p.cc)} ${onD(p)}${esc(p.name)}</h4><div>${tt(p.title)}</div>
    <div class="stats" style="margin-top:10px;text-align:left"><div>Campaign<b>⚔️ ${stLab(p.best)}</b></div><div>Team power<b>${PWh} ${fmtN(p.pow)}</b></div><div>Arena<b>${p.arena?p.arena.tier.name:'—'}</b></div><div>VIP · Cup wins<b>${p.vip} · 🏆 ${p.cupw}</b></div></div>
    <h3>BATTLE TEAM</h3><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${(p.team||[]).map((h,i)=>`<div data-m="h${i}" class="pkTap">${fcard(h.id,h.s,52)}</div>`).join('')||'<small style="color:#8fa0b4">No battle team yet</small>'}</div>${(p.team||[]).length?'<small class="pkHint">Tap a hero to see the gear</small>':''}
    <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,b=>{if(b[0]==='h'){const h=(p.team||[])[+b.slice(1)];if(h)peekHero(h,p);return false;}return true;});}

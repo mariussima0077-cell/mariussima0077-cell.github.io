@@ -148,7 +148,7 @@ function ccOf(lang) {
 }
 const langOf = l => { const x = String(l || 'en').slice(0, 2).toLowerCase(); return LANGS.includes(x) ? x : 'en'; };
 function pub(p, extra) {
-  return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.hv ? -1 : p.vip | 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, ...extra};
+  return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.hv ? -1 : p.vip | 0, on:Date.now() - (p.t | 0) < 10 * 60e3 ? 1 : 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, ...extra};
 }
 const isTst = pid => String(pid || '').startsWith('tst_');   // v16-91: owner's FULL TEST ACCOUNT (hidden from rankings)
 async function profOf(env, pid) { return pid && typeof pid === 'string' ? env.DB.prepare('SELECT * FROM prof WHERE pid=?').bind(pid.slice(0, 64)).first() : null; }
@@ -471,7 +471,7 @@ export async function onlineCron(env) { await ensure(env);
 // A few bot profiles (pid 'bot_…') on server 1: they show in rankings and are Arena opponents, climb slowly for some days to a LOW stage (20-120), then stop.
 // They NEVER get prizes (Arena daily/season, Cup, World Boss, events – the prize queries skip 'bot_'), never chat, never spend, have no Rail Wars train.
 // A new bot comes at most every 12 h while there are fewer than BOT_MAX; once there are BOT_REAL active real players, about one bot a day goes away.
-const BOT_MAX = 6, BOT_EVERY = 12 * HOUR, BOT_REAL = 30;
+const BOT_MAX = 6, BOT_FAST = 4, BOT_EVERY = 3 * HOUR, BOT_REAL = 30;   // v16-189 (Marius): 4 bots right away (one per cron), then one every 3 h up to 6
 const BOT_NAMES = ['TurboTom','NitroNico','GearHead88','LucasRPM','Mecha_Mia','DriftKing','Piston_Pete','RoadRunnerX','JulesGarage','ChromeJack','Andrei_V8','Kev_Wrench','SparkyLou','DieselDan','Sofi_Turbo','BoltBoss','RedlineRay','MaxTorque7','EmmaRev','OilyOscar'];
 const BOT_CC = ['FR','RO','GB','DE','ES','IT','PL','US','BR','PH','PT','NL'];
 const BOT_RO = [ // [hero name, class] per grade 0-3 (same order as ROSTER in index.html → id m<grade>_<i>)
@@ -490,11 +490,14 @@ async function botTick(env) {
   const db = env.DB, now = Date.now();
   const bots = (await db.prepare("SELECT uid, pid, name, created, bot FROM prof WHERE substr(pid,1,4)='bot_'").all()).results;
   const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>?").bind(now - 3 * DAY).first()).n;
+  // v16-189: bots climb to the level of the REAL players (median stage of the active ones, ×0.4-1.0), not to a tiny stage
+  const rb = (await db.prepare("SELECT best FROM prof WHERE srv=1 AND substr(pid,1,4) NOT IN ('bot_','tst_') AND t>? ORDER BY best").bind(now - 7 * DAY).all()).results.map(r => r.best | 0);
+  const med = rb.length ? rb[Math.floor(rb.length / 2)] : 60, tgOf = () => Math.max(20, Math.min(1500, Math.round(med * bRnd(.4, 1.0))));
   if (real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];   // ~1 a day (cron every 10 min)
       await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); } }
-  else if (bots.length < BOT_MAX && !bots.some(b => b.created > now - BOT_EVERY)) {
+  else if (bots.length < BOT_MAX && (bots.length < BOT_FAST || !bots.some(b => b.created > now - BOT_EVERY))) {
     const used = new Set((await db.prepare('SELECT nlow FROM prof WHERE srv=1').all()).results.map(r => r.nlow)), names = BOT_NAMES.filter(n => !used.has(n.toLowerCase()));
-    if (names.length) { const name = bPick(names), seed = Math.floor(Math.random() * 1e6), plan = {tg:Math.round(bRnd(20, 120)), life:Math.round(bRnd(3, 8) * DAY), seed, act:Math.round(bRnd(10, 21) * DAY)}, team = fillTeam(1, seed);
+    if (names.length) { const name = bPick(names), seed = Math.floor(Math.random() * 1e6), plan = {tg:tgOf(), v:2, life:Math.round(bRnd(3, 8) * DAY), seed, act:Math.round(bRnd(10, 21) * DAY)}, team = fillTeam(1, seed);
       const pid = 'bot_' + seed.toString(36) + now.toString(36);
       await db.prepare(`INSERT INTO prof(pid,srv,name,nlow,icon,cc,lang,vip,rep,best,bday,bd0,pow,lv,team,t,created,cunl,bot) VALUES(?,1,?,?,?,?,'en',?,?,1,?,1,?,?,?,?,?,'',?)`)
         .bind(pid, name, name.toLowerCase(), team[0].id, bPick(BOT_CC), Math.random() < .3 ? 1 : 0, 1, dayKey(now), teamPow(team), 14, JSON.stringify(team), now, now, JSON.stringify(plan)).run();
@@ -503,9 +506,11 @@ async function botTick(env) {
   for (const b of bots) {   // climb slowly to the target stage, then stop (after 'act' days they are not "active" any more: they leave the active rankings, stay as Arena opponents)
     let pl; try { pl = JSON.parse(b.bot || '{}'); } catch (e) { continue; }
     await db.prepare('UPDATE arena SET season=?, pts=?, peak=?, w=0, l=0, opp=? WHERE uid=? AND season<>?').bind(seasonOf(now), START_PTS, START_PTS, '[]', b.uid, seasonOf(now)).run();   // new Arena season → bots stay opponents
+    if (pl.tg && pl.v !== 2) { pl.tg = tgOf(); pl.v = 2; await db.prepare('UPDATE prof SET bot=? WHERE uid=?').bind(JSON.stringify(pl), b.uid).run(); }   // v16-189: old bots → new target
     const age = now - b.created; if (!pl.tg || age > pl.act) continue;
-    const f = Math.min(1, age / pl.life), stage = Math.max(1, Math.round(pl.tg * Math.pow(f, .7))), team = fillTeam(stage, pl.seed), dk = dayKey(now);
-    const on = f < 1 || Math.random() < .02;   // still climbing = online now; after that only a short "visit" now and then
+    const f = Math.min(1, age / pl.life), stage = Math.max(1, Math.round(pl.tg * (.3 + .7 * Math.pow(f, .7)))), team = fillTeam(stage, pl.seed), dk = dayKey(now);
+    const hs = (((pl.seed | 0) + Math.floor(now / HOUR)) * 2654435761) >>> 0;   // v16-189: online in sessions (~40% of the hours while climbing), not 24/7
+    const on = f < 1 ? hs % 100 < 40 : Math.random() < .02;
     if (!on) continue;
     const cur = await db.prepare('SELECT best, bday, bd0 FROM prof WHERE uid=?').bind(b.uid).first(); if (!cur) continue;
     const bd0 = cur.bday === dk ? cur.bd0 : cur.best;
