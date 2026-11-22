@@ -415,7 +415,7 @@ const css3=document.createElement('style');css3.textContent=`
 .gcRow .gb{grid-column:1/-1;font:800 12px Game,system-ui;color:#c9d6e2}.gcRow .gb b{color:#7CFC9A}
 .gcRow.ok{box-shadow:inset 0 0 0 2px var(--c),0 0 14px var(--c),0 3px 0 #000a}.gcRow.ok .gk::after{content:' ✓';color:#7CFC9A}
 .gcHs{grid-column:1/-1;display:flex;gap:5px;flex-wrap:wrap}
-.gcHs img{width:40px;height:40px;border-radius:8px;border:2px solid var(--c);object-fit:cover;background:#000}.gcHs img.no{filter:grayscale(1) brightness(.25);border-color:#333}
+.gcHs img{width:40px;height:40px;border-radius:8px;border:2px solid var(--c);object-fit:cover;background:#000}.gcHs img.no{filter:grayscale(1) brightness(.5) contrast(1.1);opacity:.85;border-color:#4a5260}
 .gcTot{margin:12px 4px 0;padding:10px 12px;border-radius:12px;background:#0b1424;box-shadow:inset 0 0 0 2px #ffb300;font:800 12.5px Game,system-ui;color:#ffe9a8;text-align:center}
 .gcTot b{color:#7CFC9A}
 /*UI3MORE*/
@@ -2886,7 +2886,7 @@ function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n
    <div class="gcSub">YOUR HEROES · tap a color above to jump to it</div>`;
   C.forEach(c=>{const g=T.GRADES[c.gr],L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon&&h.gr===c.gr);
     x+=`<div class="gcRow${c.tot&&c.n>=c.tot?' ok':''}" id="gcr${c.gr}" style="--c:${g.c};--c3:${g.c}33"><div class="wR g${c.gr} gcHd"><span class="gn">◆ ${g.n.toUpperCase()}</span><span class="gk">${c.n} / ${c.tot}${c.tot&&c.n>=c.tot?' <img src="img/ui5/ok.webp" alt="">':''}</span></div>
-     <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${d?portraitURL(h):T.portrait(h,1)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:''} alt="">`;}).join('')}</div></div>`;});
+     <div class="gcHs">${L.map(h=>{const d=T.G.h.disc[h.id];return `<img class="${d?'':'no'}" src="${portraitURL(h)}" ${d&&T.G.h.own[h.id]?`data-h="${h.id}"`:d?'':`data-hx="${h.id}"`} alt="">`;}).join('')}</div></div>`;});
   x+=`<div class="gcTot"><small style="color:#9fb0c0">The bonus works in the campaign and in the Arena. Summon new heroes to fill the collection.</small></div>`;
   morph($('gcW'),x);}
 function gPage(p){gpg=p;['gHero','gBag','gSalv','gColl'].forEach(id=>$(id).classList.toggle('open',id==={hero:'gHero',bag:'gBag',salv:'gSalv',coll:'gColl'}[p]));if(p==='coll'){renderColl();$('gColl').scrollTop=0;}if(p==='bag')$('gInv').scrollTop=0;if(p==='hero')$('gHero').scrollTop=0;if(p==='salv'){svPick=null;renderSalv();}renderPeds(pedList);pedGo();}
@@ -2981,7 +2981,8 @@ function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(
   x+=cmpForHero(h,ov,[],[])+`<button class="cpGo" data-p="aok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`;pop(x);}
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
-$('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr]');if(!el)return;
+$('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data-g],[data-h],[data-s],[data-f],[data-it],[data-sort],[data-ts],[data-gcr],[data-hx]');if(!el)return;
+  if(el.dataset.hx){const h=T.HB[el.dataset.hx];if(h)T.toast('🔒 '+h.n+' ('+T.GRADES[h.gr].n.toUpperCase()+') – not in your collection yet. Get it from HERO SUMMON',3000);return;}
   if(el.dataset.g==='back'){gPage('');$('cpGear').classList.remove('open');if(gRet){const f=gRet;gRet=null;f();return;}if(TWS.ret){TWS.ret=0;twOpen();return;}if(WBS.ret){WBS.ret=0;wbOpen();return;}if(DGS.ret){DGS.ret=0;rootOn();dgEl.classList.add('open');dgRender();return;}if(collHome){collHome=0;close();return;}if($('cpTeam').classList.contains('open')&&openTeam.render)openTeam.render();return;}
   if(el.dataset.g==='auto'){popAuto();return;}if(el.dataset.g==='none'){popNone();return;}
   if(el.dataset.g==='best'){popAutoBest();return;}
