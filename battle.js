@@ -780,12 +780,15 @@ const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{
 const hardOK=()=>TE().G.cp.best>=SPC;
 // v16-161 (Marius): ENDGAME RAMP – only the TOP (campaign 1000-1500, towers 300-500) climbs so the finals stay above the strongest possible team.
 // EG = how much stronger the very last stage / floor is than before. Computed by tools/endgame.py (python3 tools/endgame.py --apply) – re-run it after new content that raises power.
-const EG={camp:6.343,hard:0.87,tw:11.916,ct:7.183}; // EG-LINE (written by tools/endgame.py)
+const EG={camp:3.171,hard:0.87,tw:5.958,ct:3.591}; // EG-LINE (written by tools/endgame.py)
 const EGK=(K,x,a,b)=>K===1||x<=a?1:Math.pow(K,Math.min(1,(x-a)/(b-a)));
 const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499):1)*EGK(EG.camp,i,999,1499);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
 const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a normal team has 3-4 roles (+5-10%) → monsters +7% (from stage 15); 5 roles = a bit easier, 1-2 roles = a bit harder
-const stageMul0=i=>stageMulB(i)*GK(i)*TRK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
+// v16-161 (Marius 22 nov: "the power got bigger → make every stage and tower stronger, nobody should reach the end fast"): PK follows how much a normal team of that stage gained
+// with Legendary +10, Mythic AWAKENING, Mythic +15%, Ascended +20% and the stronger collections (measured with tools/endgame.py: Epic teams +4%, Legendary +6…+10 / Mythic copies ≈ ×2)
+const PKP=[[0,1.04],[100,1.06],[300,1.3],[600,1.7],[900,2]],PK=i=>{if(i<=0)return PKP[0][1];for(let k=1;k<PKP.length;k++){const [a,va]=PKP[k-1],[b,vb]=PKP[k];if(i<=b)return va+(vb-va)*(i-a)/(b-a);}return PKP[PKP.length-1][1];};
+const stageMul0=i=>stageMulB(i)*GK(i)*TRK(i)*PK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
 const stageMulB=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
 // v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
 const CP_MON=.25; // v16-99: .35→.25 – gear does not cost money any more (Gear Parts), money is only for the garage
