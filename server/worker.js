@@ -132,6 +132,7 @@ async function report(b, env) {
     .bind(b.pid, now, b.v | 0, b.app | 0, s.money | 0, s.sold | 0, s.xp | 0, s.vip | 0, s.lv | 0, s.best | 0, s.tk | 0, s.gtk | 0, s.heroes | 0, s.stars | 0, s.mythic | 0, score, banned, why.length && pts ? why.join(' · ') : null, flags).run();
   await db.prepare('INSERT INTO snaps(pid,t,money,lv,tk,vip,best) VALUES(?,?,?,?,?,?,?)').bind(b.pid, now, s.money | 0, s.lv | 0, s.tk | 0, s.vip | 0, s.best | 0).run();
   if (pts) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, banned ? 'ban' : 'flag', why.join(' · ')).run();
+  try { await ensureStats(env); await db.prepare('INSERT OR IGNORE INTO seen(day,pid) VALUES(?,?)').bind(parisDay(now), b.pid).run(); } catch (e) {}   // daily stats: who played on which day
   return {ok:true, serverTime:now, banned:!!banned, pkCheck: pkCheck && !banned, msg: banned ? 'Our anti-cheat system found impossible changes in this game (edited save, money/ticket hack or speed hack).' : undefined};
 }
 
@@ -187,6 +188,32 @@ async function scan(env) {
 // (online modes + cloud save only for players with a good result in the last 3 days; the browser and old apps are refused).
 const INTEG_OPS = ['sync', 'fight', 'refresh', 'wbhit', 'evsc', 'say', 'prof'];
 let integReady = false;
+// daily stats (/admin): one row per player per day (Paris time), kept 90 days
+let statsReady = false;
+async function ensureStats(env) {
+  if (statsReady) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS seen(day TEXT, pid TEXT, PRIMARY KEY(day, pid))').run();
+  statsReady = true;
+}
+const parisDay = t => new Date(t).toLocaleDateString('sv-SE', {timeZone:'Europe/Paris'});   // "2026-11-22"
+async function dailyStats(env) {
+  await ensureStats(env); const db = env.DB, now = Date.now(), day = 864e5;
+  const days = [...Array(30)].map((_, i) => parisDay(now - i * day));
+  const dau = Object.fromEntries((await db.prepare('SELECT day, COUNT(*) n FROM seen WHERE day>=? GROUP BY day').bind(days[29]).all()).results.map(r => [r.day, r.n]));
+  // D1 retention: new players of day X who were seen again on day X+1 (2 queries in total)
+  const newp = (await db.prepare('SELECT pid, first FROM players WHERE first>?').bind(now - 31 * day).all()).results;
+  const seenNew = new Set((await db.prepare('SELECT s.day || s.pid k FROM seen s JOIN players p ON p.pid=s.pid WHERE p.first>?').bind(now - 31 * day).all()).results.map(r => r.k));
+  const ret = {};
+  for (const r of newp) {
+    const d0 = parisDay(r.first), d1 = parisDay(r.first + day); if (d1 > days[0]) continue;
+    const x = ret[d0] || (ret[d0] = {n:0, b:0}); x.n++; if (seenNew.has(d1 + r.pid)) x.b++;
+  }
+  const fresh = {}; for (const r of newp) { const d = parisDay(r.first); fresh[d] = (fresh[d] || 0) + 1; }
+  const on = await db.prepare('SELECT SUM(last>?) m10, SUM(last>?) h1, SUM(last>?) d7, SUM(last>?) d30 FROM players').bind(now - 6e5, now - 36e5, now - 7 * day, now - 30 * day).first();
+  await db.prepare('DELETE FROM seen WHERE day<?').bind(parisDay(now - 90 * day)).run();
+  return {days, dau, fresh, ret, on};
+}
+
 async function ensureInteg(env) {
   if (integReady) return;
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS integ(pid TEXT PRIMARY KEY, t INTEGER, app TEXT, dev TEXT, lic TEXT, ok INTEGER, err TEXT)').run();
@@ -385,9 +412,15 @@ async function admin(url, env) {
   const igl = (await db.prepare('SELECT pid,t,app,dev,lic,ok,err FROM integ ORDER BY t DESC LIMIT 15').all()).results;
   const esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
+  let st = null; try { st = await dailyStats(env); } catch (e) {}
+  const stats = !st ? '' : `<h3>📊 Players per day (Paris time)</h3><div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
+<div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th></tr>${st.days.map(x => { const r = st.ret[x];
+  return `<tr style="border-top:1px solid #ffffff14"><td>${x.slice(5)}</td><td><b>${st.dau[x] ?? '–'}</b></td><td>${st.fresh[x] || 0}</td><td>${r && r.n ? `${r.b}/${r.n} (${Math.round(100 * r.b / r.n)}%)` : '–'}</td></tr>`; }).join('')}</table>
+<small>“Active” is counted from the day this update went live (older days show “–”). “New” works for the past too (players inactive 180+ days are removed).</small></div>`;
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
 <h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
+${stats}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
 <h3>Flagged / banned</h3>${bad.map(p => `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b> · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>flags: ${esc(p.flags)} · money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br>${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`).join('') || '<div class=c>Nobody flagged 👍</div>'}
