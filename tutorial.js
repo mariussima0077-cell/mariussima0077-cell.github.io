@@ -176,6 +176,8 @@ const PG={
   starcoll:{ok:()=>vis(document.querySelector('#gcW .scT')),t:`<b>★ STAR COLLECTION</b>: when <b>all</b> your heroes of a color reach a step (+5, +10 … Legendary +2…+10, Mythic Awakened I…V), <b>every battle hero</b> gets the bonus.`},
   evcal:{ok:()=>isOpen('ev')&&!!document.querySelector('#ev .evSch'),t:`<b>📅 EVENT CALENDAR</b> (button under the event): see the next events with their exact dates. New event: <b>DUNGEON RUSH</b> – every Dungeon key you use counts.`},
   tw500:{ok:()=>isOpen('tw')||isOpen('ct'),t:`<b>TOWERS</b> now have <b>500 floors</b>. The higher the floor, the bigger every reward. Class Towers: a <b>Mythic set piece</b> every 20 floors after 100 and a full <b style="color:#2ef3ff">ASCENDED SET</b> at floors 350-500.`},
+  // v16-164
+  bagfull:{ok:()=>isOpen('gBag')&&!isOpen('cpPop'),t:`<b>🎒 GEAR BAG</b>: battles never lose gear – the bag can go <b>over its limit</b>. When the counter is <b style="color:#ff6b6b">red</b>, only <b>GEAR SUMMON</b> is locked until you <b>SALVAGE</b>. Turn on <b>AUTO SALVAGE</b> to keep the bag clean.`},
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
