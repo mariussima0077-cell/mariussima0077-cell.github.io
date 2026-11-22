@@ -13,11 +13,16 @@ const today = () => { const d = new Date(now()); return d.getFullYear()+'-'+(d.g
 // ---------------- what is sold ----------------
 // one-time packs, in a chain (the next opens after the previous one is bought)
 const PACKS = [
-  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m3_1', dm:300,  tk:10, pk:{r:300,bk:1000}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
-  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m3_5', dm:800,  tk:20, gt:10, pk:{r:600,bk:2000}},
+  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m4_1', dm:300,  tk:10, pk:{r:300,bk:1000}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
+  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m4_3', dm:800,  tk:20, gt:10, pk:{r:600,bk:2000}},
   {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:7, hero:'m4_0', dm:1500, tk:30, gt:20, pk:{r:1200,bk:4000}},
   {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:6, hero:'m4_5', dm:3000, tk:50, gt:30, ct:20, pk:{r:2500,bk:8000}},
+  // v16-143 (Marius 21 nov): bigger one-time packs – ONLY summon tickets + Dungeon keys (key = keys for EACH of the 4 dungeons). Shown after their products exist in Play (NEWP)
+  {k:'p5', n:'MASTER PACK',  cls:'st4', price:'€19.99', val:5, tk:80,  gt:40,  ct:25,  key:5,  nw:1, bnr:'master'},
+  {k:'p6', n:'LEGEND PACK',  cls:'st5', price:'€49.99', val:5, tk:200, gt:100, ct:60,  key:12, nw:1, bnr:'legend'},
+  {k:'p7', n:'TITAN PACK',   cls:'st6', price:'€99.99', val:5, tk:420, gt:200, ct:120, key:25, nw:1, bnr:'titan'},
 ];
+const PACKSV = () => PACKS.filter(p=>!p.nw||NEWP());   // the packs the player can see
 const DIAMONDS = [
   {k:'d1', dm:300,   price:'€1.99',  ic:'ui3/v_dm'},
   {k:'d2', dm:800,   price:'€4.99',  ic:'ui3/v_dm'},
@@ -56,11 +61,12 @@ const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 function rwText(r){ const a=[];
   if(r.hero){ const h=T().HB[r.hero]; a.push((h?h.n:'Hero')); }
   if(r.dm) a.push(DMh+' '+r.dm.toLocaleString('en')); if(r.tk) a.push(r.tk+' Recruit'); if(r.gt) a.push(r.gt+' Gear'); if(r.ct) a.push(r.ct+' Crew');
-  if(r.money) a.push(T().fmt(r.money)); if(r.pk) a.push(r.pk.r+' of each role part + '+r.pk.bk+' Builder Kit'); return a.join(' + '); }
+  if(r.key) a.push(r.key+' keys for every dungeon'); if(r.money) a.push(T().fmt(r.money)); if(r.pk) a.push(r.pk.r+' of each role part + '+r.pk.bk+' Builder Kit'); return a.join(' + '); }
 function give(r, why){
   const t=T(), G=t.G;
   if(r.hero && t.gain){ t.gain(r.hero); if(t.heroRefresh) t.heroRefresh(); }
   t.giveRw({dm:r.dm||0, tk:r.tk||0, gt:r.gt||0, ct:r.ct||0, money:r.money||0, pk:r.pk||null});
+  if(r.key && window.DGK) DGK.K.forEach(d=>DGK.add(d, r.key));   // v16-143: Dungeon keys (they stay until used)
   if(window.SEC && SEC.rebase) SEC.rebase();          // big jumps from a purchase are not cheating
   t.save(); if(why) t.toast('🎁 '+why+': '+rwText(r), 4500);
   render();
@@ -159,7 +165,7 @@ button{font-family:inherit;cursor:pointer}
 #s2 .foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
 #s2 .val{font:900 12px Game,system-ui;color:#ffe08a}#s2 .val b{font-size:18px;color:#ff5a5a;display:block;line-height:1}
 #s2 .st0{--c:#7CFC9A;background:linear-gradient(135deg,#17442a,#0d1c14 70%)}#s2 .st1{--c:#4aa3ff;background:linear-gradient(135deg,#123a66,#0b1626 70%)}
-#s2 .st2{--c:#b46cff;background:linear-gradient(135deg,#3d1d6b,#150c26 70%)}#s2 .st3{--c:#ffb300;background:linear-gradient(135deg,#6b4a0a,#231705 70%)}
+#s2 .st2{--c:#b46cff;background:linear-gradient(135deg,#3d1d6b,#150c26 70%)}#s2 .st3{--c:#ffb300;background:linear-gradient(135deg,#6b4a0a,#231705 70%)}#s2 .st4{--c:#18ffff;background:linear-gradient(135deg,#0b4a55,#061a1e 70%)}#s2 .st5{--c:#ffd54a;background:linear-gradient(135deg,#7a5a0a,#2a1c03 70%)}#s2 .st6{--c:#ff4d4d;background:linear-gradient(135deg,#6b0d0d,#220505 70%)}
 #s2 .locked{filter:grayscale(.75) brightness(.6)}
 #s2 .chain{display:flex;justify-content:center;gap:6px;margin:4px 0 10px}#s2 .chain i{width:30px;height:6px;border-radius:3px;background:#2a3644}#s2 .chain i.on{background:#ffd54a;box-shadow:0 0 6px #ffb300}
 #s2 .dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-top:4px}
@@ -210,13 +216,13 @@ function render(){
   const fr=fundReady('fn')+fundReady('fh');
   h+='<div class="tabs">'+[['tp','ui3/sp_chest','PACKS'],['td','ui3/sp_dm','DIAMONDS'],['tv','ui3/sp_vip','VIP PASS'],['tf','ui3/v_gift','FUNDS']].map(([k,i,n])=>'<button data-t="'+k+'" class="'+(tab===k?'on':'')+'"><img src="'+IMG(i)+'" alt="">'+n+(k==='tf'&&fr?'<i>'+fr+'</i>':'')+'</button>').join('')+'</div><div class="pg">';
   if(tab==='tp'){
-    const nxt=PACKS.findIndex(p=>!pk[p.k]);
+    const PV=PACKSV(), nxt=PV.findIndex(p=>!pk[p.k]);
     if(nxt>=0){
-      h+='<div class="sec">SPECIAL OFFERS · ONE TIME ONLY</div><div class="chain">'+PACKS.map((p,i)=>'<i class="'+(i<=nxt?'on':'')+'"></i>').join('')+'</div>';
-      PACKS.forEach((p,i)=>{ if(pk[p.k]) return; const lk=i>nxt, hb=t.HB[p.hero];
-        h+='<div class="card pk '+p.cls+(lk?' locked':'')+'"><div class="bn"><img src="'+IMG('shop/pk_'+['starter','rookie','pro','elite'][i])+'" alt="'+p.n+'"><img class="hp" src="img/hero/'+p.hero+'.webp" alt="">'+(p.rib&&!lk?'<div class="rib">'+p.rib+'</div>':'')+'</div><div class="sub">'+(lk?'🔒 Opens after the '+PACKS[i-1].n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):(i===3?'The last offer – buy it once.':'Buy it once – then the next pack opens.'))+'</div><div class="items">'+
-          item('img/hero/'+p.hero+'.webp', hb?hb.n.split(' ')[0]+(hb.n.split(' ')[1]&&hb.n.split(' ')[0].length<5?' '+hb.n.split(' ')[1]:''):'Hero', p.hero[1]==='4'?'hero lg':'hero ep')+
-          item(IMG('ui3/v_dm'),p.dm.toLocaleString('en'))+item('img/ticket.webp','×'+p.tk)+(p.gt?item('img/gticket.webp','×'+p.gt):'')+(p.ct?item('img/cticket.webp','×'+p.ct):'')+(p.money?item(IMG('ui3/v_coins'),t.fmt(p.money)):'')+(p.pk?item('img/ui12/pk_tank.webp','×'+p.pk.r+' each')+item('img/ui12/pk_bk.webp','×'+p.pk.bk):'')+
+      h+='<div class="sec">SPECIAL OFFERS · ONE TIME ONLY</div><div class="chain">'+PV.map((p,i)=>'<i class="'+(i<=nxt?'on':'')+'"></i>').join('')+'</div>';
+      PV.forEach((p,i)=>{ if(pk[p.k]) return; const lk=i>nxt, hb=p.hero&&t.HB[p.hero];
+        h+='<div class="card pk '+p.cls+(lk?' locked':'')+'"><div class="bn"><img src="'+IMG('shop/pk_'+(p.bnr||['starter','rookie','pro','elite'][i]))+'" alt="'+p.n+'" onerror="this.onerror=null;this.src=\'img/shop/pk_elite.webp\'">'+(p.hero?'<img class="hp" src="img/hero/'+p.hero+'.webp" alt="">':'')+(p.rib&&!lk?'<div class="rib">'+p.rib+'</div>':'')+'</div><div class="sub">'+(lk?'🔒 Opens after the '+PV[i-1].n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):(p.key?'Summon tickets + '+p.key+' keys for EACH of the 4 dungeons (keys never expire). ':'')+(i===PV.length-1?'The last offer – buy it once.':'Buy it once – then the next pack opens.'))+'</div><div class="items">'+
+          (p.hero?item('img/hero/'+p.hero+'.webp', hb?hb.n.split(' ')[0]+(hb.n.split(' ')[1]&&hb.n.split(' ')[0].length<5?' '+hb.n.split(' ')[1]:''):'Hero', p.hero[1]==='4'?'hero lg':'hero ep'):'')+
+          (p.dm?item(IMG('ui3/v_dm'),p.dm.toLocaleString('en')):'')+item('img/ticket.webp','×'+p.tk)+(p.gt?item('img/gticket.webp','×'+p.gt):'')+(p.ct?item('img/cticket.webp','×'+p.ct):'')+(p.money?item(IMG('ui3/v_coins'),t.fmt(p.money)):'')+(p.pk?item('img/ui12/pk_tank.webp','×'+p.pk.r+' each')+item('img/ui12/pk_bk.webp','×'+p.pk.bk):'')+(p.key?item('img/ui2/i_key.webp','×'+p.key+' each'):'')+
           '</div><div class="foot"><span class="val"><b>×'+p.val+'</b>VALUE</span>'+(lk?'<button class="buy lock">🔒 '+P(p.k,p.price)+'</button>':'<button class="buy" data-b="'+p.k+'">'+P(p.k,p.price)+'</button>')+'</div></div>'; });
     } else h+='<div class="note">✓ You bought all special offers – thank you!</div>';
     h+='<div class="sec">FOREVER PACKS</div>'+[
