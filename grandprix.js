@@ -1,4 +1,4 @@
-// Torque Empire v16-185 (22 nov 2026, Marius): TORQUE GRAND PRIX – a ONE-TIME big event, 28 days (4 themed weeks).
+// Torque Empire v16-185 (22 nov 2026, Marius) · v16-186: the page opens ABOVE the Events page (z-index; Marius: "LET'S RACE → nothing opens"): TORQUE GRAND PRIX – a ONE-TIME big event, 28 days (4 themed weeks).
 // Everyone earns GP TOKENS from missions (daily / weekly / event) → GRAND PRIX ROAD (50 tiers, FREE lane: a MYTHIC of your choice at tier 50)
 // + GP SHOP (tokens → tickets, keys, Essence, Builder Kits, weekly limits) + a FREE weekly Pit-Stop chest.
 // LEGENDS = live TOP 100 of the server (Road points). PATRONS = SERVER GOAL: every player's points add up, each step = a gift for ALL.
@@ -85,7 +85,7 @@ function canClaim(){if(!live()||!T()||!T().G)return false;const s=S();if(s.ch!==
 function dot(){const d=document.getElementById('evDot');if(d&&canClaim())d.classList.add('on');}
 // ---------------------------------------------------------------- UI
 let el=null,tab='ev',sub='d',popEl=null;
-const css=`#gpx{position:fixed;inset:0;z-index:46;display:none;background:#0b0f18;overflow:hidden;font-family:Game,system-ui,sans-serif;color:#e8ecf2}
+const css=`#gpx{position:fixed;inset:0;z-index:59;display:none;background:#0b0f18;overflow:hidden;font-family:Game,system-ui,sans-serif;color:#e8ecf2}
 #gpx.open{display:block}#gpx .gpS{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,#2a1240 0,#141024 30%,#0b0f18 100%);padding-bottom:60px}
 #gpx .gpIn{max-width:520px;margin:0 auto}
 .gpBan{position:relative;height:clamp(250px,72vw,340px);overflow:hidden}.gpBan .bg{position:absolute;inset:0;background:url(img/gp/bg.webp) center 30%/cover}
@@ -137,8 +137,9 @@ const css=`#gpx{position:fixed;inset:0;z-index:46;display:none;background:#0b0f1
 .gpChamp{display:flex;gap:10px;align-items:center;border-radius:16px;padding:10px;background:linear-gradient(#2a1a08,#140d18);box-shadow:inset 0 0 0 2px #ffcf5a}.gpChamp .st{width:120px;flex:none;position:relative}
 .gpChamp .fig{position:relative;z-index:1;height:140px;background:url(img/hero/splash_m5_0.webp) center 15%/cover;filter:sepia(1) saturate(4) hue-rotate(-8deg) contrast(1.25);-webkit-mask:radial-gradient(ellipse 60% 70% at 50% 55%,#000 60%,transparent 72%);mask:radial-gradient(ellipse 60% 70% at 50% 55%,#000 60%,transparent 72%)}
 .gpChamp .ped{margin-top:-26px;aspect-ratio:400/177;background:url(img/gp/ped.webp) center/100% 100% no-repeat}.gpChamp .tx{font:12px system-ui;color:#ffe9c8;line-height:1.45}.gpChamp .tx b{color:#ffd54a}
-#gpPop{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:#000b}#gpPop.on{display:grid}#gpPop .box{width:90%;max-width:400px;max-height:86vh;overflow-y:auto;border-radius:18px;padding:16px;background:linear-gradient(#2c2148,#140f24);box-shadow:0 0 0 2px #ffcf5a}
+#gpPop{position:fixed;inset:0;z-index:62;display:none;place-items:center;background:#000b}#gpPop.on{display:grid}#gpPop .box{width:90%;max-width:400px;max-height:86vh;overflow-y:auto;border-radius:18px;padding:16px;background:linear-gradient(#2c2148,#140f24);box-shadow:0 0 0 2px #ffcf5a}
 #gpPop p{font:13px system-ui;color:#ddd;line-height:1.5}#gpPop p b{color:#ffd54a}
+body:has(#gpx.open) #toast{z-index:65}
 .gpEntry{position:relative;display:block;margin:6px 0 10px;border-radius:14px;overflow:hidden;height:96px;background:url(img/gp/bg.webp) center 30%/cover;box-shadow:0 0 0 2px #ffcf5a,0 0 14px #ffb30066;cursor:pointer}
 .gpEntry img{position:absolute;left:50%;top:50%;height:86%;transform:translate(-50%,-50%);filter:drop-shadow(0 3px 6px #000)}.gpEntry span{position:absolute;right:6px;bottom:5px;font:900 10px system-ui;background:#e2213b;color:#fff;border-radius:6px;padding:2px 6px}`;
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
