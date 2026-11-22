@@ -82,7 +82,7 @@ window.__BOT={
    while((G.dm||0)>=1000){G.dm-=1000;summon('m',11);r.m+=11;r.dm+=1000;}
    while(G.h.ct>=10){G.h.ct-=10;summon('c',11);r.c+=11;}
    while(G.h.ct>=1){G.h.ct-=1;summon('c',1);r.c++;}
-   const g=__BT.GSD();while(g.tk>=10){try{__BT.gsummon(10);}catch(e){this.log.push('gs '+e);break;}r.g+=11;}
+   const g=__BT.GSD();while(g.tk>=10){const t0=g.tk;try{__BT.gsummon(10);}catch(e){this.log.push('gs '+e);break;}if(g.tk>=t0)break;r.g+=11;}  /* v16-180: bag full → Gear Summon blocked (soft limit) – stop, no endless loop */
    // fusion: 3 Legendary +5 mechanics -> 1 Mythic
    for(const cat of ['m','d','g']){for(;;){const Y=Object.keys(G.h.own).filter(id=>HB[id].cat===cat&&HB[id].gr===4&&G.h.own[id].s>=FUSE_S);if(Y.length<3)break;
      Y.slice(0,3).forEach(id=>{const w=whereIs(id);if(w)delete G.h.as[w];delete G.h.own[id];});gain(pick(heroesOf(cat,5)).id);r.fuse=(r.fuse||0)+1;}}
