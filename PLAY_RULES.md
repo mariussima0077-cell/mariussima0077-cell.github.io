@@ -93,7 +93,7 @@ Ultima actualizare: 15 noiembrie 2026 (v16-45 – online: clasament, chat, aren�
 | Tip de date (Play) | Colectat | Partajat | Opțional? | Scop |
 |---|---|---|---|---|
 | App activity → **Other actions / Game progress** (rezumat progres pentru anti-cheat + salvarea din cloud) | Da | Nu | Anti-cheat: obligatoriu când e online · Cloud: opțional | App functionality, Fraud prevention / security, **Analytics** (din 22 nov 2026: număr jucători/zi în /admin – ⏳ de bifat în Play Console) |
-| Device or other IDs (ID anonim de jucător) | Da | Nu | Obligatoriu | Fraud prevention / security, App functionality, **Analytics** (din 22 nov 2026 – ⏳ de bifat în Play Console) |
+| Device or other IDs (ID anonim de jucător + din 22 nov 2026 „cheia de instalare” anonimă `te_dk`, făcută de joc, nu ID hardware) | Da | Nu | Obligatoriu | Fraud prevention / security, App functionality, **Analytics** (din 22 nov 2026 – ⏳ de bifat în Play Console) |
 | Personal info → **User IDs** (codul hash al contului Google, doar la login) | Da | Nu | **Opțional** | App functionality, Account management |
 | Financial info → Purchase history (prin Google Play, când vor fi plăți) | Da | Nu | Obligatoriu la cumpărare | App functionality, Fraud prevention |
 

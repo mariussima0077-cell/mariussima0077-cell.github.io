@@ -13,6 +13,7 @@
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
 
 import {online, onlineCron, onlineAdmin} from './online.js';
+import {EP_N, EP_H} from './ept.js';   // v16-157: enemy power of every campaign stage (made by tools/ept_table.py)
 
 // v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
 const GIFT_VIP = ['160672a2'];
@@ -24,7 +25,36 @@ const TESTER_UNBAN = ['03245000-cda3-4e5c-9e6d-d388955218a8'];   // v16-103: one
 const PARTS_T = Date.parse('2026-11-21T00:00:00Z');   // v16-129: garages upgraded with parts (buildings rule recalibrated in v16-150)
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20,
-  mem_edit:100, unpaid_pack:100};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
+  mem_edit:100, unpaid_pack:100, honeypot:100};   // v16-157: honeypot = a bait value that only a cheat tool can change
+// ------------------------------------------------------------------ v16-157 SMARTER GUARD (Marius, 22 nov 2026)
+// Every warning belongs to a KIND of sign. An automatic BAN needs score ≥ BAN_AT AND (a PROOF or 2 different kinds).
+// One kind only (e.g. only 'campaign too fast') → SHADOW (hidden): the player keeps playing but is out of every ranking,
+// Arena / Rail Wars opponent list and prize – he does not see it, so he does not make a new account. Marius decides in /admin.
+const SHADOW_AT = 60;
+const KIND = {mem_edit:'proof', honeypot:'proof', unpaid_pack:'proof', impossible:'proof', edited_save:'save', speed_hack:'speed', clock_back:'clock',
+  money_jump:'econ', ticket_jump:'econ', gear_ticket_jump:'econ', vip_jump:'econ'};
+const kindsOf = s => new Set(String(s || '').split(',').filter(Boolean));
+const canBan = k => k.has('proof') || k.size >= 2;
+// fastest possible campaign stage: ~5 s of fight at speed ×1 → ~1.7 s at ×3, + 3 s AUTO NEXT countdown (tested with sims, v16-157)
+const STAGE_MIN_S = 4, RCPT_MIN_MS = 1200;
+// power: in simulations a team never won when the monsters were 2× stronger → only ×3.5 or more counts (manual skills, luck)
+const POWER_BAD = 3.5, POWER_NOTE = 2.5;
+let gReady = false;
+async function ensureG(env) {
+  if (gReady) return; const db = env.DB;
+  for (const q of ['ALTER TABLE players ADD COLUMN bmax INTEGER DEFAULT 0', 'ALTER TABLE players ADD COLUMN shadow INTEGER DEFAULT 0',
+    'ALTER TABLE players ADD COLUMN sig TEXT', 'ALTER TABLE players ADD COLUMN pw INTEGER DEFAULT 0', 'ALTER TABLE players ADD COLUMN dk TEXT',
+    'ALTER TABLE snaps ADD COLUMN pw INTEGER DEFAULT 0']) { try { await db.prepare(q).run(); } catch (e) {} }
+  await db.batch([
+    db.prepare('CREATE TABLE IF NOT EXISTS devs(dk TEXT, pid TEXT, t INTEGER, PRIMARY KEY(dk, pid))'),
+    db.prepare('CREATE INDEX IF NOT EXISTS devs_pid ON devs(pid, t)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS ledg(pid TEXT, day TEXT, b0 INTEGER, m INTEGER DEFAULT 0, dm INTEGER DEFAULT 0, tk INTEGER DEFAULT 0, ct INTEGER DEFAULT 0, gtk INTEGER DEFAULT 0, vip INTEGER DEFAULT 0, PRIMARY KEY(pid, day))'),
+    db.prepare('CREATE TABLE IF NOT EXISTS rcpt(pid TEXT, t INTEGER, si INTEGER, h INTEGER, ms INTEGER, pw INTEGER, ep INTEGER, sp REAL, bad TEXT)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS rcpt_pid ON rcpt(pid, t)'),
+  ]);
+  gReady = true;
+}
+export {ensureG};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
 // v16-104: pack key in the game → product ID in Play Console (same as SKU in secure.js; consumables are not checked)
 const PACK_SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', plat:'vip_pass_platinum',
   p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite', p5:'pack_master', p6:'pack_legend', p7:'pack_titan', fn:'fund_normal', fh:'fund_hard',
@@ -39,6 +69,7 @@ export default {
     const url = new URL(req.url);
     if (req.method === 'OPTIONS') return json({});
     try {
+      await ensureG(env);   // v16-157: new columns / tables (once per server start)
       if (url.pathname === '/api/report' && req.method === 'POST') return json(await report(await req.json(), env));
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
       if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') { const op = url.pathname.slice(11), b = await req.json();
@@ -56,7 +87,7 @@ export default {
       return json({err:'not found'}, 404);
     } catch (e) { return json({err:String(e)}, 500); }
   },
-  async scheduled(ev, env, ctx) { ctx.waitUntil(scan(env)); ctx.waitUntil(onlineCron(env)); }
+  async scheduled(ev, env, ctx) { await ensureG(env); ctx.waitUntil(scan(env)); ctx.waitUntil(onlineCron(env)); }
 };
 
 // ------------------------------------------------------------------ report
@@ -101,38 +132,88 @@ async function report(b, env) {
   }
   // 1) warning signs found by the game itself
   const newFlags = (b.flags || []).filter(f => FLAG_PTS[f] && !(old && (old.flags || '').split(',').includes(f)));
-  newFlags.forEach(f => { pts += FLAG_PTS[f]; why.push('client:' + f); });
+  const kinds = kindsOf(old && old.sig); const add = (p, k, w) => { pts += p; if (k) kinds.add(k); why.push(w); };
+  newFlags.forEach(f => { pts += FLAG_PTS[f]; kinds.add(KIND[f] || 'client'); why.push('client:' + f); });
+  // v16-157: install key → same account on 2 phones at the same time (cloud save) = 'dual' (not cheating by itself, but its
+  // numbers jump back and forth between the 2 phones → the progress rules must not count those jumps)
+  const dk = typeof b.dk === 'string' && /^k[a-z0-9]{6,40}$/.test(b.dk) ? b.dk : null;
+  let dual = false;
+  if (dk) { await db.prepare('INSERT INTO devs(dk,pid,t) VALUES(?,?,?) ON CONFLICT(dk,pid) DO UPDATE SET t=excluded.t').bind(dk, b.pid, now).run();
+    dual = !!(await db.prepare('SELECT 1 FROM devs WHERE pid=? AND dk<>? AND t>?').bind(b.pid, dk, now - 30 * 60e3).first());
+    if (dual && !(await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='dual' AND t>?").bind(b.pid, now - 864e5).first()))
+      await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'dual', 'same account on 2 phones at the same time (info only)').run(); }
+  const bmaxOld = old ? Math.max(old.bmax || 0, old.best || 0) : 0, bmax = Math.max(bmaxOld, s.best | 0);
   // 2) impossible numbers
-  if (s.mythic > 6 || s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 1500 || s.money < 0) { pts += 100; why.push('impossible_values'); }
+  if (s.mythic > 6 || s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 1500 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
   // 3) compared with the last report
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);
+    // v16-157: 2 phones on the same account report in turn → compare with the HIGHEST value of the last 24 h, not with the
+    // other phone's lower number (that made fake jumps). A cheater gains nothing by faking a 2nd phone: the rules still apply.
+    if (dual) { const mx = await db.prepare('SELECT MAX(money) money, MAX(tk) tk, MAX(vip) vip, MAX(lv) lv FROM snaps WHERE pid=? AND t>?').bind(b.pid, now - 864e5).first();
+      if (mx) for (const f of ['money', 'tk', 'vip', 'lv']) old[f] = Math.max(old[f] || 0, mx[f] || 0); }
     const ps = capPerSec(Math.max(s.lv, old.lv));
     const capMoney = 600 * ps + ps * dt + 22 * 3600 * ps / 20;   // v16-122: + 3 Quick Idle (2 h each)     // + a full idle chest (max 14h at VIP 10)
-    if (s.money - old.money > capMoney) { pts += 40; why.push(`money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`); }
+    if (s.money - old.money > capMoney) add(40, 'econ', `money +${Math.round(s.money - old.money)} in ${Math.round(dt)}s`);
     // v16-122: purchases give VIP points (1 € = 20) → allow 2,100 per confirmed purchase since the last report
     const nb = old ? ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(b.pid, old.last - 6e5).first()) || {n:0}).n : 0;
     // v16-143: a confirmed purchase may bring up to 450 tickets (TITAN PACK)
-    if (s.tk - old.tk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`tickets +${s.tk - old.tk}`); }
-    if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
-    if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
+    if (s.tk - old.tk > 100 + dt / 45 + nb * 450) add(30, 'econ', `tickets +${s.tk - old.tk}`);
+    if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450 && !dual) add(30, 'econ', `gear tickets +${s.gtk - old.gtk}`);
+    if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) add(35, 'econ', `vip +${s.vip - old.vip}`);
     // v16-151 (Wazza4ever banned 22 nov): AUTO NEXT (v16-25) + battle speed x3 + a strong team clear easy stages in ~8 s each
     // while the game is just left ON → old limit (30 + 1 per 90 s) banned honest players. Now ~1 stage per 5 s, only 15 pts.
-    if (s.best - old.best > 30 + dt / 5) { pts += 15; why.push(`campaign +${s.best - old.best} stages`); }
+    // v16-157: compared with the BEST stage ever reported (not the last one: 2 phones / a cloud load made fake jumps, e.g. Wazza4ever
+    // +42 on 22 nov) and with the FASTEST fight possible (AUTO NEXT + ×3 ≈ 1 stage per 4.7 s). Faster than that is impossible.
+    const gain = bmax - bmaxOld;
+    if (gain > 10 + dt / STAGE_MIN_S) add(40, 'speed', `campaign +${gain} stages in ${Math.round(dt)}s (faster than the fastest fight)`);
     // v16-150 (server): since v16-129 garages are upgraded with PARTS (LV1-10 = 40-350 parts, ~350 parts per new stage at stage 100,
     // + the parts gift for old saves) → +30 levels in one session is normal. Old rule (12 + 1 per 10 min, 30 pts) flagged honest testers.
     // Now: only a huge jump (most of the map at once) and only 15 pts (never a ban by itself; max total is ~140).
-    if (s.lv - old.lv > 45 + dt / 120) { pts += 15; why.push(`buildings +${s.lv - old.lv} levels`); }
+    if (s.lv - old.lv > 45 + dt / 120) add(15, 'prog', `buildings +${s.lv - old.lv} levels`);
     if (s.sold < old.sold || s.xp < old.xp) { /* new save / reinstall – allowed, just note it */ why.push('progress_reset'); }
   }
+  // 4) v16-157 BATTLE RECEIPTS: team power vs. the monsters of that stage + duration of the fight
+  let pwLast = old ? old.pw || 0 : 0;
+  if (Array.isArray(b.rc) && b.rc.length) {
+    let nPow = 0, nSpd = 0, worst = 0, wsi = 0; const rows = [];
+    for (const r of b.rc.slice(-60)) {
+      const si = r.si | 0, h = r.h ? 1 : 0, pw = Math.max(0, +r.pw || 0), ms = Math.max(0, r.ms | 0), sp = +r.sp || 1;
+      if (si < 0 || si >= EP_N.length || !pw) continue;
+      const ep = (h ? EP_H : EP_N)[si], ratio = ep / pw; const bad = [];
+      if (ratio > POWER_BAD) { nPow++; bad.push('power'); } else if (ratio > POWER_NOTE) bad.push('close');
+      if (ms > 0 && ms < RCPT_MIN_MS) { nSpd++; bad.push('fast'); }
+      if (ratio > worst) { worst = ratio; wsi = (h ? 'H ' : '') + (Math.floor(si / 20) + 1) + '-' + (si % 20 + 1); }
+      pwLast = pw; rows.push(db.prepare('INSERT INTO rcpt(pid,t,si,h,ms,pw,ep,sp,bad) VALUES(?,?,?,?,?,?,?,?,?)').bind(b.pid, +r.t || now, si, h, ms, Math.round(pw), ep, sp, bad.join(',') || null));
+    }
+    if (rows.length) await db.batch(rows);
+    if (nPow) add(40, 'power', `won ${nPow} stage(s) with a team too weak (stage ${wsi}: monsters ×${worst.toFixed(1)} stronger)`);
+    if (nSpd) add(30, 'speed', `${nSpd} fight(s) shorter than ${RCPT_MIN_MS / 1000}s`);
+  }
+  // 5) v16-157 LEDGER: what the game GAVE today. Diamonds: max ~10,000 a day free + 40 per new stage + 25,000 per purchase + mails
+  if (b.lg && typeof b.lg === 'object') {
+    const day = parisDay(now), g = k => Math.max(0, Math.min(2e9, Math.round(+b.lg[k] || 0)));
+    await db.prepare(`INSERT INTO ledg(pid,day,b0,m,dm,tk,ct,gtk,vip) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(pid,day) DO UPDATE SET m=m+excluded.m, dm=dm+excluded.dm, tk=tk+excluded.tk, ct=ct+excluded.ct, gtk=gtk+excluded.gtk, vip=vip+excluded.vip`)
+      .bind(b.pid, day, bmaxOld, g('m'), g('dm'), g('tk'), g('ct'), g('gtk'), g('vip')).run();
+    const L = await db.prepare('SELECT * FROM ledg WHERE pid=? AND day=?').bind(b.pid, day).first();
+    const nbD = ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(b.pid, now - 864e5).first()) || {n:0}).n;
+    let mailDm = 0; try { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(b.pid).first();
+      if (pr) for (const m of (await db.prepare('SELECT rw FROM inbox WHERE uid=? AND t>?').bind(pr.uid, now - 2 * 864e5).all()).results) mailDm += +(JSON.parse(m.rw || '{}').dm || 0); } catch (e) {}
+    const capDm = 10000 + 40 * Math.max(0, bmax - (L.b0 || 0)) + 25000 * nbD + mailDm;
+    if (L.dm > capDm && !isGift(b.pid) && !(await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'ledger:%'").bind(b.pid, now - 864e5).first()))
+      add(25, 'econ', `ledger: +${L.dm} diamonds today (max possible ~${capDm})`);
+  }
   const score = Math.min(999, (old ? old.score : 0) + pts);
-  const banned = old && old.banned ? 1 : (score >= BAN_AT ? 1 : 0);
+  // v16-157: ban only with a PROOF or 2 different kinds of signs; otherwise hidden (shadow) from score SHADOW_AT
+  const banned = old && old.banned ? 1 : (score >= BAN_AT && canBan(kinds) ? 1 : 0);
+  const shadow = old && old.shadow === 2 ? 2 : (!banned && score >= SHADOW_AT ? 1 : old && old.shadow === 1 && score >= 30 ? 1 : 0);
+  if (shadow === 1 && !(old && old.shadow)) why.push('→ hidden (shadow)');
   const flags = [...new Set([...(old && old.flags ? old.flags.split(',') : []), ...(b.flags || [])])].filter(Boolean).join(',');
-  await db.prepare(`INSERT INTO players(pid,first,last,ver,app,money,sold,xp,vip,lv,best,tk,gtk,heroes,stars,mythic,score,banned,reason,flags)
-    VALUES(?1,?2,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19)
-    ON CONFLICT(pid) DO UPDATE SET last=?2,ver=?3,app=?4,money=?5,sold=?6,xp=?7,vip=?8,lv=?9,best=?10,tk=?11,gtk=?12,heroes=?13,stars=?14,mythic=?15,score=?16,banned=?17,reason=COALESCE(?18,reason),flags=?19`)
-    .bind(b.pid, now, b.v | 0, b.app | 0, s.money | 0, s.sold | 0, s.xp | 0, s.vip | 0, s.lv | 0, s.best | 0, s.tk | 0, s.gtk | 0, s.heroes | 0, s.stars | 0, s.mythic | 0, score, banned, why.length && pts ? why.join(' · ') : null, flags).run();
-  await db.prepare('INSERT INTO snaps(pid,t,money,lv,tk,vip,best) VALUES(?,?,?,?,?,?,?)').bind(b.pid, now, s.money | 0, s.lv | 0, s.tk | 0, s.vip | 0, s.best | 0).run();
+  await db.prepare(`INSERT INTO players(pid,first,last,ver,app,money,sold,xp,vip,lv,best,tk,gtk,heroes,stars,mythic,score,banned,reason,flags,bmax,shadow,sig,pw,dk)
+    VALUES(?1,?2,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21,?22,?23,?24)
+    ON CONFLICT(pid) DO UPDATE SET last=?2,ver=?3,app=?4,money=?5,sold=?6,xp=?7,vip=?8,lv=?9,best=?10,tk=?11,gtk=?12,heroes=?13,stars=?14,mythic=?15,score=?16,banned=?17,reason=COALESCE(?18,reason),flags=?19,bmax=?20,shadow=?21,sig=?22,pw=?23,dk=COALESCE(?24,dk)`)
+    .bind(b.pid, now, b.v | 0, b.app | 0, s.money | 0, s.sold | 0, s.xp | 0, s.vip | 0, s.lv | 0, s.best | 0, s.tk | 0, s.gtk | 0, s.heroes | 0, s.stars | 0, s.mythic | 0, score, banned, why.length && pts ? why.join(' · ') : null, flags, bmax, shadow, [...kinds].join(',') || null, Math.round(pwLast) || 0, dk).run();
+  await db.prepare('INSERT INTO snaps(pid,t,money,lv,tk,vip,best,pw) VALUES(?,?,?,?,?,?,?,?)').bind(b.pid, now, s.money | 0, s.lv | 0, s.tk | 0, s.vip | 0, s.best | 0, Math.round(pwLast) || 0).run();
   if (pts) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, banned ? 'ban' : 'flag', why.join(' · ')).run();
   try { await ensureStats(env); await db.prepare('INSERT OR IGNORE INTO seen(day,pid) VALUES(?,?)').bind(parisDay(now), b.pid).run(); } catch (e) {}   // daily stats: who played on which day
   return {ok:true, serverTime:now, banned:!!banned, pkCheck: pkCheck && !banned, msg: banned ? 'Our anti-cheat system found impossible changes in this game (edited save, money/ticket hack or speed hack).' : undefined};
@@ -142,7 +223,7 @@ async function report(b, env) {
 async function scan(env) {
   const db = env.DB, now = Date.now(), day = 864e5;
   // a) 24-hour check: total money earned over a day must be possible with the player's buildings
-  const rows = (await db.prepare('SELECT pid,lv,score,banned FROM players WHERE last>? AND banned=0').bind(now - day).all()).results;
+  const rows = (await db.prepare('SELECT pid,lv,score,banned,sig,shadow FROM players WHERE last>? AND banned=0').bind(now - day).all()).results;
   for (const p of rows) {
     const r = await db.prepare('SELECT MIN(t) t0, MAX(t) t1, MIN(money) m0, MAX(money) m1, MIN(vip) v0, MAX(vip) v1 FROM snaps WHERE pid=? AND t>?').bind(p.pid, now - day).first();
     if (!r || !r.t0) continue;
@@ -153,8 +234,9 @@ async function scan(env) {
     // v16-151: the bot runs every 10 min – a 24h rule may add points only ONCE per 24h (before: +50 every 10 min = ban in 20 min)
     if (why.length && await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'bot:%'").bind(p.pid, now - day).first()) continue;
     if (why.length) {
-      const score = p.score + 50, ban = score >= BAN_AT ? 1 : 0;
-      await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, why.join(' · '), p.pid).run();
+      const k = kindsOf(p.sig); k.add('econ');
+      const score = p.score + 50, ban = score >= BAN_AT && canBan(k) ? 1 : 0, sh = p.shadow === 2 ? 2 : (!ban && score >= SHADOW_AT ? 1 : p.shadow || 0);   // v16-157
+      await db.prepare('UPDATE players SET score=?, banned=?, reason=?, sig=?, shadow=? WHERE pid=?').bind(score, ban, why.join(' · '), [...k].join(','), sh, p.pid).run();
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, ban ? 'ban' : 'flag', 'bot: ' + why.join(' · ')).run();
     }
   }
@@ -186,8 +268,39 @@ async function scan(env) {
   // b) the same purchase token used by different players = shared / stolen purchase
   const dup = (await db.prepare('SELECT token, COUNT(DISTINCT pid) n FROM purchase_use GROUP BY token HAVING n>2').all()).results;
   for (const d of dup) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'token', 'purchase token used by ' + d.n + ' players').run();
+  // v16-157 SMARTER GUARD – once a day (Paris time)
+  const today = parisDay(now);
+  if (!(await db.prepare("SELECT 1 FROM events WHERE kind='fix' AND detail=?").bind('v16-157 day ' + today).first())) {
+    await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'fix', 'v16-157 day ' + today).run();
+    // e) points go DOWN with honest play: −10 a day without any new warning; under 30 the automatic shadow is lifted; at 0 the kinds are forgotten
+    await db.prepare(`UPDATE players SET score=MAX(0,score-10) WHERE banned=0 AND score>0 AND COALESCE(reason,'') NOT LIKE '%by admin%'
+      AND pid NOT IN (SELECT pid FROM events WHERE t>? AND kind IN ('flag','ban'))`).bind(now - day).run();
+    await db.prepare('UPDATE players SET shadow=0 WHERE shadow=1 AND score<30').run();
+    await db.prepare('UPDATE players SET sig=NULL, reason=NULL WHERE score=0 AND banned=0 AND sig IS NOT NULL').run();
+    // f) many accounts on one phone (info) – 3+ Player IDs with the same install key in 7 days
+    for (const r of (await db.prepare('SELECT dk, COUNT(*) n, GROUP_CONCAT(substr(pid,1,8)) ids FROM devs WHERE t>? GROUP BY dk HAVING n>=3').bind(now - 7 * day).all()).results)
+      await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'multi', `${r.n} accounts on one phone: ${r.ids}`).run();
+    // g) "feeding": an account that keeps beating (Arena / Rail Wars) another account from THE SAME phone → +25 to the winner
+    try {
+      const fd = (await db.prepare(`SELECT pa.pid apid, pd.pid dpid, COUNT(*) n FROM ahist h JOIN prof pa ON pa.uid=h.a JOIN prof pd ON pd.uid=h.d
+        JOIN devs da ON da.pid=pa.pid JOIN devs dd ON dd.pid=pd.pid AND dd.dk=da.dk WHERE h.t>? AND h.win=1 AND h.d>0 GROUP BY pa.pid, pd.pid HAVING n>=3`).bind(now - day).all()).results;
+      for (const f of fd) { const p = await db.prepare('SELECT score,sig,shadow,banned FROM players WHERE pid=?').bind(f.apid).first(); if (!p || p.banned) continue;
+        const k = kindsOf(p.sig); k.add('pvp'); const score = p.score + 25, ban = score >= BAN_AT && canBan(k) ? 1 : 0, sh = p.shadow === 2 ? 2 : (!ban && score >= SHADOW_AT ? 1 : p.shadow || 0);
+        const w = `feeding: beat ${f.n}× an account from the same phone (${String(f.dpid).slice(0, 8)})`;
+        await db.prepare('UPDATE players SET score=?, banned=?, shadow=?, sig=?, reason=? WHERE pid=?').bind(score, ban, sh, [...k].join(','), w, f.apid).run();
+        await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(f.apid, now, ban ? 'ban' : 'flag', w).run(); }
+    } catch (e) {}
+    // h) compared with everybody: a NEW account (< 3 days) already in the top 1 % of stages → "to check" (no points)
+    const act = (await db.prepare('SELECT best FROM players WHERE last>? AND banned=0 ORDER BY best DESC').bind(now - 7 * day).all()).results;
+    if (act.length >= 30) { const p99 = act[Math.floor(act.length * .01)].best;
+      for (const r of (await db.prepare('SELECT pid, best FROM players WHERE first>? AND banned=0 AND best>=? AND best>0').bind(now - 3 * day, p99).all()).results)
+        await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(r.pid, now, 'review', `new account (< 3 days) already in the top 1 % (stage ${r.best}, top 1 % = ${p99})`).run(); }
+    await db.prepare('DELETE FROM devs WHERE t<?').bind(now - 30 * day).run();
+    await db.prepare('DELETE FROM rcpt WHERE t<?').bind(now - 7 * day).run();
+    await db.prepare('DELETE FROM ledg WHERE day<?').bind(parisDay(now - 30 * day)).run();
+  }
   // c) clean up
-  await db.prepare('DELETE FROM snaps WHERE t<?').bind(now - 2 * day).run();
+  await db.prepare('DELETE FROM snaps WHERE t<?').bind(now - 7 * day).run();   // v16-157: 7 days (player card chart in /admin)
   await db.prepare('DELETE FROM players WHERE last<? AND banned=0').bind(now - 180 * day).run();
   await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'scan', 'checked ' + rows.length + ' active players').run();
   await db.prepare("DELETE FROM events WHERE kind='scan' AND t<?").bind(now - day).run();
@@ -402,12 +515,59 @@ async function gToken(env) {
   return r.access_token;
 }
 
+// ------------------------------------------------------------------ v16-157: player card (/admin?key=…&p=PLAYER_ID)
+const fmtN = n => n >= 1e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(Math.round(n));
+function powLine(r) {
+  const ratio = r.ep / Math.max(1, r.pw), lab = (r.h ? 'H ' : '') + (Math.floor(r.si / 20) + 1) + '-' + (r.si % 20 + 1);
+  const ic = ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅';
+  return `<small>⚔️ team <b>${fmtN(r.pw)}</b> / stage ${lab} <b>${fmtN(r.ep)}</b> ${ic}${r.ms ? ` · ${(r.ms / 1000).toFixed(1)}s${r.ms < RCPT_MIN_MS ? ' ❌' : ''}` : ''}</small>`;
+}
+// small line chart (SVG) – an honest player climbs smoothly, a cheater has vertical jumps
+function chart(title, pts, col, log) {
+  if (pts.length < 2) return `<div class=c><b>${title}</b><br><small>not enough data yet</small></div>`;
+  const W = 340, H = 110, t0 = pts[0][0], t1 = pts[pts.length - 1][0], f = v => log ? Math.log10(Math.max(1, v)) : v;
+  const vs = pts.map(p => f(p[1])), lo = Math.min(...vs), hi = Math.max(...vs), sx = t => 4 + (W - 8) * (t - t0) / Math.max(1, t1 - t0), sy = v => H - 14 - (H - 24) * (v - lo) / Math.max(1e-9, hi - lo);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + sx(p[0]).toFixed(1) + ',' + sy(vs[i]).toFixed(1)).join('');
+  return `<div class=c><b>${title}</b> <small>${fmtN(pts[0][1])} → <b>${fmtN(pts[pts.length - 1][1])}</b></small><svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block"><path d="${path}" fill="none" stroke="${col}" stroke-width="2"/><text x="4" y="${H - 2}" fill="#9fb0c0" font-size="10">${new Date(t0).toISOString().slice(5, 16).replace('T', ' ')}</text><text x="${W - 4}" y="${H - 2}" fill="#9fb0c0" font-size="10" text-anchor="end">${new Date(t1).toISOString().slice(5, 16).replace('T', ' ')}</text></svg></div>`;
+}
+async function playerCard(url, env, pid) {
+  const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY), esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
+  const p = await db.prepare('SELECT * FROM players WHERE pid=?').bind(pid).first(); if (!p) return new Response('unknown player', {status:404});
+  const sn = (await db.prepare('SELECT t,money,lv,tk,best,pw FROM snaps WHERE pid=? ORDER BY t').bind(pid).all()).results;
+  const thin = a => a.length <= 300 ? a : a.filter((_, i) => i % Math.ceil(a.length / 300) === 0 || i === a.length - 1);
+  const S = thin(sn), rc = (await db.prepare('SELECT * FROM rcpt WHERE pid=? ORDER BY t DESC LIMIT 25').bind(pid).all()).results;
+  const ev = (await db.prepare('SELECT * FROM events WHERE pid=? ORDER BY t DESC LIMIT 30').bind(pid).all()).results;
+  const dv = (await db.prepare('SELECT dk, t FROM devs WHERE pid=? ORDER BY t DESC LIMIT 5').bind(pid).all()).results;
+  const same = p.dk ? (await db.prepare('SELECT pid, t FROM devs WHERE dk=? AND pid<>? ORDER BY t DESC LIMIT 10').bind(p.dk, pid).all()).results : [];
+  const lg = (await db.prepare('SELECT * FROM ledg WHERE pid=? ORDER BY day DESC LIMIT 7').bind(pid).all()).results;
+  const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Player ${esc(pid.slice(0, 8))}</title>
+<style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:20px}h3{margin:14px 0 4px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}a{color:#9fd3ff}small{color:#9fb0c0}table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:3px 2px;border-top:1px solid #ffffff14;text-align:left}</style>
+<a href="/admin?key=${k}">← back</a><h1>📈 Player ${esc(pid.slice(0, 13))}…</h1>
+<div class=c>${p.banned ? '🚫 <b style="color:#ff8a80">BANNED</b>' : `⚠️ score <b>${p.score}</b>`}${p.shadow ? ` · 👻 hidden${p.shadow === 2 ? ' (by you)' : ''}` : ''} · kinds: <b>${esc(p.sig || '–')}</b><br>${esc(p.reason || '')}<br>
+<small>first seen ${d(p.first)} · last ${d(p.last)} · app ${p.app ? 'Play' : 'browser'} · stage ${p.best} (best ever ${Math.max(p.bmax || 0, p.best)}) · buildings lv ${p.lv} · heroes ${p.heroes} (${p.mythic} Mythic)</small><br>
+${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(pid)}">clear</a> · ${p.shadow ? `<a href="?key=${k}&unshadow=${encodeURIComponent(pid)}">👁️ show again</a>` : `<a href="?key=${k}&shadow=${encodeURIComponent(pid)}">👻 hide (shadow)</a>`}`}</div>
+<small>Charts: last 7 days. Honest = a line that climbs smoothly. Cheat = a vertical jump.</small>
+${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('⚔️ Team power', S.filter(r => r.pw > 0).map(r => [r.t, r.pw]), '#ff8a65', true)}${chart('💰 Money (log)', S.map(r => [r.t, r.money]), '#66bb6a', true)}${chart('🎟️ Tickets', S.map(r => [r.t, r.tk]), '#9fd3ff')}${chart('🏗️ Buildings level', S.map(r => [r.t, r.lv]), '#ce93d8')}
+<h3>⚔️ Battle receipts (new stages won)</h3><div class=c>${rc.length ? `<table><tr><th>when</th><th>stage</th><th>team</th><th>monsters</th><th></th><th>time</th></tr>${rc.map(r => { const ratio = r.ep / Math.max(1, r.pw);
+  return `<tr><td>${d(r.t).slice(6)}</td><td>${r.h ? 'H ' : ''}${Math.floor(r.si / 20) + 1}-${r.si % 20 + 1}</td><td>${fmtN(r.pw)}</td><td>${fmtN(r.ep)}</td><td>${ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅'}</td><td>${(r.ms / 1000).toFixed(1)}s${r.ms && r.ms < RCPT_MIN_MS ? '❌' : ''} ×${r.sp}</td></tr>`; }).join('')}</table>` : '<small>none yet (needs the new game version)</small>'}</div>
+<h3>📒 Ledger – what the game gave (per day)</h3><div class=c>${lg.length ? `<table><tr><th>day</th><th>💎</th><th>🎟️</th><th>crew</th><th>gear</th><th>VIP</th></tr>${lg.map(r => `<tr><td>${r.day.slice(5)}</td><td>${fmtN(r.dm)}</td><td>${fmtN(r.tk)}</td><td>${fmtN(r.ct)}</td><td>${fmtN(r.gtk)}</td><td>${fmtN(r.vip)}</td></tr>`).join('')}</table>` : '<small>none yet</small>'}</div>
+<h3>📱 Phones</h3><div class=c>${dv.map(x => `<small>${esc(x.dk).slice(0, 9)}… last ${d(x.t)}</small>`).join('<br>') || '<small>none yet</small>'}${same.length ? `<br><b>Other accounts on this phone:</b><br>${same.map(x => `<a href="?key=${k}&p=${encodeURIComponent(x.pid)}">${esc(x.pid).slice(0, 13)}</a> <small>${d(x.t)}</small>`).join('<br>')}` : ''}</div>
+<h3>📜 Events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>none</div>'}`;
+  return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
+}
+
 // ------------------------------------------------------------------ admin page (open it on your phone)
 async function admin(url, env) {
   if (!env.ADMIN_KEY || url.searchParams.get('key') !== env.ADMIN_KEY) return new Response('no', {status:403});
   const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY);
   const act = url.searchParams.get('unban');
-  if (act) { await db.prepare('UPDATE players SET banned=0, score=0, reason=? WHERE pid=?').bind('unbanned by admin', act).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
+  if (act) { await db.prepare('UPDATE players SET banned=0, score=0, shadow=0, sig=NULL, reason=? WHERE pid=?').bind('unbanned by admin', act).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
+  // v16-157: hide (shadow) / show again by hand · player card
+  const shw = url.searchParams.get('shadow'), ush = url.searchParams.get('unshadow');
+  if (shw) { await db.prepare('UPDATE players SET shadow=2 WHERE pid=?').bind(shw).run(); await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(shw, Date.now(), 'flag', 'hidden (shadow) by admin').run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(shw), 302); }
+  if (ush) { await db.prepare('UPDATE players SET shadow=0 WHERE pid=?').bind(ush).run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(ush), 302); }
+  if (url.searchParams.get('p')) return playerCard(url, env, url.searchParams.get('p'));
   const del = url.searchParams.get('delete');          // "Delete my data" e-mail: /admin?key=…&delete=PLAYER_ID (first 8 characters are enough)
   if (del && del.length >= 8) { await ensureCloud(env); const like = del + '%';
     await db.prepare('DELETE FROM accounts WHERE pid LIKE ?').bind(like).run(); await db.prepare('DELETE FROM snaps WHERE pid LIKE ?').bind(like).run();
@@ -418,7 +578,10 @@ async function admin(url, env) {
   if (ban) { await db.prepare('UPDATE players SET banned=1, score=999, reason=? WHERE pid=?').bind('banned by admin', ban).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
   const tot = await db.prepare('SELECT COUNT(*) n, SUM(last>?) d FROM players').bind(Date.now() - 864e5).first();
   const bad = (await db.prepare('SELECT * FROM players WHERE score>0 ORDER BY banned DESC, score DESC LIMIT 100').all()).results;
-  const ev = (await db.prepare('SELECT * FROM events ORDER BY t DESC LIMIT 40').all()).results;
+  const ev = (await db.prepare("SELECT * FROM events WHERE kind NOT IN ('review','dual','multi') ORDER BY t DESC LIMIT 40").all()).results;
+  const rv = (await db.prepare("SELECT * FROM events WHERE kind IN ('review','dual','multi') AND t>? ORDER BY t DESC LIMIT 30").bind(Date.now() - 3 * 864e5).all()).results;
+  // last battle receipt of every flagged player: team power vs. monsters
+  const lastR = {}; for (const p of bad) { const r = await db.prepare('SELECT * FROM rcpt WHERE pid=? ORDER BY t DESC LIMIT 1').bind(p.pid).first(); if (r) lastR[p.pid] = r; }
   const buys = await db.prepare("SELECT COUNT(*) n FROM purchases WHERE state='ok'").first();
   await ensureInteg(env); const ig = await db.prepare('SELECT COUNT(*) n, SUM(ok) g FROM integ WHERE t>?').bind(Date.now() - 3 * 864e5).first();
   // v16-120: WHY phones fail Play Integrity (reason → count) + the last 15 checks
@@ -439,7 +602,9 @@ async function admin(url, env) {
 ${stats}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
-<h3>Flagged / banned</h3>${bad.map(p => `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b> · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>flags: ${esc(p.flags)} · money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br>${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`).join('') || '<div class=c>Nobody flagged 👍</div>'}
+<h3>Flagged / banned</h3><small>👻 = hidden (shadow): plays normally but is out of rankings, opponents and prizes. Ban needs a PROOF or 2 different kinds of signs. Points go down 10 a day with honest play.</small>${bad.map(p => { const r = lastR[p.pid], pv = r ? powLine(r) : '';
+  return `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b>${p.shadow ? ' 👻' : ''} · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>kinds: <b>${esc(p.sig || '–')}</b>${(p.sig || '').includes('proof') || (p.sig || '').split(',').length >= 2 ? ' (ban possible)' : ' (1 kind → no automatic ban)'} · flags: ${esc(p.flags)}</small><br>${pv ? pv + '<br>' : ''}<small>money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br><a href="?key=${k}&p=${encodeURIComponent(p.pid)}">📈 player card</a> · ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`; }).join('') || '<div class=c>Nobody flagged 👍</div>'}
+<h3>🔎 To check (no points, 3 days)</h3>${rv.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${e.pid !== '-' ? `<a href="?key=${k}&p=${encodeURIComponent(e.pid)}">${esc(e.pid).slice(0, 10)}</a>` : ''}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>Nothing 👍</div>'}
 <h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
 }

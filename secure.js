@@ -29,6 +29,10 @@ if(!PID){ PID = (crypto.randomUUID ? crypto.randomUUID() : 'p'+Math.random().toS
 // v16-104: every Player ID this phone has used (a cloud load changes the ID) – the server finds the purchases made under any of them
 let PIDS = []; try{ PIDS = JSON.parse(LS('te_pids')||'[]'); }catch(e){}
 if(!PIDS.includes(PID)){ PIDS.push(PID); PIDS = PIDS.slice(-5); LS('te_pids', JSON.stringify(PIDS)); }
+// v16-157: install key – a random number made once on this phone/browser, kept when the Player ID changes (cloud load).
+// Anonymous (not a hardware ID). The server uses it to see the same account on 2 phones at once and many accounts on 1 phone.
+let DK = LS('te_dk'); if(!DK){ DK = 'k'+(crypto.randomUUID ? crypto.randomUUID().replace(/-/g,'').slice(0,20) : Math.random().toString(36).slice(2)+Date.now().toString(36)); LS('te_dk',DK); }
+const SID = Math.random().toString(36).slice(2,10);   // this game session
 
 // ---------- where are we running? ----------
 // Inside the Google Play app (Trusted Web Activity) the page is opened with an android-app:// referrer.
@@ -111,21 +115,38 @@ setInterval(sane, 3000);
 // A memory editor changes the number but not the coded copy → 'mem_edit' (the game can never make them differ).
 const K0 = (Math.random()*4294967295)>>>0, K1 = (Math.random()*4294967295)>>>0;
 const gF = new Float64Array(1), gU = new Uint32Array(gF.buffer);
-function guard(o, k){
+// v16-157 HONEYPOT: a plain copy of every guarded number (as a double AND as an int) – a memory scanner finds it next to the
+// real value and changes it too. The game never writes these copies except through put() → a different copy = memory editor.
+// v16-157 LEDGER: how much of each resource the game GAVE since the last report (only increases; sent to the server)
+const GAIN = {}; const LKEY = {money:'m', dm:'dm', vip:'vip', tk:'tk', ct:'ct'};
+function guard(o, k, lk){
   if(!o) return; const d = Object.getOwnPropertyDescriptor(o, k);
   if(d && d.get && d.get.__te) return; if(d && (d.get || d.set || d.configurable===false)) return;
-  let v = o[k], m0 = 0, m1 = 0;
-  const put = x => { v = x; gF[0] = typeof x==='number' ? x : NaN; m0 = gU[0]^K0; m1 = gU[1]^K1; };
+  let v = o[k], m0 = 0, m1 = 0; const DEC = new Float64Array(1), DECI = new Int32Array(1), di = 0;   // own copy per value
+  const put = x => { if(typeof x==='number' && typeof v==='number' && x > v && lk) GAIN[lk] = (GAIN[lk]||0) + (x - v);
+    v = x; gF[0] = typeof x==='number' ? x : NaN; m0 = gU[0]^K0; m1 = gU[1]^K1; DEC[di] = typeof x==='number' ? x : 0; DECI[di] = typeof x==='number' ? (x|0) : 0; };
   const get = () => v; get.__te = 1;
   get.ok = () => { gF[0] = typeof v==='number' ? v : NaN; return (gU[0]^K0)===m0 && (gU[1]^K1)===m1; };
+  get.hp = () => typeof v!=='number' || (Object.is(DEC[di],v) && DECI[di]===(v|0));
   put(v); Object.defineProperty(o, k, {get, set:put, enumerable:true, configurable:true});
 }
-const GUARDS = G => [[G,'money'],[G,'dm'],[G,'vip'],[G.h,'tk'],[G.h,'ct'],[G.gear,'tk']];
+// v16-157 HONEYPOT in the save: tempting fields that the game NEVER uses. Anyone who edits the save / the game memory and
+// "gives himself" gems or premium is caught (an honest player can never change them).
+const BAIT = {gems:0, coins:0, premium:false, unlockAll:false, godMode:false};
+function bait(G){ if(!G.xtra || typeof G.xtra!=='object'){ G.xtra = Object.assign({}, BAIT); return; }
+  for(const k in BAIT) if(G.xtra[k]!==undefined && G.xtra[k]!==BAIT[k]){ flag('honeypot'); G.xtra = Object.assign({}, BAIT); return; }
+  for(const k in BAIT) if(G.xtra[k]===undefined) G.xtra[k] = BAIT[k]; }
+const GUARDS = G => [[G,'money','m'],[G,'dm','dm'],[G,'vip','vip'],[G.h,'tk','tk'],[G.h,'ct','ct'],[G.gear,'tk','gtk']];
 function memCheck(){
   const t=T(); if(!t||!t.G||!t.G.h) return;
-  for(const [o,k] of GUARDS(t.G)){ if(!o) continue; const d = Object.getOwnPropertyDescriptor(o,k);
-    if(d && d.get && d.get.__te){ if(!d.get.ok()) flag('mem_edit'); } else guard(o,k); }
+  for(const [o,k,lk] of GUARDS(t.G)){ if(!o) continue; const d = Object.getOwnPropertyDescriptor(o,k);
+    if(d && d.get && d.get.__te){ if(!d.get.ok()) flag('mem_edit'); else if(d.get.hp && !d.get.hp()) flag('honeypot'); } else guard(o,k,lk); }
+  bait(t.G);
 }
+// v16-157 BATTLE RECEIPTS: every NEW campaign stage won → {stage, hard, real duration, team power, speed}. The server compares the
+// team power with the monsters' power of that stage and the duration with the fastest fight possible.
+let RC = []; try{ RC = JSON.parse(LS('te_rc')||'[]'); if(!Array.isArray(RC)) RC = []; }catch(e){ RC = []; }
+function rcpt(r){ try{ if(!r || !(r.pw>0)) return; RC.push({si:r.si|0, h:r.h?1:0, ms:Math.round(r.ms)||0, pw:Math.round(r.pw), sp:+r.sp||1, t:Date.now()}); RC = RC.slice(-60); LS('te_rc', JSON.stringify(RC)); }catch(e){} }
 setInterval(memCheck, 2000);
 
 // ---------- online check-in with the anti-cheat server ----------
@@ -134,15 +155,17 @@ async function report(force){
   if(!API) return; const t=T(); if(!t||!t.G) return;
   if(!force && Date.now()-lastRep < 5*60e3) return; lastRep = Date.now();
   const G=t.G, own=Object.keys(G.h.own||{});
-  const body = {pid:PID, v:15, app:STORE_BUILD?1:0, t:Date.now(),
+  const body = {pid:PID, v:15, cv:159, app:STORE_BUILD?1:0, t:Date.now(),
     s:{money:Math.round(G.money), sold:G.sold, xp:G.xp, vip:G.vip, lv:Object.keys(G.lv).reduce((a,k)=>a+(k==="rail"?0:G.lv[k]),0), best:G.cp?G.cp.best:0,
        tk:G.h.tk, gtk:(G.gear&&G.gear.tk)||0, heroes:own.length, stars:own.reduce((a,id)=>a+(G.h.own[id].s||0),0), mythic:own.filter(id=>t.HB[id]&&t.HB[id].gr===5).length},
     flags:[...flags], pids:PIDS,
+    dk:DK, sid:SID, rc:RC.slice(-60), lg:Object.assign({}, GAIN),   // v16-157: install key, battle receipts, ledger (gains since the last report)
     // v16-104: packs this phone says it owns – the server compares them with the purchases Google confirmed
     pk:Object.keys(t.PK||{}).filter(k=>SKU[k] && !CONS(k) && (SUBS(k) ? +t.PK[k] > Date.now() : t.PK[k]===true))};
   try{
     const r = await fetch(API+'/api/report',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
     const j = await r.json();
+    if(j.ok){ const sent = body.rc.length; RC = RC.slice(sent); LS('te_rc', JSON.stringify(RC)); for(const k in body.lg) GAIN[k] = Math.max(0, (GAIN[k]||0) - body.lg[k]); }   // v16-157: delivered → not sent again
     if(j.serverTime){ srvOff = j.serverTime - Date.now(); LS('te_off',String(srvOff)); }
     if(j.banned && !banned){ banned = true; showBan(j.msg); }
     if(j.pkCheck && !pkChecking){ pkChecking = true; await restore(true); setTimeout(()=>report(true), 2000); }   // v16-104: link the purchases to this ID
@@ -276,5 +299,5 @@ document.addEventListener('visibilitychange', keepAwake);
 addEventListener('pointerdown', keepAwake, {passive:true});
 keepAwake();
 
-window.SEC = {integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+window.SEC = {rcpt, integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

@@ -1652,6 +1652,7 @@ function startBattle(si,team,tw){
   B.grit=window.__SIM||tw?0:grit(si);if(tw)twArenaImg();if(B.grit)TE().toast('🔥 NEVER GIVE UP: +'+Math.round(B.grit*100)+'% HP & attack',2600);B.nit=window.__SIM||(tw&&(tw.wb||tw.dg))?0:dgNitro()/100;if(B.nit)setTimeout(()=>{if(B&&!B.res)TE().toast('⚡ NITRO BOOST: +'+Math.round(B.nit*100)+'% HP & attack',2400);},B.grit?2700:0);
   B.lowRes=LOWRES;B.lowRes2=LOWRES&&LOWRES2;if(!bsize())buildBG();
   B.trb=teamRoles(team).bon;
+  B.w0=Date.now();try{B.pw0=Math.round(teamPower(team)*(1+(B.grit||0))*(1+(B.nit||0)));}catch(e){B.pw0=0;} // v16-157: battle receipt (anti-cheat)
   B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr){sprLoad(u.spr);warmIm(u.spr.im);warmIm(u.spr.fi);warmIm(u.spr.bi);}});if(!window.__SIM)for(const k in FXIM)warmIm(FXIM[k]);
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
   spawnWave();
@@ -2535,7 +2536,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
   const P=CPX();if(!B.sim&&si===P.best){if(win)delete P.stuck;else if(!P.stuck||P.stuck.si!==si)P.stuck={si,t:Date.now()};}
   let html='';const lab=sLabel(si);
   if(win){const st=B.deaths===0?3:B.deaths<=2?2:1;const first=si>=P.best;const R=REWARDX(si);const money=first?R.money:Math.round(R.money*.25/10)*10,tk=first?R.tk:0;
-    G.money+=money;if(first)P.best=si+1;P.stars[si]=Math.max(P.stars[si]||0,st);
+    G.money+=money;if(first)P.best=si+1;P.stars[si]=Math.max(P.stars[si]||0,st);if(first&&!B.sim&&!B.tw&&window.SEC&&SEC.rcpt)SEC.rcpt({si,h:HM,ms:Date.now()-(B.w0||Date.now()),pw:B.pw0,sp:B.spd});
     const drops=[];const big=S0.boss||S0.mini;const n=first?(S0.boss?2:1):(big||Math.random()<.4?1:0);for(let k=0;k<n;k++)drops.push(dropItem(S0.c,big));
     let sold=0;drops.forEach(d=>{if(d.sold){sold+=d.sold;G.gp=(G.gp||0)+d.sold;}});
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;

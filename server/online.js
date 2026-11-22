@@ -22,6 +22,7 @@ const VIP_SQL = 'CASE ' + VIP_PTS.map((v, i) => [v, i]).reverse().map(([v, i]) =
 const START_PTS = 1000, ARENA_TK = 5, TK_EVERY = 2 * HOUR;
 const ATK = p => ARENA_TK + Math.min(3, Math.floor(((p && p.vip) | 0) / 3));   // v16-122: VIP 3 / 6 / 9 = +1 Arena fight each
 const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena daily reward per league: [diamonds, recruit tickets]
+// v16-157 (Marius): prizes (Arena daily/season, Cup, World Boss, events) only for players NOT hidden (shadow) and NOT under check (score < 50)
 // v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
 const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew'], B:['ess','dia','wheel','key','cash']};   // v16-120 KEY ROULETTE · v16-129 CASH ROULETTE (added at the END → events 0-3 stay the same)
@@ -140,6 +141,7 @@ function pub(p, extra) {
 }
 const isTst = pid => String(pid || '').startsWith('tst_');   // v16-91: owner's FULL TEST ACCOUNT (hidden from rankings)
 async function profOf(env, pid) { return pid && typeof pid === 'string' ? env.DB.prepare('SELECT * FROM prof WHERE pid=?').bind(pid.slice(0, 64)).first() : null; }
+async function isShadow(env, pid) { try { const r = await env.DB.prepare('SELECT shadow FROM players WHERE pid=?').bind(pid).first(); return !!(r && r.shadow); } catch (e) { return false; } }   // v16-157
 async function isBanned(env, pid) { const r = await env.DB.prepare('SELECT banned FROM players WHERE pid=?').bind(pid).first(); return !!(r && r.banned); }
 const unlocks = p => new Set([...(p.unl || '').split(','), ...(p.cunl || '').split(','), ...((p.vip | 0) >= 5 ? ['vip5'] : []), ...((p.vip | 0) >= 10 ? ['vip10'] : []), ...(RP(p) ? ['rail'] : [])].filter(Boolean));   // v16-155: RAIL BARON title while the Rail Pass is active   // v16-122: VIP titles
 async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl FROM prof WHERE uid=?').bind(uid).first(); if (!p) return;
@@ -219,7 +221,7 @@ const saveArena = (env, a) => env.DB.prepare('UPDATE arena SET season=?, pts=?, 
 async function findOpp(env, p, a) {
   const db = env.DB, season = a.season, me = {pts:a.pts, team:JSON.parse(p.team || '[]')};
   const rows = (await db.prepare(`SELECT a.uid, a.pts, p.name, p.icon, p.frame, p.title, p.cc, p.pow, p.team FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid
-     WHERE a.srv=? AND a.season=? AND a.uid<>? AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' AND a.pts BETWEEN ? AND ? ORDER BY RANDOM() LIMIT 12`)
+     WHERE a.srv=? AND a.season=? AND a.uid<>? AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND a.pts BETWEEN ? AND ? ORDER BY RANDOM() LIMIT 12`)
     .bind(p.srv, season, p.uid, a.pts - 250, a.pts + 300).all()).results;
   const hi = rows.filter(r => r.pts > a.pts + 20), mid = rows.filter(r => Math.abs(r.pts - a.pts) <= 60), lo = rows.filter(r => r.pts < a.pts - 20);
   const out = [], used = new Set();
@@ -256,7 +258,8 @@ async function fight(env, p, b) {
   else { const r = await db.prepare('SELECT p.*, a.pts apts FROM prof p JOIN arena a ON a.uid=p.uid WHERE p.uid=?').bind(o.uid).first(); if (!r) return {err:'old_opponents'};
     td = JSON.parse(r.team || '[]'); dpts = r.apts; dname = r.name; dp = pub(r); }
   const seed = (Math.random() * 4294967295) >>> 0, res = arenaSim(ta, td, seed), g = gain(a.pts, dpts);
-  const da = res.win ? g.w : -g.l, dd = (o.bot || isTst(p.pid)) ? 0 : (res.win ? -Math.round(g.w * .5) : 3);   // v16-91: the owner's test account never changes real players
+  const sh = await isShadow(env, p.pid);   // v16-157: a hidden (shadow) player does not change real players' points
+  const da = res.win ? g.w : -g.l, dd = (o.bot || isTst(p.pid) || sh) ? 0 : (res.win ? -Math.round(g.w * .5) : 3);   // v16-91: the owner's test account never changes real players
   a.tk -= 1; if (a.tk === ATK(p) - 1) a.tkt = Date.now(); a.pts = Math.max(0, a.pts + da); a.peak = Math.max(a.peak || 0, a.pts); if (res.win) a.w++; else a.l++; a.t = Date.now();
   a.opp = JSON.stringify(await findOpp(env, p, a)); await saveArena(env, a);
   if (!o.bot) await db.prepare('UPDATE arena SET pts=MAX(0,pts+?), peak=MAX(peak,pts+?) WHERE uid=?').bind(dd, dd, o.uid).run();
@@ -292,7 +295,7 @@ async function rwView(env, p, now) {
   const mine = (await db.prepare('SELECT id,g,tok,cars,t0,t1,hits,lost FROM rwtrain WHERE uid=? AND done=0 ORDER BY id').bind(p.uid).all()).results;
   const hits = (await db.prepare('SELECT h.t,h.win,h.steal,h.an,t.g FROM rwhit h JOIN rwtrain t ON t.id=h.tid WHERE t.uid=? AND h.t>? ORDER BY h.t DESC LIMIT 15').bind(p.uid, now - 2 * DAY).all()).results;
   const targets = (await db.prepare(`SELECT t.id,t.g,t.tok,t.lost,t.cars,t.t1,t.hits,p.uid,p.name,p.icon,p.frame,p.cc,p.pow,p.title FROM rwtrain t JOIN prof p ON p.uid=t.uid LEFT JOIN players pl ON pl.pid=p.pid
-    WHERE t.srv=? AND t.uid<>? AND t.done=0 AND t.t1>? AND t.hits<? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_'
+    WHERE t.srv=? AND t.uid<>? AND t.done=0 AND t.t1>? AND t.hits<? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_'
     AND NOT EXISTS(SELECT 1 FROM rwhit h WHERE h.tid=t.id AND h.uid=?) ORDER BY RANDOM() LIMIT 8`).bind(p.srv, p.uid, now + 60e3, RW_HITS, p.uid).all()).results;
   return {ok:true, now, sends:Math.max(0, rwSendMax(p) - d.s), atks:Math.max(0, rwAtkMax(p) - d.a), sendMax:rwSendMax(p), atkMax:rwAtkMax(p), rp:RP(p) ? +p.rp : 0, trip:RW_TRIP, steal:RW_STEAL, hitMax:RW_HITS,
     mine, hits, targets:targets.map(t => ({id:t.id, g:t.g, left:t.tok - t.lost, cars:t.cars, t1:t.t1, hits:t.hits, who:pub(t)}))};
@@ -323,10 +326,11 @@ async function railWars(env, p, op, b) {
     const dp = await db.prepare('SELECT * FROM prof WHERE uid=?').bind(t.uid).first(); if (!dp) return {err:'gone'};
     const td = JSON.parse(dp.team || '[]'), seed = (Math.random() * 4294967295) >>> 0, res = td.length ? arenaSim(ta, td, seed) : {win:1, log:[], dur:0};
     let steal = res.win && !isTst(p.pid) ? Math.floor((t.tok - t.lost) * RW_STEAL * (RP(dp) ? .5 : 1)) : 0;   // v16-155: Rail Pass owner loses half
-    const ins = await db.prepare('INSERT OR IGNORE INTO rwhit(tid,uid,t,win,steal,an) VALUES(?,?,?,?,?,?)').bind(t.id, p.uid, now, res.win ? 1 : 0, steal, p.name).run();
+    const shd = await isShadow(env, p.pid);   // v16-157: a hidden (shadow) attacker – the owner of the train sees nothing and loses nothing
+    const ins = await db.prepare('INSERT OR IGNORE INTO rwhit(tid,uid,t,win,steal,an) VALUES(?,?,?,?,?,?)').bind(t.id, p.uid, now, res.win && !shd ? 1 : 0, shd ? 0 : steal, p.name).run();
     if (!(ins.meta && ins.meta.changes)) return {err:'gone'};
     await db.prepare('UPDATE rwday SET a=a+1 WHERE uid=?').bind(p.uid).run();
-    if (res.win) { const u = await db.prepare('UPDATE rwtrain SET hits=hits+1, lost=lost+? WHERE id=? AND hits<? AND done=0').bind(steal, t.id, RW_HITS).run(); if (!(u.meta && u.meta.changes)) steal = 0; }
+    if (res.win && !shd) { const u = await db.prepare('UPDATE rwtrain SET hits=hits+1, lost=lost+? WHERE id=? AND hits<? AND done=0').bind(steal, t.id, RW_HITS).run(); if (!(u.meta && u.meta.changes)) steal = 0; }   
     const hid = (await db.prepare('INSERT INTO ahist(srv,t,kind,a,d,an,dn,win,da,dd,seed,ta,td) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id')
       .bind(p.srv, now, 'train', p.uid, t.uid, p.name, dp.name, res.win, steal, -steal, seed, JSON.stringify(ta), JSON.stringify(td)).first()).id;
     return {ok:true, kind:'train', id:hid, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pub(p), them:pub(dp), steal, g:t.g, atks:Math.max(0, rwAtkMax(p) - d.a - 1)};
@@ -345,7 +349,7 @@ async function cupTick(env) {
     if (!d && now >= ws + CUP_Q) {                       // qualification: the best 64 of the Arena (played in the last 3 days)
       const season = seasonOf(now);
       const rows = (await db.prepare(`SELECT a.uid, a.pts, p.name, p.icon, p.frame, p.pow FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid
-        WHERE a.srv=? AND a.season=? AND (a.t>? OR p.t>?) AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 64`).bind(srv, season, now - 3 * DAY, now - 3 * DAY).all()).results;
+        WHERE a.srv=? AND a.season=? AND (a.t>? OR p.t>?) AND p.team IS NOT NULL AND p.team<>'[]' AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 64`).bind(srv, season, now - 3 * DAY, now - 3 * DAY).all()).results;
       if (!rows.length) continue;
       const n = Math.min(64, nextPow2(Math.max(8, rows.length))), P = rows.map(r => ({uid:r.uid, name:r.name, icon:r.icon, frame:r.frame, pow:r.pow, pts:r.pts}));
       let k = 0; while (P.length < n) { const ref = rows[Math.min(rows.length - 1, P.length - rows.length + Math.floor(rows.length / 2))] || rows[0];
@@ -394,12 +398,12 @@ async function rewardsTick(env) {
   const db = env.DB, now = env.TEST_NOW ? +env.TEST_NOW : Date.now(), dk = dayKey(now), h = new Date(now).getUTCHours();
   if (h >= 21 && (await kvGet(env, 'daily')) !== dk) {             // 21:00 UTC = 22:00 Paris
     await kvSet(env, 'daily', dk); const season = seasonOf(now);
-    const rows = (await db.prepare('SELECT uid, pts FROM arena WHERE season=? AND t>?').bind(season, now - 2 * DAY).all()).results;
+    const rows = (await db.prepare('SELECT a.uid, a.pts FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50').bind(season, now - 2 * DAY).all()).results;
     for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = DAILY[lg]; await mail(env, r.uid, '⚔️', 'Arena daily reward', `Your league today: ${tierOf(r.pts).name}.`, {dm, tk}); }
   }
   const season = seasonOf(now), last = +(await kvGet(env, 'season') || 0);
   if (last && last < season) {                                      // the week is over: season rewards + soft reset happens when each player comes back
-    const rows = (await db.prepare('SELECT uid, pts, peak FROM arena WHERE season=? AND t>?').bind(last, now - 9 * DAY).all()).results;
+    const rows = (await db.prepare('SELECT a.uid, a.pts, a.peak FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50').bind(last, now - 9 * DAY).all()).results;
     for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = SEASON_RW[lg]; await mail(env, r.uid, '🏅', `Arena season ${last} ended`, `Final league: ${tierOf(r.pts).name}. A new season has started – your points were partly reset.`, {dm, tk}); }
     await db.prepare('UPDATE arena SET peak=pts').run();
   }
@@ -407,7 +411,7 @@ async function rewardsTick(env) {
   // WORLD BOSS: the week is over → mail the top 100 of each server
   const wk = dayKey(weekStart(now)), wlast = await kvGet(env, 'wbwk');
   if (wlast && wlast !== wk) {
-    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
+    const rows = (await db.prepare('SELECT w.uid, w.srv, w.dmg FROM wboss w LEFT JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.wk=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.srv, w.dmg DESC').bind(wlast).all()).results;
     let srv = -1, n = 0;
     for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue;
       const t = WB_RW.find(q => n >= q[0] && n <= q[1]); if (t) await mail(env, r.uid, '👹', 'World Boss – weekly ranking', `Your rank last week: #${n} (damage ${r.dmg.toLocaleString('en-US')}).`, t[2]); }
@@ -417,7 +421,7 @@ async function rewardsTick(env) {
   // v16-99 TIME EVENTS: an event is over → mail the top 100 of each server
   for (const tr of ['A', 'B']) { const ci = evIdx(now), key = 'ev_' + tr, li = await kvGet(env, key);
     if (li !== null && +li < ci) { const eid = tr + li, k = evKind(tr, +li), tkk = EV_TKK[k];
-      const rows = (await db.prepare('SELECT e.uid, e.srv, e.sc FROM evt e LEFT JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.srv, e.sc DESC, e.t ASC').bind(eid).all()).results;
+      const rows = (await db.prepare('SELECT e.uid, e.srv, e.sc FROM evt e LEFT JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.srv, e.sc DESC, e.t ASC').bind(eid).all()).results;
       let srv = -1, n = 0;
       for (const r of rows) { if (r.srv !== srv) { srv = r.srv; n = 0; } n++; if (n > 100) continue; const q = EV_RW.find(x => n >= x[0] && n <= x[1]); if (!q) continue;
         const rw = {dm: tkk ? q[2] : Math.round(q[2] * 1.5)}; if (tkk) rw[tkk] = q[3];
@@ -499,8 +503,8 @@ export async function online(op, b, env) {
   }
   if (op === 'rank') {
     const by = ['best','pow','lv'].includes(b.by) ? b.by : 'best';
-    const rows = (await db.prepare(`SELECT p.* FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? ORDER BY p.${by} DESC, p.pow DESC LIMIT 100`).bind(p.srv, now - 30 * DAY).all()).results;
-    const my = (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
+    const rows = (await db.prepare(`SELECT p.* FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? ORDER BY p.${by} DESC, p.pow DESC LIMIT 100`).bind(p.srv, now - 30 * DAY).all()).results;
+    const my = (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
     const tot = (await db.prepare('SELECT COUNT(*) n FROM prof WHERE srv=? AND t>?').bind(p.srv, now - 30 * DAY).first()).n;
     return {ok:true, by, list:rows.map(r => pub(r)), me:pub(p), myRank:my, total:tot, time:now};
   }
@@ -538,7 +542,7 @@ export async function online(op, b, env) {
   if (op === 'rw' || op === 'rwsend' || op === 'rwatk' || op === 'rwclaim') { if (await isBanned(env, b.pid)) return {banned:1}; return railWars(env, p, op, b); }   // v16-146
   if (op === 'atop') {
     const season = seasonOf(now);
-    const rows = (await db.prepare(`SELECT a.pts, a.w, a.l, p.* FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.srv=? AND a.season=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 100`).bind(p.srv, season).all()).results;
+    const rows = (await db.prepare(`SELECT a.pts, a.w, a.l, p.* FROM arena a JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.srv=? AND a.season=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' ORDER BY a.pts DESC LIMIT 100`).bind(p.srv, season).all()).results;
     return {ok:true, list:rows.map(r => pub(r, {pts:r.pts, w:r.w, l:r.l, tier:tierOf(r.pts)}))};
   }
   if (op === 'hist') {
@@ -566,12 +570,12 @@ export async function online(op, b, env) {
     const me = await db.prepare('SELECT sc, t FROM evt WHERE uid=? AND eid=?').bind(p.uid, eid).first();
     const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM evt WHERE eid=? AND srv=? AND (sc>? OR (sc=? AND t<?))').bind(eid, p.srv, me.sc, me.sc, me.t).first()).n + 1 : 0;
     if (op === 'evsc') return {ok:true, rank, sc:me ? me.sc : 0};
-    const top = (await db.prepare('SELECT e.uid, e.sc, p.name FROM evt e JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND e.srv=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.sc DESC, e.t ASC LIMIT 100').bind(eid, p.srv).all()).results;
+    const top = (await db.prepare('SELECT e.uid, e.sc, p.name FROM evt e JOIN prof p ON p.uid=e.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE e.eid=? AND e.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY e.sc DESC, e.t ASC LIMIT 100').bind(eid, p.srv).all()).results;
     return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, sc:r.sc})), me:p.uid, rank, sc:me ? me.sc : 0};
   }
   if (op === 'wbrank') {
     const ws = weekStart(now), wk = dayKey(ws);
-    const top = (await db.prepare('SELECT w.uid, w.dmg, p.name, p.icon, p.frame FROM wboss w JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.srv=? AND w.wk=? AND COALESCE(pl.banned,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.dmg DESC LIMIT 100').bind(p.srv, wk).all()).results;
+    const top = (await db.prepare('SELECT w.uid, w.dmg, p.name, p.icon, p.frame FROM wboss w JOIN prof p ON p.uid=w.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE w.srv=? AND w.wk=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY w.dmg DESC LIMIT 100').bind(p.srv, wk).all()).results;
     const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
     const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1 : 0;
     return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, icon:r.icon, frame:r.frame, dmg:r.dmg})), dmg:me ? me.dmg : 0, rank, name:p.name, end:ws + 7 * DAY, now};
