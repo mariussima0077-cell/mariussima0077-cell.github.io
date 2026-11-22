@@ -83,6 +83,11 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-173 (22 nov 2026) – EVENTS: milestone-uri noi
+- 12 milestone-uri pe event (10 la Lucky Wheel / Key Roulette, 12 la Cash Roulette), recompense ~+30%, primul la 5 summonuri.
+- În cadrul din stânga: emblema eventului (`img/ui13/evg_<event>.webp`, planșa lui Marius) în loc de tichete. Revendicările vechi sunt mutate automat (`OLDG` în `events.js`).
+- Lipsește: nimic.
+
 ## 🔴 v16-171 (22 nov 2026) – cadou Mythic pentru contul lui Marius (26875f9c)
 - Mail personal `p_26875f9c_myth` (doar pentru Player ID 26875f9c): toți cei 6 eroi Mythic (Lv 1, +0, doar cei pe care nu-i are) + câte un set complet Ascended (Lv 1, ★0) pe rolul fiecăruia: Torque King → Thunder Coil, Lady Overdrive → Nitro Rush, Ignis → Field Medic, Goliath → Iron Piston, Nova / Vega → Laser Scope.
 - Prin sistemul de Mail (nu editare de salvare) → Torque Guard nu-l vede ca trișare (max 10 Mythic, puterea mai mare nu e semnalată).
