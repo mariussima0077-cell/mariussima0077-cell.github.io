@@ -93,6 +93,12 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-186 (22 nov 2026) – rama aleasă peste tot + animație la REFRESH tren
+- Rama din Profil apare acum în antetul profilului, clasament (toate rândurile), chat, clasamentul Arenei și Cup (`fav()` / `hdrAv()` în online.js).
+- Rail Wars: REFRESH = animație tip slot (locomotiva + gradul se rotesc, apoi aterizează; „⬆ UPGRADE!” + explozie când gradul crește).
+- Idee în așteptare: coduri cadou (Redeem Code în Settings/Profil, livrare prin Mail, create din /admin) – așteaptă OK-ul lui Marius.
+- Imagini lipsă: nimic pentru astea (opțional pentru Redeem Code: iconiță, fundal pagină, banner).
+
 ## ✅ v16-173 (22 nov 2026) – EVENTS: milestone-uri noi
 - 12 milestone-uri pe event (10 la Lucky Wheel / Key Roulette, 12 la Cash Roulette), recompense ~+30%, primul la 5 summonuri.
 - În cadrul din stânga: emblema eventului (`img/ui13/evg_<event>.webp`, planșa lui Marius) în loc de tichete. Revendicările vechi sunt mutate automat (`OLDG` în `events.js`).
