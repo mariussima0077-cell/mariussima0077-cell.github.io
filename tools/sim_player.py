@@ -32,8 +32,9 @@ window.__BOT={
  // v16-131: PAYING player (≈ €28/month): day 1 all 4 one-time packs + VIP Crew + VIP Truck + Battle Speed ×3,
  // every 30 days Gold + Platinum Pass + 800-diamond pack (€4.99). VIP points 20 / €.
  pay(d){if(!window.SHOP2)return 0;let e=0;const add=(k,v)=>{try{SHOP2.grant(k,1);}catch(x){}e+=v;};
-   if(d===1){['p1','p2','p3','p4'].forEach((k,i)=>add(k,[0.99,2.99,5.99,9.99][i]));PK.vip=true;PK.car=true;PK.spd2=true;e+=3.99+5.99+2.99;}
-   if((d-1)%30===0){PK.sub=Date.now()+30*864e5;PK.plat=Date.now()+30*864e5;try{savePacks();}catch(x){}add('sub',5.99);add('plat',9.99);add('d2',4.99);}
+   // v16-155 (Marius 22 nov): ALL = every one-time pack (Starter…Titan) + Founder + forever packs + Funds, and EVERY monthly pass (Gold, Platinum, Diamond, Rail, Dungeon Pass) – no diamond packs
+   if(d===1){['p1','p2','p3','p4','p5','p6','p7'].forEach((k,i)=>add(k,[0.99,2.99,5.99,9.99,19.99,49.99,99.99][i]));PK.vip=true;PK.car=true;PK.spd2=true;PK.fdr=true;PK.fn=true;PK.fh=true;e+=3.99+5.99+2.99+4.99+9.99+9.99;}
+   if((d-1)%30===0){const x=Date.now()+30*864e5;PK.sub=x;PK.plat=x;PK.dia=x;PK.rail=x;PK.dg=x;try{savePacks();}catch(y){}add('sub',5.99);add('plat',9.99);add('dia',14.99);add('rail',4.99);e+=2.99;}
    try{savePacks();vipRefresh();}catch(x){}if(e)addVip(Math.round(e*20));this.eur=(this.eur||0)+e;return this.eur;},
  setup(paid){
    if(paid){PK.car=true;PK.vip=true;PK.spd2=true;PK.sub=Date.now()+400*864e5;try{savePacks();}catch(e){}try{vipRefresh();}catch(e){}}
