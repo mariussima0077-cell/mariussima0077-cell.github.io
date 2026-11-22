@@ -21,6 +21,7 @@ const LEGACY_T = Date.parse('2026-11-18T00:00:00Z');   // v16-125: before this, 
 // v16-71: Alex was banned by mistake for the gift (VIP 20 jump) → unbanned automatically at his next check-in (only until this date)
 const GIFT_UNBAN_UNTIL = Date.parse('2026-11-24T00:00:00Z');
 const TESTER_UNBAN = ['03245000-cda3-4e5c-9e6d-d388955218a8'];   // v16-103: one-time unban (Wazza4ever)
+const PARTS_T = Date.parse('2026-11-21T00:00:00Z');   // v16-129: garages upgraded with parts (buildings rule recalibrated in v16-150)
 const BAN_AT = 100;                          // suspicion points that trigger an automatic ban
 const FLAG_PTS = {edited_save:60, speed_hack:45, money_jump:35, ticket_jump:30, gear_ticket_jump:30, vip_jump:35, clock_back:20,
   mem_edit:100, unpaid_pack:100};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
@@ -116,7 +117,10 @@ async function report(b, env) {
     if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450) { pts += 30; why.push(`gear tickets +${s.gtk - old.gtk}`); }
     if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) { pts += 35; why.push(`vip +${s.vip - old.vip}`); }
     if (s.best - old.best > 30 + dt / 90) { pts += 30; why.push(`campaign +${s.best - old.best} stages`); }
-    if (s.lv - old.lv > 12 + dt / 600) { pts += 30; why.push(`buildings +${s.lv - old.lv} levels`); }
+    // v16-150 (server): since v16-129 garages are upgraded with PARTS (LV1-10 = 40-350 parts, ~350 parts per new stage at stage 100,
+    // + the parts gift for old saves) → +30 levels in one session is normal. Old rule (12 + 1 per 10 min, 30 pts) flagged honest testers.
+    // Now: only a huge jump (most of the map at once) and only 15 pts (never a ban by itself; max total is ~140).
+    if (s.lv - old.lv > 45 + dt / 120) { pts += 15; why.push(`buildings +${s.lv - old.lv} levels`); }
     if (s.sold < old.sold || s.xp < old.xp) { /* new save / reinstall – allowed, just note it */ why.push('progress_reset'); }
   }
   const score = Math.min(999, (old ? old.score : 0) + pts);
@@ -148,6 +152,19 @@ async function scan(env) {
       await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, why.join(' · '), p.pid).run();
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, ban ? 'ban' : 'flag', 'bot: ' + why.join(' · ')).run();
     }
+  }
+  // a2) v16-150 (server, once): give back the points of the old 'buildings +N levels' rule written after the PARTS update (21 nov)
+  //     and unban players banned only because of it (never a ban by admin)
+  if (!(await db.prepare("SELECT 1 FROM events WHERE kind='fix' AND detail='v16-150 buildings'").first())) {
+    const ev = (await db.prepare("SELECT pid, COUNT(*) n FROM events WHERE kind IN ('flag','ban') AND t>? AND detail LIKE 'buildings +%' AND detail NOT LIKE '%·%' GROUP BY pid").bind(PARTS_T).all()).results;
+    for (const e of ev) {
+      const p = await db.prepare('SELECT score, banned, reason FROM players WHERE pid=?').bind(e.pid).first();
+      if (!p || /by admin/.test(p.reason || '')) continue;
+      const score = Math.max(0, p.score - 30 * e.n), ban = p.banned && score >= BAN_AT ? 1 : 0;
+      await db.prepare('UPDATE players SET score=?, banned=?, reason=? WHERE pid=?').bind(score, ban, score ? p.reason : null, e.pid).run();
+      await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(e.pid, now, p.banned && !ban ? 'unban' : 'fix', `buildings rule recalibrated: -${30 * e.n} pts`).run();
+    }
+    await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'fix', 'v16-150 buildings').run();
   }
   // b) the same purchase token used by different players = shared / stolen purchase
   const dup = (await db.prepare('SELECT token, COUNT(DISTINCT pid) n FROM purchase_use GROUP BY token HAVING n>2').all()).results;
@@ -371,7 +388,7 @@ async function admin(url, env) {
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
 <h1>🛡️ Torque Guard</h1><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
-<h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r)}`).join('<br>') || 'no checks yet'}</div>
+<h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
 <h3>Flagged / banned</h3>${bad.map(p => `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b> · <small>${esc(p.pid)}</small><br>${esc(p.reason)}<br><small>flags: ${esc(p.flags)} · money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br>${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`).join('') || '<div class=c>Nobody flagged 👍</div>'}
 <h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
