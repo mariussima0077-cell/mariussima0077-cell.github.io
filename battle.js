@@ -3759,7 +3759,7 @@ function dgFloor(k,f){const D=DG[k],ki=DG_K.indexOf(k),R=seeded(9001+ki*1013+f*8
   const n=Math.min(5,3+Math.floor(f/12)),one=()=>cl(pk(D.pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
   const boss=f%10===0,mini=f%5===0&&!boss;let w;
   if(boss)w=[mk(n),[cl(D.boss)]];else if(mini)w=[mk(n),[cl(D.mini),one(),one()]];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
-  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9;
+  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9/Math.sqrt(PK(eq)); // v16-161 (Marius 13:19: "dungeons a bit easier"): Dungeons take only half of the new PK increase
   return {dg:k,f,w,mod:-1,eq,mul,boss,mini,st:{n:D.n+' · FLOOR '+f,bio:18,w,boss,mini}};}
 function dgRew(k,f){const m=REWARD(dgEq(f)).money,g=dgG(),r={money:Math.round(m*(k==='vault'?5:.6)/10)*10};
   if(k==='mine')r.gear={s:GSLOT[g.c.mine%6].k,r:DG_GR.mine(f)};
