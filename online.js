@@ -16,7 +16,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=148;
+const CV=149;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -709,6 +709,7 @@ function stepF(dt){const W=fc.width,H=fc.height,r=F.r;const sdt=dt*F.spd;F.t+=F.
 
 // ------------------------------------------------------------------ v16-85: ARENA 2.0 – heroes run, fight up close, real skills (preview: ?arena2=1)
 const A2ON=()=>LS('te_arena2')!=='0';   // v16-87: Marius OK → Arena 2.0 for everybody (old look only with te_arena2=0)
+const A2RING=[[.42,0],[.36,-.075],[.36,.075],[.62,-.04],[.62,.04]];   // v16-149: places around a target (x × hero size, y × screen height)
 const A2SL={m:[[.37,.63],[.33,.77],[.39,.51],[.31,.89],[.41,.70]],r:[[.18,.58],[.14,.74],[.21,.87],[.16,.47],[.23,.66]]};
 const RCOL={engine:'#ff8a3d',tuning:'#ff4a2a',inspect:'#3de0ff',service:'#7dff8a',paint:'#ff5ce1',elec:'#9fd8ff',all:'#ffd54a',crew:'#ffd54a'};
 const SPI=id=>(C()&&C().spr&&C().spr(id))||null;
@@ -756,9 +757,11 @@ function a2Step(dt){const W=fc.width,H=fc.height,r=F.r,S=F.S;
   F.U.forEach((u,i)=>{u.pt+=sdt;u.fl=Math.max(0,u.fl-sdt);u.kx*=Math.pow(.004,sdt);if(u.jz>0)u.jz=Math.max(0,u.jz-sdt*1.8);
     if(u.dead)return;if(F.t<0&&F.t>-1.3){u.gx=u.hx2;u.gy=u.hy2;}
     if(u.goal&&u.goal.dead)u.goal=null;
-    if(F.t>=0&&!F.done){if(u.goal){u.gx=u.goal.x-u.dir*S*.42;u.gy=u.goal.y+(u.slot%2?.03:-.03)*H;}else if(!u.mel||F.t-(u.lastHit||0)>2){u.gx=u.hx2;u.gy=u.hy2;}}
+    // v16-149 (Marius: „să nu se mai urce unul peste celălalt”): each melee hero on the same target gets its own place around it
+    // (front, above, below, then a 2nd row) instead of all running to the same point
+    if(F.t>=0&&!F.done){if(u.goal){const L=F.U.filter(o=>o.goal===u.goal&&!o.dead&&o.side===u.side),k=Math.max(0,L.indexOf(u)),P=A2RING[k%A2RING.length];
+        u.gx=u.goal.x-u.dir*S*P[0];u.gy=Math.max(H*.42,Math.min(H*.93,u.goal.y+P[1]*H));}else if(!u.mel||F.t-(u.lastHit||0)>2){u.gx=u.hx2;u.gy=u.hy2;}}
     let dx=u.gx-u.x,dy=u.gy-u.y;
-    F.U.forEach(o=>{if(o!==u&&!o.dead&&Math.abs(o.x-u.x)<S*.38&&Math.abs(o.y-u.y)<S*.16){dy+=(u.y>=o.y?1:-1)*S*.5*(i>F.U.indexOf(o)?1:.3);}});
     const dist=Math.hypot(dx,dy),sp=(F.t<0?S*3.2:S*2.6)*(F.t<0?dt:sdt);
     if(dist>2){const m=Math.min(dist,sp);u.x+=dx/dist*m;u.y+=dy/dist*m;u.y=Math.max(H*.42,Math.min(H*.93,u.y));
       if(dist>S*.08){if(u.ps==='idle'||u.ps==='walk')u.ps='walk';if(Math.abs(dx)>4)u.face=Math.sign(dx);}}
@@ -766,6 +769,11 @@ function a2Step(dt){const W=fc.width,H=fc.height,r=F.r,S=F.S;
     if(u.ps==='idle'&&!u.goal)u.face=u.dir;
     if((u.ps==='atk'&&u.pt>.5)||(u.ps==='skill'&&u.pt>.9)||(u.ps==='hurt'&&u.pt>.3)){u.ps='idle';u.pt=0;}
     if(u.ps==='atk'||u.ps==='skill')u.lastHit=F.t;});
+  // v16-149: bodies push each other apart (oval: wide, flat – the arena is seen from the side) → nobody stands inside / on top of another hero
+  if(F.t>-1.3){const A=F.U.filter(u=>!u.dead),rx=S*.44,ry=S*.2;
+    for(let it=0;it<2;it++)for(let a=0;a<A.length;a++)for(let b=a+1;b<A.length;b++){const u=A[a],o=A[b];let nx=(u.x-o.x)/rx,ny=(u.y-o.y)/ry,d=Math.hypot(nx,ny);
+      if(d>=1)continue;if(d<1e-3){ny=a%2?1:-1;nx=0;d=1e-3;}const f=(1-d)/2*.6/Math.max(d,.15),px=nx*f*rx,py=ny*f*ry*1.6;
+      u.x+=px;u.y=Math.max(H*.42,Math.min(H*.93,u.y+py));o.x-=px;o.y=Math.max(H*.42,Math.min(H*.93,o.y-py));}}
   // ---- camera: zoom on the hero casting a skill
   const cz=1,cx=W/2,cy=H*.62,ek=1-Math.pow(.002,dt);
   F.cam.z+=(cz-F.cam.z)*ek;F.cam.x+=(cx-F.cam.x)*ek;F.cam.y+=(cy-F.cam.y)*ek;
