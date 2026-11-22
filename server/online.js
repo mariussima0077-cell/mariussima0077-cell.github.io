@@ -148,7 +148,8 @@ async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl 
   const s = new Set((p.unl || '').split(',').filter(Boolean)); if (s.has(k)) return; s.add(k); await env.DB.prepare('UPDATE prof SET unl=? WHERE uid=?').bind([...s].join(','), uid).run(); }
 // v16-162 (22 nov 2026, Marius): personal DIAMOND gift, sent ONCE as an inbox Mail (at the anti-cheat check-in or at the online sync,
 // whichever comes first). The ledger rule in worker.js does not count these diamonds as cheating until 'until'.
-const GIFT_DM = [{p:'1d3eb4a8', dm:100000, send:false, id:'gift_dm_1d3eb4a8_v16-162', until:Date.parse('2026-12-01T00:00:00Z')}];
+const GIFT_DM = [{p:'1d3eb4a8', dm:100000, send:false, id:'gift_dm_1d3eb4a8_v16-162', until:Date.parse('2026-12-01T00:00:00Z')},
+  {p:'03245000', dm:50000, send:false, id:'gift_dm_03245000_v16-163', until:Date.parse('2026-12-01T00:00:00Z')}];   // v16-163: Wazza4ever (game Mail only)
 export const isGiftDm = pid => GIFT_DM.some(g => String(pid).startsWith(g.p) && Date.now() < g.until);
 export async function giftDm(env, pid, uid) {
   for (const g of GIFT_DM) if (String(pid).startsWith(g.p) && Date.now() < g.until) { try {

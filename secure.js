@@ -155,7 +155,7 @@ async function report(force){
   if(!API) return; const t=T(); if(!t||!t.G) return;
   if(!force && Date.now()-lastRep < 5*60e3) return; lastRep = Date.now();
   const G=t.G, own=Object.keys(G.h.own||{});
-  const body = {pid:PID, v:15, cv:162, app:STORE_BUILD?1:0, t:Date.now(),
+  const body = {pid:PID, v:15, cv:163, app:STORE_BUILD?1:0, t:Date.now(),
     s:{money:Math.round(G.money), sold:G.sold, xp:G.xp, vip:G.vip, lv:Object.keys(G.lv).reduce((a,k)=>a+(k==="rail"?0:G.lv[k]),0), best:G.cp?G.cp.best:0,
        tk:G.h.tk, gtk:(G.gear&&G.gear.tk)||0, heroes:own.length, stars:own.reduce((a,id)=>a+(G.h.own[id].s||0),0), mythic:own.filter(id=>t.HB[id]&&t.HB[id].gr===5).length},
     flags:[...flags], pids:PIDS,
