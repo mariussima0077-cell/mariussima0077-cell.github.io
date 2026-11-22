@@ -942,6 +942,16 @@ const TRK={x0:20,y0:440,x1:345,y1:1320+DY};     // race track (coming soon)
 // =================== IMAGES (img/ folder) ===================
 // v16-150 (memory): map pictures are kept in memory only as big as the map can ever show them (measured at MAX zoom on a
 // DPR-2 phone, ×1.5 for DPR-3 screens). Only pictures drawn with DI() / a full-size drawImage (never with source crops).
+// v16-153 (perf): map pictures are decoded OFF the main thread (createImageBitmap, already resized by ISC) → no hiccup when a new
+// building picture appears while you drag the map. Any problem (old WebView, network) → the old <img> path below.
+const IBM=typeof createImageBitmap==='function'&&typeof fetch==='function';
+function ibmLoad(n,E){const sc=ISC[n]||1,old=()=>{E.st=false;IBMX[n]=1;void E.ok;};
+  if(IBMX[n]){return;}
+  fetch('img/'+n+'.webp').then(r=>{if(!r.ok)throw 0;return r.blob();}).then(b=>createImageBitmap(b)).then(bm=>{
+    if(sc>=1)return bm;const w=Math.max(1,Math.round(bm.width*sc)),h=Math.max(1,Math.round(bm.height*sc));
+    return createImageBitmap(bm,{resizeWidth:w,resizeHeight:h,resizeQuality:'high'}).then(r=>{bm.close();return r;},()=>{E.sc=1;return bm;}).then(r=>{if(r!==bm)E.sc=sc;return r;});
+  }).then(bm=>{E.el=bm;E._ok=true;}).catch(()=>{if(!E._ok){E.sc=1;old();}});}
+const IBMX={};   // pictures that must use the old path
 const ISC={loading:.8,b_office:.35,b_office0:.35,b_arrivals:.45,b_arrivals0:.45,b_security:.6,b_security2:.6,b_security3:.6,b_security4:.6};
 ['rail',.9,'factory',.75,'gas',.65,'wash',.6].forEach((v,i,a)=>{if(i%2===0)[1,2,3,4].forEach(t=>ISC['x_'+v+t]=a[i+1]);});
 let PASS='all'; // 'static' = painted once into the cached map tiles, 'dyn' = drawn every frame
@@ -950,7 +960,7 @@ const IMG={};['garage','mech','vip','loading','b_arrivals','b_arrivals0','b_offi
   // v16-120 (memory): an image is loaded only the first time the map asks for it (IMG[n].ok) – before, ALL building levels LV1-4 were
   // decoded at start (~150 MB of canvases on a budget phone) even if the player only has LV1. `st` = requested, `_ok` = ready.
   const E={el:null,_ok:false,bad:false,st:false,sc:1};IMG[n]=E;
-  Object.defineProperty(E,'ok',{get(){if(!E.st){E.st=true;const el=new Image();E.el=el;el.onload=()=>{try{const sc=ISC[n]||1,c=document.createElement('canvas');c.width=Math.round(el.naturalWidth*sc);c.height=Math.round(el.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(el,0,0,c.width,c.height);E.el=c;E.sc=sc;}catch(e){}E._ok=true;};el.onerror=()=>{E.bad=true;};el.src='img/'+n+'.webp';}return E._ok;},set(v){E._ok=v;}});});
+  Object.defineProperty(E,'ok',{get(){if(!E.st){E.st=true;if(IBM&&!IBMX[n]){ibmLoad(n,E);return E._ok;}const el=new Image();E.el=el;el.onload=()=>{try{const sc=ISC[n]||1,c=document.createElement('canvas');c.width=Math.round(el.naturalWidth*sc);c.height=Math.round(el.naturalHeight*sc);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(el,0,0,c.width,c.height);E.el=c;E.sc=sc;}catch(e){}E._ok=true;};el.onerror=()=>{E.bad=true;};el.src='img/'+n+'.webp';}return E._ok;},set(v){E._ok=v;}});});
 const IM={"garage":{"w":1000,"h":568,"floor":[0,569,207,340],"door":[211,569,190,27],"floorT":[[243,198,457,538],[467,198,684,538],[696,198,913,538]],"doorT":[[257,540,447,567],[485,540,675,567],[713,540,903,567]]},"mech":{"cw":66,"ch":89,"cols":16,"rows":6,"pad":2,"anims":["idle","walk","work","repair","think","celebrate"]},"vip":{"cw":72,"ch":101,"cols":16,"rows":7,"pad":2,"anims":["idle","walk","work","repair","inspect","think","celebrate"]},"vipcar":{"cw":184,"ch":117,"cols":4,"rows":4,"pad":2,"sizes":[[133,112],[129,106],[180,74],[177,73]]},"loading":{"w":922,"h":1706,"bar":[117,1482,797,1529],"txt":[461,1572],"track":[17,28,41],"panel":[20,31,45]}};
 // =================== PACKS (kept forever: every chapter & stage) ===================
 const BM={"arrivals":{"w":1536,"h":1024,"cols":[142,293,447,604,765,921,1079,1238,1398],"rows":[[158,460],[626,914]]},"office":{"w":1672,"h":941,"crop":[15,10,1657,925],"desks":[[262,505,525,748],[597,505,860,748],[932,505,1195,748],[1262,492,1590,724]],"chairs":[[393,540],[728,540],[1063,540],[1412,530]]},"yard":{"crop":[36,318,1052,1218],"arms":[[452,344,628,365],[452,1152,628,1173]],"road":543,"spots":{"xL":355,"xR":730,"y0":480,"y1":1090}},"security":{"crop":[70,165,1146,1145],"rec":[938,228],"chair":[608,758],"door":[608,960],"out":[608,1150],"beacon":[850,622],"mon":[[155,372,438,545],[462,372,760,545],[783,372,1065,545]]}};
@@ -2613,6 +2623,12 @@ function incSale(c,price){let used=0;const k=c.value>0?price/c.value:0;if(c.inc)
 function incRates(){const now=Date.now(),m=Math.floor(now/6e4),mins=Math.max(1,Math.min(20,(now-INC.t0)/6e4)),o={};let tot=0;
   for(const b of INC.b)if(m-b.m<20)for(const k in b.s)o[k]=(o[k]||0)+b.s[k];for(const k in o){o[k]=o[k]*60/mins;tot+=o[k];}
   return {r:o,tot,ok:now-INC.t0>9e4};}
+// v16-153 (perf): 20 s after the game goes to the background, give back the big map caches (sharp map tiles + overview
+// ≈ 40-60 MB) and the battle sprite sheets not in use → Android is much less likely to kill the game while you are away.
+// Everything is rebuilt by itself when you come back (map tiles in a few frames, sprites when they are drawn again).
+let bgFreeT=0;document.addEventListener('visibilitychange',()=>{clearTimeout(bgFreeT);if(!document.hidden)return;
+  bgFreeT=setTimeout(()=>{if(!document.hidden)return;try{OV.c=null;BG.lv.clear();BG.cur=null;}catch(e){}
+    try{if(window.CAMPAIGN&&CAMPAIGN.freeMem)CAMPAIGN.freeMem();}catch(e){}},20000);});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)INC.hid=Date.now();else if(INC.hid&&Date.now()-INC.hid>6e4){INC.b=[];INC.t0=Date.now();}}); // away = no garage work → start measuring again
 const XINC={wash:l=>washPay(l)*ECO*3600/WASH_EVERY[l-1],gas:l=>gasPay(l)*ECO*3600/GAS_EVERY[l-1],factory:l=>facPrice(l)*ECO*3600/FAC_EVERY[l-1]}; // fixed income: one customer / car every X s
 const incFac=(id,l)=>!l?0:id==='office'?1+SELL_BONUS[l-1]:id==='security'?SEC_REWARD[l-1]*Math.min(.95,SEC_CATCH[l-1]):Math.sqrt(TIER(l))*SPEED[l-1]*(1+PAYB[l-1]); // more bays help only when cars wait → √
