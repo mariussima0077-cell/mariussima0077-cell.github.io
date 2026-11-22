@@ -1615,8 +1615,10 @@ let B=null,raf=0,lastT=0,running=false;
 const fy=d=>FY0+d*(FY1-FY0);
 const dsc=d=>(.98+.36*d)*S;
 // v16-25: background pictures are soft → drawn at max 1.5× (less memory); the canvas is only re-made when the size really changes
-function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(2,window.devicePixelRatio||1)*(B&&B.lowRes?(B.lowRes2?.6:.75):1);   // v16-153: 2nd step .6
-  if(!force&&w===W&&h===H&&d===DPR&&cv.width===Math.round(w*d))return false;W=w;H=h;DPR=d;BDPR=Math.min(DPR,1.5);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+// HD graphics (branch hd-graphics): sharp up to 3x on good screens, never lowers the quality by itself (localStorage te_hd=1 or ?hd=1)
+const HD=(()=>{try{return localStorage.getItem('te_hd')==='1'||/[?&]hd=1/.test(location.search);}catch(e){return false;}})();
+function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(HD?3:2,window.devicePixelRatio||1)*(B&&B.lowRes&&!HD?(B.lowRes2?.6:.75):1);   // v16-153: 2nd step .6
+  if(!force&&w===W&&h===H&&d===DPR&&cv.width===Math.round(w*d))return false;W=w;H=h;DPR=d;BDPR=Math.min(DPR,HD?2.5:1.5);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   S=clamp(Math.min(W/390,H/800),.8,1.5);HOR=H*.36;FY0=H*.47;FY1=H*.77;PANEL=H-Math.min(150,H*.19);if(B)buildBG();return true;}
 
 // v15: NEVER GIVE UP – stuck on your next stage? Your mechanics train: +7.5% HP & attack every 6 hours for 2 days, then +15% every 6 hours (max +300%). Resets when you win it.
@@ -2507,9 +2509,9 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-las
   // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".
   // Now: the first 2 s are ignored (on phones the drawing happens on the graphics chip, so the frame time must count too), and lower quality starts at the next wave change (hidden by the march) or next battle.
   if(B.real>2){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}else if(a>40&&B.lowRes&&!LOWRES2){LOWRES2=true;try{sessionStorage.setItem('te_lowres2','1');}catch(e){}}}}
-  if(LOWRES&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}
+  if(LOWRES&&!HD&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}
   // v16-153 (perf): still slow (>40 ms a frame; Google counts frames under 20 FPS as slow) → one more step down at the next march
-  if(LOWRES2&&B.lowRes&&!B.lowRes2&&B.phase==='march'&&B.phT<.2){B.lowRes2=true;bsize(true);}}
+  if(LOWRES2&&!HD&&B.lowRes&&!B.lowRes2&&B.phase==='march'&&B.phT<.2){B.lowRes2=true;bsize(true);}}
 cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
   if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
   else if(h.id==='spd'){if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(TE().spd2())B.spd=3;else{B.offer=true;B.paused=true;}}else B.spd=1;TE().G.cp.spd=B.spd;}
