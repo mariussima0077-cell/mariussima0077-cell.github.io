@@ -149,6 +149,7 @@ span.numP{display:inline-flex;align-items:flex-end;white-space:nowrap;line-heigh
 #smBox{position:relative;background:#0a1322;--u:.4px;border-radius:calc(var(--u)*18);overflow:hidden}
 /* v16-52: summon page on Marius' picture (header + background, common for HERO and CREW) */
 .smH{pointer-events:none;filter:drop-shadow(0 calc(var(--u)*6) calc(var(--u)*8) #000c)}
+.smAsc{color:#2ef3ff;background:linear-gradient(90deg,#04505e00,#04505ecc 18%,#04505ecc 82%,#04505e00);border-top:1px solid #2ef3ff88;border-bottom:1px solid #2ef3ff88;text-shadow:0 0 calc(var(--u)*8) #2ef3ff,0 calc(var(--u)*2) 0 #000}.smAsc b{color:#fff}.smAsc img{border-radius:calc(var(--u)*8);box-shadow:0 0 calc(var(--u)*10) #2ef3ff}
 .smL{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);color:#fff;font:900 italic calc(var(--u)*30) Game,system-ui;letter-spacing:calc(var(--u)*1);text-shadow:0 calc(var(--u)*3) 0 #000a,0 0 calc(var(--u)*8) #000;white-space:nowrap;pointer-events:none}
 .smL .tki{height:1.25em;width:auto;vertical-align:middle}.smL small{font-size:.72em;color:#9fd3ff;font-style:normal;letter-spacing:calc(var(--u)*1.5)}
 .smTop{font-size:calc(var(--u)*24);gap:calc(var(--u)*5)}
@@ -3596,6 +3597,9 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   h+='<div class="smL" style="'+box(256,690,410,55)+'">AVAILABLE GEAR</div><div data-a="grates" style="'+box(805,684,68,68)+'border-radius:50%"></div>';
   const ex=['tool','helm','vest','glove','boots','chip'];
   TILE2.forEach((x,i)=>{h+='<div class="smTi smGt" style="'+box(x-50,792,100,100)+'"><img src="'+GSx.icon(ex[i],i)+'" alt=""><i style="background:#000a;color:'+GRADES[i].c+'">'+GSx.RATE[i]+'%</i></div><div data-a="grates" style="'+box(x-64,778,128,172)+'"></div>';});
+  // v16-181 (Marius: „aici nu văd Ascended”): ASCENDED 0.02% on the panel, in the gap above the 6 tiles (grows with tall phones)
+  {const a=747,b=M.top(778),hh=Math.max(26,Math.min(60,b-a-10)),yy=a+(b-a-hh)/2;
+   h+='<div class="smL smAsc" data-a="grates" style="left:'+U(230)+';top:'+U(yy)+';width:'+U(460)+';height:'+U(hh)+';font-size:'+U(hh*.52)+';pointer-events:auto"><img src="'+GSx.icon('chip',6)+'" alt="" style="height:'+U(hh*.86)+'">ASCENDED <b>'+GSx.RATE[6]+'%</b></div>';}
   // the 3 summons
   [['m','HERO',47,254],['c','CREW',335,251],['gear','GEAR',621,254]].forEach(([k,n,x,w])=>{const on=k==='gear';
     h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+k+'" style="'+box(x,1022,w,59)+'">'+(k==='gear'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+'</div>';});
