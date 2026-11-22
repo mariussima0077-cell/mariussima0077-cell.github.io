@@ -263,5 +263,17 @@ async function integ(force){
 }
 setTimeout(integ, 6000);
 
+// ---------- v16-154: KEEP THE SCREEN ON while the game is open (tester Wazza4ever, 22 nov: the phone went to sleep on the game) ----------
+// Chrome / TWA: Screen Wake Lock API (released by the browser when the game is hidden → asked again when it comes back).
+// Capacitor app: the next APK/AAB sets FLAG_KEEP_SCREEN_ON in MainActivity (branch `capacitor`); the WebView may not have wakeLock.
+let wakeL = null;
+async function keepAwake(){
+  try{ if(document.visibilityState!=='visible' || wakeL || !('wakeLock' in navigator)) return;
+    wakeL = await navigator.wakeLock.request('screen'); wakeL.addEventListener('release', ()=>{ wakeL = null; }); }catch(e){ wakeL = null; }
+}
+document.addEventListener('visibilitychange', keepAwake);
+addEventListener('pointerdown', keepAwake, {passive:true});
+keepAwake();
+
 window.SEC = {integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();
