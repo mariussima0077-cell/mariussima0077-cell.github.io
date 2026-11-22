@@ -1309,7 +1309,7 @@ function drawHero(g,u,t){
 let GA=1;
 function eye(g,x,y,r,col,t,k){g.fillStyle=col;circ(g,x,y,r);g.fillStyle='rgba(255,255,255,.85)';circ(g,x-r*.3,y-r*.3,r*.3);g.globalAlpha*=.35;g.fillStyle=col;circ(g,x,y,r*2.2+Math.sin(t*6+k)*.6);g.globalAlpha=Math.min(1,g.globalAlpha/.35);}
 // v16-161 (Marius): AWAKENING in battle – Awakened III+ = aura in the tier color behind the hero, Awakened V = brighter aura + light sparks when it attacks / casts. One cached glow picture per color (cheap for budget phones).
-const AWC=['','#ffd54a','#ff5252','#c77dff','#7cf9ff','#ffffff'],AWG={};
+const AWC=['','#ffe082','#ff5252','#c77dff','#7cf9ff','#ffb300'],AWG={};
 function awGlow(c){if(AWG[c])return AWG[c];const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,c+'cc');gr.addColorStop(.45,c+'55');gr.addColorStop(1,c+'00');x.fillStyle=gr;x.fillRect(0,0,64,64);return AWG[c]=cv;}
 function drawAwk(g,u,t){if(!u.awk||u.awk<3||u.dead)return;const c=AWC[u.awk],G0=awGlow(c),p=.85+.15*Math.sin(t*4+u.k),k=u.awk>=5?1.25:1;
   g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);g.globalCompositeOperation='lighter';g.globalAlpha=.55*p;g.drawImage(G0,-46*k,-78*k,92*k,92*k);g.globalAlpha=.7*p;g.drawImage(G0,-34*k,-12,68*k,22);g.restore();

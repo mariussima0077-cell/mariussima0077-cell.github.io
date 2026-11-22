@@ -3526,7 +3526,7 @@ const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon 
 const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
 const smMap=()=>TALL.map(921,1532,[[764,.25],[1012,.2],[1097,.15],[1258,.15],[1324,.25]]);
 function smSize(){TALL.size(smBox,smMap());smKey='';}
-function openSummon(cat){if(cat)smCat=smOf(cat);smSize();smKey='';smEl.classList.add('open');renderSm();}
+function openSummon(cat){if(cat)smCat=smOf(cat);if(AWK_SHEET&&!awkSheet){awkSheet=new Image();awkSheet.src='img/fx/awaken.webp';} /* v16-161: preload the WOW sheet (88 KB) */smSize();smKey='';smEl.classList.add('open');renderSm();}
 function closeSummon(){smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
 function img(h,sil,cls){return '<img class="'+(cls||'')+'" src="'+portrait(h,sil)+'">';}
@@ -3767,15 +3767,15 @@ function popWish(){const P=G.h.pity.m,L=heroesOf('m',5).filter(h=>!h.soon);
     L.map(h=>{const on=G.h.wish===h.id,o=own(h.id);return '<div data-p="wpick" data-id="'+h.id+'" class="'+(on?'wOn':'')+'">'+card(h,o,on?'<i class="up">WISH ❤</i>':(o&&mTier(o.s)?'<i class="up">'+sLbl(h,o.s)+'</i>':''))+'</div>';}).join('')+'</div>'+(G.h.wish?'<button class="wHist" data-p="wpick" data-id="">✕ NO WISH (random Mythic)</button>':''));}
 window.popWish=popWish;window.popHero=popHero;window.popRates=popRates; // (also used by the test tools)
 // v16-161 (Marius): AWAKENING "WOW" – light burst + rays + the hero + new stars + AWAKENED n. Marius' sprite sheet img/fx/awaken.webp (8 frames in a row) is used when it exists; until then everything is drawn with CSS. Loaded only here.
-const AWK_ART={}; // id → 'img/heroes/awk/<id>.webp' (Awakened portraits, when Marius sends them)
-let awkSheet=null;const AWK_SHEET=false; // → true when Marius' sheet img/fx/awaken.webp is in the game
+const AWK_ART={m5_0:'img/hero/awk_m5_0.webp',m5_1:'img/hero/awk_m5_1.webp',m5_2:'img/hero/awk_m5_2.webp',m5_3:'img/hero/awk_m5_3.webp',m5_4:'img/hero/awk_m5_4.webp',m5_5:'img/hero/awk_m5_5.webp'}; // v16-161: Marius' Awakened portraits (shown from Awakened V; originals img/sheets/awk/)
+let awkSheet=null;const AWK_SHEET=true; // Marius' sheet img/fx/awaken.webp (4×2 frames, edges faded to black – original img/sheets/awk/awaken_src.png)
 function awakenFx(list,done){if(!list||!list.length){if(done)done();return;}const r=list[0],h=HB[r.id];if(!h){awakenFx(list.slice(1),done);return;}
   if(!awkSheet){awkSheet=new Image();if(AWK_SHEET)awkSheet.src='img/fx/awaken.webp';}
   let el=$('awkFx');if(!el){el=document.createElement('div');el.id='awkFx';document.body.appendChild(el);}
-  const t=r.awk,col=['#ffd54a','#ff5252','#c77dff','#7cf9ff','#ffffff'][t-1],art=AWK_ART[h.id]&&t>=5?AWK_ART[h.id]:(SPLASH[h.id]||portrait(h));
+  const t=r.awk,col=['#ffe082','#ff5252','#c77dff','#7cf9ff','#ffb300'][t-1],art=AWK_ART[h.id]&&t>=5?AWK_ART[h.id]:(SPLASH[h.id]||portrait(h));
   el.style.setProperty('--ac',col);
-  el.innerHTML='<div class="awBg"></div><div class="awRays"></div>'+(awkSheet.complete&&awkSheet.naturalWidth?'<div class="awSh" id="awSh"></div>':'<div class="awRing"></div><div class="awRing b"></div>')+
-    '<img class="awHero" src="'+art+'" alt=""><div class="awTx"><small>'+h.n+'</small><b>AWAKENED '+ROM[t]+'</b><div class="awSt">'+sStars(t)+'</div><em>'+(t===2?'+1 SKILL LEVEL · POWER UP':t===3?'BATTLE AURA UNLOCKED':t===4?'ULTIMATE POWER UP':t===5?'FULLY AWAKENED · GLOWING WEAPON':'POWER UP')+'</em></div><div class="awTap">Tap to continue</div>';
+  const okS=awkSheet.complete&&awkSheet.naturalWidth;el.innerHTML='<div class="awBg"></div><div class="awRays"></div>'+(okS?'':'<div class="awRing"></div><div class="awRing b"></div>')+
+    '<img class="awHero" src="'+art+'" alt="">'+(okS?'<div class="awSh" id="awSh"></div>':'')+'<div class="awTx"><small>'+h.n+'</small><b>AWAKENED '+ROM[t]+'</b><div class="awSt">'+sStars(t)+'</div><em>'+(t===2?'+1 SKILL LEVEL · POWER UP':t===3?'BATTLE AURA UNLOCKED':t===4?'ULTIMATE POWER UP':t===5?'FULLY AWAKENED · GLOWING WEAPON':'POWER UP')+'</em></div><div class="awTap">Tap to continue</div>';
   el.className='open t'+t;liftZ(el);const sh=$('awSh');if(sh){let f=0;sh.style.backgroundPosition='0 0';const it=setInterval(()=>{f++;if(f>7||!el.classList.contains('open')){clearInterval(it);sh.style.opacity=0;return;}sh.style.backgroundPosition=(f%4)*100/3+'% '+(f>3?100:0)+'%';},95);} // sheet = 4×2 frames (384×512 each, 1536×1024)try{if(navigator.vibrate)navigator.vibrate([40,40,120]);}catch(e){}
   const end=()=>{el.className='';el.innerHTML='';awakenFx(list.slice(1),done);};let ok=0;setTimeout(()=>ok=1,900);el.onclick=()=>{if(ok)end();};}
 window.awakenFx=awakenFx;
