@@ -2696,14 +2696,22 @@ function xlRows(id,lt,nu){if(nu||!BLD[id])return '';let h='';const x=lvX(id),top
   if(GCLS[id]){const c=GCLS[id],b=GB(lt),b2=GB(Math.min(MAXT,lt+1));h+='<div class="row bbRow"><span>'+'<img class="tki" src="img/ui4/cls_'+c+'.webp" alt=""> '+CLS_N[c]+' heroes in battle</span><b>+'+pctB(b)+'</b>'+(top?'<em>+'+pctB(b2)+'</em>':'')+'</div>';}
   return h;}
 const pctB=v=>(v*100<10?(v*100).toFixed(1):Math.round(v*100))+'%';
-function incRow(id,lv,nu){if(nu)return '';const top=lv<MAXLV,R=incRates(),now=R.r[id]||0,em=v=>top?'<em>'+fmt(v)+'/h</em>':'';
+// v16-183 (tester Wazza: "je up les bâtiments et je perds en $/h"): Income now = LIVE measure (last 20 min, goes up/down with
+// the cars). From LV 11 the next level shows its exact gain (+x %) instead of nothing, so nobody thinks an upgrade lowers income.
+function xGain(id){const x=lvX(id);if(ST[id]&&id!=='inspect'){const b=payB(id);return (1+b+.02)/(1+b)-1;}
+  if(id==='office'||XINC[id])return (1+.02*(x+1))/(1+.02*x)-1;return 0;}
+const xgTxt=g=>'+'+(g*100<10?(g*100).toFixed(1):Math.round(g*100))+'%';
+function incRow(id,lv,nu){if(nu)return '';const R0=incRates();if(lv>=MAXLV&&lvT(id)<MAXT&&xGain(id)>0&&(ST[id]||id==='office'||XINC[id])){
+    const now=XINC[id]?XINC[id](lv):(R0.r[id]||0),lab=XINC[id]?'💰 Income':'💰 Income now <small style="opacity:.65">(live)</small>';
+    return '<div class="row incRow"><span>'+lab+'</span><b>'+(XINC[id]||R0.ok?'≈ '+fmt(now)+'/h':'measuring…')+'</b><em>'+xgTxt(xGain(id))+' pay</em></div>';}
+  const top=lv<MAXLV,R=R0,now=R.r[id]||0,em=v=>top?'<em>'+fmt(v)+'/h</em>':'';
   if(XINC[id])return '<div class="row incRow"><span>💰 Income</span><b>'+(lv?'≈ '+fmt(XINC[id](lv))+'/h':'—')+'</b>'+em(XINC[id](lv+1))+'</div>';
   if(id==='inspect'||id==='parking'||id==='trailer'||id==='parts')return '<div class="row incRow"><span>💰 Income</span><b style="font-size:.85em">no direct money</b><em style="font-size:.85em">'+(top?'more cars for every garage':'')+'</em></div>';
   if(!(ST[id]||id==='office'||id==='security'))return '';
   if(!lv)return '<div class="row incRow"><span>💰 Income</span><b>—</b>'+(top?'<em>new jobs</em>':'')+'</div>';
   if(!R.ok)return '<div class="row incRow"><span>💰 Income</span><b style="font-size:.85em">measuring…</b></div>';
   let nx=now*incFac(id,lv+1)/incFac(id,lv);if(id==='office'){let sale=0;for(const k in R.r)if(ST[k]||k==='office')sale+=R.r[k];nx=now+sale*(incFac(id,lv+1)/incFac(id,lv)-1);}
-  return '<div class="row incRow"><span>💰 Income now</span><b>'+fmt(now)+'/h</b>'+em(nx)+'</div>';}
+  return '<div class="row incRow"><span>💰 Income now <small style="opacity:.65">(live)</small></span><b>'+fmt(now)+'/h</b>'+em(nx)+'</div>';}
 function updateDistrict(dt){
   // --- car factory: a new car leaves the right door every few seconds
   if(G.lv.factory>0){const r=xRect('factory'),lv=G.lv.factory;XS.facT+=dt;
@@ -3206,7 +3214,7 @@ function renderPanel(){
   else{b.innerHTML=(lt===0?'BUILD ':'UPGRADE ')+PKI(pk,'1.25em')+' '+nfmt(cost);b.disabled=!can;}
 }
 $('shBtn').onclick=()=>{if(sel==='vip'){closePanel();openDQ();return;}if(sel&&NOUP(sel)&&sheet.classList.contains('bldP')){closePanel();return;}if(!sel||NOUP(sel))return;const lv=G.lv[sel],lt=lvT(sel),pk=partOf(sel);if(lt>=MAXT||G.rep<BLD[sel].rep)return;const cost=PCOST(sel,lt+1);if(pkN(pk)<cost){toast(PKI(pk)+' Not enough '+PK_N[pk]+' ('+nfmt(pkN(pk))+' / '+nfmt(cost)+')',2400);return;}
-  upk()[pk]-=cost;if(lv>=MAXLV){G.lx=G.lx||{};G.lx[sel]=lvX(sel)+1;qAdd('upgrade',1);save();lastPanelKey='';renderPanel();float(AV,300,'LEVEL '+(lt+1)+'!','#ffd54a');return;}
+  upk()[pk]-=cost;if(lv>=MAXLV){const g=xGain(sel);G.lx=G.lx||{};G.lx[sel]=lvX(sel)+1;qAdd('upgrade',1);save();lastPanelKey='';renderPanel();float(AV,300,'LEVEL '+(lt+1)+'!'+(g>0?'  '+xgTxt(g)+' pay':''),'#ffd54a');return;}
   G.lv[sel]++;qAdd('upgrade',1);relayoutAfterUpgrade(sel);if(sel==='security')secLayout(true);if(sel==='parts')partsLayout();save();lastPanelKey='';renderPanel();
   let fx=AV,fy=300;const g=GAR[sel];
   if(g){const p=L2W(g,150,75);fx=p.x;fy=p.y;}else if(sel==='parts'){fx=PB.x+PB.w/2;fy=PB.y+40;}else if(sel==='trailer'){fx=200;fy=TRAIL_Y-30;}else if(sel==='parking'){fx=600;fy=AY;}else if(sel==='security'){fx=SO_X+SO_W/2;fy=SO_Y+50;}else if(XIDS.includes(sel)){const r=xRect(sel);fx=r.x+r.w/2;fy=r.y+r.h*.4;}else if(sel==='rail'){const r=rRect();fx=r.x+r.w/2;fy=r.y+r.h*.4;}
