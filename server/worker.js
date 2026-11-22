@@ -318,7 +318,7 @@ async function scan(env) {
 //   lic  = LICENSED → installed from Google Play by this Google account
 // Mode = variable INTEGRITY in wrangler.toml: 'log' (only written down, shown on /admin) or 'enforce'
 // (online modes + cloud save only for players with a good result in the last 3 days; the browser and old apps are refused).
-const INTEG_OPS = ['sync', 'fight', 'refresh', 'wbhit', 'evsc', 'say', 'prof'];
+const INTEG_OPS = ['sync', 'fight', 'refresh', 'wbhit', 'evsc', 'gpsc', 'gpfin', 'say', 'prof'];
 let integReady = false;
 // daily stats (/admin): one row per player per day (Paris time), kept 90 days
 let statsReady = false;

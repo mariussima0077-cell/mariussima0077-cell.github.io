@@ -28,6 +28,8 @@ const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena 
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
 const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew','dgr'], B:['ess','dia','wheel','key','cash']};   // v16-120 KEY ROULETTE · v16-129 CASH ROULETTE (added at the END → events 0-3 stay the same)
 const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40, key:40, cash:25, dgr:3000};   // v16-161: cash was missing (score became NaN) + DUNGEON RUSH
+const GP_T0 = Date.UTC(2026, 10, 22, 17, 0, 0), GP_T1 = GP_T0 + 28 * DAY, GP_CAP = 250000;   // v16-185 TORQUE GRAND PRIX – same dates in grandprix.js
+const GP_FIN = [[1,1,{dm:5000}],[2,2,{dm:3000,tk:20}],[3,3,{dm:2000,tk:15}],[4,10,{dm:1000,tk:10}]];
 const EV_RW = [[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
 const EV_TKK = {hero:'tk', gear:'gt', crew:'ct', ess:'tk', dia:'tk', wheel:null, key:null, cash:'tk', dgr:'tk'};
 const EV_NAME = {hero:'Hero Summon Festival', gear:'Gear Summon Forge', crew:'Crew Summon Rally', ess:'Essence Rush', dia:'Diamond Spree', wheel:'Lucky Wheel', key:'Key Roulette', cash:'Cash Roulette', dgr:'Dungeon Rush'};
@@ -101,6 +103,9 @@ async function ensure(env) {
     db.prepare('CREATE INDEX IF NOT EXISTS wboss_rank ON wboss(srv, wk, dmg)'),
     db.prepare('CREATE TABLE IF NOT EXISTS evt(uid INTEGER, eid TEXT, srv INTEGER, sc INTEGER DEFAULT 0, t INTEGER, PRIMARY KEY(uid, eid))'),
     db.prepare('CREATE INDEX IF NOT EXISTS evt_rank ON evt(eid, srv, sc)'),
+    // v16-185 TORQUE GRAND PRIX (one-time event): Road points per player, first finishers of the ULTIMATE mission
+    db.prepare('CREATE TABLE IF NOT EXISTS gpx(uid INTEGER PRIMARY KEY, srv INTEGER, sc INTEGER DEFAULT 0, t INTEGER, fin INTEGER DEFAULT 0, tf INTEGER DEFAULT 0)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS gpx_rank ON gpx(srv, sc)'),
     // v16-146 RAIL WARS: trains on their way (30 min), daily counters, who hit which train
     db.prepare('CREATE TABLE IF NOT EXISTS rwtrain(id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, srv INTEGER, g INTEGER, tok INTEGER, cars INTEGER, t0 INTEGER, t1 INTEGER, hits INTEGER DEFAULT 0, lost INTEGER DEFAULT 0, done INTEGER DEFAULT 0)'),
     db.prepare('CREATE INDEX IF NOT EXISTS rwtrain_srv ON rwtrain(srv, t1)'), db.prepare('CREATE INDEX IF NOT EXISTS rwtrain_uid ON rwtrain(uid, done)'),
@@ -635,6 +640,23 @@ export async function online(op, b, env) {
     const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
     const rank = (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1;
     return {ok:true, dmg:me.dmg, rank};
+  }
+  if (op === 'gpsc' || op === 'gprank' || op === 'gpfin') {   // v16-185 TORQUE GRAND PRIX
+    if (!p) return {err:'noprof'}; if (now < GP_T0 || now > GP_T1 + HOUR) return {err:'over'};
+    if (op !== 'gprank') { if (await isBanned(env, b.pid)) return {banned:1}; const sc = Math.round(num(b.sc, 0, GP_CAP));
+      await db.prepare('INSERT INTO gpx(uid,srv,sc,t) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET srv=excluded.srv, t=CASE WHEN excluded.sc>gpx.sc THEN excluded.t ELSE gpx.t END, sc=MAX(gpx.sc, excluded.sc)').bind(p.uid, p.srv, sc, now).run(); }
+    const me = await db.prepare('SELECT sc, t, fin FROM gpx WHERE uid=?').bind(p.uid).first();
+    if (op === 'gpfin') { if (!me || me.sc < 20000) return {err:'bad'}; if (me.fin) return {ok:true, pos:me.fin};
+      const n = (await db.prepare('SELECT COUNT(*) n FROM gpx WHERE srv=? AND fin>0').bind(p.srv).first()).n;
+      if (n >= 10) { await db.prepare('UPDATE gpx SET fin=-1, tf=? WHERE uid=?').bind(now, p.uid).run(); return {ok:true, pos:-1}; }
+      const pos = n + 1; await db.prepare('UPDATE gpx SET fin=?, tf=? WHERE uid=?').bind(pos, now, p.uid).run();
+      const q = GP_FIN.find(x => pos >= x[0] && pos <= x[1]); if (q) await mail(env, p.uid, '🏁', 'Grand Prix – First Over the Line #' + pos, `You are #${pos} of your server to finish the ULTIMATE mission!`, q[2]);
+      return {ok:true, pos}; }
+    const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM gpx WHERE srv=? AND (sc>? OR (sc=? AND t<?))').bind(p.srv, me.sc, me.sc, me.t).first()).n + 1 : 0;
+    const tot = (await db.prepare('SELECT COALESCE(SUM(sc),0) s FROM gpx WHERE srv=?').bind(p.srv).first()).s;
+    if (op === 'gpsc') return {ok:true, rank, tot};
+    const top = (await db.prepare('SELECT g.uid, g.sc, p.name FROM gpx g JOIN prof p ON p.uid=g.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE g.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY g.sc DESC, g.t ASC LIMIT 100').bind(p.srv).all()).results;
+    return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, sc:r.sc})), me:p.uid, rank, sc:me ? me.sc : 0, tot};
   }
   if (op === 'evsc' || op === 'evrank') {   // v16-99 TIME EVENTS
     if (!p) return {err:'noprof'}; const eid = String(b.eid || ''), m = /^([AB])(\d{1,6})$/.exec(eid); if (!m) return {err:'bad'};
