@@ -142,6 +142,9 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-233 (23 nov 2026) – cadou 50.000 💎 pentru Yakhouba (3975f8fb)
+- Mail personal în joc (`MAIL` din index.html, id `p_3975f8fb_dm50k`) + intrare în `GIFT_DM` (server/online.js, `send:false`, până la 7 dec) → regula ledger din Torque Guard NU-l marchează (isGiftDm). Primește diamantele când deschide Mail-ul. `CV=233`. Telefon buget: 0 erori. Nu lipsește nicio poză.
+
 ## ✅ v16-215 (23 nov 2026) – buton 🔄 RESET în /admin
 - `/admin` → caută jucătorul → fișa lui → **🔄 RESET – start from 0** → **YES, RESET**. Șterge: salvarea cloud, clasamente, Arena, chat, Mail, statistici. Telefonul primește `wipe:1` (report / online / cloud save) → șterge salvarea locală + ID nou → NEW GAME. Pachetele plătite rămân (`torqueEmpire_packs`, `te_pids`).
 - Tabel nou `wipes` (D1, se creează singur). Primul reset cerut: **pufulete** (23 nov).

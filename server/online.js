@@ -186,7 +186,8 @@ async function addUnl(env, uid, k) { const p = await env.DB.prepare('SELECT unl 
 // whichever comes first). The ledger rule in worker.js does not count these diamonds as cheating until 'until'.
 const GIFT_DM = [{p:'1d3eb4a8', dm:100000, send:false, id:'gift_dm_1d3eb4a8_v16-162', until:Date.parse('2026-12-01T00:00:00Z')},
   {p:'03245000', dm:50000, send:false, id:'gift_dm_03245000_v16-163', until:Date.parse('2026-12-01T00:00:00Z')},
-  {p:'160672a2', dm:50000, send:false, id:'gift_dm_160672a2_v16-168', until:Date.parse('2026-12-01T00:00:00Z')}];   // v16-168: Alex Covaci (game Mail only)   // v16-163: Wazza4ever (game Mail only)
+  {p:'160672a2', dm:50000, send:false, id:'gift_dm_160672a2_v16-168', until:Date.parse('2026-12-01T00:00:00Z')},
+  {p:'3975f8fb', dm:50000, send:false, id:'gift_dm_3975f8fb_v16-233', until:Date.parse('2026-12-07T00:00:00Z')}];   // v16-233: Yakhouba (game Mail only)   // v16-168: Alex Covaci (game Mail only)   // v16-163: Wazza4ever (game Mail only)
 export const isGiftDm = pid => GIFT_DM.some(g => String(pid).startsWith(g.p) && Date.now() < g.until);
 export async function giftDm(env, pid, uid) {
   for (const g of GIFT_DM) if (String(pid).startsWith(g.p) && Date.now() < g.until) { try {
