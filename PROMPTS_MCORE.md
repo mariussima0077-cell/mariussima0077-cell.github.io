@@ -6,3 +6,5 @@ Unde merg în joc (Claude le taie și le pune):
 4. `img/ui9/mc_card.webp` – rama cardului Red Mythic Box (9-slice, colțuri) – `.mcBox`
 5. `img/ui9/gms_sub.webp` + `img/ui9/gms_main.webp` – iconițele bonusurilor de ENHANCE (256×256) – lista `.gmsL`
 Prompturile sunt cele trimise lui Marius în chat (același text).
+
+6. `img/ui9/tal_m5_0.webp` … `tal_m5_5.webp` – iconițele TALENTELOR Mythic (256×256, o planșă 3×2 de la Marius, ordinea: Torque King, Lady Overdrive, Ignis / Goliath, Nova, Vega) – cardul TALENT din LEVEL UP
