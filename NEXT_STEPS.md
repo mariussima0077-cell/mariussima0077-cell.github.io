@@ -164,6 +164,10 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-253 (23 nov 2026) – animații pe toate butoanele (`btnfx.js`)
+- Fiecare buton: se strânge la apăsare, sare înapoi (bounce), flash scurt + inel auriu cu scântei unde ai atins. Doar transform/opacity → ușor pe telefoane ieftine. Un element se poate exclude cu `data-nofx`.
+- Nu lipsește nicio imagine.
+
 ## ✅ v16-233 (23 nov 2026) – cadou 50.000 💎 pentru Yakhouba (3975f8fb)
 - Mail personal în joc (`MAIL` din index.html, id `p_3975f8fb_dm50k`) + intrare în `GIFT_DM` (server/online.js, `send:false`, până la 7 dec) → regula ledger din Torque Guard NU-l marchează (isGiftDm). Primește diamantele când deschide Mail-ul. `CV=233`. Telefon buget: 0 erori. Nu lipsește nicio poză.
 
