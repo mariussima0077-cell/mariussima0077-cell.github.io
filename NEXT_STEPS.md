@@ -165,6 +165,11 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## 🟡 THIEVES 2.0 (23 nov 2026) – machetă aprobată, așteptăm pozele
+- Macheta: `preview/thieves.html` (Marius: „îmi place”). Prompturi: `PROMPTS_THIEVES.md`.
+- De făcut în joc: 3 tipuri (Amateur ~5% cash, Pro ~10%, Gang Boss ~20%, doar online, redus de Security), patrulare continuă, gardieni furioși + lupte, BACKUP gardieni (mașină de pază), întăriri hoți (dubă), uneori **GANG RAID** (toată gașca, 6-8 hoți, „masacru”) + **duba de securitate K9 cu câini**, recompense Builder Kit / Crew Tickets / 💎, tabla MOST WANTED (3 pe zi + bonus), mini-ghid nou.
+- Lipsesc pozele: Gang Boss, Crowbar Brute, Masked Runner, gardian K9, câine K9, tabla Most Wanted, afiș WANTED, banner GANG RAID.
+
 ## ✅ v16-253 (23 nov 2026) – animații pe toate butoanele (`btnfx.js`)
 - Fiecare buton: se strânge la apăsare, sare înapoi (bounce), flash scurt + inel auriu cu scântei unde ai atins. Doar transform/opacity → ușor pe telefoane ieftine. Un element se poate exclude cu `data-nofx`.
 - Nu lipsește nicio imagine.
