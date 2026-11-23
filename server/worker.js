@@ -59,7 +59,8 @@ export {ensureG};   // v16-104: memory editor (GameGuardian…) · pack used wit
 // v16-104: pack key in the game → product ID in Play Console (same as SKU in secure.js; consumables are not checked)
 const PACK_SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip_pass_monthly', plat:'vip_pass_platinum',
   p1:'pack_starter', p2:'pack_rookie', p3:'pack_pro', p4:'pack_elite', p5:'pack_master', p6:'pack_legend', p7:'pack_titan', fn:'fund_normal', fh:'fund_hard',
-  dia:'vip_pass_diamond', fdr:'founder_pass'};   // v16-122
+  dia:'vip_pass_diamond', fdr:'founder_pass',   // v16-122
+  gp1:'gp_silver', gp2:'gp_gold', gp3:'gp_plat'};   // v16-192 Grand Prix packs
 const json = (o, s=200) => new Response(JSON.stringify(o), {status:s, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-headers':'content-type'}});
 
 // best possible income per second at a total building level (same model as the game, ×40 safety margin)
