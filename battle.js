@@ -3254,7 +3254,10 @@ function autoPlan(h,take){const g=GR(),eq=g.eq[h.id]||{},K=setKeys(h)[0];if(take
     for(const it of g.inv){if(it.s!==sl.k||!free(it))continue;const p=pow(h,{...ov,[sl.k]:it});if(p>bp){bp=p;best=it;}}
     ov[sl.k]=best;}return ov;};
   const cls=(sl,gr)=>g.inv.filter(it=>it.s===sl.k&&it.set===K&&(gr==null||it.r===gr)&&aeCan(h,it,take)).sort(aeBetter);
-  const mk=gr=>{const ov={};for(const sl of GSLOT){const L=cls(sl,gr);if(L[0])ov[sl.k]=L[0];}return ov;};
+  // v16-271 (Wazza4ever 23 nov: "it offers me the old blue helmet from the bottom of my inventory"): a class-set piece is used only if
+  // no FREE piece of a HIGHER grade exists for that slot (same grade → the set piece still wins). Before: a Rare set piece beat a free Mythic one.
+  const topR=sl=>{let r=-1;for(const it of g.inv)if(it.s===sl.k&&free(it)&&it.r>r)r=it.r;return r;};
+  const mk=gr=>{const ov={};for(const sl of GSLOT){const L=cls(sl,gr);if(L[0]&&(gr!=null||L[0].r>=topR(sl)))ov[sl.k]=L[0];}return ov;};
   if(!K)return fill({});
   let bestOv=fill(mk(null)),bestP=pow(h,bestOv);
   for(let gr=6;gr>=0;gr--){const o=mk(gr);if(Object.keys(o).length<2)continue;const ov=fill(o),p=pow(h,ov);if(p>bestP){bestP=p;bestOv=ov;}}
