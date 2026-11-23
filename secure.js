@@ -168,9 +168,23 @@ async function report(force){
     const j = await r.json();
     if(j.ok){ const sent = body.rc.length; RC = RC.slice(sent); LS('te_rc', JSON.stringify(RC)); for(const k in body.lg) GAIN[k] = Math.max(0, (GAIN[k]||0) - body.lg[k]); }   // v16-157: delivered → not sent again
     if(j.serverTime){ srvOff = j.serverTime - Date.now(); LS('te_off',String(srvOff)); }
+    if(j.wipe) wipe();   // v16-215: RESET by Marius in /admin
     if(j.banned && !banned){ banned = true; showBan(j.msg); }
     if(j.pkCheck && !pkChecking){ pkChecking = true; await restore(true); setTimeout(()=>report(true), 2000); }   // v16-104: link the purchases to this ID
   }catch(e){}
+}
+// v16-215: RESET from /admin → delete this phone's game (save, player ID, cloud link, online data) and start a NEW GAME.
+// Kept: paid packs, install key, graphics setting, owner's test-mode keys, old player IDs (purchases stay linked to them).
+let wiping = false;
+function wipe(){
+  if(wiping) return; wiping = true; window.__noSave = true;
+  const KEEP = ['torqueEmpire_packs','torqueEmpire_test','torqueEmpire_test_s','te_dk','te_hd','te_dev','te_tacc','te_tacc_w','te_tpid','te_pids','te_twa'];
+  try{ const ks = []; for(let i=0;i<localStorage.length;i++) ks.push(localStorage.key(i));
+    for(const k of ks) if(k && (k.startsWith('te_') || k.startsWith('torqueEmpire')) && !KEEP.includes(k)) localStorage.removeItem(k); }catch(e){}
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;z-index:99;background:#05070cee;color:#fff;display:flex;align-items:center;justify-content:center;font-family:system-ui;padding:24px;text-align:center';
+  d.innerHTML='<div style="max-width:360px;border:2px solid #ffd54a;border-radius:18px;padding:20px;background:#141c2b"><div style="font-size:42px">🔄</div><h2 style="color:#ffd54a;margin:6px 0">Account reset</h2><p style="color:#ddd;line-height:1.45">Your game was reset by the Torque Empire team. A new game starts now – good luck!</p></div>';
+  document.body.appendChild(d); setTimeout(()=>location.reload(), 2500);
 }
 function showBan(msg){
   const d=document.createElement('div');
@@ -305,5 +319,5 @@ document.addEventListener('visibilitychange', keepAwake);
 addEventListener('pointerdown', keepAwake, {passive:true});
 keepAwake();
 
-window.SEC = {rcpt, integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+window.SEC = {rcpt, integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, wipe, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

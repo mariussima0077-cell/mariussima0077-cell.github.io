@@ -40,6 +40,24 @@ const canBan = k => k.has('proof') || k.size >= 2;
 const STAGE_MIN_S = 4, RCPT_MIN_MS = 1200;
 // power: in simulations a team never won when the monsters were 2× stronger → only ×3.5 or more counts (manual skills, luck)
 const POWER_BAD = 3.5, POWER_NOTE = 2.5;
+// v16-215 (Marius, 23 nov 2026): RESET a player from /admin (player card → 🔄 RESET). The phone gets {wipe:1} at its next
+// check-in / online call / cloud save → deletes its local save and starts a NEW GAME (new player ID). Paid packs are kept.
+let WIPES = null, wipesT = 0;
+async function isWiped(env, pid) {
+  if (!pid) return false;
+  if (!WIPES || Date.now() - wipesT > 30e3) { try { await env.DB.prepare('CREATE TABLE IF NOT EXISTS wipes(pid TEXT PRIMARY KEY, t INTEGER)').run();
+    WIPES = new Set((await env.DB.prepare('SELECT pid FROM wipes').all()).results.map(r => r.pid)); wipesT = Date.now(); } catch (e) { WIPES = WIPES || new Set(); } }
+  return WIPES.has(String(pid));
+}
+async function wipePlayer(env, pid) {
+  const db = env.DB; await isWiped(env, pid); await ensureCloud(env);
+  await db.prepare('INSERT OR REPLACE INTO wipes(pid,t) VALUES(?,?)').bind(pid, Date.now()).run(); WIPES.add(pid);
+  for (const q of ['DELETE FROM accounts WHERE pid=?', 'DELETE FROM snaps WHERE pid=?', 'DELETE FROM ledg WHERE pid=?', 'DELETE FROM rcpt WHERE pid=?', 'DELETE FROM players WHERE pid=? AND banned=0'])
+    try { await db.prepare(q).bind(pid).run(); } catch (e) {}
+  try { for (const r of (await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(pid).all()).results) for (const q of ['DELETE FROM chat WHERE uid=?','DELETE FROM arena WHERE uid=?','DELETE FROM inbox WHERE uid=?','DELETE FROM creps WHERE uid=?']) await db.prepare(q).bind(r.uid).run();
+    await db.prepare('DELETE FROM prof WHERE pid=?').bind(pid).run(); } catch (e) {}
+  await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(pid, Date.now(), 'reset', 'RESET by admin – new game at the next start').run();
+}
 let gReady = false;
 async function ensureG(env) {
   if (gReady) return; const db = env.DB;
@@ -74,10 +92,12 @@ export default {
       if (url.pathname === '/api/report' && req.method === 'POST') return json(await report(await req.json(), env));
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
       if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') { const op = url.pathname.slice(11), b = await req.json();
+        if (op === 'save' && await isWiped(env, b && b.pid)) return json({err:'wiped', wipe:1});   // v16-215: the old save must not come back
         if (op === 'save' && !(await integOk(env, b && b.pid))) return json({err:'integrity'});
         return json(await cloud(op, b, env)); }
       if (url.pathname === '/api/integrity' && req.method === 'POST') return json(await integrity(await req.json(), env));
       if (url.pathname.startsWith('/api/on/') && req.method === 'POST') { const op = url.pathname.slice(8), b = await req.json();
+        if (await isWiped(env, b && b.pid)) return json({err:'wiped', wipe:1});
         if (INTEG_OPS.includes(op) && !(await integOk(env, b && b.pid))) return json({err:'integrity'});   // v16-105: only when INTEGRITY = 'enforce'
         return json(await online(op, b, env)); }
       if (url.pathname.startsWith('/api/xfer/') && req.method === 'POST') return json(await xfer(url.pathname.slice(10), await req.json(), env));
@@ -96,6 +116,7 @@ async function report(b, env) {
   const now = Date.now();
   if (!b || typeof b.pid !== 'string' || b.pid.length > 64 || !b.s) return {err:'bad'};
   if (b.pid.startsWith('tst_')) return {ok:true, test:1, serverTime:now};   // v16-91: owner's FULL TEST ACCOUNT – not judged, not stored
+  if (await isWiped(env, b.pid)) return {ok:true, wipe:1, serverTime:now};   // v16-215: RESET by admin
   const s = b.s, db = env.DB;
   const old = await db.prepare('SELECT * FROM players WHERE pid=?').bind(b.pid).first();
   if (old && old.banned && isGift(b.pid) && now < GIFT_UNBAN_UNTIL && !/by admin/.test(old.reason || '')) {
@@ -564,6 +585,7 @@ async function playerCard(url, env, pid) {
 <div class=c>${p.banned ? '🚫 <b style="color:#ff8a80">BANNED</b>' : `⚠️ score <b>${p.score}</b>`}${p.shadow ? ` · 👻 hidden${p.shadow === 2 ? ' (by you)' : ''}` : ''} · kinds: <b>${esc(p.sig || '–')}</b><br>${esc(p.reason || '')}<br>
 <small>first seen ${d(p.first)} · last ${d(p.last)} · app ${p.app ? 'Play' : 'browser'} · stage ${p.best} (best ever ${Math.max(p.bmax || 0, p.best)}) · buildings lv ${p.lv} · heroes ${p.heroes} (${p.mythic} Mythic)</small><br>
 ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(pid)}">clear</a> · ${p.shadow ? `<a href="?key=${k}&unshadow=${encodeURIComponent(pid)}">👁️ show again</a>` : `<a href="?key=${k}&shadow=${encodeURIComponent(pid)}">👻 hide (shadow)</a>`}`}</div>
+<div class=c><a href="?key=${k}&reset=${encodeURIComponent(pid)}" style="color:#ff8a80;font-weight:bold">🔄 RESET – start from 0</a> <small>(asks first)</small></div>
 <h3>🛡️ Battle team (last online sync)</h3><div class=c>${tmHtml}</div>
 <small>Charts: last 7 days. Honest = a line that climbs smoothly. Cheat = a vertical jump.</small>
 ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('⚔️ Team power', S.filter(r => r.pw > 0).map(r => [r.t, r.pw]), '#ff8a65', true)}${chart('💰 Money (log)', S.map(r => [r.t, r.money]), '#66bb6a', true)}${chart('🎟️ Tickets', S.map(r => [r.t, r.tk]), '#9fd3ff')}${chart('🏗️ Buildings level', S.map(r => [r.t, r.lv]), '#ce93d8')}
@@ -585,6 +607,13 @@ async function admin(url, env) {
   const shw = url.searchParams.get('shadow'), ush = url.searchParams.get('unshadow');
   if (shw) { await db.prepare('UPDATE players SET shadow=2 WHERE pid=?').bind(shw).run(); await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(shw, Date.now(), 'flag', 'hidden (shadow) by admin').run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(shw), 302); }
   if (ush) { await db.prepare('UPDATE players SET shadow=0 WHERE pid=?').bind(ush).run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(ush), 302); }
+  const rst = url.searchParams.get('reset');   // v16-215: 🔄 RESET (asks first, then ok=1)
+  if (rst) { const e3 = x => String(x ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    const nm = (await pnames(db, [rst]))[rst] || rst.slice(0, 13);
+    if (url.searchParams.get('ok') !== '1') return new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Reset</title><style>body{font-family:system-ui;background:#0b1019;color:#eee;padding:16px}.c{background:#141c2b;border:1px solid #ff525288;border-radius:12px;padding:14px;font-size:15px;line-height:1.5}a.b{display:inline-block;margin-top:10px;padding:10px 16px;border-radius:10px;background:#ff5252;color:#fff;font-weight:bold;text-decoration:none}a{color:#9fd3ff}</style>
+<a href="/admin?key=${k}&p=${encodeURIComponent(rst)}">← back</a><div class=c><h2>🔄 RESET “${e3(nm)}”?</h2>Everything goes back to 0: local save on the phone, cloud save, rankings, Arena, chat messages, Mail.<br>Paid packs stay (they are linked to the Google purchases).<br>The phone starts a <b>NEW GAME</b> the next time the game is open and online.<br><a class=b href="/admin?key=${k}&reset=${encodeURIComponent(rst)}&ok=1">YES, RESET</a></div>`, {headers:{'content-type':'text/html;charset=utf-8'}});
+    await wipePlayer(env, rst);
+    return new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>body{font-family:system-ui;background:#0b1019;color:#eee;padding:16px}a{color:#9fd3ff}</style><h2>✅ “${e3(nm)}” reset</h2><p>New game at the next start (game open + internet).</p><a href="/admin?key=${k}">← back to admin</a>`, {headers:{'content-type':'text/html;charset=utf-8'}}); }
   if (url.searchParams.get('p')) return playerCard(url, env, url.searchParams.get('p'));
   const q = (url.searchParams.get('q') || '').trim().toLowerCase().slice(0, 20);   // v16-179: search a player by name
   if (q) { let rs = []; try { rs = (await db.prepare('SELECT pid,name,best,lv,t FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 30').bind('%' + q + '%').all()).results; } catch (e) {}

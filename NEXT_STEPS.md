@@ -124,6 +124,10 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-215 (23 nov 2026) – buton 🔄 RESET în /admin
+- `/admin` → caută jucătorul → fișa lui → **🔄 RESET – start from 0** → **YES, RESET**. Șterge: salvarea cloud, clasamente, Arena, chat, Mail, statistici. Telefonul primește `wipe:1` (report / online / cloud save) → șterge salvarea locală + ID nou → NEW GAME. Pachetele plătite rămân (`torqueEmpire_packs`, `te_pids`).
+- Tabel nou `wipes` (D1, se creează singur). Primul reset cerut: **pufulete** (23 nov).
+
 ## ✅ v16-186 (22 nov 2026) – rama aleasă peste tot + animație la REFRESH tren
 - Rama din Profil apare acum în antetul profilului, clasament (toate rândurile), chat, clasamentul Arenei și Cup (`fav()` / `hdrAv()` în online.js).
 - Rail Wars: REFRESH = animație tip slot (locomotiva + gradul se rotesc, apoi aterizează; „⬆ UPGRADE!” + explozie când gradul crește).
