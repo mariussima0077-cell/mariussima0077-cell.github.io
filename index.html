@@ -234,6 +234,18 @@ img.mini{width:26px;height:26px;border-radius:6px;border:2px solid;vertical-alig
 /* ===== results ===== */
 #res{touch-action:pan-y;position:fixed;inset:0;z-index:11;display:none;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#2a3a4a,#05080c 75%);padding:16px;box-sizing:border-box;overflow-y:auto}
 #res.open{display:flex}
+/* v16-237 AUTO SUMMON */
+.smAutoW{position:absolute;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.smAuto{position:relative;pointer-events:auto;height:calc(var(--u)*50);padding:0 calc(var(--u)*34);border-radius:calc(var(--u)*25);background:linear-gradient(#3fae4a,#16511d);border:calc(var(--u)*3) solid #ffd54a;box-shadow:0 0 calc(var(--u)*10) #000c,inset 0 calc(var(--u)*2) 0 #fff4;font-size:calc(var(--u)*25)!important}
+.smAuto.on{background:linear-gradient(#c62828,#7f0000);animation:auP 1s infinite}
+@keyframes auP{50%{filter:brightness(1.35)}}
+#auBar{position:fixed;left:8px;right:8px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:none;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:linear-gradient(#1d2b3a,#0b1420);border:2px solid #ffd54a;box-shadow:0 4px 18px #000c;color:#fff;font:800 13px system-ui}
+#auBar.open{display:flex}
+#auBar .auL{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+#auBar .auL b{color:#ffd54a;font-size:14px}#auBar .auL span{font-size:12px;color:#cfd8dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#auBar .auS{padding:10px 14px;border-radius:10px;background:linear-gradient(#ff5252,#b71c1c);font-weight:900;white-space:nowrap}
+.pB.auB{display:block;width:100%;border-left:6px solid var(--gc)}.pB.auB small{display:block;font-size:11px;opacity:.8;font-weight:700}
+.auSum{text-align:center;color:#fff;margin:4px 0 8px}.auSum .auW{font:900 15px system-ui;color:#ffd54a}.auSum .auC{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;font:800 13px system-ui;margin-top:4px}.auSum small{display:block;color:#9aa;font-size:11px;margin-top:3px}
 #res.best3{background:radial-gradient(circle at 50% 40%,#5a1f7a,#05080c 75%)}
 #res.best4{background:radial-gradient(circle at 50% 40%,#8a6a00,#05080c 75%)}
 #res.best5{background:radial-gradient(circle at 50% 40%,#a13a00,#05080c 75%)}
@@ -3632,7 +3644,7 @@ function smSize(){TALL.size(smBox,smMap());smKey='';}
 // v16-228: ticket count on the summon tab that has tickets (red pill)
 function smTkB(k){let n=0;try{if(k==='g'){const GSx=window.CAMPAIGN&&CAMPAIGN.gs,g=GSx&&GSx.d();n=g&&g.inv.length<GSx.INV?g.tk:0;}else n=tkN(k);}catch(e){}return n>0?'<b class="rdt" style="right:-2px;top:-9px">'+(n>999?'999+':n)+'</b>':'';}
 function openSummon(cat){if(cat)smCat=smOf(cat);if(AWK_SHEET&&!awkSheet){awkSheet=new Image();awkSheet.src='img/fx/awaken.webp';} /* v16-161: preload the WOW sheet (88 KB) */smSize();smKey='';smEl.classList.add('open');renderSm();}
-function closeSummon(){smEl.classList.remove('open');}
+function closeSummon(){auStop(1);smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
 function img(h,sil,cls){return '<img class="'+(cls||'')+'" src="'+portrait(h,sil)+'">';}
 // v16-52: new layout on Marius' pictures – header (HERO SUMMON / CREW SUMMON) + common background (img/ui4/sum_bg.webp shown from y=150, scale .8994)
@@ -3672,6 +3684,7 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
     h+='<div class="smPity" style="'+box(60,1279,392,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
     h+='<div class="smPity smWish" data-a="wish" style="'+box(469,1279,392,32)+'pointer-events:auto"><div class="pBar"><i class="pm" style="--p:'+Math.min(1,(P.m||0)/PITY_M).toFixed(3)+'"></i><span>'+(w?'<img class="wImg" src="'+portrait(w)+'" alt="">':'')+'MYTHIC <b>'+(P.m||0)+' / '+PITY_M+'</b> · WISH</span></div></div>';}
   else h+='<div class="smPity" style="'+box(60,1279,801,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY PITY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
+  h+=auPill(smCat);
   h+='<div class="smL smCol" data-a="coll" style="'+box(150,1356,620,128)+'pointer-events:auto">'+(cr?'CREW':'HERO')+' COLLECTION<small>'+discCount(smCat)+' / '+pool.length+' collected</small></div>';
   BXM=null;smBox.innerHTML=h;}
 // v16-91 (Marius): GEAR SUMMON lives on the same SUMMON page as HERO and CREW (no other page opens) – same background, gear header, gear tickets
@@ -3701,6 +3714,7 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
   h+='<div class="smPity" style="'+box(60,1279,392,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,p.l/GSx.PITY).toFixed(3)+'"></i><span>LEGENDARY <b>'+p.l+' / '+GSx.PITY+'</b></span></div></div>';
   h+='<div class="smPity" style="'+box(469,1279,392,32)+'"><div class="pBar"><i class="pm" style="--p:'+Math.min(1,(p.m||0)/GSx.PITYM).toFixed(3)+'"></i><span>MYTHIC <b>'+(p.m||0)+' / '+GSx.PITYM+'</b></span></div></div>';  // v16-161
+  h+=auPill('gear');
   h+='<div class="smL smCol" data-a="gbag" style="'+box(150,1356,620,128)+'pointer-events:auto">GEAR BAG<small>'+(g.inv.length>=GSx.INV?'<b style="color:#ff6b6b">'+g.inv.length+' / '+GSx.INV+' · BAG FULL – SALVAGE</b>':g.inv.length+' / '+GSx.INV+' · EQUIP YOUR HEROES')+'</small></div>';
   BXM=null;smBox.innerHTML=h;}
 smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
@@ -3717,7 +3731,8 @@ smEl.addEventListener('click',e=>{if(e.target===smEl){closeSummon();return;}cons
   else if(a==='rates')popRates();
   else if(a==='hist')popHist();
   else if(a==='coll'||a==='team'){openTeam(smCat==='c'?'d':smCat);}
-  else if(a==='sum')doSummon(+t.dataset.n);});
+  else if(a==='sum')doSummon(+t.dataset.n);
+  else if(a==='auto')popAuto();});
 function doSummon(n){
   if(n===1&&freeOK()){G.h.free=dayKey();showResults(summon(smCat,1),smCat,n);smKey='';renderSm();return;}
   const have=Math.min(n,tkN(smCat)),need=(n-have)*DM_SUM,go=()=>{if(smCat==='c')G.h.ct-=have;else G.h.tk-=have;G.dm-=need;showResults(summon(smCat,n===10?11:1),smCat,n);smKey='';renderSm();};
@@ -3730,6 +3745,45 @@ function payAsk(have,n,ic,name,go,popFn){const need=(n-have)*DM_SUM,dm=G.dm||0,P
     '<div class="payBox"><div>'+ic+' <b>'+have+'</b><small>tickets</small></div><span>+</span><div>'+DMI+' <b>'+need.toLocaleString()+'</b><small>diamonds</small></div></div><div class="pD" style="text-align:center">You have '+DMI+' '+dm.toLocaleString()+' → '+(dm-need).toLocaleString()+' after</div>'+
     '<button class="pB" data-p="payOK">✓ YES, SUMMON ×'+n+'</button><button class="pB grey" data-p="x">NO, CANCEL</button>');
   window.__payGo=go;}
+// ---------- v16-237 AUTO SUMMON (Marius 23 nov: "an automatic button for summons") ----------
+// Summons ×10 again and again with TICKETS ONLY (diamonds are never spent automatically – payAsk rule v16-37).
+// Stops: tickets finished · the grade the player chose (Legendary / Mythic) · gear bag full · STOP button · page closed.
+let AU=null;const AU_MS=320;
+const auGS=()=>window.CAMPAIGN&&CAMPAIGN.gs;
+function auTk(c){if(c==='gear'){const GSx=auGS();return GSx?GSx.d().tk:0;}return tkN(c);}
+function auIc(c){return c==='gear'?'<img src="img/gticket.webp" style="height:1.1em;vertical-align:-.2em" alt="">':TIK(c);}
+function auPill(c){const n=auTk(c);return '<div class="smAutoW" style="'+box(285,1311,351,45)+'"><div class="smL smAuto'+(AU?' on':'')+'" data-a="auto">'+(AU?'■ STOP AUTO':'⚡ AUTO SUMMON')+(n>=10&&!AU?'<i class="rdd" style="right:3%;top:-12%"></i>':'')+'</div></div>';}
+function popAuto(){if(AU){auStop();return;}const c=smCat,n=auTk(c),gear=c==='gear';
+  if(n<1){toast('⚡ AUTO SUMMON uses tickets only – you have no '+(gear?'Gear':c==='c'?'Crew':'Recruit')+' Tickets',2800);return;}
+  if(gear){const GSx=auGS();if(GSx&&GSx.d().inv.length>=GSx.INV){toast('🎒 Gear bag full – SALVAGE first',2600);return;}}
+  const B=(g,t,sub)=>'<button class="pB auB" data-p="auGo" data-s="'+g+'" style="--gc:'+(GRADES[g]?GRADES[g].c:'#43e97b')+'">'+t+'<small>'+sub+'</small></button>';
+  pop('<div class="pT">⚡ AUTO SUMMON</div><div class="pD">Summons <b>×10</b> again and again (×1 for the last tickets) with your <b>tickets only</b>: '+auIc(c)+' <b>'+n.toLocaleString()+'</b>.<br>'+DMI+' Diamonds are <b>never</b> used.</div><div class="pD">It stops when the tickets run out'+(gear?' or the bag is full':'')+', when you tap <b>STOP</b>, or when you get:</div>'+
+    B(4,'STOP AT LEGENDARY','first Legendary or better')+B(5,'STOP AT MYTHIC','first Mythic')+B(9,'USE ALL TICKETS','summons all '+n.toLocaleString())+'<button class="pB grey" data-p="x">CANCEL</button>',{c},'dlgSk');}
+$('pop').addEventListener('click',e=>{const t=e.target.closest('[data-p="auGo"]');if(!t)return;const c=(popCtx&&popCtx.c)||smCat;closePop();auStart(c,+t.dataset.s);});
+function auStart(c,stop){if(AU)return;AU={c,stop,res:[],cnt:0,best:-1,sold:0,why:''};
+  let b=$('auBar');if(!b){b=document.createElement('div');b.id='auBar';document.body.appendChild(b);b.addEventListener('click',()=>auStop());}
+  b.className='open';liftZ(b);auDraw();smKey='';renderSm();AU.tm=setTimeout(auStep,150);}
+function auDraw(){const b=$('auBar');if(!b||!AU)return;const c=AU.c,g=AU.best;
+  b.innerHTML='<div class="auL"><b>⚡ AUTO SUMMON</b><span>'+AU.cnt.toLocaleString()+' summoned · '+auIc(c)+' '+auTk(c).toLocaleString()+' left</span><span>Best: '+(g>=0?'<b style="color:'+(g>=6?'#2ef3ff':GRADES[g].c)+'">'+(g>=6?'ASCENDED':GRADES[g].n.toUpperCase())+'</b>':'—')+' · stops at '+(AU.stop>=9?'tickets end':AU.stop>=5?'MYTHIC':'LEGENDARY')+'</span></div><div class="auS">■ STOP</div>';}
+function auStep(){if(!AU)return;const c=AU.c,have=auTk(c);
+  if(have<1){AU.why='No tickets left';auEnd();return;}
+  const n=have>=10?10:1;let got=[];
+  try{if(c==='gear'){const GSx=auGS(),r=GSx&&GSx.sumQ(n);if(!r){AU.why='Gear bag full – SALVAGE';auEnd();return;}got=r.map(o=>({g:o.it.r,o}));r.forEach(o=>{if(o.sold)AU.sold++;});}
+    else{if(c==='c')G.h.ct-=n;else G.h.tk-=n;got=summon(c,n===10?11:1).map(o=>({g:HB[o.id].gr,o}));}}
+  catch(e){console.error(e);AU.why='Stopped';auEnd();return;}
+  got.forEach(x=>{AU.res.push(x);if(x.g>AU.best)AU.best=x.g;});AU.cnt+=got.length;
+  smKey='';renderSm();auDraw();
+  if(AU.stop<9&&AU.best>=AU.stop){AU.why=(AU.best>=6?'ASCENDED':GRADES[AU.best].n.toUpperCase())+' found!';auEnd();return;}
+  AU.tm=setTimeout(auStep,AU_MS);}
+function auStop(quiet){if(!AU)return;clearTimeout(AU.tm);if(quiet){AU=null;const b=$('auBar');if(b)b.className='';return;}AU.why='Stopped by you';auEnd();}
+function auEnd(){const A=AU;AU=null;clearTimeout(A.tm);const b=$('auBar');if(b)b.className='';smKey='';renderSm();
+  if(!A.res.length){toast('⚡ AUTO SUMMON: '+A.why,2400);return;}
+  const cnt={};A.res.forEach(x=>{cnt[x.g]=(cnt[x.g]||0)+1;});
+  const hd='<div class="auSum"><div class="auW">'+A.cnt.toLocaleString()+' summoned · '+A.why+'</div><div class="auC">'+Object.keys(cnt).sort((a,b)=>b-a).map(g=>'<span style="color:'+(g>=6?'#2ef3ff':GRADES[g].c)+'">'+(g>=6?'Ascended':GRADES[g].n)+' <b>×'+cnt[g]+'</b></span>').join('')+'</div>'+(A.sold?'<div class="auC" style="color:#9ff0a8">'+A.sold+' auto salvaged</div>':'')+'<small>Best results below</small></div>';
+  // best cards: Legendary+ (else Epic+, else the 11 best), max 30
+  const srt=[...A.res].sort((a,b)=>b.g-a.g);let L=srt.filter(x=>x.g>=4);if(!L.length)L=srt.filter(x=>x.g>=3);if(!L.length)L=srt.slice(0,11);L=L.slice(0,30);
+  if(A.c==='gear'){const GSx=auGS();if(GSx)GSx.res(L.map(x=>x.o),10,0,hd);}else showResults(L.map(x=>x.o),A.c,10,hd);}
+window.AUTOSUM={start:auStart,stop:auStop,get on(){return !!AU;}};
 $('pop').addEventListener('click',e=>{if(!e.target.closest('[data-p="payOK"]'))return;const g=window.__payGo;window.__payGo=null;closePop();if(g)g();});
 
 // ---------- results ----------
@@ -3752,8 +3806,8 @@ function fbox(h,sil,s){const i=FRI(h.gr),r=FIN[i],p=FPL[i];
 function card(h,o,extra,big){const g=GRADES[h.gr];
   return '<div class="hc'+(big?' big':'')+'" style="--gc:'+g.c+';--gd:'+g.d+'">'+fbox(h,0,o?o.s:null)+'<b>'+h.n+'</b>'+(extra||'')+'</div>';}
 function stars(s){return '<span class="stn">★+'+s+'</span>';}
-function showResults(res,cat,n){
-  let h='<div class="resT">'+CATS[cat].ic+' '+CATS[cat].title+' SUMMON ×'+res.length+'</div><div class="resG'+(res.length>1?' many':'')+'">';
+function showResults(res,cat,n,hd){
+  let h='<div class="resT">'+CATS[cat].ic+' '+CATS[cat].title+(hd?' AUTO SUMMON':' SUMMON ×'+res.length)+'</div>'+(hd||'')+'<div class="resG'+(res.length>1?' many':'')+'">';
   res.forEach((r,i)=>{const H=HB[r.id],o=own(r.id);
     const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?(isAwk(H)?(r.awk?'<i class="up awk">AWAKENED '+ROM[r.awk]+'!</i>':'<i class="up">COPY '+awkNeed(o.s).have+'/'+awkNeed(o.s).need+'</i>'):'<i class="up">+'+o.s+' ★</i>'):'<i class="mx">MAX '+(r.dm?DMI+'+'+r.dm:ESI+'+'+nfmt(r.ess||0))+(r.mc?' '+MCI+'+'+r.mc:'')+'</i>';
     h+='<div class="rc g'+H.gr+'" style="animation-delay:'+(i*.16)+'s">'+card(H,o,tagT)+'</div>';});
@@ -4144,6 +4198,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:106,d:'Nov 23, 2026',ic:'⚡',t:'AUTO SUMMON',l:['New green <b>⚡ AUTO SUMMON</b> button on the HERO, CREW and GEAR summon pages.','It summons <b>×10</b> again and again with your <b>tickets only</b> – diamonds are never used.','Choose when it stops: first <b>Legendary</b>, first <b>Mythic</b> or <b>all tickets</b>. Tap <b>■ STOP</b> any time.','At the end you see how many of each grade you got and your best results.']},
  {id:105,d:'Nov 23, 2026',ic:'👹',t:'Smarter monsters: MINI BOSS + ENRAGE',l:['Every battle now compares your <b>POWER</b> with the monsters\' power.','Monsters more than <b>×1.3</b> stronger: a <b>MINI BOSS</b> joins the last wave. More than <b>×2</b>: they go <b>ENRAGE</b> too.','Your team stronger? Nothing changes. Beating a mini boss gives bonus <b>Essence</b>.','Campaign, Torque Tower and Class Towers only. Hero armor (DEF) now blocks at most 60% of a hit, so POWER shows your real strength.','In the campaign it starts at <b>chapter 5</b> (stage 5-1) – the team screen warns you before the fight (⚠ MINI BOSS / ENRAGE).']},
  {id:104,d:'Nov 23, 2026',ic:'💎',t:'Diamond Pass: your diamonds come back',l:['<b>Tier 1</b> of the DIAMOND PASS lane now gives back <b>ALL the diamonds</b> you paid (PASS 2,500 · PASS+ 6,000 · upgrade: the 3,500 difference).','Tiers 2-100 give the rest of the rewards as before. Already claimed tier 1 before? Open the Grand Prix – your diamonds come back automatically.']},
  {id:103,d:'Nov 23, 2026',ic:'💎',t:'Grand Prix SHOP tab, DIAMOND PASS+ & bigger Campaign Funds',l:['The <b>GP SHOP</b> has its own tab now – spend your GP Tokens there.','New <b>DIAMOND PASS+</b> (💎6,000, ×0.8 lane). Already have the Diamond Pass? Upgrade for only the difference.','<b>Campaign Funds</b> give more: NORMAL 17,000 💎 (was 11,200) + Gear Tickets, HARD 25,000 💎 (was 16,700) + more tickets.']},
