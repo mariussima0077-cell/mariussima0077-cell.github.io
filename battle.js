@@ -1839,9 +1839,10 @@ function fxAura(u){const col=ROLECOL[u.role]||'#ffb300',x=u.x,y=fy(u.d),h=dsc(u.
 //  monsters > ×1.3 your power → when the LAST wave drops under 50% HP a MINI BOSS joins (HP / attack grow with the gap)
 //  monsters > ×2   your power → ENRAGE: at 70% of the last wave every monster hits harder and faster, and the mini boss comes right then
 // Winning with a mini boss on the field = a small Essence bonus.
-const MB_R=1.3,EN_R=2,MB_SC=1.45;
+const MB_R=1.3,EN_R=2,MB_SC=1.45;const MB_CH=120; // v16-236 (Marius): campaign mini boss / enrage only from chapter 5 (stage 5-1)
+function mbWarn(ep,tp,camp){if(camp&&tsi<MB_CH||!(tp>0))return '';const r=ep/tp;if(r<=MB_R)return '';return '<div style="margin-top:4px;color:'+(r>EN_R?'#ff5252':'#ffb300')+';font-weight:700;font-size:.92em">⚠ '+(r>EN_R?'MINI BOSS + ENRAGE':'MINI BOSS')+' – monsters ×'+r.toFixed(1)+' your power</div>';}
 function bEP(){const k=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);let p=0;B.stage.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*k;}));return p/B.stage.w.length*1.05;}
-function mbInit(){B.rt=0;B.mb=null;B.enr=0;if(B.tw&&(B.tw.wb||B.tw.dg))return;try{if(B.pw0>0)B.rt=bEP()/B.pw0;}catch(e){B.rt=0;}if(B.rt>MB_R&&!window.__SIM){fxImg('hm_ring');fxImg('hm_aura');}}
+function mbInit(){B.rt=0;B.mb=null;B.enr=0;if(B.tw&&(B.tw.wb||B.tw.dg))return;if(!B.tw&&B.si<MB_CH)return;try{if(B.pw0>0)B.rt=bEP()/B.pw0;}catch(e){B.rt=0;}if(B.rt>MB_R&&!window.__SIM){fxImg('hm_ring');fxImg('hm_aura');}}
 function mbCheck(){if(!(B.rt>MB_R)||B.mb||B.wave!==B.stage.w.length-1||!B.lwMax)return;
   const hp=B.mons.reduce((a,m)=>a+(m.dead||m.mb?0:m.hp),0),trig=B.rt>EN_R?.7:.5;if(hp>B.lwMax*trig)return;
   const D=Math.min(3,B.rt-1);
@@ -2936,7 +2937,7 @@ function openTeam(si,cx){const T=TE(),G=T.G;tsi=si;TCX=cx||null;cleanGear();tsel
     let sl='';for(let k=0;k<5;k++){const h=list[k];sl+=h?card(h,'slot f','',k):'<div class="slot">+</div>';}
     const ep=tEP(),tp=teamPower(list),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
     $('cpTeamBox').innerHTML=`<button class="stX" data-a="back" aria-label="close">✕</button><h2>${TCX&&TCX.done?'EDIT BATTLE TEAM':'CHOOSE YOUR TEAM'}</h2><div class="sub">${TCX?TCX.t:'STAGE '+sLabel(si)} · max 5 · ${TCX&&TCX.done?'tap a mechanic below to add him · tap a team slot to change him':'tap a hero in the team to change him'}</div><div class="cpSec">TEAM</div><div class="slots">${sl}</div>
-     <div id="cpPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <span style="color:#9a8">vs</span> <span style="color:#ff8a80">${ep.toLocaleString()}</span> <span style="color:${col}">${tp>=ep*1.15?'· EASY':tp>=ep*.85?'· EVEN':'· HARD'}</span></div>
+     <div id="cpPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <span style="color:#9a8">vs</span> <span style="color:#ff8a80">${ep.toLocaleString()}</span> <span style="color:${col}">${tp>=ep*1.15?'· EASY':tp>=ep*.85?'· EVEN':'· HARD'}</span>${mbWarn(ep,tp,1)}</div>
      <div class="cpSec" style="display:flex;justify-content:space-between;align-items:center;gap:6px">YOUR MECHANICS <span style="display:flex;gap:6px">${TCX?'':`<button class="cpB sm" data-a="gear">`}${TCX?'':`${IMGI(glyphURL('bag','#ffd54a'))} GEAR</button>`}<button class="cpB sm" data-a="best">${IMGI(glyphURL('bolt','#ffd54a'))} AUTO BEST</button></span></div>
      <div class="pool">${pool.map(h=>card(h,'pick'+(tsel.includes(h.id)?' on':''))).join('')}</div>
      <div class="roles">${Object.entries(ROLE).filter(([k])=>k!=='crew'&&(!TCX||!TCX.cls||k===TCX.cls||k==='all')).map(([k,r])=>'<div>'+IMGI(roleBadge(k),'1.5em','-.4em')+' <span>'+r.n+'</span> <b>'+r.sk+'</b></div>').join('')}</div>
