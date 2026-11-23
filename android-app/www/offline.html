@@ -5,11 +5,32 @@
 html,body{margin:0;height:100%;background:#0b1420;color:#e8eef5;font-family:system-ui,sans-serif}
 .b{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box}
 h1{font-size:22px;margin:0 0 10px;color:#ffb300}
-p{margin:0 0 22px;color:#9fb0c2;font-size:15px}
+p{margin:0 0 14px;color:#9fb0c2;font-size:15px;line-height:1.4}
+small{display:block;color:#6f8296;font-size:12px;margin:0 0 22px;min-height:16px}
 button{background:#ffb300;color:#1a1200;border:0;border-radius:24px;padding:12px 30px;font-size:16px;font-weight:700}
 </style></head>
 <body><div class="b">
 <h1>TORQUE EMPIRE</h1>
-<p>No internet connection.<br>Connect once to download the game – after that it also works offline.</p>
-<button onclick="location.href='https://mariussima0077-cell.github.io/index.html?src=capapp'">TRY AGAIN</button>
-</div></body></html>
+<p id="m">Connecting…</p>
+<small id="s"></small>
+<button onclick="tryAll(true)">TRY AGAIN</button>
+</div>
+<script>
+// v16-261 (Marius, 23 nov 2026: backup "in case of anything"): this page is inside the app (works without internet).
+// It checks again by itself every 10 s and opens the game as soon as a server answers.
+// MAIN = GitHub Pages. BACKUP = the copy of the game (to fill in at launch: our own domain / Cloudflare Pages).
+// ⚠️ A backup on ANOTHER address has its own empty local save (players must log in with Google to get their cloud save) –
+// that is why the real fix at launch is our own domain (same address, we can move it from GitHub to Cloudflare in minutes).
+const MAIN='https://mariussima0077-cell.github.io/index.html?src=capapp';
+const BACKUP=[]; // e.g. 'https://torque-empire.pages.dev/index.html?src=capapp'
+const $=id=>document.getElementById(id);
+function up(u){return fetch(u.split('?')[0]+'?ping='+Date.now(),{mode:'no-cors',cache:'no-store'}).then(()=>true,()=>false);}
+let busy=false,n=0;
+async function tryAll(user){if(busy)return;busy=true;
+  if(navigator.onLine===false){$('m').innerHTML='No internet connection.<br>Connect once to download the game – after that it also works offline.';$('s').textContent='';busy=false;return;}
+  $('m').innerHTML='The game server is not answering right now.<br>Your progress is safe.';$('s').textContent='Checking again…';
+  for(const u of [MAIN,...BACKUP]){if(await up(u)){location.href=u;return;}}
+  n++;$('s').textContent='Trying again by itself every 10 s'+(n>1?' · try '+n:'');busy=false;}
+tryAll();setInterval(tryAll,10000);addEventListener('online',()=>tryAll(true));
+</script>
+</body></html>
