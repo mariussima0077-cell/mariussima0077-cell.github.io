@@ -9,7 +9,11 @@
 (function(){
 const T=()=>window.__TE;
 const GP_T0=Date.UTC(2026,10,22,17,0,0),DAY=864e5,WEEK=7*DAY,GP_T1=GP_T0+28*DAY;   // same dates in server/online.js (GP_T0)
-const GPP=()=>false;   // PREMIUM packs: true when gp_silver / gp_gold / gp_plat exist in Play Console
+const GPP=()=>true;   // v16-192 (23 nov): gp_silver / gp_gold / gp_plat are active in Play Console
+// PREMIUM level = best pack owned (secure.js SKU gp1/gp2/gp3): 1 Silver · 2 Gold · 3 Platinum
+const PKS=[['gp1','SILVER','€4.99'],['gp2','GOLD','€9.99'],['gp3','PLATINUM','€19.99']];
+const PREM=()=>{const p=(T()&&T().PK)||{};return p.gp3?3:p.gp2?2:p.gp1?1:0;};
+const TOKB=()=>1+.1*PREM();   // +10/20/30% GP Tokens (Shop currency only – Road points and LEGENDS stay the same for everyone)
 const TIER=1500,TIERS=50;
 const now=()=>Date.now(),live=()=>now()>=GP_T0&&now()<GP_T1,wk=()=>Math.max(0,Math.min(3,Math.floor((now()-GP_T0)/WEEK)));
 const dKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
@@ -54,9 +58,9 @@ function prog(list,m){const s=S(),G=T().G,k=m[2],B=s.b,c=snap();
 const LISTS={d:MD,w:MW,e:ME};
 function mState(list,m){const s=S(),got=(list==='d'?s.d:list==='w'?s.w:s.e).got;if(got.includes(m[0]))return 'done';return Math.max(0,prog(list,m))>=m[3]?'ready':'go';}
 function claimM(list,id){if(!live())return;const s=S(),m=LISTS[list].find(x=>x[0]===id);if(!m||mState(list,m)!=='ready')return;
-  (list==='d'?s.d:list==='w'?s.w:s.e).got.push(id);s.tok+=m[4];s.pts+=m[4];T().save();T().toast(TOKI+' +'+T().nf(m[4])+' GP Tokens',1800);
+  (list==='d'?s.d:list==='w'?s.w:s.e).got.push(id);const tk=Math.round(m[4]*TOKB());s.tok+=tk;s.pts+=m[4];T().save();T().toast(TOKI+' +'+T().nf(tk)+' GP Tokens',1800);
   if(id==='ult')finish();sendSc();render();dot();}
-function claimAll(list){const s=S();let n=0,t=0;for(const m of LISTS[list]){if(mState(list,m)==='ready'){(list==='d'?s.d:list==='w'?s.w:s.e).got.push(m[0]);s.tok+=m[4];s.pts+=m[4];t+=m[4];n++;if(m[0]==='ult')finish();}}
+function claimAll(list){const s=S();let n=0,t=0;for(const m of LISTS[list]){if(mState(list,m)==='ready'){(list==='d'?s.d:list==='w'?s.w:s.e).got.push(m[0]);const tk=Math.round(m[4]*TOKB());s.tok+=tk;s.pts+=m[4];t+=tk;n++;if(m[0]==='ult')finish();}}
   if(n){T().save();T().toast(TOKI+' +'+T().nf(t)+' GP Tokens',1800);sendSc();render();dot();}}
 // ---------------------------------------------------------------- rewards
 function real(r){const t=T(),o={};for(const k in r){if(k==='essU')o.ess=Math.round(r[k]*t.ESS_U());else if(k==='bkU')o.pk={r:0,bk:Math.round(r[k]*300*(t.PART_U?t.PART_U():1))};else o[k]=r[k];}return o;}
@@ -67,8 +71,27 @@ function rwIc(r){return r.dm?'img/ui/diamond.svg':r.tk?'img/ticket.webp':r.gt?'i
 function rwN(r){const t=T(),o=real(r);return o.dm?t.nf(o.dm):o.tk||o.gt||o.ct||o.key||(o.ess?t.nf(o.ess):o.pk?t.nf(o.pk.bk):'');}
 const tierOf=()=>Math.min(TIERS,Math.floor(S().pts/TIER));
 function claimTier(i){const s=S();if(i>tierOf()||s.rf.includes(i))return;if(i===TIERS){pick();return;}s.rf.push(i);give(RD[(i-1)%10]);T().toast('🎖️ Tier '+i+': '+rwTxt(RD[(i-1)%10]),2200);render();dot();}
+function mul(r,k){const o={};for(const x in r)o[x]=r[x]*k;return o;}
+// v16-192 PREMIUM lane: tier i gives the FREE reward × premium level; buying a bigger pack later gives the difference
+function claimPrem(i){const s=S(),L=PREM();if(!s.rp)s.rp={};const had=s.rp[i]||0;if(!L){T().toast('🔒 Buy a Grand Prix Pack to open the PREMIUM lane',2200);return;}
+  if(i>tierOf()||had>=L)return;const k=L-had;
+  if(i===TIERS){if(!s.rf.includes(TIERS)){T().toast('🏆 Choose your Mythic (FREE lane) first',2200);return;}
+    s.rp[i]=L;give(mul(FINAL_BONUS,k));let x='';
+    if(L>=2&&had<2&&window.CAMPAIGN&&CAMPAIGN.ascOne){CAMPAIGN.ascOne();x+=' + ✦ ASCENDED gear';}
+    if(L>=3&&had<3&&s.my){T().gain(s.my);try{T().heroRefresh();}catch(e){}x+=' + 1 copy of '+(T().HB[s.my]?T().HB[s.my].n:'your Mythic');}
+    T().save();T().toast('👑 PREMIUM tier 50: '+rwTxt(mul(FINAL_BONUS,k))+x,4200);render();dot();return;}
+  s.rp[i]=L;const r=mul(RD[(i-1)%10],k);give(r);T().toast('👑 Premium tier '+i+': '+rwTxt(r),2200);render();dot();}
+function premAll(){const s=S(),L=PREM(),tr=tierOf();if(!L)return;if(!s.rp)s.rp={};let n=0;const sum={};
+  for(let i=1;i<Math.min(tr+1,TIERS);i++){const had=s.rp[i]||0;if(had>=L)continue;const r=mul(RD[(i-1)%10],L-had);for(const x in r)sum[x]=(sum[x]||0)+r[x];s.rp[i]=L;n++;}
+  if(n){give(sum);T().toast('👑 '+n+' premium tiers: '+rwTxt(sum),3200);render();dot();}}
+let pkBusy=0;
+async function buyPk(k){if(pkBusy||!window.SEC||now()>=GP_T1)return;const P=T().PK;if(P[k])return;pkBusy=1;
+  try{const ok=await SEC.buy(k);if(!ok)return;P[k]=true;T().savePacks();T().save();
+    T().toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked! Open the ROAD to claim your PREMIUM rewards.',4200);render();dot();}
+  finally{pkBusy=0;}}
+function pkBtn(k){const P=(T()&&T().PK)||{},x=PKS.find(z=>z[0]===k);if(P[k])return '<button class="gpBtn x">OWNED ✓</button>';if(now()>=GP_T1)return '<button class="gpBtn x">ENDED</button>';return '<button class="gpBtn g" data-g="pk" data-k="'+k+'">'+x[2]+'</button>';}
 function pick(){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS)return;pop('<div class="gpH">🏆 CHOOSE 1 MYTHIC</div><div class="gpPk">'+MYTH.map(id=>'<div class="gpPi" data-g="myth" data-id="'+id+'" style="background-image:url(img/hero/splash_'+id+'.webp)"><span>'+(t.HB[id]?t.HB[id].n:id)+'</span></div>').join('')+'</div><div class="gpSm">+ FREE bonus: '+rwTxt(FINAL_BONUS)+'</div>');}
-function takeMyth(id){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS||!MYTH.includes(id))return;s.rf.push(TIERS);t.gain(id);give(FINAL_BONUS);try{t.heroRefresh();}catch(e){}closePop();
+function takeMyth(id){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS||!MYTH.includes(id))return;s.rf.push(TIERS);s.my=id;t.gain(id);give(FINAL_BONUS);try{t.heroRefresh();}catch(e){}closePop();
   t.toast('🏆 '+(t.HB[id]?t.HB[id].n:'Mythic')+' joined your team! + '+rwTxt(FINAL_BONUS),3600);render();dot();}
 function buy(id){if(!live())return;const s=S(),x=SH.find(z=>z[0]===id);if(!x)return;const n=s.sh.n[id]||0;if(n>=x[4])return T().toast('Weekly limit reached',1600);if(s.tok<x[3])return T().toast('Not enough GP Tokens',1600);
   s.tok-=x[3];s.sh.n[id]=n+1;give(x[5]);T().toast('🛒 '+x[1]+' · '+rwTxt(x[5]),1800);render();}
@@ -116,7 +139,7 @@ const css=`#gpx{position:fixed;inset:0;z-index:59;display:none;background:#0b0f1
 .gpC{height:74px;border-radius:12px;display:grid;place-items:center;position:relative;background:linear-gradient(#2a2140,#171126);box-shadow:inset 0 0 0 1.5px #4b3d6e;margin-bottom:6px}.gpC img{width:42px;height:42px;object-fit:contain}
 .gpC .n{position:absolute;bottom:3px;right:6px;font:900 11px system-ui;color:#fff;text-shadow:0 1px 2px #000}.gpC.rd{box-shadow:inset 0 0 0 2px #43e97b,0 0 10px #43e97b88;animation:gpPl 1.2s infinite}@keyframes gpPl{50%{transform:scale(1.05)}}
 .gpC.got::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;background:#0009;border-radius:12px;font:900 28px system-ui;color:#43e97b}
-.gpC.pr{background:linear-gradient(#5a3c08,#24170a);box-shadow:inset 0 0 0 1.5px #ffcf5a;opacity:.6}.gpC.pr::before{content:'🔒';position:absolute;top:3px;left:5px;font-size:12px}
+.gpC.pr{background:linear-gradient(#5a3c08,#24170a);box-shadow:inset 0 0 0 1.5px #ffcf5a;opacity:.6}.gpC.pr.on{opacity:1}.gpC.pr.on::before{content:'👑'}.gpC.pr.rd{box-shadow:inset 0 0 0 2px #ffd54a,0 0 10px #ffb30088}.gpC.pr::before{content:'🔒';position:absolute;top:3px;left:5px;font-size:12px}
 .gpFin{border-radius:16px;padding:12px;background:radial-gradient(circle at 50% 0,#ff5a2a55,transparent 60%),linear-gradient(#3a1408,#160a10);box-shadow:inset 0 0 0 2px #ffcf5a;text-align:center}
 .gpFin .h,.gpH{font:20px Game,system-ui;color:#ffd54a;text-align:center}
 .gpPk{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.gpPi{border-radius:10px;overflow:hidden;position:relative;aspect-ratio:2/3;box-shadow:0 0 0 2px #ff3b3b;background:#000 center/cover}
@@ -181,7 +204,7 @@ function act(t){const a=t.dataset.g;
   else if(a==='go'){const l=t.dataset.l;T().toast(l==='e'?'Progress counts everything you do during the event':'Play the game – it counts by itself',1800);}
   else if(a==='tier')claimTier(+t.dataset.i);else if(a==='pick')pick();else if(a==='myth')takeMyth(t.dataset.id);
   else if(a==='buy')buy(t.dataset.id);else if(a==='chest')chest();else if(a==='goal')claimGoal(+t.dataset.i);
-  else if(a==='pack')T().toast('🏁 Grand Prix Packs are coming very soon!',2200);else if(a==='ok')closePop();else if(a==='info')intro(1);else if(a==='entry')entryFx();else if(a==='rain')rainFx();}
+  else if(a==='pack'){tab='sh';render();const e=document.querySelector('.gpPack');if(e)e.scrollIntoView({block:'center'});}else if(a==='pk')buyPk(t.dataset.k);else if(a==='prem')claimPrem(+t.dataset.i);else if(a==='pall')premAll();else if(a==='ok')closePop();else if(a==='info')intro(1);else if(a==='entry')entryFx();else if(a==='rain')rainFx();}
 function pop(h){build();document.getElementById('gpPopB').innerHTML=h;popEl.classList.add('on');}
 function closePop(){if(popEl)popEl.classList.remove('on');}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
@@ -190,7 +213,7 @@ function rowH(l,m){const st=mState(l,m),p=Math.max(0,Math.min(m[3],prog(l,m))),u
   return '<div class="gpRow'+(st==='done'?' done':'')+(ult?' ult':'')+'"><div class="ic">'+MIC[m[2]]+'</div><div class="tx"><div class="a">'+m[1]+'</div>'+(st==='done'?'':'<div class="gpBar"><i style="width:'+(p/m[3]*100)+'%"></i></div>')+'<div class="b">'+TOKI+' +'+T().nf(m[4])+(st==='done'?'':' · '+p+'/'+m[3])+'</div></div>'+b+'</div>';}
 function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(),sc=document.getElementById('gpS'),y=sc.scrollTop,tr=tierOf(),W=wk();
   let h='<div class="gpIn"><div class="gpBan"><div class="bg"></div><img class="lg" src="img/gp/logo.webp" alt="TORQUE GRAND PRIX"><div class="gpTm">'+(now()<GP_T0?'⏳ Starts in <b>'+left(GP_T0-now())+'</b>':now()>=GP_T1?'🏁 <b>FINISHED</b>':'⏱ Ends in <b>'+left(GP_T1-now())+'</b> · <b style="color:#ff6b6b">ONE TIME ONLY</b>')+'</div></div>'+
-   '<button class="gpX" data-g="x">↩</button><div class="gpCb"><div class="gpCu">'+TOKI+' '+t.nf(s.tok)+'</div><div class="gpCu">🎖️ Tier '+tr+'/'+TIERS+'</div><div class="gpCu" data-g="info">ℹ️</div></div>'+
+   '<button class="gpX" data-g="x">↩</button><div class="gpCb"><div class="gpCu">'+TOKI+' '+t.nf(s.tok)+'</div><div class="gpCu">🎖️ Tier '+tr+'/'+TIERS+'</div>'+(PREM()?'<div class="gpCu"><img class="gpTk" src="img/gp/patron.webp" alt="">'+PKS[PREM()-1][1]+'</div>':'')+'<div class="gpCu" data-g="info">ℹ️</div></div>'+
    '<div class="gpTabs">'+[['ev','tab_ev','EVENT'],['ms','tab_ms','MISSIONS'],['rd','tab_road','ROAD'],['rk','tab_leg','LEGENDS'],['pt','tab_patron','PATRONS']].map(x=>'<button data-g="tab" data-t="'+x[0]+'" class="'+(tab===x[0]||(tab==='sh'&&x[0]==='ev')?'on':'')+'"><img src="img/gp/'+x[1]+'.webp" alt="">'+x[2]+'</button>').join('')+'</div><div class="gpP">';
   if(tab==='ev'){h+='<div class="gpSec">THE 4 RACE WEEKS</div><div class="gpWk">'+WEEKS.map((w,i)=>'<div class="gpW'+(i===W&&live()?' now':'')+'"><img src="img/gp/wk_'+w[0]+'.webp" alt="">'+w[1]+(i===W&&live()?'<span class="lv">LIVE</span>':'')+'</div>').join('')+'</div><div class="gpSec">YOUR RACE</div>';
     h+='<div class="gpRow'+(s.ch===W?' done':'')+'"><div class="ic"><img src="img/gp/tab_patron.webp"></div><div class="tx"><div class="a">Free weekly Pit-Stop Chest</div><div class="b">'+rwTxt(CHEST)+'</div></div>'+(s.ch===W?'<button class="gpBtn x">TAKEN</button>':'<button class="gpBtn g" data-g="chest">FREE</button>')+'</div>';
@@ -203,10 +226,14 @@ function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(
     if(sub==='e'){h+='<div class="gpSec">🏁 FIRST OVER THE LINE · TOP 10</div><div class="gpNote">The first <b>10 players</b> of your server who finish the <b>ULTIMATE</b> mission win extra prizes by Mail: #1 '+t.DMI+' 5,000 + title “First Over the Line” · #2 '+t.DMI+' 3,000 + 20 Hero Tickets · #3 '+t.DMI+' 2,000 + 15 · #4-10 '+t.DMI+' 1,000 + 10.'+(s.fin>0?'<br><b>You finished #'+s.fin+'!</b>':s.fin<0?'<br>You finished – the 10 places were already taken.':'')+'</div>';}
     h+='<div class="gpNote">'+(sub==='d'?'Daily missions reset at midnight.':sub==='w'?'Weekly missions reset every 7 days of the event.':'Event missions count only what you do <b>during the event</b> (new stages, new floors, new heroes …) and stay open all 28 days.')+'</div>';}
   else if(tab==='rd'){h+='<div class="gpScore"><div class="a">GRAND PRIX ROAD · '+t.nf(s.pts)+' POINTS</div><div class="b">TIER '+tr+' / '+TIERS+'</div></div><div class="gpNote">Every '+t.nf(TIER)+' points = 1 tier. Points = all GP Tokens you earned (spending in the Shop does not lower them).</div><div class="gpTr" id="gpTr">';
-    for(let i=1;i<TIERS;i++){const r=RD[(i-1)%10],got=s.rf.includes(i),rd=!got&&i<=tr;h+='<div class="gpT"><div class="lv">'+(i%5?'':'⭐ ')+i+'</div><div class="gpC'+(got?' got':rd?' rd':'')+'"'+(rd?' data-g="tier" data-i="'+i+'"':'')+'><img src="'+rwIc(r)+'"><span class="n">×'+rwN(r)+'</span></div><div class="gpC pr" data-g="pack"><img src="'+rwIc(r)+'"><span class="n">×'+rwN(r)+'</span></div></div>';}
-    h+='</div><div class="gpNote" style="margin-top:0">Top row: <b>FREE</b> for everyone · bottom row: <b>PREMIUM</b> (Grand Prix Packs – coming soon)</div>';
+    for(let i=1;i<TIERS;i++){const r=RD[(i-1)%10],got=s.rf.includes(i),rd=!got&&i<=tr;h+='<div class="gpT"><div class="lv">'+(i%5?'':'⭐ ')+i+'</div><div class="gpC'+(got?' got':rd?' rd':'')+'"'+(rd?' data-g="tier" data-i="'+i+'"':'')+'><img src="'+rwIc(r)+'"><span class="n">×'+rwN(r)+'</span></div>'+(()=>{const L=PREM(),hp=(s.rp&&s.rp[i])||0,pr=mul(r,Math.max(1,L));if(!L)return '<div class="gpC pr" data-g="pack"><img src="'+rwIc(r)+'"><span class="n">×'+rwN(r)+'</span></div>';
+      const ok=i<=tr&&hp<L;return '<div class="gpC pr on'+(hp>=L?' got':ok?' rd':'')+'"'+(ok?' data-g="prem" data-i="'+i+'"':'')+'><img src="'+rwIc(r)+'"><span class="n">×'+rwN(pr)+'</span></div>';})()+'</div>';}
+    h+='</div><div class="gpNote" style="margin-top:0">Top row: <b>FREE</b> for everyone · bottom row: <b>PREMIUM</b> '+(PREM()?'(<b style="color:#ffd54a">'+PKS[PREM()-1][1]+' ×'+PREM()+'</b>)':'(Grand Prix Packs – tap a locked reward)')+'</div>';
+    if(PREM()&&(()=>{for(let i=1;i<=Math.min(tr,TIERS-1);i++)if(((s.rp||{})[i]||0)<PREM())return 1;return 0;})())h+='<div style="text-align:center;margin:-4px 0 10px"><button class="gpBtn g" data-g="pall" style="padding:9px 20px">👑 CLAIM ALL PREMIUM</button></div>';
     const fg=s.rf.includes(TIERS);h+='<div class="gpFin"><div class="h">🏆 TIER 50 – CHOOSE 1 MYTHIC</div><div class="gpSm" style="color:#ffd0b0">FREE lane – reachable by playing every day.<br><b style="color:#43e97b">+ FREE bonus: '+rwTxt(FINAL_BONUS)+'</b></div>';
-    h+='<div class="gpPk">'+MYTH.map(id=>'<div class="gpPi" style="background-image:url(img/hero/splash_'+id+'.webp)"><span>'+(t.HB[id]?t.HB[id].n:id)+'</span></div>').join('')+'</div><div style="margin-top:10px">'+(fg?'<button class="gpBtn x" style="padding:9px 18px">TAKEN</button>':tr>=TIERS?'<button class="gpBtn g" data-g="pick" style="padding:9px 18px">CHOOSE</button>':'<button class="gpBtn x" style="padding:9px 18px">LOCKED · TIER 50</button>')+'</div></div>';}
+    h+='<div class="gpPk">'+MYTH.map(id=>'<div class="gpPi" style="background-image:url(img/hero/splash_'+id+'.webp)"><span>'+(t.HB[id]?t.HB[id].n:id)+'</span></div>').join('')+'</div><div style="margin-top:10px">'+(fg?'<button class="gpBtn x" style="padding:9px 18px">TAKEN</button>':tr>=TIERS?'<button class="gpBtn g" data-g="pick" style="padding:9px 18px">CHOOSE</button>':'<button class="gpBtn x" style="padding:9px 18px">LOCKED · TIER 50</button>')+'</div>'+
+      (()=>{const L=PREM(),hp=(s.rp||{})[TIERS]||0;const tx='<b style="color:#ffd54a">PREMIUM tier 50</b>: '+rwTxt(mul(FINAL_BONUS,Math.max(1,L)))+(L>=2||!L?' · ✦ Ascended gear (Gold+)':'')+(L>=3||!L?' · +1 copy of your Mythic (Platinum)':'');
+        return '<div class="gpSm" style="margin-top:10px;color:#ffe9a8">'+tx+'</div><div style="margin-top:6px">'+(!L?'<button class="gpBtn x" data-g="pack" style="padding:8px 16px">🔒 PREMIUM</button>':hp>=L?'<button class="gpBtn x" style="padding:8px 16px">TAKEN</button>':tr>=TIERS?'<button class="gpBtn g" data-g="prem" data-i="'+TIERS+'" style="padding:8px 16px">👑 CLAIM PREMIUM</button>':'<button class="gpBtn x" style="padding:8px 16px">PREMIUM · TIER 50</button>')+'</div>';})()+'</div>';}
   else if(tab==='rk'){h+='<div class="gpScore"><div class="a">GRAND PRIX LEGENDS</div><div class="b">TOP 100</div></div>';
     if(!RK)h+='<div class="gpNote" style="text-align:center">'+(window.ONLINE&&ONLINE.call?'Loading the ranking…':'Go online to see the ranking.')+'</div>';
     else{h+=(RK.top||[]).slice(0,100).map((r,i)=>'<div class="gpRk'+(r.uid===RK.me?' me':'')+'">'+(i<4?'<img src="img/ui10/rk_'+(i+1)+'.webp">':'<div class="num">'+(i+1)+'</div>')+'<div class="nm'+(i<10?' g':'')+'">'+String(r.name||'Mechanic').replace(/[<>&]/g,'')+'</div><div class="pt">'+t.nf(r.sc)+'</div></div>').join('');
@@ -217,15 +244,15 @@ function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(
       '<div data-g="entry"><span class="e gpAn-pu">📣</span><b>Royal Entrance</b>the whole server sees you log in<u>▶ preview</u></div>'+
       '<div data-g="rain"><div class="gpDr"><i style="left:15%"></i><i style="left:45%;animation-delay:.8s"></i><i style="left:75%;animation-delay:1.6s"></i></div><span class="e gpAn-bo">💎</span><b>Diamond Rain</b>1× a day you rain gifts in chat<u>▶ preview</u></div></div>';
     h+='<div class="gpSec">PRESTIGE REWARDS</div><div class="gpRw"><div><div class="gpFr"><img src="img/gp/frame.webp" alt=""></div><b>Grand Prix Frame</b>animated · TOP 1-3</div><div><div class="gpCar"><i>🏎️</i></div><b>Legend Car “1 of 1”</b>your name on it · TOP 1-3</div><div><span class="gpGn">'+nm+'</span><b>Golden Name</b>chat &amp; ranks · TOP 1-10</div>'+
-      '<div><span class="e gpAn-fl">🏁</span><b>“GP Champion”</b>title · TOP 1-10</div><div><img class="gpAn-bo" src="img/gp/patron.webp"><b>Patron Badge</b>coming with the packs</div><div><span class="e gpAn-sh">🔒</span><b>Never again</b>one-time event</div></div><div class="gpNote">Prizes are given when the event ends. Nothing here gives battle power.</div>';}
+      '<div><span class="e gpAn-fl">🏁</span><b>“GP Champion”</b>title · TOP 1-10</div><div><img class="gpAn-bo" src="img/gp/patron.webp"><b>Patron Badge</b>'+(PREM()?'<span style="color:#43e97b">yours ✓</span>':'with any Grand Prix Pack')+'</div><div><span class="e gpAn-sh">🔒</span><b>Never again</b>one-time event</div></div><div class="gpNote">Prizes are given when the event ends. Nothing here gives battle power.</div>';}
   else if(tab==='pt'){const tot=RK?RK.tot||0:0,mx=GOAL[GOAL.length-1][0];h+='<div class="gpGoal"><div class="h"><span>🌍 SERVER GOAL</span><span style="color:#fff">'+t.nf(tot)+' / '+t.nf(mx)+'</span></div><div class="gpBar" style="height:12px;margin:10px 0"><i style="width:'+Math.min(100,tot/mx*100)+'%;background:linear-gradient(90deg,#4aa3ff,#a76bff)"></i></div>'+
       GOAL.map((g,i)=>{const got=s.gs.includes(i),ok=tot>=g[0];return '<div class="gpGr"><span>'+(got?'✅':ok?'🎁':'🔒')+'</span><span class="t">'+t.nf(g[0])+' pts · '+rwTxt(g[1])+'</span>'+(got?'<button class="gpBtn x">TAKEN</button>':ok?'<button class="gpBtn g" data-g="goal" data-i="'+i+'">CLAIM</button>':'')+'</div>';}).join('')+
       '<div class="gpNote" style="margin-bottom:0">Every player’s Road points on your server add up. Each step unlocks a gift for <b>ALL players</b>.</div></div>';
     h+='<div class="gpSec">🎁 PATRONS</div><div class="gpNote">Soon: every player who buys a <b>Grand Prix Pack</b> becomes a <b>Patron</b> – the whole server gets a small gift and sees it in the chat.</div>';}
   else if(tab==='sh'){h+='<div class="gpScore"><div class="a">GRAND PRIX SHOP</div><div class="b">'+TOKI+' '+t.nf(s.tok)+'</div></div><div class="gpShop">'+SH.map(x=>{const n=s.sh.n[x[0]]||0;return '<div class="gpIt"><img src="'+x[2]+'"><div class="n">'+x[1]+'</div><div class="l">'+n+' / '+x[4]+' this week</div><button class="gpBtn'+(n>=x[4]||s.tok<x[3]?' x':'')+'" data-g="buy" data-id="'+x[0]+'">'+TOKI+' '+x[3]+'</button></div>';}).join('')+'</div>';
-    h+='<div class="gpPack"><img src="img/gp/pack.webp" alt="GRAND PRIX PACKS"><div class="gpPks"><div class="s"><div class="n">SILVER</div><ul><li>Premium Road ×1</li><li>+10% GP Tokens</li><li>Patron Badge</li></ul><button class="gpBtn x" data-g="pack">SOON</button></div>'+
-      '<div class="g"><div class="n" style="color:#ffd54a">GOLD</div><ul><li>Premium Road ×2</li><li>+20% GP Tokens</li><li>Ascended gear at tier 50</li></ul><button class="gpBtn x" data-g="pack">SOON</button></div>'+
-      '<div class="p"><div class="n" style="color:#e3d2ff">PLATINUM</div><ul><li>Premium Road ×3</li><li>+30% GP Tokens</li><li>+1 copy of your Mythic</li></ul><button class="gpBtn x" data-g="pack">SOON</button></div></div></div>';}
+    h+='<div class="gpPack"><img src="img/gp/pack.webp" alt="GRAND PRIX PACKS"><div class="gpPks"><div class="s"><div class="n">SILVER</div><ul><li>Premium Road ×1</li><li>+10% GP Tokens</li><li>Patron Badge</li></ul>'+pkBtn('gp1')+'</div>'+
+      '<div class="g"><div class="n" style="color:#ffd54a">GOLD</div><ul><li>Premium Road ×2</li><li>+20% GP Tokens</li><li>Ascended gear at tier 50</li></ul>'+pkBtn('gp2')+'</div>'+
+      '<div class="p"><div class="n" style="color:#e3d2ff">PLATINUM</div><ul><li>Premium Road ×3</li><li>+30% GP Tokens</li><li>+1 copy of your Mythic</li></ul>'+pkBtn('gp3')+'</div></div></div>';}
   h+='</div></div>';sc.innerHTML=h;sc.scrollTop=y;
   if(tab==='rd'){const r=document.getElementById('gpTr');if(r&&!render.rdS){render.rdS=1;r.scrollLeft=Math.max(0,(Math.min(tr,TIERS-1)-2)*92);}}}
 let fxT=0;function entryFx(){if(fxT)return;fxT=1;const nm=String((window.ONLINE&&ONLINE.name&&ONLINE.name())||'Champion').replace(/[<>&]/g,'');let e=document.getElementById('gpEnt');if(!e){e=document.createElement('div');e.id='gpEnt';document.body.appendChild(e);}
