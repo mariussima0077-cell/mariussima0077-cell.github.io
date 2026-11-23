@@ -1709,7 +1709,15 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
 // drawn facing right like the other monsters (Marius' pictures face left → mirrored here)
 function drawSprMon(g,u,t,id){const M=MON[u.t],d=msprLoad(id);if(!msprOK(id)){MDRAW[M.dr0](g,u,t);return;}
   let [r,c]=msprFrame(u,t),D=d;const k=M.h/d.ih;if(r>=100){const x=d.x;if(!x.im){x.im=new Image();x.im.decoding='async';x.im.src='img/mon/'+id+'_x.webp';}if(x.im.complete&&x.im.naturalWidth){D=x;r-=100;}else{r=0;c=0;}}g.save();g.scale(-1,1);if(id==='wasp')g.translate(0,-12-Math.sin(t*5+u.k)*3);else if(M.fly)g.translate(0,-38-Math.sin(t*5+u.k)*4);
+  if(M.hue!=null&&FILT){const fr=tintFr(D,id+(D===d?'':'x'),M,r,c);if(fr){g.drawImage(fr,0,0,D.w,D.h,-D.ax*k,-D.ay*k,D.w*k,D.h*k);g.restore();return;}}
   g.drawImage(D.im,c*D.w,r*D.h,D.w,D.h,-D.ax*k,-D.ay*k,D.w*k,D.h*k);g.restore();}
+// v16-262 (Adi: Torque Tower 'sacadat' from floor ~31): coloured monsters (acts 2+) were re-coloured with canvas filter EVERY frame (~100 ms a frame on a budget phone).
+// Now each animation frame is re-coloured ONCE into its own small canvas and reused .
+const TCACHE=new Map();let tintN=0;
+function tintFr(D,id,M,r,c){const key=id+'|'+M.hue+'|'+(M.sat||1)+'|'+(M.bri||1)+'|'+r+'|'+c;let fr=TCACHE.get(key);if(fr)return fr;
+  if(tintN>11)return null;tintN++; // spread the work: max 12 new frames per screen frame (the rest a frame later)
+  try{fr=document.createElement('canvas');fr.width=D.w;fr.height=D.h;const x=fr.getContext('2d');x.filter='hue-rotate('+M.hue+'deg) saturate('+(M.sat||1)+') brightness('+(M.bri||1)+')';x.drawImage(D.im,c*D.w,r*D.h,D.w,D.h,0,0,D.w,D.h);x.filter='none';}catch(e){return null;}
+  if(TCACHE.size>900)TCACHE.clear();TCACHE.set(key,fr);return fr;}
 for(const id in MSPR)MDRAW['spr_'+id]=(g,u,t)=>drawSprMon(g,u,t,id);
 // v16-197 chapter bosses INTRO + ENRAGE atlases (tools/boss_x.py)
 MSPR.jtitan.x={w:233,h:219,ax:119.0,ay:210.0};MSPR.gtanker.x={w:268,h:205,ax:141.5,ay:198.0};MSPR.towking.x={w:250,h:218,ax:131.5,ay:207.0};MSPR.ndragon.x={w:281,h:234,ax:154.0,ay:219.0};MSPR.gomega.x={w:248,h:229,ax:132.0,ay:210.5};
@@ -1732,12 +1740,12 @@ function drawMonster(g,u,t){
   if(u.slow>0){g.fillStyle='rgba(224,69,123,.35)';ell(g,0,0,big+6,(big+6)*.3);}
   const HMX=(HM&&B&&!B.tw||u.mb)&&GA===1; // (not in the white hit-flash pass) v16-138: HARD MODE look – Marius' fire ring under the feet + ember aura behind + red heat on top, 10% bigger
   if(HMX)hmUnder(g,u,t,M,big);
-  if(M.hue!=null&&FILT){// v14 elite colours: draw the monster on its own small canvas, then recolour it once
+  if(M.hue!=null&&FILT&&!(SPM&&msprOK(M.sp))){// v14 elite colours (v16-262: sprite monsters are re-coloured once per frame picture in drawSprMon): draw the monster on its own small canvas, then recolour it once
     const tr=g.getTransform(),ps=Math.max(.5,Math.hypot(tr.a,tr.b)),hw=M.b==='titan'?230:M.b==='crusher'?150:Math.max(64,M.h*1.5*(M.big>1?1.2:1)),top=M.h*(M.b==='titan'?1.45:1.7)+(M.fly?80:0)+60,bot=40;
     const cw=Math.ceil(2*hw*ps),ch=Math.ceil((top+bot)*ps);let oc=u._oc;if(!oc||oc.width<cw||oc.height<ch||oc.width>cw*1.6){oc=u._oc=document.createElement('canvas');oc.width=cw;oc.height=ch;}
     const o=oc.getContext('2d');o.setTransform(1,0,0,1,0,0);o.clearRect(0,0,oc.width,oc.height);o.setTransform(ps,0,0,ps,hw*ps,top*ps);
     o.scale(u.face,1);if(u.dead&&!SPM)o.rotate(-u.deadT*.6);if(u.stun>0)o.rotate(Math.sin(t*30)*.04);const ga=GA;GA=1;MDRAW[M.dr](o,u,t);GA=ga;
-    g.filter='hue-rotate('+M.hue+'deg) saturate('+(M.sat||1)+') brightness('+(M.bri||1)+')';g.drawImage(oc,0,0,cw,ch,-hw,-top,2*hw,top+bot);g.filter='none';
+    let o2=u._o2;if(!o2||o2.width!==oc.width||o2.height!==oc.height){o2=u._o2=document.createElement('canvas');o2.width=oc.width;o2.height=oc.height;}const x2=o2.getContext('2d');x2.clearRect(0,0,cw,ch);x2.filter='hue-rotate('+M.hue+'deg) saturate('+(M.sat||1)+') brightness('+(M.bri||1)+')';x2.drawImage(oc,0,0,cw,ch,0,0,cw,ch);x2.filter='none';g.drawImage(o2,0,0,cw,ch,-hw,-top,2*hw,top+bot); // v16-262: recolour on the SMALL canvas (g.filter on the big battle canvas = ~100 ms a frame on phones → Tower 'sacadat')
   }else{
   g.scale(u.face,1);if(u.dead&&!SPM)g.rotate(-u.deadT*.6);
   if(u.stun>0)g.rotate(Math.sin(t*30)*.04);
@@ -1755,7 +1763,7 @@ const fy=d=>FY0+d*(FY1-FY0);
 const dsc=d=>(.98+.36*d)*S;
 // v16-25: background pictures are soft → drawn at max 1.5× (less memory); the canvas is only re-made when the size really changes
 // HD graphics (branch hd-graphics): sharp up to 3x on good screens, never lowers the quality by itself (localStorage te_hd=1 or ?hd=1)
-const HD=(()=>{try{return (window.GFX?GFX.hd:localStorage.getItem('te_hd')==='1')||/[?&]hd=1/.test(location.search);}catch(e){return false;}})(); // v16-260: AUTO graphics
+const HD=(()=>{try{return (window.GFX?GFX.hd:localStorage.getItem('te_hd')==='1')||/[?&]hd=1/.test(location.search);}catch(e){return false;}})(); // v16-262: AUTO graphics
 function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(HD?3:2,window.devicePixelRatio||1)*(B&&B.lowRes&&!HD?(B.lowRes2?.6:.75):1);   // v16-153: 2nd step .6
   if(!force&&w===W&&h===H&&d===DPR&&cv.width===Math.round(w*d))return false;W=w;H=h;DPR=d;BDPR=Math.min(DPR,HD?2.5:1.5);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   S=clamp(Math.min(W/390,H/800),.8,1.5);HOR=H*.36;FY0=H*.47;FY1=H*.77;PANEL=H-Math.min(150,H*.19);if(B)buildBG();return true;}
@@ -2717,7 +2725,7 @@ function drawPause(){g.fillStyle='rgba(0,0,0,.7)';g.fillRect(0,0,W,H);g.textAlig
 // v16-25: camera = screen shake + a short zoom "punch" on skills, boss hits and multi-KOs (more dynamic battles)
 function camT(){const z=1+(B.zoom||0);g.setTransform(DPR*z,0,0,DPR*z,DPR*(W/2*(1-z)+(B.sx||0)*z),DPR*(H*.55*(1-z)+(B.sy||0)*z));}
 function punch(z){if(!B.sim)B.zoom=Math.max(B.zoom||0,z);}
-function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
+function render(){const t=B.real;tintN=0;g.setTransform(DPR,0,0,DPR,0,0);
   let sx=0,sy=0;if(B.shake>0){sx=rnd(-1,1)*B.shake;sy=rnd(-1,1)*B.shake*.6;}
   B.sx=sx;B.sy=sy;if(sx||sy){g.fillStyle='#000';g.fillRect(0,0,W,H);}g.save();camT();
   drawBG(t);drawTele(t);drawGroundFx();drawFx2(true);
@@ -2755,8 +2763,8 @@ cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientR
 // v16-3: testers thought they had to tap to attack – explain that fights are automatic
 let hintT=0;function tapHint(card){const n=performance.now();if(n-hintT<3500)return;hintT=n;
   TE().toast(card?'⚡ Skill charging – tap the card when it shows TAP!':'🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',3200);}
-let LOWRES=!!(window.GFX&&GFX.low);try{LOWRES=LOWRES||sessionStorage.getItem('te_lowres')==='1';}catch(e){} // v16-260: LOW graphics = light battles from the start
-let GDN=0; // v16-260: 3 slow checks (~6 s of lag) on AUTO-HD / already-lightest → AUTO goes one step down for the next start
+let LOWRES=!!(window.GFX&&GFX.low);try{LOWRES=LOWRES||sessionStorage.getItem('te_lowres')==='1';}catch(e){} // v16-262: LOW graphics = light battles from the start
+let GDN=0; // v16-262: 3 slow checks (~6 s of lag) on AUTO-HD / already-lightest → AUTO goes one step down for the next start
 let LOWRES2=false;try{LOWRES2=sessionStorage.getItem('te_lowres2')==='1';}catch(e){}
 let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(running&&innerWidth>50&&innerHeight>50)bsize();},180);});
 document.addEventListener('visibilitychange',()=>{if(document.hidden||!running)return;lastT=performance.now();setTimeout(()=>{if(running&&innerWidth>50&&innerHeight>50)bsize();},300);}); // v16-206: back from the background
@@ -4229,7 +4237,7 @@ function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.b
   const it=T.srun('ia',()=>Math.random()<IDLE_ASC_H*hrs?newItem(GSLOT[Math.floor(Math.random()*6)].k,6,rollSet(6)):null);if(it){GR().inv.push(it);ascBrag([it],'idle');}return it;}
 // v16-153 (perf): called 20 s after the game went to the background – drops the hero / monster sheets (7-13 MB each in memory)
 // unless a fight is running; they load again by themselves the next time they are drawn.
-function freeMem(){if(running||window.__BATTLE_ON)return;hdIm=null;hdId='';for(const id in SPRD){const d=SPRD[id];if(d.im){d.im=null;d.bi=null;d.fi=null;}}for(const id in MSPR){if(MSPR[id].im)MSPR[id].im=null;}}
+function freeMem(){if(running||window.__BATTLE_ON)return;TCACHE.clear();hdIm=null;hdId='';for(const id in SPRD){const d=SPRD[id];if(d.im){d.im=null;d.bi=null;d.fi=null;}}for(const id in MSPR){if(MSPR[id].im)MSPR[id].im=null;}}
 window.CAMPAIGN={todo:()=>{const o=hubTodo();return o.boss||o.dg||o.arena;},dgTodo:()=>!!hubTodo().dg,peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[clsOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,set);g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&heroWhy(h));}catch(e){return false;}},heroWhy:()=>{try{const a=[...new Set(curTeamList().map(heroWhy).filter(Boolean))];return a.length>1?'×'+a.length:a[0]||'';}catch(e){return '';}},hubWhy:()=>{const o=hubTodo();return o.dg?'':o.boss?'BOSS':o.arena?'FIGHT':'';},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),sumQ:n=>gsummon(n,0,1),sumQP:n=>gsummon(n,1,1),res:(r,n,s,hd)=>gsResults(r,n,s,hd),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[clsOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 CAMPAIGN.ascOne=()=>{const g=GR();const it=newItem(GSLOT[Math.floor(Math.random()*6)].k,6);g.inv.push(it);TE().save();return it;};   // v16-192: Grand Prix Gold/Platinum – 1 Ascended piece
 if(window.SEC&&SEC.TEST_MODE)window.__PW={sv:L=>salvPkGive(L),ap:(h,t)=>autoPlan(h,t),pa:id=>{if(id)gsel=id;const h=gHero();popAuto();const p=document.querySelector(".cpPop.open,#cpPop,.pop.open");return (h?h.n:"nohero")+" | "+((document.getElementById("cpPopBox")||{}).textContent.slice(0,500))+" | "+[...document.querySelectorAll("[class*=pop],[id*=op]")].filter(e=>e.offsetParent).map(e=>e.id||e.className).slice(0,8).join(",");},own:it=>ownerOf(it),ref:aeRefill,ep:enemyPower,tw:twPower,ct:ctPower,dg:dgPower,tp:()=>teamPower(curTeamList()),pw:h=>pow(h),hm:v=>{HM=v?1:0;},ni:newItem,eqp:equip,GSLOT,GMAXR,rol:h=>roleOf(h),SETS,hof:id=>heroOf(id),gr:GR,EG,EG2,CT_K,DGK:DG_K,NST,twR:twRew,ctR:ctRew,coll:()=>collBon()}; // v16-161: for tools/endgame.py

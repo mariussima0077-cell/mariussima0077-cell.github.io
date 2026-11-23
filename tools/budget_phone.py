@@ -99,6 +99,8 @@ async def run(a, root):
             # battle
             if a.mon:  # v16-139: one test wave with these monsters (keys from MON), weak (×0.2) so the fight lasts
                 await pg.evaluate('__F.d=[];__F.js=[];__F.on=true;window.__DEV.towerW('+json.dumps(a.mon.split(','))+','+str(a.mul)+')')
+            elif a.tower > 0:
+                await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.tower({a.tower})')
             elif a.wb >= 0:  # v16-134: World Boss fight (0 SCRAPZILLA · 1 CRUSHER KING · 2 INFERNO PISTON · 3 TOW SERPENT)
                 await pg.evaluate(f'__F.d=[];__F.js=[];__F.on=true;window.__DEV.wbSet({a.wb});window.__DEV.wb()')
             else:
@@ -123,6 +125,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--phone', default='budget', choices=PHONES)
     ap.add_argument('--stage', type=int, default=0)
+    ap.add_argument('--tower', type=int, default=0, help='Torque Tower floor')
     ap.add_argument('--wb', type=int, default=-1, help='World Boss fight instead of a stage (0-3)')
     ap.add_argument('--mon', default='', help='test wave of monsters, e.g. hopper,crab,scorp (full test account)')
     ap.add_argument('--mul', type=float, default=.2, help='monster strength for --mon')
