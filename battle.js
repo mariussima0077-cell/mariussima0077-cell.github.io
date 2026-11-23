@@ -3494,7 +3494,7 @@ function hubGo(k){if(k==='back'){hubClose();return;}
   if(k==='camp')return;                       // the campaign map is already under the hub
   if(k==='tower'){twOpen();return;}
   if(k==='class'){ctOpen();return;}
-  if(k==='arena'||k==='cup'){close();HUBS.from=0;if(window.ONLINE)ONLINE.open(k==='arena'?'olArena':'olCupS');}}
+  if(k==='arena'||k==='cup'){close();HUBS.from=0;if(window.ONLINE)ONLINE.open(k==='arena'?'olArena':'olCupS',{solo:1});}}
 hubEl.addEventListener('click',e=>{const el=e.target.closest('[data-hb]');if(el)hubGo(el.dataset.hb);});
 // back from a mode that was opened from the hub → the hub again
 function backToHub(){if(HUBS.from){HUBS.from=0;hubEl.classList.add('open');hubRender();return true;}return false;}

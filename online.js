@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=230;
+const CV=231;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -69,7 +69,7 @@ const ICON={trophy:'<svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg>',chat
 // ------------------------------------------------------------------ CSS
 const css=`
 #onl{position:fixed;inset:0;z-index:13;display:none;background:#05060a;color:#fff;font-family:Game,system-ui,-apple-system,Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:pan-y}
-#onl.open{display:block}
+#onl.open{display:block}#onl.solo .nav{display:none}#onl.solo .scr{bottom:0;padding-bottom:env(safe-area-inset-bottom)}
 #onl *{box-sizing:border-box}
 #onl .scr{position:absolute;top:0;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));display:none;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top)}
 #onl .scr.on{display:flex;animation:olIn .3s cubic-bezier(.2,.9,.3,1.2)}
@@ -467,9 +467,10 @@ setInterval(()=>{if(document.visibilityState==='visible')sync();},5*60e3);
 setTimeout(sync,12000);
 
 // ------------------------------------------------------------------ open / close / tabs
-function openHub(s){if(!API()){toast('📶 Online features need an internet connection');return;}
-  root.classList.add('open');open_=true;window.__ONLINE_ON=true;show(s||'olRank');sync().then(()=>{if(cur==='olProf')renderProf();});}
-function closeHub(){root.classList.remove('open');open_=false;window.__ONLINE_ON=false;stopPolls();closeMenu();}
+// v16-231 (Marius: "Arena easier to reach, not from the chat"): opened from the BATTLE HUB → SOLO page (no Chat/Ranking bar), ✕ goes back to the Battle Hub
+function openHub(s,o){if(!API()){toast('📶 Online features need an internet connection');return;}
+  root.classList.toggle('solo',!!(o&&o.solo));root.classList.add('open');open_=true;window.__ONLINE_ON=true;show(s||'olRank');sync().then(()=>{if(cur==='olProf')renderProf();});}
+function closeHub(noBack){const so=root.classList.contains('solo')&&noBack!==1;root.classList.remove('open','solo');open_=false;window.__ONLINE_ON=false;stopPolls();closeMenu();if(so&&window.CAMPAIGN&&CAMPAIGN.hub)try{CAMPAIGN.hub();}catch(e){}}
 function stopPolls(){for(const k in polls){clearInterval(polls[k]);delete polls[k];}}
 function show(s){cur=s;stopPolls();closeMenu();
   root.querySelectorAll('.nav b').forEach(x=>x.classList.toggle('on',x.dataset.s===s));root.querySelectorAll('.scr').forEach(x=>x.classList.toggle('on',x.id===s));hdr();
@@ -616,7 +617,7 @@ $('olArB').addEventListener('click',async e=>{
   if(a.dataset.a==='ref'){const r=await call('refresh',{});if(r.ok&&arData){arData.opp=r.opp;loadArena();}}
   if(a.dataset.a==='def'){const c=C();const tm=c&&c.arenaTeam?c.arenaTeam():[];
     modal(`<h4>🛡️ My Arena team</h4><p>Your Arena team is your <b>battle team</b> from the Campaign (with its gear). It attacks and it also defends you when others attack.</p><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0">${tm.map(h=>fcard(h.id,h.s,52)).join('')}</div><p style="text-align:center">${PWh} Power <b style="color:#ffe27a">${fmtN(c&&c.teamPower?c.teamPower():0)}</b></p><div class="ok"><button class="btn gray" data-m="no">CLOSE</button><button class="btn" data-m="ok">⚔️ HEROES PAGE</button></div>`,
-      b=>{if(b==='ok'){closeHub();if(c){c.open();setTimeout(()=>c.openGear(),50);}}});}});
+      b=>{if(b==='ok'){closeHub(1);if(c){c.open();setTimeout(()=>c.openGear(),50);}}});}});
 async function doFight(key){if(fightBusy)return;fightBusy=true;await sync();const r=await call('fight',{key});fightBusy=false;
   if(!r.ok){toast({no_tickets:'⚔️ No Arena fights left',old_opponents:'🔄 Rivals changed – try again',no_team:'⚔️ You need a battle team first',network:'📶 No connection',banned:'🚫 Account blocked'}[r.err]||'⚠️ Could not start the fight',3000);loadArena();return;}
   if(r.rw){const t=T();if(t&&t.giveRw){t.giveRw(r.rw);t.save();}}
@@ -988,5 +989,5 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 #onl .sys.s2 .shine{background:linear-gradient(90deg,#b3121c,#ff5a1f);color:#fff;font-weight:900;box-shadow:0 0 0 1.5px #ffd54a}#onl .sys.s2.g .shine{background:linear-gradient(90deg,#036b7d,#14c9e0)}
 </style>`);
 addButtons();
-window.ONLINE={brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:closeHub,sync,play:playFight,call,view:viewProfile};
+window.ONLINE={brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
 })();
