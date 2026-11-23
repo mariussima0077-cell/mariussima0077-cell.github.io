@@ -22,7 +22,8 @@ window.GFX=(()=>{const L=k=>{try{return localStorage.getItem(k);}catch(e){return
     const mem=navigator.deviceMemory||0,cores=navigator.hardwareConcurrency||4,dpr=window.devicePixelRatio||1,weak=(mem&&mem<=3)||cores<=4;
     tier=weak||sc>100?'lo':(!mem||mem>=6)&&cores>=6&&dpr>=2&&sc<70?'hi':'mid';
     S('te_tier',tier+'|'+sc+(tier==='lo'&&!weak&&!old?'|p':''));}
-  const eff=man==='auto'?(tier==='hi'?'hd':tier==='lo'?'low':'std'):man;
+  // v16-266 (Marius 23 nov: freeze at Alex): AUTO never turns HD on by itself any more (3× picture = a lot of memory) – good phones get STANDARD (2×, as before v16-260); HD only if the player chooses it
+  const eff=man==='auto'?(tier==='lo'?'low':'std'):man;
   return {man,tier,sc,eff,hd:eff==='hd',low:eff==='low',auto:man==='auto',
     set(v){S('te_hd',v==='hd'?'1':null);S('te_gfx',v==='std'||v==='low'?v:null);},
     down(){if(man!=='auto'||tier==='lo')return;S('te_tier',(tier==='hi'?'mid':'lo')+'|'+sc);}};})();
@@ -4615,7 +4616,10 @@ updX();setInterval(updX,5000);
 const MAPCOV=['dq','sm','pop','team','idl','ros','xp','ccP'].map(id=>document.getElementById(id));let touchT=0,coverT=0;
 cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListener('pointermove',()=>{touchT=performance.now();},{passive:true});
 function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;const o=document.getElementById('onl');if(o&&o.classList.contains('open'))return 2;const sw=document.getElementById('st');if(sw&&sw.classList.contains('open'))return 1;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
-function frame(now){
+// v16-266 (Marius 23 nov: „jocul are freeze cu totul, nu se mișcă nimic”): one error in a frame used to stop the map loop for good.
+// Now the loop always goes on; the error is sent once to Torque Guard (/admin „🐞 Game errors”).
+function frame(now){try{frame0(now);}catch(e){requestAnimationFrame(frame);console.error(e);if(!frame.n){frame.n=1;setTimeout(()=>{throw e;},0);}}}
+function frame0(now){
   if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle?31:14.5)){requestAnimationFrame(frame);return;}}
   const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);
   if(started){let left=dt*SPD;while(left>0){const s=Math.min(.05,left);update(s);left-=s;}}
