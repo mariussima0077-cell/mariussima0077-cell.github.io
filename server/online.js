@@ -30,10 +30,16 @@ const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gea
 const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40, key:40, cash:25, dgr:3000};   // v16-161: cash was missing (score became NaN) + DUNGEON RUSH
 // v16-193 (Marius 23 nov): TORQUE GRAND PRIX once per server – starts 3 days after the server opens, 28 days. Same dates in cloud.js SERVERS[].open.
 // At the launch reset: set SRV_OPEN[1] = launch day. New server → add its opening date here (and in cloud.js).
-const SRV_OPEN = {1: Date.UTC(2026, 10, 19, 17, 0, 0)}, GP_DELAY = 3 * DAY, GP_LEN = 28 * DAY, GP_CAP = 250000;
+const SRV_OPEN = {1: Date.UTC(2026, 10, 19, 17, 0, 0)}, GP_DELAY = 3 * DAY, GP_LEN = 28 * DAY, GP_CAP = 1000000, GP_MAX = 90 * DAY, GP_TAIL = 7 * DAY, GP_FINAL = 21 * DAY, GP_FINPTS = 55000;
+// v16-228 (Marius 23 nov): NO TIME LIMIT – the Grand Prix stays open until 10 players finished ALL event missions (final = a Mythic AWAKENED I),
+// then 7 more days for everybody to claim the Road; safety cap 90 days. The CHAMPION missions open week by week → nobody can finish before day 22.
 const GP_PK = {gp1:['gp_silver','SILVER'], gp2:['gp_gold','GOLD'], gp3:['gp_plat','PLATINUM']};   // v16-196 PATRONS
-const gpT0 = srv => SRV_OPEN[srv] ? SRV_OPEN[srv] + GP_DELAY : 0, gpT1 = srv => gpT0(srv) ? gpT0(srv) + GP_LEN : 0;
-const GP_FIN = [[1,1,{dm:5000}],[2,2,{dm:3000,tk:20}],[3,3,{dm:2000,tk:15}],[4,10,{dm:1000,tk:10}]];
+const gpT0 = srv => SRV_OPEN[srv] ? SRV_OPEN[srv] + GP_DELAY : 0;
+async function gpEnd(env, srv) { const t0 = gpT0(srv); if (!t0) return 0; let r = null; try { r = await env.DB.prepare('SELECT tf FROM gpx WHERE srv=? AND fin=10').bind(srv).first(); } catch (e) {}
+  return r && r.tf ? Math.min(r.tf + GP_TAIL, t0 + GP_MAX) : t0 + GP_MAX; }
+const GP_TT = pos => pos === 1 ? 'gpc' : pos <= 3 ? 'gpp' : 'gpf';   // titles GP CHAMPION / GP PODIUM / GP FINISHER (+ name colour gold / silver / purple)
+const ncOf = u => { const s = String(u || ''); return /(^|,)gpc(,|$)/.test(s) ? 1 : /(^|,)gpp(,|$)/.test(s) ? 2 : /(^|,)gpf(,|$)/.test(s) ? 3 : 0; };
+const GP_FIN = [[1,1,{dm:10000,tk:30,gt:20,key:10}],[2,2,{dm:6000,tk:20,gt:10}],[3,3,{dm:5000,tk:15,gt:10}],[4,10,{dm:2500,tk:10,gt:5}]];   // v16-228
 const EV_RW = [[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
 const EV_TKK = {hero:'tk', gear:'gt', crew:'ct', ess:'tk', dia:'tk', wheel:null, key:null, cash:'tk', dgr:'tk'};
 const EV_NAME = {hero:'Hero Summon Festival', gear:'Gear Summon Forge', crew:'Crew Summon Rally', ess:'Essence Rush', dia:'Diamond Spree', wheel:'Lucky Wheel', key:'Key Roulette', cash:'Cash Roulette', dgr:'Dungeon Rush'};
@@ -167,7 +173,7 @@ function ccOf(lang) {
 }
 const langOf = l => { const x = String(l || 'en').slice(0, 2).toLowerCase(); return LANGS.includes(x) ? x : 'en'; };
 function pub(p, extra) {
-  return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.hv ? -1 : p.vip | 0, on:Date.now() - (p.t | 0) < 10 * 60e3 ? 1 : 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, ...extra};
+  return {uid:p.uid, name:p.name, icon:p.icon, frame:p.frame | 0, title:p.title || 'rook', cc:p.cc || '', vip:p.hv ? -1 : p.vip | 0, on:Date.now() - (p.t | 0) < 10 * 60e3 ? 1 : 0, best:p.best | 0, pow:p.pow | 0, lv:p.lv | 0, today:Math.max(0, (p.best | 0) - (p.bday === dayKey(Date.now()) ? p.bd0 | 0 : p.best | 0)), cupw:p.cupw | 0, nc:ncOf(p.unl), ...extra};
 }
 const isTst = pid => String(pid || '').startsWith('tst_');   // v16-91: owner's FULL TEST ACCOUNT (hidden from rankings)
 async function profOf(env, pid) { return pid && typeof pid === 'string' ? env.DB.prepare('SELECT * FROM prof WHERE pid=?').bind(pid.slice(0, 64)).first() : null; }
@@ -194,7 +200,7 @@ export async function giftDm(env, pid, uid) {
 }
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 // v16-196 Grand Prix PATRONS: last 30 pack buyers of the server during its Grand Prix (every player's game gives itself the small gift, capped per day)
-async function patList(env, srv) { const t0 = gpT0(srv); if (!t0 || Date.now() < t0 || Date.now() > gpT1(srv) + 7 * DAY) return undefined;
+async function patList(env, srv) { const t0 = gpT0(srv); if (!t0 || Date.now() < t0 || Date.now() > (await gpEnd(env, srv)) + 7 * DAY) return undefined;
   try { return (await env.DB.prepare('SELECT id, uid, name n, k, t FROM gpat WHERE srv=? AND t>=? ORDER BY id DESC LIMIT 30').bind(srv, t0).all()).results; } catch (e) { return undefined; } }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // v16-224 (Marius 23 nov): BIG ANNOUNCEMENTS – the whole server learns when somebody gets a MYTHIC hero or an ASCENDED gear piece.
@@ -239,7 +245,7 @@ async function annList(env, srv, since) {   // the last big announcements of thi
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
 function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && (u.has('glad') || u.has('agf'))) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10) || (f === 9 && u.has('raid')) || (f === 10 && u.has('tw3')) || (f === 11 && u.has('bhunt')) || (f === 12 && u.has('dgm')) || (f === 13 && u.has('call')) || (f === 14 && u.has('awk')); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
 const NEWT = ['sky','awk','bhunt','dgm','trny','raid','hard','coll','lucky','twr','gty','daily'];   // v16-174: 12 new titles (claimed by the game, like wr/boss/speed)
-const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail','awl', ...NEWT];   // v16-212: + ARENA WARLORD (Arena Shop)   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
+const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail','awl','gpc','gpp','gpf', ...NEWT];   // v16-228: + GP CHAMPION / GP PODIUM / GP FINISHER (Grand Prix Top 10)   // v16-212: + ARENA WARLORD (Arena Shop)   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 
 // ------------------------------------------------------------------ ARENA FIGHT (decided by the server, seeded → the same fight can be replayed)
@@ -663,7 +669,7 @@ export async function online(op, b, env) {
     const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();
     const ar = await db.prepare('SELECT tk, tkt, season FROM arena WHERE uid=?').bind(p.uid).first();
     const atk = ar ? (ar.season !== seasonOf(now) ? ATK(p) : Math.min(ATK(p), ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ATK(p);
-    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined, pat:await patList(env, p.srv), ann:await annList(env, p.srv, b.annId)};
+    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined, gp1:gpT0(p.srv) ? await gpEnd(env, p.srv) : undefined, pat:await patList(env, p.srv), ann:await annList(env, p.srv, b.annId)};
   }
   if (!p) return {err:'no_profile'};
   if (op === 'prof') {
@@ -695,13 +701,13 @@ export async function online(op, b, env) {
   }
   if (op === 'chat') {
     const ch = b.ch === 'a' ? 'a' : 'w', lang = langOf(b.lang), since = b.since | 0;
-    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.id>? ORDER BY c.id DESC LIMIT 40`)
+    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv, p.unl FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.id>? ORDER BY c.id DESC LIMIT 40`)
       .bind(p.srv, ch, since).all()).results.reverse();
     const todo = rows.filter(m => !m.sys && m.lang !== lang && b.tr !== false && !JSON.parse(m.tr || '{}')[lang]).slice(-12);
     await Promise.all(todo.map(async m => { const t = await translate(env, m.txt, m.lang, lang); if (t === null) return; const tr = JSON.parse(m.tr || '{}'); tr[lang] = t; m.tr = JSON.stringify(tr);
       await db.prepare('UPDATE chat SET tr=? WHERE id=?').bind(m.tr, m.id).run(); }));
     return {ok:true, list:rows.map(m => { const tr = JSON.parse(m.tr || '{}')[lang]; return {id:m.id, uid:m.uid, sys:m.sys, t:m.t, txt:m.txt, lang:m.lang, tr:tr && tr !== '=' ? tr : null,
-      name:m.name, icon:m.icon, frame:m.frame, title:m.title, cc:m.cc, vip:m.hv ? -1 : m.vip, me:m.uid === p.uid}; }), muted:p.mute > now ? p.mute : 0};
+      name:m.name, icon:m.icon, frame:m.frame, title:m.title, cc:m.cc, vip:m.hv ? -1 : m.vip, nc:ncOf(m.unl), me:m.uid === p.uid}; }), muted:p.mute > now ? p.mute : 0};
   }
   if (op === 'say') {
     if (isTst(b.pid)) return {err:'test'};   // v16-91: the test account only looks, it does not write in the chat
@@ -754,7 +760,7 @@ export async function online(op, b, env) {
   }
   if (op === 'gppat') {   // v16-196: a Grand Prix pack was bought → the buyer becomes a PATRON, the whole server is told (chat) and gets a small gift
     if (!p) return {err:'noprof'}; const q = GP_PK[b.k]; if (!q) return {err:'bad'};
-    if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpT1(p.srv)) return {err:'over'};
+    if (!gpT0(p.srv) || now < gpT0(p.srv) || now > await gpEnd(env, p.srv)) return {err:'over'};
     if (isTst(p.pid)) return {ok:true, test:1};   // owner's test account: no announcement to the real players
     const ids = [b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)];
     const pu = await db.prepare(`SELECT token FROM purchases WHERE sku=? AND state='ok' AND t>? AND pid IN (${ids.map(() => '?').join(',')}) AND token NOT IN (SELECT tok FROM gpat WHERE tok IS NOT NULL) ORDER BY t DESC LIMIT 1`).bind(q[0], now - 3 * HOUR, ...ids).first();
@@ -764,21 +770,27 @@ export async function online(op, b, env) {
     return {ok:true};
   }
   if (op === 'gpsc' || op === 'gprank' || op === 'gpfin') {   // v16-185 TORQUE GRAND PRIX
-    if (!p) return {err:'noprof'}; if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpT1(p.srv) + HOUR) return {err:'over'};
+    if (!p) return {err:'noprof'}; const gpE = await gpEnd(env, p.srv); if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpE + HOUR) return {err:'over'};
     if (op !== 'gprank') { if (await isBanned(env, b.pid)) return {banned:1}; const sc = Math.round(num(b.sc, 0, GP_CAP));
       await db.prepare('INSERT INTO gpx(uid,srv,sc,t) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET srv=excluded.srv, t=CASE WHEN excluded.sc>gpx.sc THEN excluded.t ELSE gpx.t END, sc=MAX(gpx.sc, excluded.sc)').bind(p.uid, p.srv, sc, now).run(); }
     const me = await db.prepare('SELECT sc, t, fin FROM gpx WHERE uid=?').bind(p.uid).first();
-    if (op === 'gpfin') { if (!me || me.sc < 20000) return {err:'bad'}; if (me.fin) return {ok:true, pos:me.fin};
+    if (op === 'gpfin') { if (!me || me.sc < GP_FINPTS || now < gpT0(p.srv) + GP_FINAL) return {err:'bad'}; if (me.fin) return {ok:true, pos:me.fin};
+      // v16-228 Torque Guard checks the player BEFORE he gets a Top 10 place: banned / hidden (shadow) / under check (score ≥ 50) / test account → no place
+      const pl = await db.prepare('SELECT banned, shadow, score FROM players WHERE pid=?').bind(p.pid).first();
+      if (isTst(p.pid) || (pl && (pl.banned || pl.shadow || (pl.score | 0) >= 50))) return {ok:true, pos:-2};
       const n = (await db.prepare('SELECT COUNT(*) n FROM gpx WHERE srv=? AND fin>0').bind(p.srv).first()).n;
       if (n >= 10) { await db.prepare('UPDATE gpx SET fin=-1, tf=? WHERE uid=?').bind(now, p.uid).run(); return {ok:true, pos:-1}; }
-      const pos = n + 1; await db.prepare('UPDATE gpx SET fin=?, tf=? WHERE uid=?').bind(pos, now, p.uid).run();
-      const q = GP_FIN.find(x => pos >= x[0] && pos <= x[1]); if (q) await mail(env, p.uid, '🏁', 'Grand Prix – First Over the Line #' + pos, `You are #${pos} of your server to finish the ULTIMATE mission!`, q[2]);
+      const pos = n + 1; await db.prepare('UPDATE gpx SET fin=?, tf=? WHERE uid=? AND fin=0').bind(pos, now, p.uid).run();
+      const q = GP_FIN.find(x => pos >= x[0] && pos <= x[1]); await addUnl(env, p.uid, GP_TT(pos));
+      if (q) await mail(env, p.uid, '🏁', 'Grand Prix – First Over the Line #' + pos, `You are #${pos} of your server to finish ALL the Grand Prix missions! Your title “${pos === 1 ? 'GP CHAMPION' : pos <= 3 ? 'GP PODIUM' : 'GP FINISHER'}” and your new name colour are unlocked (Profile → Title).`, q[2]);
+      await sysMsg(env, p.srv, pos === 1 ? `🏆 ${p.name} is the GRAND PRIX CHAMPION – first over the line! 👑` : pos === 10 ? `🏁 ${p.name} took the LAST place of the Grand Prix Top 10! The event closes in 7 days – claim your Road rewards!` : `🏁 ${p.name} finished the Grand Prix – place #${pos} of 10!`);
       return {ok:true, pos}; }
     const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM gpx WHERE srv=? AND (sc>? OR (sc=? AND t<?))').bind(p.srv, me.sc, me.sc, me.t).first()).n + 1 : 0;
     const tot = (await db.prepare('SELECT COALESCE(SUM(sc),0) s FROM gpx WHERE srv=?').bind(p.srv).first()).s;
-    if (op === 'gpsc') return {ok:true, rank, tot};
+    if (op === 'gpsc') return {ok:true, rank, tot, end:gpE};
     const top = (await db.prepare('SELECT g.uid, g.sc, p.name FROM gpx g JOIN prof p ON p.uid=g.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE g.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>\'tst_\' ORDER BY g.sc DESC, g.t ASC LIMIT 100').bind(p.srv).all()).results;
-    return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, sc:r.sc})), me:p.uid, rank, sc:me ? me.sc : 0, tot};
+    const fins = (await db.prepare('SELECT g.fin, g.tf, p.name FROM gpx g JOIN prof p ON p.uid=g.uid WHERE g.srv=? AND g.fin>0 ORDER BY g.fin LIMIT 10').bind(p.srv).all()).results;
+    return {ok:true, top:top.map(r => ({uid:r.uid, name:r.name, sc:r.sc})), me:p.uid, rank, sc:me ? me.sc : 0, tot, end:gpE, fins:fins.map(r => ({pos:r.fin, name:r.name, t:r.tf}))};
   }
   if (op === 'evsc' || op === 'evrank') {   // v16-99 TIME EVENTS
     if (!p) return {err:'noprof'}; const eid = String(b.eid || ''), m = /^([AB])(\d{1,6})$/.exec(eid); if (!m) return {err:'bad'};
