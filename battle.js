@@ -2181,11 +2181,15 @@ function unitUpdate(u,dt,foes,friends){
   u.cd-=dt;
   // spider pounce
   if(u.pounce&&dd<140*S&&dd>u.rng*1.5){u.pounce=0;u.act=null;B.fx.push({type:'dust',x:u.x,y:fy(u.d)});u.x=tg.x-u.face*(bw(u)+bw(tg));u.d=tg.d;damage(u,tg,1.5);shake(4);sparks(tg.x,headY(tg)+20,8);return;}
-  if(dd<=range||(spot&&Math.abs(u.x-spot[0])<=18*S&&Math.abs(u.d-spot[1])*(FY1-FY0)<=18*S)){if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
+  // v16-255 (Marius: "after a boss pushes them, sometimes heroes stand and don't attack"): a hero who walks but can't get closer for 0.6 s
+  // (pushed by the boss / blocked by the other heroes) attacks from where he is if the target is near enough, otherwise takes a new spot.
+  const stuck=u.hero&&(u.stk||0)>.6;if(stuck&&dd>range*1.9){u.sK=null;u.stk=0;}
+  if(dd<=range||(spot&&Math.abs(u.x-spot[0])<=18*S&&Math.abs(u.d-spot[1])*(FY1-FY0)<=18*S)||(stuck&&dd<=range*1.9)){if(u.hero)u.stk=0;if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
   // move
   const sp=u.mv*(u.slow>0?.5:1)*(u.charge?2.2:1)*(spot&&dd<130*S?1.7:1)*dt;
   const tx=spot?spot[0]:tg.x-u.face*range*.85,dx=tx-u.x,ddp=((spot?spot[1]:tg.d)-u.d)*(FY1-FY0);const L=Math.hypot(dx,ddp)||1;
-  u.x+=dx/L*Math.min(sp,L);u.d+=ddp/L*Math.min(sp,L)/(FY1-FY0)*(spot?1:.8);u.d=clamp(u.d,.02,.98);
+  if(u.hero){const lp=u.lp;if(lp){const mv=Math.hypot(u.x-lp[0],(u.d-lp[1])*(FY1-FY0));u.stk=mv<sp*.35?(u.stk||0)+dt:Math.max(0,(u.stk||0)-dt*2);}u.lp=[u.x,u.d];}
+  u.x+=dx/L*Math.min(sp,L);u.d+=ddp/L*Math.min(sp,L)/(FY1-FY0)*(spot?1:.8);u.d=clamp(u.d,.02,.98);u.x=clamp(u.x,14*S,W-14*S);
   u.st='walk';u.wph+=dt*(u.hero?11:9)*(u.charge?2:1);if(u.t==='tire')u.roll+=dt*(u.charge?14:7)*u.face;
 }
 // v16-46: melee mechanics no longer fight for the same spot. Each one takes his own place around the monster
