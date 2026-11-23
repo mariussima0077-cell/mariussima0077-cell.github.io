@@ -40,8 +40,9 @@ const PASS = {
 };
 // Campaign Funds: rewards at every 3rd chapter (NORMAL / HARD) – v16-203, was every 5th 20-stage chapter
 const FUND = {
-  fn: {n:'CAMPAIGN FUND · NORMAL', price:'€9.99', hard:0, ms:[800,800,1000,1000,1000,1200,1200,1200,1500,1500].map((dm,i)=>({dm, tk:i===9?10:5}))},
-  fh: {n:'CAMPAIGN FUND · HARD',   price:'€9.99', hard:1, ms:[1200,1200,1500,1500,1500,1800,1800,1800,2200,2200].map((dm,i)=>({dm, tk:i===9?10:5, gt:i===9?5:3}))},
+  // v16-232 (Marius 23 nov: "a bit bigger rewards"): NORMAL 11,200 → 17,000 💎 + Gear Tickets · HARD 16,700 → 25,000 💎, more tickets
+  fn: {n:'CAMPAIGN FUND · NORMAL', price:'€9.99', hard:0, ms:[1200,1200,1500,1500,1500,1800,1800,1800,2200,2500].map((dm,i)=>({dm, tk:i===9?15:8, gt:i===9?5:2}))},
+  fh: {n:'CAMPAIGN FUND · HARD',   price:'€9.99', hard:1, ms:[1800,1800,2200,2200,2200,2700,2700,2700,3200,3500].map((dm,i)=>({dm, tk:i===9?15:8, gt:i===9?10:5}))},
 };
 const SPC = 30;                           // stages per chapter (battle.js) – v16-203: was 20
 const FSTEP = 3;                          // v16-203: a Campaign Fund reward every 3rd chapter (90 stages, was every 5th of 20 = 100 stages → a bit sooner)
@@ -304,8 +305,8 @@ function render(){
       h+='<div class="card fund fc'+(F.hard?' h':'')+'"><div class="frb">'+(F.hard?'HARD ×1.5':'×6 VALUE')+'</div>'+
         '<div class="ft"><h3>CAMPAIGN FUND<em>'+NM+'</em></h3>'+(own?'<span class="act">OWNED</span>':'')+'</div>'+
         '<div class="fs">'+(F.hard?'Rewards at every 3rd chapter of HARD MODE – bigger rewards.':'Rewards at every 3rd chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward!':'')+'</div><div class="ms">'+
-        F.ms.map((m,i)=>{ const rd=done>=(i+1)*5, dn=s.includes(i), cl=own&&rd&&!dn;
-          return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'no')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'><span>'+CH+((i+1)*5)+'</span><b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
+        F.ms.map((m,i)=>{ const rd=done>=(i+1)*FSTEP, dn=s.includes(i), cl=own&&rd&&!dn;   // v16-232: was (i+1)*5 – the claim uses FSTEP
+          return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'no')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'><span>'+CH+((i+1)*FSTEP)+'</span><b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
         '</div><div class="fb"><div class="tot">Total: '+tot.dm.toLocaleString('en')+' '+DMh+'<small>+ '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · progress: '+CH+done+'</small></div>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }
   }
   h+='</div></div>';
