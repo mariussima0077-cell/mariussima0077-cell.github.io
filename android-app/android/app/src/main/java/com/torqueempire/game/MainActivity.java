@@ -1,5 +1,7 @@
 package com.torqueempire.game;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
 import androidx.core.view.WindowCompat;
@@ -17,6 +19,17 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         // v16-154: the screen stays on while the game is open (idle game; tester Wazza4ever: the phone went to sleep)
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // v16-200 (Marius 23 nov: white band at the top of the screen): the game also draws in the camera notch area,
+        // and anything Android still shows outside the game is dark, never white.
+        getWindow().getDecorView().setBackgroundColor(Color.parseColor("#0b1420"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.layoutInDisplayCutoutMode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                ? WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                : WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(lp);
+        }
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         hideBars();
     }
 
