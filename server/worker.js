@@ -70,16 +70,19 @@ function rlHit(key, max) { const now = Date.now(); let r = RL.get(key);
   return false; }
 // v16-263 GAME ERRORS (Marius 23 nov: „rapoarte automate de erori”): the game sends its JavaScript errors (max 5 a session) → /admin „🐞 Game errors”
 let errReady = false;
-async function errReport(b, req, env) { const db = env.DB;
-  if (!errReady) { await db.prepare('CREATE TABLE IF NOT EXISTS errs(h TEXT PRIMARY KEY, m TEXT, src TEXT, n INTEGER, cv INTEGER, ua TEXT, pid TEXT, gfx TEXT, t0 INTEGER, t INTEGER)').run(); errReady = true; }
+async function errEnsure(db) { if (errReady) return; await db.prepare('CREATE TABLE IF NOT EXISTS errs(h TEXT PRIMARY KEY, m TEXT, src TEXT, n INTEGER, cv INTEGER, ua TEXT, pid TEXT, gfx TEXT, t0 INTEGER, t INTEGER)').run();
+  try { await db.prepare('ALTER TABLE errs ADD COLUMN fx INTEGER DEFAULT 0').run(); } catch (e) {} errReady = true; }
+async function errReport(b, req, env) { const db = env.DB; await errEnsure(db);
   const cut = (x, n) => String(x ?? '').slice(0, n), m = cut(b && b.m, 300); if (!m) return {ok: false};
   const src = cut(b.s, 120) + ':' + (+b.l || 0), h = cut(m, 120) + '|' + src, now = Date.now();
-  await db.prepare('INSERT INTO errs(h,m,src,n,cv,ua,pid,gfx,t0,t) VALUES(?,?,?,1,?,?,?,?,?,?) ON CONFLICT(h) DO UPDATE SET n=n+1, cv=excluded.cv, ua=excluded.ua, pid=excluded.pid, gfx=excluded.gfx, t=excluded.t')
+  await db.prepare('INSERT INTO errs(h,m,src,n,cv,ua,pid,gfx,t0,t) VALUES(?,?,?,1,?,?,?,?,?,?) ON CONFLICT(h) DO UPDATE SET n=CASE WHEN fx>0 AND excluded.cv>fx AND cv<=fx THEN 1 ELSE n+1 END, cv=excluded.cv, ua=excluded.ua, pid=excluded.pid, gfx=excluded.gfx, t=excluded.t')
     .bind(h, m, src, +b.cv || 0, cut(b.ua || req.headers.get('user-agent'), 160), cut(b.pid, 64), cut(b.g, 40), now, now).run();
   return {ok: true}; }
-async function errList(env) { try { if (!errReady) { await env.DB.prepare('CREATE TABLE IF NOT EXISTS errs(h TEXT PRIMARY KEY, m TEXT, src TEXT, n INTEGER, cv INTEGER, ua TEXT, pid TEXT, gfx TEXT, t0 INTEGER, t INTEGER)').run(); errReady = true; }
+// v16-268 (Marius 23 nov: „după fix, poți șterge erorile din admin?”): ✅ FIXED hides an error (fx = the game version at that moment, count back to 0).
+// If the same error comes again from a NEWER version, it shows again by itself (the fix did not work).
+async function errList(env) { try { await errEnsure(env.DB);
   await env.DB.prepare('DELETE FROM errs WHERE t<?').bind(Date.now() - 30 * 864e5).run();
-  return (await env.DB.prepare('SELECT * FROM errs WHERE t>? ORDER BY n DESC LIMIT 25').bind(Date.now() - 7 * 864e5).all()).results; } catch (e) { return []; } }
+  return (await env.DB.prepare('SELECT * FROM errs WHERE t>? AND (fx IS NULL OR fx=0 OR cv>fx) ORDER BY n DESC LIMIT 25').bind(Date.now() - 7 * 864e5).all()).results; } catch (e) { return []; } }
 async function ensureG(env) {
   if (gReady) return; const db = env.DB;
   for (const q of ['ALTER TABLE players ADD COLUMN bmax INTEGER DEFAULT 0', 'ALTER TABLE players ADD COLUMN shadow INTEGER DEFAULT 0',
@@ -678,6 +681,9 @@ async function admin(url, env) {
   // v16-265 🆘 SUPPORT: answer a ticket (→ the player's Mail) or close it
   await db.prepare('CREATE TABLE IF NOT EXISTS tickets(id INTEGER PRIMARY KEY AUTOINCREMENT, pid TEXT, uid INTEGER, t INTEGER, cat TEXT, txt TEXT, info TEXT, st INTEGER DEFAULT 0, reply TEXT, tr INTEGER)').run();
   const tAns = url.searchParams.get('tans'), tCls = url.searchParams.get('tcls');
+  const eFix = url.searchParams.get('efix');   // v16-268: ✅ FIXED (one error, or 'all')
+  if (eFix) { await errList(env); if (eFix === 'all') await db.prepare('UPDATE errs SET fx=cv, n=0').run(); else await db.prepare('UPDATE errs SET fx=cv, n=0 WHERE h=?').bind(eFix).run();
+    return Response.redirect(url.origin + '/admin?key=' + k + '#errs', 302); }
   if (tCls) { await db.prepare('UPDATE tickets SET st=2 WHERE id=?').bind(tCls | 0).run(); return Response.redirect(url.origin + '/admin?key=' + k + '#sup', 302); }
   if (tAns) { const T = await db.prepare('SELECT * FROM tickets WHERE id=?').bind(tAns | 0).first(), msg = String(url.searchParams.get('msg') || '').trim().slice(0, 1500);
     if (T && msg && T.st !== 1) { let uid = T.uid; if (!(uid > 0)) { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(T.pid).first(); uid = pr && pr.uid; }
@@ -745,7 +751,7 @@ ${stats}
 <h3 id=sup>🆘 Support (${tks.filter(t => !t.st).length} open)</h3>${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
   return `<div class=c style="${t.st ? 'opacity:.55' : 'border-color:#ff8a80'}"><b>${TC[t.cat] || t.cat}</b> · <a href="?key=${k}&p=${encodeURIComponent(t.pid)}"><b style="color:#fff">${esc(TN[t.pid] || I.name || '(no name)')}</b></a> <small>${d(t.t)} · v${I.cv || '?'} · ${esc(I.g || '')} · S${I.srv || '?'}</small><br>${esc(t.txt)}<br><small>${esc(String(I.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>
   ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}
-<h3>🐞 Game errors (7 days)</h3>${errs.length ? errs.map(r => `<div class=c><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small></div>`).join('') : '<div class=c>No errors 👍</div>'}
+<h3 id=errs>🐞 Game errors (7 days)${errs.length > 1 ? ` <a href="?key=${k}&efix=all" style="font-size:13px">✅ all fixed</a>` : ''}</h3>${errs.length ? errs.map(r => `<div class=c><a href="?key=${k}&efix=${encodeURIComponent(r.h)}" style="float:right;padding:4px 10px;border-radius:8px;background:#2e7d32;color:#fff;text-decoration:none;font-weight:800">✅ FIXED</a>${r.fx ? '<b class=b>↩️ came back after the fix · </b>' : ''}<b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small></div>`).join('') : '<div class=c>No errors 👍</div>'}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
 <h3>Flagged / banned</h3><small>👻 = hidden (shadow): plays normally but is out of rankings, opponents and prizes. Ban needs a PROOF or 2 different kinds of signs. Points go down 10 a day with honest play.</small>${bad.map(p => { const r = lastR[p.pid], pv = r ? powLine(r) : '';
