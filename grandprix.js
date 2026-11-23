@@ -17,7 +17,11 @@ const T1=()=>T0()+GP_LEN;
 const GPP=()=>true;   // v16-192 (23 nov): gp_silver / gp_gold / gp_plat are active in Play Console
 // PREMIUM level = best pack owned (secure.js SKU gp1/gp2/gp3): 1 Silver · 2 Gold · 3 Platinum
 const PKS=[['gp1','SILVER','€4.99'],['gp2','GOLD','€9.99'],['gp3','PLATINUM','€19.99']];
-const PREM=()=>{const p=(T()&&T().PK)||{};return p.gp3?3:p.gp2?2:p.gp1?1:0;};
+// v16-194 (Marius): the packs can be bought on EVERY server → stored per server: PK.gp1_s1, PK.gp2_s2 … (consumable in Play)
+const SRV=()=>window.CLOUD?CLOUD.srv():1,PKK=k=>k+'_s'+SRV();
+function pkMig(){const P=(T()&&T().PK);if(!P)return;let ch=0;['gp1','gp2','gp3'].forEach(k=>{if(P[k]===true){P[k+'_s1']=true;delete P[k];ch=1;}});if(ch)T().savePacks();}   // v16-192 bought as one-time → server 1
+const PREM=()=>{pkMig();const p=(T()&&T().PK)||{};return p[PKK('gp3')]?3:p[PKK('gp2')]?2:p[PKK('gp1')]?1:0;};
+function grant(k){const t=T();if(!t||!t.PK||!PKS.find(x=>x[0]===k))return;t.PK[PKK(k)]=true;t.savePacks();t.save();t.toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked on this server!',3500);try{render();dot();}catch(e){}}
 const TOKB=()=>1+.1*PREM();   // +10/20/30% GP Tokens (Shop currency only – Road points and LEGENDS stay the same for everyone)
 const TIER=1500,TIERS=50;
 const now=()=>Date.now(),live=()=>now()>=T0()&&now()<T1(),wk=()=>Math.max(0,Math.min(3,Math.floor((now()-T0())/WEEK)));
@@ -90,11 +94,11 @@ function premAll(){const s=S(),L=PREM(),tr=tierOf();if(!L)return;if(!s.rp)s.rp={
   for(let i=1;i<Math.min(tr+1,TIERS);i++){const had=s.rp[i]||0;if(had>=L)continue;const r=mul(RD[(i-1)%10],L-had);for(const x in r)sum[x]=(sum[x]||0)+r[x];s.rp[i]=L;n++;}
   if(n){give(sum);T().toast('👑 '+n+' premium tiers: '+rwTxt(sum),3200);render();dot();}}
 let pkBusy=0;
-async function buyPk(k){if(pkBusy||!window.SEC||now()>=T1())return;const P=T().PK;if(P[k])return;pkBusy=1;
-  try{const ok=await SEC.buy(k);if(!ok)return;P[k]=true;T().savePacks();T().save();
+async function buyPk(k){if(pkBusy||!window.SEC||!live())return;const P=T().PK;if(P[PKK(k)])return;pkBusy=1;
+  try{const ok=await SEC.buy(k);if(!ok)return;P[PKK(k)]=true;T().savePacks();T().save();
     T().toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked! Open the ROAD to claim your PREMIUM rewards.',4200);render();dot();}
   finally{pkBusy=0;}}
-function pkBtn(k){const P=(T()&&T().PK)||{},x=PKS.find(z=>z[0]===k);if(P[k])return '<button class="gpBtn x">OWNED ✓</button>';if(now()>=T1())return '<button class="gpBtn x">ENDED</button>';return '<button class="gpBtn g" data-g="pk" data-k="'+k+'">'+x[2]+'</button>';}
+function pkBtn(k){pkMig();const P=(T()&&T().PK)||{},x=PKS.find(z=>z[0]===k);if(P[PKK(k)])return '<button class="gpBtn x">OWNED ✓</button>';if(now()>=T1())return '<button class="gpBtn x">ENDED</button>';if(now()<T0())return '<button class="gpBtn x">SOON</button>';return '<button class="gpBtn g" data-g="pk" data-k="'+k+'">'+x[2]+'</button>';}
 function pick(){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS)return;pop('<div class="gpH">🏆 CHOOSE 1 MYTHIC</div><div class="gpPk">'+MYTH.map(id=>'<div class="gpPi" data-g="myth" data-id="'+id+'" style="background-image:url(img/hero/splash_'+id+'.webp)"><span>'+(t.HB[id]?t.HB[id].n:id)+'</span></div>').join('')+'</div><div class="gpSm">+ FREE bonus: '+rwTxt(FINAL_BONUS)+'</div>');}
 function takeMyth(id){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS||!MYTH.includes(id))return;s.rf.push(TIERS);s.my=id;t.gain(id);give(FINAL_BONUS);try{t.heroRefresh();}catch(e){}closePop();
   t.toast('🏆 '+(t.HB[id]?t.HB[id].n:'Mythic')+' joined your team! + '+rwTxt(FINAL_BONUS),3600);render();dot();}
@@ -281,6 +285,6 @@ function hook(){if(!window.EVT||EVT.__gp)return false;const o=EVT.q;EVT.q=functi
   const od=EVT.dot;EVT.dot=function(){try{od.apply(EVT,arguments);}catch(e){}dot();};EVT.__gp=1;return true;}
 function boot(){if(!T()||!T().G||!window.EVT){setTimeout(boot,600);return;}build();hook();if(live())S();dot();
   setInterval(()=>{if(live()&&T()&&T().G){S();dot();}},20000);setInterval(()=>{if(live()&&T()&&T().G)sendSc();},300000);}
-window.GPX={open,close,entry,state:()=>S(),live,q,get T0(){return T0();},get T1(){return T1();}};
+window.GPX={open,close,entry,state:()=>S(),live,q,grant,get T0(){return T0();},get T1(){return T1();}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

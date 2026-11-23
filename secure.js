@@ -18,7 +18,7 @@ const SKU = {car:'vip_car', vip:'vip_mechanic', spd2:'battle_speed_x2', sub:'vip
 const EURO = {car:5.99, vip:3.99, spd2:2.99, sub:5.99, dg:2.99, plat:9.99, p1:.99, p2:2.99, p3:5.99, p4:9.99, p5:19.99, p6:49.99, p7:99.99, d1:1.99, d2:4.99, d3:9.99, d4:19.99, d5:49.99, d6:99.99, fn:9.99, fh:9.99, dia:14.99, fdr:4.99, rail:4.99, gp1:4.99, gp2:9.99, gp3:19.99};
 function vipBuy(k){ try{ const t=T(); if(!t||!t.addVip||!EURO[k]) return; const n=Math.round(EURO[k]*(t.VIP_EUR||20)); rebase(); t.addVip(n); rebase(); t.toast('👑 +'+n+' VIP points',2500); }catch(e){} }
 const SUBS = k => k==='sub'||k==='plat'||k==='dia'||k==='rail';                    // subscriptions
-const CONS = k => k==='dg'||/^d\d$/.test(k);                // consumables (can be bought again) // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
+const CONS = k => k==='dg'||/^d\d$/.test(k)||/^gp\d$/.test(k);   // v16-194: Grand Prix packs = consumable → can be bought again on every server (grandprix.js keeps gpN_s<server>)                // consumables (can be bought again) // v16-63: dg = DUNGEON PASS, consumable (30 days per purchase, no renewal)
 const PLAY = 'https://play.google.com/billing';
 
 const T = () => window.__TE;
@@ -262,6 +262,11 @@ async function restore(force){   // force (v16-104): check every Play purchase a
         if(!s.native) continue;
         if(!dgUsed().includes(p.purchaseToken)){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(!v.valid) continue;
           t.PK.dg=Math.max(Date.now(),t.PK.dg||0)+30*864e5; dgUsed(p.purchaseToken); ch=true; }
+        try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
+      if(/^gp\d$/.test(k)){                        // v16-194: Grand Prix pack paid but not given yet → give it on the current server
+        if(!s.native) continue;
+        if(!dgUsed().includes(p.purchaseToken)){ const v=await verify(p.itemId,p.purchaseToken,'inapp'); if(!v.valid) continue;
+          dgUsed(p.purchaseToken); if(window.GPX&&GPX.grant) GPX.grant(k); ch=true; }
         try{ await s.consume(p.purchaseToken); }catch(e){} continue; }
       if(/^d\d$/.test(k)){                          // v16-75: diamonds paid but not given yet (app closed during payment)
         if(!s.native) continue;
