@@ -134,7 +134,7 @@ function open(){build();el.classList.add('open');render();load();clearInterval(o
   const now=Date.now();if(D&&D.mine&&D.mine.some(t=>t.t1<=now))load(true);else render();},1000);}
 // a row for the building panels (Car Wash, Gas Station, Car Factory, Rail Terminal)
 function row(id){if(!T()||!T().G)return '';const s=S();return '<div class="row stRow" data-street="1"><span>🚆 RAIL WARS</span><b>'+TI()+' '+T().nf(s.tok)+'</b><em>OPEN ›</em></div>';}
-window.STREET={open,row,give,state:S};
+window.STREET={open,row,give,state:S,canSend:()=>{try{const s=T().RWS(),cap=T().rCap();return s.n>=cap&&!(D&&D.ok&&D.sends<=0);}catch(e){return false;}}}; // v16-257: red dot SEND on the side button
 function boot(){if(!T()||!T().G){setTimeout(boot,600);return;}S();document.addEventListener('click',e=>{if(e.target.closest('[data-street]'))open();});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
