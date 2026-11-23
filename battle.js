@@ -893,6 +893,7 @@ function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.ke
   const it={id:g.nid++,s,r,lv:1,sub};if(set)it.set=set;return it;}
 // v14: from chapter 6 on the chances keep improving until chapter 50
 function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,15,40,40,5]; /* v16-190 (Marius): fewer Mythic drops (late 20% → 5%) */return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
+// v16-213 (Marius: "still looks like Mythic → Ascended"): Ascended card moved to section 3 (drop only), section 2 = Mythic +1 → +50 only
 // v16-212 (Marius 23 nov): gear guide picture – Mythic +50 "<" Ascended (no arrow: a Mythic can not become Ascended)
 // v16-205 (Marius 23 nov): Common → Mythic: NO stars, ENHANCE +1 … +50 (every +5 = a bonus) · ASCENDED: no levels, only ★0 … ★20
 const GMAXR=[50,50,50,50,50,50,1],gMax=it=>GMAXR[it.r],GLV_MAX=50;
@@ -3082,10 +3083,11 @@ let gdBack='';function gearGuide(back){gdBack=back||'';const T=TE(),sl='tool',st
   <div class="gdS"><div class="gdH"><i>1</i>7 GRADES</div><div class="gdG">${g}</div>
    <div class="gdT">Common ➜ Mythic come from <b>Gear Summon</b>, the Campaign and Dungeons.<br><b style="color:${ASC.c}">ASCENDED</b> is the new grade above Mythic.</div></div>
   <div class="gdS"><div class="gdH"><i>2</i>ENHANCE +1 – +${GLV_MAX} · ${STI('asc')} STARS ONLY ON ASCENDED</div>
-   <div class="gdEq">${itemCard(it(5,0,1))}<em class="to">➜</em>${itemCard(M0)}<em class="vs">&lt;<small>WEAKER<br>THAN</small></em>${itemCard(A0)}</div>
+   <div class="gdEq">${itemCard(it(5,0,1))}<em class="to">➜</em>${itemCard(M0)}</div>
    <div class="gdT"><b>Common ➜ Mythic</b>: ENHANCE with Gear Parts up to <b>+${GLV_MAX}</b>. Every <b>+5</b> unlocks a bonus: +5 … +40 = extra stats <b>+${GMS_SK*100}%</b> each, <b>+45</b> = main stat ×${GMS_M45}, <b>+50</b> = main stat ×2 in total.<br><b style="color:${ASC.c}">ASCENDED</b> has no levels – a new Ascended (★0) is already <b>stronger than a Mythic +50</b>. Only Ascended get <b>stars ★1 – ★20</b> (another Ascended piece of the same slot = +1 star).<br><b>A Mythic can NOT become Ascended</b> – Ascended only drops (see 3).</div>
    <div class="gdL">${L}</div></div>
   <div class="gdS"><div class="gdH"><i>3</i>${STI('asc')} <span style="color:${ASC.c}">ASCENDED · WHERE TO FIND</span></div>
+   <div class="gdEq">${itemCard(A0)}<em class="vs">🎁<small>DROP<br>ONLY</small></em></div>
    <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from stage ${sLabel(ASC_CH*20)} (more and more up to stage ${sLabel(999)})<br>• <b>Idle Rewards</b> from stage ${sLabel(ASC_CH*20)} (small chance for every hour in the chest)<br>• <b>Class Towers</b> floors 350 · 380 · 410 · 440 · 470 · 500 (a full Ascended set of the class)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open an Ascended piece ➜ <b>${STI('asc')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
   <div class="cpRow">${gdBack?'<button class="cpGo alt" data-p="gdback">↩ BACK</button>':''}<button class="cpGo" data-p="x">GOT IT</button></div></div>`;
   pop(x);}
