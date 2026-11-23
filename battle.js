@@ -814,7 +814,15 @@ const hardOK=()=>TE().G.cp.best>=SPC;
 const EG={camp:3.171,hard:0.87,tw:5.958,ct:3.591}; // EG-LINE (written by tools/endgame.py)
 const EGK=(K,x,a,b)=>K===1||x<=a?1:Math.pow(K,Math.min(1,(x-a)/(b-a)));
 const MONX=1.25,DG_HARD=1.3; // v16-190 (Marius 22 nov): campaign monsters +25%, Dungeons +30%
-const stageMul=i=>MONX*stageMul0(i)*HK(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499):1)*EGK(EG.camp,i,999,1499);
+const stageMulN=i=>MONX*stageMul0(i)*HK(i)*EGK(EG.camp,i,999,1499);
+// v16-201 (Marius 23 nov: "hard must be hard"): HARD chapter N opens only after NORMAL N, so its first stage must not be weaker than the NORMAL boss of N.
+// HARD_RAMP: stage 1 of a hard chapter = NORMAL boss power ×HARD_FLOOR, then it climbs smoothly to the old hard boss (×HARD_K) – chapter ends unchanged.
+const HARD_FLOOR=1.1,HRC={};
+const wPow=i=>{const s=STAGES[i];let p=0;s.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=M.hp*.25+M.atk*6+M.def*4;}));return p/s.w.length;};
+const HARD_RAMP=i=>{const c=Math.floor(i/SPC),a=c*SPC,b=Math.min(NST-1,a+SPC-1),j=i-a;let f=HRC[c];
+  if(f==null){const P=x=>stageMulN(x)*stEase(x)*wPow(x);f=Math.max(1,HARD_FLOOR*P(b)/(HARD_K*P(a)));if(TE().expMul)HRC[c]=f;}
+  return Math.pow(f,1-j/(SPC-1));};
+const stageMul=i=>stageMulN(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499)*HARD_RAMP(i):1);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
 const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a normal team has 3-4 roles (+5-10%) → monsters +7% (from stage 15); 5 roles = a bit easier, 1-2 roles = a bit harder
 // v16-161 (Marius 22 nov: "the power got bigger → make every stage and tower stronger, nobody should reach the end fast"): PK follows how much a normal team of that stage gained
