@@ -132,3 +132,8 @@ Bossii de capitol din campanie (JUNKYARD TITAN `jtitan`, ACID TANKER `gtanker`, 
 Format = ca la World Boss v2: 1536×1024, 3×2 cadre de 512×512, fond verde, FACING LEFT, referința = cadrul idle 1 (×3 pe verde, `/home/claude/ref/<id>_ref.png`).
 Claude pune prompturile direct în ChatGPT (Chrome-ul lui Marius); Marius descarcă pozele → `img/sheets/boss/<id>/<id>_intro.png`, `<id>_enrage.png`.
 Integrare: rânduri noi în atlasul `img/mon/<id>.webp` (sau atlas separat) + `msprFrame`: INTRO 1,5 s la începutul luptei cu bossul, ENRAGE (pornire + buclă cadrele 4-6) când `u.enr`.
+
+## 12 · MONȘTRI NOI + BOSSI NOI (23 nov 2026, trimise direct în ChatGPT)
+Monștri mici (3×8: IDLE / WALK / ATTACK, fără skill; poza atașată = `crab.webp` doar ca stil/așezare): MUFFLER SLUG, PISTON BEETLE, TIRE ARMADILLO, WRENCH RAPTOR, OIL SLIME, RADIATOR TOAD, GEAR HEDGEHOG, BUMPER RHINO (mediu).
+Bossi (6 rânduri: IDLE 6, WALK 8, ATTACK 8, SKILL 8, HURT 4, DEATH 6; poza atașată = `jtitan.webp` doar ca stil): DOZER BEHEMOTH, FIRE ENGINE HYDRA, COMPACTOR KRAKEN, MIXER COLOSSUS.
+Toate 1536×1024, fond verde #00FF00, FACING LEFT, STYLE-ul standard Torque Empire.
