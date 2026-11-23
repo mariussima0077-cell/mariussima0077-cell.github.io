@@ -3984,7 +3984,9 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='qi')quickIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
 function claimIdle(){const I=idleNow();if(I.money<1)return;G.money+=I.money;G.h.tk+=I.tk;G.h.ct+=I.ct;if(I.dm)G.dm=(G.dm||0)+I.dm;if(I.gt)G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+I.gt;G.ess=(G.ess||0)+I.ess;G.gp=(G.gp||0)+I.gp;const ipk=pkRoles(I.rp);for(const k in ipk)pkAdd(k,ipk[k]);pkAdd('bk',I.bk);let ia=null;try{ia=window.CAMPAIGN&&CAMPAIGN.idleAsc?CAMPAIGN.idleAsc(I.hrs):null;}catch(e){}G.idle=SEC.now();if(window.EVT)EVT.q('idle',1);save();closeIdle();
-  toast('🧰 Idle Rewards: +'+fmt(I.money)+(I.tk?' · '+TKI+' +'+I.tk:'')+(I.ct?' · '+CTI+' +'+I.ct:'')+(I.dm?' · '+DMI+' +'+I.dm:'')+(I.gt?' · '+GTI+' +'+I.gt:'')+' · '+ESI+' +'+nfmt(I.ess)+' · '+GPI+' +'+nfmt(I.gp)+(I.rp||I.bk?' · 🔧 '+pkGive0(ipk)+' '+PKI('bk')+' +'+nfmt(I.bk):'')+(ia?' · ✦ ASCENDED '+CAMPAIGN.itemName(ia)+'!':''),ia?5000:3500);const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
+  {const P=['+'+fmt(I.money)];if(I.tk)P.push(TKI+' +'+I.tk);if(I.ct)P.push(CTI+' +'+I.ct);if(I.dm)P.push(DMI+' +'+I.dm);if(I.gt)P.push(GTI+' +'+I.gt);P.push(ESI+' +'+nfmt(I.ess));P.push(GPI+' +'+nfmt(I.gp));
+   if(I.rp||I.bk){Object.keys(ipk).forEach(k=>P.push(PKI(k)+' +'+nfmt(ipk[k])));P.push(PKI('bk')+' +'+nfmt(I.bk));}if(ia)P.push('✦ ASCENDED '+CAMPAIGN.itemName(ia)+'!');   /* v16-199: one chip per reward (the old line spilled out of the bar – Marius 23 nov) */
+   toast('<div class="tsH">🧰 IDLE REWARDS</div><div class="tsR">'+P.map(x=>'<span class="ti">'+x+'</span>').join('')+'</div>',ia?5500:4500);}const cx=camX+VW/Z/2,cy=camY+(VH-TOP)/Z/2;float(cx,cy,'+'+fmt(I.money),'#ffd54a');}
 $('smBtn').onclick=()=>openSummon();$('tmBtn').onclick=()=>openRoster();$('idBtn').onclick=()=>popIdle(false);
 addEventListener('resize',()=>{if(smEl.classList.contains('open')){smSize();renderSm();}if(teamEl.classList.contains('open')){teamKey='';renderTeam();}if(idlEl.classList.contains('open'))fit(idlBox,1199,1312);});
 
@@ -4406,6 +4408,13 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 .c5Pb{position:absolute;left:5.6%;width:78.6%;top:40%;height:14.5%;border-radius:9cqw;background:#0b0e16;box-shadow:inset 0 0 0 .4cqw #c9a040,inset 0 .6cqw 1cqw #000;overflow:hidden}
 .c5Pb i{display:block;height:100%;border-radius:9cqw;background:linear-gradient(#ffd27a,#ff8a00 55%,#d35400);box-shadow:0 0 2cqw #ff9800}
 .c5P em{position:absolute;top:59%;transform:translateX(-50%);font:900 4.2cqw/1 system-ui;color:#3bea4f;text-shadow:0 1px 0 #063,0 0 3px #000;font-style:normal;pointer-events:none}
+
+/* v16-199 TOAST – new clean look (Marius 23 nov: "ce urâtă îi bara asta"): dark card with a gold frame, text wraps, icons inline */
+html body #toast{display:block!important;border-image:none!important;border:2px solid #ffcf5a!important;border-radius:16px!important;background:linear-gradient(180deg,#24324a,#111a27)!important;box-shadow:0 8px 22px #000b,0 0 16px #ffb30040,inset 0 1px 0 #ffffff22!important;padding:9px 14px!important;width:max-content;min-width:0;max-width:92vw;min-height:0;font:800 13.5px/1.35 system-ui!important;color:#fff!important;text-align:center;text-shadow:0 1px 1px #000;filter:none}
+html body #toast img{height:18px;width:auto;max-width:28px;object-fit:contain;vertical-align:-4px}
+html body #toast .tsH{font:15px Game,system-ui;letter-spacing:1px;color:#ffd54a;margin-bottom:5px}
+html body #toast .tsR{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
+html body #toast .ti{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;background:#0008;border-radius:999px;padding:3px 9px;box-shadow:inset 0 0 0 1px #ffcf5a44;font:900 13px system-ui}
 </style>
 </body>
 </html>
