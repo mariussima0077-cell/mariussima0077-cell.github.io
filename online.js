@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=263;window.TE_CV=CV;
+const CV=264;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -554,9 +554,17 @@ function openMenu(mm){closeMenu();const mid=+mm.dataset.mid,uid=+mm.dataset.u,bo
 document.addEventListener('click',e=>{if(!e.target.closest('.menu')&&!e.target.closest('.m[data-u]'))closeMenu();},true);
 $('olChT').onclick=e=>{const b=e.target.closest('b');if(!b)return;if(b.dataset.tr){autoTr=!autoTr;LS('te_tr',autoTr?'1':'0');trBtn();chSince=0;chList=[];$('olMsgs').innerHTML='';loadChat();return;}
   chCh=b.dataset.ch;$('olChT').querySelectorAll('b[data-ch]').forEach(x=>x.classList.toggle('on',x===b));chSince=0;chList=[];$('olMsgs').innerHTML='';loadChat();};
-async function send(){const i=$('olIn'),txt=i.value.trim();if(!txt)return;
-  const r=await call('say',{ch:chCh,txt,lang:LANG});
-  if(r.ok){i.value='';loadChat();return;}
+// v16-264 (Marius 23 nov 2026): 3 seconds between messages – if you press SEND sooner, the message waits and goes out BY ITSELF
+// when the 3 seconds are over (the button counts 3·2·1), so you never have to press again.
+let chLast=0,chQ=0,chSB=false;
+function chQueue(ms){const btn=$('olSend');if(chQ)return;const end=Date.now()+ms;btn.classList.add('wait');
+  const tick=()=>{const l=end-Date.now();if(l>0){btn.textContent='⏳ '+Math.ceil(l/1000);chQ=setTimeout(tick,200);return;}
+    chQ=0;btn.textContent='SEND';btn.classList.remove('wait');send();};tick();}
+async function send(){const i=$('olIn'),txt=i.value.trim();if(!txt||chSB)return;
+  const left=chLast+3000-Date.now();if(left>0){chQueue(left);return;}
+  chSB=true;const r=await call('say',{ch:chCh,txt,lang:LANG});chSB=false;
+  if(r.ok){chLast=Date.now();if(i.value.trim()===txt)i.value='';loadChat();return;}
+  if(r.err==='slow'){chLast=Date.now();chQueue(3000);return;}
   const E={need_name:'✏️ Choose your player name first (Profile)',slow:'⏳ Slow down – wait a few seconds',muted:'🔇 You are muted until '+(r.until?new Date(r.until).toLocaleString():''),banned:'🚫 Your account is blocked',test:'🧪 Test account – chat is read-only',network:'📶 No connection'};
   toast(E[r.err]||'⚠️ Message not sent',3000);if(r.err==='need_name'){show('olProf');setTimeout(nameModal,300);}}
 $('olSend').onclick=send;$('olIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send();}});

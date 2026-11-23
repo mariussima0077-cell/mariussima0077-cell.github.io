@@ -731,7 +731,7 @@ export async function online(op, b, env) {
     if (await isBanned(env, b.pid)) return {err:'banned'};
     if (p.mute > now) return {err:'muted', until:p.mute};
     if (p.name.startsWith('Mechanic')) return {err:'need_name'};
-    if (now - p.lastmsg < 4000) return {err:'slow'};
+    if (now - p.lastmsg < 2900) return {err:'slow'};   // v16-264: 3 s between messages (the game waits and sends by itself)
     let txt = clean(b.txt).replace(/\s+/g, ' ').slice(0, 200); if (!txt) return {err:'empty'};
     txt = maskBad(txt); const ch = b.ch === 'a' ? 'a' : 'w', lang = guessLang(txt, langOf(b.lang));
     const id = (await db.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang) VALUES(?,?,?,?,?,?) RETURNING id').bind(p.srv, ch, p.uid, now, txt, lang).first()).id;
