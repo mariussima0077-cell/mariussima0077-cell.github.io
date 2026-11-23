@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=267;window.TE_CV=CV;
+const CV=269;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -439,7 +439,7 @@ root.innerHTML=SVGDEFS+`
   <div class="body" id="olCupB"></div></div></section>
 <section class="scr skn sk-profile" id="olProf"><div class="skH"><img class="hi" src="img/ui2/profile_h.webp" alt=""><div id="olPrH"></div>${top('user','MY PROFILE','NAME · ICON · FRAME · TITLE')}</div><div class="skB">
   <div class="body" id="olPrB"></div></div></section>
-<div class="nav" id="olNav"><b data-s="olRank"><img src="img/ui3/on_rank.webp" alt="">RANKING</b><b data-s="olChat"><img src="img/ui3/on_chat.webp" alt="">CHAT<i id="olChDot"></i></b><b data-s="olArena"><img src="img/ui3/on_arena.webp" alt="">ARENA<i id="olArDot"></i></b><b data-s="olCupS"><img src="img/ui3/on_cup.webp" alt="">CUP</b><b data-s="olProf"><img src="img/ui3/on_prof.webp" alt="">PROFILE</b></div>
+<div class="nav" id="olNav"><b data-s="olRank"><img src="img/ui3/on_rank.webp" alt="">RANKING</b><b data-s="olChat"><img src="img/ui3/on_chat.webp" alt="">CHAT<i id="olChDot"></i></b><b data-s="olArena"><img src="img/ui3/on_arena.webp" alt="">ARENA<i id="olArDot"></i></b><b data-s="olCupS"><img src="img/ui3/on_cup.webp" alt="">CUP</b></div>
 <div id="olFx"><canvas id="olFc"></canvas><div class="vs" id="olVs"></div><div class="ctl"><button id="olSpd">×2 ⏩</button><button id="olSkip">SKIP ⏭</button></div><div class="res" id="olRes"></div></div>`;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.appendChild(root);
 
@@ -465,7 +465,7 @@ async function sync(){
   let team=[];try{team=c.arenaTeam();}catch(e){}
   const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0)+Object.values(G.lx||{}).reduce((a,b)=>a+b,0);
   const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),pids:window.SEC&&SEC.pids?SEC.pids():undefined,icon:LS('te_icon')||undefined,annId});
-  if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;if(r.gp0)LS('te_gp0_'+(window.CLOUD?CLOUD.srv():1),String(r.gp0));if(r.gp1)LS('te_gp1_'+(window.CLOUD?CLOUD.srv():1),String(r.gp1));if(r.pat&&window.GPX&&GPX.pat)GPX.pat(r.pat);if(r.ann)annGot(r.ann);dots();if(open_)hdr();}
+  if(r.ok){ME=r.me;hudAv();inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;if(r.gp0)LS('te_gp0_'+(window.CLOUD?CLOUD.srv():1),String(r.gp0));if(r.gp1)LS('te_gp1_'+(window.CLOUD?CLOUD.srv():1),String(r.gp1));if(r.pat&&window.GPX&&GPX.pat)GPX.pat(r.pat);if(r.ann)annGot(r.ann);dots();if(open_)hdr();}
   return r;}
 let arenaTk=0;
 function dots(){const ch=chatSrvLast>chatLast;const a=$('chDot');if(a)a.classList.toggle('on',ch||inboxN>0);$('olChDot').classList.toggle('on',ch);
@@ -698,7 +698,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
    <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${(()=>{const G=window.GFX||{man:'auto',eff:'std'},TN={hd:'HD',std:'STANDARD',low:'LOW'};return [['auto','⚙️ AUTO · recommended','The game checked your phone → <b>'+TN[G.man==='auto'?G.eff:(G.tier==='lo'?'low':'std')]+'</b> for you'],['hd','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory'],['std','🖼️ STANDARD','Sharp picture, normal battery use'],['low','🍃 LOW · SMOOTH','For older phones – lighter picture, no lag, less battery']].map(g=>`<div class="${G.man===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${G.man===g[0]?'✅':''}</b></div>`).join('');})()}</div>
    <div class="o-note">Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.<br>Player ID ${ME.uid} · <u data-a="mutes">muted players (${mutes.size})</u></div>`;}
 async function setProf(set,paid){const r=await call('prof',{set,paid});
-  if(r.ok){ME={...ME,...r.me};renderProf();return r;}
+  if(r.ok){ME={...ME,...r.me};renderProf();hudAv();return r;}
   const E={name_rules:'✏️ 3–14 letters, numbers, _ . -',name_bad:'🚫 This name is not allowed',name_taken:'❌ This name is already used on your server',locked:'🔒 Not unlocked yet',network:'📶 No connection'};
   if(r.err!=='pay')toast(E[r.err]||'⚠️ Could not save',3000);return r;}
 $('olPrH').addEventListener('click',e=>{if(e.target.closest('[data-a="name"]'))nameModal();if(e.target.closest('[data-a="hv"]'))setProf({hv:ME.hv?0:1});});
@@ -1025,5 +1025,9 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 #onl .sys.s2 .shine{background:linear-gradient(90deg,#b3121c,#ff5a1f);color:#fff;font-weight:900;box-shadow:0 0 0 1.5px #ffd54a}#onl .sys.s2.g .shine{background:linear-gradient(90deg,#036b7d,#14c9e0)}
 </style>`);
 addButtons();
+// v16-269 (Marius 23 nov): my avatar + frame in the top bar (next to the money) → tap = MY PROFILE page (alone, without the online tabs)
+function hudAv(){const e=document.getElementById('hudAv');if(!e)return;let ic=LS('te_icon'),fr=+(LS('te_hfr')||0);if(ME){ic=ME.icon||ic;fr=ME.frame|0;LS('te_hfr',String(fr));}
+  const k=ic+'|'+fr;if(e.dataset.k===k)return;e.dataset.k=k;e.innerHTML=avf(ic,fr);}
+{const e=document.getElementById('hudAv');if(e){hudAv();e.onclick=()=>openHub('olProf',{solo:true});}}
 window.ONLINE={help:helpOpen,brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
 })();

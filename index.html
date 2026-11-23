@@ -65,7 +65,10 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:Ga
 #hud{position:fixed;left:0;right:0;top:0;height:52px;display:flex;gap:6px;padding:8px 8px;box-sizing:border-box;justify-content:space-between;align-items:center;pointer-events:none;z-index:5;background:linear-gradient(#0d141bee,#0d141b99)}
 .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 10px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 #hud{justify-content:center;padding:3px 4px}
-#hudBar{position:relative;width:min(100%,560px);aspect-ratio:2156/176;max-height:100%;background:url(img/ui2/hud.webp) center/100% 100% no-repeat;container-type:size}
+#hudBar{position:relative;width:min(calc(100% - 50px),560px);aspect-ratio:2156/176;max-height:100%;background:url(img/ui2/hud.webp) center/100% 100% no-repeat;container-type:size}
+/* v16-269 (Marius 23 nov): my avatar + frame at the left of the top bar → tap = MY PROFILE (the PROFILE tab left the online pages) */
+#hudAv{position:relative;flex:none;width:44px;height:47px;margin:0 4px 0 0;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 2px 3px #000)}#hudAv:active{transform:scale(.93)}
+#hudAv .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}#hudAv .f{position:absolute;inset:0;background:center/100% 100% no-repeat}
 #hudBar>*{position:absolute;font-weight:900;line-height:1;white-space:nowrap;text-shadow:0 2px 0 #000,0 0 6px #000}
 #money{left:8.4%;width:12.2%;overflow:hidden;top:50%;transform:translateY(-55%);font-size:40cqh;color:#ffd54a}
 #dmH{pointer-events:auto;left:28.4%;width:10.8%;overflow:hidden;top:50%;transform:translateY(-55%);font-size:40cqh;color:#bfefff}
@@ -1009,7 +1012,7 @@ html body .dgPS span{font-size:10px!important}
 <body>
 <canvas id="game"></canvas>
 <div id="fx"></div>
-<div id="hud"><div id="hudBar">
+<div id="hud"><div id="hudAv" class="av" aria-label="My profile"></div><div id="hudBar">
   <span id="money">$0</span><span id="incH"></span>
   <span id="dmH">0</span>
   <div id="repPill"><span id="rep">REP 1</span><span class="rb"><i id="repBar"></i></span></div>
@@ -4432,7 +4435,8 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
- {id:123,d:'Nov 23, 2026',ic:'🆘',t:'HELP & SUPPORT in the game',l:['Found a bug, a problem with a purchase or your account? Go to <b>PROFILE → HELP &amp; SUPPORT</b> (or MAIL → Need help?).','Choose what it is about, write a few words and tap <b>SEND</b> – the answer comes in your <b>MAIL</b>.','Chat: 3 seconds between messages – if you tap SEND sooner, your message waits and goes out by itself.']},
+ {id:124,d:'Nov 23, 2026',ic:'👤',t:'Your avatar in the top bar',l:['Your <b>avatar with your frame</b> is now at the top left, next to your money.','Tap it to open <b>MY PROFILE</b> (name, icon, frame, title, graphics, help) – the PROFILE tab left the online pages.']},
+ {id:123,d:'Nov 23, 2026',ic:'🆘',t:'HELP & SUPPORT in the game',l:['Found a bug, a problem with a purchase or your account? Tap <b>your avatar</b> (top left) → <b>HELP &amp; SUPPORT</b> (or MAIL → Need help?).','Choose what it is about, write a few words and tap <b>SEND</b> – the answer comes in your <b>MAIL</b>.','Chat: 3 seconds between messages – if you tap SEND sooner, your message waits and goes out by itself.']},
  {id:122,d:'Nov 23, 2026',ic:'📱',t:'AUTO graphics – the game checks your phone',l:['At the first start the game now <b>checks your phone</b> by itself: good phones get <b>HD</b>, normal phones <b>STANDARD</b>, older phones <b>LOW</b> – a lighter picture, so no lag.','If battles get slow, AUTO goes one step lower by itself next time.','You can still choose in <b>PROFILE → GRAPHICS</b>: AUTO · HD · STANDARD · LOW.']},
  {id:121,d:'Nov 23, 2026',ic:'🚨',t:'THIEVES 2.0 – gangs, bosses & K9 dogs',l:['Thieves now come <b>in groups</b>: amateurs, fast <b>★ PROs</b> and the <b>👑 GANG BOSS</b> with his van full of helpers. Sometimes the <b>whole GANG</b> attacks at once – a <b>GANG RAID</b>!','Your guards <b>patrol</b> all the time and fight like crazy. With 2+ thieves a <b>security car brings BACKUP</b> guards, and in big raids the <b>K9 van</b> drops a dog handler with his dogs.','Caught thieves give <b>Builder Kit</b>, <b>Crew Tickets</b> and <b>diamonds</b>. A thief who escapes steals <b>5–20% of your cash</b> – higher Security = less.','New <b>MOST WANTED</b> board in SECURITY: 3 wanted thieves every day, each with a bounty – catch all 3 for a daily bonus.']},
  {id:120,d:'Nov 23, 2026',ic:'🛡️',t:'Skills look like the hero\'s own art',l:['Hero skills now show only the hero\'s <b>own effect pictures</b> – the extra drawn circles, flashes and rings are gone (Epic, Legendary and Mythic heroes).','<b>Goliath – IRON FORTRESS</b>: every hero he protects now carries a small copy of <b>his golden shield</b> while the shield lasts. Ignis brings fallen heroes back with <b>his phoenix</b>.']},
@@ -4574,7 +4578,7 @@ const MAIL=[
  {id:'m3',d:'Nov 14, 2026',ic:'💎',t:'Diamonds are here!',b:'Diamonds are new in Torque Empire! Use them to summon when you run out of tickets (100 Diamonds = 1 summon – we always ask before using them). Here are some to start with.',g:{dm:1000}},
  {id:'m2',d:'Nov 14, 2026',ic:'🎁',t:'Thank you, tester!',b:'Thank you for helping us test Torque Empire before the launch. Here is a small gift for your garage. Have fun – and keep the reports coming!',g:{tk:10,ct:5}},
  {id:'m1',d:'Nov 14, 2026',ic:'📅',t:'New: Daily Check-in',b:'Tap the calendar at the top right every day. Seven days of rewards, with a big chest on day 7. A missed day does not reset your progress.'},
- {id:'m0',d:'Nov 13, 2026',ic:'🛠️',t:'Need help?',b:'Found a bug, a problem with a purchase or have an idea? Tap <b>HELP &amp; SUPPORT</b> below (or <b>PROFILE → HELP &amp; SUPPORT</b>) – we read every message and answer in your MAIL.',help:1},
+ {id:'m0',d:'Nov 13, 2026',ic:'🛠️',t:'Need help?',b:'Found a bug, a problem with a purchase or have an idea? Tap <b>HELP &amp; SUPPORT</b> below (or tap <b>your avatar</b> top left → <b>HELP &amp; SUPPORT</b>) – we read every message and answer in your MAIL.',help:1},
 ].filter(m=>!m.pid||(window.SEC&&String(SEC.PID).startsWith(m.pid)));
 const mlUnread=()=>MAIL.filter(m=>!G.ml.r.includes(m.id)||(m.g&&!G.ml.c.includes(m.id))).length;
 const xpEl=$('xp');let xpMode='',xpMail='';
