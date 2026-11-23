@@ -1697,13 +1697,13 @@ function hmOver(g,u,t,M,big){const A=fxImg('hm_aura');if(!A.complete||!A.natural
   const ah=Math.min(M.h*1.1,200),aw=Math.max(ah*.84,big*2.2),f=(Math.floor(t*11+u.k*3)+4)%8,fy=M.fly?-38-Math.sin(t*5+u.k)*4:0;
   g.globalCompositeOperation='lighter';g.globalAlpha=a0*(.22+.08*Math.sin(t*4+u.k));g.drawImage(A,f*200,0,200,238,-aw/2,fy-ah+2,aw,ah);g.globalCompositeOperation=o;g.globalAlpha=a0;}
 function drawMonster(g,u,t){
-  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);if(HM&&B&&!B.tw)g.scale(1.1,1.1);
+  g.save();g.translate(u.sx,u.sy);g.scale(u.sc,u.sc);if(HM&&B&&!B.tw)g.scale(1.1,1.1);if(u.mb)g.scale(MB_SC,MB_SC);
   const SPM=!!MON[u.t].sp;let alpha=1;if(u.dead){const L8=SPM&&MSPR[MON[u.t].sp].L;alpha=SPM&&!(L8&&L8.d<0)?clamp(1-(u.deadT-.75)*2.6,0,1):clamp(1-u.deadT*1.6,0,1);}
   g.globalAlpha=alpha*GA;const M=MON[u.t],big=M.b==='titan'?70:M.b==='crusher'?34:M.big>1.5?26:16;
   g.fillStyle='rgba(0,0,0,.38)';ell(g,0,0,big,big*.28);
   if(u.mark>0){g.strokeStyle='rgba(80,255,170,.85)';g.lineWidth=1.6;g.beginPath();g.ellipse(0,0,big+4,(big+4)*.3,0,0,TAU);g.stroke();}
   if(u.slow>0){g.fillStyle='rgba(224,69,123,.35)';ell(g,0,0,big+6,(big+6)*.3);}
-  const HMX=HM&&B&&!B.tw&&GA===1; // (not in the white hit-flash pass) v16-138: HARD MODE look – Marius' fire ring under the feet + ember aura behind + red heat on top, 10% bigger
+  const HMX=(HM&&B&&!B.tw||u.mb)&&GA===1; // (not in the white hit-flash pass) v16-138: HARD MODE look – Marius' fire ring under the feet + ember aura behind + red heat on top, 10% bigger
   if(HMX)hmUnder(g,u,t,M,big);
   if(M.hue!=null&&FILT){// v14 elite colours: draw the monster on its own small canvas, then recolour it once
     const tr=g.getTransform(),ps=Math.max(.5,Math.hypot(tr.a,tr.b)),hw=M.b==='titan'?230:M.b==='crusher'?150:Math.max(64,M.h*1.5*(M.big>1?1.2:1)),top=M.h*(M.b==='titan'?1.45:1.7)+(M.fly?80:0)+60,bot=40;
@@ -1764,6 +1764,7 @@ function startBattle(si,team,tw){
   B.lowRes=LOWRES;B.lowRes2=LOWRES&&LOWRES2;if(!bsize())buildBG();
   B.trb=teamRoles(team).bon;
   B.w0=Date.now();try{B.pw0=Math.round(teamPower(team)*(1+(B.grit||0))*(1+(B.nit||0)));}catch(e){B.pw0=0;} // v16-157: battle receipt (anti-cheat)
+  mbInit(); // v16-235: MINI BOSS + ENRAGE
   B.heroes=team.map((h,i)=>mkHeroUnit(h,i,team.length));B.heroes.forEach(u=>{portraitCv(u.h);if(u.spr){sprLoad(u.spr);warmIm(u.spr.im);warmIm(u.spr.fi);warmIm(u.spr.bi);}});if(!window.__SIM)for(const k in FXIM)warmIm(FXIM[k]);
   formation();B.heroes.forEach(u=>{u.x=u.fx-W*.5;u.d=u.fd;u.st='walk';});
   spawnWave();
@@ -1775,6 +1776,7 @@ function spawnWave(){const w=B.stage.w[B.wave];
     else{m.x=W+30+i*(26*S)+rnd(0,20);m.d=n===1?.45:clamp(.1+(i/(n-1||1))*.8+rnd(-.06,.06),.05,.95);}
     B.mons.push(m);
     if(m.boss)B.bossBar=m;});
+  if(B.wave===B.stage.w.length-1)B.lwMax=B.mons.reduce((a,m)=>a+(m.dead?0:m.max),0);
   B.waveT=0;}
 
 // ---------------------------------------------------------------- combat helpers
@@ -1831,10 +1833,32 @@ function fxAura(u){const col=ROLECOL[u.role]||'#ffb300',x=u.x,y=fy(u.d),h=dsc(u.
   fxs('trace_01',col,x,y-70*h,{d:.55,s0:170*S,s1:220*S,sx:2.2,a0:.8});fxs('trace_01','#ffffff',x,y-70*h,{d:.4,s0:150*S,s1:200*S,sx:.9,a0:.7});fxSpark(x,y-40*h,col,6,26*S);}
 
 
+// ---------------------------------------------------------------- v16-235 MINI BOSS + ENRAGE (Marius 23 nov: "38 M team beats 107 M monsters – the monsters need some brains")
+// Every battle compares the monsters' POWER with your team's POWER (B.pw0, with NEVER GIVE UP / NITRO). Only in the CAMPAIGN (Normal + Hard),
+// TORQUE TOWER and CLASS TOWERS – never in Dungeons, World Boss, Arena or Rail Wars. If YOUR team is stronger nothing happens (upgrades always help).
+//  monsters > ×1.3 your power → when the LAST wave drops under 50% HP a MINI BOSS joins (HP / attack grow with the gap)
+//  monsters > ×2   your power → ENRAGE: at 70% of the last wave every monster hits harder and faster, and the mini boss comes right then
+// Winning with a mini boss on the field = a small Essence bonus.
+const MB_R=1.3,EN_R=2,MB_SC=1.45;
+function bEP(){const k=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);let p=0;B.stage.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*k;}));return p/B.stage.w.length*1.05;}
+function mbInit(){B.rt=0;B.mb=null;B.enr=0;if(B.tw&&(B.tw.wb||B.tw.dg))return;try{if(B.pw0>0)B.rt=bEP()/B.pw0;}catch(e){B.rt=0;}if(B.rt>MB_R&&!window.__SIM){fxImg('hm_ring');fxImg('hm_aura');}}
+function mbCheck(){if(!(B.rt>MB_R)||B.mb||B.wave!==B.stage.w.length-1||!B.lwMax)return;
+  const hp=B.mons.reduce((a,m)=>a+(m.dead||m.mb?0:m.hp),0),trig=B.rt>EN_R?.7:.5;if(hp>B.lwMax*trig)return;
+  const D=Math.min(3,B.rt-1);
+  if(B.rt>EN_R){B.enr=1;const K=1+.2*Math.min(3,B.rt-1);for(const m of B.mons)if(!m.dead){m.atk*=K;m.as*=.8;m.enr=true;}}
+  const ts=[...new Set(B.stage.w.flat())].filter(t=>MON[t].b!=='titan'&&MON[t].b!=='crusher'&&!MON[t].boss&&!MON[t].fly),t=(ts.length?ts:B.stage.w[B.stage.w.length-1]).slice().sort((a,b)=>MON[b].hp-MON[a].hp)[0];
+  const m=mkMon(t,0);if(B.mod)twModMon(m);
+  m.mb=1;m.boss=true;m.name='MINI BOSS';m.max=m.hp=Math.max(m.max*3,B.lwMax*(.5+.8*D));m.atk*=2+4*D;m.as*=.85;m.def*=1.5;m.H=(m.H||40)*MB_SC;
+  m.x=W+40;m.d=.5;m.st='walk';B.mons.push(m);B.mb=m;B.bossBar=m;
+  if(!B.sim){B.flash=.6;shake(16);punch(.05);}B.banner={boss:m,t:0,name:B.enr?'⚠ MINI BOSS + ENRAGE!':'⚠ WARNING! MINI BOSS'};}
+function mbPay(){if(!B.mb)return;try{const T=TE(),G=T.G,e=Math.max(1,Math.round(.3*T.ESS_Ui(B.tw&&B.tw.eq!=null?B.tw.eq:B.si)));G.ess=(G.ess||0)+e;T.save();T.toast('👹 MINI BOSS defeated! +'+T.nf(e)+' Essence',2600);}catch(e){}}
+// v16-235 (Marius 23 nov: a 38 M team beat 107 M monsters): hero DEF from gear went up to ~390 → 92% less damage, but DEF counts almost nothing in POWER.
+// Heroes now block at most DEF_CAP of a hit, so POWER shows the real strength again.
+const DEF_CAP=.6;
 function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(tgt.hero&&!o.sure){const dg=pv(tgt,'tuning',1);if(dg&&!tgt.stun&&Math.random()*100<dg){pasTxt(tgt,1,'DODGE');return 0;}}
   let a=src.atk*mult*(src.buff>0?1.3:1)*rnd(.9,1.1);if(src.hero&&src.skK>1&&(o.skill||mult>1.15))a*=src.skK; // v16-99: skill level (+6% skill damage per level)
-  a*=100/(100+tgt.def*3);if(tgt.mark>0)a*=1.35;if(tgt.nmk>0&&src.hero)a*=1+(tgt.nmv||0);
+  a*=tgt.hero?Math.max(1-DEF_CAP,100/(100+tgt.def*3)):100/(100+tgt.def*3);/* v16-235: hero armor max -60% (DEF_CAP) */if(tgt.mark>0)a*=1.35;if(tgt.nmk>0&&src.hero)a*=1+(tgt.nmv||0);
   if(src.hero){let ld=0;for(const h of B.heroes)if(!h.dead)ld=Math.max(ld,pv(h,'all',0));if(ld)a*=1+ld/100;
     const th=pv(src,'paint',1);if(th&&tgt.slow>0)a*=1+th/100;const pr=pv(src,'inspect',1);if(pr&&tgt.mark>0)a*=1+pr/100;}
   else if(tgt.hero){const ir=pv(tgt,'engine',0);if(ir)a*=1-ir/100;}
@@ -2202,7 +2226,7 @@ function step(dt){B.t+=dt;B.phT+=dt;
     sep(B.heroes);sep(B.mons);sepHM();
     for(const u of B.heroes)if(!u.dead){u.x=clamp(u.x,u.act?8*S:26*S,W-(u.act?8:26)*S);}
     // v16-46: monsters can no longer be pushed out of the picture (knock-backs + crowding moved them past the right edge)
-    keepIn();unstuck();
+    keepIn();unstuck();mbCheck();
     if(B.auto)for(const u of B.heroes)if(canCast(u)){if(u.role==='service'){const low=alive(B.heroes).some(h=>h.hp/h.max<.6)||(u.h.id==='m4_1'&&!u.rev&&B.heroes.some(h=>h.dead));if(!low&&(u.waitT=(u.waitT||0)+dt)<4)continue;u.waitT=0;}cast(u);break;}
     B.mons=B.mons.filter(m=>!(m.dead&&m.deadT>1.2));
     if(B.wbB){B.wbT-=dt;if(B.wbT<=0){B.wbT=0;B.phase='win';B.phT=0;B.wbUp=1;for(const h of B.heroes)if(!h.dead)h.st='win';}}
@@ -2217,7 +2241,7 @@ function step(dt){B.t+=dt;B.phT+=dt;
     for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.62+.1*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=(m.mv+240*S)*dt;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*9;}}
     if(B.phT>4&&!done){for(const u of alive(B.heroes)){u.x=fin(u.fx)?u.fx:W*.25;u.d=fin(u.fd)?u.fd:.5;}done=true;} // v16-206: a march can never hang
     if(B.phT>1.05&&done){B.phase='fight';B.phT=0;B.spawned=false;B.wdT=B.t;punch(.03);talWave();}}
-  else if(B.phase==='win'){for(const u of B.heroes){if(!u.dead)u.st='win';u.flash=Math.max(0,u.flash-dt*6);if(u.dead)u.deadT+=dt;}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim)finish(true);}}
+  else if(B.phase==='win'){for(const u of B.heroes){if(!u.dead)u.st='win';u.flash=Math.max(0,u.flash-dt*6);if(u.dead)u.deadT+=dt;}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim){mbPay();finish(true);}}}
   else if(B.phase==='lose'){for(const m of B.mons){if(!m.dead){m.st='idle';}}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim)finish(false);}}
   for(let i=B.proj.length-1;i>=0;i--)if(projUpdate(B.proj[i],dt))B.proj.splice(i,1);
   for(const p of B.parts){p.life-=dt;p.vy+=p.g*dt;if(p.drag){p.vx*=1-p.drag*dt;p.vy*=1-p.drag*dt;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;
