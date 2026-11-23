@@ -236,8 +236,9 @@ img.mini{width:26px;height:26px;border-radius:6px;border:2px solid;vertical-alig
 #res.open{display:flex}
 /* v16-237 AUTO SUMMON */
 .smAutoW{position:absolute;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.smAuto{position:relative;pointer-events:auto;height:calc(var(--u)*50);padding:0 calc(var(--u)*34);border-radius:calc(var(--u)*25);background:linear-gradient(#3fae4a,#16511d);border:calc(var(--u)*3) solid #ffd54a;box-shadow:0 0 calc(var(--u)*10) #000c,inset 0 calc(var(--u)*2) 0 #fff4;font-size:calc(var(--u)*25)!important}
-.smAuto.on{background:linear-gradient(#c62828,#7f0000);animation:auP 1s infinite}
+.smAuto{position:relative;pointer-events:auto;height:calc(var(--u)*70);aspect-ratio:600/102;background:url(img/ui9/auto_auto.webp) center/100% 100% no-repeat;filter:drop-shadow(0 calc(var(--u)*4) calc(var(--u)*6) #000c)}
+.smAuto.on{background-image:url(img/ui9/auto_stop.webp);animation:auP 1s infinite}
+.smAuto:active{transform:scale(.96)}
 @keyframes auP{50%{filter:brightness(1.35)}}
 #auBar{position:fixed;left:8px;right:8px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:none;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:linear-gradient(#1d2b3a,#0b1420);border:2px solid #ffd54a;box-shadow:0 4px 18px #000c;color:#fff;font:800 13px system-ui}
 #auBar.open{display:flex}
@@ -3640,7 +3641,7 @@ function summon(cat,n){const P=G.h.pity[cat],out=[];
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
 // ---------- DOM: summon page (my picture) ----------
-const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
+const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui9/auto_auto.webp','img/ui9/auto_stop.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
 const smMap=()=>TALL.map(921,1532,[[764,.25],[1012,.2],[1097,.15],[1258,.15],[1324,.25]]);
 function smSize(){TALL.size(smBox,smMap());smKey='';}
 // v16-228: ticket count on the summon tab that has tickets (red pill)
@@ -3754,7 +3755,7 @@ let AU=null;const AU_MS=320;
 const auGS=()=>window.CAMPAIGN&&CAMPAIGN.gs;
 function auTk(c){if(c==='gear'){const GSx=auGS();return GSx?GSx.d().tk:0;}return tkN(c);}
 function auIc(c){return c==='gear'?'<img src="img/gticket.webp" style="height:1.1em;vertical-align:-.2em" alt="">':TIK(c);}
-function auPill(c){const n=auTk(c);return '<div class="smAutoW" style="'+box(285,1311,351,45)+'"><div class="smL smAuto'+(AU?' on':'')+'" data-a="auto">'+(AU?'■ STOP AUTO':'⚡ AUTO SUMMON')+(n>=10&&!AU?'<i class="rdd" style="right:3%;top:-12%"></i>':'')+'</div></div>';}
+function auPill(c){const n=auTk(c);return '<div class="smAutoW" style="'+box(285,1311,351,45)+'"><div class="smAuto'+(AU?' on':'')+'" data-a="auto" role="button" aria-label="'+(AU?'STOP AUTO':'AUTO SUMMON')+'">'+(n>=10&&!AU?'<i class="rdd" style="right:3%;top:-12%"></i>':'')+'</div></div>';}
 // v16-238 (Marius: "also with diamonds, not only tickets"): the player picks a diamond LIMIT in the window = his yes (payAsk rule)
 const AU_DM=[0,10000,50000,-1];
 function popAuto(dmI){if(AU){auStop();return;}const c=smCat,n=auTk(c),gear=c==='gear',dm=G.dm||0;dmI=dmI|0;
