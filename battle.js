@@ -1768,7 +1768,7 @@ function startBattle(si,team,tw){
   $('bt').classList.add('open');window.__BATTLE_ON=true;if(!window.__SIM){let n=0;try{n=+localStorage.getItem('te_bhint')||0;localStorage.setItem('te_bhint',n+1);}catch(e){}}running=true;lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
 function spawnWave(){const w=B.stage.w[B.wave];
   w.forEach((t,i)=>{const m=mkMon(t,i);if(B.mod)twModMon(m);const n=w.length;
-    if(m.b==='titan'){m.x=W*.78;m.d=.42;m.st='idle';}
+    if(m.b==='titan'){m.d=.42;m.x=Math.min(W*.78,bossXM(m));m.st='idle';}
     if(B.tw&&B.tw.wb&&m.boss){m.x=W*.75;m.d=.4;m.max=m.hp=B.tw.L*WB_LAYERS;m.wbB=1;m.sp3=1e9;m.sp1=3;m.sp2=MON[m.t].noLz?1e9:7;m.hurtS=0;B.wbB=m;B.wbD=0;B.wbT=WB_T;}
     else{m.x=W+30+i*(26*S)+rnd(0,20);m.d=n===1?.45:clamp(.1+(i/(n-1||1))*.8+rnd(-.06,.06),.05,.95);}
     B.mons.push(m);
@@ -1781,7 +1781,13 @@ function dist(a,b){return Math.hypot(a.x-b.x,(a.d-b.d)*(FY1-FY0)*1.25);}
 function nearest(u,list){let best=null,bd=1e9;for(const o of list){if(o.dead)continue;const d=dist(u,o);if(d<bd){bd=d;best=o;}}return best;}
 function cluster(list,r){let best=null,bn=-1;for(const a of list){if(a.dead)continue;let n=0;for(const b of list)if(!b.dead&&dist(a,b)<r)n++;if(n>bn||(n===bn&&a.x<best.x)){bn=n;best=a;}}return best;}
 function sxy(u){return [u.x,fy(u.d)];}
-function headY(u){return fy(u.d)-(u.lift||0)-(u.hero?(u.spr?84:70):(u.H*MON[u.t].sc+(u.fly?42:0))*(u.boss?1:1.22))*dsc(u.d);}
+// v16-219 (Marius 23 nov, 5-30 OMEGA ENGINE in Messenger: "the boss is not visible"): a chapter boss picture was ~as wide as the phone
+// and stood with its centre at the right edge (titan bosses were never kept inside). Now: boss drawn at most ~2/3 of the screen wide
+// and always fully inside the picture on the right (World Boss keeps its own layout).
+function bossHW(u){const M=MON[u.t],d=M.sp&&MSPR[M.sp],k=d?M.h/d.ih:1;return (d?Math.max(d.ax,d.w-d.ax)*k:M.h*.6)*dsc(u.d)*(HM&&B&&!B.tw?1.1:1);}
+function bossK(u){return u.wbB?1:Math.min(1,W*.33/bossHW(u));}
+function bossXM(u){return W-bossHW(u)*bossK(u)-4*S;}
+function headY(u){return fy(u.d)-(u.lift||0)-(u.hero?(u.spr?84:70):(u.H*MON[u.t].sc+(u.fly?42:0))*(u.boss?bossK(u):1.22))*dsc(u.d);}
 
 function num(x,y,txt,col,big){B.nums.push({x:x+rnd(-8,8),y,txt,col,t:0,big:big||0});if(B.nums.length>60)B.nums.shift();}
 function part(o){if(B.parts.length>380)B.parts.shift();B.parts.push(Object.assign({vx:0,vy:0,g:0,life:1,max:1,r:2,col:'#fff',type:'spark',rot:0,vr:0,drag:0},o));}
@@ -2099,7 +2105,7 @@ function unitUpdate(u,dt,foes,friends){
   if(!u.hero){if(u.act){monAct(u,dt);return;}
     // v16-65: a monster still outside the picture (march ended before it walked in) first walks in. Before, a ranged one
     // (Exhaust Snake / Headlight Drone) shot from off-screen, the mechanics stood at the right edge unable to reach it → battle stuck.
-    if(!u.in&&u.b!=='titan'&&!u.wbB){const xm=W-(u.boss?64:40)*S;if(u.x<=xm)u.in=1;else{u.face=-1;u.st='walk';u.wph+=dt*9;u.x=Math.max(xm,u.x-(u.mv+180*S)*dt);if(u.x<=xm)u.in=1;return;}}
+    if(!u.in&&u.b!=='titan'&&!u.wbB){const xm=u.boss?bossXM(u):W-40*S;if(u.x<=xm)u.in=1;else{u.face=-1;u.st='walk';u.wph+=dt*9;u.x=Math.max(xm,u.x-(u.mv+180*S)*dt);if(u.x<=xm)u.in=1;return;}}
     if(monSpecial(u,dt))return;}
   // pick target
   let tg=null;
@@ -2107,7 +2113,7 @@ function unitUpdate(u,dt,foes,friends){
   if(!tg){u.st=B.phase==='win'?'win':'idle';return;}
   if(!u.hero||u.st!=='atk'||Math.abs(tg.x-u.x)>8*S)u.face=tg.x>=u.x?1:-1;
   let dd=dist(u,tg),range=u.rng+(tg.boss?(tg.b==='titan'?60:20)*S:0);
-  if(u.rng<80*S&&tg.b!=='titan'&&!tg.wbB&&!u.wbB)range=Math.max(range,bw(u)+bw(tg)+4*S); // v16-107: melee units stop face to face, not inside each other
+  if(u.rng<80*S&&!tg.wbB&&!u.wbB)range=Math.max(range,bw(u)+bw(tg)+4*S); // v16-107: melee units stop face to face, not inside each other
   const spot=u.hero&&u.rng<80*S?meleeSpot(u,tg,range):null;
   if(u.st==='atk'){const prev=u.ap;u.ap+=dt/(u.hero?.42/(u.aspd>0?1+u.aspdK:1):Math.min(.6,u.as*.45));
     if(prev<.55&&u.ap>=.55)doHit(u,tg);
@@ -2165,8 +2171,8 @@ function sep(list){for(let i=0;i<list.length;i++){const a=list[i];if(a.dead||a.a
 
 // v16-107 (Marius: 'heroes ride on the monsters'): half body width in px + heroes and monsters in the same lane can no longer stand
 // inside each other – each one is pushed back to its own side (bosses don't move; the giant titan keeps its own rules).
-function bw(u){if(u.hero)return 26*dsc(u.d);const M=MON[u.t];return Math.min(70*S,(M?M.h*M.sc:40)*(u.boss?1:1.22)*.38*dsc(u.d));}
-function sepHM(){const F=FY1-FY0;for(const h of B.heroes){if(h.dead||h.act)continue;for(const m of B.mons){if(m.dead||m.act||m.b==='titan'||m.wbB)continue;
+function bw(u){if(u.hero)return 26*dsc(u.d);if(u.boss&&!u.wbB)return bossHW(u)*bossK(u)*.5;const M=MON[u.t];return Math.min(70*S,(M?M.h*M.sc:40)*(u.boss?1:1.22)*.38*dsc(u.d));}
+function sepHM(){const F=FY1-FY0;for(const h of B.heroes){if(h.dead||h.act)continue;for(const m of B.mons){if(m.dead||m.act||m.wbB)continue;
   if(Math.abs(m.d-h.d)*F>40*S)continue;const dx=m.x-h.x,min=(bw(h)+bw(m))*.9,ax=Math.abs(dx);if(ax>=min)continue;
   const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;if(m.boss)h.x-=dir*o;else{h.x-=dir*o*.5;m.x+=dir*o*.5;}}}}
 // v16-206 (tester Wazza4ever 23 nov: Class Tower, came back to the game after a while – the heroes ran on the spot towards 2 Mirror Moths and never hit them).
@@ -2178,7 +2184,7 @@ function unstuck(){if(B.wbB||B.sim&&!B.wdOn)return;const hs=B.mons.reduce((a,m)=
   for(const m of B.mons){if(m.dead||m.b==='titan')continue;if(!fin(m.d))m.d=.5;if(!fin(m.x))m.x=W*.7;m.x=clamp(m.x,W*.4,W-40*S);m.d=clamp(m.d,.06,.94);m.in=1;if(m.act&&B.wdN>1)m.act=null;}
   const ms=alive(B.mons);for(const u of B.heroes){if(u.dead)continue;if(!fin(u.d))u.d=.5;if(!fin(u.x))u.x=W*.3;u.act=null;u.lift=0;u.sP=null;u.sT=null;u.sK=null;u.st='idle';u.ap=0;
     const tg=nearest(u,ms)||ms[0];if(!tg)continue;const rg=u.rng<80*S?bw(u)+bw(tg)+2*S:Math.min(u.rng*.8,W*.45);u.x=clamp(tg.x-rg,26*S,W-26*S);u.d=clamp(tg.d+rnd(-.08,.08),.04,.96);u.face=1;}}
-function keepIn(){for(const m of B.mons){if(m.dead||m.b==='titan')continue;const xm=W-(m.boss?64:40)*S;if(m.x<=xm)m.in=1;else if(m.in)m.x=xm;if(m.in&&!m.act)m.x=Math.max(m.x,30*S);}}
+function keepIn(){for(const m of B.mons){if(m.boss&&!m.dead&&!m.wbB&&m.b==='titan')m.x=clamp(m.x,W*.42,bossXM(m));if(m.dead||m.b==='titan')continue;const xm=m.boss?bossXM(m):W-40*S;if(m.x<=xm)m.in=1;else if(m.in)m.x=xm;if(m.in&&!m.act)m.x=Math.max(m.x,30*S);}}
 function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelAnimationFrame(raf);B.auto=true;let t=0;while(t<(maxT||400)&&!B.res){step(1/30);t+=1/30;}
   const r={win:B.phase==='win',t:Math.round(t),deaths:B.deaths,wave:B.wave,left:B.mons.filter(m=>!m.dead).map(m=>m.t+':'+Math.round(m.hp/m.max*100)+'%')};return r;}
 function step(dt){B.t+=dt;B.phT+=dt;
@@ -2614,7 +2620,7 @@ function render(){const t=B.real;g.setTransform(DPR,0,0,DPR,0,0);
   B.sx=sx;B.sy=sy;if(sx||sy){g.fillStyle='#000';g.fillRect(0,0,W,H);}g.save();camT();
   drawBG(t);drawTele(t);drawGroundFx();drawFx2(true);
   const all=[...B.heroes,...B.mons].sort((a,b)=>a.d-b.d||(a.dead?-1:1));
-  for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?1:1.22);drawUnit(g,u,B.t);}
+  for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?bossK(u):1.22);drawUnit(g,u,B.t);}
   for(const u of all)bars(u);
   drawProj(t);drawFx(t);drawParts();drawFx2(false);camT();drawNums();
   g.restore();
