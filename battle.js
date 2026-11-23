@@ -792,7 +792,8 @@ const hardOK=()=>TE().G.cp.best>=SPC;
 // EG = how much stronger the very last stage / floor is than before. Computed by tools/endgame.py (python3 tools/endgame.py --apply) – re-run it after new content that raises power.
 const EG={camp:3.171,hard:0.87,tw:5.958,ct:3.591}; // EG-LINE (written by tools/endgame.py)
 const EGK=(K,x,a,b)=>K===1||x<=a?1:Math.pow(K,Math.min(1,(x-a)/(b-a)));
-const stageMul=i=>stageMul0(i)*HK(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499):1)*EGK(EG.camp,i,999,1499);
+const MONX=1.25,DG_HARD=1.3; // v16-190 (Marius 22 nov): campaign monsters +25%, Dungeons +30%
+const stageMul=i=>MONX*stageMul0(i)*HK(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499):1)*EGK(EG.camp,i,999,1499);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
 const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a normal team has 3-4 roles (+5-10%) → monsters +7% (from stage 15); 5 roles = a bit easier, 1-2 roles = a bit harder
 // v16-161 (Marius 22 nov: "the power got bigger → make every stage and tower stronger, nobody should reach the end fast"): PK follows how much a normal team of that stage gained
@@ -839,7 +840,7 @@ function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.ke
   for(let i=0;i<GSUBN[r];i++){const k=others.splice(Math.floor(Math.random()*others.length),1)[0];sub.push([k,Math.round(GSTAT[k].v[r]*.4*10)/10]);}
   const it={id:g.nid++,s,r,lv:1,sub};if(set)it.set=set;return it;}
 // v14: from chapter 6 on the chances keep improving until chapter 50
-function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,5,30,45,20];return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
+function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,15,40,40,5]; /* v16-190 (Marius): fewer Mythic drops (late 20% → 5%) */return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
 const GMAXR=[10,15,20,30,40,50,60],gMax=it=>GMAXR[it.r];
 function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;k=Math.min(5,k);if(k===5&&c>=ASC_CH&&Math.random()<.15*Math.min(1,(c-ASC_CH+1)/21))k=6;return k;}
 function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(svAuto(it)){salvPkGive([it]);return {it,sold:salvageV(it),auto:1};}if(g.inv.length>=GHARD_()){return {it,sold:salvageV(it)};}g.inv.push(it);return g.inv.length>GINV_()?{it,over:1}:{it};}
@@ -3811,13 +3812,13 @@ const dgNitro=()=>{try{const g=dgG();return g.nt>Date.now()?g.np:0;}catch(e){ret
 const dgEq=f=>Math.min(NST-1,Math.round(f<=30?6+f*f*.95:861+(f-30)*9.2));
 const DG_X=f=>f<=30?1:Math.pow(1+DGXA,f-30);const DGXA=.031;
 // v16-176: floors 61-100 give MYTHIC gear / MYTHIC set pieces (never Ascended – Marius 21 nov), NITRO up to +30%
-const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:f<=60?4:5,forge:f=>f<=10?2:f<=20?3:f<=60?4:5},DG_NIT=f=>f<=10?10:f<=20?15:f<=30?20:f<=60?25:30;
+const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:f<=60||f%10?4:5,forge:f=>f<=10?2:f<=20?3:f<=60||f%10?4:5} /* v16-190: Mythic only on boss floors 70, 80, 90, 100 */,DG_NIT=f=>f<=10?10:f<=20?15:f<=30?20:f<=60?25:30;
 const DG_RX=f=>(f>30?1+(f-30)/35:1)*(f>30&&f%10===0?2:1),DG_RM=f=>(1+f/30)*DG_RX(f);   // v16-176: Essence / Gear Parts climb faster after floor 30 · boss floors 40, 50 … 100 = ×2
 function dgFloor(k,f){const D=DG[k],ki=DG_K.indexOf(k),R=seeded(9001+ki*1013+f*89),pk=a=>a[Math.floor(R()*a.length)],act=f<=30?Math.min(9,Math.floor((f-1)/3)):Math.min(ACTS.length-1,9+Math.ceil((f-30)/14)),cl=m=>act?monClone(m,act):m;
   const n=Math.min(5,3+Math.floor(f/12)),one=()=>cl(pk(D.pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
   const boss=f%10===0,mini=f%5===0&&!boss;let w;
   if(boss)w=[mk(n),[cl(D.boss)]];else if(mini)w=[mk(n),[cl(D.mini),one(),one()]];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
-  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9/Math.sqrt(PK(eq))*DG_X(f); // v16-161 (Marius 13:19: "dungeons a bit easier"): Dungeons take only half of the new PK increase
+  const eq=dgEq(f),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*.9/Math.sqrt(PK(eq))*DG_X(f)*DG_HARD; // v16-190 (Marius): dungeons stronger // v16-161 (Marius 13:19: "dungeons a bit easier"): Dungeons take only half of the new PK increase
   return {dg:k,f,w,mod:-1,eq,mul,boss,mini,st:{n:D.n+' · FLOOR '+f,bio:18,w,boss,mini}};}
 function dgRew(k,f){const m=REWARD(dgEq(f)).money,g=dgG(),r={money:Math.round(m*(k==='vault'?5:.6)*DG_RX(f)/10)*10};
   if(k==='mine')r.gear={s:GSLOT[g.c.mine%6].k,r:DG_GR.mine(f)};
