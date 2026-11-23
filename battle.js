@@ -3052,7 +3052,7 @@ function renderSalv(){const T=TE(),svG=svGG();const L=svList(),A=svPick=svList(1
   $m('svSlots').innerHTML=Array.from({length:20},(_,k)=>{const it=L[k];return `<div class="svS" style="left:${[8.5,25.6,42.7,59.6,76.7][k%5]}%;top:${[33.7,44.3,54.9,65.4][k/5|0]}%">${it?`<div data-sx="${it.id}">${itemCard(it)}</div>`:''}</div>`;}).join('');
   $m('svInfo').innerHTML=`<div class="svT">${A.length?`<b>${A.length}</b> item${A.length>1?'s':''} · <b class="g">+${GPN(sum)}</b> <small style="color:#ffd54a">+ garage parts</small>`:'Nothing to salvage'}</div><div class="svC">${T.GRADES.slice(0,6).map((gr,i)=>`<b data-sv="${i}" class="${svG[i]?'on':''}" style="--c:${gr.c}">${gr.n.toUpperCase()}</b>`).join('')}</div>`;
   $('svGo').innerHTML=A.length?`SALVAGE ALL ${A.length}`:'—';$('svGo').classList.toggle('dis',!A.length);
-  $m('svHelp').innerHTML=`<div class="gNote">${IMGI('img/ui2/i_scrap.webp','1.3em','-.35em')} Gear that a hero wears is never salvaged. <b>Tap the grades</b> to choose what goes in (saved) · tap an item to keep it${svSkip.size?` · <u data-g="svReset">show kept items (${svSkip.size})</u>`:''}</div><button class="svAuto${GR().asv?' on':''}" data-g="svAuto">AUTO SALVAGE · ${GR().asv?'ON':'OFF'}<small>new campaign drops of the chosen grades are salvaged at once · set pieces never</small></button>`;}
+  $m('svHelp').innerHTML=`<div class="gNote">${IMGI('img/ui2/i_scrap.webp','1.3em','-.35em')} Gear that a hero wears is never salvaged. <b>Tap the grades</b> to choose what goes in (saved) · tap an item to keep it${svSkip.size?` · <u data-g="svReset">show kept items (${svSkip.size})</u>`:''}</div><button class="svAuto${GR().asv?' on':''}" data-g="svAuto">AUTO SALVAGE · ${GR().asv?'ON':'OFF'}<small>new gear of the chosen grades (campaign + Gear Summon) is salvaged at once · set pieces never</small></button>`;}
 function cmpForHero(h,ov,xp,xc){return cmpBlock(unitStats(h),unitStats(h,ov),pow(h),pow(h,ov),xp,xc);}
 let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id);if(!it)return;const h=gHero(),sl=GS[it.s],st=GSTAT[sl.st],o=ownerOf(it),oh=o&&T.HB[o];gsalv=0;gstar='';
   // v16-47: Marius' item card (img/ui2/item_f.webp): icon · name plate · 4 stat lines · EQUIP (green) / UPGRADE (blue) / SALVAGE (orange)
@@ -3228,7 +3228,7 @@ function gsummon(n,paid){const T=TE(),g=GSD();
   if(!paid&&g.tk<n){const have=g.tk;T.payAsk(have,n,GTKI,'Gear Tickets',()=>{g.tk-=have;T.G.dm-=(n-have)*T.DM_SUM;gsummon(n,1);},pop);return;}
   if(!paid)g.tk-=n;const cnt=n===10?11:1,res=[];let sold=0;
   for(let k=0;k<cnt;k++){const [r,it]=T.srun('g',()=>{const r=gsRoll();return [r,newItem(GSLOT[Math.floor(Math.random()*6)].k,r,rollSet(r))];});g.sum++; // v16-101 anti-reroll (index.html srun)
-    g.hist.unshift({s:it.s,r,t:Date.now()});if(g.inv.length>=GHARD_()){sold+=salvageV(it);res.push({it,sold:1});}else{g.inv.push(it);res.push({it});}}
+    g.hist.unshift({s:it.s,r,t:Date.now()});if(svAuto(it)){sold+=salvageV(it);salvPkGive([it]);res.push({it,sold:1,auto:1});}else if(g.inv.length>=GHARD_()){sold+=salvageV(it);res.push({it,sold:1});}else{g.inv.push(it);res.push({it});}} // v16-221 (Marius): AUTO SALVAGE also works on GEAR SUMMON
   g.hist.length=Math.min(g.hist.length,60);if(sold)T.G.gp=(T.G.gp||0)+sold;if(window.EVT){EVT.add('gear',cnt);EVT.q('sum',cnt);}T.save();gsBadge();renderGSum();if(T.smRefresh)T.smRefresh();gsResults(res,n,sold);}
 function gsBadge(){const b=$('cpGSB');if(b)b.innerHTML='<span>'+GTKI.replace('1.15em','1.3em')+' <b>'+GSD().tk+'</b></span><small>SUMMON</small>';}
 function gsTiles(){const T=TE(),ex=['tool','helm','vest','glove','boots','chip'];
@@ -3278,8 +3278,8 @@ function renderGSum(){const T=TE(),g=GSD(),p=g.pity,dm=T.G.dm||0;gsSize();
   GYM=null;$('gsBox').innerHTML=h;}
 function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r));
   let x=`<h2 style="color:${GG(best).c}">${best>=5?'MYTHIC GEAR!':best>=4?'LEGENDARY GEAR!':'GEAR SUMMONED'}</h2><div class="sub">${res.length} item${res.length>1?'s':''}${n===10?' · +1 BONUS':''}</div>
-   <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${GG(o.it.r).c}">${GG(o.it.r).n}</i><i>${itemName(o.it)}</i>${o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
-   ${sold?`<div class="sub">Bag full (${GINV_()}) – extra gear salvaged for ${GPN(sold)}</div>`:''}
+   <div class="gsRes">${res.map((o,k)=>`<div class="gsR r${o.it.r}" style="animation-delay:${k*.12}s">${itemCard(o.it,`<i style="color:${GG(o.it.r).c}">${GG(o.it.r).n}</i><i>${itemName(o.it)}</i>${o.auto?'<i style="color:#9ff0a8">auto salvaged</i>':o.sold?'<i style="color:#ff8a80">bag full – sold</i>':''}`)}</div>`).join('')}</div>
+   ${sold?`<div class="sub">${res.some(o=>o.auto)?'AUTO SALVAGE':'Bag full ('+GINV_()+')'} – salvaged for ${GPN(sold)} + garage parts</div>`:''}
    <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}" style="white-space:nowrap;overflow:hidden;padding:0 12px 0 22px">AGAIN ×${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
 function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+GG(r).c+'">'+GS_NAMES[r]+'</b>',p+'%',(r>=6?'★20':'+'+GLV_MAX)+(GSUBN[r]?' · +'+GSUBN[r]+' stat'+(GSUBN[r]>1?'s':''):''))).join('')+
