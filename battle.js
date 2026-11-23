@@ -643,6 +643,18 @@ const MON={
  scorp:{n:'Jack Scorpion',dr:'spider',hp:600,atk:66,def:12,mv:90,rng:34,as:1.1,h:48,desc:'Stinger strike'},
  goblin:{n:'Filter Goblin',dr:'imp',hp:420,atk:54,def:6,mv:96,rng:180,as:1.5,h:50,at:'acid',desc:'Throws oil bombs'},
  moth:{n:'Mirror Moth',dr:'drone',hp:340,atk:56,def:5,mv:92,rng:200,as:1.4,h:36,fly:1,at:'beam',desc:'Mirror glare'},
+ // v16-197: 7 small monsters + 4 chapter bosses drawn by Marius (ChatGPT, 23 nov) – acts 11-15 only (stages 1001-1500)
+ slug:{n:'Muffler Slug',dr:'tire',hp:700,atk:50,def:16,mv:60,rng:170,as:1.5,h:40,at:'acid',desc:'Spits soot balls'},
+ beetle:{n:'Piston Beetle',dr:'tire',hp:820,atk:58,def:20,mv:80,rng:30,as:1.2,h:42,charge:1,desc:'Piston ram'},
+ raptor:{n:'Wrench Raptor',dr:'spider',hp:480,atk:64,def:8,mv:130,rng:30,as:.9,h:44,pounce:1,desc:'Leaps and bites'},
+ slime:{n:'Oil Slime',dr:'brute',hp:900,atk:52,def:14,mv:70,rng:60,as:1.3,h:40,desc:'Oil whip'},
+ toad:{n:'Radiator Toad',dr:'imp',hp:620,atk:56,def:12,mv:80,rng:90,as:1.3,h:44,desc:'Hose tongue lash'},
+ hedge:{n:'Gear Hedgehog',dr:'tire',hp:560,atk:60,def:14,mv:100,rng:28,as:1.0,h:38,charge:1,desc:'Spinning gear ball'},
+ rhino:{n:'Bumper Rhino',dr:'brute',hp:1200,atk:70,def:22,mv:80,rng:34,as:1.3,h:52,charge:1,desc:'Bumper charge'},
+ dozer:{n:'DOZER BEHEMOTH',dr:'titan',hp:12500,atk:130,def:28,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'slug',lc:'#ffb300',lz:[40,120],desc:'Chapter boss'},
+ kraken:{n:'COMPACTOR KRAKEN',dr:'titan',hp:13000,atk:132,def:28,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'slime',lc:'#76ff03',lz:[40,120],desc:'Chapter boss'},
+ hydra:{n:'FIRE ENGINE HYDRA',dr:'titan',hp:13000,atk:134,def:29,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'toad',lc:'#80d8ff',lz:[40,120],desc:'Chapter boss'},
+ mixer:{n:'MIXER COLOSSUS',dr:'titan',hp:13500,atk:134,def:30,mv:28,rng:130,as:1.7,h:220,boss:1,b:'titan',big:5,summ:'beetle',lc:'#ff9100',lz:[40,120],desc:'Chapter boss'},
  crusher:{n:'CRUSHER',hp:4600,atk:110,def:24,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#bf5a1e',b:'#5d2a0c',c:'#e07b39',e:'#ff1744',horn:1},desc:'Mini-boss'},
  sludge:{n:'SLUDGE CRUSHER',dr:'crusher',hp:4800,atk:110,def:24,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#4e8a1e',b:'#1d3a0a',c:'#8bc34a',e:'#c6ff00',horn:1},desc:'Mini-boss'},
  frost:{n:'FROST CRUSHER',dr:'crusher',hp:5000,atk:112,def:26,mv:55,rng:50,as:1.5,h:110,boss:1,b:'crusher',sc:1.3,big:3,pal:{a:'#5c8db8',b:'#1d3550',c:'#b3e5fc',e:'#80d8ff',horn:1},desc:'Mini-boss'},
@@ -660,7 +672,10 @@ const MSPR={cbrute:{w:281,h:153,ax:140.5,ay:144.5,ih:138.6},crawler:{w:197,h:132
  gbattery:{w:250,h:158,ax:125,ay:151.3,ih:123.2},gdrone:{w:240,h:153,ax:120,ay:145.8,ih:123.2},gcan:{w:329,h:142,ax:164.5,ay:136.4,ih:118.2},gmantis:{w:279,h:151,ax:139.5,ay:137.7,ih:136},gsaw:{w:218,h:151,ax:109,ay:138.5,ih:137.7},ggolem:{w:261,h:157,ax:130.5,ay:151.2,ih:140.4},gtanker:{w:372,h:172,ax:186,ay:165,ih:147},gbat:{w:247,h:145,ax:123.5,ay:130.9,ih:110.5},ghorn:{w:227,h:155,ax:113.5,ay:146.2,ih:128.4},gomega:{w:316,h:169,ax:158,ay:163.5,ih:161},
  // v16-139: 3-row sheets (tools/atlas_mon.py <sheet> <id> .75 r3)
  nhopper:{w:162,h:173,ax:81,ay:168,ih:127.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},ncrab:{w:176,h:132,ax:88,ay:129,ih:95.2,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nscorp:{w:171,h:178,ax:85.5,ay:172.5,ih:140.2,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},ngoblin:{w:162,h:195,ax:81,ay:191.2,ih:160.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nmoth:{w:177,h:147,ax:88.5,ay:137.2,ih:132.4,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},
- gspark:{w:204,h:128,ax:102,ay:119.8,ih:112.2,L:{i:0,w:1,a:2,s:4,s2:3,d:-1}},gbrake:{w:210,h:115,ax:105,ay:108,ih:107.1,L:{i:0,w:1,a:2,s:4,s2:3,d:-1}},gairbag:{w:213,h:146,ax:106.5,ay:137.3,ih:101.1,L:{i:0,w:1,a:2,s:3,s2:4,d:4}}};
+ gspark:{w:204,h:128,ax:102,ay:119.8,ih:112.2,L:{i:0,w:1,a:2,s:4,s2:3,d:-1}},gbrake:{w:210,h:115,ax:105,ay:108,ih:107.1,L:{i:0,w:1,a:2,s:4,s2:3,d:-1}},gairbag:{w:213,h:146,ax:106.5,ay:137.3,ih:101.1,L:{i:0,w:1,a:2,s:3,s2:4,d:4}},
+ // v16-197: new 3-row sheets (.75 r3) + new boss sheets (scale 1)
+ nmslug:{w:216,h:123,ax:108,ay:120,ih:91.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},npbeetle:{w:168,h:133,ax:84,ay:120.8,ih:96,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nwraptor:{w:155,h:113,ax:77.5,ay:108.8,ih:93.8,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},noslime:{w:222,h:132,ax:111,ay:126.8,ih:99,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nrtoad:{w:170,h:149,ax:85,ay:145.5,ih:115.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nghedge:{w:165,h:122,ax:82.5,ay:116.2,ih:106.5,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},nbrhino:{w:167,h:125,ax:83.5,ay:121.1,ih:111,L:{i:0,w:1,a:2,s:2,s2:2,d:-1}},
+ bdozer:{w:322,h:171,ax:161,ay:164,ih:158},bhydra:{w:314,h:189,ax:157,ay:179,ih:167},bkraken:{w:312,h:173,ax:156,ay:168,ih:146},bmixer:{w:294,h:169,ax:147,ay:162,ih:160}};
 // monster key → [sprite, height in game units, new name, hue (mini-boss colours per world)]
 const MSKIN={spider:['crawler',46,'Bolt Crawler'],tire:['rat',46,'Tire Rat'],imp:['pimp',50,'Piston Imp'],snake:['esnake',42,'Exhaust Snake'],
  turbo:['hound',50,'Scrap Hound'],brute:['cbrute',88,'Crankshaft Brute'],
@@ -669,7 +684,9 @@ const MSKIN={spider:['crawler',46,'Bolt Crawler'],tire:['rat',46,'Tire Rat'],imp
  battery:['gbattery',64,'Battery Golem'],drone:['gdrone',36,'Headlight Drone'],canister:['gcan',48,'Fuel Can Bomber'],wiper:['gmantis',54,'Wiper Mantis'],hubcap:['gsaw',36,'Hubcap Saw'],
  gearbox:['ggolem',92,'Gearbox Golem'],bat:['gbat',38,'Exhaust Bat'],horn:['ghorn',50,'Horn Howler'],tanker:['gtanker',165,'ACID TANKER'],omega:['gomega',180,'OMEGA ENGINE'],
  wraith:['gspark',44,'Spark Wraith'],brake:['gbrake',54,'Brake Beast'],airbag:['gairbag',56,'Airbag Blob'],
- hopper:['nhopper',44,'Spring Hopper'],crab:['ncrab',40,'Caliper Crab'],scorp:['nscorp',48,'Jack Scorpion'],goblin:['ngoblin',50,'Filter Goblin'],moth:['nmoth',36,'Mirror Moth']};
+ hopper:['nhopper',44,'Spring Hopper'],crab:['ncrab',40,'Caliper Crab'],scorp:['nscorp',48,'Jack Scorpion'],goblin:['ngoblin',50,'Filter Goblin'],moth:['nmoth',36,'Mirror Moth'],
+ slug:['nmslug',40,'Muffler Slug'],beetle:['npbeetle',42,'Piston Beetle'],raptor:['nwraptor',44,'Wrench Raptor'],slime:['noslime',40,'Oil Slime'],toad:['nrtoad',44,'Radiator Toad'],hedge:['nghedge',38,'Gear Hedgehog'],rhino:['nbrhino',54,'Bumper Rhino'],
+ dozer:['bdozer',175,'DOZER BEHEMOTH'],hydra:['bhydra',195,'FIRE ENGINE HYDRA'],kraken:['bkraken',175,'COMPACTOR KRAKEN'],mixer:['bmixer',205,'MIXER COLOSSUS']};
 for(const k in MSKIN){const [id,h,n,hue]=MSKIN[k],M=MON[k];M.dr0=M.dr||k;M.dr='spr_'+id;M.sp=id;M.h=h;M.sc=1;M.n=n;if(hue!=null){M.hue=hue;M.sat=1.1;}}
 MON.wyrm.lc='#40c4ff';MON.tanker.lz=[150,95];MON.omega.lz=[150,110];MON.titan.lz=[20,120];MON.wyrm.lz=[125,128];MON.plow.lz=[70,150];MON.plow.lc='#ffd740';MON.crusher.desc=MON.sludge.desc=MON.frost.desc=MON.neonc.desc=MON.magma.desc='Mini-boss · stinger dive';
 for(const k in MON){const M=MON[k];M.dr=M.dr||k;M.sc=M.sc||1;M.big=M.big||1;M.b=M.b||'';}
@@ -720,6 +737,8 @@ const BIO=[
 // Act 1 = the 5 hand-made chapters. Acts 2-10 revisit the 5 worlds with new weather/colours, stronger "elite" monsters
 // (same drawings, new colours via a hue filter) and new bosses.
 MON.omega.desc='Chapter boss';
+// v16-197: the 7 new small monsters join the 5 of v16-139 in acts 11-15
+const NW12=['slug','beetle','raptor','slime','toad','hedge','rhino','hopper','crab','scorp','goblin','moth'];
 const ACTS=[null,
  {n:'Dusk',bio:{h:22,s:1.1,l:.92},mh:28,ms:1.15},
  {n:'Storm',bio:{h:0,s:.6,l:.78,rain:1},mh:195,ms:1.1},
@@ -731,12 +750,12 @@ const ACTS=[null,
  {n:'Void',bio:{h:235,s:.7,l:.55,night:1},mh:230,ms:.55,mb:.85},
  {n:'Omega',bio:{h:-12,s:1.3,l:.7,fires:1,lava:1},mh:320,ms:1.5},
  // v16-139 (Marius: 'more stages, normal and hard'): ACT 11 – 5 new chapters (100 stages), the 5 new small monsters in every zone
- {n:'Nemesis',bio:{h:150,s:1.15,l:.62,night:1,moon:1,fires:1},mh:140,ms:1.35,mb:.95,nw:['hopper','crab','scorp','goblin','moth']},
+ {n:'Nemesis',bio:{h:150,s:1.15,l:.62,night:1,moon:1,fires:1},mh:140,ms:1.35,mb:.95,nw:NW12},
  // v16-139 (Marius: '1500 stages in total, so we know we have enough'): acts 12-15
- {n:'Apex',bio:{h:-55,s:1.2,l:.9},mh:-70,ms:1.3,nw:['hopper','crab','scorp','goblin','moth']},
- {n:'Eclipse',bio:{h:200,s:.8,l:.5,night:1,moon:1},mh:205,ms:1.2,mb:.9,nw:['hopper','crab','scorp','goblin','moth']},
- {n:'Chaos',bio:{h:-90,s:1.3,l:.75,rain:1,fires:1},mh:290,ms:1.45,nw:['hopper','crab','scorp','goblin','moth']},
- {n:'Legend',bio:{h:40,s:1.35,l:.95,fires:1},mh:48,ms:1.55,mb:1.15,nw:['hopper','crab','scorp','goblin','moth']}];
+ {n:'Apex',bio:{h:-55,s:1.2,l:.9},mh:-70,ms:1.3,nw:NW12},
+ {n:'Eclipse',bio:{h:200,s:.8,l:.5,night:1,moon:1},mh:205,ms:1.2,mb:.9,nw:NW12},
+ {n:'Chaos',bio:{h:-90,s:1.3,l:.75,rain:1,fires:1},mh:290,ms:1.45,nw:NW12},
+ {n:'Legend',bio:{h:40,s:1.35,l:.95,fires:1},mh:48,ms:1.55,mb:1.15,nw:NW12}];
 const CH_NAMES=[
  ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss','Apex Scrap Peaks','Eclipse Junkyard','Chaos Scrapstorm','Legend Scrap Throne'],
  ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss','Apex Acid Towers','Eclipse Refinery','Chaos Chem Storm','Legend Oil Kingdom'],
@@ -760,11 +779,13 @@ function monClone(k,a){const A=ACTS[a],key=k+'_'+a;if(MON[key])return key;const 
   // bosses of acts 2-10 get the same base stats in every world, so only the stage level decides how hard they are
   const norm=M.b==='titan'?{hp:12500,atk:130,def:28}:M.b==='crusher'?{hp:5000,atk:112,def:26}:{};
   MON[key]=Object.assign({},M,norm,{n,hue:A.mh,sat:A.ms,bri:A.mb||1,base:k,desc:k==='omega'&&a===ACTS.length-1?'Final boss':k==='omega'?'Chapter boss':M.desc});return key;}
+// v16-197: acts 11-15 – new chapter bosses (Omega Engine stays the final boss)
+const NBOSS=['dozer','kraken','hydra','mixer',null];
 for(let a=1;a<ACTS.length;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb=t+a*5;
   const bios=B0.bios.map(bi=>{BIO.push(Object.assign(bioVariant(BIO[bi],A.bio),{n:A.n+' '+BIO[bi].n}));return BIO.length-1;});
   const pool=B0.pool.map((pz,z)=>{const p2=pz.map(k=>monClone(k,a));if(a>=2){const ex=CHAP[(t+a)%5].pool[z][(a+z)%CHAP[(t+a)%5].pool[z].length];p2.push(monClone(ex,a));}
-    if(A.nw){p2.push(monClone(A.nw[(t+z)%5],a),monClone(A.nw[(t+z+2)%5],a));}return p2;});
-  CHAP.push({n:CH_NAMES[t][a],col:colX(CH_COL[t],{h:A.mh*.35,s:1.1}),bios,zones:B0.zones.map(z=>z.startsWith(A.n)?z.replace(A.n,'Ultima'):A.n+' '+z),pool,mini:monClone(B0.mini,a),boss:monClone(B0.boss,a),
+    if(A.nw){const L=A.nw.length,q=t*4+z;p2.push(monClone(A.nw[q%L],a),monClone(A.nw[(q+6)%L],a));}return p2;});
+  CHAP.push({n:CH_NAMES[t][a],col:colX(CH_COL[t],{h:A.mh*.35,s:1.1}),bios,zones:B0.zones.map(z=>z.startsWith(A.n)?z.replace(A.n,'Ultima'):A.n+' '+z),pool,mini:monClone(B0.mini,a),boss:monClone(a>=10&&NBOSS[t]?NBOSS[t]:B0.boss,a),
     names:B0.names.map(x=>x.startsWith(A.n)?x.replace(A.n,'Ultima'):A.n+' '+x),act:a});}
 CHAP.forEach((C,i)=>{C.n=CH_NAMES[i%5][Math.floor(i/5)];});
 const NCH=CHAP.length,SPC=20,NST=NCH*SPC;
@@ -1604,6 +1625,9 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
     if(u.enr){if(u.enrT==null)u.enrT=t;const e=t-u.enrT;return[5,e<.9?F(e/.9*6):3+Math.floor(t*7+u.k)%3];} // ENRAGE stays visible (hits come all the time)
     if(u.hurtS>0)return[4,F((.45-u.hurtS)/.45*6)];
     return[0,Math.floor(t*7+u.k)%6];} // v16-61: every WORLD BOSS sprite (SCRAPZILLA, CRUSHER KING, INFERNO PISTON, TOW SERPENT)
+  const XX=MSPR[id].x;if(XX){const F6=v=>Math.min(5,Math.max(0,Math.floor(v))); // v16-197 chapter bosses: INTRO (Marius' pictures) when the boss appears, ENRAGE start + loop (img/mon/<id>_x.webp)
+    if(u.xI==null)u.xI=t;const it=t-u.xI;if(it<1.5&&!a&&u.st!=='atk')return[100,F6(it/1.5*6)];
+    if(u.enr&&!a&&u.st!=='atk'&&u.st!=='walk'&&!(u.stun>0)&&!(u.hurt>.35)){if(u.enrT==null)u.enrT=t;const e=t-u.enrT;return[101,e<.9?F6(e/.9*6):3+Math.floor(t*7+u.k)%3];}}
   if(a&&a.k==='pound')return[SZ?WBX.pr:3,Math.min(7,Math.floor(a.t/a.dur*8))];
   if(a&&a.k==='laser'){if(id==='ndragon'||SZ)return[3,a.t<a.dur?Math.min(2,Math.floor(a.t/a.dur*3)):2]; // dragon: open mouth, the game draws the nitro breath
     return[3,Math.min(7,Math.floor(a.t/(a.dur+.6)*8))];}
@@ -1616,9 +1640,11 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
   return[0,Math.floor(t*7+u.k)%6];}
 // drawn facing right like the other monsters (Marius' pictures face left → mirrored here)
 function drawSprMon(g,u,t,id){const M=MON[u.t],d=msprLoad(id);if(!msprOK(id)){MDRAW[M.dr0](g,u,t);return;}
-  const [r,c]=msprFrame(u,t),k=M.h/d.ih;g.save();g.scale(-1,1);if(id==='wasp')g.translate(0,-12-Math.sin(t*5+u.k)*3);else if(M.fly)g.translate(0,-38-Math.sin(t*5+u.k)*4);
-  g.drawImage(d.im,c*d.w,r*d.h,d.w,d.h,-d.ax*k,-d.ay*k,d.w*k,d.h*k);g.restore();}
+  let [r,c]=msprFrame(u,t),D=d;const k=M.h/d.ih;if(r>=100){const x=d.x;if(!x.im){x.im=new Image();x.im.decoding='async';x.im.src='img/mon/'+id+'_x.webp';}if(x.im.complete&&x.im.naturalWidth){D=x;r-=100;}else{r=0;c=0;}}g.save();g.scale(-1,1);if(id==='wasp')g.translate(0,-12-Math.sin(t*5+u.k)*3);else if(M.fly)g.translate(0,-38-Math.sin(t*5+u.k)*4);
+  g.drawImage(D.im,c*D.w,r*D.h,D.w,D.h,-D.ax*k,-D.ay*k,D.w*k,D.h*k);g.restore();}
 for(const id in MSPR)MDRAW['spr_'+id]=(g,u,t)=>drawSprMon(g,u,t,id);
+// v16-197 chapter bosses INTRO + ENRAGE atlases (tools/boss_x.py)
+MSPR.jtitan.x={w:233,h:219,ax:119.0,ay:210.0};MSPR.gtanker.x={w:268,h:205,ax:141.5,ay:198.0};MSPR.towking.x={w:250,h:218,ax:131.5,ay:207.0};MSPR.ndragon.x={w:281,h:234,ax:154.0,ay:219.0};MSPR.gomega.x={w:248,h:229,ax:132.0,ay:210.5};
 // v16-138: HARD MODE fx (Marius' pictures, tools/hardfx_cut.py): ring 8×300×137 (ring centre at 68% of the height), aura 8×200×238 (base at the bottom)
 function hmUnder(g,u,t,M,big){const R=fxImg('hm_ring'),A=fxImg('hm_aura');const a0=g.globalAlpha;
   if(A.complete&&A.naturalWidth){const ah=Math.min(M.h*1.3,230),aw=Math.max(ah*.84,big*2.6),f=Math.floor(t*11+u.k*3)%8,fy=M.fly?-38-Math.sin(t*5+u.k)*4:0;

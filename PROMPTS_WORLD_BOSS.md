@@ -137,3 +137,4 @@ Integrare: rânduri noi în atlasul `img/mon/<id>.webp` (sau atlas separat) + `m
 Monștri mici (3×8: IDLE / WALK / ATTACK, fără skill; poza atașată = `crab.webp` doar ca stil/așezare): MUFFLER SLUG, PISTON BEETLE, TIRE ARMADILLO, WRENCH RAPTOR, OIL SLIME, RADIATOR TOAD, GEAR HEDGEHOG, BUMPER RHINO (mediu).
 Bossi (6 rânduri: IDLE 6, WALK 8, ATTACK 8, SKILL 8, HURT 4, DEATH 6; poza atașată = `jtitan.webp` doar ca stil): DOZER BEHEMOTH, FIRE ENGINE HYDRA, COMPACTOR KRAKEN, MIXER COLOSSUS.
 Toate 1536×1024, fond verde #00FF00, FACING LEFT, STYLE-ul standard Torque Empire.
+✅ v16-200 (23 nov): §11 și §12 în joc (fără TIRE ARMADILLO – poza n-a venit).
