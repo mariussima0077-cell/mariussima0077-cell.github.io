@@ -1986,12 +1986,14 @@ function teamBuff(o){for(const h of alive(B.heroes)){if(o.atk){h.buff=Math.max(h
   if(o.def)h.defB=Math.max(h.defB,o.def);if(o.crit)h.critB=Math.max(h.critB,o.crit);B.fx.push({type:'plus',u:h,t:0,d:.8,col:o.col||'#ffab00',txt:o.txt});}}
 function imgFx(k,x,y,w,d,o){B.fx.push(Object.assign({type:'imgfx',k,x,y,w,t:0,d},o||{}));}
 function burnOn(m,src){m.burn=4;m.burnSrc=src;}
+// v16-256 (Marius: "keep what I gave you"): when the hero's own effect sheet (fxs) is loaded, the extra code-drawn effects of his skill are skipped
+const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
 function castAct(u,dur,fire){u.act={k:'cast',t:0,dur,fire};u.st='cast';}
 const SKF={
  m3_0(u,ms){const P=skp(u),f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Viktor's ENGINE DROP – he throws the engine from where he stands (no more leap); it falls on the biggest group (fxs frame 2 = lands = damage); same numbers as before
    if(!f8||!(u.spr&&u.spr.v8)){const c=cluster(ms,(P.rad||95)*S)||ms[0];u.act={k:'leap',t:0,dur:.55,x0:u.x,d0:u.d,x1:c.x-24*S,d1:c.d,p:P};u.st='leap';return;}
    castAct(u,.6,()=>{u.post=.6;const ms2=alive(B.mons);if(!ms2.length)return;const c=cluster(ms2,(P.rad||95)*S)||ms2[0],cx=c.x,cd=c.d;B.fx.push({type:'sheet8',t:0,d:.96,sp:u.spr,x:cx,dd:cd});
-     B.fx.push({type:'call',t:-.24,d:.05,fn:()=>{const R=(P.rad||95)*S,y=fy(cd),RC=P.col||'#d05cff';B.fx.push({type:'ring',x:cx,y,t:0,d:.5,r:R,col:RC,ground:1});debris(cx,y,10,['#6d4c41','#9e9e9e','#d05cff']);shake(14);
+     B.fx.push({type:'call',t:-.24,d:.05,fn:()=>{const R=(P.rad||95)*S,y=fy(cd),RC=P.col||'#d05cff';shake(14);
        for(const m of alive(B.mons))if(Math.hypot(m.x-cx,(m.d-cd)*(FY1-FY0)*1.25)<R){damage(u,m,P.mult||2.2,{skill:1});m.stun=Math.max(m.stun,P.stun||1.2);if(!m.boss)m.x+=(P.push||26)*S;if(P.slow)m.slow=Math.max(m.slow,P.slow);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,u);}
        if(!u.dead){u.taunt=4;u.shield=Math.max(u.shield,u.max*(P.shield||.25));}}});});},
  m3_1(u){const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Big Mo's TOOLBOX FORTRESS – his own healing dome (8 frames) under every mechanic, brightest (frame 4) when the toolbox hits the ground = heal + shield; same numbers as before
@@ -2002,14 +2004,14 @@ const SKF={
    castAct(u,.6,()=>{u.post=.6;const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],ok=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;let ds=0;
    if(c&&ok){const tt=.7*Math.max(0,c.x-u.x)/Math.max(1,W+20-u.x);ds=Math.max(0,.46-tt);B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}
    B.fx.push({type:'scan',x:u.x,t:-ds,d:.7,src:u,hit:new Set(),p:P});});},
- m3_3(u){castAct(u,.6,()=>{u.post=.6;B.fx.push({type:'coil',x:u.x+u.face*62*S,dd:u.d,t:0,d:4,tick:0,src:u});if(FX2)fxBurst(u.x+u.face*62*S,fy(u.d)-40*dsc(u.d),'#e040fb',40*S);});}, // v16-109 Dr. Ohm: cast frames 1-5 (5 = plants the coil) → laughs
+ m3_3(u){castAct(u,.6,()=>{u.post=.6;B.fx.push({type:'coil',x:u.x+u.face*62*S,dd:u.d,t:0,d:4,tick:0,src:u});if(FX2&&!FV8(u))fxBurst(u.x+u.face*62*S,fy(u.d)-40*dsc(u.d),'#e040fb',40*S);});}, // v16-109 Dr. Ohm: cast frames 1-5 (5 = plants the coil) → laughs
  m3_4(u,ms){ // v16-110: Hugo's HEADSHOT – crosshair (fxs 0-3) locks on the strongest enemy while he kneels and aims, the shot (skill frame 4) = the sky beam (fxs frame 4); same numbers as before
    const pick=()=>alive(B.mons).slice().sort((a,b)=>b.hp-a.hp)[0];let t=pick();if(!t)return;const P=skp(u),ok=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;
    const f=ok?{type:'sheet8',t:-.12,d:.96,sp:u.spr,x:t.x,dd:t.d}:null;if(f)B.fx.push(f);
    castAct(u,.75,()=>B.fx.push({type:'call',t:-.15,d:.05,fn:()=>{if(u.dead)return;u.post=.6;if(t.dead)t=pick();if(!t)return;if(f){f.x=t.x;f.dd=t.d;}
      const k=dsc(u.d),bx=u.x+u.face*113*SPK*k,by=fy(u.d)-(u.lift||0)-125*SPK*k,x=t.x,y=headY(t)+22*dsc(t.d),C=P.col||'#e040fb';
      B.fx.push({type:'beam',x0:bx,y0:by,x1:x,y1:y,t:0,d:ok?.3:.5,col:C,w:ok?7:14});damage(u,t,4.5,{crit:1,skill:1});t.mark=Math.max(t.mark,6);shake(10);
-     B.fx.push({type:'ring',x,y:ok?fy(t.d):y,t:0,d:.4,r:50*S,col:C,ground:ok?1:0});if(FX2){fxBurst(x,y,C,60*S);if(!ok)fxs('flare_01','#ffffff',x,y,{d:.3,s0:20*S,s1:110*S});}}}));},
+     if(!ok)B.fx.push({type:'ring',x,y,t:0,d:.4,r:50*S,col:C,ground:0});if(FX2&&!FV8(u)){fxBurst(x,y,C,60*S);if(!ok)fxs('flare_01','#ffffff',x,y,{d:.3,s0:20*S,s1:110*S});}}}));},
  m3_5(u){const P=skp(u),go=()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,mult:P.mult,band:P.band,col:P.col,p:P};u.st='dash';
    // v16-113: Aria's NEON SPIN – her own neon tornado (8 frames, frame 5 = burst) on the biggest group in her wide lane, timed with her arrival; same numbers as before
    if(u.spr&&u.spr.fx8){const ms=alive(B.mons).filter(m=>m.x>u.x&&Math.abs(m.d-u.d)<(P.band||.38)),c=cluster(ms,100*S)||ms.sort((a,b)=>a.x-b.x)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}}};
@@ -2019,8 +2021,8 @@ const SKF={
    if(u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth){u.act.nb=1;const ms=alive(B.mons).filter(m=>m.x>u.x&&Math.abs(m.d-u.d)<.2),c=cluster(ms,100*S)||ms.sort((a,b)=>a.x-b.x)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.48),d:.96,sp:u.spr,x:c.x,dd:c.d});}}};
    if(u.spr&&u.spr.v8)castAct(u,.4,go);else go();},
  m4_0(u){castAct(u,.75,()=>{const y=fy(.5);shake(14);u.post=.6;B.fx.push({type:'quake',x0:u.x+30*S,t:0,d:1.1,src:u,hit:new Set()});
-   B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);
-   if(FX2){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
+   if(!FV8(u)){B.fx.push({type:'ring',x:u.x+30*S,y:fy(u.d),t:0,d:.5,r:90*S,col:'#ffd54a',ground:1});debris(u.x+30*S,fy(u.d),10,['#6d4c41','#9e9e9e','#ffca28']);}
+   if(FX2&&!FV8(u)){fxShock(u.x+30*S,fy(u.d),'#ffd54a',90*S);fxBurst(u.x+30*S,fy(u.d)-14*S,'#ffab00',50*S);}
    u.taunt=4;u.shield=Math.max(u.shield,u.max*.3);});},
  m4_1(u){const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-96: her own holy pillar (8 frames), peak (frame 5) = the moment of the heal
    if(f8){const dd=!u.rev&&B.heroes.find(h=>h.dead&&h!==u);for(const h of B.heroes)if(!h.dead||h===dd)B.fx.push({type:'sheet8',t:-.32,d:.96,sp:u.spr,x:h.x,dd:h.d});}
@@ -2028,11 +2030,11 @@ const SKF={
    if(dead){u.rev=1;dead.dead=false;dead.hp=Math.round(dead.max*.4);dead.deadT=0;dead.st='idle';dead.act=null;dead.stun=0;dead.lift=0;dead.en=0;
      num(dead.x,headY(dead)-16,'REVIVED!','#fff59d',1);if(!f8)imgFx('holy',dead.x,fy(dead.d)+6*S,120*S,1.3);}
    for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(h!==dead&&!f8)imgFx('holy',h.x,fy(h.d)+6*S,90*S,1);
-     if(FX2){fxs('magic_02','#fff176',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#fff176',5,22*S);}}
+     if(FX2&&!FV8(u)){fxs('magic_02','#fff176',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#fff176',5,22*S);}}
    teamBuff({def:6,col:'#fff176',txt:'DEF UP'});B.flash=.5;});},
  m4_2(u,ms){const c=cluster(ms,100*S)||ms[0];castAct(u,.6,()=>{const cx=c.x,cd=c.d,v=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;u.post=.6;
    // v16-96: Duke's own vortex (8 frames): tornado grows, frame 5 = crystal burst → damage + freeze land then (old image fx only if the sheet didn't load)
-   if(v){B.fx.push({type:'sheet8',t:-.12,d:1.25,sp:u.spr,x:cx,dd:cd});if(FX2)fxBurst(cx,fy(cd)-30*S,'#d05cff',50*S);}else imgFx('vortex',cx,fy(cd)+12*S,215*S,1.1,{spin:1});
+   if(v){B.fx.push({type:'sheet8',t:-.12,d:1.25,sp:u.spr,x:cx,dd:cd});if(FX2&&!FV8(u))fxBurst(cx,fy(cd)-30*S,'#d05cff',50*S);}else imgFx('vortex',cx,fy(cd)+12*S,215*S,1.1,{spin:1});
    B.fx.push({type:'dvort',t:v?-.67:0,src:u,x:cx,dd:cd});shake(6);});},
  m4_3(u,ms){castAct(u,.85,()=>{const cx=ms.reduce((a,m)=>a+m.x,0)/ms.length,top=FY0-120*S;u.post=.6;
    // v16-106: Sofia's own storm cloud (8 frames, frame 5 = the big strike); the old cloud picture only if the sheet didn't load
@@ -2056,39 +2058,40 @@ const SKF={
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
    if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,.7,()=>{u.post=.6;shake(14);B.flash=.25;
-     if(c){const R=120*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);if(FX2)fxBurst(m.x,headY(m)+24*dsc(m.d),'#ffca28',36*S);}
-       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ffca28',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ffb300',R);}debris(c.x,fy(c.d),8,['#6d4c41','#ffca28','#9e9e9e']);}
-     if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);B.fx.push({type:'ring',x:u.x,y:fy(u.d),t:0,d:.6,r:70*S,col:'#ffca28',ground:1});}
-     for(const h of alive(B.heroes))if(h!==u){h.shield=Math.max(h.shield,h.max*.25);if(FX2)fxs('magic_02','#ffd54f',h.x,fy(h.d),{ground:1,d:.9,s0:20*S,s1:80*S,sy:.34,vr:2.5,ease:1});}
+     if(c){const R=120*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ffca28',36*S);}
+       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ffca28',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ffb300',R);debris(c.x,fy(c.d),8,['#6d4c41','#ffca28','#9e9e9e']);}}
+     if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);if(!f8)B.fx.push({type:'ring',x:u.x,y:fy(u.d),t:0,d:.6,r:70*S,col:'#ffca28',ground:1});}
+     // v16-256: every hero with Goliath's shield carries a small copy of HIS shield picture (fxs frame 3) while the shield lasts
+     for(const h of alive(B.heroes)){if(h!==u)h.shield=Math.max(h.shield,h.max*.25);if(f8)B.fx.push({type:'sh8',u:h,sp:u.spr,c:2,t:0,d:6});else if(FX2&&h!==u)fxs('magic_02','#ffd54f',h.x,fy(h.d),{ground:1,d:.9,s0:20*S,s1:80*S,sy:.34,vr:2.5,ease:1});}
      teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
  m5_4(u){ // v16-141: Nova's STARFIRE RAIN – the arrow rain (fxs) falls on the biggest group; impact = fxs frame 5 = end of her shot up (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
    if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
-     if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2)fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
-       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
+     if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
+       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
  m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
    if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=135*S,v=u.tl?TV(u):0;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.6,{skill:1});m.slow=Math.max(m.slow,4);m.weak=Math.max(m.weak,5);if(v)wetOn(m,v);}
-       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ff4fd8',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ff80ab',R);}sparks(c.x,fy(c.d)-10*S,16,'#fff59d');}});},
+       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ff4fd8',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff80ab',R);}sparks(c.x,fy(c.d)-10*S,16,'#fff59d');}});},
  m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
    if(tg){tg.mark=Math.max(tg.mark,2);if(f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
    castAct(u,.7,()=>{u.post=.6;shake(12);B.flash=.2;if(!tg)return;
      const [bx,by]=muzzle(u,40,40),ty=headY(tg)+16*dsc(tg.d);B.fx.push({type:'beam',x0:bx,y0:by,x1:W+40*S,y1:ty,t:0,d:.45,col:'#18ffff',w:9});
      if(!tg.dead)damage(u,tg,5.5,{skill:1,crit:1});
-     for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S){damage(u,m,1.6,{skill:1});if(FX2)fxs('circle_05','#18ffff',m.x,headY(m)+16*dsc(m.d),{d:.25,s0:14*S,s1:48*S});}
+     for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S){damage(u,m,1.6,{skill:1});if(FX2&&!FV8(u))fxs('circle_05','#18ffff',m.x,headY(m)+16*dsc(m.d),{d:.25,s0:14*S,s1:48*S});}
      sparks(tg.x,ty,16,'#e0ffff');});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
    if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,.7,()=>{u.post=.6;shake(12);B.flash=.35;
-     for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);if(FX2)fxBurst(m.x,headY(m)+24*dsc(m.d),'#ff9100',40*S);}
-     if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ff9100',110*S);}
-     const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);B.fx.push({type:'ring',x:d.x,y:fy(d.d),t:0,d:.6,r:60*S,col:'#ff9100',ground:1});}}
-     for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
+     for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ff9100',40*S);}
+     if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff9100',110*S);}
+     const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);if(f8)B.fx.push({type:'sheet8',t:-.1,d:.96,sp:u.spr,x:d.x,dd:d.d});else B.fx.push({type:'ring',x:d.x,y:fy(d.d),t:0,d:.6,r:60*S,col:'#ff9100',ground:1});}}
+     for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
  m5_1(u){castAct(u,.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
    if(u.spr&&u.spr.fx8){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
@@ -2117,7 +2120,7 @@ function monAct(m,dt){const a=m.act;a.t+=dt;
       B.fx.push(WX.lz===1?{type:'wbfx',id:MON[m.t].sp,x0:m.x-LZ[0]*sc,y0:fy(m.d)-LZ[1]*sc,x1:-30*S,t:0,d:.85,y1:fy(a.d)-30*dsc(a.d)}:{type:'wbfx',id:MON[m.t].sp,x0:m.x-LZ[0]*sc,y0:fy(a.d),x1:-30*S,t:0,d:.95});}}
   if(a.k==='pound'){m.ap=a.t/a.dur;if(a.t>=a.dur){const hs=alive(B.heroes);const mult=m.b==='titan'?2.0:m.b==='crusher'?1.9:1.8;
       for(const h of hs)if(Math.hypot(h.x-a.tx,(h.d-a.td)*(FY1-FY0)*1.25)<a.r){damage(m,h,mult);h.stun=Math.max(h.stun,.8);}
-      const y=fy(a.td);B.fx.push({type:'ring',x:a.tx,y,t:0,d:.45,r:a.r,col:'#ff8a65',ground:1});smoke(a.tx,y,10,'rgba(120,90,60,.55)',1.4);debris(a.tx,y,8,['#6d4c41','#8d6e63','#9e9e9e']);shake(m.boss?14:9);if(FX2){fxShock(a.tx,y,'#ff5722',a.r*.8);fxs('dirt_02','#6d4c41',a.tx,y-12*S,{add:0,d:.55,s0:40*S,s1:a.r*1.6,rot:rnd(0,TAU),ease:1});fxScorch(a.tx,y,'#2b1a10',a.r*.6,2);}
+      const y=fy(a.td);B.fx.push({type:'ring',x:a.tx,y,t:0,d:.45,r:a.r,col:'#ff8a65',ground:1});smoke(a.tx,y,10,'rgba(120,90,60,.55)',1.4);debris(a.tx,y,8,['#6d4c41','#8d6e63','#9e9e9e']);shake(m.boss?14:9);if(FX2&&!FV8(u)){fxShock(a.tx,y,'#ff5722',a.r*.8);fxs('dirt_02','#6d4c41',a.tx,y-12*S,{add:0,d:.55,s0:40*S,s1:a.r*1.6,rot:rnd(0,TAU),ease:1});fxScorch(a.tx,y,'#2b1a10',a.r*.6,2);}
       m.act=null;m.st='idle';m.cd=m.as*.6;}}
   else if(a.k==='charge'){if(a.t<a.dur){m.st='idle';m.d+=(a.d-m.d)*Math.min(1,dt*5);m.ap=a.t/a.dur;return;}m.st='walk';m.wph+=dt*24;m.face=-1;m.x-=520*S*dt;
     for(const h of alive(B.heroes))if(!a.hit.has(h)&&Math.abs(h.x-m.x)<30*S&&Math.abs(h.d-m.d)<.14){a.hit.add(h);damage(m,h,2.2);h.x-=30*S;h.stun=Math.max(h.stun,.6);shake(8);}
@@ -2146,7 +2149,7 @@ function unitUpdate(u,dt,foes,friends){
     if(a.k==='leap'){const k=Math.min(1,a.t/a.dur);u.x=lerp(a.x0,a.x1,k);u.d=lerp(a.d0,a.d1,k);u.lift=Math.sin(k*Math.PI)*80*S;
       if(k>=1){u.lift=0;const P=a.p||{},R=(P.rad||95)*S,y=fy(u.d),RC=P.col||'#ffab00';B.fx.push({type:'ring',x:u.x+24*S,y,t:0,d:.5,r:R,col:RC,ground:1});B.fx.push({type:'ring',x:u.x+24*S,y,t:-.08,d:.5,r:R*.6,col:'#fff3c4',ground:1});
         smoke(u.x+20*S,y,12,'rgba(150,110,70,.55)',1.3);debris(u.x+20*S,y,10,['#6d4c41','#9e9e9e','#ffca28']);shake(14);
-        if(FX2){const lx=u.x+24*S;fxShock(lx,y,RC,R);if(P.weak||P.burn)fxSmoke(lx,y,P.col||'#616161',8,60*S);fxScorch(lx,y,'#2b1a10',R*.7,2.5);fxBurst(lx,y-18*S,'#ff6d00',60*S);fxs('dirt_02','#8d6e63',lx,y-14*S,{add:0,d:.55,s0:40*S,s1:180*S,a0:.95,rot:rnd(0,TAU),ease:1});fxSmoke(lx,y,'#a1887f',6,50*S);B.hs=.12;}
+        if(FX2&&!FV8(u)){const lx=u.x+24*S;fxShock(lx,y,RC,R);if(P.weak||P.burn)fxSmoke(lx,y,P.col||'#616161',8,60*S);fxScorch(lx,y,'#2b1a10',R*.7,2.5);fxBurst(lx,y-18*S,'#ff6d00',60*S);fxs('dirt_02','#8d6e63',lx,y-14*S,{add:0,d:.55,s0:40*S,s1:180*S,a0:.95,rot:rnd(0,TAU),ease:1});fxSmoke(lx,y,'#a1887f',6,50*S);B.hs=.12;}
         for(const m of alive(B.mons))if(Math.hypot(m.x-(u.x+24*S),(m.d-u.d)*(FY1-FY0)*1.25)<R){damage(u,m,P.mult||2.2,{skill:1});m.stun=Math.max(m.stun,P.stun||1.2);if(!m.boss)m.x+=(P.push||26)*S;if(P.slow)m.slow=Math.max(m.slow,P.slow);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,u);}
         if(P.rage){u.buff=Math.max(u.buff,P.rage);u.aspdK=Math.max(u.aspd>0?u.aspdK:0,.3);u.aspd=Math.max(u.aspd,P.rage);num(u.x,headY(u)-14,'RAGE!','#ff7043',1);}
         u.taunt=4;u.shield=Math.max(u.shield,u.max*(P.shield||.25));u.act=null;u.st='idle';u.cd=.3;u.land=u.spr&&u.spr.lt||.32;}
@@ -2155,7 +2158,7 @@ function unitUpdate(u,dt,foes,friends){
       if(!a.back){u.face=1;u.x+=v;u.st='dash';
         const F=a.fire,P=a.p||{},c1=F?'#ff6d00':a.col||'#40c4ff',c2=F?'#ff3d00':a.col||'#2979ff',c3=F?'#ffd180':a.col?hexA(a.col,.6):'#80d8ff';
         for(const m of alive(B.mons))if(!a.hit.has(m)&&Math.abs(m.x-u.x)<26*S&&(a.all||Math.abs(m.d-u.d)<(a.band||.2))){a.hit.add(m);damage(u,m,a.mult||2.6,{crit:1,skill:1});if(F)burnOn(m,u);if(P.mark)m.mark=Math.max(m.mark,P.mark);if(P.slow)m.slow=Math.max(m.slow,P.slow);
-          if(P.splash){for(const o of alive(B.mons))if(o!==m&&Math.hypot(o.x-m.x,(o.d-m.d)*(FY1-FY0)*1.25)<60*S)damage(u,o,P.splash,{noCrit:1,skill:1});B.fx.push({type:'ring',x:m.x,y:fy(m.d),t:0,d:.4,r:60*S,col:c1,ground:1});if(FX2)fxBurst(m.x,fy(m.d)-20*S,c1,50*S);shake(4);}if(u.spr&&u.spr.dboom&&u.spr.bi&&!a.nb)B.fx.push({type:'sprBoom',x:m.x,y:fy(m.d),t:0,d:.6,r:60*S,im:u.spr.bi});sparks(m.x,headY(m)+20,10,c1);if(FX2){fxs('slash_02',c1,m.x,headY(m)+24*dsc(m.d),{d:.25,s0:50*S,s1:90*S,rot:-Math.PI/2+rnd(-.4,.4),ease:1});fxBurst(m.x,headY(m)+24*dsc(m.d),c2,40*S);if(F)fxs('fire_01','#ff9100',m.x,headY(m)+24*dsc(m.d),{d:.4,s0:20*S,s1:80*S,rot:rnd(0,TAU),ease:1});}}
+          if(P.splash){for(const o of alive(B.mons))if(o!==m&&Math.hypot(o.x-m.x,(o.d-m.d)*(FY1-FY0)*1.25)<60*S)damage(u,o,P.splash,{noCrit:1,skill:1});B.fx.push({type:'ring',x:m.x,y:fy(m.d),t:0,d:.4,r:60*S,col:c1,ground:1});if(FX2&&!FV8(u))fxBurst(m.x,fy(m.d)-20*S,c1,50*S);shake(4);}if(u.spr&&u.spr.dboom&&u.spr.bi&&!a.nb)B.fx.push({type:'sprBoom',x:m.x,y:fy(m.d),t:0,d:.6,r:60*S,im:u.spr.bi});sparks(m.x,headY(m)+20,10,c1);if(FX2&&!FV8(u)){fxs('slash_02',c1,m.x,headY(m)+24*dsc(m.d),{d:.25,s0:50*S,s1:90*S,rot:-Math.PI/2+rnd(-.4,.4),ease:1});fxBurst(m.x,headY(m)+24*dsc(m.d),c2,40*S);if(F)fxs('fire_01','#ff9100',m.x,headY(m)+24*dsc(m.d),{d:.4,s0:20*S,s1:80*S,rot:rnd(0,TAU),ease:1});}}
         if(FX2&&!sprOK(u.spr)){const ty=fy(u.d)-30*dsc(u.d);fxs('muzzle_02',c2,u.x-26*S,ty,{d:.22,s0:70*S,s1:40*S,rot:-Math.PI/2,a0:.9});fxs('trace_01',c3,u.x-60*S,ty+rnd(-14,14)*S,{d:.25,s0:120*S,s1:160*S,sx:.6,rot:Math.PI/2,a0:.7});}
         for(let k=0;k<(F?5:3);k++)part({x:u.x-rnd(0,F?40:24)*S,y:fy(u.d)-rnd(4,40)*S,vx:rnd(-60,-20),vy:rnd(-20,20),life:rnd(.25,.5),r:rnd(3,F?9:7)*S,col:F?(k%2?'rgba(255,109,0,.75)':'rgba(255,214,0,.8)'):(k%2?'rgba(41,121,255,.7)':'rgba(180,230,255,.8)'),type:'flame'});
         if(u.x>W-20*S){a.back=true;}}
@@ -2205,18 +2208,18 @@ function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
   if(u.hero&&u.tl)talHit(u,tg);
   if(u.hero){const R=u.role,MR=MYTH_RNG[u.h&&u.h.id];
-    if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2)fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');return;} // v16-141: Nova arrow / Vega railgun shot
-    if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
-    else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
+    if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2&&!FV8(u))fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');return;} // v16-141: Nova arrow / Vega railgun shot
+    if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2&&!FV8(u)){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
+    else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2&&!FV8(u)){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
       const sc=pv(u,'elec',1);if(sc&&!tg.dead&&Math.random()*100<sc){tg.stun=Math.max(tg.stun,.6);pasTxt(u,1);}
       const stc=pv(u,'elec',0);if(stc&&Math.random()*100<stc){let o=null,bd=170*S;for(const m of B.mons){if(m.dead||m===tg)continue;const d2=dist(tg,m);if(d2<bd){bd=d2;o=m;}}
-        if(o){const oy=headY(o)+16*dsc(o.d);if(!B.sim){B.fx.push({type:'bolt',x0:x,y0:y,x1:o.x,y1:oy,t:0,d:.22,col:ec});if(FX2)fxBolt(x,y,o.x,oy,ec||'#40c4ff',26);}damage(u,o,.6,{noCrit:1});}}}
+        if(o){const oy=headY(o)+16*dsc(o.d);if(!B.sim){B.fx.push({type:'bolt',x0:x,y0:y,x1:o.x,y1:oy,t:0,d:.22,col:ec});if(FX2&&!FV8(u))fxBolt(x,y,o.x,oy,ec||'#40c4ff',26);}damage(u,o,.6,{noCrit:1});}}}
     else if(R==='service')shoot(u,tg,'bolt',1,u.spr&&u.spr.look?{look:u.spr.look}:null);
     else if(R==='paint'){const pc=['#e0457b','#29b6f6','#ffd21a','#76ff03'][u.hits++%4];shoot(u,tg,'paint',1,{col:pc});
       if(sprOK(u.spr)){const [px,py]=muzzle(u);B.fx.push({type:'beam',x0:px,y0:py,x1:x,y1:y,t:0,d:.2,col:u.spr.col||'#ff4fd8',w:5});}}
     else{const m=R==='all'?1.15:1;damage(u,tg,m);sparks(x,y,R==='engine'?10:6,R==='tuning'?'#40c4ff':'#ffe082');if(R==='engine'||R==='all'){shake(3);if(!tg.boss)tg.x+=6*S;}
       B.fx.push({type:'slash',x,y,t:0,d:.18,f:u.face,col:R==='tuning'?'#40c4ff':'#fff'});
-      if(FX2){const sc=R==='tuning'?'#40c4ff':R==='engine'?'#ff9100':'#ffe082';fxs('slash_02',sc,x-u.face*4*S,y,{d:.2,s0:40*S,s1:64*S,rot:(u.face>0?-Math.PI/2:Math.PI/2)+rnd(-.5,.5),ease:1});fxs('flare_01','#ffffff',x,y,{d:.15,s0:12*S,s1:44*S});}}
+      if(FX2&&!FV8(u)){const sc=R==='tuning'?'#40c4ff':R==='engine'?'#ff9100':'#ffe082';fxs('slash_02',sc,x-u.face*4*S,y,{d:.2,s0:40*S,s1:64*S,rot:(u.face>0?-Math.PI/2:Math.PI/2)+rnd(-.5,.5),ease:1});fxs('flare_01','#ffffff',x,y,{d:.15,s0:12*S,s1:44*S});}}
     return;}
   const t=u.t;
   if(u.at==='smoke')shoot(u,tg,'smoke',1,{spd:260});
@@ -2294,30 +2297,30 @@ function step(dt){B.t+=dt;B.phT+=dt;
 }
 function fxUpdateGear(f){f.done=true;const x=f.tgt?f.tgt.x:f.x;const y=f.tgt?fy(f.tgt.d):fy(rnd(.1,.9));
   if(f.tgt&&!f.tgt.dead){damage(f.src,f.tgt,f.mult||3,{skill:1});}debris(x,y-6,4,['#ffd54a','#ffca28','#9e9e9e']);shake(6);B.fx.push({type:'ring',x,y,t:0,d:.35,r:40*S,col:'#ffd54a',ground:1});f.lx=x;
-  if(FX2){fxs('fire_01','#ffab00',x,y-16*S,{d:.45,s0:24*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxShock(x,y,'#ffd54a',40*S);fxScorch(x,y,'#2b1a10',30*S,2);}}
+  if(FX2&&!FV8(u)){fxs('fire_01','#ffab00',x,y-16*S,{d:.45,s0:24*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxShock(x,y,'#ffd54a',40*S);fxScorch(x,y,'#2b1a10',30*S,2);}}
 function fxUpdate(f,dt){
   if(f.type==='scan'){if(f.t<0)return;const P=f.p||{},SC=P.col||'#64ffda',x=lerp(f.x,W+20,Math.max(0,f.t/f.d));if(FX2&&Math.random()<.5)fxs('trace_01',SC,x,(FY0+FY1)/2-50*S,{d:.3,s0:(FY1-FY0)+180*S,s1:(FY1-FY0)+180*S,sx:.35,a0:.6});
-    for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);m.mark=Math.max(m.mark,P.mark||7);if(P.slow)m.slow=Math.max(m.slow,P.slow);damage(f.src,m,P.mult||1.2,{skill:1});sparks(m.x,headY(m)+20,6,SC);if(FX2){const my=headY(m)+22*dsc(m.d);fxs('magic_02',SC,m.x,my,{d:.7,s0:20*S,s1:80*S,vr:3,ease:1});fxs('circle_05','#a7ffeb',m.x,my,{d:.35,s0:20*S,s1:60*S});}}}
+    for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);m.mark=Math.max(m.mark,P.mark||7);if(P.slow)m.slow=Math.max(m.slow,P.slow);damage(f.src,m,P.mult||1.2,{skill:1});sparks(m.x,headY(m)+20,6,SC);if(FX2&&!FV8(u)){const my=headY(m)+22*dsc(m.d);fxs('magic_02',SC,m.x,my,{d:.7,s0:20*S,s1:80*S,vr:3,ease:1});fxs('circle_05','#a7ffeb',m.x,my,{d:.35,s0:20*S,s1:60*S});}}}
   else if(f.type==='chain'&&!f.done&&f.t>=0){f.done=true;if(!f.b.dead){damage(f.src,f.b,f.mult,{skill:1});f.b.stun=Math.max(f.b.stun,f.stun||1.5);sparks(f.b.x,headY(f.b)+20,10,'#80d8ff',200);}shake(3);
-    if(FX2){const a=f.a,b=f.b,ax=a.x,ay=a.hero?fy(a.d)-44*dsc(a.d):headY(a)+20,bx=b.x,by=headY(b)+20;fxBolt(ax,ay,bx,by,'#40c4ff',80);fxs('spark_02','#80d8ff',bx,by,{d:.4,s0:40*S,s1:100*S,rot:rnd(0,TAU),ease:1});fxBurst(bx,by,'#40c4ff',36*S);}}
+    if(FX2&&!FV8(u)){const a=f.a,b=f.b,ax=a.x,ay=a.hero?fy(a.d)-44*dsc(a.d):headY(a)+20,bx=b.x,by=headY(b)+20;fxBolt(ax,ay,bx,by,'#40c4ff',80);fxs('spark_02','#80d8ff',bx,by,{d:.4,s0:40*S,s1:100*S,rot:rnd(0,TAU),ease:1});fxBurst(bx,by,'#40c4ff',36*S);}}
   else if(FX2&&f.type==='gear'&&!f.done&&f.t>=0){const gx=f.tgt&&f.tgt.x!==undefined?f.tgt.x:f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5),gy=lerp(f.y0,ty,Math.min(1,f.t/f.d/.85));fxs('flame_04','#ff9100',gx,gy-f.r*.6,{d:.22,s0:f.r*2.6,s1:f.r*1.2,a0:.7,rot:rnd(-.3,.3)});
     if(f.t>=f.d*.85)fxUpdateGear(f);}
   else if(f.type==='gear'&&!f.done&&f.t>=f.d*.85)fxUpdateGear(f);
   else if(f.type==='puddle'){f.tick+=dt;if(f.tick>.5){f.tick=0;for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.d0)*(FY1-FY0)*1.25)<f.r){damage(f.src,m,.22,{noCrit:1,skill:1});m.slow=Math.max(m.slow,.6);}}}
   else if(f.type==='quake'){const x=lerp(f.x0,W+90*S,Math.max(0,f.t/f.d));f.fx=x;if(Math.random()<.5)debris(x,fy(rnd(.1,.9)),2,['#6d4c41','#9e9e9e','#ffca28']);if(f.t<f.d*.8)B.shake=Math.max(B.shake,5);
-    for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);damage(f.src,m,2.3,{skill:1});m.stun=Math.max(m.stun,1.6);if(!m.boss)m.x+=22*S;sparks(m.x,headY(m)+20,10,'#ffd54a');if(FX2)fxBurst(m.x,fy(m.d)-20*S,'#ffab00',40*S);}}
+    for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);damage(f.src,m,2.3,{skill:1});m.stun=Math.max(m.stun,1.6);if(!m.boss)m.x+=22*S;sparks(m.x,headY(m)+20,10,'#ffd54a');if(FX2&&!FV8(u))fxBurst(m.x,fy(m.d)-20*S,'#ffab00',40*S);}}
   else if(f.type==='strike'&&!f.done&&f.t>=0){f.done=true;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],x=m.x,y=headY(m)+22*dsc(m.d);
     B.fx.push({type:'bolt',x0:x+rnd(-30,30)*S,y0:f.top,x1:x,y1:y,t:0,d:.28,col:'#ffe066'});damage(f.src,m,1.5,{skill:1});m.stun=Math.max(m.stun,1);sparks(x,y,10,'#fff176',220);shake(5);
-    if(FX2){fxBolt(x,f.top,x,y,'#ffd54a',60);fxs('spark_02','#fff59d',x,y,{d:.35,s0:40*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxBurst(x,y,'#ffd54a',40*S);}}}
+    if(FX2&&!FV8(u)){fxBolt(x,f.top,x,y,'#ffd54a',60);fxs('spark_02','#fff59d',x,y,{d:.35,s0:40*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxBurst(x,y,'#ffd54a',40*S);}}}
   else if(f.type==='call'&&!f.done&&f.t>=0){f.done=true;f.fn();} // v16-109: delayed skill moment (Hugo's shot on his skill frame 4)
   else if(f.type==='mega'&&!f.done&&f.t>=0){f.done=true;const y=fy(f.dd);if(!(f.src&&f.src.spr&&f.src.spr.fx8&&f.src.spr.fi&&f.src.spr.fi.naturalWidth))imgFx('gearboom',f.x,y+16*S,230*S,1);shake(16);B.flash=.4;
     for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.dd)*(FY1-FY0)*1.25)<110*S)damage(f.src,m,1.5,{skill:1});
-    if(FX2){fxShock(f.x,y,'#ff6d00',110*S);fxScorch(f.x,y,'#2b1a10',80*S,2.5);}}
+    if(FX2&&!FV8(u)){fxShock(f.x,y,'#ff6d00',110*S);fxScorch(f.x,y,'#2b1a10',80*S,2.5);}}
   else if(f.type==='dvort'&&!f.done&&f.t>=0){f.done=true;const R=105*S,y=fy(f.dd);shake(10);  // v16-96: DIAMOND VORTEX impact (crystal freeze)
     for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.dd)*(FY1-FY0)*1.25)<R){damage(f.src,m,2.1,{skill:1});m.stun=Math.max(m.stun,2.2);m.ice=2.2;m.mark=Math.max(m.mark,4);}
-    if(FX2){fxBurst(f.x,y-30*S,'#80d8ff',70*S);fxShock(f.x,y,'#80d8ff',R*.7);}}
+    if(FX2&&!FV8(u)){fxBurst(f.x,y-30*S,'#80d8ff',70*S);fxShock(f.x,y,'#80d8ff',R*.7);}}
   else if(f.type==='coil'){f.tick+=dt;if(f.tick>=.4){f.tick=0;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],y0=fy(f.dd)-70*dsc(f.dd),y=headY(m)+22*dsc(m.d);
-      B.fx.push({type:'bolt',x0:f.x,y0,x1:m.x,y1:y,t:0,d:.22,col:'#e040fb'});damage(f.src,m,.8,{skill:1});m.stun=Math.max(m.stun,.5);sparks(m.x,y,6,'#ea80fc');if(FX2)fxBolt(f.x,y0,m.x,y,'#e040fb',40);}}}
+      B.fx.push({type:'bolt',x0:f.x,y0,x1:m.x,y1:y,t:0,d:.22,col:'#e040fb'});damage(f.src,m,.8,{skill:1});m.stun=Math.max(m.stun,.5);sparks(m.x,y,6,'#ea80fc');if(FX2&&!FV8(u))fxBolt(f.x,y0,m.x,y,'#e040fb',40);}}}
   else if(f.type==='imgfx'&&f.u&&!f.u.dead){f.x=f.u.x;f.y=headY(f.u)-8*S;}
   else if(f.type==='plus'&&f.t<dt*1.5&&f.txt)num(f.u.x,headY(f.u)-14,f.txt,f.col||'#69f0ae');
 }
@@ -2535,6 +2538,7 @@ function drawFx(t){
     else if(f.type==='plus'){const u=f.u;const [x,y]=sxy(u);g.globalAlpha=1-k;g.fillStyle=f.col||'#69f0ae';g.font='900 14px Game,system-ui';g.textAlign='center';g.fillText('✚',x+8,y-70*dsc(u.d)-k*20);}
     else if(f.type==='gear'){const x=f.tgt&&f.tgt.x!==undefined?(f.lx||f.tgt.x):f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5);const y=lerp(f.y0,ty,Math.min(1,k/.85));
       if(k<.85){g.translate(x,y);g.rotate(t*12);gearShape(f.r,'#ffd54a');g.rotate(-t*12);g.globalAlpha=.25;g.fillStyle='#ffab00';g.fillRect(-2,-80,4,70);}}
+    else if(f.type==='sh8'){const h=f.u,d=f.sp,v=d&&d.fx8;if(!h||h.dead||!(h.shield>0)){f.t=f.d;}else if(v&&d.fi&&d.fi.naturalWidth){const R=v.rows[0],kk=SPK*dsc(h.d)*.36,a=Math.min(1,f.t*4);g.globalAlpha=a*(.75+.2*Math.sin(f.t*5));g.translate(h.x+20*S*dsc(h.d),fy(h.d)-6*S+Math.sin(f.t*3)*2*S);g.drawImage(d.fi,f.c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='sheet8'){if(f.u&&!f.u.dead){f.x=f.u.x;f.dd=f.u.d;}const d=f.sp,v=d.fx8,R=v.rows[0];if(d.fi&&d.fi.complete&&d.fi.naturalWidth){const c=Math.min(7,Math.floor(k*8)),kk=SPK*dsc(f.dd)*1.25;g.globalAlpha=k>.9?(1-k)*10:1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='imgfx'){const im=FXIM[f.k];if(fxOK(f.k)){const e=1-Math.pow(1-Math.min(1,k*3),3),w=f.w*(f.float?1:(.6+.4*e)),h=w*im.naturalHeight/im.naturalWidth;
         g.globalAlpha=Math.min(1,k*6)*(k<.7?1:1-(k-.7)/.3);if(f.spin){g.translate(f.x,f.y-h/2);g.scale(1+Math.sin(f.t*30)*.03,1);g.drawImage(im,-w/2,-h/2,w,h);}else g.drawImage(im,f.x-w/2,f.y-(f.cloud?h/2:h)-(f.float?Math.sin(f.t*6)*3:0),w,h);}}
