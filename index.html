@@ -4431,6 +4431,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:123,d:'Nov 23, 2026',ic:'🆘',t:'HELP & SUPPORT in the game',l:['Found a bug, a problem with a purchase or your account? Go to <b>PROFILE → HELP &amp; SUPPORT</b> (or MAIL → Need help?).','Choose what it is about, write a few words and tap <b>SEND</b> – the answer comes in your <b>MAIL</b>.','Chat: 3 seconds between messages – if you tap SEND sooner, your message waits and goes out by itself.']},
  {id:122,d:'Nov 23, 2026',ic:'📱',t:'AUTO graphics – the game checks your phone',l:['At the first start the game now <b>checks your phone</b> by itself: good phones get <b>HD</b>, normal phones <b>STANDARD</b>, older phones <b>LOW</b> – a lighter picture, so no lag.','If battles get slow, AUTO goes one step lower by itself next time.','You can still choose in <b>PROFILE → GRAPHICS</b>: AUTO · HD · STANDARD · LOW.']},
  {id:121,d:'Nov 23, 2026',ic:'🚨',t:'THIEVES 2.0 – gangs, bosses & K9 dogs',l:['Thieves now come <b>in groups</b>: amateurs, fast <b>★ PROs</b> and the <b>👑 GANG BOSS</b> with his van full of helpers. Sometimes the <b>whole GANG</b> attacks at once – a <b>GANG RAID</b>!','Your guards <b>patrol</b> all the time and fight like crazy. With 2+ thieves a <b>security car brings BACKUP</b> guards, and in big raids the <b>K9 van</b> drops a dog handler with his dogs.','Caught thieves give <b>Builder Kit</b>, <b>Crew Tickets</b> and <b>diamonds</b>. A thief who escapes steals <b>5–20% of your cash</b> – higher Security = less.','New <b>MOST WANTED</b> board in SECURITY: 3 wanted thieves every day, each with a bounty – catch all 3 for a daily bonus.']},
  {id:120,d:'Nov 23, 2026',ic:'🛡️',t:'Skills look like the hero\'s own art',l:['Hero skills now show only the hero\'s <b>own effect pictures</b> – the extra drawn circles, flashes and rings are gone (Epic, Legendary and Mythic heroes).','<b>Goliath – IRON FORTRESS</b>: every hero he protects now carries a small copy of <b>his golden shield</b> while the shield lasts. Ignis brings fallen heroes back with <b>his phoenix</b>.']},
@@ -4572,7 +4573,7 @@ const MAIL=[
  {id:'m3',d:'Nov 14, 2026',ic:'💎',t:'Diamonds are here!',b:'Diamonds are new in Torque Empire! Use them to summon when you run out of tickets (100 Diamonds = 1 summon – we always ask before using them). Here are some to start with.',g:{dm:1000}},
  {id:'m2',d:'Nov 14, 2026',ic:'🎁',t:'Thank you, tester!',b:'Thank you for helping us test Torque Empire before the launch. Here is a small gift for your garage. Have fun – and keep the reports coming!',g:{tk:10,ct:5}},
  {id:'m1',d:'Nov 14, 2026',ic:'📅',t:'New: Daily Check-in',b:'Tap the calendar at the top right every day. Seven days of rewards, with a big chest on day 7. A missed day does not reset your progress.'},
- {id:'m0',d:'Nov 13, 2026',ic:'🛠️',t:'Need help?',b:'Found a bug or have an idea? Write to us – we read every message. Tell us your phone model and what happened.',mail:1},
+ {id:'m0',d:'Nov 13, 2026',ic:'🛠️',t:'Need help?',b:'Found a bug, a problem with a purchase or have an idea? Tap <b>HELP &amp; SUPPORT</b> below (or <b>PROFILE → HELP &amp; SUPPORT</b>) – we read every message and answer in your MAIL.',help:1},
 ].filter(m=>!m.pid||(window.SEC&&String(SEC.PID).startsWith(m.pid)));
 const mlUnread=()=>MAIL.filter(m=>!G.ml.r.includes(m.id)||(m.g&&!G.ml.c.includes(m.id))).length;
 const xpEl=$('xp');let xpMode='',xpMail='';
@@ -4601,12 +4602,11 @@ function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTM
   if(xpMode==='mail'){T.textContent='MAIL';S.textContent='MESSAGES FROM TORQUE STUDIOS';
     if(xpMail){const m=MAIL.find(q=>q.id===xpMail),got=G.ml.c.includes(m.id);
       let h='<div class="mlBody"><h3>'+m.ic+' '+m.t+'</h3><div class="fr">From: Torque Studios · '+m.d+'</div>'+m.b;
-      if(m.mail)h+='<div class="mlGift">✉️ torqueempirehelp@gmail.com</div>';
       if(m.g)h+='<div class="mlGift">'+(got?'✓ Gift claimed':'🎁 Gift: '+rwHtml(m.g).replace(/<br>/g,' · '))+'</div>';h+='</div>';
       if(m.g&&!got)h+='<button class="xBtn rdHost" id="mlGo">🎁 CLAIM GIFT<i class="rdd"></i></button>';
-      if(m.mail)h+='<button class="xBtn" id="mlW">✉️ WRITE TO US</button>';
+      if(m.help)h+='<button class="xBtn" id="mlW">🆘 HELP &amp; SUPPORT</button>';
       B.innerHTML=h;const g=$('mlGo');if(g)g.onclick=()=>{if(G.ml.c.includes(m.id))return;giveRw(m.g);G.ml.c.push(m.id);save();toast('🎁 '+rwHtml(m.g).replace(/<br>/g,' · ')+' added!',3000);renderXP();updX();};
-      const w=$('mlW');if(w)w.onclick=()=>{location.href='mailto:torqueempirehelp@gmail.com?subject='+encodeURIComponent('Torque Empire – feedback');};return;}
+      const w=$('mlW');if(w)w.onclick=()=>{xpMail='';xpEl.classList.remove('open');xpMode='';updX();if(window.ONLINE&&ONLINE.help)ONLINE.help();};return;} // v16-265: in-game HELP & SUPPORT form (no e-mail)
     B.innerHTML=MAIL.map(m=>{const un=!G.ml.r.includes(m.id),gift=m.g&&!G.ml.c.includes(m.id);
       return '<div class="mlI'+(un||gift?' unread':'')+'" data-ml="'+m.id+'"><span class="ic">'+m.ic+'</span><div><b>'+m.t+'</b><small>Torque Studios · '+m.d+'</small></div>'+(gift?'<span class="gift">🎁</span>':un?'<i style="width:10px;height:10px;border-radius:5px;background:#ff5b4b"></i>':'')+'</div>';}).join('');}}
 $('xpBody').addEventListener('click',e=>{const m=e.target.closest('[data-ml]');if(!m)return;xpMail=m.dataset.ml;if(!G.ml.r.includes(xpMail)){G.ml.r.push(xpMail);save();}renderXP();updX();});

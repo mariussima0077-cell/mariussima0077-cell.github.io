@@ -655,6 +655,16 @@ export async function online(op, b, env) {
     const a = await db.prepare('SELECT pts, w, l, season FROM arena WHERE uid=?').bind(p.uid).first();
     return {ok:true, p:pub(p, {team:viewTeam(JSON.parse(p.team || '[]')), arena:a && a.season === seasonOf(now) ? {pts:a.pts, w:a.w, l:a.l, tier:tierOf(a.pts)} : null})}; }
   let p = await profOf(env, b.pid);
+  // v16-265 HELP & SUPPORT (Marius 23 nov): the player's message → table tickets → /admin „🆘 Support” (answer goes to his Mail). Max 3 a day.
+  if (op === 'help') {
+    await db.prepare('CREATE TABLE IF NOT EXISTS tickets(id INTEGER PRIMARY KEY AUTOINCREMENT, pid TEXT, uid INTEGER, t INTEGER, cat TEXT, txt TEXT, info TEXT, st INTEGER DEFAULT 0, reply TEXT, tr INTEGER)').run();
+    const c = await db.prepare('SELECT COUNT(*) n FROM tickets WHERE pid=? AND t>?').bind(b.pid, now - DAY).first(); if (c && c.n >= 3) return {err:'limit'};
+    const txt = clean(String(b.txt || '').replace(/\s*\n\s*/g, ' · ')).slice(0, 1000).trim(); if (txt.length < 5) return {err:'short'};
+    const cat = ['bug','buy','acc','pl','idea','oth'].includes(b.cat) ? b.cat : 'oth';
+    const info = JSON.stringify({cv: b.cv | 0, g: String(b.g || '').slice(0, 30), ua: String(b.ua || '').slice(0, 160), name: p ? p.name : '', srv: p ? p.srv : 0});
+    const r = await db.prepare('INSERT INTO tickets(pid,uid,t,cat,txt,info) VALUES(?,?,?,?,?,?) RETURNING id').bind(b.pid, p ? p.uid : 0, now, cat, txt, info).first();
+    return {ok:true, id: r && r.id};
+  }
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
     const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, team = cleanTeam(b.team), lang = String(b.lang || 'en').slice(0, 12);

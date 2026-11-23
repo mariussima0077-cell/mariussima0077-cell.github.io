@@ -675,6 +675,16 @@ async function giftPage(url, env) {
 async function admin(url, env) {
   if (!env.ADMIN_KEY || url.searchParams.get('key') !== env.ADMIN_KEY) return new Response('no', {status:403});
   const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY);
+  // v16-265 🆘 SUPPORT: answer a ticket (→ the player's Mail) or close it
+  await db.prepare('CREATE TABLE IF NOT EXISTS tickets(id INTEGER PRIMARY KEY AUTOINCREMENT, pid TEXT, uid INTEGER, t INTEGER, cat TEXT, txt TEXT, info TEXT, st INTEGER DEFAULT 0, reply TEXT, tr INTEGER)').run();
+  const tAns = url.searchParams.get('tans'), tCls = url.searchParams.get('tcls');
+  if (tCls) { await db.prepare('UPDATE tickets SET st=2 WHERE id=?').bind(tCls | 0).run(); return Response.redirect(url.origin + '/admin?key=' + k + '#sup', 302); }
+  if (tAns) { const T = await db.prepare('SELECT * FROM tickets WHERE id=?').bind(tAns | 0).first(), msg = String(url.searchParams.get('msg') || '').trim().slice(0, 1500);
+    if (T && msg && T.st !== 1) { let uid = T.uid; if (!(uid > 0)) { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(T.pid).first(); uid = pr && pr.uid; }
+      if (uid > 0) { await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), '🆘', 'Reply from Torque Studios', msg + '\n\n— Your message: “' + String(T.txt).slice(0, 300) + '”', '{}').run();
+        await db.prepare('UPDATE tickets SET st=1, reply=?, tr=? WHERE id=?').bind(msg, Date.now(), T.id).run(); }
+      else return new Response('This player has no online profile yet (he never opened the online pages) – the answer cannot reach his Mail. Try again later.', {status:200}); }
+    return Response.redirect(url.origin + '/admin?key=' + k + '#sup', 302); }
   const act = url.searchParams.get('unban');
   if (act) { await db.prepare('UPDATE players SET banned=0, score=0, shadow=0, sig=NULL, reason=? WHERE pid=?').bind('unbanned by admin', act).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
   // v16-157: hide (shadow) / show again by hand · player card
@@ -721,6 +731,9 @@ async function admin(url, env) {
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
   let st = null; try { st = await dailyStats(env); } catch (e) {}
   const errs = await errList(env);   // v16-263
+  const tks = (await db.prepare('SELECT * FROM tickets WHERE st=0 OR t>? ORDER BY st, t DESC LIMIT 40').bind(Date.now() - 3 * 864e5).all()).results;   // v16-265
+  const TN = await pnames(db, tks.map(t => t.pid));
+  const TC = {bug:'🐞 Bug', buy:'💳 Purchase', acc:'👤 Account', pl:'🚩 Player', idea:'💡 Idea', oth:'❓ Other'};
   const stats = !st ? '' : `<h3>📊 Players per day (Paris time)</h3><div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
 <div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th></tr>${st.days.map(x => { const r = st.ret[x];
   return `<tr style="border-top:1px solid #ffffff14"><td>${x.slice(5)}</td><td><b>${st.dau[x] ?? '–'}</b></td><td>${st.fresh[x] || 0}</td><td>${r && r.n ? `${r.b}/${r.n} (${Math.round(100 * r.b / r.n)}%)` : '–'}</td></tr>`; }).join('')}</table>
@@ -729,6 +742,9 @@ async function admin(url, env) {
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
 <h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>${giftForm(env.ADMIN_KEY, '')}<div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
 ${stats}
+<h3 id=sup>🆘 Support (${tks.filter(t => !t.st).length} open)</h3>${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
+  return `<div class=c style="${t.st ? 'opacity:.55' : 'border-color:#ff8a80'}"><b>${TC[t.cat] || t.cat}</b> · <a href="?key=${k}&p=${encodeURIComponent(t.pid)}"><b style="color:#fff">${esc(TN[t.pid] || I.name || '(no name)')}</b></a> <small>${d(t.t)} · v${I.cv || '?'} · ${esc(I.g || '')} · S${I.srv || '?'}</small><br>${esc(t.txt)}<br><small>${esc(String(I.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>
+  ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}
 <h3>🐞 Game errors (7 days)</h3>${errs.length ? errs.map(r => `<div class=c><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small></div>`).join('') : '<div class=c>No errors 👍</div>'}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>

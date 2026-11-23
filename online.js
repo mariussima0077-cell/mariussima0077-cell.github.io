@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=264;window.TE_CV=CV;
+const CV=265;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -694,6 +694,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
    <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
    <h3>FRAME</h3><div class="frames">${FR.map(f=>`<div class="${f[0]===ME.frame?'sel':''} ${fOk(f[0])?'':'o-lock'}" data-fr="${f[0]}"><div class="av">${avf(ME.icon,f[0])}</div><small>${f[1]}<br>${fOk(f[0])?(f[0]===ME.frame?'✅ in use':'tap to use'):'🔒 '+f[2]}</small></div>`).join('')}</div>
    <h3>TITLE</h3><div class="tlist">${TORD.map(k=>`<div class="${k===ME.title?'sel':''} ${tOk(k)?'':'o-lock'}" data-tt="${k}">${tt(k)}<span>${TT[k][2]}</span><b>${tOk(k)?(k===ME.title?'✅':''):'🔒'}</b></div>`).join('')}</div>
+   <h3>HELP & SUPPORT</h3><div class="tlist"><div data-help="1">🆘 WRITE TO US<span>A bug, a purchase, your account or an idea – we answer in your MAIL</span><b>›</b></div></div>
    <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${(()=>{const G=window.GFX||{man:'auto',eff:'std'},TN={hd:'HD',std:'STANDARD',low:'LOW'};return [['auto','⚙️ AUTO · recommended','The game checked your phone → <b>'+TN[G.man==='auto'?G.eff:({hi:'hd',mid:'std',lo:'low'}[G.tier]||'std')]+'</b> for you'],['hd','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory'],['std','🖼️ STANDARD','Sharp picture, normal battery use'],['low','🍃 LOW · SMOOTH','For older phones – lighter picture, no lag, less battery']].map(g=>`<div class="${G.man===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${G.man===g[0]?'✅':''}</b></div>`).join('');})()}</div>
    <div class="o-note">Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.<br>Player ID ${ME.uid} · <u data-a="mutes">muted players (${mutes.size})</u></div>`;}
 async function setProf(set,paid){const r=await call('prof',{set,paid});
@@ -704,6 +705,7 @@ $('olPrH').addEventListener('click',e=>{if(e.target.closest('[data-a="name"]'))n
 $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
+  if(e.target.closest('[data-help]')){helpForm();return;}
   const gx=e.target.closest('[data-gfx]');if(gx){const v=gx.dataset.gfx,G=window.GFX;if(!G||G.man===v)return;G.set(v);try{T().save();}catch(x){}toast({auto:'⚙️ AUTO graphics',hd:'✨ HD graphics ON',std:'🖼️ STANDARD graphics',low:'🍃 LOW graphics'}[v]+' – restarting…',1500);setTimeout(()=>location.reload(),1200);return;}
   const ic=e.target.closest('[data-ic]');if(ic){LS('te_icon',ic.dataset.ic);await setProf({icon:ic.dataset.ic});return;}
   const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+((FR.find(x=>x[0]===+fr.dataset.fr)||[])[2]||'Locked'),2500);return;}await setProf({frame:+fr.dataset.fr});return;}
@@ -742,6 +744,22 @@ async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 
 // ------------------------------------------------------------------ modal helper
 function modal(html,cb){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="box"><button class="mX" data-mx aria-label="close">✕</button>${html}</div>`;root.appendChild(d);
   d.addEventListener('click',async e=>{if(e.target.closest('[data-mx]')){d.remove();return;}const b=e.target.closest('[data-m]');if(!b){if(e.target===d){d.remove();}return;}const k=await (cb?cb(b.dataset.m):true);if(k!==false)d.remove();});return d;}
+
+// v16-265 (Marius 23 nov 2026: „butonul Help… adaugă-l undeva în joc”): HELP & SUPPORT form → Torque Guard /admin „🆘 Support”.
+// The game adds by itself: player ID, name, version, graphics, phone. The answer comes as a message in MAIL. Max 3 messages a day.
+const HCAT=[['bug','🐞 Bug'],['buy','💳 Purchase'],['acc','👤 Account / save'],['pl','🚩 A player'],['idea','💡 Idea'],['oth','❓ Other']];
+function helpForm(){let cat='bug';
+  const d=modal(`<h4>🆘 HELP & SUPPORT</h4><p style="margin:4px 0 8px">What is it about?</p><div id="hlC" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${HCAT.map(c=>`<b data-hc="${c[0]}" style="padding:6px 10px;border-radius:12px;border:2px solid #ffd54a55;background:#00000040;font:800 12px Game,system-ui;cursor:pointer">${c[1]}</b>`).join('')}</div>
+    <textarea id="hlT" maxlength="1000" placeholder="Tell us what happened (what you did, what you saw)…" style="width:100%;box-sizing:border-box;height:120px;margin:10px 0 4px;border-radius:12px;border:2px solid #ffd54a55;background:#0b1019;color:#fff;padding:10px;font:14px system-ui;resize:none"></textarea>
+    <small style="display:block;color:#b9a77a;margin-bottom:10px">We add your player ID, game version and phone model by ourselves. The answer comes in your <b>MAIL</b>.</small>
+    <div class="ok"><button class="btn gray" data-m="no">CANCEL</button><button class="btn" data-m="send">SEND</button></div>`,async b=>{
+      if(b!=='send')return true;const t=d.querySelector('#hlT').value.trim();if(t.length<5){toast('✏️ Write a few words first',2500);return false;}
+      const r=await call('help',{cat,txt:t,g:window.GFX?GFX.eff+'/'+GFX.tier:'',ua:navigator.userAgent.slice(0,160)});
+      if(r.ok){toast('✅ Sent! We will answer in your MAIL',3500);return true;}
+      toast({limit:'⏳ You already sent 3 messages today – we will answer soon',short:'✏️ Write a few words first',network:'📶 No connection – try again',update:'⬆️ Update the game first'}[r.err]||'⚠️ Could not send – try again',3500);return false;});
+  const C=d.querySelector('#hlC'),mark=()=>C.querySelectorAll('[data-hc]').forEach(x=>{const on=x.dataset.hc===cat;x.style.borderColor=on?'#ffd54a':'#ffd54a55';x.style.background=on?'#ffd54a33':'#00000040';});
+  C.addEventListener('click',e=>{const x=e.target.closest('[data-hc]');if(!x)return;e.stopPropagation();cat=x.dataset.hc;mark();});mark();return d;}
+function helpOpen(){if(!API()){toast('📶 HELP needs an internet connection');return;}if(!open_)openHub('olProf');helpForm();}
 
 // ------------------------------------------------------------------ ARENA FIGHT – plays the fight decided by the server
 const fc=$('olFc'),g=fc.getContext('2d');let F=null,fRaf=0;
@@ -1007,5 +1025,5 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 #onl .sys.s2 .shine{background:linear-gradient(90deg,#b3121c,#ff5a1f);color:#fff;font-weight:900;box-shadow:0 0 0 1.5px #ffd54a}#onl .sys.s2.g .shine{background:linear-gradient(90deg,#036b7d,#14c9e0)}
 </style>`);
 addButtons();
-window.ONLINE={brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
+window.ONLINE={help:helpOpen,brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
 })();
