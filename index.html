@@ -244,6 +244,8 @@ img.mini{width:26px;height:26px;border-radius:6px;border:2px solid;vertical-alig
 #auBar .auL{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
 #auBar .auL b{color:#ffd54a;font-size:14px}#auBar .auL span{font-size:12px;color:#cfd8dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #auBar .auS{padding:10px 14px;border-radius:10px;background:linear-gradient(#ff5252,#b71c1c);font-weight:900;white-space:nowrap}
+.auDm{margin:6px 0;padding:8px;border-radius:10px;background:#0006;border:1px solid #4fc3f755;color:#fff;text-align:center;font-size:13px}.auDm small{color:#9fd3ff;font-size:11px}
+.auDr{display:flex;gap:6px;justify-content:center;margin:6px 0 4px}.auD{flex:1;padding:8px 0;border-radius:8px;border:2px solid #4fc3f7;background:#0d2a40;color:#9fd3ff;font:900 13px system-ui}.auD.on{background:linear-gradient(#4fc3f7,#0277bd);color:#fff;border-color:#ffd54a}
 .pB.auB{display:block;width:100%;border-left:6px solid var(--gc)}.pB.auB small{display:block;font-size:11px;opacity:.8;font-weight:700}
 .auSum{text-align:center;color:#fff;margin:4px 0 8px}.auSum .auW{font:900 15px system-ui;color:#ffd54a}.auSum .auC{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;font:800 13px system-ui;margin-top:4px}.auSum small{display:block;color:#9aa;font-size:11px;margin-top:3px}
 #res.best3{background:radial-gradient(circle at 50% 40%,#5a1f7a,#05080c 75%)}
@@ -3753,23 +3755,33 @@ const auGS=()=>window.CAMPAIGN&&CAMPAIGN.gs;
 function auTk(c){if(c==='gear'){const GSx=auGS();return GSx?GSx.d().tk:0;}return tkN(c);}
 function auIc(c){return c==='gear'?'<img src="img/gticket.webp" style="height:1.1em;vertical-align:-.2em" alt="">':TIK(c);}
 function auPill(c){const n=auTk(c);return '<div class="smAutoW" style="'+box(285,1311,351,45)+'"><div class="smL smAuto'+(AU?' on':'')+'" data-a="auto">'+(AU?'■ STOP AUTO':'⚡ AUTO SUMMON')+(n>=10&&!AU?'<i class="rdd" style="right:3%;top:-12%"></i>':'')+'</div></div>';}
-function popAuto(){if(AU){auStop();return;}const c=smCat,n=auTk(c),gear=c==='gear';
-  if(n<1){toast('⚡ AUTO SUMMON uses tickets only – you have no '+(gear?'Gear':c==='c'?'Crew':'Recruit')+' Tickets',2800);return;}
+// v16-238 (Marius: "also with diamonds, not only tickets"): the player picks a diamond LIMIT in the window = his yes (payAsk rule)
+const AU_DM=[0,10000,50000,-1];
+function popAuto(dmI){if(AU){auStop();return;}const c=smCat,n=auTk(c),gear=c==='gear',dm=G.dm||0;dmI=dmI|0;
+  if(n<1&&dm<DM_SUM){toast('⚡ AUTO SUMMON: no '+(gear?'Gear':c==='c'?'Crew':'Recruit')+' Tickets and not enough '+DMI,2800);return;}
   if(gear){const GSx=auGS();if(GSx&&GSx.d().inv.length>=GSx.INV){toast('🎒 Gear bag full – SALVAGE first',2600);return;}}
+  if(n<1&&!dmI)dmI=1;
+  const lim=AU_DM[dmI]<0?dm:Math.min(dm,AU_DM[dmI]),tot=n+Math.floor(lim/DM_SUM);
   const B=(g,t,sub)=>'<button class="pB auB" data-p="auGo" data-s="'+g+'" style="--gc:'+(GRADES[g]?GRADES[g].c:'#43e97b')+'">'+t+'<small>'+sub+'</small></button>';
-  pop('<div class="pT">⚡ AUTO SUMMON</div><div class="pD">Summons <b>×10</b> again and again (×1 for the last tickets) with your <b>tickets only</b>: '+auIc(c)+' <b>'+n.toLocaleString()+'</b>.<br>'+DMI+' Diamonds are <b>never</b> used.</div><div class="pD">It stops when the tickets run out'+(gear?' or the bag is full':'')+', when you tap <b>STOP</b>, or when you get:</div>'+
-    B(4,'STOP AT LEGENDARY','first Legendary or better')+B(5,'STOP AT MYTHIC','first Mythic')+B(9,'USE ALL TICKETS','summons all '+n.toLocaleString())+'<button class="pB grey" data-p="x">CANCEL</button>',{c},'dlgSk');}
-$('pop').addEventListener('click',e=>{const t=e.target.closest('[data-p="auGo"]');if(!t)return;const c=(popCtx&&popCtx.c)||smCat;closePop();auStart(c,+t.dataset.s);});
-function auStart(c,stop){if(AU)return;AU={c,stop,res:[],cnt:0,best:-1,sold:0,why:''};
+  const D=AU_DM.map((v,k)=>'<button class="auD'+(k===dmI?' on':'')+'" data-p="auDm" data-i="'+k+'">'+(v===0?'NO':v<0?'ALL':(v/1000)+'K')+'</button>').join('');
+  pop('<div class="pT">⚡ AUTO SUMMON</div><div class="pD">Summons <b>×10</b> again and again (×1 at the end) with your tickets: '+auIc(c)+' <b>'+n.toLocaleString()+'</b>.</div>'+
+    '<div class="auDm"><div>'+DMI+' <b>Use diamonds too?</b> <small>(100 = 1 summon · you have '+dm.toLocaleString()+')</small></div><div class="auDr">'+D+'</div>'+
+    '<small>'+(dmI?'Max <b>'+lim.toLocaleString()+'</b> '+DMI+' – tickets are used first':'Tickets only')+'</small></div>'+
+    '<div class="pD">It stops when it runs out'+(gear?' or the bag is full':'')+', when you tap <b>STOP</b>, or when you get:</div>'+
+    B(4,'STOP AT LEGENDARY','first Legendary or better')+B(5,'STOP AT MYTHIC','first Mythic')+B(9,'USE EVERYTHING','up to '+tot.toLocaleString()+' summons')+'<button class="pB grey" data-p="x">CANCEL</button>',{c,dmI,lim},'dlgSk');}
+$('pop').addEventListener('click',e=>{const d=e.target.closest('[data-p="auDm"]');if(d){popAuto(+d.dataset.i);return;}const t=e.target.closest('[data-p="auGo"]');if(!t)return;const c=(popCtx&&popCtx.c)||smCat,lim=(popCtx&&popCtx.lim)||0;closePop();auStart(c,+t.dataset.s,lim);});
+function auStart(c,stop,lim){if(AU)return;AU={c,stop,res:[],cnt:0,best:-1,sold:0,why:'',dmL:lim||0,dmU:0};
   let b=$('auBar');if(!b){b=document.createElement('div');b.id='auBar';document.body.appendChild(b);b.addEventListener('click',()=>auStop());}
   b.className='open';liftZ(b);auDraw();smKey='';renderSm();AU.tm=setTimeout(auStep,150);}
 function auDraw(){const b=$('auBar');if(!b||!AU)return;const c=AU.c,g=AU.best;
-  b.innerHTML='<div class="auL"><b>⚡ AUTO SUMMON</b><span>'+AU.cnt.toLocaleString()+' summoned · '+auIc(c)+' '+auTk(c).toLocaleString()+' left</span><span>Best: '+(g>=0?'<b style="color:'+(g>=6?'#2ef3ff':GRADES[g].c)+'">'+(g>=6?'ASCENDED':GRADES[g].n.toUpperCase())+'</b>':'—')+' · stops at '+(AU.stop>=9?'tickets end':AU.stop>=5?'MYTHIC':'LEGENDARY')+'</span></div><div class="auS">■ STOP</div>';}
-function auStep(){if(!AU)return;const c=AU.c,have=auTk(c);
-  if(have<1){AU.why='No tickets left';auEnd();return;}
-  const n=have>=10?10:1;let got=[];
-  try{if(c==='gear'){const GSx=auGS(),r=GSx&&GSx.sumQ(n);if(!r){AU.why='Gear bag full – SALVAGE';auEnd();return;}got=r.map(o=>({g:o.it.r,o}));r.forEach(o=>{if(o.sold)AU.sold++;});}
-    else{if(c==='c')G.h.ct-=n;else G.h.tk-=n;got=summon(c,n===10?11:1).map(o=>({g:HB[o.id].gr,o}));}}
+  b.innerHTML='<div class="auL"><b>⚡ AUTO SUMMON</b><span>'+AU.cnt.toLocaleString()+' summoned · '+auIc(c)+' '+auTk(c).toLocaleString()+(AU.dmL?' · '+DMI+' '+AU.dmU.toLocaleString()+' / '+AU.dmL.toLocaleString():'')+'</span><span>Best: '+(g>=0?'<b style="color:'+(g>=6?'#2ef3ff':GRADES[g].c)+'">'+(g>=6?'ASCENDED':GRADES[g].n.toUpperCase())+'</b>':'—')+' · stops at '+(AU.stop>=9?'the end':AU.stop>=5?'MYTHIC':'LEGENDARY')+'</span></div><div class="auS">■ STOP</div>';}
+function auStep(){if(!AU)return;const c=AU.c,have=auTk(c),dmCan=Math.floor(Math.min(G.dm||0,AU.dmL-AU.dmU)/DM_SUM);
+  if(have+dmCan<1){AU.why=AU.dmL?'No tickets / diamond limit reached':'No tickets left';auEnd();return;}
+  const n=have+dmCan>=10?10:1,use=Math.min(n,have),need=(n-use)*DM_SUM;let got=[];
+  try{if(c==='gear'){const GSx=auGS();if(!GSx||GSx.d().inv.length>=GSx.INV){AU.why='Gear bag full – SALVAGE';auEnd();return;}
+      GSx.d().tk-=use;G.dm-=need;const r=GSx.sumQP(n);got=r.map(o=>({g:o.it.r,o}));r.forEach(o=>{if(o.sold)AU.sold++;});}
+    else{if(c==='c')G.h.ct-=use;else G.h.tk-=use;G.dm-=need;got=summon(c,n===10?11:1).map(o=>({g:HB[o.id].gr,o}));}
+    AU.dmU+=need;}
   catch(e){console.error(e);AU.why='Stopped';auEnd();return;}
   got.forEach(x=>{AU.res.push(x);if(x.g>AU.best)AU.best=x.g;});AU.cnt+=got.length;
   smKey='';renderSm();auDraw();
@@ -3779,7 +3791,7 @@ function auStop(quiet){if(!AU)return;clearTimeout(AU.tm);if(quiet){AU=null;const
 function auEnd(){const A=AU;AU=null;clearTimeout(A.tm);const b=$('auBar');if(b)b.className='';smKey='';renderSm();
   if(!A.res.length){toast('⚡ AUTO SUMMON: '+A.why,2400);return;}
   const cnt={};A.res.forEach(x=>{cnt[x.g]=(cnt[x.g]||0)+1;});
-  const hd='<div class="auSum"><div class="auW">'+A.cnt.toLocaleString()+' summoned · '+A.why+'</div><div class="auC">'+Object.keys(cnt).sort((a,b)=>b-a).map(g=>'<span style="color:'+(g>=6?'#2ef3ff':GRADES[g].c)+'">'+(g>=6?'Ascended':GRADES[g].n)+' <b>×'+cnt[g]+'</b></span>').join('')+'</div>'+(A.sold?'<div class="auC" style="color:#9ff0a8">'+A.sold+' auto salvaged</div>':'')+'<small>Best results below</small></div>';
+  const hd='<div class="auSum"><div class="auW">'+A.cnt.toLocaleString()+' summoned · '+A.why+'</div>'+(A.dmU?'<div class="auC">'+DMI+' <b>'+A.dmU.toLocaleString()+'</b> diamonds used</div>':'')+'<div class="auC">'+Object.keys(cnt).sort((a,b)=>b-a).map(g=>'<span style="color:'+(g>=6?'#2ef3ff':GRADES[g].c)+'">'+(g>=6?'Ascended':GRADES[g].n)+' <b>×'+cnt[g]+'</b></span>').join('')+'</div>'+(A.sold?'<div class="auC" style="color:#9ff0a8">'+A.sold+' auto salvaged</div>':'')+'<small>Best results below</small></div>';
   // best cards: Legendary+ (else Epic+, else the 11 best), max 30
   const srt=[...A.res].sort((a,b)=>b.g-a.g);let L=srt.filter(x=>x.g>=4);if(!L.length)L=srt.filter(x=>x.g>=3);if(!L.length)L=srt.slice(0,11);L=L.slice(0,30);
   if(A.c==='gear'){const GSx=auGS();if(GSx)GSx.res(L.map(x=>x.o),10,0,hd);}else showResults(L.map(x=>x.o),A.c,10,hd);}
@@ -4198,6 +4210,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:107,d:'Nov 23, 2026',ic:'💎',t:'AUTO SUMMON with diamonds',l:['<b>⚡ AUTO SUMMON</b> can now use <b>diamonds</b> too: choose NO, <b>10K</b>, <b>50K</b> or <b>ALL</b> in its window.','Tickets are always used first, then diamonds (100 = 1 summon) – never more than the limit you chose.']},
  {id:106,d:'Nov 23, 2026',ic:'⚡',t:'AUTO SUMMON',l:['New green <b>⚡ AUTO SUMMON</b> button on the HERO, CREW and GEAR summon pages.','It summons <b>×10</b> again and again with your <b>tickets only</b> – diamonds are never used.','Choose when it stops: first <b>Legendary</b>, first <b>Mythic</b> or <b>all tickets</b>. Tap <b>■ STOP</b> any time.','At the end you see how many of each grade you got and your best results.']},
  {id:105,d:'Nov 23, 2026',ic:'👹',t:'Smarter monsters: MINI BOSS + ENRAGE',l:['Every battle now compares your <b>POWER</b> with the monsters\' power.','Monsters more than <b>×1.3</b> stronger: a <b>MINI BOSS</b> joins the last wave. More than <b>×2</b>: they go <b>ENRAGE</b> too.','Your team stronger? Nothing changes. Beating a mini boss gives bonus <b>Essence</b>.','Campaign, Torque Tower and Class Towers only. Hero armor (DEF) now blocks at most 60% of a hit, so POWER shows your real strength.','In the campaign it starts at <b>chapter 5</b> (stage 5-1) – the team screen warns you before the fight (⚠ MINI BOSS / ENRAGE).']},
  {id:104,d:'Nov 23, 2026',ic:'💎',t:'Diamond Pass: your diamonds come back',l:['<b>Tier 1</b> of the DIAMOND PASS lane now gives back <b>ALL the diamonds</b> you paid (PASS 2,500 · PASS+ 6,000 · upgrade: the 3,500 difference).','Tiers 2-100 give the rest of the rewards as before. Already claimed tier 1 before? Open the Grand Prix – your diamonds come back automatically.']},
