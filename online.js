@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=227;
+const CV=228;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -456,7 +456,7 @@ async function sync(){
   return r;}
 let arenaTk=0;
 function dots(){const ch=chatSrvLast>chatLast;const a=$('chDot');if(a)a.classList.toggle('on',ch||inboxN>0);$('olChDot').classList.toggle('on',ch);
-  const ad=$('arDot');if(ad)ad.classList.toggle('on',arenaTk>0);$('olArDot').classList.toggle('on',arenaTk>0);const md=$('olAmDot');if(md)md.classList.toggle('on',!!(asData&&asData.mile.some(m=>!m.got&&asData.w>=m.n)));}
+  const mr=!!(asData&&asData.mile.some(m=>!m.got&&asData.w>=m.n));const ad=$('arDot');if(ad){ad.classList.toggle('on',arenaTk>0||mr);ad.dataset.t=arenaTk>0?String(arenaTk):mr?'GIFT':'';}const ft=document.querySelector('#olArT [data-t=fight]');if(ft){let q=ft.querySelector('.rdt');if(arenaTk>0){if(!q){ft.insertAdjacentHTML('beforeend','<b class="rdt" style="right:-2px;top:-6px"></b>');q=ft.querySelector('.rdt');}q.textContent=arenaTk;}else if(q)q.remove();}$('olArDot').classList.toggle('on',arenaTk>0);const md=$('olAmDot');if(md)md.classList.toggle('on',!!(asData&&asData.mile.some(m=>!m.got&&asData.w>=m.n)));}
 function hdr(){root.querySelectorAll('[data-srv]').forEach(e=>e.textContent='🌍 S'+(window.CLOUD?CLOUD.srv():1));
   root.querySelectorAll('[data-gift]').forEach(e=>{e.classList.toggle('on',inboxN>0);e.querySelector('i').textContent=inboxN;});}
 setInterval(()=>{if(document.visibilityState==='visible')sync();},5*60e3);
@@ -587,7 +587,7 @@ function asRender(){const B=$('olArB'),r=asData;if(!r)return;dots();
     <div class="o-note">Earn ${AMh} medals: <b>+10</b> per win · <b>+3</b> per loss · daily reward by league (${AMh} 20 → 100) · season end (${AMh} 100 → 1,000). Weekly limits reset with the season (Monday).</div>`;return;}
   const mx=r.mile[r.mile.length-1].n,pct=Math.min(100,r.w/mx*100);
   B.innerHTML=`${head}<div class="amTr"><img src="img/arena/am_bar.webp" alt=""><i style="width:${pct*.86}%"></i><span>${r.w} / ${mx} WINS</span></div>
-   ${r.mile.map((m,i)=>{const ok=r.w>=m.n;return `<div class="amR ${m.got?'got':ok?'rdy':''}"><img class="ch" src="img/arena/am_chest${i<3?0:i<6?1:2}.webp" alt=""><div class="t"><b>${m.n} WINS</b><small>${rwLine(m.rw)}</small></div><button data-am="${i}" class="${m.got||!ok?'off':''}">${m.got?'✓':ok?'CLAIM':`${Math.min(r.w,m.n)}/${m.n}`}</button></div>`;}).join('')}
+   ${r.mile.map((m,i)=>{const ok=r.w>=m.n;return `<div class="amR ${m.got?'got':ok?'rdy':''}"><img class="ch" src="img/arena/am_chest${i<3?0:i<6?1:2}.webp" alt=""><div class="t"><b>${m.n} WINS</b><small>${rwLine(m.rw)}</small></div><button data-am="${i}" class="${m.got||!ok?'off':''}" style="position:relative">${!m.got&&ok?'<i class="rdd"></i>':''}${m.got?'✓':ok?'CLAIM':`${Math.min(r.w,m.n)}/${m.n}`}</button></div>`;}).join('')}
    <div class="o-note">Win Arena fights to open the chests. Wins and chests reset every season (Monday).</div>`;}
 async function asBuy(k){const x=asData&&asData.shop.find(z=>z.k===k);if(!x)return;
   if(x.once&&x.own)return toast('✓ You already own it');if(asData.med<x.pr)return toast(AMh+' Not enough Arena Medals ('+fmtN(x.pr)+')',2400);

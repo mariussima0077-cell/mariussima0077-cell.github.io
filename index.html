@@ -930,6 +930,12 @@ html body .dgPS span{font-size:10px!important}
 #cpDot.ex,.rdx.ex{width:20px!important;height:20px!important;min-width:20px!important;right:-4px!important;top:-4px!important}#cpDot.ex:after,.rdx.ex:after{content:'!'!important}
 .rdx.ex:after{font-size:calc(var(--u,1px)*44)!important}
 .rdd{position:absolute;right:-3px;top:-3px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a80,#ff1744 45%,#b0001e);box-shadow:0 0 0 2px #fff,0 0 8px #ff1744;z-index:4;pointer-events:none;animation:rdxP 1.6s ease-in-out infinite}
+/* v16-228 (Marius): the dot SAYS what to do (LV UP, GEAR, 5, GIFT …) and every page continues the trail */
+#heDot[data-t]:not([data-t=""]),#tkDot[data-t]:not([data-t=""]),#rosDot[data-t]:not([data-t=""]),#idDot[data-t]:not([data-t=""]),#dqDot[data-t]:not([data-t=""]),#evDot[data-t]:not([data-t=""]),#ciDot[data-t]:not([data-t=""]),#nwDot[data-t]:not([data-t=""]),#mlDot[data-t]:not([data-t=""]),#chDot[data-t]:not([data-t=""]),#arDot[data-t]:not([data-t=""]),#cpDot[data-t]:not([data-t=""]),#vipDot[data-t]:not([data-t=""]){width:auto!important;min-width:16px!important;height:15px!important;padding:0 4px!important;border-radius:8px!important;right:-3px!important;top:-5px!important}
+#heDot[data-t]:not([data-t=""]):after,#tkDot[data-t]:not([data-t=""]):after,#rosDot[data-t]:not([data-t=""]):after,#idDot[data-t]:not([data-t=""]):after,#dqDot[data-t]:not([data-t=""]):after,#evDot[data-t]:not([data-t=""]):after,#ciDot[data-t]:not([data-t=""]):after,#nwDot[data-t]:not([data-t=""]):after,#mlDot[data-t]:not([data-t=""]):after,#chDot[data-t]:not([data-t=""]):after,#arDot[data-t]:not([data-t=""]):after,#cpDot[data-t]:not([data-t=""]):after,#vipDot[data-t]:not([data-t=""]):after{content:attr(data-t)!important;position:relative!important;inset:auto!important;display:block!important;font:900 9px/15px Game,system-ui!important;white-space:nowrap}
+.rdt{position:absolute;right:2px;top:2px;z-index:4;pointer-events:none;padding:0 5px;height:15px;border-radius:8px;background:radial-gradient(circle at 35% 30%,#ff8a80,#ff1744 45%,#b0001e);box-shadow:0 0 0 1.5px #fff,0 0 6px #ff1744;font:900 9px/15px Game,system-ui;font-style:normal;color:#fff;white-space:nowrap;letter-spacing:.2px;text-shadow:0 1px 1px #7a0010;animation:rdxP 1.6s ease-in-out infinite}
+.rdHost{position:relative}
+.gPed .rdt{font:900 9px/15px Game,system-ui!important;margin:0!important;color:#fff!important;text-shadow:0 1px 1px #7a0010!important;top:16%!important;right:-6%!important}#gBtns .cpGo,.rsA{position:relative}
 @keyframes rdxP{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 </style>
 </head>
@@ -3228,7 +3234,7 @@ function renderPanel(){
     h+='<div class="subcard"><div>'+U3('sp_vip','64px')+'</div><div class="tx"><b>'+(S2()?'VIP Pass':'VIP Pass · '+SUB_PRICE+' / 30 days')+'</b>'+(sub?'Active – '+(S2()?SHOP2.PASSN()+' · '+SHOP2.days():Math.ceil((PK.sub-Date.now())/864e5))+' days left. All benefits ×'+SUB_MULT+'.':(S2()?'Silver ×1.2 · Gold ×1.5 · Platinum ×2 – you can have all three (×2.7).':'All VIP benefits ×'+SUB_MULT+' stronger than without the pass.'))+'</div>'+
       (S2()?'<button class="buy" data-buy="sub">'+(sub?'ACTIVE':'OPEN')+'</button>':sub?'<button class="buy own">ACTIVE</button>':'<button class="buy" data-buy="sub">'+SUB_PRICE+'</button>')+'</div>';
     {const P=VP(VLV),dOK=VLV&&G.vipD!==dayK(),wOK=VLV&&G.vipW!==weekK();
-     h+='<div class="vipGift">'+VIPI(VLV||1,'58px')+'<div class="tx"><b>VIP '+VLV+' GIFTS</b><br>'+(VLV?'Every day: '+TKI+' <b>'+P.sum+'</b> free summons · '+DMI+' <b>'+P.dm+'</b><br>Every Monday: '+TKI+CTI+'<img class="tki" src="img/gticket.webp"> <b>'+3*VLV+'</b> each + 🗝 1':'Reach VIP 1 with Daily Quests to unlock daily gifts.')+'</div><div class="bt"><button class="buy'+(dOK?'':' own')+'" data-vg="d">'+(dOK?'DAILY':'✓ TODAY')+'</button><button class="buy'+(wOK?'':' own')+'" data-vg="w">'+(wOK?'WEEKLY':'✓ WEEK')+'</button></div></div>';
+     h+='<div class="vipGift">'+VIPI(VLV||1,'58px')+'<div class="tx"><b>VIP '+VLV+' GIFTS</b><br>'+(VLV?'Every day: '+TKI+' <b>'+P.sum+'</b> free summons · '+DMI+' <b>'+P.dm+'</b><br>Every Monday: '+TKI+CTI+'<img class="tki" src="img/gticket.webp"> <b>'+3*VLV+'</b> each + 🗝 1':'Reach VIP 1 with Daily Quests to unlock daily gifts.')+'</div><div class="bt"><button class="buy rdHost'+(dOK?'':' own')+'" data-vg="d">'+(dOK?'DAILY<i class="rdd"></i>':'✓ TODAY')+'</button><button class="buy rdHost'+(wOK?'':' own')+'" data-vg="w">'+(wOK?'WEEKLY<i class="rdd"></i>':'✓ WEEK')+'</button></div></div>';
      if(VLV)h+='<div class="row"><span>🎁 Quick Idle (2 h at once)</span><b style="color:#7CFC9A">'+P.qi+' / day</b></div>'+(P.sweep?'<div class="row"><span>⚡ SWEEP (campaign + Dungeons)</span><b style="color:#7CFC9A">ON</b></div>':'')+(P.bag?'<div class="row"><span>🎒 Gear bag</span><b style="color:#7CFC9A">+'+P.bag+'</b></div>':'')+(P.arena?'<div class="row"><span>⚔️ Arena fights a day</span><b style="color:#7CFC9A">+'+P.arena+'</b></div>':'')+(P.dkey?'<div class="row"><span>🗝 Dungeon keys a day</span><b style="color:#7CFC9A">+'+P.dkey+'</b></div>':'');}
     h+='<div class="sec">YOUR BENEFITS · VIP '+VLV+'</div>'+(sub?'':'<div style="color:#9fb0c0;font:700 11px Game,system-ui;margin:-4px 0 6px 2px">👑 = with VIP Pass</div>')+VIP_BEN.map(b=>{const v=benAt(b,VLV,sub),on=VLV>=b.from;
       return '<div class="row"><span>'+(VIP_IMG[b.k]?U3(VIP_IMG[b.k]):b.ic)+' '+b.n+'</span><b style="color:'+(on?'#7CFC9A':'#5f6f7f')+'">'+(on?pctT(v,b.neg):'🔒 VIP '+b.from)+'</b>'+(on&&!sub?'<em style="color:#ffd54a;white-space:nowrap">'+pctT(benAt(b,VLV,true),b.neg)+'&nbsp;👑</em>':'')+'</div>';}).join('');
@@ -3333,17 +3339,17 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
     h+='<div class="dqN" style="'+box(222,y-50,480,40)+'">'+q.n+'</div>';
     h+='<div class="dqB" style="'+box(222,y+6,478,36)+'"><i style="width:'+Math.round(f*100)+'%"></i><span>'+(q.t==='earn'?fmt(q.p)+' / '+fmt(q.g):q.p+' / '+q.g)+'</span></div>';
     h+=q.cl?'<div class="dqR done" style="'+box(728,y-60,118,120)+'">✓</div>'
-      :done?'<div class="dqR claim" data-claim="'+i+'" style="'+box(728,y-60,118,120)+'">+'+q.vip+'<small>CLAIM</small></div>'
+      :done?'<div class="dqR claim" data-claim="'+i+'" style="'+box(728,y-60,118,120)+'">+'+q.vip+'<small>CLAIM</small><i class="rdd"></i></div>'
       :'<div class="dqR" style="'+box(728,y-60,118,120)+'">+'+q.vip+'<small>VIP PTS</small></div>';});
   const fr=Math.min(1,Math.max(0,(cl-1)/4));
   h+='<div style="'+box(330,1567,475*fr,10)+'background:linear-gradient(90deg,#ff9800,#ffd54a);border-radius:'+U(5)+';box-shadow:0 0 '+U(10)+' #ffb300"></div>';
   DQ_GIFTS.forEach((g,i)=>{const x=DQGX[i],ok=cl>=g.need,got=G.dq.gifts[i];
-    h+='<div class="dqG'+(got?' got':ok?' ready':'')+'" data-gift="'+i+'" style="'+box(x-58,1458,116,104)+'"></div>';
+    h+='<div class="dqG'+(got?' got':ok?' ready':'')+'" data-gift="'+i+'" style="'+box(x-58,1458,116,104)+'">'+(ok&&!got?'<i class="rdd"></i>':'')+'</div>';
     h+='<div class="dqC'+(ok?' on':'')+'" style="'+box(x-25,1547,50,50)+'">'+g.need+'</div>';
     h+='<div class="dqP" style="'+box(x+8,1462,74,32)+'">+'+g.vip+'</div>';});
   h+='<div class="dqP" style="'+box(58,1572,140,34)+'background:#b71c1c;color:#fff">TODAY +'+today+'</div>';
   // v16-25: CLAIM ALL (quests + gifts) – shown instead of the VIP line while something is ready
-  if(dqReady())h+='<div class="dqAll" data-all="1" style="'+box(281,1606,360,78)+'">CLAIM ALL<small>'+dqReady()+'</small></div>';
+  if(dqReady())h+='<div class="dqAll" data-all="1" style="'+box(281,1606,360,78)+'">CLAIM ALL<small>'+dqReady()+'</small><i class="rdd"></i></div>';
   else h+='<div class="dqT" style="'+box(40,1640,842,40)+'color:#cfd8dc">👑 VIP '+VLV+' · '+G.vip+(VIP_PTS[VLV+1]?' / '+VIP_PTS[VLV+1]:'')+' points</div>';
   h+='<div data-close="1" style="'+box(820,0,102,90)+'"></div>';
   BXM=null;dqBox.innerHTML=h;}
@@ -3623,6 +3629,8 @@ const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon 
 const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
 const smMap=()=>TALL.map(921,1532,[[764,.25],[1012,.2],[1097,.15],[1258,.15],[1324,.25]]);
 function smSize(){TALL.size(smBox,smMap());smKey='';}
+// v16-228: ticket count on the summon tab that has tickets (red pill)
+function smTkB(k){let n=0;try{if(k==='g'){const GSx=window.CAMPAIGN&&CAMPAIGN.gs,g=GSx&&GSx.d();n=g&&g.inv.length<GSx.INV?g.tk:0;}else n=tkN(k);}catch(e){}return n>0?'<b class="rdt" style="right:-2px;top:-9px">'+(n>999?'999+':n)+'</b>':'';}
 function openSummon(cat){if(cat)smCat=smOf(cat);if(AWK_SHEET&&!awkSheet){awkSheet=new Image();awkSheet.src='img/fx/awaken.webp';} /* v16-161: preload the WOW sheet (88 KB) */smSize();smKey='';smEl.classList.add('open');renderSm();}
 function closeSummon(){smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
@@ -3655,10 +3663,10 @@ function renderSm(){if(!smEl.classList.contains('open'))return;
     h+='<div class="smTi" style="'+box(x-50,792,100,100)+'">'+(hh?img(hh,d?0:1):'')+'</div>'+'<div data-a="tier" data-g="'+i+'" style="'+box(x-64,778,128,172)+'"></div>';});
   // v16-89 (Marius): the 3 plates are the 3 summons – HERO · CREW · GEAR (Rate Info stays on the (i) button of the grade panel, History inside Rate Info)
   [['m','HERO',47,254],['c','CREW',335,251],['g','GEAR',621,254]].forEach(([k,n,x,w])=>{const on=k===smCat;
-    h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+(k==='g'?'gear':k)+'" style="'+box(x,1022,w,59)+'">'+(k==='g'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+'</div>';});
+    h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+(k==='g'?'gear':k)+'" style="'+box(x,1022,w,59)+'">'+(k==='g'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+smTkB(k)+'</div>';});
   // summon buttons
-  h+='<div class="smL smBig" data-a="sum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+TIK(smCat)+' 1</span></div>';
-  h+='<div class="smL smBig gold" data-a="sum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+TIK(smCat)+' 10</span></div>';
+  h+='<div class="smL smBig" data-a="sum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+TIK(smCat)+' 1</span>'+(tkN(smCat)>=1&&tkN(smCat)<10?'<i class="rdd" style="right:6%;top:10%"></i>':'')+'</div>';
+  h+='<div class="smL smBig gold" data-a="sum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+TIK(smCat)+' 10</span>'+(tkN(smCat)>=10?'<i class="rdd" style="right:6%;top:10%"></i>':'')+'</div>';
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
   if(smCat==='m'){const w=G.h.wish&&HB[G.h.wish]; // v16-161: 2 pity bars – LEGENDARY 100 + MYTHIC 1500 (tap = WISH)
     h+='<div class="smPity" style="'+box(60,1279,392,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,P.l/PITY_L).toFixed(3)+'"></i><span>LEGENDARY <b>'+P.l+' / '+PITY_L+'</b></span></div></div>';
@@ -3687,9 +3695,9 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   TILE7.forEach((x,i)=>{h+='<div class="smTi smGt" style="'+box(x-40,805,80,80)+'"><img src="'+GSx.icon(ex[i],i)+'" alt=""><i style="background:#000a;color:'+(i>=6?'#2ef3ff':GRADES[i].c)+'">'+GSx.RATE[i]+'%</i></div><div data-a="grates" style="'+box(x-54,790,108,152)+'"></div>';});
   // the 3 summons
   [['m','HERO',47,254],['c','CREW',335,251],['gear','GEAR',621,254]].forEach(([k,n,x,w])=>{const on=k==='gear';
-    h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+k+'" style="'+box(x,1022,w,59)+'">'+(k==='gear'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+'</div>';});
-  h+='<div class="smL smBig" data-a="gsum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+GT+' 1</span></div>';
-  h+='<div class="smL smBig gold" data-a="gsum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+GT+' 10</span></div>';
+    h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+k+'" style="'+box(x,1022,w,59)+'">'+(k==='gear'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+smTkB(k==='gear'?'g':k)+'</div>';});
+  const gOK=g.inv.length<GSx.INV;h+='<div class="smL smBig" data-a="gsum" data-n="1" style="'+box(40,1110,408,133)+'pointer-events:auto">SUMMON ×1<span>'+GT+' 1</span>'+(gOK&&g.tk>=1&&g.tk<10?'<i class="rdd" style="right:6%;top:10%"></i>':'')+'</div>';
+  h+='<div class="smL smBig gold" data-a="gsum" data-n="10" style="'+box(469,1105,372,138)+'pointer-events:auto">SUMMON ×10<span>'+GT+' 10</span>'+(gOK&&g.tk>=10?'<i class="rdd" style="right:6%;top:10%"></i>':'')+'</div>';
   h+='<div class="smL smRib" style="'+box(829,1118,56,34)+'">+1</div>';
   h+='<div class="smPity" style="'+box(60,1279,392,32)+'"><div class="pBar"><i style="--p:'+Math.min(1,p.l/GSx.PITY).toFixed(3)+'"></i><span>LEGENDARY <b>'+p.l+' / '+GSx.PITY+'</b></span></div></div>';
   h+='<div class="smPity" style="'+box(469,1279,392,32)+'"><div class="pBar"><i class="pm" style="--p:'+Math.min(1,(p.m||0)/GSx.PITYM).toFixed(3)+'"></i><span>MYTHIC <b>'+(p.m||0)+' / '+GSx.PITYM+'</b></span></div></div>';  // v16-161
@@ -3797,7 +3805,7 @@ function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=ro
   // v16-49: the 3 tabs are on Marius' MY CREW picture (wrench · shield · scooter)
   $('rsTabsH').innerHTML=CATK.map(c=>{const n=Object.keys(G.h.own).filter(id=>HB[id].cat===c).length;return '<button class="rsTab rsT'+c+(c===cat?' on':'')+'" data-ro="cat" data-c="'+c+'"><span>'+CATS[c].n+' <small>'+n+'</small></span>'+(rosHint(c)?'<i></i>':'')+'</button>';}).join('');
   let x='';
-  x+='<div class="rsAct"><button class="rsA gold" data-ro="auto">AUTO BEST</button><button class="rsA" data-ro="coll">COLLECTION</button><button class="rsA blue" data-ro="sum">'+TKI+' SUMMON</button></div>';
+  x+='<div class="rsAct"><button class="rsA gold rdHost" data-ro="auto">AUTO BEST'+(rosHint(cat)?'<b class="rdt" style="right:10%;top:3px">SWAP</b>':'')+'</button><button class="rsA" data-ro="coll">COLLECTION</button><button class="rsA blue" data-ro="sum">'+TKI+' SUMMON</button></div>';
   const bonusTxt=(k,id)=>{const v=slotStats(k,id);return SLOTL[k[0]][0].split(' ')[0]+' '+pctS(v[0]);};
   // working now
   const groups={};slotsOf(cat).forEach(k=>{const g=cat==='g'?'security':k.split('|')[1];(groups[g]=groups[g]||[]).push(k);});
@@ -3814,7 +3822,7 @@ function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=ro
   if(!mine.length)x+='<div class="rsEmpty">You have no '+CATS[cat].n.toLowerCase()+' yet.<br><button class="rsA blue" data-ro="sum" style="margin-top:10px">'+TKI+' GO TO SUMMON</button></div>';
   else if(!bench.length)x+='<div class="rsEmpty">Everybody is working. 👍</div>';
   else{x+='<div class="rsGrid">';bench.forEach(id=>{const b=rosBetter(id);
-      x+='<div class="rsC'+(b?' better':'')+'" data-ro="bench" data-id="'+id+'">'+card(HB[id],own(id),b?'<i class="bt">▲ BETTER</i>':'')+'<span class="hint'+(b?' up':'')+'">'+(b?'▲ '+pctS(b.d)+' '+SLOTL[cat][0].split(' ')[0]+'<br>'+(b.cur?'replaces '+HB[b.cur].n:'empty place'):'no better place')+'</span></div>';});
+      x+='<div class="rsC'+(b?' better':'')+'" data-ro="bench" data-id="'+id+'">'+card(HB[id],own(id),b?'<i class="bt">▲ BETTER</i><b class="rdt" style="right:2px;top:2px">SWAP</b>':'')+'<span class="hint'+(b?' up':'')+'">'+(b?'▲ '+pctS(b.d)+' '+SLOTL[cat][0].split(' ')[0]+'<br>'+(b.cur?'replaces '+HB[b.cur].n:'empty place'):'no better place')+'</span></div>';});
     x+='</div>';}
   x+='<div class="rsNote">ℹ️ This page is only for the <b>garage</b> (repairs, security, driving). The <b>battle team</b> is chosen in ⚔️ Battle. Before any change you see <b>Before / After</b>.</div>';
   morph(rsBody,x);}
@@ -4047,7 +4055,7 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV" style="'+box(560,836,270,70)+'">'+I.tk+'</div>';
   {const tkh=1/IDLE_TK_H+(ccR().tk||0);/* v16-209: real rate = base 1/2h + Classic cars (tester Wazza4ever: "written 1, I get 2") */
   h+='<div class="idV grn" style="'+box(860,836,265,70)+'">'+(tkh>=1?(Math.round(tkh*10)/10)+'/h':'1 every '+(Math.round(10/tkh)/10)+'h')+'</div>';}
-  h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
+  h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'">'+(I.hrs>=1?'<i class="rdd" style="right:3%;top:8%;width:16px;height:16px"></i>':'')+'</div>';
   const cc=(I.dm||I.gt||ccR().dm)?'<br>🏆 <b>Classic cars</b>: '+DMI+' +'+(I.dm||0)+(I.gt?' · '+GTI+' +'+I.gt:'')+' (tickets above include them)':'';
   h+='<div class="idEG" style="'+box(150,1083,900,34)+'">'+ESI+' <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' <b>+'+nfmt(I.gp)+'</b> &nbsp;·&nbsp; 🔧 Garage parts <b>+'+nfmt(I.rp)+'</b> &nbsp;·&nbsp; '+PKI('bk')+' <b>+'+nfmt(I.bk)+'</b></div>';
   h+='<div class="idQI'+(qiLeft()?'':' off')+'" data-i="qi" style="'+box(330,1222,540,74)+'">🎁 QUICK IDLE 2h · '+(VLV?qiLeft()+' left':'VIP 1')+'</div>';
@@ -4100,7 +4108,11 @@ function sideLock(){const first=!Array.isArray(G.ul);if(first)G.ul=[];const nw=[
   for(const u of SIDE_UL){const el=$(u.b);if(!el)continue;const ok=ulOK(u);el.style.display=ok?'':'none';
     if(ok&&!G.ul.includes(u.b)){G.ul.push(u.b);if(!first&&started){nw.push(u.n);el.classList.add('ulNew');setTimeout(()=>el.classList.remove('ulNew'),8000);}}}
   if(first)save();else if(nw.length){save();autoToast('🔓 NEW: <b>'+nw.join(' · ')+'</b> unlocked!',3500);}}
-let hudN=0;function hud(){hudN++;if(hudN%30===1){sideLock();const R=incRates();$('incH').textContent=R.ok&&R.tot>0?'+'+fmt(R.tot)+'/h':'';}if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%60===31){try{const c=$('cpDot');if(c){c.classList.toggle('on',!!(window.CAMPAIGN&&CAMPAIGN.todo&&CAMPAIGN.todo()));c.classList.toggle('ex',!!(window.CAMPAIGN&&CAMPAIGN.dgTodo&&CAMPAIGN.dgTodo()));}const v=$('vipDot');if(v)v.classList.toggle('on',!!(VLV&&(G.vipD!==dayK()||G.vipW!==weekK())));}catch(e){}}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
+function dotLbl(){const S=(id,t)=>{const d=$(id);if(d&&d.dataset.t!==t)d.dataset.t=t;},C=window.CAMPAIGN||{},tx=id=>{const d=$(id);return d?String(d.textContent||'').trim():'';};
+  try{S('heDot',C.heroWhy?C.heroWhy():'');S('cpDot',C.hubWhy?C.hubWhy():'');}catch(e){}
+  S('tkDot',tx('tkDot'));S('dqDot',tx('dqDot'));S('mlDot',tx('mlDot'));S('idDot',$('idDot')&&$('idDot').classList.contains('full')?'FULL':'');
+  S('rosDot','SWAP');S('evDot','CLAIM');S('ciDot','GIFT');S('nwDot','NEW');S('vipDot','GIFT');S('chDot','');}
+let hudN=0;function hud(){hudN++;if(hudN%30===1){sideLock();const R=incRates();$('incH').textContent=R.ok&&R.tot>0?'+'+fmt(R.tot)+'/h':'';}if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%60===31){try{const c=$('cpDot');if(c){c.classList.toggle('on',!!(window.CAMPAIGN&&CAMPAIGN.todo&&CAMPAIGN.todo()));c.classList.toggle('ex',!!(window.CAMPAIGN&&CAMPAIGN.dgTodo&&CAMPAIGN.dgTodo()));}const v=$('vipDot');if(v)v.classList.toggle('on',!!(VLV&&(G.vipD!==dayK()||G.vipW!==weekK())));dotLbl();}catch(e){}}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
@@ -4132,6 +4144,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:99,d:'Nov 23, 2026',ic:'🔴',t:'Red dots show the way',l:['A red dot now <b>says what to do</b>: <b>LV UP</b>, <b>GEAR</b>, <b>SWAP</b>, <b>GIFT</b>, ticket counts …','Follow the dots: every page shows the next dot until the exact hero, button or reward.','The <b>❗</b> is only for <b>Dungeons</b> (keys waiting).']},
  {id:98,d:'Nov 23, 2026',ic:'👑',t:'Grand Prix Packs now STACK',l:['Every Grand Prix Pack you buy now <b>adds up</b>: Silver ×1 + Gold ×2 + Platinum ×3 = PREMIUM lane up to <b>×6</b> (before, only your best pack counted).','Bought a new pack after claiming? The Premium tiers you already took give you the <b>difference</b> – tap CLAIM ALL PREMIUM.','Gold or Platinum still give the ✦ Ascended gear and Platinum the extra Mythic copy at tier 50 (only once).']},
  {id:97,d:'Nov 23, 2026',ic:'🔥',t:'Server announcements & red ❗',l:['When a player gets a <b style="color:#ff5a3c">MYTHIC</b> hero, the <b>whole server</b> sees it: a big golden banner on top of the screen + a message in the WORLD chat.','The same for <b style="color:#2ef3ff">ASCENDED</b> gear – from Gear Summon, campaign, Dungeons, Class Towers or Idle Rewards.','A red <b style="color:#ff1744">❗</b> now shows everywhere there is something to do: BATTLE (World Boss keys / rewards, Dungeon keys, Arena fights), ARENA, VIP gifts, Heroes, Summon, Crew, Idle, Quests, Events, Check-in, News, Mail and Chat.']},
  {id:96,d:'Nov 23, 2026',ic:'⭐',t:'GRADE BEATS PLUS',l:['A hero of a <b>higher grade at +0</b> is now always stronger than a hero of the grade below at its max: Uncommon +0 > Common +50 · Rare +0 > Uncommon +50 · Epic +0 > Rare +50 · Legendary +0 > Epic +50 · Mythic > Legendary +10.','Common → Epic: every + gives <b>+1.2%</b> (+50 = ×1.6). Legendary: every + gives <b>+9.5%</b> (+10 ≈ 2× an Epic +50).','Summon higher grades – they are worth it!']},
@@ -4261,7 +4274,7 @@ function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTM
     const r=c5Rw(n)||{tk:0,ct:0,gt:0},TK=[['img/ticket.webp','RECRUIT',r.tk],['img/cticket.webp','CREW',r.ct],['img/gticket.webp','GEAR',r.gt]];
     let h='<div class="c5H"><img src="img/ci/c5_hero.webp" alt=""></div>';
     h+='<div class="c5T"><div class="c5Tk">'+TK.map(t=>'<div><img src="'+t[0]+'" alt=""><b>'+t[1]+'<br>TICKET</b><span>×'+t[2]+'</span></div>').join('')+'</div>'+
-      '<button class="c5Go'+(rd?'':' off')+'" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'CLAIM':got>=C5_TOTAL?'ALL COLLECTED':'COME BACK TOMORROW')+'</button></div>';
+      '<button class="c5Go'+(rd?'':' off')+'" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'CLAIM<i class="rdd" style="right:4%;top:8%"></i>':got>=C5_TOTAL?'ALL COLLECTED':'COME BACK TOMORROW')+'</button></div>';
     h+='<div class="c5g">';for(let d=blk;d<Math.min(blk+30,C5_DAYS);d++){const done=d<n,now=rd&&d===n,q=c5Rw(d),big=(d+1)%30===0||d===C5_DAYS-1;
       h+='<div class="c5d'+(done?' done':'')+(now?' now':'')+(big&&!now?' big':'')+'"><b>DAY '+(d+1)+'</b><img src="img/ticket.webp" alt=""><span>'+(q?(q.tk+q.ct+q.gt):0)+'</span>'+(done?'<i>✔</i>':'')+'</div>';}
     h+='</div>';
@@ -4278,7 +4291,7 @@ function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTM
       let h='<div class="mlBody"><h3>'+m.ic+' '+m.t+'</h3><div class="fr">From: Torque Studios · '+m.d+'</div>'+m.b;
       if(m.mail)h+='<div class="mlGift">✉️ torqueempirehelp@gmail.com</div>';
       if(m.g)h+='<div class="mlGift">'+(got?'✓ Gift claimed':'🎁 Gift: '+rwHtml(m.g).replace(/<br>/g,' · '))+'</div>';h+='</div>';
-      if(m.g&&!got)h+='<button class="xBtn" id="mlGo">🎁 CLAIM GIFT</button>';
+      if(m.g&&!got)h+='<button class="xBtn rdHost" id="mlGo">🎁 CLAIM GIFT<i class="rdd"></i></button>';
       if(m.mail)h+='<button class="xBtn" id="mlW">✉️ WRITE TO US</button>';
       B.innerHTML=h;const g=$('mlGo');if(g)g.onclick=()=>{if(G.ml.c.includes(m.id))return;giveRw(m.g);G.ml.c.push(m.id);save();toast('🎁 '+rwHtml(m.g).replace(/<br>/g,' · ')+' added!',3000);renderXP();updX();};
       const w=$('mlW');if(w)w.onclick=()=>{location.href='mailto:torqueempirehelp@gmail.com?subject='+encodeURIComponent('Torque Empire – feedback');};return;}
