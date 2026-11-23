@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=229;
+const CV=230;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -38,7 +38,8 @@ const TT={gpc:['t5','GP CHAMPION','Grand Prix: #1 to finish all missions'],gpp:[
  trny:['t4','TRAIN TYCOON','Send 100 trains in Rail Wars'],raid:['t4','RAIL RAIDER','Win 50 train attacks in Rail Wars'],hard:['t4','HARDCORE','Reach HARD MODE stage 4-10'],coll:['t3','COLLECTOR','Own 10 classic cars in the Collection Garage'],
  lucky:['t3','LUCKY STAR','Own a Mythic hero'],twr:['t3','TOWER CLIMBER','Reach floor 100 in Torque Tower'],gty:['t3','GARAGE TYCOON','Get a building to level 50'],daily:['t2','DAILY GRINDER','Check in 30 days']};
 const TORD=['gpc','gpp','gpf','fdr','rail','king','cup','awl','sky','awk','leg','bhunt','dgm','trny','raid','hard','glad','coll','lucky','twr','gty','boss','gear','speed','daily','chat','wr','rook'];
-const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
+const GPB={gpc:1,gpp:2,gpf:3};   // v16-230: Grand Prix Top 10 badges (Marius' pictures) in front of the title
+const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${GPB[k]?`<img src="img/gp/top${GPB[k]}.webp" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:2px">`:''}${x[1]}</i>`;};
 // v16-228 Grand Prix Top 10 name colours: 1 gold (#1) · 2 silver (#2-3) · 3 purple (#4-10)
 const nmc=p=>p&&p.nc?`<span class="gpN gpN${p.nc|0}">${esc(p.name)}</span>`:esc(p&&p.name);
 (function(){try{const st=document.createElement('style');st.textContent='.gpN1{background:linear-gradient(90deg,#fff3a8,#ffbf1a,#fff8d0,#ffbf1a);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:gpNs 2.4s linear infinite;font-weight:900}.gpN2{color:#dfe7ef!important;text-shadow:0 0 6px #b8c7d6;font-weight:900}.gpN3{color:#c99bff!important;text-shadow:0 0 6px #8a4dff;font-weight:900}@keyframes gpNs{to{background-position:-250% 0}}';document.head.appendChild(st);}catch(e){}})();
