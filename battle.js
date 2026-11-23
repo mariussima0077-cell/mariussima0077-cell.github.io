@@ -85,7 +85,7 @@ css.textContent=`
 #cpChap{display:flex;align-items:center;gap:8px;background:#000a;border:1px solid #ffb30044;border-radius:12px;padding:4px}
 #cpChN{flex:1;text-align:center;line-height:1.1}#cpChN b{display:block;font-size:15px;letter-spacing:.5px;text-shadow:0 1px 0 #000}#cpChN small{font-size:10px;color:#c8a27c;font-weight:800}
 .chA{width:40px;height:34px;border-radius:10px;border:1px solid #ffb30088;background:linear-gradient(#3a2614,#1d120a);color:#ffd54a;font-size:22px;font-weight:900;padding:0}.chA.off{opacity:.45}
-#cpPath{height:3340px}
+#cpPath{height:3340px} .gmsL{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0 8px}.gmsL>div{display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:7px;background:rgba(0,0,0,.35);font-size:11px;color:#9aa;opacity:.75}.gmsL>div b{color:#ccc;min-width:28px}.gmsL>div span{flex:1;line-height:1.1}.gmsL>div i{font-style:normal;font-size:10px}.gmsL>div.on{opacity:1;color:#e8ffe8;background:rgba(46,125,50,.45)}.gmsL>div.on b{color:#7CFC9A}.gmsL>div.nx{opacity:1;color:#fff3c4;box-shadow:0 0 0 1.5px #ffd54a inset}.gmsL>div.nx b{color:#ffd54a}
 .node img{width:62%;height:62%;object-fit:contain;pointer-events:none}
 .node.mini{width:78px;height:78px;margin:-39px 0 0 -39px;background:radial-gradient(circle at 50% 35%,#8a3a12,#2a0a04);border-width:4px}
 .mon.bossm{width:100px;border-color:#ff525288}
@@ -856,7 +856,7 @@ const GNAMES={tool:['Rusty Wrench','Steel Wrench','Torque Wrench','Impact Gun','
  boots:['Old Sneakers','Work Boots','Steel Toes','Racing Boots','Golden Boots','Nitro Boots','Warp Boots'],chip:['Basic Fuse','ECU Chip','Tuned ECU','Stage 2 ECU','Golden ECU','Quantum ECU','Singularity ECU']};
 // v16-89 (Marius): ASCENDED = gear grade above Mythic (grade 6, gear only) + gear STARS ★1-★5 (merge an identical piece: same slot + same grade)
 const ASC={n:'Ascended',c:'#2ef3ff',d:'#04505e'},GG=r=>r>=6?ASC:TE().GRADES[r],GGLOW=['','','','#d070ff','#ffd54a','#ff3d3d','#2ef3ff'];
-const GSTARMAX=5,GSTAR_K=.2,ASC_CH=29,GSTARMAX6=20,gsMax=it=>it&&it.r>=6?GSTARMAX6:GSTARMAX; // v16-99: Ascended ★1…★20 (every 5 = new color + new stat)
+const GSTARMAX=0,GSTAR_K=.2,ASC_CH=29,GSTARMAX6=20,gsMax=it=>it&&it.r>=6?GSTARMAX6:GSTARMAX; // v16-99: Ascended ★1…★20 (every 5 = new color + new stat)
 const gStarK=sr=>{sr=sr||0;return sr<=5?1+GSTAR_K*sr:(1+GSTAR_K*5+.05*(sr-5))*Math.pow(1.03,Math.floor((sr-1)/5));}; // +20% main stat per star · Ascended drops from chapter 30
 const STI=(k,t)=>'<img class="sti" src="'+(t&&k!=='off'?'img/ui9/star_'+ST_COL[t]:'img/ui8/star_'+k)+'.webp" alt="★">',starsH=(n,asc,all)=>{let h='';if(n>5){const t=Math.min(3,Math.ceil(n/5)-1),w=n-5*t;for(let i=0;i<5;i++)h+=STI(asc?'asc':'on',i<w?t:t-1);return h;}for(let i=0;i<(all?5:n);i++)h+=STI(i<n?(asc?'asc':'on'):'off');return h;};
 const ST_COL=['gold','red','purple','rainbow']; // v16-93: Marius' star pictures
@@ -868,18 +868,27 @@ const GMAXLV=10,GSUBN=[0,0,1,1,2,2,3],GINV0=150;const GINV_=()=>{try{const T=TE(
 const GOVER=150,GHARD_=()=>GINV_()+GOVER,bagOver=()=>{try{return GR().inv.length>=GINV_();}catch(e){return false;}}; // v16-122: VIP 3/6/9 = +20 bag slots each
 const GDROP=[[60,30,9,1,0,0],[30,40,22,7,1,0],[10,30,38,18,4,0],[0,15,35,35,14,1],[0,0,25,42,28,5]];
 function GR(){const G=TE().G;if(!G.gear)G.gear={inv:[],eq:{},nid:1,kit:0};const g=G.gear;
-  if(!g.kit){g.kit=1;['tool','helm','vest'].forEach(s=>g.inv.push(newItem(s,0)));}return g;}
+  if(!g.kit){g.kit=1;['tool','helm','vest'].forEach(s=>g.inv.push(newItem(s,0)));}
+  if(!g.m205){g.m205=1;let gp=0;for(const it of g.inv){if(it.r>=6){const o=mainOld(it);let sr=it.sr||0;while(sr<GSTARMAX6&&mainV({...it,sr})<o)sr++;for(let l=1;l<(it.lv||1);l++)gp+=gpCost({...it,lv:l});it.sr=sr;it.lv=1;}
+    else if(it.sr){const o=mainOld(it);let lv=it.lv||1;while(lv<GLV_MAX&&mainV({...it,lv,sr:0})<o)lv++;it.lv=lv;delete it.sr;}}if(gp){const G=TE().G;G.gp=(G.gp||0)+gp;}}
+  return g;}
 function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.keys(GSTAT).filter(k=>k!==st),sub=[];
   for(let i=0;i<GSUBN[r];i++){const k=others.splice(Math.floor(Math.random()*others.length),1)[0];sub.push([k,Math.round(GSTAT[k].v[r]*.4*10)/10]);}
   const it={id:g.nid++,s,r,lv:1,sub};if(set)it.set=set;return it;}
 // v14: from chapter 6 on the chances keep improving until chapter 50
 function gdrop(c){if(c<5)return GDROP[c];const k=Math.min(1,(c-4)/45),A=GDROP[4],Z=[0,0,15,40,40,5]; /* v16-190 (Marius): fewer Mythic drops (late 20% → 5%) */return A.map((v,i)=>Math.round(v+(Z[i]-v)*k));}
-const GMAXR=[10,15,20,30,40,50,60],gMax=it=>GMAXR[it.r];
+// v16-205 (Marius 23 nov): Common → Mythic: NO stars, ENHANCE +1 … +50 (every +5 = a bonus) · ASCENDED: no levels, only ★0 … ★20
+const GMAXR=[50,50,50,50,50,50,1],gMax=it=>GMAXR[it.r],GLV_MAX=50;
+const GMS_SUB=lv=>Math.min(8,Math.floor(Math.min(lv,GLV_MAX)/5)),GMS_SK=.05,GMS_M45=1.4,GMS_M50=2/1.4,GMS_MUL=lv=>(lv>=45?GMS_M45:1)*(lv>=50?GMS_M50:1); // +5 … +40 = extra stats +5% each · +45 = main ×1.4 · +50 = main ×1.43 (×2 in total = what ★5 gave before; levels up to +40 give exactly the old values)
+const ASC_A0=11.467,ASC_STEP=1.0382; // Ascended ★0 = 1.3 × Mythic +50 · ★20 = the old Ascended max (Lv 60 ★20)
 function rollR(c,bump){const w=gdrop(c);let r=Math.random()*100,k=0;for(;k<5;k++){r-=w[k];if(r<0)break;}if(bump&&Math.random()<.5)k++;k=Math.min(5,k);if(k===5&&c>=ASC_CH&&Math.random()<.15*Math.min(1,(c-ASC_CH+1)/21))k=6;return k;}
 function dropItem(c,bump){const g=GR();const rr=rollR(c,bump),it=newItem(GSLOT[Math.floor(Math.random()*6)].k,rr,rollSet(rr));if(svAuto(it)){salvPkGive([it]);return {it,sold:salvageV(it),auto:1};}if(g.inv.length>=GHARD_()){return {it,sold:salvageV(it)};}g.inv.push(it);return g.inv.length>GINV_()?{it,over:1}:{it};}
 const itemById=id=>id?GR().inv.find(i=>i.id===id):null;
-const ASC_K=1.2,subV=(it,v)=>it.r>=6?Math.round(v*ASC_K*10)/10:v; // v16-161 (Marius): ASCENDED gear +20% (main + extra stats)
-const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K:1)*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // +12% of the base value per level (Lv 50 = ×6.9)
+const ASC_K=1.2,subV=(it,v)=>it.r>=6?Math.round(v*ASC_K*10)/10:Math.round(v*(1+GMS_SK*GMS_SUB(it.lv||1))*10)/10; // v16-161 (Marius): ASCENDED gear +20% (main + extra stats)
+const mainV=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K*ASC_A0*Math.pow(ASC_STEP,Math.min(GSTARMAX6,it.sr||0)):(1+.12*(Math.min(GLV_MAX,it.lv)-1))*GMS_MUL(it.lv))*10)/10;
+const mainOld=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K:1)*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // before v16-205 (migration only)
+const gLvTxt=it=>it.r>=6?'★'+(it.sr||0):'+'+it.lv;
+const GMS_LIST=()=>{const o=[];for(let l=5;l<=GLV_MAX;l+=5)o.push([l,l===45?'Main stat ×'+GMS_M45:l===50?'Main stat ×'+GMS_M50.toFixed(2)+' (×2)':'Extra stats +'+GMS_SK*100+'%']);return o;}; // +12% of the base value per level (Lv 50 = ×6.9)
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
 // v16-129: salvage also gives GARAGE PARTS – set pieces give the parts of their class's role, other gear a random role
@@ -888,7 +897,7 @@ function salvPk(list){const T=TE(),U=T.PART_U?T.PART_U():1,o={};for(const it of 
   if(it.set&&CLS2ROLE[it.set])o[CLS2ROLE[it.set]]=(o[CLS2ROLE[it.set]]||0)+n;else{const q=T.pkRoles?T.pkRoles(n):{};for(const k in q)o[k]=(o[k]||0)+q[k];}}return o;}
 function salvPkGive(list){const T=TE(),o=salvPk(list);if(T.pkAdd)for(const k in o)T.pkAdd(k,o[k]);return o;}
 const pkTxt=o=>{const T=TE();return Object.keys(o).map(k=>(T.PKI?T.PKI(k):'')+' +'+T.nf(o[k])).join(' ');};
-const salvageV=it=>Math.max(1,Math.round(4*Math.pow(it.r+1,1.8)*(1+.5*(it.lv-1))*(1+(it.sr||0)))); // v16-99: salvage gives GEAR PARTS (= old money ÷ 10)
+const salvageV=it=>Math.max(1,Math.round(4*Math.pow(it.r+1,1.8)*(it.r>=6?1:1+.5*(Math.min(it.lv,GLV_MAX)-1))*(1+(it.sr||0)))); // v16-99: salvage gives GEAR PARTS (= old money ÷ 10)
 const gpCost=it=>Math.max(1,Math.round(upCost(it)/10)); // v16-99: gear upgrades cost GEAR PARTS, money stays for the garage
 const GPN=n=>TE().GPI+' '+TE().nf(n);
 function ownerOf(it){const eq=GR().eq;for(const hid in eq)for(const s in eq[hid])if(eq[hid][s]===it.id)return hid;return null;}
@@ -1052,7 +1061,7 @@ function itemIconURL(s,r,set){const key='it'+s+r+(set||'');if(ICC[key])return IC
   x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r,set),0,0);x.restore();
   const u=c.toDataURL();if(ok)ICC[key]=u;return u;}
 function itemCard(it,extra,cls){const T=TE(),i=Math.min(6,it.r),r=T.FIN[i],p=T.FPL[i];
-  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">Lv ${it.lv}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
+  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}" data-it="${it.id}"><div class="fc"><img class="ff" src="img/fr${i}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">${gLvTxt(it)}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
 
 // ---------------------------------------------------------------- team helpers
 function myMechs(){const T=TE(),o=[];
@@ -3007,9 +3016,9 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
   const mx=it.lv>=gMax(it),c=mx?0:gpCost(it);
   let b1='';if(h){b1=o===h.id?`<button class="b1" data-p="ueq" data-it="${it.id}">UNEQUIP</button>`:`<button class="b1" data-p="eq" data-it="${it.id}">EQUIP<small>on ${h.n}</small></button>`;}else b1='<button class="b1 dis">EQUIP</button>';
   let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itHave" title="Your Gear Parts">${TE().GPI}<span><small>YOU HAVE</small>${T.nf(G.gp||0)}</span></div><div class="itIc">${itemCard(it)}</div>
-   <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · Lv ${it.lv}/${gMax(it)}${' · '+starsH(it.sr||0,it.r>=6,1)}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
+   <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · ${it.r>=6?starsH(it.sr||0,1,1)+' '+(it.sr||0)+'/'+GSTARMAX6:'+'+it.lv+' / +'+GLV_MAX}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
    <div class="itSt">${rows.slice(0,4).join('')}</div>
-   <div class="itBt">${b1}<button class="b2${mx||(G.gp||0)<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?'MAX LEVEL':`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${GPN(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${GPN(salvageV(it))}</small></button></div></div><div class="itMore">`;
+   <div class="itBt">${b1}<button class="b2${mx||(G.gp||0)<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?(it.r>=6?'★ STARS ONLY':'MAX +'+GLV_MAX):`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${GPN(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${GPN(salvageV(it))}</small></button></div></div><div class="itMore">`;
   if(h){const cur=itemById((g.eq[h.id]||{})[it.s]);
     if(o===h.id){x+=`<div class="cpSec">IF YOU UNEQUIP IT FROM ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:null},[],[`${sl.n} slot becomes empty`]);}
     else{const xc=[],xp=[];if(cur)xc.push(`Replaces <b style="color:${GG(cur.r).c}">${itemName(cur)}</b> Lv ${cur.lv} (goes back to the bag)`);
@@ -3017,27 +3026,28 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
       x+=`<div class="cpSec">BEFORE / AFTER ON ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:it},xp,xc);}}
   if(it.set){const n=h&&setKeys(h).includes(it.set)?heroGear(h.id).filter(o=>o.set===it.set).length:0;x+=`<div class="cpSec">${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n.toUpperCase()}${it.set!=='all'&&CLS2ROLE[it.set]?' + MYTHIC '+BROLE[CLS2ROLE[it.set]].n:''} ONLY</div>`+setBlock(it.set,n);}
   // v16-89: STARS (merge an identical free piece) and ASCEND (Mythic ★5 + 1 more Mythic of the same slot)
-  {const sr=it.sr||0,f=starFood(it),nm=`${GG(it.r).n} ${sl.n}`,fx=f?`<div class="iFood">${itemCard(f)}<span>uses <b style="color:${GG(f.r).c}">${itemName(f)}</b> Lv ${f.lv}${f.sr?' '+starsH(f.sr,f.r>=6):''}<br><small>free piece from the bag · it is gone after</small></span></div>`:`<div class="pD">Needs one more <b style="color:${GG(it.r).c}">${nm}</b> in the bag (not worn).</div>`;
-   const SM=gsMax(it);if(sr<SM){x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${SM}<button class="gGd" data-p="gguide" data-it="${it.id}">?</button></div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV({...it,sr:sr+1})}%</b> <small>(★${sr} ➜ ★${sr+1}${sr>=5?' · +5% each star'+((sr+1)%5===0&&sr+1>5?' · NEW STAR COLOR + NEW STAT':''):' · +'+GSTAR_K*100+'% each star'})</small></div>${fx}<button class="cpGo${f?'':' dis'}" data-p="${f?'star':''}" data-it="${it.id}">${STI('on')} STAR UP</button>`;}
+  {const sr=it.sr||0,f=starFood(it),nm=`${GG(it.r).n} ${sl.n}`,fx=f?`<div class="iFood">${itemCard(f)}<span>uses <b style="color:${GG(f.r).c}">${itemName(f)}</b> ${gLvTxt(f)}<br><small>free piece from the bag · it is gone after</small></span></div>`:`<div class="pD">Needs one more <b style="color:${GG(it.r).c}">${nm}</b> in the bag (not worn).</div>`;
+   const SM=gsMax(it);if(sr<SM){x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${SM}<button class="gGd" data-p="gguide" data-it="${it.id}">?</button></div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV({...it,sr:sr+1})}%</b> <small>(★${sr} ➜ ★${sr+1}${' · +'+((ASC_STEP-1)*100).toFixed(1)+'% each star'+((sr+1)%5===0&&sr+1>5?' · NEW STAR COLOR + NEW STAT':'')})</small></div>${fx}<button class="cpGo${f?'':' dis'}" data-p="${f?'star':''}" data-it="${it.id}">${STI('on')} STAR UP</button>`;}
    // v16-121 (Marius): ASCEND merge removed – Ascended only from Gear Summon, campaign battles (ch. 30+) and Idle Rewards
-   else x+=`<div class="cpSec">${STI('on')} STARS ${sr} / ${SM} · MAX</div>`;}
-  if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(Lv ${it.lv} ➜ ${it.lv+1})</small></div><div class="iUp iCost">Cost: <b>${GPN(c)}</b> · You have: <b class="${(G.gp||0)<c?'no':'up'}">${GPN(G.gp||0)}</b>${(G.gp||0)<c?` <small>(need ${T.nf(c-(G.gp||0))} more)</small>`:''}</div>`;}
+   else if(SM)x+=`<div class="cpSec">${STI('asc')} STARS ${sr} / ${SM} · MAX</div>`;}
+  if(!mx){const nx={...it,lv:it.lv+1};x+=`<div class="cpSec">UPGRADE</div><div class="iUp">${st.n}: <b>+${mainV(it)}%</b> ➜ <b class="up">+${mainV(nx)}%</b> <small>(+${it.lv} ➜ +${it.lv+1}${(it.lv+1)%5===0?' · <b style="color:#ffd54a">BONUS!</b>':''})</small></div><div class="iUp iCost">Cost: <b>${GPN(c)}</b> · You have: <b class="${(G.gp||0)<c?'no':'up'}">${GPN(G.gp||0)}</b>${(G.gp||0)<c?` <small>(need ${T.nf(c-(G.gp||0))} more)</small>`:''}</div>`;}
+  if(it.r<6)x+=`<div class="cpSec">ENHANCE BONUSES · +${it.lv} / +${GLV_MAX}</div><div class="gmsL">${GMS_LIST().map(([l,t])=>`<div class="${it.lv>=l?'on':it.lv<l&&it.lv>=l-5?'nx':''}"><b>+${l}</b><span>${t}</span><i>${it.lv>=l?'✓':it.lv>=l-5?'NEXT':'🔒'}</i></div>`).join('')}</div>`;
   x+='</div>';
   if(keep)morph($('cpPopBox'),x);else pop(x);$('cpPopBox').classList.add('itPop');}
 // v16-93 GEAR GUIDE – how gear gets stronger than Mythic, with pictures (Marius: "doar scris nu se vede")
 let gdBack='';function gearGuide(back){gdBack=back||'';const T=TE(),sl='tool',st=GSTAT[GS[sl].st];
-  const it=(r,sr,lv)=>({id:'gd'+r+'_'+sr,s:sl,r,lv:lv||GMAXR[r],sr:sr||0,sub:[]}),M0=it(5,0),M5=it(5,5),A5=it(6,5);
+  const it=(r,sr,lv)=>({id:'gd'+r+'_'+sr,s:sl,r,lv:lv||GMAXR[r],sr:sr||0,sub:[]}),M0=it(5,0),M5=it(5,5),A5=it(6,5),A0=it(6,0);
   let g='';for(let r=0;r<=6;r++)g+=`<div>${itemCard(it(r,r===6?5:0,1))}<b style="color:${GG(r).c}">${GG(r).n.toUpperCase()}</b></div>`;
-  let L='';for(let n=0;n<=5;n++)L+=`<span>${starsH(n,0,1)}</span><span>${n?'+'+n+' copy':'new'}</span><span>${st.n} <b>+${mainV(it(5,n))}%</b></span>`;
+  let L='';for(const l of [1,10,20,30,40,50])L+=`<span><b>+${l}</b></span><span>Mythic</span><span>${st.n} <b>+${mainV(it(5,0,l))}%</b></span>`;L+=`<span>${starsH(0,1,1)}</span><span style="color:${ASC.c}">Ascended ★0</span><span>${st.n} <b>+${mainV(A0)}%</b></span><span>${starsH(20,1)}</span><span style="color:${ASC.c}">Ascended ★20</span><span>${st.n} <b>+${mainV(it(6,20))}%</b></span>`;
   const x=`<div class="gdW"><h2>GEAR GUIDE</h2><div class="sub">HOW GEAR GETS STRONGER THAN MYTHIC</div>
   <div class="gdS"><div class="gdH"><i>1</i>7 GRADES</div><div class="gdG">${g}</div>
    <div class="gdT">Common ➜ Mythic come from <b>Gear Summon</b>, the Campaign and Dungeons.<br><b style="color:${ASC.c}">ASCENDED</b> is the new grade above Mythic.</div></div>
-  <div class="gdS"><div class="gdH"><i>2</i>${STI('on')} STARS ★1 – ★5</div>
-   <div class="gdEq">${itemCard(M0)}<em>+</em>${itemCard(M0)}<em class="to">➜</em>${itemCard(it(5,1))}</div>
-   <div class="gdT">Put a <b>second identical piece</b> (same grade + same slot, free in the bag) into it = <b>+1 star</b>.<br>Every star = <b>+${GSTAR_K*100}% main stat</b>. Works for every grade.</div>
+  <div class="gdS"><div class="gdH"><i>2</i>ENHANCE +1 – +${GLV_MAX} · ${STI('asc')} STARS ONLY ON ASCENDED</div>
+   <div class="gdEq">${itemCard(it(5,0,1))}<em class="to">➜</em>${itemCard(M0)}<em class="to">➜</em>${itemCard(A0)}</div>
+   <div class="gdT"><b>Common ➜ Mythic</b>: ENHANCE with Gear Parts up to <b>+${GLV_MAX}</b>. Every <b>+5</b> unlocks a bonus: +5 … +40 = extra stats <b>+${GMS_SK*100}%</b> each, <b>+45</b> = main stat ×${GMS_M45}, <b>+50</b> = main stat ×2 in total.<br><b style="color:${ASC.c}">ASCENDED</b> has no levels – a new Ascended (★0) is already <b>stronger than a Mythic +50</b>. Only Ascended get <b>stars ★1 – ★20</b> (a second identical Ascended piece = +1 star).</div>
    <div class="gdL">${L}</div></div>
   <div class="gdS"><div class="gdH"><i>3</i>${STI('asc')} <span style="color:${ASC.c}">ASCENDED · WHERE TO FIND</span></div>
-   <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from stage ${sLabel(ASC_CH*20)} (more and more up to stage ${sLabel(999)})<br>• <b>Idle Rewards</b> from stage ${sLabel(ASC_CH*20)} (small chance for every hour in the chest)<br>• <b>Class Towers</b> floors 350 · 380 · 410 · 440 · 470 · 500 (a full Ascended set of the class)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open any piece ➜ <b>${STI('on')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
+   <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from stage ${sLabel(ASC_CH*20)} (more and more up to stage ${sLabel(999)})<br>• <b>Idle Rewards</b> from stage ${sLabel(ASC_CH*20)} (small chance for every hour in the chest)<br>• <b>Class Towers</b> floors 350 · 380 · 410 · 440 · 470 · 500 (a full Ascended set of the class)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open an Ascended piece ➜ <b>${STI('asc')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
   <div class="cpRow">${gdBack?'<button class="cpGo alt" data-p="gdback">↩ BACK</button>':''}<button class="cpGo" data-p="x">GOT IT</button></div></div>`;
   pop(x);}
 // v16-42: GEAR UPGRADE animation (Marius: "I see nothing when I upgrade – only after I leave and come back")
@@ -3049,7 +3059,7 @@ function upFx(it,v0,p0){const T=TE(),st=GSTAT[GS[it.s].st],col=GG(it.r).c,h=gHer
   const dp=h&&ownerOf(it)===h.id?pow(h)-p0:0;
   let sp='';for(let i=0;i<16;i++){const a=i/16*6.283+Math.random()*.3,d=70+Math.random()*60;sp+=`<i style="--x:${Math.cos(a)*d|0}px;--y:${Math.sin(a)*d|0}px;--d:${(Math.random()*.15).toFixed(2)}s"></i>`;}
   o.innerHTML=`<div class="ufRays"></div><div class="ufSp">${sp}</div><div class="ufIc"><img src="${itemIconURL(it.s,it.r,it.set)}"></div>
-    <div class="ufT">${mx?'MAX LEVEL!':'UPGRADE SUCCESS!'}</div><div class="ufL">Lv ${it.lv-1} <b>➜</b> <span>Lv ${it.lv}</span></div>
+    <div class="ufT">${mx?'MAX +'+GLV_MAX+'!':it.lv%5===0?'BONUS UNLOCKED!':'ENHANCE SUCCESS!'}</div><div class="ufL">+${it.lv-1} <b>➜</b> <span>+${it.lv}</span></div>${it.lv%5===0?`<div class="ufS" style="color:#ffd54a">★ ${(GMS_LIST().find(z=>z[0]===it.lv)||[0,''])[1]}</div>`:''}
     <div class="ufS">${IMGI(glyphURL(st.ic,st.col),'1.1em','-.22em')} ${st.n} +${v0}% <b>➜</b> <span>+${mainV(it)}%</span></div>${dp>0?`<div class="ufP">${IMGI(PWU,'1.2em','-.25em')} Power +${dp.toLocaleString()}</div>`:''}`;
   const P=$('cpPop').getBoundingClientRect(),cd=bx.querySelector('.iTop>.gi,.itIc>.gi'),cr=cd&&cd.getBoundingClientRect();let cy=cr&&cr.bottom>40&&cr.top<P.height-40?cr.top+cr.height/2:P.height*.42;o.style.top=Math.max(0,Math.min(P.height-300,cy-P.top-130))+'px';
   $('cpPop').appendChild(o);clearTimeout(upFx.t);upFx.t=setTimeout(()=>o.remove(),1800);
@@ -3140,7 +3150,7 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
   if(a==='up'&&it){const c=gpCost(it);if((G.gp||0)<c){T.toast('Not enough Gear Parts ('+GPN(c)+') · salvage gear, Dungeons, campaign, Idle Rewards',2600);return;}if(it.lv>=gMax(it))return;
     const v0=mainV(it),p0=gHero()?pow(gHero()):0;G.gp-=c;it.lv++;T.save();renderGear();popItem(it.id,true);upFx(it,v0,p0);return;}
   if(a==='star'&&it){const f=starFood(it);if(!f)return;
-    if(gstar!==it.id+a){gstar=it.id+a;el.innerHTML='TAP AGAIN<small>'+itemName(f)+' Lv '+f.lv+' is used</small>';return;}gstar='';
+    if(gstar!==it.id+a){gstar=it.id+a;el.innerHTML='TAP AGAIN<small>'+itemName(f)+' '+gLvTxt(f)+' is used</small>';return;}gstar='';
     const g=GR(),p0=gHero()?pow(gHero()):0;g.inv.splice(g.inv.indexOf(f),1);
     if(a==='star'){if((it.sr||0)>=gsMax(it))return;it.sr=(it.sr||0)+1;if(it.r>=6&&it.sr>5&&it.sr%5===0){const k0=Object.keys(GSTAT).filter(k=>k!==GS[it.s].st&&!it.sub.some(z=>z[0]===k));if(k0.length){const k=k0[Math.floor(Math.random()*k0.length)];it.sub.push([k,Math.round(GSTAT[k].v[6]*.4*10)/10]);}it.sub.forEach(z=>z[1]=Math.round(z[1]*1.15*10)/10);}}else{it.r=6;const k0=Object.keys(GSTAT).filter(k=>k!==GS[it.s].st&&!it.sub.some(z=>z[0]===k));if(k0.length){const k=k0[Math.floor(Math.random()*k0.length)];it.sub.push([k,Math.round(GSTAT[k].v[6]*.4*10)/10]);}}
     T.save();renderGear();popItem(it.id,true);const dp=gHero()&&ownerOf(it)===gHero().id?pow(gHero())-p0:0;
@@ -3219,8 +3229,8 @@ function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r))
    ${sold?`<div class="sub">Bag full (${GINV_()}) – extra gear salvaged for ${GPN(sold)}</div>`:''}
    <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}" style="white-space:nowrap;overflow:hidden;padding:0 12px 0 22px">AGAIN ×${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
-function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+GG(r).c+'">'+GS_NAMES[r]+'</b>',p+'%','Lv '+GMAXR[r]+(GSUBN[r]?' · +'+GSUBN[r]+' stat'+(GSUBN[r]>1?'s':''):''))).join('')+
-  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons and a <b style="color:#ff3b3b">Mythic</b> every ${GS_PITY.m} summons (now ${GSD().pity.l||0}/${GS_PITY.l} · ${GSD().pity.m||0}/${GS_PITY.m}).</div><div>★ <b>Stars</b>: merge 2 identical pieces (same slot + same grade) → ★1…★5, each star +20% main stat.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic): 0.02% in the summon, or it drops in campaign battles and Idle Rewards from stage ${sLabel(ASC_CH*20)}. Ascended pieces go up to <b>★20</b>: every 5 stars a new star color (gold → red → purple → rainbow) + a new bonus stat.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
+function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+GG(r).c+'">'+GS_NAMES[r]+'</b>',p+'%',(r>=6?'★20':'+'+GLV_MAX)+(GSUBN[r]?' · +'+GSUBN[r]+' stat'+(GSUBN[r]>1?'s':''):''))).join('')+
+  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons and a <b style="color:#ff3b3b">Mythic</b> every ${GS_PITY.m} summons (now ${GSD().pity.l||0}/${GS_PITY.l} · ${GSD().pity.m||0}/${GS_PITY.m}).</div><div>⬆ <b>Enhance</b>: Common → Mythic go to <b>+50</b> with Gear Parts, a bonus every +5. ★ <b>Stars</b> only on Ascended.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic): 0.02% in the summon, or it drops in campaign battles and Idle Rewards from stage ${sLabel(ASC_CH*20)}. Ascended pieces go up to <b>★20</b>: every 5 stars a new star color (gold → red → purple → rainbow) + a new bonus stat.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
   <div class="wS">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="wP">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div><button class="wHist" data-p="gsHist">📜 SUMMON HISTORY</button>`);}
 function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">Last '+g.hist.length+' of '+g.sum+' gear summons</div>'+(g.hist.length?g.hist.map(o=>wRowB(o.r,'<img src="'+itemIconURL(o.s,o.r)+'" alt=""> <b style="color:'+GG(o.r).c+'">'+GNAMES[o.s][o.r]+'</b>',null,GS_NAMES[o.r])).join(''):'<div class="wP">Nothing yet.</div>'));}
 
