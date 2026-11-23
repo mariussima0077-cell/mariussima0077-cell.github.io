@@ -1906,7 +1906,7 @@ function updateSecurity(dt){
     if(d.mode==='run'){if(!chase(d,dt,v)){if(RAID&&(RAID.van>=0||THF.some(T=>T.st==='come')))p.moving=false;else d.mode='ret';}}
     else if(d.mode==='fight'){p.moving=false;if(d.tg)p.a=Math.atan2(d.tg.p.y-p.y,d.tg.p.x-p.x);}
     else if(d.mode==='hold'||d.mode==='stun'){p.moving=false;d.ht=(d.ht||0)+dt;if(d.ht>(d.mode==='hold'?2.2:1.5)){d.mode='run';d.tg=null;}}
-    else if(d.mode==='ret'){if(RAID&&secOn()){d.mode='run';continue;}if(goTo(p,d.veh,dt,v*.8)){d.mode='gone';p.vis=false;d.veh.crew--;}}}
+    else if(d.mode==='ret'){if(RAID&&secOn()){d.mode='run';continue;}if(goTo(p,d.veh,dt,v*.8)&&!RAID){d.mode='gone';p.vis=false;d.veh.crew--;}}}  // they wait at their car until the raid is over
   for(let i=XG.length-1;i>=0;i--)if(XG[i].mode==='gone')XG.splice(i,1);
   // vehicles
   for(let i=police.length-1;i>=0;i--){const c=police[i],done=stepCop(c,dt);
