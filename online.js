@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=213;
+const CV=214;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -31,15 +31,15 @@ function needUpd(){if(document.getElementById('updNeed'))return;const d=document
     navigator.serviceWorker.getRegistration().then(r=>{if(!r){go();return;}navigator.serviceWorker.addEventListener('controllerchange',go);r.update().then(()=>{if(!r.installing&&!r.waiting)go();}).catch(go);setTimeout(go,8000);}).catch(go);};}
 
 // ------------------------------------------------------------------ titles, frames, leagues
-const TT={vip10:['t5','VIP LEGEND','Reach VIP 10'],vip5:['t3','VIP STAR','Reach VIP 5'],fdr:['t5','FOUNDER','Founder Pass (Shop)'],rail:['t4','RAIL BARON','Rail Pass active (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
+const TT={vip10:['t5','VIP LEGEND','Reach VIP 10'],vip5:['t3','VIP STAR','Reach VIP 5'],fdr:['t5','FOUNDER','Founder Pass (Shop)'],rail:['t4','RAIL BARON','Rail Pass active (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],awl:['t5','ARENA WARLORD','Arena Shop (2,000 medals)'],
  boss:['t3','BOSS SLAYER','Reach campaign stage 3-21'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 2-11'],rook:['t0','ROOKIE','Start the game'],
  // v16-174: 12 new titles (Marius: more titles on the profile) – kept forever once reached (G.ttl)
  sky:['t5','SKY BREAKER','Reach floor 500 in Torque Tower'],awk:['t5','AWAKENED','Awaken a Mythic hero'],bhunt:['t4','BOSS HUNTER','Claim the last World Boss reward of a day'],dgm:['t4','DUNGEON MASTER','Reach floor 50 in all 4 Dungeons'],
  trny:['t4','TRAIN TYCOON','Send 100 trains in Rail Wars'],raid:['t4','RAIL RAIDER','Win 50 train attacks in Rail Wars'],hard:['t4','HARDCORE','Reach HARD MODE stage 4-10'],coll:['t3','COLLECTOR','Own 10 classic cars in the Collection Garage'],
  lucky:['t3','LUCKY STAR','Own a Mythic hero'],twr:['t3','TOWER CLIMBER','Reach floor 100 in Torque Tower'],gty:['t3','GARAGE TYCOON','Get a building to level 50'],daily:['t2','DAILY GRINDER','Check in 30 days']};
-const TORD=['fdr','rail','king','cup','sky','awk','leg','bhunt','dgm','trny','raid','hard','glad','coll','lucky','twr','gty','boss','gear','speed','daily','chat','wr','rook'];
+const TORD=['fdr','rail','king','cup','awl','sky','awk','leg','bhunt','dgm','trny','raid','hard','glad','coll','lucky','twr','gty','boss','gear','speed','daily','chat','wr','rook'];
 const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};
-const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)'],[8,'VIP 10','Reach VIP 10'],
+const FR=[[0,'Common','Free'],[1,'Uncommon','Reputation 5'],[2,'Rare','VIP 3'],[3,'Epic','Arena GOLD or Arena Shop'],[4,'Legendary','VIP 7 or Arena DIAMOND'],[5,'Mythic','Arena LEGEND or a Cup win'],[7,'Founder','Founder Pass (Shop)'],[8,'VIP 10','Reach VIP 10'],
  [9,'Rail Baron','Win 50 train attacks in Rail Wars'],[10,'Tower Climber','Reach floor 300 in Torque Tower'],[11,'Boss Hunter','Claim the last World Boss reward of a day'],[12,'Dungeon Master','Reach floor 50 in all 4 Dungeons'],[13,'Collector','Own all 12 classic cars'],[14,'Awakened','Awaken a Mythic hero']];   // v16-174: 6 new frames (Marius' pictures, img/fr9-14)   // v16-122: 8 = VIP 10 frame (Marius' picture, img/fr8)
 //   // v16-122: 7 = FOUNDER (img/fr7 – 6 is the Ascended gear frame)
 const LG=[['BRONZE','#ffd8b0','#d0864a','#5a2a08','#e07a3a'],['SILVER','#ffffff','#b8c4d2','#4a5462','#7fd0ff'],['GOLD','#fffbe6','#ffc23a','#6a3a00','#ff3b3b'],['PLATINUM','#e8fffb','#5fe0c8','#0a4a44','#3fa7ff'],['DIAMOND','#e8f4ff','#5aa8ff','#0a2a6a','#c35cff'],['LEGEND','#fff1d0','#ff5a3c','#5a0a0a','#ffd54a']];
@@ -94,6 +94,28 @@ const css=`
 #onl .tabs b.on{background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);color:#3a1d00;box-shadow:0 0 0 1.5px #7a4a00,0 0 12px #ffb30066,inset 0 1.5px 0 #fff9}
 #onl .tabs b.on:after,#onl .shine:after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,#fff8,transparent);animation:olSh 3.2s ease-in-out infinite;pointer-events:none}
 @keyframes olSh{0%,55%{left:-60%}100%{left:130%}}
+/* v16-212 ARENA SHOP + REWARDS */
+#onl #olArT{gap:4px}#onl #olArT b{font-size:10px;letter-spacing:.2px}
+#onl #olAmDot{position:absolute;top:3px;right:4px;width:8px;height:8px;border-radius:50%;background:#ff3d3d;box-shadow:0 0 6px #f00;display:none}#onl #olAmDot.on{display:block}
+#onl .asT{display:block;width:96%;max-width:440px;margin:4px auto 2px}
+#onl .asHd{display:flex;flex-direction:column;align-items:center;gap:2px;margin:2px 10px 8px;padding:7px 10px;border-radius:12px;background:linear-gradient(#2a1546ee,#150a26ee);box-shadow:0 0 0 1.5px #e0a82e,inset 0 1px 0 #fff2}
+#onl .asHd span{font:900 15px Game,system-ui;color:#ffe27a;text-shadow:0 2px 0 #000}#onl .asHd span .tki{width:26px;height:26px;vertical-align:-7px}#onl .asHd small{font:700 10.5px system-ui;color:#d9c8ff}
+#onl .asG{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:0 9px}
+#onl .asC{position:relative;aspect-ratio:300/384;background:url(img/arena/as_card.webp) center/100% 100% no-repeat;display:flex;flex-direction:column;align-items:center;padding:13% 7% 0;text-align:center;animation:olIn .35s both}
+#onl .asC .ic{width:46%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 3px 3px #000a)}
+#onl .asC b{font:900 10px/1.12 Game,system-ui;color:#fff;margin-top:3px;min-height:23px;display:flex;align-items:center;text-shadow:0 1px 0 #000}
+#onl .asC small{font:700 9.5px system-ui;color:#d2b8ff;margin-top:1px}
+#onl .asC button{position:absolute;left:12%;right:12%;bottom:8.5%;height:15%;border:0;border-radius:8px;font:900 11.5px Game,system-ui;color:#3a1d00;background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);box-shadow:0 0 0 1.5px #7a4a00,inset 0 1px 0 #fff9;display:flex;align-items:center;justify-content:center;gap:2px;padding:0}
+#onl .asC button .tki{width:15px;height:15px}#onl .asC button.off{filter:grayscale(.8) brightness(.75)}#onl .asC.sold{opacity:.6}
+#onl .asLeg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0;max-height:52vh;overflow:auto}#onl .asLeg div{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}#onl .asLeg .ring{width:54px;height:54px}#onl .asLeg small{font:800 9.5px system-ui;color:#fff;text-align:center}
+#onl .amTr{position:relative;margin:4px 8px 10px}#onl .amTr img{width:100%;display:block}#onl .amTr i{position:absolute;left:11.5%;top:31%;height:38%;border-radius:6px;background:linear-gradient(#ffe98a,#ffb300 55%,#d07a00);box-shadow:0 0 10px #ffc40099;transition:width .8s}
+#onl .amTr span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-left:8%;font:900 12px Game,system-ui;color:#fff;text-shadow:0 0 3px #000,0 2px 0 #000}
+#onl .amR{display:flex;align-items:center;gap:8px;margin:0 10px 7px;padding:6px 9px;border-radius:13px;background:linear-gradient(#2a1546,#150a26);box-shadow:0 0 0 1.5px #6b4a9a,inset 0 1px 0 #fff1;animation:olIn .35s both}
+#onl .amR.rdy{box-shadow:0 0 0 2px #ffc928,0 0 14px #ffb30077}#onl .amR.got{opacity:.55}
+#onl .amR .ch{width:52px;height:44px;object-fit:contain;filter:drop-shadow(0 3px 3px #000a)}#onl .amR.rdy .ch{animation:amBob 1.2s ease-in-out infinite}
+@keyframes amBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+#onl .amR .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}#onl .amR .t b{font:900 13px Game,system-ui;color:#ffe27a}#onl .amR .t small{font:700 11px system-ui;color:#fff}#onl .amR .t .tki{width:15px;height:15px;vertical-align:-3px}
+#onl .amR button{min-width:68px;height:32px;border:0;border-radius:9px;font:900 12px Game,system-ui;color:#3a1d00;background:linear-gradient(#fff1a8,#ffc928 45%,#e59400);box-shadow:0 0 0 1.5px #7a4a00}#onl .amR button.off{background:linear-gradient(#3b4656,#222a36);color:#aab6c6;box-shadow:0 0 0 1px #4a5668}
 #onl .body{flex:1;overflow:auto;padding:0 10px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #onl .body::-webkit-scrollbar{display:none}
 #onl .ond{display:inline-block;width:9px;height:9px;border-radius:50%;background:#3dff5a;box-shadow:0 0 6px #3dff5a;margin-right:4px;vertical-align:1px;animation:olPl 1.6s infinite}
@@ -398,7 +420,7 @@ root.innerHTML=SVGDEFS+`
   <div class="msgs" id="olMsgs"></div></div>
   <div class="inp"><input id="olIn" maxlength="200" enterkeyhint="send" placeholder="Write a message…" autocomplete="off"><button class="btn shine" id="olSend">SEND</button></div></section>
 <section class="scr sk-arena" id="olArena">${top('arena','ARENA','PVP · WEEKLY SEASON')}
-  <div class="tabs" id="olArT"><b data-t="fight" class="on">FIGHT</b><b data-t="top">ARENA TOP</b><b data-t="hist">HISTORY</b></div>
+  <div class="tabs" id="olArT"><b data-t="fight" class="on">FIGHT</b><b data-t="shop">SHOP</b><b data-t="mile">REWARDS<i id="olAmDot"></i></b><b data-t="top">TOP</b><b data-t="hist">HISTORY</b></div>
   <div class="body" id="olArB"></div></section>
 <section class="scr skn sk-cup" id="olCupS"><div class="skH"><img class="hi" src="img/ui2/cup_h.webp" alt="">${top('cup','TORQUE CUP','WEEKEND TOURNAMENT')}</div><div class="skB">
   <div class="body" id="olCupB"></div></div></section>
@@ -434,7 +456,7 @@ async function sync(){
   return r;}
 let arenaTk=0;
 function dots(){const ch=chatSrvLast>chatLast;const a=$('chDot');if(a)a.classList.toggle('on',ch||inboxN>0);$('olChDot').classList.toggle('on',ch);
-  const ad=$('arDot');if(ad)ad.classList.toggle('on',arenaTk>0);$('olArDot').classList.toggle('on',arenaTk>0);}
+  const ad=$('arDot');if(ad)ad.classList.toggle('on',arenaTk>0);$('olArDot').classList.toggle('on',arenaTk>0);const md=$('olAmDot');if(md)md.classList.toggle('on',!!(asData&&asData.mile.some(m=>!m.got&&asData.w>=m.n)));}
 function hdr(){root.querySelectorAll('[data-srv]').forEach(e=>e.textContent='🌍 S'+(window.CLOUD?CLOUD.srv():1));
   root.querySelectorAll('[data-gift]').forEach(e=>{e.classList.toggle('on',inboxN>0);e.querySelector('i').textContent=inboxN;});}
 setInterval(()=>{if(document.visibilityState==='visible')sync();},5*60e3);
@@ -527,8 +549,8 @@ $('olSend').onclick=send;$('olIn').addEventListener('keydown',e=>{if(e.key==='En
 
 // ------------------------------------------------------------------ ARENA
 function tierPct(t,p){return t.next?Math.max(4,Math.min(100,(p-t.from)/(t.next-t.from)*100)):100;}
-async function loadArena(){const B=$('olArB');if(!arData)B.innerHTML='<div class="empty">Loading…</div>';
-  if(arTab==='top')return arTop();if(arTab==='hist')return arHist();
+async function loadArena(){const B=$('olArB');if(LS('te_aleg')==='1'){LS('te_aleg','0');setTimeout(legPick,300);}if(!arData)B.innerHTML='<div class="empty">Loading…</div>';
+  if(arTab==='top')return arTop();if(arTab==='hist')return arHist();if(arTab==='shop'||arTab==='mile')return arShop();
   const r=await call('arena',{});if(r.banned){B.innerHTML='<div class="empty">🚫 Your account is blocked.</div>';return;}
   if(!r.ok){B.innerHTML=`<div class="empty">📶 Could not reach the Arena.</div>`;return;}
   arData=r;arenaTk=r.tk;dots();const t=r.tier;
@@ -538,8 +560,42 @@ async function loadArena(){const B=$('olArB');if(!arData)B.innerHTML='<div class
    <div class="btns"><div class="shine" data-a="def">🛡️ MY TEAM</div><div class="shine" data-a="ref">🔄 NEW RIVALS</div></div>
    <div class="leag">${LG.map((l,i)=>`<div class="${i===t.lg?'on':''}">${badge(i)}${l[0]}</div>`).join('')}</div>
    <div class="o-note">Fights are automatic: your <b>battle team</b> (with gear) against the other player's team – he does not need to be online. Win = up to +${win(r.pts,r.pts+400)} points. When others attack you, you lose a few points only if they win.<br>Rivals marked <span class="ai">AI</span> are training rivals while the server is still filling up.</div>
-   <h3>DAILY REWARD (22:00)</h3><div class="o-rw">${r.daily.map(d=>`<span>${d.lg}</span><span>${DMh} ${d.dm} · ${TKh} ${d.tk}</span>`).join('')}</div>`;
+   <h3>DAILY REWARD (22:00)</h3><div class="o-rw">${r.daily.map((d,i)=>`<span>${d.lg}</span><span>${DMh} ${d.dm} · ${TKh} ${d.tk} · ${AMh} ${AM_DAILY[i]}</span>`).join('')}</div>`;
   requestAnimationFrame(()=>{const i=B.querySelector('.ahero .o-bar i');if(i)i.style.width=tierPct(t,r.pts)+'%';});arenaTick();}
+// ------------------------------------------------------------------ v16-212 ARENA SHOP + MILESTONE REWARDS (Marius 23 nov) – medals live on the SERVER
+const AMh='<img class="tki" src="img/arena/am_medal.webp" alt="">',AM_DAILY=[20,30,45,60,80,100];
+const DGNm={vault:'Cash Vault',mine:'Scrap Mine',forge:'Gear Forge',lab:'Essence Lab'};
+let asData=null;
+const asIc=k=>k==='tk'?'img/ticket.webp':k==='gt'?'img/gticket.webp':k==='ct'?'img/cticket.webp':k[0]==='k'&&k[1]==='_'?'img/dg/k_'+k.slice(2)+'.webp':k==='ess'?'img/ui9/essence.webp':k==='bk'?'img/ui12/pk_bk.webp':k==='leg'?'img/arena/am_chest2.webp':k==='agf'?'img/ui3/on_arena.webp':'img/ui/ic_arena.webp';
+function asReal(rw){const t=T()||{},o={};for(const k in rw){if(k==='essU')o.ess=Math.round(rw[k]*(t.ESS_U?t.ESS_U():300));else if(k==='bkU')o.pk={r:0,bk:Math.round(rw[k]*300*(t.PART_U?t.PART_U():1))};else if(k==='keys'||k==='leg'||k==='unl'||k==='am')o[k]=rw[k];else o[k]=rw[k];}return o;}
+function asName(k,rw){const r=asReal(rw);return {tk:'Recruit Ticket',gt:'Gear Ticket',ct:'Crew Ticket',ess:fmtN(r.ess||0)+' Essence',bk:fmtN(r.pk?r.pk.bk:0)+' Builder Kit',leg:'Legendary Hero (choose)',agf:'Gladiator Frame',awl:'Title ARENA WARLORD'}[k]||(k[0]==='k'?(DGNm[k.slice(2)]||'Dungeon')+' Key':k);}
+function rwLine(rw){const r=asReal(rw),a=[];if(r.dm)a.push(DMh+' '+r.dm);if(r.tk)a.push(TKh+' '+r.tk);if(r.gt)a.push(GTh+' '+r.gt);if(r.ct)a.push(CTh+' '+r.ct);if(r.am)a.push(AMh+' '+r.am);
+  if(r.keys)for(const k in r.keys)a.push('<img class="tki" src="img/dg/k_'+k+'.webp" alt=""> '+r.keys[k]);return a.join(' · ');}
+function asGive(rw){const t=T();if(!t)return;const r=asReal(rw);if(r.keys&&window.DGK)for(const k in r.keys)DGK.add(k,r.keys[k]);
+  const g={};['dm','tk','gt','ct','ess','pk'].forEach(k=>{if(r[k])g[k]=r[k];});if(Object.keys(g).length&&t.giveRw)t.giveRw(g);
+  if(r.leg){legPick();}if(r.unl){sync().then(()=>{try{renderProf();}catch(e){}});}if(t.save)t.save();}
+function legPick(){const t=T();const L=(t.HEROES||[]).filter(h=>h.cat==='m'&&h.gr===4&&!h.soon);
+  const d=modal(`<h4>${AMh} CHOOSE 1 LEGENDARY</h4><p>Tap a hero. It joins your team (or adds a copy).</p><div class="asLeg">${L.map(h=>`<div data-m="h_${h.id}">${ring(h.id)}<small>${esc(h.n)}</small></div>`).join('')}</div>`,
+    b=>{if(!b||b.slice(0,2)!=='h_')return false;const id=b.slice(2);t.gain(id);try{t.heroRefresh();}catch(e){}if(t.save)t.save();toast('🏆 '+esc(t.HB&&t.HB[id]?t.HB[id].n:'Legendary')+' joined your team!',3200);LS('te_aleg','0');return true;});
+  d.querySelector('[data-mx]').remove();LS('te_aleg','1');}   // the choice cannot be closed – if the game is killed, it comes back at the next opening
+async function arShop(){const B=$('olArB');if(!asData)B.innerHTML='<div class="empty">Loading…</div>';const r=await call('ashop',{});
+  if(r.banned){B.innerHTML='<div class="empty">🚫 Your account is blocked.</div>';return;}if(!r.ok){B.innerHTML='<div class="empty">📶 Could not reach the Arena.</div>';return;}asData=r;asRender();}
+function asRender(){const B=$('olArB'),r=asData;if(!r)return;dots();
+  const head=`<div class="asHd"><span>${AMh} <b>${fmtN(r.med)}</b> Arena Medals</span><small>Season ${r.season} · ${r.w} wins · resets in ${dur(r.end-Date.now())}</small></div>`;
+  if(arTab==='shop'){B.innerHTML=`<img class="asT" src="img/arena/as_title.webp" alt="ARENA SHOP">${head}<div class="asG">${r.shop.map(x=>{const lim=x.k==='leg'?1:x.lim,left=x.once?(x.own?0:1):lim?lim-x.used:9,off=left<=0||r.med<x.pr;
+      return `<div class="asC ${left<=0?'sold':''}"><img class="ic" src="${asIc(x.k)}" alt=""><b>${asName(x.k,x.rw)}</b><small>${x.once?(x.own?'OWNED':'once'):x.k==='leg'?(left?'1 / month':'next month'):lim?(x.g?`keys ${x.used} / ${lim} week`:`${x.used} / ${lim} this week`):''}</small><button class="${off?'off':''}" data-ab="${x.k}">${left<=0?'✓':AMh+' '+fmtN(x.pr)}</button></div>`;}).join('')}</div>
+    <div class="o-note">Earn ${AMh} medals: <b>+10</b> per win · <b>+3</b> per loss · daily reward by league (${AMh} 20 → 100) · season end (${AMh} 100 → 1,000). Weekly limits reset with the season (Monday).</div>`;return;}
+  const mx=r.mile[r.mile.length-1].n,pct=Math.min(100,r.w/mx*100);
+  B.innerHTML=`${head}<div class="amTr"><img src="img/arena/am_bar.webp" alt=""><i style="width:${pct*.86}%"></i><span>${r.w} / ${mx} WINS</span></div>
+   ${r.mile.map((m,i)=>{const ok=r.w>=m.n;return `<div class="amR ${m.got?'got':ok?'rdy':''}"><img class="ch" src="img/arena/am_chest${i<3?0:i<6?1:2}.webp" alt=""><div class="t"><b>${m.n} WINS</b><small>${rwLine(m.rw)}</small></div><button data-am="${i}" class="${m.got||!ok?'off':''}">${m.got?'✓':ok?'CLAIM':`${Math.min(r.w,m.n)}/${m.n}`}</button></div>`;}).join('')}
+   <div class="o-note">Win Arena fights to open the chests. Wins and chests reset every season (Monday).</div>`;}
+async function asBuy(k){const x=asData&&asData.shop.find(z=>z.k===k);if(!x)return;
+  if(x.once&&x.own)return toast('✓ You already own it');if(asData.med<x.pr)return toast(AMh+' Not enough Arena Medals ('+fmtN(x.pr)+')',2400);
+  modal(`<h4>Buy ${asName(k,x.rw)}?</h4><p style="text-align:center"><img src="${asIc(k)}" style="width:64px" alt=""><br>for ${AMh} <b>${fmtN(x.pr)}</b> Arena Medals</p><div class="ok"><button class="btn gray" data-m="no">NO</button><button class="btn" data-m="ok">YES, BUY</button></div>`,async b=>{if(b!=='ok')return;
+    const r=await call('abuy',{k});if(!r.ok){toast({medals:'Not enough Arena Medals',limit:'Limit reached',owned:'You already own it',network:'📶 No connection'}[r.err]||'⚠️ Could not buy',2400);return;}
+    asData=r;asGive(r.rw);toast('🛒 '+asName(k,x.rw),2200);asRender();});}
+async function asMile(i){const r=await call('amile',{i});if(!r.ok){toast({wins:'Win more Arena fights first',claimed:'Already claimed'}[r.err]||'⚠️ Could not claim',2200);return;}
+  asData=r;asGive(r.rw);toast('🎁 '+rwLine(r.rw),2600);asRender();}
 const win=(a,b)=>{const E=1/(1+Math.pow(10,(b-a)/400));return Math.max(6,Math.round(32*(1-E))+4);};
 function arenaTick(){if(!arData||arTab!=='fight')return;const s=$('olSeason');if(s)s.textContent=dur(arData.end-Date.now());const n=$('olTkN');if(n)n.textContent=arData.tkNext?'· +1 in '+dur(arData.tkNext-Date.now()):'';
   if(arData.tkNext&&Date.now()>arData.tkNext+1500){arData.tkNext=0;loadArena();}}
@@ -549,6 +605,7 @@ async function arHist(){const B=$('olArB');const r=await call('hist',{});if(!r.o
   B.innerHTML=r.list.length?r.list.map(h=>`<div class="hrow ${h.win?'hw':'hl'}"><b class="w ${h.win?'o-y':'o-n'}">${h.win?'WIN':'LOSS'}</b><span>${h.kind==='cup'?'🏟️':h.atk?'⚔️ you attacked':'🛡️ attacked you:'} <b>${esc(h.other)}</b><br><small>${new Date(h.t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${h.d>0?'+':''}${h.d} pts</small></span><button class="play" data-replay="${h.id}">▶ WATCH</button></div>`).join(''):'<div class="empty">No fights yet.</div>';}
 $('olArT').onclick=e=>{const b=e.target.closest('b');if(!b)return;arTab=b.dataset.t;$('olArT').querySelectorAll('b').forEach(x=>x.classList.toggle('on',x===b));arData=null;loadArena();};
 $('olArB').addEventListener('click',async e=>{
+  const ab=e.target.closest('[data-ab]');if(ab){e.stopPropagation();asBuy(ab.dataset.ab);return;}const am=e.target.closest('[data-am]');if(am){e.stopPropagation();if(!am.classList.contains('off'))asMile(+am.dataset.am);return;}
   const f=e.target.closest('[data-fight]');if(f){e.stopPropagation();if(f.classList.contains('off')){toast('⚔️ No Arena fights left – +1 every 2 hours');return;}doFight(f.dataset.fight);return;}
   const rp=e.target.closest('[data-replay]');if(rp){e.stopPropagation();const r=await call('replay',{id:+rp.dataset.replay});if(r.ok)playFight(r,true);else toast('⚠️ This fight is too old');return;}
   const a=e.target.closest('[data-a]');if(!a)return;
@@ -605,7 +662,7 @@ $('olCupB').addEventListener('click',async e=>{const b=e.target.closest('[data-r
 function myHeroes(){const t=T();if(!t)return [];const G=t.G,o=[];for(const id in G.h.own){const h=t.HB[id];if(h&&h.cat==='m'&&!h.soon)o.push(h);}o.sort((a,b)=>b.gr-a.gr||(G.h.own[b.id].s||0)-(G.h.own[a.id].s||0));return o;}
 function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty">Loading…</div>';return;}
   const u=new Set(ME.unl||[]),G=T().G,vip=vipLv(G),rep=G.rep||0;
-  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&u.has('glad'))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)))||(f===8&&vip>=10)||[[9,'raid'],[10,'tw3'],[11,'bhunt'],[12,'dgm'],[13,'call'],[14,'awk']].some(x=>x[0]===f&&u.has(x[1]));
+  const fOk=f=>f===0||(f===1&&(rep>=5||u.has('f1')))||(f===2&&vip>=3)||(f===3&&(u.has('glad')||u.has('agf')))||(f===4&&(vip>=7||u.has('dia')))||(f===5&&(u.has('leg')||u.has('cup')))||(f===7&&(u.has('fdr')||!!(T().PK&&T().PK.fdr)))||(f===8&&vip>=10)||[[9,'raid'],[10,'tw3'],[11,'bhunt'],[12,'dgm'],[13,'call'],[14,'awk']].some(x=>x[0]===f&&u.has(x[1]));
   const tOk=k=>k==='rook'||u.has(k);
   const H=myHeroes();
   $('olPrH').innerHTML=`${hdrAv(ME.icon,ME.frame)}<div class="pnm"><b>${esc(ME.name)}</b><button class="edit" data-a="name">✏️</button></div><div class="ptt">${tt(ME.title)}</div><div class="pid">${flag(ME.cc)} · ID ${ME.uid} · S${window.CLOUD?CLOUD.srv():1}</div><div class="pvip">${vip?vipB(vip)+' <b>VIP '+vip+'</b>':''}<button class="hvB" data-a="hv">${ME.hv?'🙈 VIP HIDDEN':'👁 VIP VISIBLE'}</button><small>${ME.hv?'Others do not see your VIP level':'Tap to hide your VIP level from others'}</small></div>
@@ -705,7 +762,7 @@ function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u
   setTimeout(()=>{if(!F)return;const R=$('olRes'),t=r.tier;R.classList.toggle('lose',!r.win);
     R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${r.kind==='train'&&!F.replay?(r.rwH||''):F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
      ${t&&!F.replay?`<div class="lg"><div class="o-bar"><i style="width:${tierPct(t,r.pts-r.da)}%"></i></div><small>${t.name} · ${r.pts} pts</small></div>`:''}
-     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>${DMh} +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>${TKh} +${r.rw.tk} Recruit</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
+     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>${DMh} +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>${TKh} +${r.rw.tk} Recruit</div>`:''}${r.rw.am?`<div>${AMh} +${r.rw.am} Medals</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
     R.classList.add('on');$('olFx').classList.add('end');if(!F.replay&&r.kind!=='train'){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
       setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
     $('olCont').onclick=()=>{const tro=F&&F.trOpen,oe=r.onEnd;$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(tro){root.classList.remove('open');}if(oe){try{oe();}catch(e){}return;}if(cur==='olArena'){arData=null;loadArena();}};},1100);}

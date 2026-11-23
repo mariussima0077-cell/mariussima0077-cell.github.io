@@ -42,6 +42,16 @@ const WB_RW = [[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:
 const WB_DAY = 6;        // max hits per UTC day (3 keys per local day → up to 6 in one UTC day around midnight)
 const WB_CAP = 60;       // one 60 s hit can be at most WB_CAP × team power (normal play: ~1-5 ×)
 const SEASON_RW = [[150,3],[300,5],[500,8],[800,12],[1200,16],[2000,25]];
+// v16-212 (Marius 23 nov): ARENA MEDALS – the Arena's own currency, kept HERE on the server (arena.med), spent in the ARENA SHOP.
+// win +10 · loss +3 · daily mail by league · season-end mail by league (the mail gives 'am', added to arena.med when the mail is claimed)
+const AM_WIN = 10, AM_LOSS = 3, AM_DAILY = [20,30,45,60,80,100], AM_SEASON = [100,200,350,500,750,1000];
+// shop: [key, price, weekly limit (0 = none), limit group, reward] – rewards are abstract, the game turns them into items (essU/bkU = by progress)
+// NO diamonds, NO Mythic, NO Mythic Core (Marius). 'leg' = 1 Legendary hero of your choice, once a MONTH. 'agf'/'awl' = cosmetics, once forever.
+const ASHOP = [['tk',120,10,'',{tk:1}],['gt',120,10,'',{gt:1}],['ct',100,10,'',{ct:1}],
+  ['k_vault',150,5,'k',{keys:{vault:1}}],['k_mine',150,5,'k',{keys:{mine:1}}],['k_forge',150,5,'k',{keys:{forge:1}}],['k_lab',150,5,'k',{keys:{lab:1}}],
+  ['ess',80,10,'',{essU:1}],['bk',100,10,'',{bkU:1}],['leg',5000,0,'',{leg:1}],['agf',3000,0,'',{unl:'agf'}],['awl',2000,0,'',{unl:'awl'}]];
+// milestones: wins in the current season (weekly) → reward; reset every season
+const AMILE = [[3,{dm:50}],[7,{tk:2}],[12,{am:100}],[20,{dm:150,gt:2}],[30,{keys:{vault:1,forge:1}}],[45,{am:300}],[60,{dm:300,tk:5,gt:5}]];
 const CUP_RW = {1:{dm:2000,tk:50,t:'Champion'}, 2:{dm:1200,tk:30,t:'Final'}, 4:{dm:800,tk:20,t:'Semi-final'}, 8:{dm:500,tk:15,t:'Quarter-final'}, 16:{dm:300,gt:10,t:'Round of 16'}, 32:{dm:150,gt:5,t:'Round of 32'}, 64:{dm:80,gt:3,t:'Round of 64'}};
 const BOTN = ['Rusty_Rick','GearGrinder','Lugnut_Lou','OilSlick','Sparky_88','TorqueTina','Wrenchy','PistonPete','Clutch_Kid','Turbo_Ted','NutBuster','RevLimit','BoltBaron','DieselDan','CamshaftCarl','Brake_Bea','Muffler_Max','HubcapHal','ChromeCleo','Axle_Ace'];
 const HERO_IDS = [['m0_0','m0_1','m0_2','m0_3','m0_4','m0_5','m0_6','m0_7','m0_8','m0_9'],['m1_0','m1_1','m1_2','m1_3','m1_4','m1_5','m1_6'],['m2_0','m2_1','m2_2','m2_3','m2_4','m2_5','m2_6'],
@@ -121,6 +131,9 @@ async function ensure(env) {
   try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}
   try { await db.prepare('ALTER TABLE prof ADD COLUMN rp INTEGER DEFAULT 0').run(); } catch (e) {}
   try { await db.prepare("ALTER TABLE prof ADD COLUMN bot TEXT DEFAULT ''").run(); } catch (e) {}   // v16-167: filler bots (JSON plan)   // v16-155: RAIL PASS – subscription end (ms), checked against Google purchases at every sync   // v16-122: HIDE VIP (others do not see the VIP level)
+  try { await db.prepare('ALTER TABLE arena ADD COLUMN med INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-212 ARENA MEDALS
+  try { await db.prepare("ALTER TABLE arena ADD COLUMN ams TEXT DEFAULT ''").run(); } catch (e) {}      // v16-212 milestones claimed {s:season, c:[i]}
+  try { await db.prepare("ALTER TABLE arena ADD COLUMN abuy TEXT DEFAULT ''").run(); } catch (e) {}     // v16-212 shop counts {s:season, c:{k:n}, m:'YYYY-MM', L:n, u:[once]}
   ready = true;
 }
 const kvGet = async (env, k) => { const r = await env.DB.prepare('SELECT v FROM kv WHERE k=?').bind(k).first(); return r ? r.v : null; };
@@ -185,9 +198,9 @@ async function patList(env, srv) { const t0 = gpT0(srv); if (!t0 || Date.now() <
   try { return (await env.DB.prepare('SELECT id, uid, name n, k, t FROM gpat WHERE srv=? AND t>=? ORDER BY id DESC LIMIT 30').bind(srv, t0).all()).results; } catch (e) { return undefined; } }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
-function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10) || (f === 9 && u.has('raid')) || (f === 10 && u.has('tw3')) || (f === 11 && u.has('bhunt')) || (f === 12 && u.has('dgm')) || (f === 13 && u.has('call')) || (f === 14 && u.has('awk')); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
+function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && (u.has('glad') || u.has('agf'))) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10) || (f === 9 && u.has('raid')) || (f === 10 && u.has('tw3')) || (f === 11 && u.has('bhunt')) || (f === 12 && u.has('dgm')) || (f === 13 && u.has('call')) || (f === 14 && u.has('awk')); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
 const NEWT = ['sky','awk','bhunt','dgm','trny','raid','hard','coll','lucky','twr','gty','daily'];   // v16-174: 12 new titles (claimed by the game, like wr/boss/speed)
-const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail', ...NEWT];   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
+const TITLES = ['rook','wr','boss','gear','speed','chat','glad','leg','cup','king','fdr','vip5','vip10','rail','awl', ...NEWT];   // v16-212: + ARENA WARLORD (Arena Shop)   // v16-122: + FOUNDER (was missing here) + VIP STAR / VIP LEGEND
 function titleOk(p, k) { return k === 'rook' || unlocks(p).has(k); }
 
 // ------------------------------------------------------------------ ARENA FIGHT (decided by the server, seeded → the same fight can be replayed)
@@ -306,6 +319,7 @@ async function fight(env, p, b) {
   const tr = tierOf(a.peak); if (tr.lg >= 2) await addUnl(env, p.uid, 'glad'); if (tr.lg >= 4) await addUnl(env, p.uid, 'dia'); if (tr.lg >= 5) await addUnl(env, p.uid, 'leg');
   const before = tierOf(a.pts - da).lg; if (!isTst(p.pid) && tr.lg > before && tierOf(a.pts).lg >= 3) await sysMsg(env, p.srv, `⚔️ ${p.name} climbed to ${LEAGUES[tierOf(a.pts).lg]} in the Arena!`);
   const rw = res.win ? {dm:20, tk:1} : {dm:5};
+  const am = res.win ? AM_WIN : AM_LOSS; await db.prepare('UPDATE arena SET med=COALESCE(med,0)+? WHERE uid=?').bind(am, p.uid).run(); rw.am = am;   // v16-212
   return {ok:true, id:hid, win:res.win, log:res.log, dur:res.dur, ta:pubTeam(ta), td:pubTeam(td), me:pub(p), them:dp, da, pts:a.pts, tier:tierOf(a.pts), tk:a.tk, rw};
 }
 async function replay(env, id) {
@@ -430,18 +444,55 @@ async function cupView(env, p) {
 }
 const slim = (d, uid) => ({n:d.n, P:d.P.map(x => ({uid:x.uid, bot:x.bot ? 1 : 0, name:x.name, icon:x.icon, frame:x.frame, pow:x.pow})), R:d.R, round:d.round, next:d.next, done:d.done, champ:d.champ, me:d.P.findIndex(x => x.uid === uid)});
 
+// ------------------------------------------------------------------ v16-212 ARENA SHOP + MILESTONES (Marius 23 nov)
+const monthKey = t => new Date(t).toISOString().slice(0, 7);
+async function arenaShop(env, p, op, b) {
+  const db = env.DB, now = Date.now(), a = await arenaRow(env, p), season = a.season, mk = monthKey(now);
+  const row = await db.prepare('SELECT med, ams, abuy FROM arena WHERE uid=?').bind(p.uid).first() || {};
+  let med = row.med | 0, ms = {}, bu = {};
+  try { ms = JSON.parse(row.ams || '{}'); } catch (e) {} try { bu = JSON.parse(row.abuy || '{}'); } catch (e) {}
+  if (ms.s !== season) ms = {s:season, c:[]};
+  if (bu.s !== season) bu = {s:season, c:{}, m:bu.m, L:bu.L, u:bu.u || []};
+  if (bu.m !== mk) { bu.m = mk; bu.L = 0; } bu.u = bu.u || [];
+  const unl = unlocks(p), w = a.w | 0;
+  const grp = (g, k) => g ? ASHOP.filter(x => x[3] === g).reduce((n, x) => n + (bu.c[x[0]] | 0), 0) : (bu.c[k] | 0);
+  const view = () => ({ok:true, med, season, end:weekStart(now) + 7 * DAY, w,
+    shop:ASHOP.map(([k, pr, lim, g, rw]) => ({k, pr, lim, g, used:k === 'leg' ? (bu.L | 0) : grp(g, k), once:!!rw.unl, own:rw.unl ? (unl.has(rw.unl) || bu.u.includes(k)) : false, rw})),
+    mile:AMILE.map(([n, rw], i) => ({n, rw, got:ms.c.includes(i)}))});
+  const save = async () => { await db.prepare('UPDATE arena SET med=?, ams=?, abuy=? WHERE uid=?').bind(med, JSON.stringify(ms), JSON.stringify(bu), p.uid).run(); };
+  if (op === 'ashop') { await save(); return view(); }
+  if (op === 'abuy') {
+    const it = ASHOP.find(x => x[0] === String(b.k || '')); if (!it) return {err:'bad'};
+    const [k, pr, lim, g, rw] = it;
+    if (rw.unl && (unl.has(rw.unl) || bu.u.includes(k))) return {err:'owned'};
+    if (k === 'leg' && (bu.L | 0) >= 1) return {err:'limit'};
+    if (lim && grp(g, k) >= lim) return {err:'limit'};
+    if (med < pr) return {err:'medals'};
+    med -= pr; if (k === 'leg') bu.L = (bu.L | 0) + 1; else if (rw.unl) { bu.u.push(k); await addUnl(env, p.uid, rw.unl); } else bu.c[k] = (bu.c[k] | 0) + 1;
+    await save(); try { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, 'ashop', `Arena Shop: ${k} −${pr} medals (left ${med})`).run(); } catch (e) {}
+    return {...view(), rw};
+  }
+  if (op === 'amile') {
+    const i = b.i | 0, m = AMILE[i]; if (!m) return {err:'bad'};
+    if (ms.c.includes(i)) return {err:'claimed'}; if (w < m[0]) return {err:'wins'};
+    ms.c.push(i); const rw = {...m[1]}; if (rw.am) { med += rw.am; } await save();
+    return {...view(), rw};
+  }
+  return {err:'bad'};
+}
+
 // ------------------------------------------------------------------ daily / season rewards (cron)
 async function rewardsTick(env) {
   const db = env.DB, now = env.TEST_NOW ? +env.TEST_NOW : Date.now(), dk = dayKey(now), h = new Date(now).getUTCHours();
   if (h >= 21 && (await kvGet(env, 'daily')) !== dk) {             // 21:00 UTC = 22:00 Paris
     await kvSet(env, 'daily', dk); const season = seasonOf(now);
     const rows = (await db.prepare('SELECT a.uid, a.pts FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'bot_\'').bind(season, now - 2 * DAY).all()).results;
-    for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = DAILY[lg]; await mail(env, r.uid, '⚔️', 'Arena daily reward', `Your league today: ${tierOf(r.pts).name}.`, {dm, tk}); }
+    for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = DAILY[lg]; await mail(env, r.uid, '⚔️', 'Arena daily reward', `Your league today: ${tierOf(r.pts).name}.`, {dm, tk, am:AM_DAILY[lg]}); }
   }
   const season = seasonOf(now), last = +(await kvGet(env, 'season') || 0);
   if (last && last < season) {                                      // the week is over: season rewards + soft reset happens when each player comes back
     const rows = (await db.prepare('SELECT a.uid, a.pts, a.peak FROM arena a LEFT JOIN prof p ON p.uid=a.uid LEFT JOIN players pl ON pl.pid=p.pid WHERE a.season=? AND a.t>? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND COALESCE(pl.score,0)<50 AND substr(p.pid,1,4)<>\'bot_\'').bind(last, now - 9 * DAY).all()).results;
-    for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = SEASON_RW[lg]; await mail(env, r.uid, '🏅', `Arena season ${last} ended`, `Final league: ${tierOf(r.pts).name}. A new season has started – your points were partly reset.`, {dm, tk}); }
+    for (const r of rows) { const lg = tierOf(r.pts).lg, [dm, tk] = SEASON_RW[lg]; await mail(env, r.uid, '🏅', `Arena season ${last} ended`, `Final league: ${tierOf(r.pts).name}. A new season has started – your points were partly reset.`, {dm, tk, am:AM_SEASON[lg]}); }
     await db.prepare('UPDATE arena SET peak=pts').run();
   }
   if (last !== season) await kvSet(env, 'season', season);
@@ -628,6 +679,7 @@ export async function online(op, b, env) {
   if (op === 'arena') { if (await isBanned(env, b.pid)) return {banned:1}; return {ok:true, ...(await arenaView(env, p))}; }
   if (op === 'refresh') { const a = await arenaRow(env, p); a.opp = JSON.stringify(await findOpp(env, p, a)); await saveArena(env, a); return {ok:true, opp:await oppView(env, p, a)}; }
   if (op === 'fight') { if (await isBanned(env, b.pid)) return {banned:1}; return fight(env, p, b); }
+  if (op === 'ashop' || op === 'abuy' || op === 'amile') { if (await isBanned(env, b.pid)) return {banned:1}; return arenaShop(env, p, op, b); }   // v16-212
   if (op === 'stbuy') {   // v16-169: Street Shop purchase log (shown on the player card in /admin, kind 'stshop'); max 60 a day
     const k = String(b.k || '').replace(/[^a-z0-9_]/gi, '').slice(0, 12), pr = b.p | 0, left = b.left | 0; if (!k) return {err:'bad'};
     if ((await db.prepare("SELECT COUNT(*) n FROM events WHERE pid=? AND kind='stshop' AND t>?").bind(b.pid, now - DAY).first()).n >= 60) return {ok:true};
@@ -704,7 +756,9 @@ export async function online(op, b, env) {
   if (op === 'inbox') return {ok:true, list:(await db.prepare('SELECT id,t,ic,title,body,rw FROM inbox WHERE uid=? AND got=0 ORDER BY id DESC LIMIT 30').bind(p.uid).all()).results.map(r => ({...r, rw:JSON.parse(r.rw || '{}')}))};
   if (op === 'claim') {
     const r = await db.prepare('UPDATE inbox SET got=1 WHERE id=? AND uid=? AND got=0 RETURNING rw').bind(b.id | 0, p.uid).first();
-    return r ? {ok:true, rw:JSON.parse(r.rw || '{}')} : {err:'claimed'};
+    if (!r) return {err:'claimed'}; const rw = JSON.parse(r.rw || '{}');
+    if (rw.am > 0) await db.prepare('UPDATE arena SET med=COALESCE(med,0)+? WHERE uid=?').bind(Math.min(5000, rw.am | 0), p.uid).run();   // v16-212 ARENA MEDALS from Mail
+    return {ok:true, rw};
   }
   return {err:'not found'};
 }
