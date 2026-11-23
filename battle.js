@@ -1842,7 +1842,7 @@ function fxAura(u){const col=ROLECOL[u.role]||'#ffb300',x=u.x,y=fy(u.d),h=dsc(u.
 const MB_R=1.3,EN_R=2,MB_SC=1.45;const MB_CH=120; // v16-236 (Marius): campaign mini boss / enrage only from chapter 5 (stage 5-1)
 function mbWarn(ep,tp,camp){if(camp&&tsi<MB_CH||!(tp>0))return '';const r=ep/tp;if(r<=MB_R)return '';return '<div style="margin-top:4px;color:'+(r>EN_R?'#ff5252':'#ffb300')+';font-weight:700;font-size:.92em">⚠ '+(r>EN_R?'MINI BOSS + ENRAGE':'MINI BOSS')+' – monsters ×'+r.toFixed(1)+' your power</div>';}
 function bEP(){const k=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);let p=0;B.stage.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*k;}));return p/B.stage.w.length*1.05;}
-function mbInit(){B.rt=0;B.mb=null;B.enr=0;if(B.tw&&(B.tw.wb||B.tw.dg))return;if(!B.tw&&B.si<MB_CH)return;try{if(B.pw0>0)B.rt=bEP()/B.pw0;}catch(e){B.rt=0;}if(B.rt>MB_R&&!window.__SIM){fxImg('hm_ring');fxImg('hm_aura');}}
+function mbInit(){B.rt=0;B.mb=null;B.enr=0;if(B.tw&&(B.tw.wb||B.tw.dg))return;if(!B.tw&&B.si<MB_CH)return;try{if(B.pw0>0)B.rt=bEP()/B.pw0;}catch(e){B.rt=0;}if(B.rt>MB_R&&!window.__SIM){fxImg('hm_ring');fxImg('hm_aura');fxImg(B.rt>EN_R?'mb_enr':'mb_warn');}}
 function mbCheck(){if(!(B.rt>MB_R)||B.mb||B.wave!==B.stage.w.length-1||!B.lwMax)return;
   const hp=B.mons.reduce((a,m)=>a+(m.dead||m.mb?0:m.hp),0),trig=B.rt>EN_R?.7:.5;if(hp>B.lwMax*trig)return;
   const D=Math.min(3,B.rt-1);
@@ -1851,7 +1851,7 @@ function mbCheck(){if(!(B.rt>MB_R)||B.mb||B.wave!==B.stage.w.length-1||!B.lwMax)
   const m=mkMon(t,0);if(B.mod)twModMon(m);
   m.mb=1;m.boss=true;m.name='MINI BOSS';m.max=m.hp=Math.max(m.max*3,B.lwMax*(.5+.8*D));m.atk*=2+4*D;m.as*=.85;m.def*=1.5;m.H=(m.H||40)*MB_SC;
   m.x=W+40;m.d=.5;m.st='walk';B.mons.push(m);B.mb=m;B.bossBar=m;
-  if(!B.sim){B.flash=.6;shake(16);punch(.05);}B.banner={boss:m,t:0,name:B.enr?'⚠ MINI BOSS + ENRAGE!':'⚠ WARNING! MINI BOSS'};}
+  if(!B.sim){B.flash=.6;shake(16);punch(.05);}B.banner={boss:m,t:0,name:B.enr?'⚠ MINI BOSS + ENRAGE!':'⚠ WARNING! MINI BOSS',img:B.enr?'mb_enr':'mb_warn'};}
 function mbPay(){if(!B.mb)return;try{const T=TE(),G=T.G,e=Math.max(1,Math.round(.3*T.ESS_Ui(B.tw&&B.tw.eq!=null?B.tw.eq:B.si)));G.ess=(G.ess||0)+e;T.save();T.toast('👹 MINI BOSS defeated! +'+T.nf(e)+' Essence',2600);}catch(e){}}
 // v16-235 (Marius 23 nov: a 38 M team beat 107 M monsters): hero DEF from gear went up to ~390 → 92% less damage, but DEF counts almost nothing in POWER.
 // Heroes now block at most DEF_CAP of a hit, so POWER shows the real strength again.
@@ -1925,7 +1925,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
 function cast(u){if(!canCast(u))return;u.en=0;u.enLock=3;B.flash=.15;if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
-  B.banner={u,t:0,name:skOf(u.h).sk};
+  if(!(B.banner&&B.banner.img))B.banner={u,t:0,name:skOf(u.h).sk}; // v16-237: the MINI BOSS picture banner is not cut by a skill banner
   const R=u.role,ms=alive(B.mons);
   if(SKF[u.h.id]){B.hk=u.skK||1;try{SKF[u.h.id](u,ms);}finally{B.hk=1;}return;}
   const P=skp(u);
@@ -2591,7 +2591,8 @@ function drawFCard(u,x,y,cw,ch,ready,t){const h=u.h,i=h.crew?0:Math.min(5,h.gr|0
   if(ready){g.font='900 '+Math.round(cw/4.6)+'px Game,system-ui';g.lineWidth=3;g.strokeStyle='#000';g.strokeText('TAP!',x+cw/2,wy+wh*.42);g.fillStyle='#fff3c4';g.fillText('TAP!',x+cw/2,wy+wh*.42);}
   if(u.dead){g.globalAlpha=1;g.font='900 22px Game,system-ui';g.fillText('💀',x+cw/2,wy+wh*.42);}
   return true;}
-function drawBanner(t){const b=B.banner;if(!b)return;if(FX2&&b.u)return drawBanner2(t,b);const k=b.t,a=k<.15?k/.15:k>1.05?Math.max(0,(1.3-k)/.25):1;const y=H*.3;
+function drawBanner(t){const b=B.banner;if(!b)return;if(b.img){const im=fxImg(b.img);if(im.complete&&im.naturalWidth){const k=b.t,al=k<.12?k/.12:k>1.05?Math.max(0,(1.3-k)/.25):1,bw=Math.min(W*.98,520*S),bh=bw*im.naturalHeight/im.naturalWidth,sc=k<.18?1.35-.35*(k/.18):1+.03*Math.sin(k*18)*Math.max(0,1-k),y=H*.3; // v16-237: Marius's banner pictures
+    g.save();g.globalAlpha=al;g.translate(W/2,y);g.scale(sc,sc);g.drawImage(im,-bw/2,-bh/2,bw,bh);g.restore();return;}}if(FX2&&b.u)return drawBanner2(t,b);const k=b.t,a=k<.15?k/.15:k>1.05?Math.max(0,(1.3-k)/.25):1;const y=H*.3;
   g.save();g.globalAlpha=a;const off=(1-Math.min(1,k/.18))*-W;
   const gr=g.createLinearGradient(0,y-34,0,y+34);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(.5,b.boss?'rgba(120,0,0,.85)':'rgba(30,15,0,.85)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,y-40,W,80);
   g.fillStyle=b.boss?'#ff1744':(b.u?b.u.look.gc:'#ffb300');g.fillRect(0,y-30,W,2);g.fillRect(0,y+28,W,2);
