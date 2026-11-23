@@ -12,7 +12,7 @@
 //                           is stored – never the e-mail or the name. Table `accounts` is created by itself.
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
 
-import {online, onlineCron, onlineAdmin, giftDm, isGiftDm} from './online.js';
+import {online, onlineCron, onlineAdmin, giftDm, isGiftDm, adminGifts} from './online.js';
 import {EP_N, EP_H} from './ept.js';   // v16-157: enemy power of every campaign stage (made by tools/ept_table.py)
 
 // v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
@@ -70,6 +70,8 @@ async function ensureG(env) {
     db.prepare('CREATE TABLE IF NOT EXISTS ledg(pid TEXT, day TEXT, b0 INTEGER, m INTEGER DEFAULT 0, dm INTEGER DEFAULT 0, tk INTEGER DEFAULT 0, ct INTEGER DEFAULT 0, gtk INTEGER DEFAULT 0, vip INTEGER DEFAULT 0, PRIMARY KEY(pid, day))'),
     db.prepare('CREATE TABLE IF NOT EXISTS rcpt(pid TEXT, t INTEGER, si INTEGER, h INTEGER, ms INTEGER, pw INTEGER, ep INTEGER, sp REAL, bad TEXT)'),
     db.prepare('CREATE INDEX IF NOT EXISTS rcpt_pid ON rcpt(pid, t)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS agift(id INTEGER PRIMARY KEY AUTOINCREMENT, pid TEXT, dm INTEGER, msg TEXT, t INTEGER, sent INTEGER DEFAULT 0, ts INTEGER, mid INTEGER, nonce TEXT UNIQUE)'),   // v16-233b: 💎 sent from /admin
+    db.prepare('CREATE INDEX IF NOT EXISTS agift_pid ON agift(pid, sent)'),
   ]);
   gReady = true;
 }
@@ -223,7 +225,8 @@ async function report(b, env) {
     const nbD = ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(b.pid, now - 864e5).first()) || {n:0}).n;
     let mailDm = 0; try { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(b.pid).first();
       if (pr) for (const m of (await db.prepare('SELECT rw FROM inbox WHERE uid=? AND t>?').bind(pr.uid, now - 2 * 864e5).all()).results) mailDm += +(JSON.parse(m.rw || '{}').dm || 0); } catch (e) {}
-    const capDm = 10000 + 40 * Math.max(0, bmax - (L.b0 || 0)) + 25000 * nbD + mailDm;
+    let agDm = 0; try { agDm = ((await db.prepare('SELECT SUM(dm) s FROM agift WHERE pid=? AND t>?').bind(b.pid, now - 30 * 864e5).first()) || {}).s || 0; } catch (e) {}   // v16-233b: 💎 from /admin are never cheating
+    const capDm = 10000 + 40 * Math.max(0, bmax - (L.b0 || 0)) + 25000 * nbD + mailDm + agDm;
     if (L.dm > capDm && !isGift(b.pid) && !isGiftDm(b.pid) && !(await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'ledger:%'").bind(b.pid, now - 864e5).first()))
       add(25, 'econ', `ledger: +${L.dm} diamonds today (max possible ~${capDm})`);
   }
@@ -585,7 +588,7 @@ async function playerCard(url, env, pid) {
 <div class=c>${p.banned ? '🚫 <b style="color:#ff8a80">BANNED</b>' : `⚠️ score <b>${p.score}</b>`}${p.shadow ? ` · 👻 hidden${p.shadow === 2 ? ' (by you)' : ''}` : ''} · kinds: <b>${esc(p.sig || '–')}</b><br>${esc(p.reason || '')}<br>
 <small>first seen ${d(p.first)} · last ${d(p.last)} · app ${p.app ? 'Play' : 'browser'} · stage ${p.best} (best ever ${Math.max(p.bmax || 0, p.best)}) · buildings lv ${p.lv} · heroes ${p.heroes} (${p.mythic} Mythic)</small><br>
 ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(pid)}">clear</a> · ${p.shadow ? `<a href="?key=${k}&unshadow=${encodeURIComponent(pid)}">👁️ show again</a>` : `<a href="?key=${k}&shadow=${encodeURIComponent(pid)}">👻 hide (shadow)</a>`}`}</div>
-<div class=c><a href="?key=${k}&reset=${encodeURIComponent(pid)}" style="color:#ff8a80;font-weight:bold">🔄 RESET – start from 0</a> <small>(asks first)</small></div>
+${giftForm(env.ADMIN_KEY, pid)}${await giftList(db, pid)}<div class=c><a href="?key=${k}&reset=${encodeURIComponent(pid)}" style="color:#ff8a80;font-weight:bold">🔄 RESET – start from 0</a> <small>(asks first)</small></div>
 <h3>🛡️ Battle team (last online sync)</h3><div class=c>${tmHtml}</div>
 <small>Charts: last 7 days. Honest = a line that climbs smoothly. Cheat = a vertical jump.</small>
 ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('⚔️ Team power', S.filter(r => r.pw > 0).map(r => [r.t, r.pw]), '#ff8a65', true)}${chart('💰 Money (log)', S.map(r => [r.t, r.money]), '#66bb6a', true)}${chart('🎟️ Tickets', S.map(r => [r.t, r.tk]), '#9fd3ff')}${chart('🏗️ Buildings level', S.map(r => [r.t, r.lv]), '#ce93d8')}
@@ -595,6 +598,52 @@ ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('�
 <h3>📱 Phones</h3><div class=c>${dv.map(x => `<small>${esc(x.dk).slice(0, 9)}… last ${d(x.t)}</small>`).join('<br>') || '<small>none yet</small>'}${same.length ? `<br><b>Other accounts on this phone:</b><br>${same.map(x => `<a href="?key=${k}&p=${encodeURIComponent(x.pid)}">${NM[x.pid] ? esc(NM[x.pid]) : esc(x.pid).slice(0, 13)}</a> <small>${d(x.t)}</small>`).join('<br>')}` : ''}</div>
 <h3>📜 Events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>none</div>'}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
+}
+
+// ------------------------------------------------------------------ v16-233b (23 nov 2026, Marius): 💎 SEND DIAMONDS from /admin
+// To anybody (name or Player ID), any amount, optional message. Goes into the player's Mail (claim = diamonds). Never flagged:
+// the LEDGER rule adds these diamonds to the daily maximum for 30 days. A gift is sent only ONCE (nonce, even if the page is reloaded).
+const GIFT_MAX = 10000000;
+const escH = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const PAGE = (t, b) => new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>${t}</title><style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:14px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:12px;margin:8px 0;font-size:15px;line-height:1.5}a{color:#9fd3ff}small{color:#9fb0c0}a.b{display:inline-block;margin-top:10px;padding:11px 18px;border-radius:10px;background:#29b6f6;color:#001;font-weight:bold;text-decoration:none}</style>${b}`, {headers:{'content-type':'text/html;charset=utf-8'}});
+function giftForm(key, pid) {
+  const I = 'padding:8px;border-radius:8px;border:0;font-size:15px;box-sizing:border-box';
+  return `<form class=c style="display:flex;flex-wrap:wrap;gap:6px;border-color:#29b6f688"><b style="width:100%;color:#7fd8ff">💎 Send diamonds</b><input type=hidden name=key value="${escH(key)}">
+${pid ? `<input type=hidden name=gift value="${escH(pid)}">` : `<input name=gift required placeholder="player name or Player ID" style="${I};flex:1 1 100%">`}
+<input name=dm type=number min=1 max=${GIFT_MAX} required placeholder="💎 amount" style="${I};flex:1 1 40%"><input name=msg maxlength=200 placeholder="message (optional)" style="${I};flex:1 1 50%">
+<button style="padding:8px 14px;border-radius:8px;border:0;background:#29b6f6;font-weight:bold;flex:1 1 100%">SEND 💎</button><small>Goes into the player's Mail. Torque Guard knows it → no flag, no ban.</small></form>`;
+}
+async function giftList(db, pid) {
+  let r = []; try { r = (await db.prepare('SELECT a.dm,a.msg,a.t,a.sent,a.ts,i.got FROM agift a LEFT JOIN inbox i ON i.id=a.mid WHERE a.pid=? ORDER BY a.id DESC LIMIT 10').bind(pid).all()).results; } catch (e) {}
+  if (!r.length) return '';
+  const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
+  return `<div class=c><b>💎 Diamonds you sent</b><br>${r.map(g => `<small>${d(g.t)}</small> <b>${(g.dm | 0).toLocaleString('en')}</b> 💎 · ${g.got ? '✅ claimed' : g.sent ? '📬 in his Mail' : '⏳ waiting (sent when he goes online)'}${g.msg ? `<br><small>“${escH(g.msg)}”</small>` : ''}`).join('<br>')}</div>`;
+}
+async function giftPage(url, env) {
+  const db = env.DB, key = env.ADMIN_KEY, k = encodeURIComponent(key), q = (url.searchParams.get('gift') || '').trim().slice(0, 64);
+  const dm = Math.floor(+url.searchParams.get('dm') || 0), msg = (url.searchParams.get('msg') || '').trim().slice(0, 200), back = `<a href="/admin?key=${k}">← back</a>`;
+  if (!q) return PAGE('Gift', back + '<div class=c>Write a player name or Player ID.</div>');
+  if (!(dm >= 1 && dm <= GIFT_MAX)) return PAGE('Gift', back + `<div class=c>Amount must be 1 – ${GIFT_MAX.toLocaleString('en')} 💎.</div>`);
+  // who? exact Player ID · start of a Player ID (8+ characters) · exact name · part of a name
+  let rs = [];
+  try { rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE pid=?').bind(q).all()).results;
+    if (!rs.length && q.length >= 8) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE pid LIKE ? LIMIT 5').bind(q + '%').all()).results;
+    if (!rs.length) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE nlow=? LIMIT 5').bind(q.toLowerCase()).all()).results;
+    if (!rs.length) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 20').bind('%' + q.toLowerCase() + '%').all()).results; } catch (e) {}
+  if (!rs.length) { const pl = await db.prepare('SELECT pid,best FROM players WHERE pid=? OR (length(?)>=8 AND pid LIKE ?) LIMIT 2').bind(q, q, q + '%').all().catch(() => ({results:[]}));
+    rs = pl.results.map(r => ({pid:r.pid, name:'', best:r.best})); }   // player without an online profile yet (gift waits)
+  const link = r => `/admin?key=${k}&gift=${encodeURIComponent(r.pid)}&dm=${dm}&msg=${encodeURIComponent(msg)}`;
+  if (!rs.length) return PAGE('Gift', back + `<div class=c>Nobody found for “${escH(q)}”.</div>`);
+  if (rs.length > 1) return PAGE('Gift', back + `<h2>Which player? (💎 ${dm.toLocaleString('en')})</h2>` + rs.map(r => `<div class=c><a href="${link(r)}"><b>${escH(r.name || '(no name)')}</b></a><br><small>${escH(r.pid)} · stage ${r.best | 0}</small></div>`).join(''));
+  const P = rs[0], nm = P.name || P.pid.slice(0, 13) + '…', card = `<a href="/admin?key=${k}&p=${encodeURIComponent(P.pid)}">← back to ${escH(nm)}</a>`;
+  const nonce = url.searchParams.get('n');
+  if (!nonce) return PAGE('Gift', card + `<div class=c style="border-color:#29b6f6"><h2>💎 Send ${dm.toLocaleString('en')} diamonds?</h2>To: <b>${escH(nm)}</b><br><small>${escH(P.pid)}</small>${msg ? `<br>Message: “${escH(msg)}”` : ''}<br>It goes into his Mail${P.name ? '' : ' (he has no online profile yet → it is sent when he goes online with a name)'}. No flag, no ban.<br><a class=b href="${link(P)}&n=${Date.now().toString(36) + Math.random().toString(36).slice(2, 8)}">YES, SEND 💎</a></div>`);
+  const now = Date.now();
+  const ins = await db.prepare('INSERT OR IGNORE INTO agift(pid,dm,msg,t,nonce) VALUES(?,?,?,?,?)').bind(P.pid, dm, msg || null, now, nonce.slice(0, 40)).run();
+  if (ins.meta && ins.meta.changes) { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(P.pid, now, 'gift', `💎 ${dm} diamonds sent by admin${msg ? ' – ' + msg : ''}`).run();
+    await adminGifts(env, P.pid); }
+  const g = await db.prepare('SELECT sent FROM agift WHERE nonce=?').bind(nonce.slice(0, 40)).first();
+  return PAGE('Gift', `<h2>✅ ${dm.toLocaleString('en')} 💎 → ${escH(nm)}</h2><div class=c>${g && g.sent ? '📬 It is in his Mail now (he claims it in the game).' : '⏳ Saved. It goes into his Mail the next time he is online.'}</div>${card}<br><br>${back}`);
 }
 
 // ------------------------------------------------------------------ admin page (open it on your phone)
@@ -614,6 +663,7 @@ async function admin(url, env) {
 <a href="/admin?key=${k}&p=${encodeURIComponent(rst)}">← back</a><div class=c><h2>🔄 RESET “${e3(nm)}”?</h2>Everything goes back to 0: local save on the phone, cloud save, rankings, Arena, chat messages, Mail.<br>VIP Passes are removed. The other paid packs stay (VIP mechanic, VIP car…).<br>The phone starts a <b>NEW GAME</b> the next time the game is open and online.<br><a class=b href="/admin?key=${k}&reset=${encodeURIComponent(rst)}&ok=1">YES, RESET</a></div>`, {headers:{'content-type':'text/html;charset=utf-8'}});
     await wipePlayer(env, rst);
     return new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>body{font-family:system-ui;background:#0b1019;color:#eee;padding:16px}a{color:#9fd3ff}</style><h2>✅ “${e3(nm)}” reset</h2><p>New game at the next start (game open + internet).</p><a href="/admin?key=${k}">← back to admin</a>`, {headers:{'content-type':'text/html;charset=utf-8'}}); }
+  if (url.searchParams.has('gift')) return giftPage(url, env);   // v16-233b: 💎 SEND DIAMONDS (asks first)
   if (url.searchParams.get('p')) return playerCard(url, env, url.searchParams.get('p'));
   const q = (url.searchParams.get('q') || '').trim().toLowerCase().slice(0, 20);   // v16-179: search a player by name
   if (q) { let rs = []; try { rs = (await db.prepare('SELECT pid,name,best,lv,t FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 30').bind('%' + q + '%').all()).results; } catch (e) {}
@@ -651,7 +701,7 @@ async function admin(url, env) {
 <small>“Active” is counted from the day this update went live (older days show “–”). “New” works for the past too (players inactive 180+ days are removed).</small></div>`;
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
-<h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form><div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
+<h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>${giftForm(env.ADMIN_KEY, '')}<div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
 ${stats}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>

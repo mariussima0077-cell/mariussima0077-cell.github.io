@@ -198,6 +198,22 @@ export async function giftDm(env, pid, uid) {
     await env.DB.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(pid, Date.now(), 'gift', g.id).run();
     await mail(env, uid, '🎁', 'A gift from Torque Studios', 'Thank you for playing Torque Empire! Here are ' + g.dm.toLocaleString('en') + ' Diamonds for your hero summons. Good luck!', {dm:g.dm});
   } catch (e) {} }
+  await adminGifts(env, pid, uid);   // v16-233b
+}
+// v16-233b (23 nov 2026, Marius): 💎 diamonds sent by hand from /admin (table agift, created in worker.js ensureG).
+// Delivered as ONE inbox Mail at the next check-in / online sync (at once if the player already has an online profile).
+// The LEDGER rule in worker.js adds these diamonds to the daily maximum (30 days) → the player is never flagged/banned for them.
+export async function adminGifts(env, pid, uid) {
+  try { const db = env.DB, ag = (await db.prepare('SELECT id,dm,msg FROM agift WHERE pid=? AND sent=0 ORDER BY id').bind(pid).all()).results;
+    if (!ag.length) return 0;
+    if (!(uid > 0)) { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(pid).first(); uid = pr && pr.uid; }
+    if (!(uid > 0)) return 0;
+    let n = 0; for (const g of ag) {
+      if (!(await db.prepare('UPDATE agift SET sent=1, ts=? WHERE id=? AND sent=0 RETURNING id').bind(Date.now(), g.id).first())) continue;   // never twice
+      const body = (g.msg ? g.msg + '\n\n' : 'Thank you for playing Torque Empire! ') + 'Here are ' + (g.dm | 0).toLocaleString('en') + ' Diamonds. Good luck!';
+      const m = await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?) RETURNING id').bind(uid, Date.now(), '💎', 'Gift from Torque Studios', body, JSON.stringify({dm:g.dm | 0})).first();
+      await db.prepare('UPDATE agift SET mid=? WHERE id=?').bind(m && m.id, g.id).run(); n++; }
+    return n; } catch (e) { return 0; }
 }
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
 // v16-196 Grand Prix PATRONS: last 30 pack buyers of the server during its Grand Prix (every player's game gives itself the small gift, capped per day)
