@@ -532,7 +532,7 @@ const ROLE={
  elec:{n:'Shocker',ic:'⚡',hp:730,atk:90,def:10,mv:80,rng:205,as:1.25,crit:.1,sk:'OVERVOLT',skd:'Chain lightning jumps 6 times: 200% damage and stun 1.5s.'},
  all:{n:'Legend',ic:'🌟',hp:1350,atk:112,def:26,mv:92,rng:42,as:.9,crit:.15,sk:'TORQUE STORM',skd:'Giant gears rain on every enemy: 300% damage. All mechanics +30% attack for 6s.'},
  crew:{n:'Crew',ic:'🔩',hp:700,atk:50,def:8,mv:84,rng:30,as:1.1,crit:.06,sk:'WRENCH THROW',skd:'Throws a spinning wrench: 250% damage.'}};
-const GMUL=[1,1.4,1.95,2.75,4.1,6.44]; // v16-161 (Marius): Mythic +15% (5.6 → 6.44)
+const GMUL=[1,1.68,2.82,4.74,8,6.44]; // v16-223 (Marius 23 nov): every grade +0 > the grade below at max (Common +50 1.6 < Uncommon 1.68 · Uncommon +50 2.69 < Rare 2.82 · Rare +50 4.51 < Epic 4.74 · Epic +50 7.58 < Legendary 8 · Legendary +10 15.6 < Mythic 16.4) // v16-161 (Marius): Mythic +15% (5.6 → 6.44)
  // v16-134 (Marius: bigger gaps between grades): was [1,1.32,1.75,2.3,3.4,4.4] – ~×1.4 per grade; monsters follow with GK(i) // v16-40: Legendary 3.0→3.4, Mythic 3.9→4.4 (a new Legendary now beats an Uncommon +50)
 // v16-14: unique skills (each Legendary / Mythic has its own skill; the others still use their class skill)
 const HSK={
