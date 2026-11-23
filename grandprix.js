@@ -21,7 +21,7 @@ const PKS=[['gp1','SILVER','€4.99'],['gp2','GOLD','€9.99'],['gp3','PLATINUM'
 const SRV=()=>window.CLOUD?CLOUD.srv():1,PKK=k=>k+'_s'+SRV();
 function pkMig(){const P=(T()&&T().PK);if(!P)return;let ch=0;['gp1','gp2','gp3'].forEach(k=>{if(P[k]===true){P[k+'_s1']=true;delete P[k];ch=1;}});if(ch)T().savePacks();}   // v16-192 bought as one-time → server 1
 const PREM=()=>{pkMig();const p=(T()&&T().PK)||{};return p[PKK('gp3')]?3:p[PKK('gp2')]?2:p[PKK('gp1')]?1:0;};
-function grant(k){const t=T();if(!t||!t.PK||!PKS.find(x=>x[0]===k))return;t.PK[PKK(k)]=true;t.savePacks();t.save();t.toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked on this server!',3500);try{render();dot();}catch(e){}}
+function grant(k){const t=T();if(!t||!t.PK||!PKS.find(x=>x[0]===k))return;t.PK[PKK(k)]=true;patSend(k);t.savePacks();t.save();t.toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked on this server!',3500);try{render();dot();}catch(e){}}
 const TOKB=()=>1+.1*PREM();   // +10/20/30% GP Tokens (Shop currency only – Road points and LEGENDS stay the same for everyone)
 const TIER=1500,TIERS=50;
 const now=()=>Date.now(),live=()=>now()>=T0()&&now()<T1(),wk=()=>Math.max(0,Math.min(3,Math.floor((now()-T0())/WEEK)));
@@ -93,9 +93,16 @@ function claimPrem(i){const s=S(),L=PREM();if(!s.rp)s.rp={};const had=s.rp[i]||0
 function premAll(){const s=S(),L=PREM(),tr=tierOf();if(!L)return;if(!s.rp)s.rp={};let n=0;const sum={};
   for(let i=1;i<Math.min(tr+1,TIERS);i++){const had=s.rp[i]||0;if(had>=L)continue;const r=mul(RD[(i-1)%10],L-had);for(const x in r)sum[x]=(sum[x]||0)+r[x];s.rp[i]=L;n++;}
   if(n){give(sum);T().toast('👑 '+n+' premium tiers: '+rwTxt(sum),3200);render();dot();}}
+// v16-196 PATRONS: every pack bought on the server → a gift for EVERYBODY (max 300 diamonds + 6 tickets a day per player)
+const PGIFT={gp1:{dm:30},gp2:{dm:60},gp3:{dm:100,tk:2}},PCAP={dm:300,tk:6};
+function patSend(k){try{if(window.ONLINE&&ONLINE.call)ONLINE.call('gppat',{k,pids:window.SEC&&SEC.pids?SEC.pids():undefined});}catch(e){}}
+function pat(list){if(!Array.isArray(list)||!T()||!T().G)return;const s=S();s.pl=list.slice(0,30);if(!s.pg)s.pg=[];const dk=dKey();if(!s.pd||s.pd.k!==dk)s.pd={k:dk,dm:0,tk:0};
+  const sum={},who=[];for(const x of list.slice().reverse()){if(s.pg.includes(x.id))continue;s.pg.push(x.id);if(!live()||x.t<now()-2*DAY)continue;const r=PGIFT[x.k];if(!r)continue;
+    for(const k in r){const m=Math.min(r[k],PCAP[k]-s.pd[k]);if(m>0){s.pd[k]+=m;sum[k]=(sum[k]||0)+m;}}who.push(x.n);}
+  s.pg=s.pg.slice(-200);if(Object.keys(sum).length){give(sum);T().toast('👑 '+who.slice(0,2).map(n=>String(n).replace(/[<>&]/g,'')).join(', ')+(who.length>2?' +'+(who.length-2):'')+' became Grand Prix PATRON'+(who.length>1?'S':'')+' – gift: '+rwTxt(sum),4200);}else T().save();try{render();}catch(e){}}
 let pkBusy=0;
 async function buyPk(k){if(pkBusy||!window.SEC||!live())return;const P=T().PK;if(P[PKK(k)])return;pkBusy=1;
-  try{const ok=await SEC.buy(k);if(!ok)return;P[PKK(k)]=true;T().savePacks();T().save();
+  try{const ok=await SEC.buy(k);if(!ok)return;P[PKK(k)]=true;T().savePacks();T().save();patSend(k);
     T().toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked! Open the ROAD to claim your PREMIUM rewards.',4200);render();dot();}
   finally{pkBusy=0;}}
 function pkBtn(k){pkMig();const P=(T()&&T().PK)||{},x=PKS.find(z=>z[0]===k);if(P[PKK(k)])return '<button class="gpBtn x">OWNED ✓</button>';if(now()>=T1())return '<button class="gpBtn x">ENDED</button>';if(now()<T0())return '<button class="gpBtn x">SOON</button>';return '<button class="gpBtn g" data-g="pk" data-k="'+k+'">'+x[2]+'</button>';}
@@ -148,6 +155,7 @@ const css=`#gpx{position:fixed;inset:0;z-index:59;display:none;background:#0b0f1
 .gpC{height:74px;border-radius:12px;display:grid;place-items:center;position:relative;background:linear-gradient(#2a2140,#171126);box-shadow:inset 0 0 0 1.5px #4b3d6e;margin-bottom:6px}.gpC img{width:42px;height:42px;object-fit:contain}
 .gpC .n{position:absolute;bottom:3px;right:6px;font:900 11px system-ui;color:#fff;text-shadow:0 1px 2px #000}.gpC.rd{box-shadow:inset 0 0 0 2px #43e97b,0 0 10px #43e97b88;animation:gpPl 1.2s infinite}@keyframes gpPl{50%{transform:scale(1.05)}}
 .gpC.got::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;background:#0009;border-radius:12px;font:900 28px system-ui;color:#43e97b}
+.gpPl{display:flex;flex-direction:column;gap:5px}.gpPr{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:linear-gradient(90deg,#2a1a08,#171126);box-shadow:inset 0 0 0 1.5px #e0aa2588}.gpPr img{width:28px;height:28px;object-fit:contain}.gpPr .n{flex:1;min-width:0;font:13px Game,system-ui;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gpPr .k{font:900 11px system-ui;padding:2px 8px;border-radius:999px;color:#1a1006}.gpPr .kgp1{background:#d9e2ec}.gpPr .kgp2{background:#ffd54a}.gpPr .kgp3{background:#c9a8ff}
 .gpC.pr{background:linear-gradient(#5a3c08,#24170a);box-shadow:inset 0 0 0 1.5px #ffcf5a;opacity:.6}.gpC.pr.on{opacity:1}.gpC.pr.on::before{content:'👑'}.gpC.pr.rd{box-shadow:inset 0 0 0 2px #ffd54a,0 0 10px #ffb30088}.gpC.pr::before{content:'🔒';position:absolute;top:3px;left:5px;font-size:12px}
 .gpFin{border-radius:16px;padding:12px;background:radial-gradient(circle at 50% 0,#ff5a2a55,transparent 60%),linear-gradient(#3a1408,#160a10);box-shadow:inset 0 0 0 2px #ffcf5a;text-align:center}
 .gpFin .h,.gpH{font:20px Game,system-ui;color:#ffd54a;text-align:center}
@@ -257,7 +265,8 @@ function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(
   else if(tab==='pt'){const tot=RK?RK.tot||0:0,mx=GOAL[GOAL.length-1][0];h+='<div class="gpGoal"><div class="h"><span>🌍 SERVER GOAL</span><span style="color:#fff">'+t.nf(tot)+' / '+t.nf(mx)+'</span></div><div class="gpBar" style="height:12px;margin:10px 0"><i style="width:'+Math.min(100,tot/mx*100)+'%;background:linear-gradient(90deg,#4aa3ff,#a76bff)"></i></div>'+
       GOAL.map((g,i)=>{const got=s.gs.includes(i),ok=tot>=g[0];return '<div class="gpGr"><span>'+(got?'✅':ok?'🎁':'🔒')+'</span><span class="t">'+t.nf(g[0])+' pts · '+rwTxt(g[1])+'</span>'+(got?'<button class="gpBtn x">TAKEN</button>':ok?'<button class="gpBtn g" data-g="goal" data-i="'+i+'">CLAIM</button>':'')+'</div>';}).join('')+
       '<div class="gpNote" style="margin-bottom:0">Every player’s Road points on your server add up. Each step unlocks a gift for <b>ALL players</b>.</div></div>';
-    h+='<div class="gpSec">🎁 PATRONS</div><div class="gpNote">Soon: every player who buys a <b>Grand Prix Pack</b> becomes a <b>Patron</b> – the whole server gets a small gift and sees it in the chat.</div>';}
+    h+='<div class="gpSec">👑 PATRONS</div><div class="gpNote">Every player who buys a <b>Grand Prix Pack</b> becomes a <b>Patron</b> – the whole server is told in the chat and <b>everybody</b> gets a gift: Silver '+rwTxt(PGIFT.gp1)+' · Gold '+rwTxt(PGIFT.gp2)+' · Platinum '+rwTxt(PGIFT.gp3)+'.<br><small style="opacity:.8">Max '+rwTxt(PCAP)+' per day from Patron gifts.</small></div>';
+    const PL=s.pl||[];h+=PL.length?'<div class="gpPl">'+PL.map(x=>'<div class="gpPr"><img src="img/gp/patron.webp" alt=""><span class="n">'+String(x.n||'Mechanic').replace(/[<>&]/g,'')+'</span><span class="k k'+x.k+'">'+({gp1:'SILVER',gp2:'GOLD',gp3:'PLATINUM'}[x.k]||'')+'</span></div>').join('')+'</div>':'<div class="gpNote" style="text-align:center">No Patron yet on this server – be the first! '+(PREM()?'':'<button class="gpBtn g" data-g="pack" style="margin-top:6px">SEE THE PACKS</button>')+'</div>';}
   else if(tab==='sh'){h+='<div class="gpScore"><div class="a">GRAND PRIX SHOP</div><div class="b">'+TOKI+' '+t.nf(s.tok)+'</div></div><div class="gpShop">'+SH.map(x=>{const n=s.sh.n[x[0]]||0;return '<div class="gpIt"><img src="'+x[2]+'"><div class="n">'+x[1]+'</div><div class="l">'+n+' / '+x[4]+' this week</div><button class="gpBtn'+(n>=x[4]||s.tok<x[3]?' x':'')+'" data-g="buy" data-id="'+x[0]+'">'+TOKI+' '+x[3]+'</button></div>';}).join('')+'</div>';
     h+='<div class="gpPack"><img src="img/gp/pack.webp" alt="GRAND PRIX PACKS"><div class="gpPks"><div class="s"><div class="n">SILVER</div><ul><li>Premium Road ×1</li><li>+10% GP Tokens</li><li>Patron Badge</li></ul>'+pkBtn('gp1')+'</div>'+
       '<div class="g"><div class="n" style="color:#ffd54a">GOLD</div><ul><li>Premium Road ×2</li><li>+20% GP Tokens</li><li>Ascended gear at tier 50</li></ul>'+pkBtn('gp2')+'</div>'+
@@ -285,6 +294,6 @@ function hook(){if(!window.EVT||EVT.__gp)return false;const o=EVT.q;EVT.q=functi
   const od=EVT.dot;EVT.dot=function(){try{od.apply(EVT,arguments);}catch(e){}dot();};EVT.__gp=1;return true;}
 function boot(){if(!T()||!T().G||!window.EVT){setTimeout(boot,600);return;}build();hook();if(live())S();dot();
   setInterval(()=>{if(live()&&T()&&T().G){S();dot();}},20000);setInterval(()=>{if(live()&&T()&&T().G)sendSc();},300000);}
-window.GPX={open,close,entry,state:()=>S(),live,q,grant,get T0(){return T0();},get T1(){return T1();}};
+window.GPX={open,close,entry,state:()=>S(),live,q,grant,pat,get T0(){return T0();},get T1(){return T1();}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

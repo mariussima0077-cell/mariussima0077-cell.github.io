@@ -31,6 +31,7 @@ const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40,
 // v16-193 (Marius 23 nov): TORQUE GRAND PRIX once per server – starts 3 days after the server opens, 28 days. Same dates in cloud.js SERVERS[].open.
 // At the launch reset: set SRV_OPEN[1] = launch day. New server → add its opening date here (and in cloud.js).
 const SRV_OPEN = {1: Date.UTC(2026, 10, 19, 17, 0, 0)}, GP_DELAY = 3 * DAY, GP_LEN = 28 * DAY, GP_CAP = 250000;
+const GP_PK = {gp1:['gp_silver','SILVER'], gp2:['gp_gold','GOLD'], gp3:['gp_plat','PLATINUM']};   // v16-196 PATRONS
 const gpT0 = srv => SRV_OPEN[srv] ? SRV_OPEN[srv] + GP_DELAY : 0, gpT1 = srv => gpT0(srv) ? gpT0(srv) + GP_LEN : 0;
 const GP_FIN = [[1,1,{dm:5000}],[2,2,{dm:3000,tk:20}],[3,3,{dm:2000,tk:15}],[4,10,{dm:1000,tk:10}]];
 const EV_RW = [[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
@@ -109,6 +110,8 @@ async function ensure(env) {
     // v16-185 TORQUE GRAND PRIX (one-time event): Road points per player, first finishers of the ULTIMATE mission
     db.prepare('CREATE TABLE IF NOT EXISTS gpx(uid INTEGER PRIMARY KEY, srv INTEGER, sc INTEGER DEFAULT 0, t INTEGER, fin INTEGER DEFAULT 0, tf INTEGER DEFAULT 0)'),
     db.prepare('CREATE INDEX IF NOT EXISTS gpx_rank ON gpx(srv, sc)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS gpat(id INTEGER PRIMARY KEY AUTOINCREMENT, srv INTEGER, uid INTEGER, name TEXT, k TEXT, t INTEGER, tok TEXT UNIQUE)'),   // v16-196 Grand Prix PATRONS
+    db.prepare('CREATE INDEX IF NOT EXISTS gpat_srv ON gpat(srv, id)'),
     // v16-146 RAIL WARS: trains on their way (30 min), daily counters, who hit which train
     db.prepare('CREATE TABLE IF NOT EXISTS rwtrain(id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, srv INTEGER, g INTEGER, tok INTEGER, cars INTEGER, t0 INTEGER, t1 INTEGER, hits INTEGER DEFAULT 0, lost INTEGER DEFAULT 0, done INTEGER DEFAULT 0)'),
     db.prepare('CREATE INDEX IF NOT EXISTS rwtrain_srv ON rwtrain(srv, t1)'), db.prepare('CREATE INDEX IF NOT EXISTS rwtrain_uid ON rwtrain(uid, done)'),
@@ -177,6 +180,9 @@ export async function giftDm(env, pid, uid) {
   } catch (e) {} }
 }
 async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?)').bind(uid, Date.now(), ic, title, body, JSON.stringify(rw || {})).run(); }
+// v16-196 Grand Prix PATRONS: last 30 pack buyers of the server during its Grand Prix (every player's game gives itself the small gift, capped per day)
+async function patList(env, srv) { const t0 = gpT0(srv); if (!t0 || Date.now() < t0 || Date.now() > gpT1(srv) + 7 * DAY) return undefined;
+  try { return (await env.DB.prepare('SELECT id, uid, name n, k, t FROM gpat WHERE srv=? AND t>=? ORDER BY id DESC LIMIT 30').bind(srv, t0).all()).results; } catch (e) { return undefined; } }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
 function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && u.has('glad')) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10) || (f === 9 && u.has('raid')) || (f === 10 && u.has('tw3')) || (f === 11 && u.has('bhunt')) || (f === 12 && u.has('dgm')) || (f === 13 && u.has('call')) || (f === 14 && u.has('awk')); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
@@ -564,7 +570,7 @@ export async function online(op, b, env) {
     const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();
     const ar = await db.prepare('SELECT tk, tkt, season FROM arena WHERE uid=?').bind(p.uid).first();
     const atk = ar ? (ar.season !== seasonOf(now) ? ATK(p) : Math.min(ATK(p), ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ATK(p);
-    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined};
+    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined, pat:await patList(env, p.srv)};
   }
   if (!p) return {err:'no_profile'};
   if (op === 'prof') {
@@ -648,6 +654,17 @@ export async function online(op, b, env) {
     const me = await db.prepare('SELECT dmg FROM wboss WHERE uid=? AND wk=?').bind(p.uid, wk).first();
     const rank = (await db.prepare('SELECT COUNT(*) n FROM wboss WHERE srv=? AND wk=? AND dmg>?').bind(p.srv, wk, me.dmg).first()).n + 1;
     return {ok:true, dmg:me.dmg, rank};
+  }
+  if (op === 'gppat') {   // v16-196: a Grand Prix pack was bought → the buyer becomes a PATRON, the whole server is told (chat) and gets a small gift
+    if (!p) return {err:'noprof'}; const q = GP_PK[b.k]; if (!q) return {err:'bad'};
+    if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpT1(p.srv)) return {err:'over'};
+    if (isTst(p.pid)) return {ok:true, test:1};   // owner's test account: no announcement to the real players
+    const ids = [b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)];
+    const pu = await db.prepare(`SELECT token FROM purchases WHERE sku=? AND state='ok' AND t>? AND pid IN (${ids.map(() => '?').join(',')}) AND token NOT IN (SELECT tok FROM gpat WHERE tok IS NOT NULL) ORDER BY t DESC LIMIT 1`).bind(q[0], now - 3 * HOUR, ...ids).first();
+    if (!pu) return {err:'nopurchase'};
+    await db.prepare('INSERT OR IGNORE INTO gpat(srv,uid,name,k,t,tok) VALUES(?,?,?,?,?,?)').bind(p.srv, p.uid, p.name, b.k, now, pu.token).run();
+    await sysMsg(env, p.srv, `👑 ${p.name} became a ${q[1]} PATRON of the Grand Prix – everybody on the server gets a gift! 🎁`);
+    return {ok:true};
   }
   if (op === 'gpsc' || op === 'gprank' || op === 'gpfin') {   // v16-185 TORQUE GRAND PRIX
     if (!p) return {err:'noprof'}; if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpT1(p.srv) + HOUR) return {err:'over'};
