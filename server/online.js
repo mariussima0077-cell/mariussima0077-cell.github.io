@@ -524,8 +524,9 @@ async function rewardsTick(env) {
   await db.prepare('DELETE FROM inbox WHERE (got=1 AND t<?) OR t<?').bind(now - 7 * DAY, now - 60 * DAY).run();
 }
 export async function onlineCron(env) { await ensure(env);
+  try { await botTick(env); } catch (e) { console.log('botTick', e && e.message); }   // v16-222: bots FIRST (before, an error/CPU limit in rewards/cup stopped them)
   try { await env.DB.prepare(`UPDATE prof SET vip=(SELECT ${VIP_SQL} FROM players pl WHERE pl.pid=prof.pid) WHERE pid IN (SELECT pid FROM players)`).run(); } catch (e) {}   // v16-85: fix every profile
-  await rewardsTick(env); await cupTick(env); try { await botTick(env); } catch (e) {} }
+  await rewardsTick(env); await cupTick(env); }
 
 // ------------------------------------------------------------------ v16-167: FILLER BOTS (Marius 22 nov: "a few bots, one by one, so players have someone to play with")
 // v16-217 (Marius 23 nov: "10 bots now, funny names, they climb the campaign like a normal free player, they attack nobody, they never stop"):
@@ -533,7 +534,8 @@ export async function onlineCron(env) { await ensure(env);
 // 230 month 1, 450 month 3, 680 month 6; each bot ×0.7-1.3) and their team gets better as they go (like summoning). Online in sessions (~40% of the hours).
 // They NEVER attack (no Arena attacks, no Rail Wars, no chat, no spending) and NEVER get prizes (the prize queries skip 'bot_'). They stay Arena opponents.
 // Old bots (normal names, v<3) are removed. When there are BOT_REAL active real players, about one bot a day goes away.
-const BOT_MAX = 10, BOT_V = 3, BOT_REAL = 30;
+const BOT_MAX = 10, BOT_V = 3, BOT_REAL = 30, BOT_REAL_ST = 150;
+let botSeen = 0;   // v16-222: the ranking also makes the bots (once per 10 min per server copy), so they appear without waiting for the cron
 const BOT_NAMES = ['LugNutLarry','ClutchNorris','WD40Wendy','BrakeDancer','MufflerMike','TireKicker','DuctTapeDave','PistonPanda','CaptainCarb','NoBrakesNed',
   'HubcapHarry','RevvyMcRev','TurboTurtle','SpannerSusan','GreasyGrandpa','OilSpillBill','SirHonksALot','BumperBetty','WobblyWheel','ChickenTikkaV8'];
 const BOT_CC = ['FR','RO','GB','DE','ES','IT','PL','US','BR','PH','PT','NL'];
@@ -556,7 +558,7 @@ async function botTick(env) {
   const plOf = b => { try { return JSON.parse(b.bot || '{}'); } catch (e) { return {}; } };
   for (const b of bots) if (plOf(b).v !== BOT_V) { await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); }   // old bots out
   bots = bots.filter(b => plOf(b).v === BOT_V);
-  const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>?").bind(now - 3 * DAY).first()).n;
+  const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>? AND best>=?").bind(now - 3 * DAY, BOT_REAL_ST).first()).n;   // v16-222: only players who really play (paid testers who only open the game do not count)
   if (real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];   // ~1 a day (cron every 10 min)
       await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); } }
   else if (bots.length < BOT_MAX) {   // all missing bots right away
@@ -643,6 +645,7 @@ export async function online(op, b, env) {
     p = await profOf(env, b.pid); return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], vip:p.vip | 0, hv:p.hv | 0})};
   }
   if (op === 'rank') {
+    if (now - botSeen > 6e5) { botSeen = now; try { await botTick(env); } catch (e) { console.log('botTick', e && e.message); } }
     const by = ['best','pow','lv'].includes(b.by) ? b.by : 'best';
     const rows = (await db.prepare(`SELECT p.* FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? ORDER BY p.${by} DESC, p.pow DESC LIMIT 100`).bind(p.srv, now - 30 * DAY).all()).results;
     const my = (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
