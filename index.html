@@ -8,6 +8,24 @@
 <meta name="theme-color" content="#0b1019">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<script>// v16-260 AUTO GRAPHICS (Marius, 23 nov 2026): at the first start the game checks the phone once (memory, CPU cores, a short speed test).
+// Good phones get HD by themselves, normal phones STANDARD, weak phones LOW (lighter picture, no lag). PROFILE → GRAPHICS: AUTO / HD / STANDARD / LOW.
+// If AUTO chose too high and the battles are slow, it goes one step down by itself (saved for the next start).
+window.GFX=(()=>{const L=k=>{try{return localStorage.getItem(k);}catch(e){return null;}},S=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v);}catch(e){}};
+  const man=L('te_hd')==='1'?'hd':/^(std|low)$/.test(L('te_gfx')||'')?L('te_gfx'):'auto';
+  let tier=(L('te_tier')||'').split('|')[0],sc=+((L('te_tier')||'').split('|')[1]||0);
+  if(!/^(hi|mid|lo)$/.test(tier)){
+    const b=()=>{const t0=performance.now();let x=0;const a=new Float64Array(4096);for(let i=0;i<300000;i++){const j=i&4095;a[j]=a[j]*.5+Math.sqrt(i);x+=a[(i*7)&4095];}
+      const o=[];for(let i=0;i<20000;i++)o.push({i,v:i*1.5});o.sort((p,q)=>q.v-p.v);return performance.now()-t0+(x>1e300?1:0)+(o[0].i<0?1:0);};
+    try{sc=Math.round(b()+b()+b());}catch(e){sc=60;}
+    const mem=navigator.deviceMemory||0,cores=navigator.hardwareConcurrency||4,dpr=window.devicePixelRatio||1;
+    tier=(mem&&mem<=3)||cores<=4||sc>100?'lo':(!mem||mem>=6)&&cores>=6&&dpr>=2&&sc<70?'hi':'mid';
+    S('te_tier',tier+'|'+sc);}
+  const eff=man==='auto'?(tier==='hi'?'hd':tier==='lo'?'low':'std'):man;
+  return {man,tier,sc,eff,hd:eff==='hd',low:eff==='low',auto:man==='auto',
+    set(v){S('te_hd',v==='hd'?'1':null);S('te_gfx',v==='std'||v==='low'?v:null);},
+    down(){if(man!=='auto'||tier==='lo')return;S('te_tier',(tier==='hi'?'mid':'lo')+'|'+sc);}};})();
+</script>
 <script>window.PWI='<img class="tki pwi" src="img/ui/power.webp" alt="">'; // v16-178: POWER icon (Marius)
 
 // v16-12: old Chrome / WebView (e.g. Chrome 95 on Android 12) can't read colors like #fff1c1cc (#RRGGBBAA) in canvas → crashed the battle.
@@ -3259,8 +3277,8 @@ function render(){
 
 // =================== CAMERA & INPUT ===================
 // v16-156 HD graphics (player choice in Profile → GRAPHICS): up to 3x on good screens, never lowers the quality by itself
-const HDM=(()=>{try{return localStorage.getItem('te_hd')==='1';}catch(e){return false;}})();
-let zAx=-1,zAy=-1,DPR=1,MAXDPR=Math.min(HDM?3:2,window.devicePixelRatio||1),VW=0,VH=0,Z=1,camX=0,camY=0,vX=0,vY=0,camInit=false,zAnim=null;
+const HDM=GFX.hd; // v16-260: AUTO graphics (index.html top) decide HD / STANDARD / LOW
+let zAx=-1,zAy=-1,DPR=1,MAXDPR=Math.min(HDM?3:GFX.low?1.5:2,window.devicePixelRatio||1),VW=0,VH=0,Z=1,camX=0,camY=0,vX=0,vY=0,camInit=false,zAnim=null;
 const baseS=()=>VW/600;
 const minS=()=>Math.min(VW/W,(VH-TOP)/H)*.95;
 const maxS=()=>baseS()*3.2;
@@ -3407,8 +3425,8 @@ $('shStats').addEventListener('click',e=>{const pk=e.target.closest('[data-pick]
   if(id==='car')VT.t=VT.next=8;
   toast(id==='vip'?'👑 VIP Crew Boost active – every mechanic +25%!':id==='spd2'?'⏩ Battle Speed ×3 unlocked forever!':'🚚 VIP Truck unlocked! The first rich clients are on their way.',4000);});});
 // v16-157: HD button above the zoom buttons (same setting as Profile → GRAPHICS); 2 taps = no restart by mistake
-{const hb=$('hdBtn');if(HDM)hb.classList.add('on');let arm=0;hb.onclick=()=>{if(Date.now()-arm>4000){arm=Date.now();toast(HDM?'✨ HD graphics are ON · tap again for AUTO (best for every phone)':'✨ HD graphics: the sharpest picture, uses more battery · tap again to turn ON',3500);return;}
-  try{if(HDM)localStorage.removeItem('te_hd');else localStorage.setItem('te_hd','1');}catch(e){}save();toast(HDM?'⚙️ AUTO graphics – restarting…':'✨ HD ON – restarting…',1500);setTimeout(()=>location.reload(),1100);};}
+{const hb=$('hdBtn');if(HDM)hb.classList.add('on');let arm=0;hb.onclick=()=>{if(Date.now()-arm>4000){arm=Date.now();toast(HDM?'✨ HD graphics are ON · tap again for STANDARD (less battery)':'✨ HD graphics: the sharpest picture, uses more battery · tap again to turn ON',3500);return;}
+  GFX.set(HDM?'std':'hd');save();toast(HDM?'⚙️ STANDARD graphics – restarting…':'✨ HD ON – restarting…',1500);setTimeout(()=>location.reload(),1100);};}
 $('zin').onclick=()=>zoomBtn(1.35);$('zout').onclick=()=>zoomBtn(1/1.35);
 function jobStatus(c,j){if(j.done)return'✓ done';if(j.parts){const s=j.order?j.order.st:'';return{ordered:'📦 ordered',heli:'🚁 flying in',pad:'🛬 on helipad',truck:'🛻 on the way',done:'✓ parts in stock'}[s]||'needs parts';}return'';}
 function renderPanel(){
@@ -4401,6 +4419,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:122,d:'Nov 23, 2026',ic:'📱',t:'AUTO graphics – the game checks your phone',l:['At the first start the game now <b>checks your phone</b> by itself: good phones get <b>HD</b>, normal phones <b>STANDARD</b>, older phones <b>LOW</b> – a lighter picture, so no lag.','If battles get slow, AUTO goes one step lower by itself next time.','You can still choose in <b>PROFILE → GRAPHICS</b>: AUTO · HD · STANDARD · LOW.']},
  {id:121,d:'Nov 23, 2026',ic:'🚨',t:'THIEVES 2.0 – gangs, bosses & K9 dogs',l:['Thieves now come <b>in groups</b>: amateurs, fast <b>★ PROs</b> and the <b>👑 GANG BOSS</b> with his van full of helpers. Sometimes the <b>whole GANG</b> attacks at once – a <b>GANG RAID</b>!','Your guards <b>patrol</b> all the time and fight like crazy. With 2+ thieves a <b>security car brings BACKUP</b> guards, and in big raids the <b>K9 van</b> drops a dog handler with his dogs.','Caught thieves give <b>Builder Kit</b>, <b>Crew Tickets</b> and <b>diamonds</b>. A thief who escapes steals <b>5–20% of your cash</b> – higher Security = less.','New <b>MOST WANTED</b> board in SECURITY: 3 wanted thieves every day, each with a bounty – catch all 3 for a daily bonus.']},
  {id:120,d:'Nov 23, 2026',ic:'🛡️',t:'Skills look like the hero\'s own art',l:['Hero skills now show only the hero\'s <b>own effect pictures</b> – the extra drawn circles, flashes and rings are gone (Epic, Legendary and Mythic heroes).','<b>Goliath – IRON FORTRESS</b>: every hero he protects now carries a small copy of <b>his golden shield</b> while the shield lasts. Ignis brings fallen heroes back with <b>his phoenix</b>.']},
  {id:119,d:'Nov 23, 2026',ic:'⚔️',t:'Heroes don\'t stand still anymore',l:['After a boss pushes them back, heroes sometimes stood still and did not attack. Now a hero who can\'t reach his place attacks from where he is (if the enemy is close) or picks a new place right away.']},

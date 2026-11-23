@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=259;
+const CV=260;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -677,7 +677,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
    <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
    <h3>FRAME</h3><div class="frames">${FR.map(f=>`<div class="${f[0]===ME.frame?'sel':''} ${fOk(f[0])?'':'o-lock'}" data-fr="${f[0]}"><div class="av">${avf(ME.icon,f[0])}</div><small>${f[1]}<br>${fOk(f[0])?(f[0]===ME.frame?'✅ in use':'tap to use'):'🔒 '+f[2]}</small></div>`).join('')}</div>
    <h3>TITLE</h3><div class="tlist">${TORD.map(k=>`<div class="${k===ME.title?'sel':''} ${tOk(k)?'':'o-lock'}" data-tt="${k}">${tt(k)}<span>${TT[k][2]}</span><b>${tOk(k)?(k===ME.title?'✅':''):'🔒'}</b></div>`).join('')}</div>
-   <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${[['0','⚙️ AUTO','Best for every phone – lowers the quality by itself if the game gets slow'],['1','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory']].map(g=>`<div class="${(LS('te_hd')==='1'?'1':'0')===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${(LS('te_hd')==='1'?'1':'0')===g[0]?'✅':''}</b></div>`).join('')}</div>
+   <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${(()=>{const G=window.GFX||{man:'auto',eff:'std'},TN={hd:'HD',std:'STANDARD',low:'LOW'};return [['auto','⚙️ AUTO · recommended','The game checked your phone → <b>'+TN[G.man==='auto'?G.eff:({hi:'hd',mid:'std',lo:'low'}[G.tier]||'std')]+'</b> for you'],['hd','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory'],['std','🖼️ STANDARD','Sharp picture, normal battery use'],['low','🍃 LOW · SMOOTH','For older phones – lighter picture, no lag, less battery']].map(g=>`<div class="${G.man===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${G.man===g[0]?'✅':''}</b></div>`).join('');})()}</div>
    <div class="o-note">Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.<br>Player ID ${ME.uid} · <u data-a="mutes">muted players (${mutes.size})</u></div>`;}
 async function setProf(set,paid){const r=await call('prof',{set,paid});
   if(r.ok){ME={...ME,...r.me};renderProf();return r;}
@@ -687,7 +687,7 @@ $('olPrH').addEventListener('click',e=>{if(e.target.closest('[data-a="name"]'))n
 $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
-  const gx=e.target.closest('[data-gfx]');if(gx){const v=gx.dataset.gfx;if((LS('te_hd')==='1'?'1':'0')===v)return;LS('te_hd',v==='1'?'1':null);try{T().save();}catch(x){}toast(v==='1'?'✨ HD graphics ON – restarting…':'⚙️ AUTO graphics – restarting…',1500);setTimeout(()=>location.reload(),1200);return;}
+  const gx=e.target.closest('[data-gfx]');if(gx){const v=gx.dataset.gfx,G=window.GFX;if(!G||G.man===v)return;G.set(v);try{T().save();}catch(x){}toast({auto:'⚙️ AUTO graphics',hd:'✨ HD graphics ON',std:'🖼️ STANDARD graphics',low:'🍃 LOW graphics'}[v]+' – restarting…',1500);setTimeout(()=>location.reload(),1200);return;}
   const ic=e.target.closest('[data-ic]');if(ic){LS('te_icon',ic.dataset.ic);await setProf({icon:ic.dataset.ic});return;}
   const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+((FR.find(x=>x[0]===+fr.dataset.fr)||[])[2]||'Locked'),2500);return;}await setProf({frame:+fr.dataset.fr});return;}
   const tk=e.target.closest('[data-tt]');if(tk){if(tk.classList.contains('o-lock')){toast('🔒 '+TT[tk.dataset.tt][2],2500);return;}await setProf({title:tk.dataset.tt});}});

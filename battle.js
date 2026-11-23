@@ -1755,7 +1755,7 @@ const fy=d=>FY0+d*(FY1-FY0);
 const dsc=d=>(.98+.36*d)*S;
 // v16-25: background pictures are soft → drawn at max 1.5× (less memory); the canvas is only re-made when the size really changes
 // HD graphics (branch hd-graphics): sharp up to 3x on good screens, never lowers the quality by itself (localStorage te_hd=1 or ?hd=1)
-const HD=(()=>{try{return localStorage.getItem('te_hd')==='1'||/[?&]hd=1/.test(location.search);}catch(e){return false;}})();
+const HD=(()=>{try{return (window.GFX?GFX.hd:localStorage.getItem('te_hd')==='1')||/[?&]hd=1/.test(location.search);}catch(e){return false;}})(); // v16-260: AUTO graphics
 function bsize(force){const w=innerWidth,h=innerHeight,d=Math.min(HD?3:2,window.devicePixelRatio||1)*(B&&B.lowRes&&!HD?(B.lowRes2?.6:.75):1);   // v16-153: 2nd step .6
   if(!force&&w===W&&h===H&&d===DPR&&cv.width===Math.round(w*d))return false;W=w;H=h;DPR=d;BDPR=Math.min(DPR,HD?2.5:1.5);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   S=clamp(Math.min(W/390,H/800),.8,1.5);HOR=H*.36;FY0=H*.47;FY1=H*.77;PANEL=H-Math.min(150,H*.19);if(B)buildBG();return true;}
@@ -2739,7 +2739,7 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-las
   const t0=performance.now();render();
   // v16-25: the old check counted loading hiccups at the start and re-made the canvas in the middle of the fight → the screen "tore".
   // Now: the first 2 s are ignored (on phones the drawing happens on the graphics chip, so the frame time must count too), and lower quality starts at the next wave change (hidden by the march) or next battle.
-  if(B.real>2){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}else if(a>40&&B.lowRes&&!LOWRES2){LOWRES2=true;try{sessionStorage.setItem('te_lowres2','1');}catch(e){}}}}
+  if(B.real>2){B.perf.push(Math.max(performance.now()-t0,raw*1000));if(B.perf.length>120){const a=B.perf.reduce((x,y)=>x+y,0)/B.perf.length;B.perf=[];if(a>30&&window.GFX&&GFX.auto&&(HD||LOWRES2)&&++GDN===3)GFX.down();if(a>30&&!B.lowRes&&!LOWRES){LOWRES=true;try{sessionStorage.setItem('te_lowres','1');}catch(e){}}else if(a>40&&B.lowRes&&!LOWRES2){LOWRES2=true;try{sessionStorage.setItem('te_lowres2','1');}catch(e){}}}}
   if(LOWRES&&!HD&&!B.lowRes&&B.phase==='march'&&B.phT<.2){B.lowRes=true;bsize(true);}
   // v16-153 (perf): still slow (>40 ms a frame; Google counts frames under 20 FPS as slow) → one more step down at the next march
   if(LOWRES2&&!HD&&B.lowRes&&!B.lowRes2&&B.phase==='march'&&B.phT<.2){B.lowRes2=true;bsize(true);}}
@@ -2755,7 +2755,8 @@ cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientR
 // v16-3: testers thought they had to tap to attack – explain that fights are automatic
 let hintT=0;function tapHint(card){const n=performance.now();if(n-hintT<3500)return;hintT=n;
   TE().toast(card?'⚡ Skill charging – tap the card when it shows TAP!':'🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',3200);}
-let LOWRES=false;try{LOWRES=sessionStorage.getItem('te_lowres')==='1';}catch(e){}
+let LOWRES=!!(window.GFX&&GFX.low);try{LOWRES=LOWRES||sessionStorage.getItem('te_lowres')==='1';}catch(e){} // v16-260: LOW graphics = light battles from the start
+let GDN=0; // v16-260: 3 slow checks (~6 s of lag) on AUTO-HD / already-lightest → AUTO goes one step down for the next start
 let LOWRES2=false;try{LOWRES2=sessionStorage.getItem('te_lowres2')==='1';}catch(e){}
 let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(running&&innerWidth>50&&innerHeight>50)bsize();},180);});
 document.addEventListener('visibilitychange',()=>{if(document.hidden||!running)return;lastT=performance.now();setTimeout(()=>{if(running&&innerWidth>50&&innerHeight>50)bsize();},300);}); // v16-206: back from the background

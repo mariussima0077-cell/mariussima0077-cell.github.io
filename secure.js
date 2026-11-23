@@ -178,7 +178,7 @@ async function report(force){
 let wiping = false;
 function wipe(){
   if(wiping) return; wiping = true; window.__noSave = true;
-  const KEEP = ['torqueEmpire_packs','torqueEmpire_test','torqueEmpire_test_s','te_dk','te_hd','te_dev','te_tacc','te_tacc_w','te_tpid','te_pids','te_twa'];
+  const KEEP = ['torqueEmpire_packs','torqueEmpire_test','torqueEmpire_test_s','te_dk','te_hd','te_gfx','te_tier','te_dev','te_tacc','te_tacc_w','te_tpid','te_pids','te_twa'];
   try{ const ks = []; for(let i=0;i<localStorage.length;i++) ks.push(localStorage.key(i));
     for(const k of ks) if(k && (k.startsWith('te_') || k.startsWith('torqueEmpire')) && !KEEP.includes(k)) localStorage.removeItem(k); }catch(e){}
   // v16-218 (Marius, 23 nov 2026): RESET also removes the VIP Passes (Silver / Gold / Platinum / Diamond). The other packs stay (VIP mechanic, VIP car, speed…).

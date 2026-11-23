@@ -21,10 +21,10 @@ Needs: playwright (python) + /usr/bin/google-chrome. Works on a COPY of the repo
 import argparse, asyncio, json, os, shutil, subprocess, sys, tempfile, time, socket, re
 
 PHONES = {
-    'budget': dict(w=360, h=800, dpr=2, cpu=6, name='Budget phone (Galaxy A05/A15 class)'),
-    'low':    dict(w=360, h=760, dpr=1.5, cpu=10, name='Low-end phone (old 2-3 GB)'),
-    'mid':    dict(w=393, h=873, dpr=2.75, cpu=3, name='Mid-range phone (Galaxy A54 class)'),
-    'pc':     dict(w=360, h=800, dpr=2, cpu=1, name='No slow-down (calibration)'),
+    'budget': dict(w=360, h=800, dpr=2, cpu=6, mem=4, cores=8, name='Budget phone (Galaxy A05/A15 class)'),
+    'low':    dict(w=360, h=760, dpr=1.5, cpu=10, mem=2, cores=8, name='Low-end phone (old 2-3 GB)'),
+    'mid':    dict(w=393, h=873, dpr=2.75, cpu=3, mem=8, cores=8, name='Mid-range phone (Galaxy A54 class)'),
+    'pc':     dict(w=360, h=800, dpr=2, cpu=1, mem=8, cores=8, name='No slow-down (calibration)'),
 }
 UA = 'Mozilla/5.0 (Linux; Android 13; SM-A055F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36'
 
@@ -73,6 +73,8 @@ async def run(a, root):
             pg.on('pageerror', lambda e: errs.append('PAGE: ' + str(e)[:200]))
             pg.on('console', lambda m: m.type == 'error' and 'ERR_' not in m.text and errs.append('CONSOLE: ' + m.text[:200]))
             await pg.add_init_script(FPS_JS)
+            # v16-260: the phone's memory / CPU cores (AUTO graphics reads them) – this sandbox has only 2 cores
+            await pg.add_init_script(f"Object.defineProperty(navigator,'deviceMemory',{{get:()=>{P['mem']}}});Object.defineProperty(navigator,'hardwareConcurrency',{{get:()=>{P['cores']}}});")
             if a.hd: await pg.add_init_script("try{localStorage.setItem('te_hd','1')}catch(e){}")
             cdp = await ctx.new_cdp_session(pg)
             await cdp.send('Emulation.setCPUThrottlingRate', {'rate': P['cpu']})
@@ -83,6 +85,7 @@ async def run(a, root):
                 if await pg.evaluate("document.getElementById('loader').classList.contains('hide')"): break
                 await pg.mouse.click(P['w'] / 2, P['h'] * .9); await pg.wait_for_timeout(500)
             rep['load_s'] = round(time.time() - t0, 1)
+            rep['auto_graphics'] = await pg.evaluate("window.GFX?GFX.eff+' (phone '+GFX.tier+', speed test '+GFX.sc+')':'?'")
             await pg.wait_for_timeout(2000)
             await pg.screenshot(path=f'{a.out}/1_map.png')
             # garage map: idle + a few drags
