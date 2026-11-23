@@ -3555,7 +3555,7 @@ function closeSummon(){smEl.classList.remove('open');}
 const TILE_X=[115,255,393,530,667,805];
 function img(h,sil,cls){return '<img class="'+(cls||'')+'" src="'+portrait(h,sil)+'">';}
 // v16-52: new layout on Marius' pictures – header (HERO SUMMON / CREW SUMMON) + common background (img/ui4/sum_bg.webp shown from y=150, scale .8994)
-const TILE2=[112,255,394,531,670,811];
+const TILE2=[112,255,394,531,670,811],TILE7=[106.1,224.9,343.6,462.3,581,699.7,818.5];   // TILE7 = Gear Summon (7 grades, v16-200)
 const dmS=n=>n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=100000?Math.floor(n/1000)+'K':n.toLocaleString(); // v16-113: 1.00M, not 1000K
 function renderSm(){if(!smEl.classList.contains('open'))return;
   if(smCat==='gear'){renderSmGear();return;}
@@ -3609,11 +3609,9 @@ function renderSmGear(){const GSx=window.CAMPAIGN&&CAMPAIGN.gs;if(!GSx){smBox.in
   h+='<div class="smL smTop smDm" style="'+box(738,170,164,78)+'">'+DMI+dmS(dm)+'</div>';
   // grade panel
   h+='<div class="smL" style="'+box(256,690,410,55)+'">AVAILABLE GEAR</div><div data-a="grates" style="'+box(805,684,68,68)+'border-radius:50%"></div>';
-  const ex=['tool','helm','vest','glove','boots','chip'];
-  TILE2.forEach((x,i)=>{h+='<div class="smTi smGt" style="'+box(x-50,792,100,100)+'"><img src="'+GSx.icon(ex[i],i)+'" alt=""><i style="background:#000a;color:'+GRADES[i].c+'">'+GSx.RATE[i]+'%</i></div><div data-a="grates" style="'+box(x-64,778,128,172)+'"></div>';});
-  // v16-190 (Marius: „aici nu văd Ascended”): ASCENDED 0.02% on the panel, in the gap above the 6 tiles (grows with tall phones)
-  {const a=747,b=M.top(778),hh=Math.max(26,Math.min(60,b-a-10)),yy=a+(b-a-hh)/2;
-   h+='<div class="smL smAsc" data-a="grates" style="left:'+U(230)+';top:'+U(yy)+';width:'+U(460)+';height:'+U(hh)+';font-size:'+U(hh*.52)+';pointer-events:auto"><img src="'+GSx.icon('chip',6)+'" alt="" style="height:'+U(hh*.86)+'">ASCENDED <b>'+GSx.RATE[6]+'%</b></div>';}
+  const ex=['tool','helm','vest','glove','boots','chip','chip'];
+  // v16-200 (Marius 23 nov): 7 tiles – ASCENDED next to the others (the picture was rebuilt with tools/gsum_asc.py, frames 0.8×)
+  TILE7.forEach((x,i)=>{h+='<div class="smTi smGt" style="'+box(x-40,805,80,80)+'"><img src="'+GSx.icon(ex[i],i)+'" alt=""><i style="background:#000a;color:'+(i>=6?'#2ef3ff':GRADES[i].c)+'">'+GSx.RATE[i]+'%</i></div><div data-a="grates" style="'+box(x-54,790,108,152)+'"></div>';});
   // the 3 summons
   [['m','HERO',47,254],['c','CREW',335,251],['gear','GEAR',621,254]].forEach(([k,n,x,w])=>{const on=k==='gear';
     h+='<div class="smL smPl smTab'+(on?' on':'')+'" data-a="cat" data-c="'+k+'" style="'+box(x,1022,w,59)+'">'+(k==='gear'?'<img src="img/gticket.webp" alt="">':k==='c'?CTI:TKI)+n+'</div>';});
