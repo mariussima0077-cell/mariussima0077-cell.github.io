@@ -28,7 +28,10 @@ const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena 
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
 const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew','dgr'], B:['ess','dia','wheel','key','cash']};   // v16-120 KEY ROULETTE · v16-129 CASH ROULETTE (added at the END → events 0-3 stay the same)
 const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40, key:40, cash:25, dgr:3000};   // v16-161: cash was missing (score became NaN) + DUNGEON RUSH
-const GP_T0 = Date.UTC(2026, 10, 22, 17, 0, 0), GP_T1 = GP_T0 + 28 * DAY, GP_CAP = 250000;   // v16-185 TORQUE GRAND PRIX – same dates in grandprix.js
+// v16-193 (Marius 23 nov): TORQUE GRAND PRIX once per server – starts 3 days after the server opens, 28 days. Same dates in cloud.js SERVERS[].open.
+// At the launch reset: set SRV_OPEN[1] = launch day. New server → add its opening date here (and in cloud.js).
+const SRV_OPEN = {1: Date.UTC(2026, 10, 19, 17, 0, 0)}, GP_DELAY = 3 * DAY, GP_LEN = 28 * DAY, GP_CAP = 250000;
+const gpT0 = srv => SRV_OPEN[srv] ? SRV_OPEN[srv] + GP_DELAY : 0, gpT1 = srv => gpT0(srv) ? gpT0(srv) + GP_LEN : 0;
 const GP_FIN = [[1,1,{dm:5000}],[2,2,{dm:3000,tk:20}],[3,3,{dm:2000,tk:15}],[4,10,{dm:1000,tk:10}]];
 const EV_RW = [[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,250,3]];
 const EV_TKK = {hero:'tk', gear:'gt', crew:'ct', ess:'tk', dia:'tk', wheel:null, key:null, cash:'tk', dgr:'tk'};
@@ -561,7 +564,7 @@ export async function online(op, b, env) {
     const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();
     const ar = await db.prepare('SELECT tk, tkt, season FROM arena WHERE uid=?').bind(p.uid).first();
     const atk = ar ? (ar.season !== seasonOf(now) ? ATK(p) : Math.min(ATK(p), ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ATK(p);
-    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now};
+    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined};
   }
   if (!p) return {err:'no_profile'};
   if (op === 'prof') {
@@ -647,7 +650,7 @@ export async function online(op, b, env) {
     return {ok:true, dmg:me.dmg, rank};
   }
   if (op === 'gpsc' || op === 'gprank' || op === 'gpfin') {   // v16-185 TORQUE GRAND PRIX
-    if (!p) return {err:'noprof'}; if (now < GP_T0 || now > GP_T1 + HOUR) return {err:'over'};
+    if (!p) return {err:'noprof'}; if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpT1(p.srv) + HOUR) return {err:'over'};
     if (op !== 'gprank') { if (await isBanned(env, b.pid)) return {banned:1}; const sc = Math.round(num(b.sc, 0, GP_CAP));
       await db.prepare('INSERT INTO gpx(uid,srv,sc,t) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET srv=excluded.srv, t=CASE WHEN excluded.sc>gpx.sc THEN excluded.t ELSE gpx.t END, sc=MAX(gpx.sc, excluded.sc)').bind(p.uid, p.srv, sc, now).run(); }
     const me = await db.prepare('SELECT sc, t, fin FROM gpx WHERE uid=?').bind(p.uid).first();

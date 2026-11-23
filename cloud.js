@@ -13,8 +13,8 @@ const API = () => window.SEC && SEC.api();
 // v16-44: game servers. Only S1 is open now. Each server = its own game; the cloud keeps one save per Google account per server.
 // ⚠️ Before opening S2: give each server its own local save key (SAVE_KEY+'_s2') – see NEXT_STEPS.md.
 const SERVERS = [
-  {id:1, n:'S1 · Torque City', st:'open'},
-  {id:2, n:'S2 · Nitro Bay',   st:'soon'},
+  {id:1, n:'S1 · Torque City', st:'open', open:Date.UTC(2026,10,19,17)},   // v16-193 open = opening date (Grand Prix = open + 3 days) – same in server/online.js SRV_OPEN; set it again at the launch reset
+  {id:2, n:'S2 · Nitro Bay',   st:'soon', open:0},
 ];
 let srv = +(LS('te_srv')||1); if(!SERVERS.find(x=>x.id===srv && x.st==='open')) srv = 1;
 let sess = LS('te_sess'), syncedT = +(LS('te_cloud_t')||0), lastHash = '', lastOk = 0, busy = false, gisLoaded = false, delArm = 0, asking = false;
@@ -194,5 +194,5 @@ if(CLIENT_ID && sess){
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') upload(false, true); });
 }
 
-window.CLOUD = {mount, mountStart, refresh, srv:()=>srv, on:()=>!!(CLIENT_ID&&sess), cred:c=>onCred({credential:c})};
+window.CLOUD = {mount, mountStart, refresh, srv:()=>srv, srvOpen:id=>{const x=SERVERS.find(s=>s.id===id);return x&&x.open||0;}, on:()=>!!(CLIENT_ID&&sess), cred:c=>onCred({credential:c})};
 })();

@@ -8,14 +8,19 @@
 // Progress of the event missions = what you do DURING the event (new stages, new floors …) → fair for new and old players.
 (function(){
 const T=()=>window.__TE;
-const GP_T0=Date.UTC(2026,10,22,17,0,0),DAY=864e5,WEEK=7*DAY,GP_T1=GP_T0+28*DAY;   // same dates in server/online.js (GP_T0)
+const DAY=864e5,WEEK=7*DAY,GP_DELAY=3*DAY,GP_LEN=28*DAY;
+// v16-193 (Marius 23 nov): the Grand Prix happens ONCE PER SERVER – it starts 3 days after the server opens (players first see how the game works)
+// and lasts 28 days. Opening date: the server sends it at every sync (gp0, server/online.js SRV_OPEN); until then cloud.js SERVERS[].open.
+function T0(){const sv=window.CLOUD?CLOUD.srv():1;let v=0;try{v=+localStorage.getItem('te_gp0_'+sv)||0;}catch(e){}
+  if(!v&&window.CLOUD&&CLOUD.srvOpen){const o=CLOUD.srvOpen(sv);if(o)v=o+GP_DELAY;}return v||Infinity;}   // Infinity = server not opened yet → no event
+const T1=()=>T0()+GP_LEN;
 const GPP=()=>true;   // v16-192 (23 nov): gp_silver / gp_gold / gp_plat are active in Play Console
 // PREMIUM level = best pack owned (secure.js SKU gp1/gp2/gp3): 1 Silver · 2 Gold · 3 Platinum
 const PKS=[['gp1','SILVER','€4.99'],['gp2','GOLD','€9.99'],['gp3','PLATINUM','€19.99']];
 const PREM=()=>{const p=(T()&&T().PK)||{};return p.gp3?3:p.gp2?2:p.gp1?1:0;};
 const TOKB=()=>1+.1*PREM();   // +10/20/30% GP Tokens (Shop currency only – Road points and LEGENDS stay the same for everyone)
 const TIER=1500,TIERS=50;
-const now=()=>Date.now(),live=()=>now()>=GP_T0&&now()<GP_T1,wk=()=>Math.max(0,Math.min(3,Math.floor((now()-GP_T0)/WEEK)));
+const now=()=>Date.now(),live=()=>now()>=T0()&&now()<T1(),wk=()=>Math.max(0,Math.min(3,Math.floor((now()-T0())/WEEK)));
 const dKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
 const TOKI='<img class="gpTk" src="img/gp/token.webp" alt="">';
 // ---------------------------------------------------------------- missions
@@ -85,11 +90,11 @@ function premAll(){const s=S(),L=PREM(),tr=tierOf();if(!L)return;if(!s.rp)s.rp={
   for(let i=1;i<Math.min(tr+1,TIERS);i++){const had=s.rp[i]||0;if(had>=L)continue;const r=mul(RD[(i-1)%10],L-had);for(const x in r)sum[x]=(sum[x]||0)+r[x];s.rp[i]=L;n++;}
   if(n){give(sum);T().toast('👑 '+n+' premium tiers: '+rwTxt(sum),3200);render();dot();}}
 let pkBusy=0;
-async function buyPk(k){if(pkBusy||!window.SEC||now()>=GP_T1)return;const P=T().PK;if(P[k])return;pkBusy=1;
+async function buyPk(k){if(pkBusy||!window.SEC||now()>=T1())return;const P=T().PK;if(P[k])return;pkBusy=1;
   try{const ok=await SEC.buy(k);if(!ok)return;P[k]=true;T().savePacks();T().save();
     T().toast('👑 Grand Prix '+PKS.find(x=>x[0]===k)[1]+' unlocked! Open the ROAD to claim your PREMIUM rewards.',4200);render();dot();}
   finally{pkBusy=0;}}
-function pkBtn(k){const P=(T()&&T().PK)||{},x=PKS.find(z=>z[0]===k);if(P[k])return '<button class="gpBtn x">OWNED ✓</button>';if(now()>=GP_T1)return '<button class="gpBtn x">ENDED</button>';return '<button class="gpBtn g" data-g="pk" data-k="'+k+'">'+x[2]+'</button>';}
+function pkBtn(k){const P=(T()&&T().PK)||{},x=PKS.find(z=>z[0]===k);if(P[k])return '<button class="gpBtn x">OWNED ✓</button>';if(now()>=T1())return '<button class="gpBtn x">ENDED</button>';return '<button class="gpBtn g" data-g="pk" data-k="'+k+'">'+x[2]+'</button>';}
 function pick(){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS)return;pop('<div class="gpH">🏆 CHOOSE 1 MYTHIC</div><div class="gpPk">'+MYTH.map(id=>'<div class="gpPi" data-g="myth" data-id="'+id+'" style="background-image:url(img/hero/splash_'+id+'.webp)"><span>'+(t.HB[id]?t.HB[id].n:id)+'</span></div>').join('')+'</div><div class="gpSm">+ FREE bonus: '+rwTxt(FINAL_BONUS)+'</div>');}
 function takeMyth(id){const t=T(),s=S();if(s.rf.includes(TIERS)||tierOf()<TIERS||!MYTH.includes(id))return;s.rf.push(TIERS);s.my=id;t.gain(id);give(FINAL_BONUS);try{t.heroRefresh();}catch(e){}closePop();
   t.toast('🏆 '+(t.HB[id]?t.HB[id].n:'Mythic')+' joined your team! + '+rwTxt(FINAL_BONUS),3600);render();dot();}
@@ -212,7 +217,7 @@ function rowH(l,m){const st=mState(l,m),p=Math.max(0,Math.min(m[3],prog(l,m))),u
   const b=st==='done'?'<button class="gpBtn x">DONE</button>':st==='ready'?'<button class="gpBtn g" data-g="cm" data-l="'+l+'" data-id="'+m[0]+'">CLAIM</button>':'<button class="gpBtn" data-g="go" data-l="'+l+'">GO</button>';
   return '<div class="gpRow'+(st==='done'?' done':'')+(ult?' ult':'')+'"><div class="ic">'+MIC[m[2]]+'</div><div class="tx"><div class="a">'+m[1]+'</div>'+(st==='done'?'':'<div class="gpBar"><i style="width:'+(p/m[3]*100)+'%"></i></div>')+'<div class="b">'+TOKI+' +'+T().nf(m[4])+(st==='done'?'':' · '+p+'/'+m[3])+'</div></div>'+b+'</div>';}
 function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(),sc=document.getElementById('gpS'),y=sc.scrollTop,tr=tierOf(),W=wk();
-  let h='<div class="gpIn"><div class="gpBan"><div class="bg"></div><img class="lg" src="img/gp/logo.webp" alt="TORQUE GRAND PRIX"><div class="gpTm">'+(now()<GP_T0?'⏳ Starts in <b>'+left(GP_T0-now())+'</b>':now()>=GP_T1?'🏁 <b>FINISHED</b>':'⏱ Ends in <b>'+left(GP_T1-now())+'</b> · <b style="color:#ff6b6b">ONE TIME ONLY</b>')+'</div></div>'+
+  let h='<div class="gpIn"><div class="gpBan"><div class="bg"></div><img class="lg" src="img/gp/logo.webp" alt="TORQUE GRAND PRIX"><div class="gpTm">'+(now()<T0()?'⏳ Starts in <b>'+left(T0()-now())+'</b>':now()>=T1()?'🏁 <b>FINISHED</b>':'⏱ Ends in <b>'+left(T1()-now())+'</b> · <b style="color:#ff6b6b">ONE TIME ONLY</b>')+'</div></div>'+
    '<button class="gpX" data-g="x">↩</button><div class="gpCb"><div class="gpCu">'+TOKI+' '+t.nf(s.tok)+'</div><div class="gpCu">🎖️ Tier '+tr+'/'+TIERS+'</div>'+(PREM()?'<div class="gpCu"><img class="gpTk" src="img/gp/patron.webp" alt="">'+PKS[PREM()-1][1]+'</div>':'')+'<div class="gpCu" data-g="info">ℹ️</div></div>'+
    '<div class="gpTabs">'+[['ev','tab_ev','EVENT'],['ms','tab_ms','MISSIONS'],['rd','tab_road','ROAD'],['rk','tab_leg','LEGENDS'],['pt','tab_patron','PATRONS']].map(x=>'<button data-g="tab" data-t="'+x[0]+'" class="'+(tab===x[0]||(tab==='sh'&&x[0]==='ev')?'on':'')+'"><img src="img/gp/'+x[1]+'.webp" alt="">'+x[2]+'</button>').join('')+'</div><div class="gpP">';
   if(tab==='ev'){h+='<div class="gpSec">THE 4 RACE WEEKS</div><div class="gpWk">'+WEEKS.map((w,i)=>'<div class="gpW'+(i===W&&live()?' now':'')+'"><img src="img/gp/wk_'+w[0]+'.webp" alt="">'+w[1]+(i===W&&live()?'<span class="lv">LIVE</span>':'')+'</div>').join('')+'</div><div class="gpSec">YOUR RACE</div>';
@@ -271,11 +276,11 @@ function intro(force){const s=S();if(s.intro&&!force)return;s.intro=1;T().save()
 function open(){if(!T()||!T().G)return;build();S();el.classList.add('open');tab='ev';render.rdS=0;render();intro();if(live())sendSc();
   clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}if(tab!=='rd'&&tab!=='ms')render();},30000);}
 function close(){if(el)el.classList.remove('open');closePop();try{const d=document.getElementById('evDot');if(d&&window.EVT)EVT.dot();}catch(e){}dot();}
-function entry(){if(now()>=GP_T1+7*DAY)return '';return '<div class="gpEntry" onclick="GPX.open()"><img src="img/gp/logo.webp" alt="TORQUE GRAND PRIX">'+(live()?'<span>'+(canClaim()?'🎁 ':'')+'LIVE · '+left(GP_T1-now())+'</span>':'')+'</div>';}
+function entry(){if(T0()===Infinity||now()>=T1()+7*DAY)return '';return '<div class="gpEntry" onclick="GPX.open()"><img src="img/gp/logo.webp" alt="TORQUE GRAND PRIX">'+(live()?'<span>'+(canClaim()?'🎁 ':'')+'LIVE · '+left(T1()-now())+'</span>':'')+'</div>';}
 function hook(){if(!window.EVT||EVT.__gp)return false;const o=EVT.q;EVT.q=function(k,n){try{o.apply(EVT,arguments);}catch(e){}try{q(k,n);}catch(e){}};
   const od=EVT.dot;EVT.dot=function(){try{od.apply(EVT,arguments);}catch(e){}dot();};EVT.__gp=1;return true;}
 function boot(){if(!T()||!T().G||!window.EVT){setTimeout(boot,600);return;}build();hook();if(live())S();dot();
   setInterval(()=>{if(live()&&T()&&T().G){S();dot();}},20000);setInterval(()=>{if(live()&&T()&&T().G)sendSc();},300000);}
-window.GPX={open,close,entry,state:()=>S(),live,q,T0:GP_T0,T1:GP_T1};
+window.GPX={open,close,entry,state:()=>S(),live,q,get T0(){return T0();},get T1(){return T1();}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
