@@ -683,7 +683,13 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #sheet.bldP #shDots i.gd{box-shadow:0 0 calc(var(--bw)*.03) #fff3a0}
 #sheet.bldP #shDots i:nth-child(1){left:calc(var(--bw)*217/1113)}#sheet.bldP #shDots i:nth-child(2){left:calc(var(--bw)*286/1113)}#sheet.bldP #shDots i:nth-child(3){left:calc(var(--bw)*354/1113)}#sheet.bldP #shDots i:nth-child(4){left:calc(var(--bw)*423/1113)}#sheet.bldP #shDots i:nth-child(5){left:calc(var(--bw)*491/1113)}#sheet.bldP #shDots i:nth-child(6){left:calc(var(--bw)*560/1113)}#sheet.bldP #shDots i:nth-child(7){left:calc(var(--bw)*629/1113)}#sheet.bldP #shDots i:nth-child(8){left:calc(var(--bw)*698/1113)}#sheet.bldP #shDots i:nth-child(9){left:calc(var(--bw)*767/1113)}#sheet.bldP #shDots i:nth-child(10){left:calc(var(--bw)*836/1113)}
 #sheet.bldP #shClose{position:absolute;right:calc(var(--bw)*15/1113);top:calc(var(--bw)*62/1113);width:calc(var(--bw)*128/1113);height:calc(var(--bw)*128/1113);border-radius:50%;background:none;border:0;box-shadow:none;color:transparent;font-size:1px;z-index:3}
-#sheet.bldP .pkBar{margin:0 3px 6px;padding:4px 4px 5px;border-radius:12px;background:linear-gradient(#162338f2,#0b1424f2);border:1.5px solid #e0aa2599;text-align:center}#sheet.bldP .pkBar>small{display:block;font:900 9.5px Game,system-ui;color:#ffd54a;letter-spacing:1px;text-shadow:0 1px 0 #000}#sheet.bldP .pkBar>div{display:flex;justify-content:space-between;gap:2px}#sheet.bldP .pkBar span{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;border-radius:8px;padding:1px 0}#sheet.bldP .pkBar span.on{background:#ffd54a33;box-shadow:inset 0 0 0 1.5px #ffd54a}#sheet.bldP .pkBar b{font:900 11.5px Game,system-ui;color:#fff;text-shadow:0 1px 0 #000;white-space:nowrap}
+#sheet.bldP .pkBar{margin:0 3px 6px;padding:4px 4px 5px;border-radius:12px;background:linear-gradient(#162338f2,#0b1424f2);border:1.5px solid #e0aa2599;text-align:center}#sheet.bldP .pkBar>small{display:block;font:900 9.5px Game,system-ui;color:#ffd54a;letter-spacing:1px;text-shadow:0 1px 0 #000}#sheet.bldP .pkBar>div{display:flex;justify-content:space-between;gap:2px}#sheet.bldP .pkBar span{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;border-radius:8px;padding:1px 0}#sheet.bldP .pkBar span.on{background:#ffd54a33;box-shadow:inset 0 0 0 1.5px #ffd54a}
+.pkBar span{position:relative;cursor:pointer}.pkBar span:active{transform:scale(.92)}
+.pkBar .pkUp{position:absolute;top:-2px;right:12%;font:900 10px system-ui;font-style:normal;color:#43e97b;text-shadow:0 0 4px #000,0 1px 0 #000;animation:pkUpB 1s ease-in-out infinite}
+@keyframes pkUpB{50%{transform:translateY(-3px)}}
+#shBtn.pkFlash{animation:pkFl .45s ease-in-out 3}@keyframes pkFl{50%{transform:scale(1.08);filter:brightness(1.35) drop-shadow(0 0 8px #ffd54a)}}
+.dqGo{position:absolute;right:-6%;bottom:-4%;padding:.1em .45em;border-radius:1em;background:linear-gradient(#ffe36a,#ffb300);color:#3a2300;font:900 calc(var(--u)*26) Game,system-ui;box-shadow:0 2px 0 #7a4b00,0 0 6px #000a}
+.dqI.go{cursor:pointer}.dqI.go:active{transform:scale(.94)}#sheet.bldP .pkBar b{font:900 11.5px Game,system-ui;color:#fff;text-shadow:0 1px 0 #000;white-space:nowrap}
 #sheet.bldP #shDesc{color:#c9d6e2;font-size:12.5px;margin:2px 4px 6px;line-height:1.3}
 #sheet.bldP .row{position:relative;border:0;margin:0 0 3px;padding:0 34.5% 0 calc(var(--bw)*.035);gap:4px;height:calc((var(--bw)*989/1113)*90/950);min-height:30px;background:url(img/ui3/bld_row.webp) 0 0/100% 100% no-repeat;font-size:12.5px;font-weight:800;color:#e8f0f8;box-sizing:border-box}
 #sheet.bldP .row>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000}
@@ -2690,7 +2696,51 @@ const incFac=(id,l)=>!l?0:id==='office'?1+SELL_BONUS[l-1]:id==='security'?SEC_RE
 function pkRow(id,lt,nu,cost,pk){if(nu||lt>=MAXT)return '';const n=pkN(pk),ok=n>=cost;
   return pkBar(pk)+'<div class="row pkRow"><span>'+PKI(pk,'1.35em')+' '+PK_N[pk]+'</span><b style="color:'+(ok?'#7dff8a':'#ff8a80')+'">have '+nfmt(n)+'</b><em>need '+nfmt(cost)+'</em></div>';}
 // v16-144: YOUR PARTS strip – every garage part you own right now (tester Wazza: "je vois pas les ressources que j'ai")
-function pkBar(cur){return '<div class="pkBar"><small>YOUR PARTS</small><div>'+['tank','warrior','ranger','mage','support','bk'].map(k=>'<span'+(k===cur?' class="on"':'')+'>'+PKI(k,'1.45em')+'<b>'+nfmt(pkN(k))+'</b></span>').join('')+'</div></div>';}
+// v16-214 (Marius 23 nov): tap a part → the map flies to the LOWEST building that uses it and opens its upgrade (▲ = you can upgrade one now)
+function pkBar(cur){return '<div class="pkBar"><small>YOUR PARTS · tap = weakest building</small><div>'+['tank','warrior','ranger','mage','support','bk'].map(k=>'<span data-pkgo="'+k+'"'+(k===cur?' class="on"':'')+'>'+(pkCanUp(k)?'<i class="pkUp">▲</i>':'')+PKI(k,'1.45em')+'<b>'+nfmt(pkN(k))+'</b></span>').join('')+'</div></div>';}
+// ---------------------------------------------------------------- v16-214 SHORTCUTS (Marius 23 nov 2026)
+// YOUR PARTS → weakest building of that part · GO buttons (Grand Prix missions, Daily Quests, event quests) → the page where the task is done.
+const bldOK=id=>!!BLD[id]&&!NOUP(id)&&G.rep>=(BLD[id].rep||0)&&lvT(id)<MAXT;
+function pkCanUp(k){for(const id in BLD)if(partOf(id)===k&&bldOK(id)&&pkN(k)>=PCOST(id,lvT(id)+1))return true;return false;}
+function bldFor(k){const c=Object.keys(BLD).filter(id=>(k==null||partOf(id)===k)&&bldOK(id));if(!c.length)return null;
+  const mn=Math.min(...c.map(lvT)),t=c.filter(id=>lvT(id)===mn),i=t.indexOf(sel);return t[(i+1)%t.length];}   // same level → every tap goes to the next one (Paint ↔ Electrical)
+function bRect(id){if(GAR[id])return {x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32};if(XIDS.includes(id))return xRect(id);
+  return id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:id==='export'?{x:GXR,y:ROWY.D,w:GW,h:GD+22}:id==='parking'?{x:430,y:110,w:345,h:290}:id==='parts'?{x:PB.x,y:PB.y,w:PB.w,h:PB.h}:
+    id==='security'?{x:SO_X,y:SO_Y,w:SO_W,h:SO_HH}:id==='rail'?SOON.rail:id==='trailer'?{x:YX0,y:TRAIL_Y-60,w:YX1-YX0,h:90}:null;}
+let camG=null;
+function camGlide(r){if(!r)return;const first=!camG;camG={x:r.x+r.w/2,y:r.y+r.h/2,n:0};if(first)(function st(){if(!camG)return;
+  const tx=camG.x-VW/Z/2,ty=camG.y-(VH-TOP)/Z*.3;camX+=(tx-camX)*.2;camY+=(ty-camY)*.2;vX=vY=0;clampCam();
+  if(++camG.n>60||(Math.abs(tx-camX)<1&&Math.abs(ty-camY)<1)){camG=null;return;}requestAnimationFrame(st);})();}   // building in the upper part, the sheet stays under it
+function goBld(id,up){if(!id||!INFO[id])return false;camGlide(bRect(id));openPanel(id);
+  if(up!==false)setTimeout(()=>{const b=$('shBtn');if(b&&!b.disabled){b.classList.remove('pkFlash');void b.offsetWidth;b.classList.add('pkFlash');}},350);return true;}
+function pkGo(k){const id=bldFor(k);if(!id){toast(PKI(k,'1.2em')+' '+PK_N[k]+': every building that uses them is at MAX (or still locked)',2400,0,1);return;}goBld(id);}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-pkgo]');if(t)pkGo(t.dataset.pkgo);});
+// GOTO(k): opens the page of a mission → returns the id of the page to watch ('map' = stays on the map) or null (locked / nothing to open)
+const isOpenId=id=>{const e=$(id);return !!(e&&e.classList.contains('open'));};
+function GOTO(k){const C=window.CAMPAIGN,bat=f=>{if(!C)return null;try{f();}catch(e){console.error(e);}return isOpenId('cp')?'cp':null;};
+  if(GAR[k]||k==='office'||k==='security'||k==='parking'||k==='parts')return goBld(k,false)?'map':null;
+  switch(k){
+    case 'sold':case 'sell':case 'earn':return goBld('office',false)?'map':null;
+    case 'upgrade':case 'bld':{const id=bldFor(null);return id&&goBld(id)?'map':(toast('🏗️ Every building is at MAX level',2000,0,1),null);}
+    case 'thief':return goBld('security',false)?'map':null;
+    case 'fleet':return goBld('parking',false)?'map':null;
+    case 'load':return goBld('export',false)?'map':null;
+    case 'win':case 'stg':case 'ult':return bat(()=>C.open());
+    case 'tw':return bat(()=>C.tower());
+    case 'ctw':return bat(()=>C.classTowers());
+    case 'dgk':case 'edgk':case 'dgr':return bat(()=>C.dungeons());
+    case 'lvl':case 'ess':return bat(()=>C.heroes());
+    case 'wb':return bat(()=>C.worldBoss());
+    case 'sum':case 'esum':case 'hero':case 'dia':openSummon('m');return 'sm';
+    case 'crew':openSummon('c');return 'sm';
+    case 'gear':openSummon('gear');return 'sm';
+    case 'idle':popIdle(false);return 'idl';
+    case 'login':toast('📅 Done – you opened the game today. Just CLAIM it!',2000,0,1);return null;}
+  return null;}
+// back to where you came from (Grand Prix / Events) when the page you went to is closed
+let goW=0;function goBack(w,fn){clearInterval(goW);if(!w||w==='map')return;const t0=Date.now();
+  goW=setInterval(()=>{if(Date.now()-t0>36e5){clearInterval(goW);return;}if(!isOpenId(w)){clearInterval(goW);setTimeout(()=>{try{fn();}catch(e){console.error(e);}},120);}},400);}
+window.GOTO=(k,back)=>{const w=GOTO(k);if(w&&back)goBack(w,back);return w;};
 function xlRows(id,lt,nu){if(nu||!BLD[id])return '';let h='';const x=lvX(id),top=lt<MAXT;
   if(lt>=10||x)h+='<div class="row"><span>⭐ Extra income (LV 11+)</span><b>+'+Math.round(2*x)+'%</b>'+(top&&lt>=10?'<em>+'+Math.round(2*(x+1))+'%</em>':'')+'</div>';
   if(GCLS[id]){const c=GCLS[id],b=GB(lt),b2=GB(Math.min(MAXT,lt+1));h+='<div class="row bbRow"><span>'+'<img class="tki" src="img/ui4/cls_'+c+'.webp" alt=""> '+CLS_N[c]+' heroes in battle</span><b>+'+pctB(b)+'</b>'+(top?'<em>+'+pctB(b2)+'</em>':'')+'</div>';}
@@ -3269,7 +3319,8 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   const cl=dqClaimed(),today=G.dq.q.filter(q=>q.cl).reduce((a,q)=>a+q.vip,0)+DQ_GIFTS.reduce((a,g,i)=>a+(G.dq.gifts[i]?g.vip:0),0);
   const M=dqMap();BXM=M;let h=TALL.bg(M,'img/dq.webp',0,0,922,1706)+'<div class="dqT" style="'+box(330,412,262,40)+'line-height:'+U(40)+';color:#fff">⏱ '+hh+'h '+mm+'m</div>';
   G.dq.q.forEach((q,i)=>{const y=DQY[i],done=q.p>=q.g,f=q.p/q.g;
-    h+='<div class="dqI'+(done?' ok':'')+'" style="'+box(62,y-65,130,130)+'">'+(DQ_IMG[q.id]?'<img src="img/ui3/'+DQ_IMG[q.id]+'.webp" alt="" style="width:78%;height:auto">':q.ic)+'</div>';
+    const go=!done&&!q.cl;   // v16-214: GO – tap the picture of an open quest → the map shows where it is done
+    h+='<div class="dqI'+(done?' ok':'')+(go?' go':'')+'"'+(go?' data-dqgo="'+q.id+'"':'')+' style="'+box(62,y-65,130,130)+'">'+(DQ_IMG[q.id]?'<img src="img/ui3/'+DQ_IMG[q.id]+'.webp" alt="" style="width:78%;height:auto">':q.ic)+(go?'<span class="dqGo">GO ›</span>':'')+'</div>';
     h+='<div class="dqN" style="'+box(222,y-50,480,40)+'">'+q.n+'</div>';
     h+='<div class="dqB" style="'+box(222,y+6,478,36)+'"><i style="width:'+Math.round(f*100)+'%"></i><span>'+(q.t==='earn'?fmt(q.p)+' / '+fmt(q.g):q.p+' / '+q.g)+'</span></div>';
     h+=q.cl?'<div class="dqR done" style="'+box(728,y-60,118,120)+'">✓</div>'
@@ -3288,6 +3339,7 @@ function renderDQ(){if(!dqEl.classList.contains('open')&&dqKey)return;
   h+='<div data-close="1" style="'+box(820,0,102,90)+'"></div>';
   BXM=null;dqBox.innerHTML=h;}
 dqEl.addEventListener('click',e=>{if(e.target===dqEl||e.target.closest('[data-close]')){closeDQ();return;}
+  {const g=e.target.closest('[data-dqgo]');if(g){if(GOTO(g.dataset.dqgo))closeDQ();return;}}
   if(e.target.closest('[data-all]')){let vip=0,tk=0,ct=0,dm=0,n=0;
     G.dq.q.forEach(q=>{if(q.p>=q.g&&!q.cl){q.cl=1;G.h.tk+=1;tk++;vip+=q.vip;n++;}});
     DQ_GIFTS.forEach((G2,i)=>{if(dqClaimed()>=G2.need&&!G.dq.gifts[i]){G.dq.gifts[i]=1;G.h.tk+=G2.tk;G.h.ct+=G2.tk;G.dm=(G.dm||0)+G2.dm;dm+=G2.dm;tk+=G2.tk;ct+=G2.tk;vip+=G2.vip;n++;}});
@@ -4069,6 +4121,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:95,d:'Nov 23, 2026',ic:'👉',t:'SHORTCUTS & GO buttons',l:['<b>YOUR PARTS</b>: tap a part → the map flies to your <b>weakest building</b> that uses it and opens its upgrade. A green <b style="color:#43e97b">▲</b> = you can upgrade one right now.','<b>GO</b> on every <b>Grand Prix</b> mission takes you straight to the place where it is done (campaign, summon, Dungeons, towers, heroes, Idle…). Close that page and you are back in the Grand Prix.','<b>Daily Quests</b> (tap the picture) and the <b>event quests</b> have GO too.']},
  {id:94,d:'Nov 23, 2026',ic:'🏅',t:'ARENA SHOP + ARENA REWARDS',l:['New Arena currency: <b>ARENA MEDALS</b> – <b>+10</b> for a win, <b>+3</b> for a loss, more with the daily reward (20 → 100 by league) and at the end of the season (100 → 1,000).','<b>ARENA SHOP</b> (tab SHOP): Recruit / Gear / Crew tickets, Dungeon keys, Essence, Builder Kits – weekly limits. A <b>Legendary hero of your choice</b> once a month, the <b>Gladiator frame</b> and the title <b>ARENA WARLORD</b>.','<b>ARENA REWARDS</b> (tab REWARDS): 7 chests at 3 · 7 · 12 · 20 · 30 · 45 · 60 wins, every season.']},
  {id:93,d:'Nov 23, 2026',ic:'🔥',t:'MYTHIC TALENTS',l:['Every <b>Mythic</b> hero has his own <b>TALENT</b>, unlocked in 3 phases on the way to Lv 400: <b>I at Lv 320 · II at Lv 360 · III at Lv 400</b>.','<b>The Torque King</b> – Overload Crown (lightning jumps to 2 more monsters) · <b>Lady Overdrive</b> – Redline Rush (+attack speed at the start of every wave) · <b>Ignis</b> – Rebirth Flame (reborn once per battle).','<b>Goliath</b> – Iron Wall (shield for the whole team every wave) · <b>Nova</b> – Star Mark (her target takes more damage) · <b>Vega</b> – Piercing Rail (every 3rd shot goes through the line).','See it in the <b>LEVEL UP</b> window of a Mythic hero.']},
 {id:92,d:'Nov 23, 2026',ic:'🔴',t:'MYTHIC CORE & Lv 400',l:['New rare currency: <b>Mythic Core</b>. A duplicate of a hero already at its max can give one: Common 0.02% · Uncommon 0.03% · Rare 0.05% · Epic 0.2% · Legendary 1% · a <b>Mythic duplicate always gives 50</b>.','<b>Mythic heroes</b> now go up to <b>Lv 400</b>: levels 301-400 and 5 <b>Core Ascensions</b> are paid in Mythic Core (+4% stats and +1 skill level each Core Ascension).','<b>CORE SHOP</b> (LEVEL UP window of a Mythic): the <b>RED MYTHIC BOX</b> – open it and choose any Mythic hero (new or +1 copy for Awakening). The box can never be salvaged.','The last stages and floors got stronger again to stay above the strongest team.']},

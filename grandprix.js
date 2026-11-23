@@ -225,15 +225,20 @@ function build(){if(el)return;const st=document.createElement('style');st.textCo
 function act(t){const a=t.dataset.g;
   if(a==='x')close();else if(a==='tab'){tab=t.dataset.t;render();if(tab==='rk'||tab==='pt')loadRank().then(render);}
   else if(a==='sub'){sub=t.dataset.s;render();}else if(a==='cm')claimM(t.dataset.l,t.dataset.id);else if(a==='ca')claimAll(t.dataset.l);
-  else if(a==='go'){const l=t.dataset.l;T().toast(l==='e'?'Progress counts everything you do during the event':'Play the game – it counts by itself',1800);}
+  else if(a==='go')goM(t.dataset.l,t.dataset.id);
   else if(a==='tier')claimTier(+t.dataset.i);else if(a==='pick')pick();else if(a==='myth')takeMyth(t.dataset.id);
   else if(a==='buy')buy(t.dataset.id);else if(a==='chest')chest();else if(a==='goal')claimGoal(+t.dataset.i);
   else if(a==='pack'){tab='sh';render();const e=document.querySelector('.gpPack');if(e)e.scrollIntoView({block:'center'});}else if(a==='pk')buyPk(t.dataset.k);else if(a==='prem')claimPrem(+t.dataset.i);else if(a==='pall')premAll();else if(a==='ok')closePop();else if(a==='info')intro(1);else if(a==='entry')entryFx();else if(a==='rain')rainFx();}
+// v16-214 (Marius 23 nov): GO → the page where the mission is done (index.html GOTO); when you close that page you are back here, on the same tab
+function goM(l,id){const m=(LISTS[l]||[]).find(x=>x[0]===id);if(!m)return;const ev=document.getElementById('ev'),evOn=!!(ev&&ev.classList.contains('open')),tb=tab,sb=sub;
+  if(!window.GOTO){T().toast('Play the game – it counts by itself',1800);return;}
+  const w=GOTO(m[2],()=>{if(evOn&&window.EVT)EVT.open();open();tab=tb;sub=sb;render();});if(!w)return;
+  close();if(ev)ev.classList.remove('open');}
 function pop(h){build();document.getElementById('gpPopB').innerHTML=h;popEl.classList.add('on');}
 function closePop(){if(popEl)popEl.classList.remove('on');}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function rowH(l,m){const st=mState(l,m),p=Math.max(0,Math.min(m[3],prog(l,m))),ult=m[0]==='ult';
-  const b=st==='done'?'<button class="gpBtn x">DONE</button>':st==='ready'?'<button class="gpBtn g" data-g="cm" data-l="'+l+'" data-id="'+m[0]+'">CLAIM</button>':'<button class="gpBtn" data-g="go" data-l="'+l+'">GO</button>';
+  const b=st==='done'?'<button class="gpBtn x">DONE</button>':st==='ready'?'<button class="gpBtn g" data-g="cm" data-l="'+l+'" data-id="'+m[0]+'">CLAIM</button>':'<button class="gpBtn" data-g="go" data-l="'+l+'" data-id="'+m[0]+'">GO</button>';
   return '<div class="gpRow'+(st==='done'?' done':'')+(ult?' ult':'')+'"><div class="ic">'+MIC[m[2]]+'</div><div class="tx"><div class="a">'+m[1]+'</div>'+(st==='done'?'':'<div class="gpBar"><i style="width:'+(p/m[3]*100)+'%"></i></div>')+'<div class="b">'+TOKI+' +'+T().nf(m[4])+(st==='done'?'':' · '+p+'/'+m[3])+'</div></div>'+b+'</div>';}
 function render(){if(!el||!el.classList.contains('open'))return;const t=T(),s=S(),sc=document.getElementById('gpS'),y=sc.scrollTop,tr=tierOf(),W=wk();
   let h='<div class="gpIn"><div class="gpBan"><div class="bg"></div><img class="lg" src="img/gp/logo.webp" alt="TORQUE GRAND PRIX"><div class="gpTm">'+(now()<T0()?'⏳ Starts in <b>'+left(T0()-now())+'</b>':now()>=T1()?'🏁 <b>FINISHED</b>':'⏱ Ends in <b>'+left(T1()-now())+'</b> · <b style="color:#ff6b6b">ONE TIME ONLY</b>')+'</div></div>'+

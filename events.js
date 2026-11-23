@@ -40,6 +40,8 @@ const RANKRW=[[1,1,2000,20],[2,3,1500,15],[4,10,1000,10],[11,50,500,5],[51,100,2
 const WHEEL=[[20,30],[30,25],[50,18],[80,12],[100,8],[150,4.5],[300,2],[1000,.5]];
 // KEY ROULETTE slices: [dungeon ('any' = one random dungeon, 'all' = every dungeon), keys, chance %]
 const KWH=[['vault',1,17],['mine',1,17],['forge',1,17],['lab',1,17],['any',2,14],['all',1,10],['any',3,6],['all',3,2]];
+// v16-214 (Marius 23 nov): GO buttons – event → page where its points are made (index.html GOTO)
+const EGO={hero:'hero',gear:'gear',crew:'crew',ess:'ess',dia:'dia',dgr:'dgr'};
 const KQ=[['login','Open the game today',1,1],['win','Win 5 battles in the campaign',5,1],['dgk','Use 3 Dungeon keys',3,1],['sum','Summon 10 times (heroes, crew or gear)',10,1],['idle','Collect Idle Rewards 2 times',2,1]];
 const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
 // CASH ROULETTE slices: [what, amount, chance %] – rp = random role parts, bk = Builder Kit (both × your campaign stage), key = 1 dungeon key (random), kall = 1 key in every dungeon, jack = parts jackpot
@@ -131,7 +133,8 @@ function drawWheel(cv){if(!cv)return;const KR=wKind==='key',SW=SL(wKind),okI=x=>
   else{g.beginPath();g.moveTo(X-R*.09,Y-R*1.05);g.lineTo(X+R*.09,Y-R*1.05);g.lineTo(X,Y-R*.85);g.closePath();g.fillStyle='#ff1744';g.fill();}}
 function shade(c){const n=parseInt(c.slice(1),16),f=v=>Math.round(v*.45);return 'rgb('+f(n>>16)+','+f(n>>8&255)+','+f(n&255)+')';}
 // ---------------- page
-const css=`#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716 url(img/ui9/ev_bg.webp) top center/100% auto no-repeat;color:#fff;font-family:Game,system-ui;overflow:hidden}
+const css=`.evGo{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:10px;background:linear-gradient(#ffe36a,#ffb300);color:#3a2300;font:900 11px Game,system-ui;font-style:normal;text-shadow:none;box-shadow:0 2px 0 #7a4b00;cursor:pointer;vertical-align:1px}.evGo:active{transform:scale(.92)}
+#ev{position:fixed;inset:0;z-index:58;display:none;background:#0b0716 url(img/ui9/ev_bg.webp) top center/100% auto no-repeat;color:#fff;font-family:Game,system-ui;overflow:hidden}
 #ev.open{display:flex;flex-direction:column}#ev:after{content:'';position:absolute;left:0;right:0;top:29vw;bottom:0;background:linear-gradient(#0b071600,#0b0716cc 30vw,#0b0716ee);pointer-events:none;z-index:0}#ev>*{position:relative;z-index:1}
 #ev .evTop{position:relative;height:29vw;flex:none;display:flex;align-items:center;justify-content:center;padding-top:env(safe-area-inset-top)}#ev .evTop .evX{position:absolute;left:8px;top:calc(env(safe-area-inset-top) + 6px)}
 #ev .evX{width:40px;height:40px;border:0;border-radius:12px;background:linear-gradient(#ffcf4a,#e08a00);font:900 20px Game,system-ui;color:#3a1c00;box-shadow:0 3px 0 #6b3d00}
@@ -192,6 +195,7 @@ function build(){if(el)return;const st=document.createElement('style');st.textCo
     else if(a==='rk'){view='rank';render();showRank();}
     else if(a==='spin')spin();
     else if(a==='sch'){view='sched';render();}
+    else if(a==='go'){const tb=tab,w=window.GOTO?GOTO(t.dataset.k,()=>{open();tab=tb;render();}):null;if(w){el.classList.remove('open');if(window.GPX)GPX.close();}}   // v16-214: GO → the page of the quest, back here when it is closed
     else if(a==='wq'){const B=S().B,w=B.w,x=QL(B.k).find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast((B.k==='key'?'🔑':'🎡')+' +'+x[3]+' free spin',1800);render();}});}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function render(){if(!el||!el.classList.contains('open'))return;const s=S();
@@ -200,10 +204,10 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   if(view==='sched'){body.innerHTML=schedHtml();return;}
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h=(window.GPX?GPX.entry():'')+'<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
-  h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+NH(T().nf(sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+'</div>';
+  h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+NH(T().nf(sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+(EGO[st.k]?' <b class="evGo" data-e="go" data-k="'+EGO[st.k]+'">GO ›</b>':'')+'</div>';
   if(st.k==='cash'){const w=st.w,p=cwPrice(w),can=!spinning&&w.used<CW_MAX&&T().G.money>=p;h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">'+(w.used>=CW_MAX?'MAX SPINS':'SPIN · '+T().fmt(p))+'</button><div class="evP">Spins: <b>'+w.used+' / '+CW_MAX+'</b> · your cash: <b>'+T().fmt(T().G.money)+'</b> · next spin costs ×1.15</div><div class="evP">Prizes grow with your campaign stage. Parts upgrade your garages (LV 1-100).</div></div>';}
   else if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
-    h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
+    h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+(!ok&&x[0]!=='login'?' <b class="evGo" data-e="go" data-k="'+x[0]+'">GO ›</b>':'')+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+'</button></div>';}).join('');}
   h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evGoalIc(E)+NH(T().nf(g),T().nf(g).length>5?.85:1.1)+'</div><div class="r'+(Object.values(realRw(st,m[1])).filter(Boolean).length>1?' two':'')+'">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
   const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div><button class="evSch" data-e="sch">📅 EVENT CALENDAR</button>';
