@@ -126,3 +126,9 @@ Antet: Use the attached picture as the character reference (same design, colors,
 ➡️ **INFERNO PISTON** (trimis 21 nov): 7 poze – intro, idle, attack, skill „V12 ERUPTION”, fxlava (4 fâșii 1536×256 = val de lavă cu stâlpi de foc spre stânga), hit, enrage → `img/sheets/wb/inferno2/inferno_*.webp`. Referința = cadrul 1 din `inferno.webp`.
 ➡️ **TOW SERPENT** (trimis 21 nov): 7 poze – intro, idle, attack, skill „CHAIN STORM”, fxchain (4 fâșii 1536×256 = lanț cu cârlig de macara care zboară spre stânga + scântei), hit, enrage → `img/sheets/wb/tow2/tow_*.webp`. Referința = cadrul 1 din `tow.webp`.
 Toate cele 4 World Boss au acum prompturi în formatul nou.
+
+## 11 · BOSSII DE CAPITOL – INTRO + ENRAGE (23 nov 2026)
+Bossii de capitol din campanie (JUNKYARD TITAN `jtitan`, ACID TANKER `gtanker`, TOW KING `towking`, NITRO DRAGON `ndragon`, OMEGA ENGINE `gomega`) aveau doar idle/walk/attack/skill/hit/moarte. Nu aveau INTRO și ENRAGE (`u.enr` exista în cod, dar nu se vedea pe sprite).
+Format = ca la World Boss v2: 1536×1024, 3×2 cadre de 512×512, fond verde, FACING LEFT, referința = cadrul idle 1 (×3 pe verde, `/home/claude/ref/<id>_ref.png`).
+Claude pune prompturile direct în ChatGPT (Chrome-ul lui Marius); Marius descarcă pozele → `img/sheets/boss/<id>/<id>_intro.png`, `<id>_enrage.png`.
+Integrare: rânduri noi în atlasul `img/mon/<id>.webp` (sau atlas separat) + `msprFrame`: INTRO 1,5 s la începutul luptei cu bossul, ENRAGE (pornire + buclă cadrele 4-6) când `u.enr`.
