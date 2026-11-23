@@ -3414,7 +3414,7 @@ const nfmt=n=>fmt(n).replace('$','');
 function addEss(n,why){n=Math.round(n);if(!n)return;G.ess=(G.ess||0)+n;save();if(why)toast(ESI+' +'+nfmt(n)+' Essence · '+why,2600);}
 function addGp(n,why){n=Math.round(n);if(!n)return;G.gp=(G.gp||0)+n;save();if(why)toast(GPI+' +'+nfmt(n)+' Gear Parts · '+why,2600);}
 const DUPX=[{d:2},{d:5},{d:10},{d:30},{d:150},{d:1000}];
-const MCI='<span class="mcI"></span>'; // v16-207: Mythic Core icon (CSS orb until Marius\' picture img/ui9/mcore.webp arrives) // duplicate after the max: Common-Rare → Essence (× essence unit), Epic-Mythic → Diamonds
+const MCI='<img class="mcI" src="img/ui9/mcore.webp" alt="">'; // v16-208: Mythic Core icon (Marius' picture) // duplicate after the max: Common-Rare → Essence (× essence unit), Epic-Mythic → Diamonds
 // v16-165: rebirth() was missing from window.__TE → the REBIRTH NOW button threw 'T.rebirth is not a function'
 // v16-133 (Marius): REBIRTH – a hero goes back to Lv 1 / no Ascension, 100% of the Essence comes back (free). The refunded Essence is
 // remembered in G.essR: spending it again does NOT count for the Essence event (no ranking farming with reset + re-level).
