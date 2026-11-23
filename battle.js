@@ -1210,7 +1210,7 @@ m5_2:{a:[148.0,246],m:[300,150],fire:1,v8:{cw:237,uw:316.0,ax:148.0,rows:[[0,196
  // v16-34: Legendary guards (atlas_rare.py + tools/fix_gold_halo.py: lemon glow -> gold, Gabriel's ghost frame without the brown cloud)
  g4_0:{w:384,a:[209,248],m:[300,150]},g4_1:{w:384,a:[198,248],m:[300,150]},g4_2:{w:384,a:[213,248],m:[300,150]},g4_3:{w:384,a:[204,248],m:[300,150]},
  // v16-35: Mythic guards (fix_red_tint.py rows 2-5, fade_cell.py The Wall hex wall) + 6 thieves t0..t5 (map only)
- g5_0:{w:384,a:[195,248],m:[300,150]},g5_1:{w:384,a:[213,248],m:[300,150]},t0:{w:384,a:[197,248],m:[300,150]},t1:{w:384,a:[181,248],m:[300,150]},t2:{w:384,a:[195,248],m:[300,150]},t3:{w:384,a:[198,248],m:[300,150]},t4:{w:384,a:[195,248],m:[300,150]},t5:{w:384,a:[199,248],m:[300,150]}};
+ g5_0:{w:384,a:[195,248],m:[300,150]},g5_1:{w:384,a:[213,248],m:[300,150]},t0:{w:384,a:[197,248],m:[300,150]},t1:{w:384,a:[181,248],m:[300,150]},t2:{w:384,a:[195,248],m:[300,150]},t3:{w:384,a:[198,248],m:[300,150]},t4:{w:384,a:[195,248],m:[300,150]},t5:{w:384,a:[199,248],m:[300,150]},tb:{w:384,a:[206,248],m:[300,150]},tc:{w:384,a:[194,248],m:[300,150]},td:{w:384,a:[194,248],m:[300,150]},te:{w:384,a:[194,248],m:[300,150]},k9d:{w:384,a:[196,248],m:[300,150]},k9g:{w:384,a:[200,248],m:[300,150]}}; // v16-254 Thieves 2.0: Gang Boss, Crowbar Carl, Shadow Kid, Lockpick Leo, K9 dog + handler
 const FXIM={};for(const k of['quake','holy','vortex','cloud','hglass','gearboom']){FXIM[k]=new Image();FXIM[k].src='img/hero/fx_'+k+'.webp';}
 const fxOK=k=>FXIM[k]&&FXIM[k].complete&&FXIM[k].naturalWidth>0;
 const SPK=.37,SPCELL=192;

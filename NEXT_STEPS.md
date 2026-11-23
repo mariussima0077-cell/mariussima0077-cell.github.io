@@ -168,10 +168,13 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
-## 🟡 THIEVES 2.0 (23 nov 2026) – machetă aprobată, așteptăm pozele
-- Macheta: `preview/thieves.html` (Marius: „îmi place”). Prompturi: `PROMPTS_THIEVES.md`.
-- De făcut în joc: 3 tipuri (Amateur ~5% cash, Pro ~10%, Gang Boss ~20%, doar online, redus de Security), patrulare continuă, gardieni furioși + lupte, BACKUP gardieni (mașină de pază), întăriri hoți (dubă), uneori **GANG RAID** (toată gașca, 6-8 hoți, „masacru”) + **duba de securitate K9 cu câini**, recompense Builder Kit / Crew Tickets / 💎, tabla MOST WANTED (3 pe zi + bonus), mini-ghid nou.
-- Lipsesc pozele: Gang Boss, Crowbar Brute, Masked Runner, gardian K9, câine K9, tabla Most Wanted, afiș WANTED, banner GANG RAID.
+## ✅ v16-258 (23 nov 2026) – THIEVES 2.0 LIVE
+- Cod: blocul „THIEVES 2.0” din `index.html` (`startRaid`, `THF`, `XG`, `mwGet`), sprite-uri noi în `battle.js` SPRD: `tb` Big Tony (Gang Boss), `tc` Crowbar Carl, `td` Shadow Kid, `te` Lockpick Leo (Masked Runner v1, ușa ștearsă), `k9d` câine, `k9g` gardian K9. UI: `img/thief/` (mw_board, mw_poster, gang_raid).
+- Raiduri: solo / duo (25% dubă cu întăriri) / BOSS (de 3×/zi, Security ≥3, dubă cu boss + 2) / GANG RAID (1×/zi, Security ≥4, 4 pe jos + dubă cu boss + 3, banner). Hoț scăpat = −5% (amator) / −10% (PRO) / −20% (boss) din cash, redus cu Security (−4,5%/nivel) și scutul gardienilor; doar cât jocul e deschis.
+- Gardieni: biroul iese în patrulare, toți aleargă furioși, lupte cu praf/stele, BACKUP (mașină de pază, 1-2 gardieni, +1 la gang), K9 van (handler + 1-2 câini) la gang și la boss de la Security 5.
+- Recompense: Builder Kit (după PART_U), Crew Tickets, diamante (PRO/boss); MOST WANTED 3/zi în panoul SECURITY + bonus zilnic. Fereastră „RAID STOPPED / RAID OVER” doar la raiduri de 3+ hoți sau boss. Mini-ghid `thieves2`, NEWS id 121.
+- Test: `__TE.SECT.startRaid('gang'|'boss'|'duo'|'solo')`, `__TE.SECT.mkTest()` pune mașini în yard/export.
+- Nu lipsește nicio imagine.
 
 ## ✅ v16-253 (23 nov 2026) – animații pe toate butoanele (`btnfx.js`)
 - Fiecare buton: se strânge la apăsare, sare înapoi (bounce), flash scurt + inel auriu cu scântei unde ai atins. Doar transform/opacity → ușor pe telefoane ieftine. Un element se poate exclude cu `data-nofx`.

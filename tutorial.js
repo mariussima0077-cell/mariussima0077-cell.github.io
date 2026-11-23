@@ -206,6 +206,8 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   // v16-214 (Marius 23 nov: shortcuts)
   pkgo:{ok:()=>isOpen('sheet')&&vis(document.querySelector('#sheet .pkBar')),t:`<b>YOUR PARTS</b>: tap a part → the map flies to your <b>weakest building</b> that uses it and opens its upgrade. A green <b style="color:#43e97b">▲</b> = you have enough parts to upgrade one now.`},
   gogo:{ok:()=>isOpen('gpx')&&vis(document.querySelector('#gpx [data-g=go]')),t:`<b>GO</b>: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have <b>GO</b> too.`},
+  // v16-254 (Marius 23 nov: Thieves 2.0)
+  thieves2:{ok:()=>isOpen('sheet')&&sel0()==='security'&&!!document.querySelector('#sheet .mwB'),t:`<b>THIEVES 2.0</b>: thieves come in groups – <b>★ PRO</b>, <b>👑 GANG BOSS</b> and sometimes a whole <b style="color:#ff6b6b">GANG RAID</b>. Guards get <b>BACKUP</b> and <b>K9 dogs</b>. Caught = Builder Kit, Crew Tickets, diamonds; escaped = part of your cash stolen. <b>MOST WANTED</b>: catch the 3 thieves on the board today for a bounty.`},
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;

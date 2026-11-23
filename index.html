@@ -557,6 +557,26 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .mlGift{margin-top:12px;border-radius:12px;padding:10px;background:#0b1118;border:1px dashed #e0aa25;text-align:center;font-weight:900;font-size:15px}.mlGift img{height:22px;vertical-align:-6px}
 .repBon{margin:6px 0 2px;padding:8px 10px;border-radius:12px;background:#0e3a1e;border:1px solid #2e7d32;font-weight:800;font-size:13px;color:#b9f6ca;text-align:center}
 #shDots{flex-wrap:wrap}#shDots .upParts{flex:0 0 100%}#shDots .upParts small{margin-left:8px;font-size:11.5px}
+/* v16-254 Thieves 2.0 */
+.gRaidB{position:fixed;left:50%;top:22%;width:min(92vw,420px);transform:translate(-50%,-50%);z-index:9000;pointer-events:none;filter:drop-shadow(0 6px 14px #000a);animation:gRaid 2.9s ease-out forwards}
+@keyframes gRaid{0%{transform:translate(-50%,-50%) scale(2.2);opacity:0}12%{transform:translate(-50%,-50%) scale(.92);opacity:1}18%{transform:translate(-50%,-50%) scale(1.04)}22%,80%{transform:translate(-50%,-50%) scale(1)}25%,31%{margin-left:-5px}28%,34%{margin-left:5px}37%{margin-left:0}100%{transform:translate(-50%,-50%) scale(1.1);opacity:0}}
+.raidC{position:fixed;inset:0;z-index:8990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);animation:rcIn .25s ease-out}
+@keyframes rcIn{from{opacity:0}}
+.raidC .rcB{width:min(86vw,320px);background:linear-gradient(#2b3d52,#141d28);border:3px solid #ffd54a;border-radius:18px;padding:14px 14px 12px;text-align:center;color:#fff;box-shadow:0 10px 30px #000a;animation:rcPop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes rcPop{from{transform:scale(.6)}}
+.raidC h3{margin:0;font:900 26px Game,system-ui;color:#ffd54a;text-shadow:0 2px 0 #000}
+.raidC p{margin:4px 0 8px;font:800 12.5px Body,system-ui;color:#dfe8f1}.raidC p.mw{color:#ffd54a}.raidC p.ls{color:#ff6b6b}
+.raidC .rcB>div{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border-radius:9px;padding:5px 10px;margin:4px 0;font:800 13px Body,system-ui}
+.raidC .rcB>div span{flex:1;text-align:left}.raidC .rcB>div b{font:900 16px Game,system-ui;color:#7CFC9A}.raidC i{font-style:normal}.raidC .tki{width:22px;height:22px}
+.raidC button{margin-top:8px;font:900 16px Game,system-ui;color:#3a2200;background:linear-gradient(#ffe27a,#ffb300);border:0;border-radius:12px;padding:7px 34px;box-shadow:0 3px 0 #8f4c00}
+.mwB{position:relative;width:100%;aspect-ratio:1020/670;background:url(img/thief/mw_board.webp) center/100% 100% no-repeat;margin:4px 0 2px}
+.mwP{position:absolute;top:33%;width:21.5%;aspect-ratio:300/458;background:url(img/thief/mw_poster.webp) center/100% 100% no-repeat;transform:rotate(-2deg);filter:drop-shadow(0 3px 4px #0008)}
+.mwP.p0{left:10%}.mwP.p1{left:39.3%;transform:rotate(1.5deg)}.mwP.p2{left:68.5%;transform:rotate(-1deg)}
+.mwF{position:absolute;left:19%;top:29.5%;width:62%;height:36.5%;background-repeat:no-repeat;background-size:952% 1058%;background-position:8.1% 6.1%;filter:sepia(.3)}
+.mwN{position:absolute;left:8%;right:8%;top:69%;height:9%;display:flex;align-items:center;justify-content:center;font:900 clamp(7px,2.3vw,10px) Game,system-ui;color:#fff;text-shadow:0 1px 0 #600;white-space:nowrap;overflow:hidden}
+.mwR{position:absolute;left:12%;right:12%;top:84%;height:10%;display:flex;align-items:center;justify-content:center;gap:2px;font:900 clamp(6px,2vw,9px) Game,system-ui;color:#4a2a08;white-space:nowrap}
+.mwR .tki{width:1.25em;height:1.25em}
+.mwS{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) rotate(-18deg);font:900 clamp(10px,3.6vw,16px) Game,system-ui;color:#c62828;border:3px solid #c62828;border-radius:6px;padding:0 5px;background:#fff8;letter-spacing:1px}
 .stepNote{margin-top:8px;padding:8px 10px;border-radius:12px;background:#0b1622;border:1px solid #2f5a85;font-size:12.5px;line-height:1.4;color:#cfe3ff}
 @media (max-height:700px){#side2 button{width:42px;height:42px}#side2 svg{width:30px;height:30px}}
 
@@ -1699,82 +1719,204 @@ const PATROL=[{x:PX_R,y:SOUT.y},{x:PX_R,y:PY_B},{x:PX_L,y:PY_B},{x:PX_L,y:PY_T},
 const XCAMS=[{x:YXL+4,y:(YT+YB)/2,a:0},{x:YXR-4,y:(YT+YB)/2,a:Math.PI},{x:SO_X+6,y:SO_Y+6,a:-Math.PI*.62},{x:SO_X+SO_W-6,y:SO_Y+6,a:-Math.PI*.38}];
 var PATROL_OK=1;
 const OFFW=()=>Math.min(34,SO_W*.2); // how far the desk guard walks left/right in the office
-const guards=[0,1].map(k=>({k,mode:k?'off':'desk',route:[],pi:0,t:0,delay:0,p:mkPerson({x:CHAIR.x,y:CHAIR.y,a:-Math.PI/2,suit:'#2f5bb7',cap:'#0b0f1a',pants:'#1a2338',vest:'#1d3c80',skin:k?'#c68642':'#f1c27d',pose:'',vis:k===0})}));
-const thief={st:'none',next:rnd(50,80),t:0,route:[],car:null,win:false,cop:null,p:mkPerson({suit:'#1b1b1b',cap:'#2b2b2b',pants:'#111',skin:'#e0ac69',vis:false})};
+// =================== v16-254 THIEVES 2.0 (Marius 23 nov): several thieves at once, PRO + GANG BOSS, van reinforcements, GANG RAID,
+// angry patrolling guards, BACKUP security car, K9 van with dogs, % of cash stolen, Builder Kit / Crew / diamond rewards, MOST WANTED ===================
+const guards=[0,1].map(k=>({k,mode:k?'off':'desk',route:[],pi:0,t:0,delay:0,dt:rnd(8,16),p:mkPerson({x:CHAIR.x,y:CHAIR.y,a:-Math.PI/2,suit:'#2f5bb7',cap:'#0b0f1a',pants:'#1a2338',vest:'#1d3c80',skin:k?'#c68642':'#f1c27d',pose:'',vis:k===0})}));
 const police=[];
 const POLICE_T=TYPES.find(t=>t.liv==='police');
+const VAN_T=TYPES.find(t=>t.b==='van'&&!t.liv), SUV_T=TYPES.find(t=>t.liv==='police2');
+const SECV_T=Object.assign({},SUV_T,{n:'Security car',liv:'sec',col:'#1b5e20'}), K9V_T=Object.assign({},VAN_T,{n:'K9 van',liv:'k9',col:'#1c1c1c'});
+const TT={am:{n:'THIEF',brk:3.4,fight:1.4,mod:1,loss:.05,bk:.05,ct:.3,dm:0,h:24},
+          pro:{n:'PRO',brk:2.4,fight:2.4,mod:.72,loss:.10,bk:.15,ct:1,dm:5,h:24},
+          boss:{n:'GANG BOSS',brk:4.5,fight:7,mod:.55,loss:.20,bk:.6,ct:3,dm:30,h:33}};
+const TSK={am:['t1','t2','t4','t5','tc','td'],pro:['t0','t3','te'],boss:['tb']};
+const TNAME={t0:'Violet Vex',t1:'Sticky Sam',t2:'Gold Chain Gus',t3:'The Fox',t4:'Hoodie Hank',t5:'Granny Grab',tb:'Big Tony',tc:'Crowbar Carl',td:'Shadow Kid',te:'Lockpick Leo'};
+const GSK=['g0_0','g1_0','g2_0','g3_0','g4_0','g5_0'];
+const MW_RW={am:{bk:.3,ct:2},pro:{bk:.5,dm:20},boss:{dm:50,ct:3}}, MW_ALL={dm:50,tk:2};
+const secLv=()=>Math.max(1,Math.min(10,G.lv.security||1));
+const secRed=()=>(secLv()-1)*.045;                                   // higher Security = less money stolen (LV 10: −40%)
+const THF=[], XG=[];                                                  // thieves on the map · extra defenders (backup guards, K9 handler, dogs)
+let RAID=null, raidNext=rnd(45,75);
+const secOn=()=>THF.some(T=>T.st==='sneak'||T.st==='break'||T.st==='fight');
 function goRoute(o,dt,v){const p=o.p;
   while(o.route.length){const q=o.route[0],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy);if(d<.5){o.route.shift();continue;}
     const mv=Math.min(d,v*dt);p.x+=dx/d*mv;p.y+=dy/d*mv;p.a=lerpA(p.a,Math.atan2(dy,dx),Math.min(1,dt*10));p.walk+=dt*(v>60?15:10);p.moving=true;return false;}
   p.moving=false;return true;}
+function goTo(p,q,dt,v){const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy);if(d<1){p.moving=false;return true;}
+  const mv=Math.min(d,v*dt);p.x+=dx/d*mv;p.y+=dy/d*mv;p.a=lerpA(p.a,Math.atan2(dy,dx),Math.min(1,dt*10));p.moving=true;return d-mv<1;}
 function theftTargets(){return cars.filter(c=>!c.path.length&&!c.driver&&(c.state==='yard'||(c.state==='forsale'&&!c.agent)));}
-const nearThief=(from)=>{const t=thief.p,dx=from.x-t.x,dy=from.y-t.y,d=Math.hypot(dx,dy)||1;return{x:t.x+dx/d*10,y:t.y+dy/d*10};};
-function spawnThief(){const L=theftTargets();if(!L.length)return false;
-  const yd=L.filter(c=>c.state==='yard'),c=yd.length&&Math.random()<.65?pick(yd):pick(L);
-  c.prevState=c.state;c.state='theft';thief.car=c;
-  thief.win=Math.random()>=Math.min(.95,SEC_CATCH[G.lv.security-1]+VB('thief')+guardBonus().cat);
-  const side=carSide(c),p=thief.p;let st;
-  if(c.prevState==='forsale'){st=[{x:Math.min(W-20,c.x+260),y:1335+DY},{x:c.x+rnd(-10,10),y:1325+DY}];}
-  else if(c.x<AV){st=[{x:YXL-190,y:c.y+rnd(-40,40)},{x:YXL-14,y:c.y+rnd(-14,14)}];}
-  else{st=[{x:PX_R+190,y:PY_B+40},{x:PX_R,y:PY_B+16},{x:YXR-6,y:c.y+rnd(-10,10)}];}
-  thief.sk='t'+Math.floor(Math.random()*6);p.x=st[0].x;p.y=st[0].y;p.vis=true;p.pose='';thief.route=[...st.slice(1),side];thief.st='sneak';thief.t=0;return true;}
-function alarmStart(){const c=thief.car;c.alarm=1;
-  autoToast('🚨 A thief is breaking into a car! Your guard is running…',3500);float(c.x,c.y-34,'🚨 THIEF!','#ff5252');
-  guards.forEach(g=>{if(!g.p.vis)return;const end=()=>nearThief(g.mode==='desk'?SOUT:g.p);
-    let via;if(g.mode==='desk'){via=[SDOOR,SOUT,{x:PX_R,y:SOUT.y}];
-      if(c.prevState==='forsale')via.push({x:PX_R,y:PY_T},{x:thief.p.x,y:PY_T});else if(c.x<AV)via.push({x:PX_R,y:PY_T},{x:AV+8,y:PY_T},{x:AV+8,y:thief.p.y});else via.push({x:PX_R,y:thief.p.y});}
-    else via=[];
-    g.via=g.mode==='desk'?via.slice(3):null;g.mode='run';g.p.pose='';g.delay=g.k?0:.6;g.route=[...via,end()];});}
-function guardHome(g){g.mode=g.k?'patrol':'back';g.p.pose='';
+const nearPt=(T,from)=>{const t=T.p,dx=from.x-t.x,dy=from.y-t.y,d=Math.hypot(dx,dy)||1;return{x:t.x+dx/d*10,y:t.y+dy/d*10};};
+function guardHome(g){g.mode=g.k?'patrol':'back';g.p.pose='';g.tg=null;
   if(g.k){let bi=0,bd=1e9;PATROL.forEach((q,i)=>{const d=dist(q,g.p);if(d<bd){bd=d;bi=i;}});g.pi=bi;g.route=[PATROL[bi]];}
-  else g.route=[...(g.via||[]).slice().reverse(),{x:PX_R,y:SOUT.y},SOUT,SDOOR,CHAIR];}
+  else g.route=[{x:PX_R,y:SOUT.y},SOUT,SDOOR,CHAIR];}
 function mkCop(x,y,path,v,mode){const c={id:9000+Math.floor(Math.random()*999),type:POLICE_T,x,y,a:0,col:POLICE_T.col,siren:true,tune:{},jobs:[],dmg:[],dirt:0,lift:0,state:'police',path,v,mode,t:0,acc:'#fff',wrapCol:'#111'};police.push(c);return c;}
-function catchThief(){const T=thief,c=T.car;T.st='caught';T.ct=time;T.p.pose='';c.state=c.prevState;c.alarm=0;
-  const lv=G.lv.security,rw=Math.max(20,Math.round(c.value*SEC_REWARD[lv-1]*(1+guardBonus().rew)));G.money+=rw;incAdd('security',rw);G.sec.caught++;G.h.ct++;qAdd('thief',1);
-  float(T.p.x,T.p.y-26,'👮 THIEF CAUGHT! +'+fmt(rw),'#7CFC9A');autoToast('👮 Thief caught! Reward +'+fmt(rw)+' · '+CTI+' +1 · The police are coming',4000);
-  const road=c.slot.road,lane=offsetPath(route(carG,{x:AV,y:170},road),LN);
-  const cop=mkCop(-90,96,roundPath([{x:-90,y:96},{x:lane[0].x,y:96},...lane],18).slice(1),240,'arrest');cop.road=road;T.cop=cop;save();}
-function stealCar(){const T=thief,c=T.car;c.alarm=0;T.p.vis=false;T.st='driving';
-  const loss=Math.min(G.money,Math.round((c.price||c.value)*THEFT_LOSS*(1-guardBonus().shield)));G.money-=loss;G.sec.stolen++;
-  float(c.x,c.y-30,'🚨 CAR STOLEN! −'+fmt(loss),'#ff5252');autoToast('🚨 A car was stolen! −'+fmt(loss)+' · Police chase!',4500);
-  const s=c.slot,lane=offsetPath(route(carG,s.road,{x:AV,y:108}),LN),ex=lane[lane.length-1].x;
-  const fwd=roundPath([...lane,{x:ex,y:72},{x:W+320,y:72}],18);
-  c.stolen=true;c.state='stolen';c.price=0;c.path=[...innR(s),{x:s.entry.x,y:s.entry.y,rev:true},{x:lane[0].x,y:lane[0].y,rev:true,old:s},...fwd.slice(1)];c.slot=null;c.onArrive=()=>{c.gone=true;};save();}
 function stepCop(c,dt){if(!c.path.length)return true;const p=c.path[0],dx=p.x-c.x,dy=p.y-c.y,d=Math.hypot(dx,dy);
   if(d<.4){c.path.shift();return !c.path.length;}
   const ta=Math.atan2(dy,dx);let sp=c.v;if(angDiff(c.a,ta)>.6)sp*=.4;if(c.path.length<=2&&d<40&&c.mode!=='chase')sp*=Math.max(.3,d/40);
   c.a=lerpA(c.a,ta,Math.min(1,dt*7));const mv=Math.min(d,sp*dt);c.x+=dx/d*mv;c.y+=dy/d*mv;return false;}
+const toRoad=road=>{const lane=offsetPath(route(carG,{x:AV,y:170},road),LN);return roundPath([{x:-90,y:96},{x:lane[0].x,y:96},...lane],18).slice(1);};
+const fromRoad=(c)=>{const lane=offsetPath(route(carG,c.road,{x:AV,y:108}),LN),ex=lane[lane.length-1].x;return roundPath([{x:c.x,y:c.y},...lane,{x:ex,y:72},{x:W+320,y:72}],18).slice(1);};
+// a vehicle that drives to the road of a car, stops (onStop) and later leaves
+function mkVeh(T,col,road,onStop,siren){const c=mkCop(-90,96,toRoad(road),T===VAN_T?205:235,'drop');c.type=T;c.col=col;c.siren=!!siren;c.road=road;c.onStop=onStop;c.crew=0;return c;}
+function vehLeave(c){c.path=fromRoad(c);c.mode='leave';c.v=220;}
+// ---------- thieves ----------
+function pickSk(ty){const mw=mwGet(),q=mw.l.find(o=>o.ty===ty&&!o.c);if(q&&Math.random()<.4)return q.sk;return pick(TSK[ty]);}
+function catchCh(ty){return Math.min(.95,(SEC_CATCH[secLv()-1]+VB('thief')+guardBonus().cat)*TT[ty].mod+(RAID&&RAID.k9?.08:0));}
+function freeCar(){const L=theftTargets();if(!L.length)return null;const yd=L.filter(c=>c.state==='yard');return yd.length&&Math.random()<.65?pick(yd):pick(L);}
+function addThief(ty,from){let c=freeCar();if(!c){const u=THF.filter(T=>T.car&&T.car.state==='theft');if(!u.length)return null;c=pick(u).car;}
+  if(c.state!=='theft'){c.prevState=c.state;c.state='theft';RAID.cars.push(c);}
+  const T={ty,sk:pickSk(ty),st:'sneak',t:0,ft:0,ds:[],car:c,route:[],win:Math.random()>=catchCh(ty),p:mkPerson({vis:true,suit:'#1b1b1b',pants:'#111'}),ph:Math.random()*9};
+  const side=carSide(c),p=T.p;let st;
+  if(from){st=[{x:from.x+rnd(-8,8),y:from.y+rnd(-6,6)}];T.st='come';}
+  else if(c.prevState==='forsale')st=[{x:Math.min(W-20,c.x+260),y:1335+DY},{x:c.x+rnd(-10,10),y:1325+DY}];
+  else if(c.x<AV)st=[{x:YXL-190,y:c.y+rnd(-40,40)},{x:YXL-14,y:c.y+rnd(-14,14)}];
+  else st=[{x:PX_R+190,y:PY_B+40},{x:PX_R,y:PY_B+16},{x:YXR-6,y:c.y+rnd(-10,10)}];
+  T.o={x:st[0].x,y:st[0].y};p.x=st[0].x;p.y=st[0].y;T.route=[...st.slice(1),{x:side.x+rnd(-7,7),y:side.y+rnd(-5,5)}];
+  THF.push(T);RAID.n++;return T;}
+function gangVan(n,boss,at){const c=freeCar()||(THF[0]&&THF[0].car);if(!c||!c.slot)return;
+  mkVeh(VAN_T,'#212121',c.slot.road,v=>{if(boss)addThief('boss',v);for(let i=0;i<n;i++)addThief(RAID.proOK&&Math.random()<.3?'pro':'am',v);
+    float(v.x,v.y-30,boss?'👑 GANG BOSS!':'🚐 REINFORCEMENTS!','#ff9100');setTimeout(()=>vehLeave(v),1600);});}
+function startRaid(force){if(!theftTargets().length)return false;
+  const lv=secLv(),S=G.sec,dk=dayK();if(S.d!==dk){S.d=dk;S.bn=0;S.gn=0;}
+  const proOK=lv>=2||G.sold>=30,bossOK=lv>=3,gangOK=lv>=4,r=Math.random();
+  let kind=force||'solo';if(force);else if(gangOK&&!(S.gn>0)&&r<.07)kind='gang';else if(bossOK&&(S.bn||0)<3&&r<.2)kind='boss';else if(r<.55)kind='duo';
+  RAID={kind,t:0,n:0,caught:0,esc:0,loss:0,rw:{bk:0,ct:0,dm:0,tk:0},mw:0,cars:[],proOK,backup:0,k9:0,van:-1,alarm:0,cop:null};
+  const foot=ty=>addThief(ty||(proOK&&Math.random()<.3?'pro':'am'));
+  if(kind==='gang'){S.gn=(S.gn||0)+1;for(let i=0;i<4;i++)foot();RAID.van=5;RAID.vanBoss=1;RAID.vanN=3;}
+  else if(kind==='boss'){S.bn=(S.bn||0)+1;RAID.van=.3;RAID.vanBoss=1;RAID.vanN=2;}
+  else if(kind==='duo'){foot();foot();if(Math.random()<.25){RAID.van=6;RAID.vanN=2;}}
+  else foot();
+  if(kind==='gang')gangBanner();
+  return true;}
+function gangBanner(){const b=document.createElement('img');b.src='img/thief/gang_raid.webp';b.className='gRaidB';document.body.appendChild(b);setTimeout(()=>b.remove(),2900);}
+function secAlarm(T){if(RAID.alarm)return;RAID.alarm=1;const c=T.car;
+  float(c.x,c.y-34,RAID.n>1?'🚨 '+RAID.n+' THIEVES!':'🚨 THIEF!','#ff5252');
+  guards.forEach(g=>{if(!g.p.vis||g.mode==='run'||g.mode==='fight')return;g.tg=T;
+    let via=[];if(g.mode==='desk'||g.mode==='back'){via=[SDOOR,SOUT,{x:PX_R,y:SOUT.y}];
+      if(c.prevState==='forsale')via.push({x:PX_R,y:PY_T},{x:T.p.x,y:PY_T});else if(c.x<AV)via.push({x:PX_R,y:PY_T},{x:AV+8,y:PY_T},{x:AV+8,y:T.p.y});}
+    g.mode='run';g.p.pose='';g.delay=g.k?0:.5;g.route=via;});}
+function lossFor(T){const pct=TT[T.ty].loss*(1-secRed())*(1-guardBonus().shield);return Math.min(G.money,Math.round(G.money*pct));}
+function escape(T){const loss=lossFor(T);G.money-=loss;RAID.loss+=loss;RAID.esc++;G.sec.stolen++;
+  float(T.p.x,T.p.y-32,'💸 −'+fmt(loss),'#ff5252');
+  const c=T.car;if(c&&c.state==='theft'&&!c.stolenBy&&c.slot){c.stolenBy=T;c.alarm=0;T.p.vis=false;T.st='driving';
+    const s=c.slot,lane=offsetPath(route(carG,s.road,{x:AV,y:108}),LN),ex=lane[lane.length-1].x,fwd=roundPath([...lane,{x:ex,y:72},{x:W+320,y:72}],18);
+    c.stolen=true;c.state='stolen';c.price=0;c.path=[...innR(s),{x:s.entry.x,y:s.entry.y,rev:true},{x:lane[0].x,y:lane[0].y,rev:true,old:s},...fwd.slice(1)];c.slot=null;c.onArrive=()=>{c.gone=true;};
+    RAID.cars=RAID.cars.filter(x=>x!==c);}
+  else{T.st='flee';T.route=[T.o];}
+  save();}
+function caught(T){T.st='caught';T.ct=time;RAID.caught++;G.sec.caught++;qAdd('thief',1);
+  const D=TT[T.ty],R=RAID.rw,bk=Math.round(65*PART_U()*D.bk*(1+VB('pk')));R.bk+=bk;R.ct+=D.ct>=1?D.ct:(Math.random()<D.ct?1:0);R.dm+=D.dm;
+  float(T.p.x,T.p.y-30,'⛓ CAUGHT! +'+bk+' 🧰','#7CFC9A');
+  const mw=mwGet(),q=mw.l.find(o=>o.sk===T.sk&&o.ty===T.ty&&!o.c);
+  if(q){q.c=1;const b=MW_RW[q.ty];if(b.bk)R.bk+=Math.round(65*PART_U()*b.bk);R.ct+=b.ct||0;R.dm+=b.dm||0;RAID.mw++;float(T.p.x,T.p.y-46,'📋 MOST WANTED: '+TNAME[q.sk]+'!','#ffd54a');
+    if(mw.l.every(o=>o.c)&&!mw.all){mw.all=1;R.dm+=MW_ALL.dm;R.tk+=MW_ALL.tk;RAID.mwAll=1;}}
+  save();}
+// ---------- defenders (base guards + backup) ----------
+function pickTg(d){let best=null,bd=1e9;for(const T of THF){if(!(T.st==='sneak'||T.st==='break'||T.st==='fight'))continue;
+    if(d.kind==='dog'&&T.ty==='boss'&&T.ds.length<1)continue;
+    const cap=T.ty==='boss'?4:2;if(T.st==='fight'&&T.ds.length>=cap)continue;const s=dist(d.p,T.p)+T.ds.length*70+(T.st==='sneak'?60:0);if(s<bd){bd=s;best=T;}}
+  return best;}
+function engage(d,T){d.mode='fight';d.tg=T;if(!T.ds.includes(d))T.ds.push(d);if(T.st!=='fight'){T.st='fight';T.ft=0;}}
+function chase(d,dt,v){let T=d.tg;if(!T||!(T.st==='sneak'||T.st==='break'||T.st==='fight')||(T.st==='fight'&&T.ds.length>=(T.ty==='boss'?4:2)&&!T.ds.includes(d)))T=d.tg=pickTg(d);
+  if(!T)return false;if(goTo(d.p,nearPt(T,d.p),dt,v))engage(d,T);return true;}
+function spawnBackup(T){const lv=secLv(),c=T.car,road=(c.slot||{}).road;if(!road)return;RAID.backup=1;
+  const n=(lv>=6?2:1)+(RAID.kind==='gang'?1:0);
+  mkVeh(SECV_T,'#1b5e20',road,v=>{for(let i=0;i<n;i++){XG.push({kind:'x',sk:pick(GSK),veh:v,mode:'run',p:mkPerson({x:v.x+rnd(-8,8),y:v.y+rnd(-6,6),vis:true}),ph:Math.random()*9});v.crew++;}
+    float(v.x,v.y-30,'🚓 BACKUP!','#7CFC9A');},true);}
+function spawnK9(T){const c=T.car,road=(c.slot||{}).road;if(!road)return;RAID.k9=1;const nd=RAID.kind==='gang'?2:1;
+  mkVeh(K9V_T,'#1c1c1c',road,v=>{XG.push({kind:'h',sk:'k9g',veh:v,mode:'cmd',ht:0,p:mkPerson({x:v.x,y:v.y+8,vis:true}),ph:0});v.crew++;
+    for(let i=0;i<nd;i++){XG.push({kind:'dog',sk:'k9d',veh:v,mode:'wait',ht:-.6-i*.3,p:mkPerson({x:v.x+rnd(-10,10),y:v.y+rnd(2,10),vis:true}),ph:Math.random()*9});v.crew++;}
+    float(v.x,v.y-30,'🐕 K9 UNIT!','#ffd54a');},true);}
+function endRaid(){const R=RAID,W2=R.rw;if(!R)return;
+  if(W2.bk)pkAdd('bk',W2.bk);if(W2.ct)G.h.ct+=W2.ct;if(W2.dm)G.dm=(G.dm||0)+W2.dm;if(W2.tk)G.h.tk+=W2.tk;
+  R.cars.forEach(c=>{if(c.state==='theft'){c.state=c.prevState;c.alarm=0;}});
+  if(R.n>=3||R.kind==='boss'||R.mwAll)raidCard(R);
+  THF.length=0;RAID=null;raidNext=rnd(80,150);
+  guards.forEach(g=>{if(g.p.vis&&g.mode!=='desk'&&g.mode!=='patrol')guardHome(g);});
+  XG.forEach(d=>{if(d.mode!=='gone')d.mode='ret';});save();}
+function raidCard(R){const o=document.createElement('div');o.className='raidC';const W2=R.rw;
+  const row=(i,n,v)=>v?'<div><i>'+i+'</i><span>'+n+'</span><b>+'+nfmt(v)+'</b></div>':'';
+  o.innerHTML='<div class="rcB"><h3>'+(R.esc?'RAID OVER':'RAID STOPPED!')+'</h3><p>'+R.caught+' / '+R.n+' thieves caught'+(R.kind==='gang'?' · GANG RAID':R.kind==='boss'?' · GANG BOSS':'')+'</p>'+
+    row(PKI('bk'),'Builder Kit',W2.bk)+row(CTI,'Crew Tickets',W2.ct)+row(DMI,'Diamonds',W2.dm)+row(TKI,'Recruit Tickets',W2.tk)+
+    (R.mw?'<p class="mw">📋 Most Wanted caught: '+R.mw+(R.mwAll?' · ALL 3 – DAILY BONUS!':'')+'</p>':'')+(R.loss?'<p class="ls">💸 Stolen: −'+fmt(R.loss)+'</p>':'')+'<button>OK</button></div>';
+  o.onclick=()=>o.remove();document.body.appendChild(o);setTimeout(()=>o.remove(),6000);}
+// ---------- MOST WANTED (3 thieves a day) ----------
+function mwGet(){const S=G.sec,dk=dayK();if(S.mw&&S.mw.d===dk)return S.mw;
+  const lv=secLv(),sd=[...dk].reduce((a,ch)=>a*31+ch.charCodeAt(0)|0,7),pk=(L,k)=>L[Math.abs(sd*(k+3))%L.length];
+  const l=[{ty:'am',sk:pk(TSK.am,1),c:0},{ty:(lv>=2||G.sold>=30)?'pro':'am',sk:'',c:0},{ty:lv>=3?'boss':((lv>=2||G.sold>=30)?'pro':'am'),sk:'',c:0}];
+  l[1].sk=pk(TSK[l[1].ty].filter(s=>s!==l[0].sk),2);l[2].sk=pk(TSK[l[2].ty].filter(s=>s!==l[0].sk&&s!==l[1].sk),5);
+  return S.mw={d:dk,l,all:0};}
+function mwHtml(){const mw=mwGet(),bt=o=>{const b=MW_RW[o.ty],P=[];if(b.bk)P.push(PKI('bk')+' '+nfmt(Math.round(65*PART_U()*b.bk)));if(b.ct)P.push(CTI+' '+b.ct);if(b.dm)P.push(DMI+' '+b.dm);return P.join(' ');};
+  return '<div class="sec">📋 MOST WANTED – TODAY</div><div class="mwB">'+mw.l.map((o,i)=>'<div class="mwP p'+i+'"><div class="mwF" style="background-image:url(img/hero/sp_'+o.sk+'.webp)"></div><div class="mwN">'+TNAME[o.sk]+(o.ty==='boss'?' 👑':o.ty==='pro'?' ★':'')+'</div><div class="mwR">'+bt(o)+'</div>'+(o.c?'<div class="mwS">CAUGHT</div>':'')+'</div>').join('')+'</div>'+
+    '<div class="note">Catch all 3 today → <b>DAILY BONUS</b> '+DMI+' '+MW_ALL.dm+' · '+TKI+' '+MW_ALL.tk+(mw.all?' ✅':'')+'</div>';}
+// ---------- update ----------
 function updateSecurity(dt){
-  const lv=G.lv.security,gv=SEC_SPEED[lv-1],T=thief,g2=guards[1],gb=guardBonus();
-  if(SEC_GUARDS[TIER(lv)-1]>1&&!g2.p.vis){g2.p.vis=true;g2.p.x=SOUT.x;g2.p.y=SOUT.y;g2.mode='patrol';g2.pi=0;g2.route=[PATROL[0]];}
-  // thief
-  if(T.st==='none'){T.next-=dt;if(T.next<=0&&!spawnThief())T.next=8;}
-  else if(T.st==='sneak'){if(goRoute(T,dt,58)){T.st='break';T.t=0;alarmStart();}}
-  else if(T.st==='break'){T.t+=dt;T.p.pose='work';T.p.tool='#90a4ae';T.p.a=Math.atan2(T.car.y-T.p.y,T.car.x-T.p.x);
-    if(onScreen(T.p.x,T.p.y,20)&&Math.random()<dt*10)parts.push({x:T.p.x+Math.cos(T.p.a)*9,y:T.p.y+Math.sin(T.p.a)*9,vx:rnd(-30,30),vy:rnd(-30,30),life:.25,max:.25,r:rnd(.8,1.6),col:pick(['#ffd54a','#fff'])});
-    if(T.win&&T.t>2.8)stealCar();}
-  else if(T.st==='driving'){const c=T.car;if(c.gone||c.y<90){mkCop(-160,72,[{x:W+420,y:72}],250,'chase');float(Math.max(60,c.x-40),c.y+20,'🚔 POLICE CHASE!','#64b5f6');T.st='none';T.car=null;T.next=rnd(60,110);
-      guards.forEach(g=>{if(g.mode==='run')guardHome(g);});}}
-  else if(T.st==='toPolice'){if(goRoute(T,dt,36)){T.p.vis=false;T.st='inCar';T.cop.t=0;guards.forEach(g=>{if(g.mode==='hold')guardHome(g);});}}
-  // guards
+  const lv=secLv(),gv=SEC_SPEED[lv-1],g2=guards[1],gb=guardBonus();
+  if(SEC_GUARDS[TIER(G.lv.security)-1]>1&&!g2.p.vis){g2.p.vis=true;g2.p.x=SOUT.x;g2.p.y=SOUT.y;g2.mode='patrol';g2.pi=0;g2.route=[PATROL[0]];}
+  if(!RAID){raidNext-=dt;if(raidNext<=0&&!startRaid())raidNext=8;}
+  const R=RAID;
+  if(R){R.t+=dt;
+    if(R.van>=0&&R.t>=R.van){R.van=-1;gangVan(R.vanN||2,R.vanBoss);}
+    const live=THF.filter(T=>T.st==='sneak'||T.st==='break'||T.st==='fight'||T.st==='come');
+    if(R.alarm&&!R.backup&&R.t>3&&(R.n>=2||R.van>=0))spawnBackup(live[0]||THF[0]);
+    if(R.alarm&&!R.k9&&R.t>5&&(R.kind==='gang'||(R.kind==='boss'&&lv>=5))&&live.length)spawnK9(live[0]);
+    for(const T of THF){const D=TT[T.ty];
+      if(T.st==='come'){if(goRoute(T,dt,85)){T.st='break';T.t=0;secAlarm(T);}}
+      else if(T.st==='sneak'){if(goRoute(T,dt,58)){T.st='break';T.t=0;secAlarm(T);}}
+      else if(T.st==='break'){T.t+=dt;T.car.alarm=1;T.p.a=Math.atan2(T.car.y-T.p.y,T.car.x-T.p.x);
+        if(onScreen(T.p.x,T.p.y,20)&&Math.random()<dt*8)parts.push({x:T.p.x+Math.cos(T.p.a)*9,y:T.p.y+Math.sin(T.p.a)*9,vx:rnd(-30,30),vy:rnd(-30,30),life:.25,max:.25,r:rnd(.8,1.6),col:pick(['#ffd54a','#fff'])});
+        if(T.win&&T.t>D.brk)escape(T);
+        else if(!T.win&&R.t>90){T.st='flee';T.route=[T.o];}}           // nobody came in time: he runs away (takes nothing)
+      else if(T.st==='fight'){T.ds=T.ds.filter(d=>d.mode==='fight'&&d.tg===T);if(!T.ds.length){T.st='break';continue;}
+        T.ft+=dt*T.ds.reduce((a,d)=>a+(d.kind==='dog'?1.6:1),0);
+        if(onScreen(T.p.x,T.p.y,24)&&Math.random()<dt*14)parts.push({x:T.p.x+rnd(-12,12),y:T.p.y+rnd(-8,6),vx:rnd(-25,25),vy:rnd(-30,-5),life:.45,max:.45,r:rnd(2,4),col:'rgba(225,215,195,.9)'});
+        if(T.ft>=D.fight){const ds=T.ds;T.ds=[];
+          if(T.win){ds.forEach(d=>{d.mode='stun';d.ht=0;d.tg=null;});T.st='break';T.t=D.brk-.3;float(T.p.x,T.p.y-30,'💥 BROKE FREE!','#ff9100');}
+          else{ds.forEach(d=>{d.mode='hold';d.ht=0;d.tg=T;});caught(T);}}}
+      else if(T.st==='flee'){if(goRoute(T,dt,95)){T.st='gone';T.p.vis=false;}}
+      else if(T.st==='driving'){const c=T.car;if(c.gone||c.y<90){mkCop(-160,72,[{x:W+420,y:72}],250,'chase');float(Math.max(60,c.x-40),c.y+20,'🚔 POLICE CHASE!','#64b5f6');T.st='gone';}}
+      else if(T.st==='toPolice'){if(goRoute(T,dt,36)){T.p.vis=false;T.st='inCar';}}}
+    // everybody caught or gone → the police come for the caught ones, then the raid ends
+    if(!live.length&&R.van<0&&THF.length&&!police.some(c=>c.mode==='drop'&&!c.crew&&c.type===VAN_T)){
+      const cg=THF.filter(T=>T.st==='caught');
+      if(!cg.length){if(THF.every(T=>T.st==='gone'||T.st==='inCar'))endRaid();}
+      else if(!R.cop){const c=cg[0].car,road=c&&c.slot&&c.slot.road;
+        if(road){const lane=offsetPath(route(carG,{x:AV,y:170},road),LN);R.cop=mkCop(-90,96,roundPath([{x:-90,y:96},{x:lane[0].x,y:96},...lane],18).slice(1),240,'arrest');R.cop.road=road;}
+        else{cg.forEach(T=>{T.st='gone';T.p.vis=false;});}}}}
+  // base guards
   for(const g of guards){if(!g.p.vis)continue;const p=g.p;
-    if(g.mode==='desk'){p.pose=''; // v16-31: no chair any more – the guard walks around the office (desk ↔ monitors ↔ door side)
+    if(g.mode==='desk'){p.pose='';
+      g.dt-=dt;if(g.dt<=0&&!RAID){g.dt=rnd(10,18);g.mode='lap';g.lap=PATROL.length+1;g.pi=PATROL.length-1;g.route=[SDOOR,SOUT,{x:PX_R,y:SOUT.y},PATROL[g.pi]];continue;} // v16-254: the desk guard goes out on patrol too
       if(g.route.length){goRoute(g,dt,20);}else{p.moving=false;g.wt=(g.wt==null?rnd(2,5):g.wt)-dt;
         if(g.wt<=0){g.wt=rnd(3,7);const fy=CHAIR.y+(SDOOR.y-CHAIR.y)*.3,o=OFFW();g.route=[pick([{x:CHAIR.x-o,y:fy},{x:CHAIR.x+o,y:fy},{x:CHAIR.x,y:CHAIR.y},{x:CHAIR.x-o*.5,y:CHAIR.y+2},{x:CHAIR.x+o*.5,y:CHAIR.y+2}])];}}}
-    else if(g.mode==='patrol'){if(goRoute(g,dt,30)){g.pi=(g.pi+1)%PATROL.length;g.route=[PATROL[g.pi]];}}
+    else if(g.mode==='lap'){if(goRoute(g,dt,32)){if(--g.lap<=0)guardHome(g);else{g.pi=(g.pi+PATROL.length-1)%PATROL.length;g.route=[PATROL[g.pi]];}}}
+    else if(g.mode==='patrol'){if(goRoute(g,dt,32)){g.pi=(g.pi+1)%PATROL.length;g.route=[PATROL[g.pi]];}}
     else if(g.mode==='run'){if(g.delay>0){g.delay-=dt;p.a=lerpA(p.a,Math.PI/2,Math.min(1,dt*6));continue;}
-      if(T.st==='break'&&g.route.length)g.route[g.route.length-1]=nearThief(g.route.length>1?g.route[g.route.length-2]:p);
-      if(goRoute(g,dt,gv*(1+gb.spd[g.k]))){if(T.st==='break'&&!T.win){catchThief();g.mode='hold';}else if(T.st==='caught'||T.st==='toPolice'){g.mode='hold';g.ht=0;}else guardHome(g);if(g.mode==='hold')g.ht=0;}}
-    else if(g.mode==='hold'){p.moving=false;g.ht=(g.ht||0)+dt;p.a=Math.atan2(T.p.y-p.y,T.p.x-p.x);}
+      const v=gv*(1+gb.spd[g.k])*1.1;
+      if(g.route.length){goRoute(g,dt,v);continue;}
+      if(!chase(g,dt,v))guardHome(g);}
+    else if(g.mode==='fight'){p.moving=false;if(g.tg)p.a=Math.atan2(g.tg.p.y-p.y,g.tg.p.x-p.x);}
+    else if(g.mode==='hold'||g.mode==='stun'){p.moving=false;g.ht=(g.ht||0)+dt;if(g.ht>(g.mode==='hold'?2.4:1.6)){g.mode='run';g.route=[];g.tg=null;if(!pickTg(g))guardHome(g);}}
     else if(g.mode==='back'){if(goRoute(g,dt,40)){g.mode='desk';}}}
-  // police cars
+  // backup guards, K9 handler, dogs
+  for(const d of XG){const p=d.p;if(d.mode==='gone')continue;
+    const v=d.kind==='dog'?gv*1.55:gv*1.05;
+    if(d.mode==='cmd'){d.ht+=dt;p.moving=false;if(d.ht>1.2){d.mode='run';}continue;}
+    if(d.mode==='wait'){d.ht+=dt;if(d.ht>0){d.mode='run';}continue;}
+    if(d.mode==='run'){if(!chase(d,dt,v)){if(RAID&&(RAID.van>=0||THF.some(T=>T.st==='come')))p.moving=false;else d.mode='ret';}}
+    else if(d.mode==='fight'){p.moving=false;if(d.tg)p.a=Math.atan2(d.tg.p.y-p.y,d.tg.p.x-p.x);}
+    else if(d.mode==='hold'||d.mode==='stun'){p.moving=false;d.ht=(d.ht||0)+dt;if(d.ht>(d.mode==='hold'?2.2:1.5)){d.mode='run';d.tg=null;}}
+    else if(d.mode==='ret'){if(RAID&&secOn()){d.mode='run';continue;}if(goTo(p,d.veh,dt,v*.8)){d.mode='gone';p.vis=false;d.veh.crew--;}}}
+  for(let i=XG.length-1;i>=0;i--)if(XG[i].mode==='gone')XG.splice(i,1);
+  // vehicles
   for(let i=police.length-1;i>=0;i--){const c=police[i],done=stepCop(c,dt);
-    if(c.mode==='arrest'&&done){c.mode='wait';T.st='toPolice';const sd=carSide(c);T.route=[sd];}
-    else if(c.mode==='wait'){if(T.st==='inCar'){c.t+=dt;if(c.t>1.1){const lane=offsetPath(route(carG,c.road,{x:AV,y:108}),LN),ex=lane[lane.length-1].x;
-        c.path=roundPath([{x:c.x,y:c.y},...lane,{x:ex,y:72},{x:W+320,y:72}],18).slice(1);c.mode='leave';c.v=220;T.st='none';T.car=null;T.cop=null;T.next=rnd(60,110);}}}
+    if(c.mode==='drop'&&done){c.mode='park';c.t=0;c.siren=c.type!==VAN_T;try{c.onStop(c);}catch(e){}}
+    else if(c.mode==='park'){c.t+=dt;if(c.type!==VAN_T&&c.crew<=0&&c.t>2&&!(RAID&&secOn()))vehLeave(c);}
+    else if(c.mode==='arrest'&&done){c.mode='wait';c.t=0;const sd=carSide(c);THF.forEach(T=>{if(T.st==='caught'){T.st='toPolice';T.route=[{x:sd.x+rnd(-4,4),y:sd.y+rnd(-4,4)}];}});}
+    else if(c.mode==='wait'){if(!THF.some(T=>T.st==='toPolice'||T.st==='caught'||T.st==='driving'||T.st==='come')){c.t+=dt;if(c.t>1.1){vehLeave(c);if(RAID&&RAID.cop===c)endRaid();}}}
     else if((c.mode==='leave'||c.mode==='chase')&&done)police.splice(i,1);}
-  if(T.car&&T.st==='caught'&&T.car.alarm)T.car.alarm=0;
 }
+
 const clerk=mkPerson({x:PB.x+98,y:PB.y+60,a:Math.PI/2,suit:'#ef6c00',pose:'desk'});
 // v14: Parts Office LV2-LV4 = my new pictures (LV1 keeps the empty old picture)
 function partsLayout(){const t=PLV('parts'),m=PARTART[t];if(t>=2&&m){PB.w=m.w>m.h*1.08?220:196;PB.h=PB.w*m.h/m.w;}else{PB.w=196;PB.h=197;}PB.y=293-PB.h;PB.x=905;clerk.x=PB.x+PB.w*.5;clerk.y=PB.y+PB.h*(t>=2?.33:.3);}
@@ -1972,6 +2114,7 @@ function drawCarRaw(c){
   const lv=T.liv;
   if(lv==='police'){X.fillStyle='#111';X.fillRect(hx-1,-hw-2,hl-hx+3,T.W+4);X.fillRect(-hl-1,-hw-2,L*.2,T.W+4);X.fillStyle='#1e3a8a';X.fillRect(-hl*.55,-hw-1,L*.62,2.2);X.fillRect(-hl*.55,hw-1.2,L*.62,2.2);}
   if(lv==='police2'){X.fillStyle='#f5f5f5';X.fillRect(-hl,-hw-1,L,2.6);X.fillRect(-hl,hw-1.6,L,2.6);X.fillStyle='#1565c0';X.fillRect(-hl,-hw+1.4,L,1.2);X.fillRect(-hl,hw-2.6,L,1.2);}
+  if(lv==='sec'||lv==='k9'){X.fillStyle='#ffc400';X.fillRect(-hl,-hw-1,L,2.4);X.fillRect(-hl,hw-1.4,L,2.4);X.fillStyle='#111';X.fillRect(-hl*.2,-hw-1,L*.12,2.4);X.fillRect(-hl*.2,hw-1.4,L*.12,2.4);}
   if(lv==='amb'){X.fillStyle='#d32f2f';X.fillRect(-hl,-hw-1,L,3);X.fillRect(-hl,hw-2,L,3);X.fillStyle='#ffb300';for(let k=0;k<4;k++){X.fillRect(-hl,-hw+3+k*5,3,2.4);}X.fillStyle='#1565c0';X.fillRect(-hl*.3,-hw-1,L*.25,1.4);X.fillRect(-hl*.3,hw-.4,L*.25,1.4);}
   if(lv==='fire'){X.fillStyle='#fafafa';X.fillRect(-hl,-hw-1,L,2.4);X.fillRect(-hl,hw-1.4,L,2.4);X.fillStyle='#ffd600';X.fillRect(-hl,-hw+1.4,L,.9);X.fillRect(-hl,hw-2.3,L,.9);}
   if(lv==='taxi'&&DET){for(const s of[-1,1])for(let k=0;k<10;k++){X.fillStyle=k%2?'#111':'#fff';X.fillRect(-hl*.5+k*L*.065,s<0?-hw-.5:hw-1.5,L*.065,2);}}
@@ -2005,7 +2148,7 @@ function drawCarRaw(c){
   // emergency roof equipment
   if(T.liv&&T.liv!=='taxi'){const lx=T.b==='van'?xc-4:xc-3.5,on=c.siren?((time*7+(c.id||0))|0)%2:-1;
     X.fillStyle='#202020';rr(lx-2.3,-rw+.4,4.6,rw*2-.8,1.2);X.fill();
-    const A=T.liv==='fire'?['#ff1744','#ff1744']:T.liv==='amb'?['#ff1744','#e3f2fd']:['#ff1744','#2979ff'];
+    const A=T.liv==='sec'||T.liv==='k9'?['#ffab00','#ffd740']:T.liv==='fire'?['#ff1744','#ff1744']:T.liv==='amb'?['#ff1744','#e3f2fd']:['#ff1744','#2979ff'];
     X.fillStyle=on===0?A[0]:shade(A[0],-.45);X.fillRect(lx-1.8,-rw+.9,3.6,rw-1.2);X.fillStyle=on===1?A[1]:shade(A[1],-.45);X.fillRect(lx-1.8,.3,3.6,rw-1.2);
     if(on>=0){X.fillStyle=(on?A[1]:A[0])+'55';ell(lx,on?rw*.5:-rw*.5,9,7);}
     if(T.liv==='amb'){const cx2=(xb+xc)/2-4;X.fillStyle='#d32f2f';X.fillRect(cx2-5,-1.4,10,2.8);X.fillRect(cx2-1.4,-5,2.8,10);
@@ -2201,7 +2344,8 @@ function drawGuard(g){const p=g.p;p.miniOK=false;
   if(window.CAMPAIGN&&CAMPAIGN.mini){const h=heroIn('g|'+g.k)||{id:'g0_0'};if(h){
     if(p.ph==null)p.ph=Math.random()*12;
     let an=0,t=time;const run=g.mode==='run'&&g.delay<=0&&p.moving,walk=!run&&p.moving;
-    if(g.mode==='hold'){const q=g.ht||0;if(q<2){an=3;t=q/3;}else if(q<3.2){an=5;t=q-2;}}
+    if(g.mode==='hold'){const q=g.ht||0;if(q<1.4){an=3;t=.7+q/3;}else{an=5;t=q-1.4;}}
+    else if(g.mode==='fight')an=3;else if(g.mode==='stun')an=0;
     else if(run)an=2;else if(walk)an=1;
     else{const q=(time+p.ph)%12;if(q<1.6){an=4;t=q;}}
     const face=p.moving||g.mode==='hold'?(Math.cos(p.a)>=0?1:-1):(p.face||1);if(p.moving||g.mode==='hold')p.face=face;
@@ -2490,9 +2634,9 @@ function drawSecurity(){
   if(PASS==='static')return;
   if((time*1.5|0)%2){const [rx,ry]=P(...S.rec);X.fillStyle='#222c35';circ(rx,ry,(S.cover?19:14)/k);}
   for(const m of S.mon){const [a,b]=P(m[0],m[1]),[c,d]=P(m[2],m[3]);X.fillStyle='rgba(140,255,210,.12)';X.fillRect(a,b+((time*9)%(d-b-2)),c-a,2);}
-  const alarm=thief.st==='sneak'||thief.st==='break',[lx,ly]=P(...S.beacon);
+  const alarm=secOn(),brk=THF.some(T=>T.st==='break'||T.st==='fight'),[lx,ly]=P(...S.beacon);
   if(alarm){const on=(time*5|0)%2;X.fillStyle=on?'rgba(255,30,30,.55)':'rgba(255,30,30,.15)';circ(lx,ly,on?11:6);
-    if(on&&thief.st==='break'){for(const m of S.mon){const [a,b]=P(m[0],m[1]),[c,d]=P(m[2],m[3]);X.fillStyle='rgba(255,40,40,.22)';X.fillRect(a,b,c-a,d-b);}}}
+    if(on&&brk){for(const m of S.mon){const [a,b]=P(m[0],m[1]),[c,d]=P(m[2],m[3]);X.fillStyle='rgba(255,40,40,.22)';X.fillRect(a,b,c-a,d-b);}}}
   else if((time*1.2|0)%3===0){X.fillStyle='rgba(255,40,40,.3)';circ(lx,ly,4);}
 }
 function drawCams(){const n=SEC_XCAMS[PLV('security')-1];for(let i=0;i<n;i++){const c=XCAMS[i];if(!onScreen(c.x,c.y,140))continue;const a=c.a+Math.sin(time*.5+i*1.7)*.55;
@@ -2504,17 +2648,34 @@ function drawAlarm(c){if(!onScreen(c.x,c.y,50))return;const on=(time*6|0)%2,L=c.
   X.strokeStyle='rgba(255,40,40,'+(.6-((time*1.6)%1)*.6)+')';X.lineWidth=2.5;X.beginPath();X.arc(c.x,c.y,18+((time*1.6)%1)*26,0,7);X.stroke();}
 // v16-35: 6 thieves from Marius' sheets (t0..t5, one picked at random each time). Rows: 0 idle · 1 sneak · 2 run · 3 break-in · 4 caught (surprise, hands up, cuffed) · 5 walk away cuffed
 function drawThief(T){const p=T.p;if(!(window.CAMPAIGN&&CAMPAIGN.mini))return false;
-  let an=0,t=time;const fr=f=>(f+.1)/5; // row 4 plays at 5 fps in mini()
-  if(T.st==='sneak')an=p.moving?1:0;else if(T.st==='break')an=3;
+  let an=0,t=time+T.ph;const fr=f=>(f+.1)/5,D=TT[T.ty]; // row 4 plays at 5 fps in mini()
+  if(T.st==='sneak')an=p.moving?1:0;else if(T.st==='come'||T.st==='flee')an=2;else if(T.st==='break'||T.st==='fight')an=3;
   else if(T.st==='caught'){an=4;const q=time-(T.ct||time);t=fr(q<.7?0:q<1.6?1:q<2.2?2:3);}
   else if(T.st==='toPolice')an=5;
   const face=Math.cos(p.a)>=0?1:-1;
+  if(T.ty==='boss'){X.fillStyle='rgba(255,23,68,'+(.25+.15*Math.sin(time*6))+')';ell(p.x,p.y+6,13,4.5);}
   X.fillStyle='rgba(0,0,0,.28)';ell(p.x,p.y+6,7,2.6);
-  return CAMPAIGN.mini(X,T.sk||'t0',an,t,p.x,p.y+6,24,face,0);}
+  return CAMPAIGN.mini(X,T.sk||'t0',an,t,p.x,p.y+6,D.h,face,0);}
+function drawXG(d){const p=d.p;if(!(window.CAMPAIGN&&CAMPAIGN.mini))return;let an=0,t=time+d.ph;const dog=d.kind==='dog';
+  if(d.mode==='fight')an=dog?4:3;else if(d.mode==='hold')an=5;else if(d.mode==='cmd')an=d.ht<.7?4:3;else if(d.mode==='wait'||d.mode==='stun')an=dog?3:0;
+  else if(p.moving)an=d.mode==='ret'?1:2;
+  if(dog&&d.mode==='fight')t=time*.6+d.ph; 
+  const face=Math.cos(p.a)>=0?1:-1;X.fillStyle='rgba(0,0,0,.28)';ell(p.x,p.y+6,dog?8:7,2.6);
+  CAMPAIGN.mini(X,d.sk,an,t,p.x,p.y+6,dog?17:24,face,0);}
+function fightFx(x,y){const k=time*7;for(let i=0;i<3;i++){const a=k+i*2.1;X.font='9px system-ui';X.textAlign='center';X.fillStyle='#ffeb3b';X.fillText('★',x+Math.cos(a)*12,y-26+Math.sin(a)*4);}
+  if(((time*5)|0)%2){X.font='12px system-ui';X.fillText('💥',x+Math.sin(time*23)*3,y-30);}}
+function hpBarT(T){const D=TT[T.ty],v=Math.max(0,1-T.ft/D.fight),x=T.p.x,y=T.p.y-D.h-8;X.fillStyle='rgba(0,0,0,.65)';rr(x-16,y,32,5,2);X.fill();X.fillStyle='#ff1744';rr(x-15.5,y+.5,31*v,4,2);X.fill();}
 function drawSecPeople(){
-  for(const g of guards)if(g.p.vis&&onScreen(g.p.x,g.p.y,20)){drawGuard(g);if(DET&&g.mode==='run')tag(g.p.x,g.p.y-15,'👮','#1565c0');}
-  const T=thief;if(T.p.vis&&onScreen(T.p.x,T.p.y,24)){const ok=drawThief(T),ty=T.p.y-(ok?30:15);
-    if(T.st==='caught'||T.st==='toPolice')tag(T.p.x,ty,'⛓ CAUGHT','#2e7d32');else if(DET)tag(T.p.x,ty,'🦹 THIEF','#c62828');}
+  for(const g of guards)if(g.p.vis&&onScreen(g.p.x,g.p.y,20)){drawGuard(g);if(g.mode==='run'&&g.delay<=0){X.font='10px system-ui';X.textAlign='center';X.fillText('😠',g.p.x+6,g.p.y-25);}}
+  for(const d of XG)if(d.p.vis&&onScreen(d.p.x,d.p.y,24)){drawXG(d);if(d.mode==='run'&&d.p.moving&&d.kind!=='dog'){X.font='10px system-ui';X.textAlign='center';X.fillText('😠',d.p.x+6,d.p.y-25);}
+    if(d.mode==='stun')fightFx(d.p.x,d.p.y+8);}
+  for(const T of THF){if(!T.p.vis||!onScreen(T.p.x,T.p.y,30))continue;const ok=drawThief(T),D=TT[T.ty],ty=T.p.y-(ok?D.h+6:15);
+    if(T.st==='fight')fightFx(T.p.x,T.p.y);
+    if(T.ty==='boss'&&(T.st==='fight'||T.st==='break'))hpBarT(T);
+    if(T.st==='caught'||T.st==='toPolice')tag(T.p.x,ty,'⛓ CAUGHT','#2e7d32');
+    else if(T.ty==='boss')tag(T.p.x,ty-6,'👑 GANG BOSS','#b71c1c');
+    else if(T.ty==='pro')tag(T.p.x,ty,'★ PRO','#6a1b9a');
+    else if(DET)tag(T.p.x,ty,'🦹 THIEF','#c62828');}
 }
 function drawArm(px,py,L,v){const len=Math.max(2,L*Math.cos(v*Math.PI/2*.94)),hh=L*21/176;
   X.fillStyle='rgba(0,0,0,'+(.22+v*.12)+')';X.fillRect(px-len+1,py-hh*.35+2+v*7,len,hh*.7);
@@ -3079,7 +3240,7 @@ function render(){
   for(const c of cars)if(onScreen(c.x,c.y,40))drawCar(c);
   for(const c of police)if(onScreen(c.x,c.y,40))drawCar(c);
   drawDistrictDyn();drawRailDyn();
-  if(thief.car&&thief.car.alarm)drawAlarm(thief.car);
+  for(const T of THF)if(T.car&&T.car.alarm&&T.car.state==='theft'&&(T.st==='break'||T.st==='fight'))drawAlarm(T.car);
   drawTruck();drawCams();
   for(const a of anims){const t=a.t/a.d;crate(a.x0+(a.x1-a.x0)*t,a.y0+(a.y1-a.y0)*t-Math.sin(t*Math.PI)*10);}
   STIDS.forEach(id=>bays[id].forEach(b=>{if(b.mech&&onScreen(b.mech.x,b.mech.y,24))drawMech(b.mech);}));
@@ -3170,8 +3331,8 @@ const INFO={
   parts:{title:'Parts Office & Helipad',desc:'Inspection orders the parts a car needs. The helicopter flies them in urgently, and your parts driver takes the work pickup and trailer down the private road to collect them.',rows:[['Pickup speed',l=>l?PARTS_TRUCK[l-1]:'—'],['Crates per trip',l=>l?PARTS_CAP[l-1]:'—'],['Helicopter speed',l=>l?HELI_V[l-1]:'—']]},
   export:{title:'Export Parking',desc:'Finished cars wait here until the Sales Office sells them online.',rows:[['Spots',()=>8]]},
   yard:{title:'Transport Yard',desc:'Sold cars wait behind the barriers until the transporter loads them. A guard watches the CCTV from the security office.',rows:[['Parking spots',()=>YARD_ROWS*2],['Guards',()=>SEC_GUARDS[PLV('security')-1]]]},
-  security:{title:'🛡️ Security',desc:'Your guard watches the CCTV. Sometimes a thief tries to steal a car from the Transport Yard or Export Parking. If the guard catches him, the police take him away and you get a reward. If he escapes, you lose money and the police chase him.',
-    rows:[['Guards',l=>SEC_GUARDS[TIER(l)-1]+(l>=3?' (1 patrols)':'')],['Catch chance',l=>Math.round(Math.min(.95,SEC_CATCH[l-1]+VB('thief')+guardBonus().cat)*100)+'%'],['Guard run speed',l=>SEC_SPEED[l-1]],['Reward per thief',l=>Math.round(SEC_REWARD[l-1]*100)+'% of car'],['Extra CCTV cameras',l=>SEC_XCAMS[TIER(l)-1]]]},
+  security:{title:'🛡️ Security',desc:'Thieves come for the cars in the Transport Yard and Export Parking – alone, in pairs, with a PRO, a GANG BOSS with his van… and sometimes the whole GANG. Your guards patrol and fight them; BACKUP guards and the K9 dog unit come to help. Caught thieves give Builder Kit, Crew Tickets and diamonds. A thief who escapes steals part of your cash – a higher Security level steals less.',
+    rows:[['Guards',l=>SEC_GUARDS[TIER(l)-1]+(l>=3?' (1 patrols)':'')],['Catch chance',l=>Math.round(Math.min(.95,SEC_CATCH[l-1]+VB('thief')+guardBonus().cat)*100)+'%'],['Guard run speed',l=>SEC_SPEED[l-1]],['Backup guards',l=>(l>=6?2:1)+' (security car)'],['K9 dog unit',l=>l>=5?'Boss + Gang raids':'Gang raids'],['Less cash stolen',l=>'−'+Math.round((Math.min(10,l)-1)*4.5)+'%'],['Extra CCTV cameras',l=>SEC_XCAMS[TIER(l)-1]]]},
   collection:{title:'🏆 Collection Garage',desc:'COMING SOON. A premium showroom for classic and vintage cars. Because these cars are priceless it has its own fence, CCTV cameras, a guard house, a barrier and a laser gate.',rows:[]},
   wash:{title:'🫧 Car Wash',desc:'Drivers come from the street for a wash and pay you. Your sold cars also get a free shine before delivery, so they sell for more. LV 1-4 make the car wash bigger, LV 5-10 bring more money.',
     rows:[['Customer every',l=>l?WASH_EVERY[l-1]+'s':'—'],['Pay per wash',l=>l?fmt(washPay(l)):'—'],['Shine bonus on sold cars',l=>l?'+'+Math.round(WASH_SALE[l-1]*100)+'%':'—']]},
@@ -3308,7 +3469,7 @@ function renderPanel(){
   if(window.STREET&&['wash','gas','factory','rail'].includes(sel)&&!locked)h+=STREET.row(sel);
   if(ST[sel]&&sel!=='inspect'){h+='<div class="sec">JOBS</div>'+JOBS.filter(j=>j.st===sel).map(j=>{const ok=G.rep>=j.rep&&(!j.parts||G.lv.parts>0);
     return '<div class="job'+(ok?'':' off')+'"><span class="ic">'+(ok?'✓':'🔒')+'</span><span>'+j.n+(j.parts?' 📦':'')+'</span><span class="st">'+fmt(j.pay)+' · '+j.t+'s'+(ok?'':'<br>'+(G.rep<j.rep?'Rep '+j.rep:'needs Parts Office'))+'</span></div>';}).join('');}
-  if(sel==='security')h+='<div class="sec">RECORD</div><div class="row"><span>👮 Thieves caught</span><b>'+G.sec.caught+'</b></div><div class="row"><span>🚨 Cars stolen</span><b>'+G.sec.stolen+'</b></div>';
+  if(sel==='security')h+=mwHtml()+'<div class="sec">RECORD</div><div class="row"><span>👮 Thieves caught</span><b>'+G.sec.caught+'</b></div><div class="row"><span>🚨 Cars stolen</span><b>'+G.sec.stolen+'</b></div>';
   if(VB('disc')>0&&!nu&&lt<MAXT)h+='<div class="note">👑 VIP upgrade discount '+pctT(VB('disc'),1)+' included.</div>';
   if(SOON_IDS.includes(sel))h+='<div class="lock">🚧 Coming soon – nothing to do here yet.</div>';
   if(locked)h+='<div class="lock">🔒 Unlocks at Reputation '+need+'. Sell more cars to grow your reputation.</div>';
@@ -4240,6 +4401,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:121,d:'Nov 23, 2026',ic:'🚨',t:'THIEVES 2.0 – gangs, bosses & K9 dogs',l:['Thieves now come <b>in groups</b>: amateurs, fast <b>★ PROs</b> and the <b>👑 GANG BOSS</b> with his van full of helpers. Sometimes the <b>whole GANG</b> attacks at once – a <b>GANG RAID</b>!','Your guards <b>patrol</b> all the time and fight like crazy. With 2+ thieves a <b>security car brings BACKUP</b> guards, and in big raids the <b>K9 van</b> drops a dog handler with his dogs.','Caught thieves give <b>Builder Kit</b>, <b>Crew Tickets</b> and <b>diamonds</b>. A thief who escapes steals <b>5–20% of your cash</b> – higher Security = less.','New <b>MOST WANTED</b> board in SECURITY: 3 wanted thieves every day, each with a bounty – catch all 3 for a daily bonus.']},
  {id:120,d:'Nov 23, 2026',ic:'🛡️',t:'Skills look like the hero\'s own art',l:['Hero skills now show only the hero\'s <b>own effect pictures</b> – the extra drawn circles, flashes and rings are gone (Epic, Legendary and Mythic heroes).','<b>Goliath – IRON FORTRESS</b>: every hero he protects now carries a small copy of <b>his golden shield</b> while the shield lasts. Ignis brings fallen heroes back with <b>his phoenix</b>.']},
  {id:119,d:'Nov 23, 2026',ic:'⚔️',t:'Heroes don\'t stand still anymore',l:['After a boss pushes them back, heroes sometimes stood still and did not attack. Now a hero who can\'t reach his place attacks from where he is (if the enemy is close) or picks a new place right away.']},
  {id:118,d:'Nov 23, 2026',ic:'👆',t:'Animated buttons',l:['Every button now <b>reacts to your finger</b>: it squeezes when you press, bounces back when you let go, and a small golden spark shows where you tapped.']},
@@ -4499,7 +4661,7 @@ try{migr99();migr247();heroRefresh();}catch(e){console.error(e);}
 function migr161(){if(G.m161)return;G.m161=1;let dm=0;for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o||h.cat!=='m')continue;const mx=hMaxS(h),k=h.gr===5?1000:h.gr===4?150:0;if(k&&o.s>mx){dm+=(o.s-mx)*k;o.s=mx;}}
   if(dm){G.dm=(G.dm||0)+dm;setTimeout(()=>toast('💎 +'+dm.toLocaleString()+' · extra hero stars → diamonds (new AWAKENING / Legendary +10)',4200),4000);}save();}
 try{migr161();}catch(e){console.error(e);}
-window.__TE={MC_LV,MC_CH,MC_N,MC_ASC,MC_BOX,isMM,hMax,lvMC,ascMC,lvHave,ascHave,rebirthMC,MCI,hMaxS,sLbl,mTier,isAwk,ROM,sStars,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,rebirth,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
+window.__TE={SECT:{openSec:()=>openPanel("security"),startRaid,cars:()=>cars,mkTest:()=>{[...yardSpots.slice(0,6),...expSpots.slice(0,4)].forEach(s=>{if(s.car)return;const c=newCar();c.slot=s;s.car=c;c.x=s.x;c.y=s.y;c.a=s.a;c.state=s.kind==="exp"?"forsale":"yard";c.value=500;cars.push(c);});},get RAID(){return RAID;},THF,XG,guards,police,VAN_T,setCam:(x,y,z)=>{Z=z;camX=x-VW/2/Z;camY=y-(VH-TOP)/2/Z;},set raidNext(v){raidNext=v;}},MC_LV,MC_CH,MC_N,MC_ASC,MC_BOX,isMM,hMax,lvMC,ascMC,lvHave,ascHave,rebirthMC,MCI,hMaxS,sLbl,mTier,isAwk,ROM,sStars,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,rebirth,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()))};
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};
