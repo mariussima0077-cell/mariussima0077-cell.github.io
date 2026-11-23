@@ -65,9 +65,9 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:Ga
 #hud{position:fixed;left:0;right:0;top:0;height:52px;display:flex;gap:6px;padding:8px 8px;box-sizing:border-box;justify-content:space-between;align-items:center;pointer-events:none;z-index:5;background:linear-gradient(#0d141bee,#0d141b99)}
 .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 10px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 #hud{justify-content:center;padding:3px 4px}
-#hudBar{position:relative;width:min(calc(100% - 50px),560px);aspect-ratio:2156/176;max-height:100%;background:url(img/ui2/hud.webp) center/100% 100% no-repeat;container-type:size}
+#hudBar{position:relative;width:min(calc(100% - 64px),560px);aspect-ratio:2156/176;max-height:100%;background:url(img/ui2/hud.webp) center/100% 100% no-repeat;container-type:size}
 /* v16-269 (Marius 23 nov): my avatar + frame at the left of the top bar → tap = MY PROFILE (the PROFILE tab left the online pages) */
-#hudAv{position:relative;flex:none;width:44px;height:47px;margin:0 4px 0 0;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 2px 3px #000)}#hudAv:active{transform:scale(.93)}
+#hudAv{position:relative;flex:none;width:58px;height:62px;align-self:flex-start;margin:-2px 3px -14px 0;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 2px 3px #000)}#hudAv:active{transform:scale(.93)}
 #hudAv .p{position:absolute;left:15%;right:15%;top:18%;bottom:27%;border-radius:6px;background:#111 center/cover;z-index:1}#hudAv .f{position:absolute;inset:0;background:center/100% 100% no-repeat}
 #hudBar>*{position:absolute;font-weight:900;line-height:1;white-space:nowrap;text-shadow:0 2px 0 #000,0 0 6px #000}
 #money{left:8.4%;width:12.2%;overflow:hidden;top:50%;transform:translateY(-55%);font-size:40cqh;color:#ffd54a}
@@ -3135,7 +3135,11 @@ const rSlot=(s)=>{const w=Math.floor(s/2),x0=RT.x-146-(w+1)*126;return {x:x0+(s%
 const rwWH=()=>{const I=rwI('wag'+RT.g);return I.complete&&I.naturalWidth?124*I.naturalHeight/I.naturalWidth:30;};
 function rwCar(i){while(RT.cars.length<=i){const c=newCar(false);c.col=pick(VIVID);c.dirt=0;c.dmg=[];RT.cars.push(c);}return RT.cars[i];}
 function updateRail(dt){
-  if(!(G.lv.rail>0))return;const s=RWS(),cap=rCap(),stop=rStop();s.ft=Date.now();
+  if(!(G.lv.rail>0))return;const s=RWS(),cap=rCap(),stop=rStop(),now=Date.now(),gap=(now-(s.ft||now))/1000;s.ft=now;
+  // v16-270 (Marius 23 nov: „la Rail Wars să vină mașinile pe tren și când suntem offline”): back from the background (phone locked, other app)
+  // → the cars the factory made meanwhile are put on the train at once (before: only after a full restart of the game)
+  if(gap>5&&G.lv.factory>0&&RT.st==='dock'){const fl=dcars.filter(c=>c.exp).length+RT.park.filter(Boolean).length+RT.mv.length,add=Math.floor(gap/(rwFill()/cap));
+    if(add>0&&s.n+fl<cap){s.n=Math.min(cap-fl,s.n+add);save();}}
   for(const c of RT.park)if(c&&c.fade<1)c.fade=Math.min(1,c.fade+dt*2);
   for(const c of dcars)if(c.exp)c.age=(c.age||0)+dt;   // v16-167: trip timer
   // export cars from the factory (one train ≈ 1 hour)
