@@ -3789,7 +3789,7 @@ function resHtml(f){const GTI='<img class="tki" src="img/gticket.webp">',KI='<im
   return '<div class="wP rsInfo">'+R.map(([k,ic,n,g,u])=>'<div class="rsI'+(k===f?' on':'')+'"><b>'+ic+' '+n+'</b><span><em>GET</em> '+g+'</span><span><em>USE</em> '+u+'</span></div>').join('')+'</div>';}
 function popRes(f){popW('RESOURCES',resHtml(f));setTimeout(()=>{const e=document.querySelector('.rsI.on');if(e)e.scrollIntoView({block:'center'});},60);}
 function popTickets(){popW(TKI+' TICKETS','<div class="wP"><div>'+TKI+' <b>Recruit Tickets</b> summon Mechanics. You have <b>'+G.h.tk+'</b>.</div><div>'+CTI+' <b>Crew Tickets</b> summon Drivers and Guards (mixed). You have <b>'+G.h.ct+'</b>.</div><div>Both are earned only by playing.</div><div>'+DMI+' No tickets? <b>'+DM_SUM+' Diamonds = 1 summon</b> – you have <b>'+(G.dm||0).toLocaleString()+'</b> (always asked first).</div></div><div class="wS">WHERE TO GET TICKETS</div>'+
-  (()=>{const GTI='<img class="tki" src="img/gticket.webp">';return ['📅 Daily Check-in: '+TKI+' +10 · '+CTI+' +10 · '+GTI+' +10',TKI+' Daily Quest: +1 each · gifts +1 / +2 / +2 / +3',CTI+' Daily Quest gifts: +1 / +2 / +2 / +3',CTI+' Thief caught: +1',TKI+' +5 · '+CTI+' +3 every new Reputation level',TKI+' +5 · '+CTI+' +3 every new VIP level',TKI+' +1 / 2 h · '+CTI+' +1 / 4 h in Idle Rewards',TKI+' Campaign: +1 · mini-boss +3 · boss +5',CTI+' +3 · '+DMI+' +100 for every campaign boss'];})().map(t=>'<div class="wR wTx"><span>'+t+'</span></div>').join(''));}
+  (()=>{const GTI='<img class="tki" src="img/gticket.webp">';return ['📅 Daily Check-in: '+TKI+' +10 · '+CTI+' +10 · '+GTI+' +10',TKI+' Daily Quest: +1 each · gifts +1 / +2 / +2 / +3',CTI+' Daily Quest gifts: +1 / +2 / +2 / +3',CTI+' Thief caught: +1',TKI+' +5 · '+CTI+' +3 every new Reputation level',TKI+' +5 · '+CTI+' +3 every new VIP level',TKI+' +1 / 2 h · '+CTI+' +1 / 4 h in Idle Rewards (+ more from Classic cars)',TKI+' Campaign: +1 · mini-boss +3 · boss +5',CTI+' +3 · '+DMI+' +100 for every campaign boss'];})().map(t=>'<div class="wR wTx"><span>'+t+'</span></div>').join(''));}
 function popRates(){const P=G.h.pity[smCat];const pc=r=>(Math.round(r*10000)/100)+'%'; // v16-113: 2 decimals → Mythic 0.08% (was shown as 0.1%)
   const row=(i,pct,right)=>wRow(i,'<b style="color:'+GRADES[i].c+'">'+GRADES[i].n+'</b>',pct,right);
   popW('SUMMON RATES','<div class="wS">'+CATS[smCat].n.toUpperCase()+(smCat==='c'?' · DRIVERS + GUARDS':'')+'</div>'+RATES.map((r,i)=>row(i,pc(r),heroesOf(smCat,i).length+' heroes')).join('')+
@@ -3982,7 +3982,8 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idV gold" style="'+box(560,740,270,70)+'">'+numH(fmt(I.money),'gold',1.25)+'</div>';
   h+='<div class="idV grn" style="'+box(860,740,265,70)+'">'+fmt(idleRate())+'/h</div>';
   h+='<div class="idV" style="'+box(560,836,270,70)+'">'+I.tk+'</div>';
-  h+='<div class="idV grn" style="'+box(860,836,265,70)+'">1 every '+IDLE_TK_H+'h</div>';
+  {const tkh=1/IDLE_TK_H+(ccR().tk||0);/* v16-209: real rate = base 1/2h + Classic cars (tester Wazza4ever: "written 1, I get 2") */
+  h+='<div class="idV grn" style="'+box(860,836,265,70)+'">'+(tkh>=1?(Math.round(tkh*10)/10)+'/h':'1 every '+(Math.round(10/tkh)/10)+'h')+'</div>';}
   h+='<div class="idClaim'+(I.money<1?' off':'')+'" data-i="claim" style="'+box(178,948,846,140)+'"></div>';
   const cc=(I.dm||I.gt||ccR().dm)?'<br>🏆 <b>Classic cars</b>: '+DMI+' +'+(I.dm||0)+(I.gt?' · '+GTI+' +'+I.gt:'')+' (tickets above include them)':'';
   h+='<div class="idEG" style="'+box(150,1083,900,34)+'">'+ESI+' <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' <b>+'+nfmt(I.gp)+'</b> &nbsp;·&nbsp; 🔧 Garage parts <b>+'+nfmt(I.rp)+'</b> &nbsp;·&nbsp; '+PKI('bk')+' <b>+'+nfmt(I.bk)+'</b></div>';
