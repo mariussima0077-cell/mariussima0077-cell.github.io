@@ -2149,6 +2149,15 @@ function bw(u){if(u.hero)return 26*dsc(u.d);const M=MON[u.t];return Math.min(70*
 function sepHM(){const F=FY1-FY0;for(const h of B.heroes){if(h.dead||h.act)continue;for(const m of B.mons){if(m.dead||m.act||m.b==='titan'||m.wbB)continue;
   if(Math.abs(m.d-h.d)*F>40*S)continue;const dx=m.x-h.x,min=(bw(h)+bw(m))*.9,ax=Math.abs(dx);if(ax>=min)continue;
   const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;if(m.boss)h.x-=dir*o;else{h.x-=dir*o*.5;m.x+=dir*o*.5;}}}}
+// v16-206 (tester Wazza4ever 23 nov: Class Tower, came back to the game after a while – the heroes ran on the spot towards 2 Mirror Moths and never hit them).
+// WATCHDOG: if no monster loses HP for 6 s in a fight, every unit is put back in a reachable place (bad numbers fixed, monsters inside the picture,
+// stuck skills / melee places cleared) and each hero is placed in reach of his target. Normal fights never trigger it.
+const fin=v=>typeof v==='number'&&isFinite(v);
+function unstuck(){if(B.wbB||B.sim&&!B.wdOn)return;const hs=B.mons.reduce((a,m)=>a+(m.dead?0:m.hp),0)+B.wave*1e15;if(hs!==B.wdH){B.wdH=hs;B.wdT=B.t;return;}
+  if(B.t-B.wdT<6||!alive(B.heroes).length||!alive(B.mons).length)return;B.wdT=B.t;B.wdN=(B.wdN||0)+1;
+  for(const m of B.mons){if(m.dead||m.b==='titan')continue;if(!fin(m.d))m.d=.5;if(!fin(m.x))m.x=W*.7;m.x=clamp(m.x,W*.4,W-40*S);m.d=clamp(m.d,.06,.94);m.in=1;if(m.act&&B.wdN>1)m.act=null;}
+  const ms=alive(B.mons);for(const u of B.heroes){if(u.dead)continue;if(!fin(u.d))u.d=.5;if(!fin(u.x))u.x=W*.3;u.act=null;u.lift=0;u.sP=null;u.sT=null;u.sK=null;u.st='idle';u.ap=0;
+    const tg=nearest(u,ms)||ms[0];if(!tg)continue;const rg=u.rng<80*S?bw(u)+bw(tg)+2*S:Math.min(u.rng*.8,W*.45);u.x=clamp(tg.x-rg,26*S,W-26*S);u.d=clamp(tg.d+rnd(-.08,.08),.04,.96);u.face=1;}}
 function keepIn(){for(const m of B.mons){if(m.dead||m.b==='titan')continue;const xm=W-(m.boss?64:40)*S;if(m.x<=xm)m.in=1;else if(m.in)m.x=xm;if(m.in&&!m.act)m.x=Math.max(m.x,30*S);}}
 function simRun(si,team,maxT){startBattle(si,team);B.sim=1;running=false;cancelAnimationFrame(raf);B.auto=true;let t=0;while(t<(maxT||400)&&!B.res){step(1/30);t+=1/30;}
   const r={win:B.phase==='win',t:Math.round(t),deaths:B.deaths,wave:B.wave,left:B.mons.filter(m=>!m.dead).map(m=>m.t+':'+Math.round(m.hp/m.max*100)+'%')};return r;}
@@ -2165,7 +2174,7 @@ function step(dt){B.t+=dt;B.phT+=dt;
     sep(B.heroes);sep(B.mons);sepHM();
     for(const u of B.heroes)if(!u.dead){u.x=clamp(u.x,u.act?8*S:26*S,W-(u.act?8:26)*S);}
     // v16-46: monsters can no longer be pushed out of the picture (knock-backs + crowding moved them past the right edge)
-    keepIn();
+    keepIn();unstuck();
     if(B.auto)for(const u of B.heroes)if(canCast(u)){if(u.role==='service'){const low=alive(B.heroes).some(h=>h.hp/h.max<.6)||(u.h.id==='m4_1'&&!u.rev&&B.heroes.some(h=>h.dead));if(!low&&(u.waitT=(u.waitT||0)+dt)<4)continue;u.waitT=0;}cast(u);break;}
     B.mons=B.mons.filter(m=>!(m.dead&&m.deadT>1.2));
     if(B.wbB){B.wbT-=dt;if(B.wbT<=0){B.wbT=0;B.phase='win';B.phT=0;B.wbUp=1;for(const h of B.heroes)if(!h.dead)h.st='win';}}
@@ -2178,7 +2187,8 @@ function step(dt){B.t+=dt;B.phT+=dt;
       u.face=1;u.st='walk';u.wph+=dt*11;u.stun=0;if(Math.abs(dx)>2||Math.abs(ddp)>.01)done=false;}
     B.scroll+=dt*240*S;if(B.phT>.3&&!B.spawned){B.spawned=true;spawnWave();for(const m of B.mons)if(m.b!=='titan')m.x+=W*.4;}
     for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.62+.1*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=(m.mv+240*S)*dt;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*9;}}
-    if(B.phT>1.05&&done){B.phase='fight';B.phT=0;B.spawned=false;punch(.03);}}
+    if(B.phT>4&&!done){for(const u of alive(B.heroes)){u.x=fin(u.fx)?u.fx:W*.25;u.d=fin(u.fd)?u.fd:.5;}done=true;} // v16-206: a march can never hang
+    if(B.phT>1.05&&done){B.phase='fight';B.phT=0;B.spawned=false;B.wdT=B.t;punch(.03);}}
   else if(B.phase==='win'){for(const u of B.heroes){if(!u.dead)u.st='win';u.flash=Math.max(0,u.flash-dt*6);if(u.dead)u.deadT+=dt;}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim)finish(true);}}
   else if(B.phase==='lose'){for(const m of B.mons){if(!m.dead){m.st='idle';}}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim)finish(false);}}
   for(let i=B.proj.length-1;i>=0;i--)if(projUpdate(B.proj[i],dt))B.proj.splice(i,1);
@@ -2619,7 +2629,8 @@ let hintT=0;function tapHint(card){const n=performance.now();if(n-hintT<3500)ret
   TE().toast(card?'⚡ Skill charging – tap the card when it shows TAP!':'🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill',3200);}
 let LOWRES=false;try{LOWRES=sessionStorage.getItem('te_lowres')==='1';}catch(e){}
 let LOWRES2=false;try{LOWRES2=sessionStorage.getItem('te_lowres2')==='1';}catch(e){}
-let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(running)bsize();},180);});
+let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(running&&innerWidth>50&&innerHeight>50)bsize();},180);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden||!running)return;lastT=performance.now();setTimeout(()=>{if(running&&innerWidth>50&&innerHeight>50)bsize();},300);}); // v16-206: back from the background
 
 // ---------------------------------------------------------------- results
 const ANX={id:0,n:0};
