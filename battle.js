@@ -813,10 +813,10 @@ const CPX=()=>{const G=TE().G;if(!HM)return G.cp;if(!G.cph)G.cph={best:0,stars:{
 const hardOK=()=>TE().G.cp.best>=SPC;
 // v16-161 (Marius): ENDGAME RAMP – only the TOP (campaign 1000-1500, towers 300-500) climbs so the finals stay above the strongest possible team.
 // EG = how much stronger the very last stage / floor is than before. Computed by tools/endgame.py (python3 tools/endgame.py --apply) – re-run it after new content that raises power.
-const EG={camp:3.171,hard:0.87,tw:5.958,ct:3.591}; // EG-LINE (written by tools/endgame.py)
+const EG={camp:11.328,hard:0.87,tw:24.459,ct:14.744}; // EG-LINE (written by tools/endgame.py)
 const EGK=(K,x,a,b)=>K===1||x<=a?1:Math.pow(K,Math.min(1,(x-a)/(b-a)));
 // v16-203: stages 1501-2250 (acts 11-15 got 30 stages per chapter) – a second ramp on top: NORMAL 2250 = 1.0 × max, HARD 2250 = 2.0 × max
-const EG2={camp:1.45,hard:0.92}; // EG2-LINE (written by tools/endgame.py)
+const EG2={camp:1.398,hard:0.92}; // EG2-LINE (written by tools/endgame.py)
 const MONX=1.25,DG_HARD=1.3; // v16-190 (Marius 22 nov): campaign monsters +25%, Dungeons +30%
 const stageMulN=i=>MONX*stageMul0(i)*HK(i)*EGK(EG.camp,i,999,1499)*EGK(EG2.camp,i,1499,2249);
 // v16-201 (Marius 23 nov: "hard must be hard"): HARD chapter N opens only after NORMAL N, so its first stage must not be weaker than the NORMAL boss of N.
