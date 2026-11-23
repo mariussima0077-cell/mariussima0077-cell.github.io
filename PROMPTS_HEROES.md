@@ -65,3 +65,7 @@ Referința atașată = captură cu cadrele mari din planșa veche (ChatGPT nu pr
 ## AWAKENING (22 nov 2026, v16-161) – 1 planșă WOW + 6 portrete Awakened
 1. **Planșa WOW** → `img/fx/awaken.webp` (apoi `AWK_SHEET=true` în `index.html`). ChatGPT **1536x1024**, 4×2 frame-uri de **384×512** (3:4), fond NEGRU (se pune peste joc cu „screen”, negrul dispare). În joc: lățime ~360 px pe telefon, mărită ×1,25 – efect de lumină, deci se poate să fie puțin moale.
 2. **Portret Awakened** pentru fiecare Mythic → `img/hero/awk_<id>.webp` 768×1152 (ca splash-ul) + rând în `AWK_ART` (`index.html`). ChatGPT **1024x1536**, apoi micșorat la 768×1152. Referință: splash-ul eroului (`img/hero/splash_<id>.webp`). Se vede pe pagina eroului / la WOW de la Awakened V.
+
+
+## v16-210 – EROU MYTHIC NOU = și TALENT (regula lui Marius, 23 nov 2026)
+După cele 8 planșe de animație: propune un talent unic (`TAL` în battle.js, 3 faze Lv 320/360/400) + promptul iconiței talentului (rama rotundă aurie cu centru roșu, ca planșa din PROMPTS_MCORE.md, 1024x1024 → `img/ui9/tal_<id>.webp` 256×256). Lv 300-400 cu Mythic Core și Red Mythic Box merg automat.
