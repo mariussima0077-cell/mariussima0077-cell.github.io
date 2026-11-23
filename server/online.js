@@ -197,6 +197,45 @@ async function mail(env, uid, ic, title, body, rw) { if (uid > 0) await env.DB.p
 async function patList(env, srv) { const t0 = gpT0(srv); if (!t0 || Date.now() < t0 || Date.now() > gpT1(srv) + 7 * DAY) return undefined;
   try { return (await env.DB.prepare('SELECT id, uid, name n, k, t FROM gpat WHERE srv=? AND t>=? ORDER BY id DESC LIMIT 30').bind(srv, t0).all()).results; } catch (e) { return undefined; } }
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
+// v16-224 (Marius 23 nov): BIG ANNOUNCEMENTS – the whole server learns when somebody gets a MYTHIC hero or an ASCENDED gear piece.
+// chat row with sys=2 (+ uid of the lucky player, k = JSON data for the golden banner). Every game shows the banner (op 'ann', also in sync).
+const MYTH = {m5_0:'The Torque King', m5_1:'Lady Overdrive', m5_2:'Ignis, the Iron Phoenix', m5_3:'Goliath, the Iron Bulwark', m5_4:'Nova, the Starfire Huntress', m5_5:'Vega, the Railgun Ace'};
+const GSL = {tool:'Tool', helm:'Helmet', vest:'Work Vest', glove:'Gloves', boots:'Boots', chip:'ECU Chip'}, GSI = ['tool','helm','vest','glove','boots','chip'];
+const GSET = {engine:['Iron Piston',['Piston Hammer','Piston Helm','Piston Plate','Hydraulic Fists','Piston Boots','Engine Core']], tuning:['Nitro Rush',['Nitro Impact Gun','Nitro Racing Helmet','Nitro Racing Vest','Nitro Gloves','Nitro Jet Boots','Nitro Race ECU']],
+  inspect:['Laser Scope',['Laser Scanner','Scope Helmet','Circuit Vest','Laser Gloves','Light-Strip Boots','Scan Crystal']], service:['Field Medic',['Healing Wrench','Medic Helmet','Medic Vest','Healing Gloves','Medic Boots','Heart Chip']],
+  paint:['Color Storm',['Rainbow Spray Gun','Painter Mask','Splash Vest','Dripping Gloves','Splash Boots','Palette Chip']], elec:['Thunder Coil',['Tesla Wrench','Coil Helmet','Battery Vest','Arc Gloves','Spark Boots','Thunder Cell']],
+  all:['Torque King',['Royal Scepter','Gear Crown','Royal Armor','Ruby Gauntlets','Gear-Wing Boots','Ruby Core']]};
+const BRAG_SRC = {sum:'Hero Summon', gsum:'Gear Summon', camp:'the Campaign', idle:'Idle Rewards', dg:'the Dungeons', tower:'the Class Towers', box:'a chest', wish:'the Mythic Wish'};
+const BRAG_MAX = 6;   // per player per hour (a ×10 summon is ONE announcement)
+async function brag(env, p, b) {
+  const db = env.DB, now = Date.now();
+  if (isTst(p.pid) || String(p.pid).startsWith('bot_')) return {ok:true, skip:1};
+  if (await isBanned(env, p.pid)) return {err:'banned'};
+  const pl = await db.prepare('SELECT shadow, score FROM players WHERE pid=?').bind(p.pid).first();
+  if (pl && (pl.shadow || (pl.score | 0) >= 50)) return {ok:true};   // shadow-ban: he thinks it worked, nobody sees it
+  const n = (await db.prepare('SELECT COUNT(*) n FROM chat WHERE sys=2 AND uid=? AND t>?').bind(p.uid, now - HOUR).first()).n;
+  if (n >= BRAG_MAX) return {ok:true, skip:1};
+  const src = BRAG_SRC[b.src] ? b.src : 'sum', nm = p.name;
+  let txt, k;
+  if (b.kind === 'hero') {
+    const ids = (Array.isArray(b.ids) ? b.ids : []).map(String).filter(id => MYTH[id]).slice(0, 11); if (!ids.length) return {err:'bad'};
+    const names = ids.map(id => MYTH[id]);
+    txt = ids.length === 1 ? `🔥 ${nm} got the MYTHIC hero ${names[0]} from ${BRAG_SRC[src]}! 🔥` : `🔥 ${nm} got ${ids.length} MYTHIC heroes from ${BRAG_SRC[src]}: ${names.map(x => x.split(',')[0]).join(', ')}! 🔥`;
+    k = {kind:'hero', ids, src};
+  } else if (b.kind === 'gear') {
+    const L = (Array.isArray(b.items) ? b.items : []).filter(x => x && GSL[x.s]).slice(0, 11).map(x => ({s:x.s, set:GSET[x.set] ? x.set : ''})); if (!L.length) return {err:'bad'};
+    const iname = x => x.set ? GSET[x.set][1][GSI.indexOf(x.s)] : GSL[x.s];
+    txt = L.length === 1 ? `💠 ${nm} found an ASCENDED ${iname(L[0])}${L[0].set ? ' (' + GSET[L[0].set][0] + ' set)' : ''} in ${BRAG_SRC[src]}! 💠` : `💠 ${nm} found ${L.length} ASCENDED gear pieces in ${BRAG_SRC[src]}! 💠`;
+    k = {kind:'gear', items:L, src};
+  } else return {err:'bad'};
+  k.n = nm; k.icon = p.icon; k.frame = p.frame | 0; k.cc = p.cc;
+  await db.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys,tr) VALUES(?,?,?,?,?,?,2,?)').bind(p.srv, 'w', p.uid, now, txt, 'en', JSON.stringify({k})).run();
+  return {ok:true};
+}
+async function annList(env, srv, since) {   // the last big announcements of this server (max 30 min old)
+  const rows = (await env.DB.prepare('SELECT id, uid, t, txt, tr FROM chat WHERE srv=? AND sys=2 AND hid=0 AND id>? AND t>? ORDER BY id DESC LIMIT 5').bind(srv, since | 0, Date.now() - 30 * 60e3).all()).results;
+  return rows.reverse().map(r => { let k = {}; try { k = JSON.parse(r.tr || '{}').k || {}; } catch (e) {} return {id:r.id, uid:r.uid, t:r.t, txt:r.txt, k}; });
+}
 // frames: 0 free · 1 Rep 5 · 2 VIP 3 · 3 Arena GOLD · 4 VIP 7 or Arena DIAMOND · 5 Arena LEGEND or a Cup win
 function frameOk(p, f) { const u = unlocks(p); return f === 0 || (f === 1 && (p.rep >= 5 || u.has('f1'))) || (f === 2 && p.vip >= 3) || (f === 3 && (u.has('glad') || u.has('agf'))) || (f === 4 && (p.vip >= 7 || u.has('dia'))) || (f === 5 && (u.has('leg') || u.has('cup'))) || (f === 7 && u.has('fdr')) || (f === 8 && (p.vip | 0) >= 10) || (f === 9 && u.has('raid')) || (f === 10 && u.has('tw3')) || (f === 11 && u.has('bhunt')) || (f === 12 && u.has('dgm')) || (f === 13 && u.has('call')) || (f === 14 && u.has('awk')); }   // v16-122: 8 = VIP 10 frame   // v16-122: 7 = FOUNDER (Founder Pass)
 const NEWT = ['sky','awk','bhunt','dgm','trny','raid','hard','coll','lucky','twr','gty','daily'];   // v16-174: 12 new titles (claimed by the game, like wr/boss/speed)
@@ -624,7 +663,7 @@ export async function online(op, b, env) {
     const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();
     const ar = await db.prepare('SELECT tk, tkt, season FROM arena WHERE uid=?').bind(p.uid).first();
     const atk = ar ? (ar.season !== seasonOf(now) ? ATK(p) : Math.min(ATK(p), ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ATK(p);
-    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined, pat:await patList(env, p.srv)};
+    return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined, pat:await patList(env, p.srv), ann:await annList(env, p.srv, b.annId)};
   }
   if (!p) return {err:'no_profile'};
   if (op === 'prof') {
@@ -644,6 +683,8 @@ export async function online(op, b, env) {
     const ks = Object.keys(up); if (ks.length) await db.prepare(`UPDATE prof SET ${ks.map(k => k + '=?').join(',')} WHERE uid=?`).bind(...ks.map(k => up[k]), p.uid).run();
     p = await profOf(env, b.pid); return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], vip:p.vip | 0, hv:p.hv | 0})};
   }
+  if (op === 'brag') return brag(env, p, b);
+  if (op === 'ann') return {ok:true, list:await annList(env, p.srv, b.since)};
   if (op === 'rank') {
     if (now - botSeen > 6e5) { botSeen = now; try { await botTick(env); } catch (e) { console.log('botTick', e && e.message); } }
     const by = ['best','pow','lv'].includes(b.by) ? b.by : 'best';

@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=223;
+const CV=224;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -451,8 +451,8 @@ async function sync(){
   const t=T(),c=C();if(!t||!t.G||!c||!c.arenaTeam||!PID())return;
   let team=[];try{team=c.arenaTeam();}catch(e){}
   const G=t.G,lv=Object.values(G.lv||{}).reduce((a,b)=>a+b,0)+Object.values(G.lx||{}).reduce((a,b)=>a+b,0);
-  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),pids:window.SEC&&SEC.pids?SEC.pids():undefined,icon:LS('te_icon')||undefined});
-  if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;if(r.gp0)LS('te_gp0_'+(window.CLOUD?CLOUD.srv():1),String(r.gp0));if(r.pat&&window.GPX&&GPX.pat)GPX.pat(r.pat);dots();if(open_)hdr();}
+  const r=await call('sync',{srv:window.CLOUD?CLOUD.srv():1,lang:LANG,s:{best:G.cp?G.cp.best:0,vip:vipLv(G),rep:G.rep||0,lv},team,unl:unlocksLocal(),pids:window.SEC&&SEC.pids?SEC.pids():undefined,icon:LS('te_icon')||undefined,annId});
+  if(r.ok){ME=r.me;inboxN=r.inbox;chatSrvLast=r.chatLast;arenaTk=r.arenaTk;if(r.gp0)LS('te_gp0_'+(window.CLOUD?CLOUD.srv():1),String(r.gp0));if(r.pat&&window.GPX&&GPX.pat)GPX.pat(r.pat);if(r.ann)annGot(r.ann);dots();if(open_)hdr();}
   return r;}
 let arenaTk=0;
 function dots(){const ch=chatSrvLast>chatLast;const a=$('chDot');if(a)a.classList.toggle('on',ch||inboxN>0);$('olChDot').classList.toggle('on',ch);
@@ -520,7 +520,7 @@ async function loadChat(){if(chBusy)return;chBusy=true;const r=await call('chat'
   if(near||r.list.length)box.scrollTop=1e6;
   if(chCh==='w'&&chSince>chatLast){chatLast=chSince;LS('te_chat_seen',String(chatLast));dots();}}
 function msgHtml(m){const tm=new Date(m.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  if(m.sys)return `<div class="sys"><span class="shine">${esc(m.txt)}</span></div>`;
+  if(m.sys)return `<div class="sys${m.sys===2?' s2'+(/ASCENDED/.test(m.txt)?' g':''):''}"><span class="shine">${esc(m.txt)}</span></div>`;
   const txt=autoTr&&m.tr?m.tr:m.txt;const trl=autoTr&&m.tr?`<div class="tr">🌐 translated from ${LNAME[m.lang]||m.lang} · <u data-orig="${m.id}">show original</u></div>`:'';
   if(m.me)return `<div class="m me" data-mid="${m.id}">${fav(m.icon,m.frame)}<div class="bub"><div class="h" style="justify-content:flex-end"><span class="tm">${tm}</span>${tt(m.title)} You</div><p>${esc(m.txt)}</p></div></div>`;
   return `<div class="m" data-mid="${m.id}" data-u="${m.uid}">${fav(m.icon,m.frame)}<div class="bub"><div class="h">${flag(m.cc)} ${esc(m.name)} ${vipB(m.vip)} ${tt(m.title)}<span class="tm">${tm}</span></div><p>${esc(txt)}</p>${trl}</div></div>`;}
@@ -944,6 +944,45 @@ function addButtons(){
   const sd=$('side');if(sd&&!$('arBtn')){const b=document.createElement('button');b.id='arBtn';b.innerHTML='<img src="img/ui/ic_arena.webp" alt="Arena"><i id="arDot"></i>';
     const cp=$('cpBtn');if(cp&&cp.nextSibling)sd.insertBefore(b,cp.nextSibling);else sd.appendChild(b);b.onclick=()=>openHub('olArena');}
   dots();}
+// ------------------------------------------------------------------ v16-223 BIG ANNOUNCEMENTS (Marius 23 nov): MYTHIC hero / ASCENDED gear → the whole server sees it
+// the game calls ONLINE.brag('hero',{ids,src}) / ONLINE.brag('gear',{items:[{s,set}],src}); the server checks it and writes it in the chat (sys=2);
+// every game asks for new ones ('ann', every 90 s while the game is open + in sync) and shows the golden banner on top of the screen.
+const BQ=[];let bqT=0;
+function brag(kind,d){try{if(!PID())return;BQ.push({kind,...d});clearTimeout(bqT);bqT=setTimeout(bragSend,1500);}catch(e){}}
+async function bragSend(){const L=BQ.splice(0);const H=L.filter(x=>x.kind==='hero'),Gq=L.filter(x=>x.kind==='gear');
+  const grp=(arr,key)=>{const o={};arr.forEach(x=>{(o[x.src]=o[x.src]||[]).push(...x[key]);});return o;};
+  const hg=grp(H,'ids'),gg=grp(Gq,'items');
+  for(const src in hg)await call('brag',{kind:'hero',src,ids:hg[src].slice(0,11)});
+  for(const src in gg)await call('brag',{kind:'gear',src,items:gg[src].slice(0,11)});
+  setTimeout(annPoll,800);}
+let annId=+LS('te_ann')||0,annQ=[],annBusy=0;
+function annGot(list){if(!Array.isArray(list)||!list.length)return;const first=!annId;for(const a of list){if(a.id<=annId)continue;annId=a.id;if(!first)annQ.push(a);}LS('te_ann',String(annId));annNext();}
+async function annPoll(){if(document.visibilityState!=='visible'||!PID())return;const r=await call('ann',{since:annId});if(r&&r.ok)annGot(r.list);}
+setInterval(annPoll,90e3);setTimeout(annPoll,20e3);
+function annNext(){if(annBusy||!annQ.length)return;const a=annQ.shift(),k=a.k||{};annBusy=1;
+  let el=$('annB');if(!el){el=document.createElement('div');el.id='annB';document.body.appendChild(el);el.onclick=()=>{el.classList.remove('on');};}
+  const hero=k.kind==='hero',ids=hero?(k.ids||[]):[],items=hero?[]:(k.items||[]);
+  const pics=hero?ids.slice(0,3).map(id=>`<div class="aP" style="background-image:url(${HI(id)})"></div>`).join(''):items.slice(0,3).map(x=>{let u='';try{u=C().gs.icon(x.s,6);}catch(e){}return `<div class="aP g"><img src="${u}" alt=""></div>`;}).join('');
+  const tt=hero?(ids.length>1?ids.length+' MYTHIC HEROES':'MYTHIC HERO'):(items.length>1?items.length+' ASCENDED GEAR':'ASCENDED GEAR');
+  el.className=hero?'myth':'asc';
+  el.innerHTML=`<div class="aIn"><div class="aPs">${pics}</div><div class="aTx"><small>${hero?'🔥':'💠'} ${tt} ${hero?'🔥':'💠'}</small><b>${esc(String(k.n||'A player').slice(0,16))}</b><span>${esc(String(a.txt||'').replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9!)]+$/g,'').replace(String(k.n||''),'').trim())}</span></div></div>`;
+  void el.offsetWidth;el.classList.add('on');setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{annBusy=0;annNext();},700);},6500);}
+document.head.insertAdjacentHTML('beforeend',`<style>
+#annB{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 58px);transform:translate(-50%,-160%) scale(.9);z-index:9500;width:min(94vw,400px);pointer-events:auto;transition:transform .55s cubic-bezier(.2,1.4,.4,1),opacity .4s;opacity:0}
+#annB.on{transform:translate(-50%,0) scale(1);opacity:1}
+#annB .aIn{display:flex;align-items:center;gap:9px;padding:8px 12px 8px 8px;border-radius:16px;position:relative;overflow:hidden}
+#annB.myth .aIn{background:linear-gradient(100deg,#4a0000,#b3121c 45%,#ff5a1f 75%,#5a0000);box-shadow:0 0 0 2px #ffd54a,0 0 0 4px #6b0000,0 0 26px #ff3b2fcc,0 8px 18px #000a}
+#annB.asc .aIn{background:linear-gradient(100deg,#00262e,#036b7d 45%,#14c9e0 75%,#00262e);box-shadow:0 0 0 2px #b9fbff,0 0 0 4px #00414b,0 0 26px #2ef3ffcc,0 8px 18px #000a}
+#annB .aIn:after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#fff7 50%,transparent 70%);transform:translateX(-120%);animation:annSh 1.6s .5s ease-in-out 2}
+@keyframes annSh{to{transform:translateX(120%)}}
+#annB .aPs{display:flex;flex:none}#annB .aP{width:48px;height:48px;border-radius:12px;background:#000 center/cover;margin-left:-14px;box-shadow:0 0 0 2px #ffd54a,0 3px 8px #000c;animation:annPop .6s cubic-bezier(.2,1.6,.4,1) both}
+#annB .aP:first-child{margin-left:0}#annB .aP.g{background:radial-gradient(#0d6b7a,#012a31);box-shadow:0 0 0 2px #b9fbff,0 3px 8px #000c;display:flex;align-items:center;justify-content:center}#annB .aP.g img{width:86%;height:86%;object-fit:contain}
+@keyframes annPop{from{transform:scale(.2) rotate(-20deg)}}
+#annB .aTx{min-width:0;display:flex;flex-direction:column;line-height:1.15;color:#fff;text-shadow:0 1px 2px #000}
+#annB .aTx small{font:900 10.5px Game,system-ui;letter-spacing:.06em;color:#ffe27a}#annB.asc .aTx small{color:#d9feff}
+#annB .aTx b{font:900 16px Game,system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#annB .aTx span{font:700 11px Game,system-ui;color:#fff3d6}
+#onl .sys.s2 .shine{background:linear-gradient(90deg,#b3121c,#ff5a1f);color:#fff;font-weight:900;box-shadow:0 0 0 1.5px #ffd54a}#onl .sys.s2.g .shine{background:linear-gradient(90deg,#036b7d,#14c9e0)}
+</style>`);
 addButtons();
-window.ONLINE={name:()=>ME&&ME.name,open:openHub,close:closeHub,sync,play:playFight,call,view:viewProfile};
+window.ONLINE={brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:closeHub,sync,play:playFight,call,view:viewProfile};
 })();
