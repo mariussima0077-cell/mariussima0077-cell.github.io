@@ -58,6 +58,8 @@ ROWS = ['idle', 'run', 'attack', 'skill', 'hitko', 'win']
 REF = HEROES[HID][1]
 OLDH = 241          # standing height in 256-cell units (same size as the old sheet)
 APU = .75           # atlas px per unit (same as the old 192-px cells)
+HD = os.environ.get('HD') == '1'   # v16-252 (Marius: "the hero in the middle is not HD"): HD=1 → only the IDLE row at 2.4× → img/hero/hd_<id>.webp (hero page)
+if HD: APU = .75 * 2.4
 P = 110             # extension padding (sheet px)
 
 SPECKS = {'m5_5', 'm5_4', 'm5_3', 'm5_2', 'm3_0', 'm3_1', 'm3_2', 'm3_4', 'm3_5', 'm3_6'}   # v16-109 Hugo: barrel tip of attack frame 3 crosses into frame 4   # v16-108 Gloria: boots of the neighbour KO frame cross the cell line
@@ -247,7 +249,10 @@ def pack(rows, name):
     u = lambda v: round(v / APU, 1)
     return {'cw': cw, 'uw': u(cw), 'ax': u(L), 'rows': [[m[0], m[1], u(m[1]), u(m[2])] for m in meta]}, A.size
 
-if __name__ == '__main__':
+if __name__ == '__main__' and HD:
+    m, sz = pack([frames('idle')], 'img/hero/hd_%s.webp' % HID)
+    print(json.dumps({HID: m}, separators=(',', ':')))
+elif __name__ == '__main__':
     hero = [frames(n) for n in ROWS]
     m, sz = pack(hero, 'img/hero/sp_%s.webp' % HID)
     f, fsz = pack([frames('fx')], 'img/hero/fxs_%s.webp' % HID)
