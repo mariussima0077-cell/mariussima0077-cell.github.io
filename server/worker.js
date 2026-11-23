@@ -59,6 +59,27 @@ async function wipePlayer(env, pid) {
   await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(pid, Date.now(), 'reset', 'RESET by admin – new game at the next start').run();
 }
 let gReady = false;
+// v16-263 RATE LIMIT – counted per server copy (Cloudflare runs several; good enough against floods / bots / spam).
+// Normal play = ~10-30 requests a minute (save 3 min, sync 5 min, chat 5 s, ranking 10 s) → 240/min per player is far away.
+const RL = new Map();
+function rlHit(key, max) { const now = Date.now(); let r = RL.get(key);
+  if (!r || now - r.t0 > 60e3) { if (r && r.blk > now) return true; r = {t0: now, n: 0, blk: r ? r.blk : 0}; RL.set(key, r); }
+  if (r.blk > now) return true;
+  if (++r.n > max) { r.blk = now + 120e3; return true; }
+  if (RL.size > 20000) { for (const [k, v] of RL) if (now - v.t0 > 120e3 && v.blk < now) RL.delete(k); }
+  return false; }
+// v16-263 GAME ERRORS (Marius 23 nov: „rapoarte automate de erori”): the game sends its JavaScript errors (max 5 a session) → /admin „🐞 Game errors”
+let errReady = false;
+async function errReport(b, req, env) { const db = env.DB;
+  if (!errReady) { await db.prepare('CREATE TABLE IF NOT EXISTS errs(h TEXT PRIMARY KEY, m TEXT, src TEXT, n INTEGER, cv INTEGER, ua TEXT, pid TEXT, gfx TEXT, t0 INTEGER, t INTEGER)').run(); errReady = true; }
+  const cut = (x, n) => String(x ?? '').slice(0, n), m = cut(b && b.m, 300); if (!m) return {ok: false};
+  const src = cut(b.s, 120) + ':' + (+b.l || 0), h = cut(m, 120) + '|' + src, now = Date.now();
+  await db.prepare('INSERT INTO errs(h,m,src,n,cv,ua,pid,gfx,t0,t) VALUES(?,?,?,1,?,?,?,?,?,?) ON CONFLICT(h) DO UPDATE SET n=n+1, cv=excluded.cv, ua=excluded.ua, pid=excluded.pid, gfx=excluded.gfx, t=excluded.t')
+    .bind(h, m, src, +b.cv || 0, cut(b.ua || req.headers.get('user-agent'), 160), cut(b.pid, 64), cut(b.g, 40), now, now).run();
+  return {ok: true}; }
+async function errList(env) { try { if (!errReady) { await env.DB.prepare('CREATE TABLE IF NOT EXISTS errs(h TEXT PRIMARY KEY, m TEXT, src TEXT, n INTEGER, cv INTEGER, ua TEXT, pid TEXT, gfx TEXT, t0 INTEGER, t INTEGER)').run(); errReady = true; }
+  await env.DB.prepare('DELETE FROM errs WHERE t<?').bind(Date.now() - 30 * 864e5).run();
+  return (await env.DB.prepare('SELECT * FROM errs WHERE t>? ORDER BY n DESC LIMIT 25').bind(Date.now() - 7 * 864e5).all()).results; } catch (e) { return []; } }
 async function ensureG(env) {
   if (gReady) return; const db = env.DB;
   for (const q of ['ALTER TABLE players ADD COLUMN bmax INTEGER DEFAULT 0', 'ALTER TABLE players ADD COLUMN shadow INTEGER DEFAULT 0',
@@ -91,6 +112,10 @@ export default {
     if (req.method === 'OPTIONS') return json({});
     try {
       await ensureG(env);   // v16-157: new columns / tables (once per server start)
+      // v16-263 (Marius 23 nov: „limită de cereri pe server”): too many requests from one player / one internet address → 2 minutes pause
+      if (url.pathname.startsWith('/api/') && req.method === 'POST') { let pid = ''; try { const b = await req.clone().json(); pid = b && b.pid ? String(b.pid).slice(0, 64) : ''; } catch (e) {}
+        if (rlHit('i:' + (req.headers.get('cf-connecting-ip') || '-'), 1500) || (pid && rlHit('p:' + pid, 240))) return json({err:'slow'}, 429); }
+      if (url.pathname === '/api/err' && req.method === 'POST') return json(await errReport(await req.json(), req, env));
       if (url.pathname === '/api/report' && req.method === 'POST') return json(await report(await req.json(), env));
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
       if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') { const op = url.pathname.slice(11), b = await req.json();
@@ -695,6 +720,7 @@ async function admin(url, env) {
   const esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
   let st = null; try { st = await dailyStats(env); } catch (e) {}
+  const errs = await errList(env);   // v16-263
   const stats = !st ? '' : `<h3>📊 Players per day (Paris time)</h3><div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
 <div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th></tr>${st.days.map(x => { const r = st.ret[x];
   return `<tr style="border-top:1px solid #ffffff14"><td>${x.slice(5)}</td><td><b>${st.dau[x] ?? '–'}</b></td><td>${st.fresh[x] || 0}</td><td>${r && r.n ? `${r.b}/${r.n} (${Math.round(100 * r.b / r.n)}%)` : '–'}</td></tr>`; }).join('')}</table>
@@ -703,6 +729,7 @@ async function admin(url, env) {
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
 <h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>${giftForm(env.ADMIN_KEY, '')}<div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
 ${stats}
+<h3>🐞 Game errors (7 days)</h3>${errs.length ? errs.map(r => `<div class=c><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small></div>`).join('') : '<div class=c>No errors 👍</div>'}
 <h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
 <details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
 <h3>Flagged / banned</h3><small>👻 = hidden (shadow): plays normally but is out of rankings, opponents and prizes. Ban needs a PROOF or 2 different kinds of signs. Points go down 10 a day with honest play.</small>${bad.map(p => { const r = lastR[p.pid], pv = r ? powLine(r) : '';

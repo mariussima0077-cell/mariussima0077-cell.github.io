@@ -13,14 +13,15 @@
 // If AUTO chose too high and the battles are slow, it goes one step down by itself (saved for the next start).
 window.GFX=(()=>{const L=k=>{try{return localStorage.getItem(k);}catch(e){return null;}},S=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v);}catch(e){}};
   const man=L('te_hd')==='1'?'hd':/^(std|low)$/.test(L('te_gfx')||'')?L('te_gfx'):'auto';
-  let tier=(L('te_tier')||'').split('|')[0],sc=+((L('te_tier')||'').split('|')[1]||0);
-  if(!/^(hi|mid|lo)$/.test(tier)){
+  const TP=(L('te_tier')||'').split('|');let tier=TP[0],sc=+(TP[1]||0);
+  // v16-263: LOW chosen ONLY by the speed test (the phone was busy?) is checked again at the next start → the better result counts
+  if(!/^(hi|mid|lo)$/.test(tier)||TP[2]==='p'){const old=TP[2]==='p'?sc:0;
     const b=()=>{const t0=performance.now();let x=0;const a=new Float64Array(4096);for(let i=0;i<300000;i++){const j=i&4095;a[j]=a[j]*.5+Math.sqrt(i);x+=a[(i*7)&4095];}
       const o=[];for(let i=0;i<20000;i++)o.push({i,v:i*1.5});o.sort((p,q)=>q.v-p.v);return performance.now()-t0+(x>1e300?1:0)+(o[0].i<0?1:0);};
-    try{sc=Math.round(b()+b()+b());}catch(e){sc=60;}
-    const mem=navigator.deviceMemory||0,cores=navigator.hardwareConcurrency||4,dpr=window.devicePixelRatio||1;
-    tier=(mem&&mem<=3)||cores<=4||sc>100?'lo':(!mem||mem>=6)&&cores>=6&&dpr>=2&&sc<70?'hi':'mid';
-    S('te_tier',tier+'|'+sc);}
+    try{sc=Math.round(b()+b()+b());}catch(e){sc=60;}if(old)sc=Math.min(sc,old);
+    const mem=navigator.deviceMemory||0,cores=navigator.hardwareConcurrency||4,dpr=window.devicePixelRatio||1,weak=(mem&&mem<=3)||cores<=4;
+    tier=weak||sc>100?'lo':(!mem||mem>=6)&&cores>=6&&dpr>=2&&sc<70?'hi':'mid';
+    S('te_tier',tier+'|'+sc+(tier==='lo'&&!weak&&!old?'|p':''));}
   const eff=man==='auto'?(tier==='hi'?'hd':tier==='lo'?'low':'std'):man;
   return {man,tier,sc,eff,hd:eff==='hd',low:eff==='low',auto:man==='auto',
     set(v){S('te_hd',v==='hd'?'1':null);S('te_gfx',v==='std'||v==='low'?v:null);},
@@ -38,6 +39,17 @@ window.GFX=(()=>{const L=k=>{try{return localStorage.getItem(k);}catch(e){return
 }catch(e){}})();
 </script>
 <script src="secure.js"></script>
+<script>// v16-263 (Marius 23 nov 2026): GAME ERRORS – a JavaScript error on a player's phone is sent to Torque Guard (/admin „🐞 Game errors”):
+// the message, file:line, game version, graphics, phone. Max 5 different errors a session, each only once. No personal data.
+(()=>{const seen=new Set();let q=[],n=0,tm=0;
+  function send(){tm=0;const api=window.SEC&&SEC.api&&SEC.api();if(!api){if(q.length)tm=setTimeout(send,5000);return;}
+    const b=q;q=[];b.forEach(e=>{try{fetch(api+'/api/err',{method:'POST',headers:{'content-type':'application/json'},keepalive:true,
+      body:JSON.stringify({pid:window.SEC&&SEC.PID,cv:window.TE_CV||0,g:window.GFX?GFX.eff+'/'+GFX.tier:'',ua:navigator.userAgent,...e})}).catch(()=>{});}catch(x){}});}
+  function add(m,s,l){m=String(m||'').slice(0,300);if(!m||/^Script error\.?$/.test(m)||/ResizeObserver loop/.test(m))return;
+    s=String(s||'').replace(location.origin,'').split('?')[0];const k=m+'|'+s+'|'+l;if(seen.has(k)||n>=5)return;seen.add(k);n++;q.push({m,s,l:+l||0});if(!tm)tm=setTimeout(send,3000);}
+  addEventListener('error',e=>{if(e&&e.target&&e.target!==window&&!e.error)return;add(e.message||(e.error&&e.error.message),e.filename,e.lineno);});
+  addEventListener('unhandledrejection',e=>{const r=e&&e.reason;if(!r||r.name==='AbortError')return;add('(promise) '+(r.message||r),r.stack&&(r.stack.match(/https?:\/\/[^\s)]+/)||[''])[0].replace(/:\d+:\d+$/,''),0);});
+})();</script>
 <script src="xfer.js"></script>
 <style>
 /* v16-124 (Marius: new game font everywhere) – ONE family "Game": heavy text (800-900: titles, buttons, numbers) = Lilita One,
