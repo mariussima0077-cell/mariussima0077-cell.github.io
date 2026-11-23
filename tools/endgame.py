@@ -36,7 +36,7 @@ PAGE_JS = r"""async()=>{const P=__PW,T=__TE,G=T.G,g=P.gr(),out={};
  const lv=(n,a)=>mech.forEach(h=>{const o=own(h.id);o.lv=n;o.a=a;});
  // ---- MAX
  for(const k in G.lv)G.lv[k]=100;
- mech.forEach(h=>{const o=own(h.id);o.s=maxS(h);G.h.disc[h.id]=1;});lv(300,14);
+ mech.forEach(h=>{const o=own(h.id);o.s=maxS(h);G.h.disc[h.id]=1;});lv(300,14);mech.forEach(h=>{if(T.hMax&&T.hMax(h.id)>300){const o=own(h.id);o.lv=T.hMax(h.id);o.a=o.lv/20-1;}}); // v16-207: Mythic Lv 400
  g.eq={};const best=mech.slice().sort((a,b)=>P.pw(b)-P.pw(a)).slice(0,5).map(h=>h.id);team(best);dress(best,6,20);
  out.max=P.tp();out.maxTeam=best.map(id=>T.HB[id].n);
  // ---- MID-GAME: 5 Epic +10, Lv 100 (asc 4), Legendary gear ★0 Lv 40, garages LV 20, Legendary +2 / Mythic none
