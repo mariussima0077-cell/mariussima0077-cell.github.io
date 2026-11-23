@@ -163,7 +163,10 @@ const PG={
   gear:{ok:()=>isOpen('cpPop')&&!!document.querySelector('#cpPopBox .iUp'),t:`<b>GEAR</b> makes heroes stronger in battle. <b>UPGRADE</b> with <b>Gear Parts</b> (salvage, campaign, Dungeons, Idle). Two identical pieces = <b>★ STAR UP</b>. A full class set gives extra bonuses.`},
   crew:{ok:()=>isOpen('ros'),t:`<b>MY CREW</b> = everybody who <b>works in your garage</b>: mechanics (heroes), guards and drivers. Each workshop takes only <b>its own class</b>. Better crew = faster work and more money. <b>AUTO BEST</b> fills every place.`},
   summon:{ok:()=>isOpen('sm')&&!isOpen('res'),t:`<b>SUMMON</b>: <b>HERO</b> = mechanics who work AND fight · <b>CREW</b> = drivers and guards for the garage · <b>GEAR</b> = equipment. <b>×10</b> gives 11. A <b>Legendary</b> is guaranteed every 100 summons.`},
-  vip:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>VIP</b> is free for everybody: <b>Daily Quests</b> give VIP points. Every VIP level makes your bonuses stronger (income, Idle time…). VIP Passes make them even bigger.`},
+  vip:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>VIP</b> is free for everybody: <b>Daily Quests</b> give VIP points. Every VIP level gives a bigger <b>DAILY GIFT</b> (tickets, diamonds, Essence, Builder Kit, Dungeon keys) and stronger Idle bonuses. VIP Passes make the bonuses even bigger.`},
+  // v16-238 (Marius 23 nov: VIP gives more on every level) – also for players who already saw the old VIP guide
+  vip2:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>NEW VIP GIFTS</b>: tap <b>DAILY</b> every day – each VIP level adds more: Crew &amp; Gear tickets, more diamonds, <b>Essence</b>, <b>Builder Kit</b>, <b>Dungeon keys</b>. VIP 7 / 10 = extra <b>World Boss keys</b>. Idle now gives more <b>Essence, Gear Parts and garage parts</b> with VIP.`},
+  dq2:{ok:()=>isOpen('dq'),t:`<b>DAILY QUESTS</b> now also have <b>battle quests</b>: campaign, towers, Dungeons, Arena, World Boss. Tap a picture (<b>GO ›</b>) to go straight there. Every quest gives <b>VIP points</b>.`},
   events:{ok:()=>isOpen('ev'),t:`<b>EVENTS</b>: 2 events at the same time, 3 days each. Just play (summon, spend Essence…) to collect points → <b>milestone rewards</b> and <b>TOP 100</b> prizes.`},
   checkin:{ok:()=>isOpen('xp')&&!!document.getElementById('ciGo'),t:`<b>DAILY CHECK-IN</b>: come back every day for free tickets. Missing a day <b>never resets</b> your progress – you simply continue.`},
   // v16-143 (Marius 21 nov: "check the training for everything we added today") – one short guide the first time each new page opens
@@ -204,6 +207,7 @@ const PG={
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
+  if(k==='vip'&&!seen.includes('p_vip2'))seen.push('p_vip2');   // v16-238: new players already read the new VIP text
   MINI='p_'+k;L=[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];
   running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},900);
 window.__TUT={start:()=>{MINI=null;L=S;start(true);},go:n=>go(n),end};

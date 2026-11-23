@@ -2697,7 +2697,7 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
     let sold=0;drops.forEach(d=>{if(d.sold){sold+=d.sold;G.gp=(G.gp||0)+d.sold;}});
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;
     const ct=first?R.ct:0,dmw=first?R.dm:0;if(ct)G.h.ct+=ct;if(dmw)G.dm=(G.dm||0)+dmw;
-    const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?4:S0.mini?1.5:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3.75:S0.mini?2:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);
+    const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?4:S0.mini?1.5:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3.75:S0.mini?2:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);if(window.TEQ)TEQ('win',1);
     const PU=T.PART_U?T.PART_U():1,pkr=T.pkRoles?T.pkRoles(PU*(first?(S0.boss?195:S0.mini?100:50):5)*hk):{},pkb=Math.round(PU*(first?(S0.boss?199:S0.mini?100:52):4)*hk);if(T.pkAdd){for(const k in pkr)T.pkAdd(k,pkr[k]);T.pkAdd('bk',pkb);} // v16-129: garage parts from stages // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
     T.save();if(tk)T.addTickets(tk,'Campaign '+lab);
     const chDone=first&&S0.boss&&S0.c<NCH-1;
@@ -2853,7 +2853,7 @@ const cpSwOK=()=>{try{const T=TE();return !!(T.VP&&T.VP(T.VLV()).sweep);}catch(e
 function cpSweep(si){const T=TE(),G=T.G,P=CPX();if(!cpSwOK()){T.toast('👑 SWEEP opens at VIP 4',2400);return;}if(si>=P.best)return;
   const S0=STAGES[si],R=REWARDX(si),money=Math.round(R.money*.25/10)*10;G.money+=money;
   const big=S0.boss||S0.mini,drops=[];if(big||Math.random()<.4)drops.push(dropItem(S0.oc,big));drops.forEach(d=>{if(d.sold)G.gp=(G.gp||0)+d.sold;});
-  const ess=Math.round(T.ESS_U()*.1),gpw=Math.round(T.GP_U()*.25);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);T.save();
+  const ess=Math.round(T.ESS_U()*.1),gpw=Math.round(T.GP_U()*.25);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);if(window.TEQ)TEQ('win',1);T.save();
   T.toast('⚡ SWEEP '+sLabel(si)+': '+T.fmt(money)+' · '+T.ESI+' +'+T.nf(ess)+' · '+T.GPI+' +'+T.nf(gpw)+(drops.length?' · '+itemName(drops[0].it):''),2600);}
 
 // ---------------------------------------------------------------- shared popup + before/after helpers
@@ -3406,7 +3406,8 @@ function anxTower(can,go){const G=TE().G;const show=()=>{const on=G.cp.autoNext!
   const start=()=>{clearInterval(ANX.id);ANX.n=0;if(!can||G.cp.autoNext===false||window.__TUTON)return show();ANX.n=3;show();
     ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}ANX.n--;show();if(ANX.n<=0){clearInterval(ANX.id);$('cpRes').classList.remove('open');go();}},1000);};
   start();return ()=>{G.cp.autoNext=G.cp.autoNext===false;TE().save();start();};}
-function twFinish(win,retreat){if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
+function twFinish(win,retreat){{const F0=B.tw||{};if(window.TEQ&&!retreat&&(win||F0.wb))TEQ(F0.wb?'wb':F0.dg?'dg':'tower',1);}   // v16-238: daily quests
+  if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
   if(win&&f===t.b+1){const r=twRew(f);t.b=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;if(r.ct)G.h.ct+=r.ct;T.save();if(r.tk)T.addTickets(r.tk,'Tower floor '+f);
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">TORQUE TOWER · FLOOR ${f}<small>${f>=TW_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
@@ -3498,7 +3499,7 @@ function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');const TD=hubTodo();
   let h=tallBg()+'<button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
   const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:arOK()?'PvP · ONLINE':'🔒 STAGE '+sLabel(AR_UNLOCK),tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
     class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',
-    boss:wbOK()?WBOSS[wbCur()].n+' · KEYS '+wbKeys()+'/'+WB_KEYS:'🔒 STAGE '+sLabel(WB_UNLOCK-1),
+    boss:wbOK()?WBOSS[wbCur()].n+' · KEYS '+wbKeys()+'/'+wbKMax():'🔒 STAGE '+sLabel(WB_UNLOCK-1),
     dg:dgOK()?'KEYS '+DG_K.reduce((a,k)=>a+dgDay(k),0)+'/'+DG_K.length*dgMax()+((t=>t?' +'+t:'')(DG_K.reduce((a,k)=>a+dgBon(k),0))):'🔒 STAGE '+sLabel(DG_UNLOCK)};
   const top=285,avail=1536+HX-(HX>0?250:20)-top,n=HUBM.length,ex=m=>m.full?1.3:m.k==='camp'?1.08:1,
     hh=Math.max(118,Math.min(190,(avail-(n-1)*30)/HUBM.reduce((a,m)=>a+ex(m),0))),ths=HUBM.map(m=>m.full?Math.min(HUB_W/m.ar,hh*ex(m)):hh*ex(m)),sum=ths.reduce((a,b)=>a+b,0),
@@ -3769,7 +3770,8 @@ function wbG(){const G=TE().G;if(!G.wb)G.wb={d:'',n:0,dmg:0,best:0,cl:[],L:0,wk:
   if(w.tv!==2){w.tv=2;w.cl=(w.cl||[]).map(i=>WB_TIER.findIndex(q=>q.b===WB_OLDB[i])).filter(i=>i>=0);}
   if(w.wk!==wbWeek()){w.wk=wbWeek();w.wd=0;w.wbest=0;}
   return w;}
-const wbKeys=()=>Math.max(0,WB_KEYS-wbG().n);
+const wbVip=()=>{try{const T=TE();return T.VP?T.VP(T.VLV()).wbk||0:0;}catch(e){return 0;}},wbKMax=()=>WB_KEYS+wbVip(); // v16-238: VIP 7 +1 · VIP 10 +2 keys a day
+const wbKeys=()=>Math.max(0,wbKMax()-wbG().n);
 const wbTierSt=i=>{const w=wbG();return w.cl.includes(i)?2:w.dmg>=WB_TIER[i].b*w.L?1:0;}; // 0 locked · 1 ready · 2 claimed
 const wbReady=()=>wbOK()&&(wbKeys()>0||WB_TIER.some((q,i)=>wbTierSt(i)===1));
 const KEYI=h=>'<img src="img/wb/key.webp" alt="" style="height:'+(h||'1.3em')+';vertical-align:-.3em">';
@@ -3789,7 +3791,7 @@ function wbRender(){const T=TE(),w=wbG(),Bo=WBOSS[wbCur()],M=wbMap(),bx=$('wbBox
   h+='<div class="wbW" data-wb="info" style="'+gbx(170,712,684,84)+'"><img src="img/wb/t_weak.webp" alt="WEAK TO"><span>'+'<img src="'+CLSU(Bo.weak)+'" alt="">'+'<b>'+ROLE[Bo.weak].n.toUpperCase()+'</b> +30%</span></div>';
   h+='<div class="wbD" style="'+gbx(152,800,720,168)+'"><img src="img/wb/dmg.webp" alt=""><div><small>TODAY\'S DAMAGE</small><b>'+fmtD(w.dmg)+'</b><small>'+(w.dmg/w.L).toFixed(1)+' HP BARS · BEST HIT '+fmtD(w.best)+'</small></div></div>';
   const ms=new Date();ms.setHours(24,0,0,0);const left=ms-Date.now();
-  h+='<div class="wbK" style="'+gbx(112,972,800,70)+'">'+[0,1,2].map(i=>'<img src="img/wb/key.webp" alt="" class="'+(i<wbKeys()?'':'off')+'">').join('')+'<span><b>'+wbKeys()+'/'+WB_KEYS+'</b> BOSS KEYS · new in '+Math.floor(left/36e5)+'h '+Math.floor(left%36e5/6e4)+'m</span></div>';
+  h+='<div class="wbK" style="'+gbx(112,972,800,70)+'">'+Array.from({length:wbKMax()},(q,i)=>i).map(i=>'<img src="img/wb/key.webp" alt="" class="'+(i<wbKeys()?'':'off')+'">').join('')+'<span><b>'+wbKeys()+'/'+wbKMax()+'</b> BOSS KEYS · new in '+Math.floor(left/36e5)+'h '+Math.floor(left%36e5/6e4)+'m</span></div>';
   h+='<img class="wbTD" src="img/wb/t_daily.webp" alt="DAILY REWARDS" style="'+gbx(172,1046,680,108)+'">';
   h+='<div class="wbList" style="'+gbx(56,1160,912,182)+'">';
   WB_TIER.forEach((q,i)=>{const st=wbTierSt(i);
@@ -3797,7 +3799,7 @@ function wbRender(){const T=TE(),w=wbG(),Bo=WBOSS[wbCur()],M=wbMap(),bx=$('wbBox
   h+='</div>';
   const sw=wbSwOK();h+='<div class="wbSw'+(sw?'':' dis')+'" data-wb="sweep" style="'+gbx(40,1346,470,112)+'"><img src="img/dg/b_sweep.webp" alt="SWEEP"><small>'+(w.wbest?'⚡ '+fmtD(w.wbest)+' · best hit this week':'attack once this week first')+'</small></div>';
   h+='<div class="wbRk" data-wb="rank" style="'+gbx(26,1458,500,58)+'"><img src="img/wb/t_rank.webp" alt="DAMAGE RANKING"></div>';
-  h+='<div class="wbA'+(wbKeys()?'':' dis')+'" data-wb="go" style="'+gbx(540,1352,460,178)+'"><img src="img/wb/atk.webp" alt="">'+(wbKeys()?'<i class="rdd" style="right:10%;top:12%;width:16px;height:16px"></i>':'')+'<b>'+(wbKeys()?'ATTACK':'NO KEYS')+'<small>'+KEYI('1.2em')+' '+wbKeys()+'/'+WB_KEYS+' · 60 s</small></b></div>';
+  h+='<div class="wbA'+(wbKeys()?'':' dis')+'" data-wb="go" style="'+gbx(540,1352,460,178)+'"><img src="img/wb/atk.webp" alt="">'+(wbKeys()?'<i class="rdd" style="right:10%;top:12%;width:16px;height:16px"></i>':'')+'<b>'+(wbKeys()?'ATTACK':'NO KEYS')+'<small>'+KEYI('1.2em')+' '+wbKeys()+'/'+wbKMax()+' · 60 s</small></b></div>';
   h+='<div class="wbWk" style="'+gbx(26,1504,500,30)+'">THIS WEEK '+fmtD(w.wd)+(WBS.rank&&WBS.rank.rank?' · #'+WBS.rank.rank:'')+'</div>';
   GYM=null;bx.innerHTML=h;wbAnim();}
 // the boss idles on the page (12 fps, only while the page is open)
@@ -3819,15 +3821,15 @@ function wbInfo(){const Bo=WBOSS[wbCur()],w=wbG();
 function wbClaim(i){const T=TE(),w=wbG();if(wbTierSt(i)!==1)return;const q=WB_TIER[i];w.cl.push(i);T.giveRw?T.giveRw(q):null;
   if(!T.giveRw){if(q.dm)T.G.dm=(T.G.dm||0)+q.dm;if(q.tk)T.G.h.tk+=q.tk;if(q.gt)GSD().tk+=q.gt;if(q.ct)T.G.h.ct+=q.ct;}
   T.save();T.toast('🎁 '+wbRwHtml(q).replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ')+' · claimed!',2600);if(T.updHud)T.updHud();wbRender();}
-function wbGo(){const w=wbG();if(w.n>=WB_KEYS){TE().toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
+function wbGo(){const w=wbG();if(w.n>=wbKMax()){TE().toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
   wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);wbGo0(teamHeroes());}
-function wbGo0(team){const w=wbG();if(w.n>=WB_KEYS)return;if(!team||!team.length)team=bestTeam().map(heroOf);
+function wbGo0(team){const w=wbG();if(w.n>=wbKMax())return;if(!team||!team.length)team=bestTeam().map(heroOf);
   w.n++;TE().save();wbEl.classList.remove('open');cancelAnimationFrame(WBS.raf);
   try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad(WBOSS[wbCur()].sp);
   safeStart(wbEq(),team,wbFight());if(!(B&&B.wbB&&running)){w.n--;TE().save();}}
 // v16-176 (Marius): SWEEP = one key, no fight, deals your BEST HIT of this week (same boss all week; needs one real attack this week)
 const wbSwOK=()=>wbKeys()>0&&wbG().wbest>0;
-function wbSweep(){const T=TE(),w=wbG();if(!wbKeys()){T.toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
+function wbSweep(){const T=TE(),w=wbG();if(wbKeys()&&w.wbest&&window.TEQ)TEQ('wb',1);if(!wbKeys()){T.toast('🔑 No BOSS KEYS left today · new keys at midnight',2600);return;}
   if(!w.wbest){T.toast('⚔ Attack the boss once this week – SWEEP then repeats your best hit',2800);return;}
   const dmg=Math.round(w.wbest),before=w.dmg;w.n++;w.dmg+=dmg;w.best=Math.max(w.best,dmg);w.wd+=dmg;w.pend.push({d:dmg,t:Date.now()});T.save();wbSend();
   const nt=WB_TIER.filter(q=>before<q.b*w.L&&w.dmg>=q.b*w.L).length;
@@ -3855,7 +3857,7 @@ function wbFinish(win,retreat){const T=TE(),w=wbG(),dmg=Math.round(B.wbD||0),bef
     <div class="wbRL">${(dmg/w.L).toFixed(1)} HP BARS${nb&&dmg>0?' · <i>NEW BEST TODAY!</i>':''}</div>
     <div class="wbRL">TODAY <b>${fmtD(w.dmg)}</b> · THIS WEEK <b>${fmtD(w.wd)}</b></div>
     ${nt?`<div class="wbRN">🎁 ${nt} new daily reward${nt>1?'s':''} – claim on the WORLD BOSS page</div>`:''}
-    <div class="wbRL">${KEYI()} ${wbKeys()}/${WB_KEYS} keys left today</div>
+    <div class="wbRL">${KEYI()} ${wbKeys()}/${wbKMax()} keys left today</div>
     <div class="cpRow"><button class="cpGo" data-a="wb">WORLD BOSS</button><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button></div></div>`;
   $('cpResBox').classList.remove('rsSk');$('cpResBox').classList.add('wbSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;clearInterval(ANX.id);
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('cpResBox').classList.remove('wbSk');$('bt').classList.remove('open');
