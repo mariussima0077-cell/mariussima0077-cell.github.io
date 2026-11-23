@@ -528,12 +528,16 @@ export async function onlineCron(env) { await ensure(env);
   await rewardsTick(env); await cupTick(env); try { await botTick(env); } catch (e) {} }
 
 // ------------------------------------------------------------------ v16-167: FILLER BOTS (Marius 22 nov: "a few bots, one by one, so players have someone to play with")
-// A few bot profiles (pid 'bot_…') on server 1: they show in rankings and are Arena opponents, climb slowly for some days to a LOW stage (20-120), then stop.
-// They NEVER get prizes (Arena daily/season, Cup, World Boss, events – the prize queries skip 'bot_'), never chat, never spend, have no Rail Wars train.
-// A new bot comes at most every 12 h while there are fewer than BOT_MAX; once there are BOT_REAL active real players, about one bot a day goes away.
-const BOT_MAX = 6, BOT_FAST = 4, BOT_EVERY = 3 * HOUR, BOT_REAL = 30;   // v16-189 (Marius): 4 bots right away (one per cron), then one every 3 h up to 6
-const BOT_NAMES = ['TurboTom','NitroNico','GearHead88','LucasRPM','Mecha_Mia','DriftKing','Piston_Pete','RoadRunnerX','JulesGarage','ChromeJack','Andrei_V8','Kev_Wrench','SparkyLou','DieselDan','Sofi_Turbo','BoltBoss','RedlineRay','MaxTorque7','EmmaRev','OilyOscar'];
+// v16-217 (Marius 23 nov: "10 bots now, funny names, they climb the campaign like a normal free player, they attack nobody, they never stop"):
+// 10 bot profiles (pid 'bot_…') on server 1, all created at once. They climb the campaign forever at a FREE-PLAYER pace (≈ stage 30 day 1, 100 week 1,
+// 230 month 1, 450 month 3, 680 month 6; each bot ×0.7-1.3) and their team gets better as they go (like summoning). Online in sessions (~40% of the hours).
+// They NEVER attack (no Arena attacks, no Rail Wars, no chat, no spending) and NEVER get prizes (the prize queries skip 'bot_'). They stay Arena opponents.
+// Old bots (normal names, v<3) are removed. When there are BOT_REAL active real players, about one bot a day goes away.
+const BOT_MAX = 10, BOT_V = 3, BOT_REAL = 30;
+const BOT_NAMES = ['LugNutLarry','ClutchNorris','WD40Wendy','BrakeDancer','MufflerMike','TireKicker','DuctTapeDave','PistonPanda','CaptainCarb','NoBrakesNed',
+  'HubcapHarry','RevvyMcRev','TurboTurtle','SpannerSusan','GreasyGrandpa','OilSpillBill','SirHonksALot','BumperBetty','WobblyWheel','ChickenTikkaV8'];
 const BOT_CC = ['FR','RO','GB','DE','ES','IT','PL','US','BR','PH','PT','NL'];
+const botStage = pl => Math.max(1, Math.min(2200, Math.round(30 * pl.sp * Math.pow(Math.max(.03, (Date.now() - pl.t0) / DAY + pl.d0), .6))));
 const BOT_RO = [ // [hero name, class] per grade 0-3 (same order as ROSTER in index.html → id m<grade>_<i>)
  [['Rusty Joe','service'],['Benny Bolt','service'],['Tom Wrench','engine'],['Ollie Oil','engine'],['Mia Brush','paint'],['Dan Dent','paint'],['Sam Spark','elec'],['Pete Gauge','inspect'],['Kim Tablet','inspect'],['Ricky Rev','tuning']],
  [['Gina Gear','engine'],['Bruno Piston','engine'],['Marco Torque','service'],['Leo Lift','service'],['Hank Hammer','paint'],['Vic Spray','paint'],['Ivy Volt','elec'],['Nora Check','inspect'],['Axel Grind','tuning']],
@@ -548,33 +552,30 @@ function fillTeam(stage, seed) {   // 5 heroes whose team power ≈ the enemy po
 }
 async function botTick(env) {
   const db = env.DB, now = Date.now();
-  const bots = (await db.prepare("SELECT uid, pid, name, created, bot FROM prof WHERE substr(pid,1,4)='bot_'").all()).results;
+  let bots = (await db.prepare("SELECT uid, pid, name, created, bot FROM prof WHERE substr(pid,1,4)='bot_'").all()).results;
+  const plOf = b => { try { return JSON.parse(b.bot || '{}'); } catch (e) { return {}; } };
+  for (const b of bots) if (plOf(b).v !== BOT_V) { await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); }   // old bots out
+  bots = bots.filter(b => plOf(b).v === BOT_V);
   const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>?").bind(now - 3 * DAY).first()).n;
-  // v16-189: bots climb to the level of the REAL players (median stage of the active ones, ×0.4-1.0), not to a tiny stage
-  const rb = (await db.prepare("SELECT best FROM prof WHERE srv=1 AND substr(pid,1,4) NOT IN ('bot_','tst_') AND t>? ORDER BY best").bind(now - 7 * DAY).all()).results.map(r => r.best | 0);
-  const med = rb.length ? rb[Math.floor(rb.length / 2)] : 60, tgOf = () => Math.max(20, Math.min(2250, Math.round(med * bRnd(.4, 1.0))));
   if (real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];   // ~1 a day (cron every 10 min)
       await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); } }
-  else if (bots.length < BOT_MAX && (bots.length < BOT_FAST || !bots.some(b => b.created > now - BOT_EVERY))) {
+  else if (bots.length < BOT_MAX) {   // all missing bots right away
     const used = new Set((await db.prepare('SELECT nlow FROM prof WHERE srv=1').all()).results.map(r => r.nlow)), names = BOT_NAMES.filter(n => !used.has(n.toLowerCase()));
-    if (names.length) { const name = bPick(names), seed = Math.floor(Math.random() * 1e6), plan = {tg:tgOf(), v:2, life:Math.round(bRnd(3, 8) * DAY), seed, act:Math.round(bRnd(10, 21) * DAY)}, team = fillTeam(1, seed);
-      const pid = 'bot_' + seed.toString(36) + now.toString(36);
-      await db.prepare(`INSERT INTO prof(pid,srv,name,nlow,icon,cc,lang,vip,rep,best,bday,bd0,pow,lv,team,t,created,cunl,bot) VALUES(?,1,?,?,?,?,'en',?,?,1,?,1,?,?,?,?,?,'',?)`)
-        .bind(pid, name, name.toLowerCase(), team[0].id, bPick(BOT_CC), Math.random() < .3 ? 1 : 0, 1, dayKey(now), teamPow(team), 14, JSON.stringify(team), now, now, JSON.stringify(plan)).run();
+    for (let k = bots.length; k < BOT_MAX && names.length; k++) {
+      const name = names.splice(Math.floor(Math.random() * names.length), 1)[0], seed = Math.floor(Math.random() * 1e6);
+      const plan = {v:BOT_V, seed, t0:now, sp:+bRnd(.7, 1.3).toFixed(2), d0:+bRnd(0, 2).toFixed(2)}, stage = botStage(plan), team = fillTeam(stage, seed);
+      const pid = 'bot_' + seed.toString(36) + now.toString(36) + k;
+      await db.prepare(`INSERT INTO prof(pid,srv,name,nlow,icon,cc,lang,vip,rep,best,bday,bd0,pow,lv,team,t,created,cunl,bot) VALUES(?,1,?,?,?,?,'en',?,?,?,?,?,?,?,?,?,?,'',?)`)
+        .bind(pid, name, name.toLowerCase(), team[0].id, bPick(BOT_CC), Math.random() < .3 ? 1 : 0, 1, stage, dayKey(now), stage, teamPow(team), 14 + Math.round(stage * .6), JSON.stringify(team), now, now, JSON.stringify(plan)).run();
       const p = await profOf(env, pid);
       await db.prepare('INSERT OR IGNORE INTO arena(uid,srv,season,pts,w,l,tk,tkt,opp,peak,t) VALUES(?,1,?,?,0,0,0,?,?,?,0)').bind(p.uid, seasonOf(now), START_PTS, now, '[]', START_PTS).run(); } }
-  for (const b of bots) {   // climb slowly to the target stage, then stop (after 'act' days they are not "active" any more: they leave the active rankings, stay as Arena opponents)
-    let pl; try { pl = JSON.parse(b.bot || '{}'); } catch (e) { continue; }
+  for (const b of bots) {   // climb forever at a free-player pace, only while "online"
+    const pl = plOf(b);
     await db.prepare('UPDATE arena SET season=?, pts=?, peak=?, w=0, l=0, opp=? WHERE uid=? AND season<>?').bind(seasonOf(now), START_PTS, START_PTS, '[]', b.uid, seasonOf(now)).run();   // new Arena season → bots stay opponents
-    if (pl.tg && pl.v !== 2) { pl.tg = tgOf(); pl.v = 2; await db.prepare('UPDATE prof SET bot=? WHERE uid=?').bind(JSON.stringify(pl), b.uid).run(); }   // v16-189: old bots → new target
-    const age = now - b.created; if (!pl.tg || age > pl.act) continue;
-    const f = Math.min(1, age / pl.life), stage = Math.max(1, Math.round(pl.tg * (.3 + .7 * Math.pow(f, .7)))), team = fillTeam(stage, pl.seed), dk = dayKey(now);
-    const hs = (((pl.seed | 0) + Math.floor(now / HOUR)) * 2654435761) >>> 0;   // v16-189: online in sessions (~40% of the hours while climbing), not 24/7
-    const on = f < 1 ? hs % 100 < 40 : Math.random() < .02;
-    if (!on) continue;
+    const hs = (((pl.seed | 0) + Math.floor(now / HOUR)) * 2654435761) >>> 0; if (hs % 100 >= 40) continue;   // online ~40% of the hours, in sessions
     const cur = await db.prepare('SELECT best, bday, bd0 FROM prof WHERE uid=?').bind(b.uid).first(); if (!cur) continue;
-    const bd0 = cur.bday === dk ? cur.bd0 : cur.best;
-    await db.prepare('UPDATE prof SET best=?, bday=?, bd0=?, pow=?, lv=?, team=?, icon=?, t=? WHERE uid=?').bind(stage, dk, bd0, teamPow(team), Math.min(200, 14 + stage), JSON.stringify(team), team[0].id, now, b.uid).run();
+    const stage = Math.max(cur.best | 0, botStage(pl)), team = fillTeam(stage, pl.seed), dk = dayKey(now), bd0 = cur.bday === dk ? cur.bd0 : cur.best;
+    await db.prepare('UPDATE prof SET best=?, bday=?, bd0=?, pow=?, lv=?, team=?, icon=?, t=? WHERE uid=?').bind(stage, dk, bd0, teamPow(team), Math.min(1400, 14 + Math.round(stage * .6)), JSON.stringify(team), team[0].id, now, b.uid).run();
   }
 }
 
