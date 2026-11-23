@@ -18,8 +18,17 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=260;
-async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){return {err:'network'};}}
+const CV=261;
+// v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
+// a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
+let NETF=0;function netPill(on){let d=document.getElementById('netPill');
+  if(!on){if(d)d.remove();return;}if(d)return;d=document.createElement('div');d.id='netPill';
+  d.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 46px);transform:translateX(-50%);z-index:99990;background:rgba(14,22,34,.94);color:#ffd27a;border:1px solid #ffb02e;border-radius:14px;padding:5px 12px;font:800 11px Game,system-ui;letter-spacing:.3px;box-shadow:0 3px 10px rgba(0,0,0,.5);max-width:92vw;text-align:center;pointer-events:auto';
+  d.innerHTML=navigator.onLine===false?'📶 No internet · your progress is saved on this phone':'🔧 Server maintenance · keep playing, your progress is safe';
+  d.onclick=()=>d.remove();document.body.appendChild(d);}
+function netRes(ok){if(ok){if(NETF)netPill(false);NETF=0;}else if(++NETF===3)netPill(true);}
+addEventListener('online',()=>{NETF=0;netPill(false);});
+async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();netRes(true);if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();if(j&&j.wipe&&window.SEC&&SEC.wipe)SEC.wipe();return j;}catch(e){netRes(false);return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
 function needUpd(){if(document.getElementById('updNeed'))return;const d=document.createElement('div');d.id='updNeed';
