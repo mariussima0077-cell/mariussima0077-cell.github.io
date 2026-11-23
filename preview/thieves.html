@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Torque Empire – Thieves 2.0 (mockup)</title>
+<style>
+@font-face{font-family:Game;src:url(../assets/fonts/lilita.woff2) format('woff2');font-weight:800 900}
+@font-face{font-family:Body;src:url(../assets/fonts/baloo.woff2) format('woff2')}
+*{box-sizing:border-box}
+body{margin:0;background:#0b1017;color:#e8eef5;font:600 14px Body,system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;padding:10px 10px 40px}
+h1{font:900 24px Game,system-ui;color:#ffd54a;text-align:center;margin:6px 0 2px;letter-spacing:.5px;text-shadow:0 2px 0 #7a3d00}
+.sub{text-align:center;color:#8fa3b8;font-size:12px;margin-bottom:8px}
+#cv{width:100%;aspect-ratio:360/520;display:block;border-radius:14px;border:2px solid #ffd54a55;background:#222;touch-action:manipulation}
+h2{font:900 18px Game,system-ui;color:#ffd54a;margin:18px 0 8px}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.card{background:linear-gradient(#1c2836,#121a24);border:2px solid #2f4257;border-radius:12px;padding:7px 6px;text-align:center}
+.card.pro{border-color:#7e57c2}.card.boss{border-color:#e53935;box-shadow:0 0 12px #e5393555}
+.card .pic{height:74px;background-repeat:no-repeat;background-size:400% 600%;background-position:0 0;margin:0 auto 2px;width:111px}
+.card b{display:block;font:900 14px Game,system-ui}
+.card small{display:block;color:#9fb3c8;font-size:11px;line-height:1.35}
+.card .lo{color:#ff6b6b}.card .rw{color:#7CFC9A}
+.mw{background:#3b2a17 url() ;border:3px solid #8d6e45;border-radius:12px;padding:10px;background:linear-gradient(#4a3520,#2e2013)}
+.mw .t{font:900 22px Game;color:#ffcf6e;text-align:center;letter-spacing:1px;text-shadow:0 2px 0 #000}
+.mw .t small{display:block;font:700 11px Body;color:#d8b98a;letter-spacing:0}
+.posters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.poster{background:#e9d8b4;border-radius:4px;padding:5px;color:#3a2410;text-align:center;position:relative;transform:rotate(-2deg);box-shadow:0 3px 6px #0008}
+.poster:nth-child(2){transform:rotate(1.5deg)}.poster:nth-child(3){transform:rotate(-1deg)}
+.poster .w{font:900 12px Game;letter-spacing:1px}
+.poster .pic{height:62px;width:93px;margin:0 auto;background-repeat:no-repeat;background-size:400% 600%;filter:sepia(.35)}
+.poster .n{font:900 11px Game}.poster .b{font:900 12px Game;color:#a0280f}
+.poster .st{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-18deg);font:900 18px Game;color:#c62828;border:3px solid #c62828;border-radius:6px;padding:0 6px;background:#fff6;opacity:.9}
+.mw .all{margin-top:9px;text-align:center;font:800 12px Body;color:#ffe0a0}
+ul{margin:0;padding-left:18px;line-height:1.5;color:#c9d6e3}
+li b{color:#fff}
+.note{margin-top:14px;font-size:12px;color:#8fa3b8;border-top:1px dashed #2f4257;padding-top:8px}
+</style></head><body><div class="wrap">
+<h1>THIEVES 2.0</h1>
+<div class="sub">MOCKUP – not in the game yet · the scene repeats</div>
+<canvas id="cv"></canvas>
+
+<h2>🦹 3 TYPES OF THIEVES</h2>
+<div class="types">
+ <div class="card"><div class="pic" style="background-image:url(../img/hero/sp_t1.webp)"></div><b>AMATEUR</b><small>often · 1-2 at once<br>easy to catch</small><small class="lo">steals ~5% cash</small><small class="rw">🧰 Builder Kit · 🎫 Crew</small></div>
+ <div class="card pro"><div class="pic" style="background-image:url(../img/hero/sp_t0.webp)"></div><b style="color:#b39ddb">PRO</b><small>rarer · fast<br>harder to catch</small><small class="lo">steals ~10% cash</small><small class="rw">reward ×3 · 💎 a few</small></div>
+ <div class="card boss"><div class="pic" style="background-image:url(../img/hero/sp_t3.webp);filter:drop-shadow(0 0 4px #ff1744)"></div><b style="color:#ff5252">GANG BOSS</b><small>2-3× a day · HP bar<br>calls a van of helpers</small><small class="lo">steals ~20% cash</small><small class="rw">big chest · 💎💎</small></div>
+</div>
+
+<h2>📋 MOST WANTED (every day)</h2>
+<div class="mw"><div class="t">MOST WANTED<small>catch them today for the bounty</small></div>
+ <div class="posters">
+  <div class="poster"><div class="w">WANTED</div><div class="pic" style="background-image:url(../img/hero/sp_t2.webp)"></div><div class="n">"Slim Jack"</div><div class="b">🧰 +60 · 💎 20</div><div class="st">CAUGHT</div></div>
+  <div class="poster"><div class="w">WANTED</div><div class="pic" style="background-image:url(../img/hero/sp_t4.webp)"></div><div class="n">"The Fox"</div><div class="b">🧰 +90 · 🎫 3</div></div>
+  <div class="poster"><div class="w">WANTED</div><div class="pic" style="background-image:url(../img/hero/sp_t3.webp)"></div><div class="n">"Big Tony" 👑</div><div class="b">💎 60 · chest</div></div>
+ </div>
+ <div class="all">Catch all 3 today → <b>DAILY BONUS</b> 🎁</div>
+</div>
+
+<h2>🛡️ SECURITY GETS SERIOUS</h2>
+<ul>
+ <li><b>Patrols all the time</b> – guards walk the Yard and Export Parking, flashlights at night.</li>
+ <li><b>Angry guards</b> – they sprint, jump on the thief, dust + stars, then cuffs.</li>
+ <li><b>BACKUP</b> – when 2+ thieves come, the guard radios: a Security car brings 1-2 more guards (more with higher Security level).</li>
+ <li><b>Reinforcements for thieves too</b> – sometimes a van drops 2-3 more thieves (always with the Gang Boss).</li>
+ <li><b>Money lost</b> – big, but only while you play (never offline). Security level + good guards make it smaller.</li>
+</ul>
+<div class="note">Mockup only. The Gang Boss, the thieves' van, the Security car and the Most Wanted board will get their own pictures (ChatGPT prompts after your OK). Numbers are examples.</div>
+</div>
+<script>
+(()=>{
+const cv=document.getElementById('cv'),X=cv.getContext('2d'),W=360,H=520;
+function fit(){const d=Math.min(3,devicePixelRatio||1);cv.width=W*d;cv.height=H*d;X.setTransform(d,0,0,d,0,0);}fit();addEventListener('resize',fit);
+const L=s=>{const i=new Image();i.src='../img/hero/'+s+'.webp';return i;};
+const TH=[L('sp_t1'),L('sp_t0'),L('sp_t3'),L('sp_t2')],GU=[L('sp_g1_0'),L('sp_g3_0'),L('sp_g0_0'),L('sp_g4_0')];
+// sheet = 4 columns × 6 rows (288×192 cells)
+function spr(im,row,fr,x,y,h,face,fps,t){if(!im.complete||!im.naturalWidth)return;const c=typeof fr==='number'?fr:Math.floor(t*(fps||8))%4;
+  const w=h*1.5;X.save();X.translate(x,y);X.scale(face<0?-1:1,1);X.drawImage(im,c*288,row*192,288,192,-w/2,-h*.97,w,h);X.restore();}
+const lerp=(a,b,k)=>a+(b-a)*Math.max(0,Math.min(1,k));
+const seg=(t,a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+// ---------- scene ----------
+const LOT={x:30,y:150,w:300,h:250}, SLOTS=[[70,215],[130,215],[190,215],[250,215],[70,330],[130,330],[190,330],[250,330]];
+const CARC=['#e53935','#1e88e5','#fdd835','#43a047','#8e24aa','#fb8c00','#00acc1','#eceff1'];
+function car(x,y,col,ang,alarm,t,kind){X.save();X.translate(x,y);X.rotate(ang||0);
+  const L2=kind==='van'?62:46,Wd=kind==='van'?28:24;
+  X.fillStyle='rgba(0,0,0,.35)';X.fillRect(-L2/2+3,-Wd/2+4,L2,Wd);
+  X.fillStyle=col;rr(-L2/2,-Wd/2,L2,Wd,7);X.fill();
+  X.fillStyle='rgba(0,0,0,.45)';rr(kind==='van'?L2/2-20:-6,-Wd/2+3,kind==='van'?14:18,Wd-6,4);X.fill();
+  if(kind!=='van'){X.fillStyle='rgba(255,255,255,.18)';rr(-L2/2+5,-Wd/2+3,10,Wd-6,3);X.fill();}
+  X.fillStyle='#fff8c0';X.fillRect(L2/2-3,-Wd/2+3,3,5);X.fillRect(L2/2-3,Wd/2-8,3,5);
+  if(kind==='sec'||kind==='cop'){const on=Math.floor(t*8)%2;X.fillStyle=on?'#ff1744':'#2979ff';X.fillRect(-4,-Wd/2+2,6,5);X.fillStyle=on?'#2979ff':'#ff1744';X.fillRect(-4,Wd/2-7,6,5);
+    X.fillStyle=kind==='sec'?'#2e7d32':'#1565c0';X.fillRect(-L2/2+6,-2,L2-12,4);}
+  if(kind==='van'){X.fillStyle='#ff5252';X.font='900 8px Game';X.textAlign='center';X.fillText('☠',-12,4);}
+  if(alarm){const a=.35+.35*Math.sin(t*20);X.fillStyle='rgba(255,30,30,'+a+')';rr(-L2/2-5,-Wd/2-5,L2+10,Wd+10,10);X.fill();}
+  X.restore();}
+function rr(x,y,w,h,r){X.beginPath();X.moveTo(x+r,y);X.arcTo(x+w,y,x+w,y+h,r);X.arcTo(x+w,y+h,x,y+h,r);X.arcTo(x,y+h,x,y,r);X.arcTo(x,y,x+w,y,r);X.closePath();}
+function bg(){X.fillStyle='#2a2f36';X.fillRect(0,0,W,H);
+  // roads
+  X.fillStyle='#3b4048';X.fillRect(0,88,W,44);X.fillRect(0,420,W,44);
+  X.strokeStyle='#d8c35a';X.setLineDash([14,10]);X.lineWidth=2;X.beginPath();X.moveTo(0,110);X.lineTo(W,110);X.moveTo(0,442);X.lineTo(W,442);X.stroke();X.setLineDash([]);
+  // lot
+  X.fillStyle='#4a5059';X.fillRect(LOT.x,LOT.y,LOT.w,LOT.h);
+  X.strokeStyle='#e8e8e8aa';X.lineWidth=2;for(let i=0;i<5;i++){const x=40+i*60;X.beginPath();X.moveTo(x,LOT.y+12);X.lineTo(x,LOT.y+105);X.moveTo(x,LOT.y+145);X.lineTo(x,LOT.y+238);X.stroke();}
+  X.fillStyle='#ffffff55';X.font='900 11px Game';X.textAlign='center';X.fillText('EXPORT PARKING',W/2,LOT.y+128);
+  // fence + gate
+  X.strokeStyle='#8d9aa8';X.lineWidth=3;X.strokeRect(LOT.x-6,LOT.y-6,LOT.w+12,LOT.h+12);
+  X.fillStyle='#2a2f36';X.fillRect(LOT.x-9,LOT.y+95,6,60);X.fillRect(LOT.x+LOT.w+3,LOT.y+95,6,60);
+  // guard booth
+  X.fillStyle='#37474f';rr(300,28,52,48,6);X.fill();X.fillStyle='#ffd54a';X.font='900 9px Game';X.fillText('SECURITY',326,56);
+  // lamps
+  for(const [lx,ly] of [[20,140],[340,140],[20,410],[340,410]]){X.fillStyle='#ffe08222';X.beginPath();X.arc(lx,ly,60,0,7);X.fill();X.fillStyle='#ffe082';X.beginPath();X.arc(lx,ly,3,0,7);X.fill();}}
+function night(){X.fillStyle='rgba(5,10,35,.38)';X.fillRect(0,0,W,H);}
+function cone(x,y,dir){X.save();X.globalCompositeOperation='lighter';const g=X.createRadialGradient(x,y,4,x,y,70);g.addColorStop(0,'rgba(255,240,170,.42)');g.addColorStop(1,'rgba(255,240,170,0)');
+  X.fillStyle=g;X.beginPath();X.moveTo(x,y);X.arc(x,y,70,dir-.42,dir+.42);X.closePath();X.fill();X.restore();}
+function tag(x,y,s,col,sz){X.font='900 '+(sz||11)+'px Game';X.textAlign='center';X.lineWidth=3;X.strokeStyle='#000';X.strokeText(s,x,y);X.fillStyle=col;X.fillText(s,x,y);}
+function banner(s,col,t0,t){const k=seg(t,t0,t0+.25),o=1-seg(t,t0+2.2,t0+2.6);if(t<t0||o<=0)return;X.save();X.globalAlpha=o;const y=lerp(20,62,k);
+  X.fillStyle='rgba(0,0,0,.72)';rr(18,y-18,W-36,30,10);X.fill();X.strokeStyle=col;X.lineWidth=2;X.stroke();tag(W/2,y+3,s,col,15);X.restore();}
+function dust(x,y,t){for(let i=0;i<7;i++){const a=i*0.9+t*3,r=10+6*Math.sin(t*9+i);X.fillStyle='rgba(220,210,190,'+(.35+.2*Math.sin(t*7+i))+')';X.beginPath();X.arc(x+Math.cos(a)*r,y-10+Math.sin(a)*r*.6,7,0,7);X.fill();}
+  for(let i=0;i<3;i++){const a=t*6+i*2.1;tag(x+Math.cos(a)*16,y-30+Math.sin(a)*6,'★','#ffeb3b',12);}
+  tag(x+Math.sin(t*20)*3,y-36,'💥','#fff',14);}
+function hpBar(x,y,v){X.fillStyle='#000a';rr(x-22,y,44,7,3);X.fill();X.fillStyle=v>.4?'#ff5252':'#ff1744';rr(x-21,y+1,42*v,5,2);X.fill();tag(x,y-3,'👑 GANG BOSS','#ff5252',9);}
+// money
+let cash=12400000;const fmt=v=>(v/1e6).toFixed(2)+'M';
+const floats=[];function fl(x,y,s,c){floats.push({x,y,s,c,t:0});}
+// ----------- actors along the timeline (loop 27 s) -----------
+const LOOP=27;let last=performance.now()/1000,T=0,fired={};
+function once(k,f){if(!fired[k]){fired[k]=1;f();}}
+function frame(){const now=performance.now()/1000;let dt=Math.min(.05,now-last);last=now;T+=dt;if(T>LOOP){T=0;fired={};cash=12400000;floats.length=0;}
+  const t=T;bg();
+  const thiefCar=SLOTS[1]; // the blue car
+  // parked cars
+  SLOTS.forEach((s,i)=>{if(i===1)return;car(s[0],s[1],CARC[i],Math.PI/2,0,t);});
+  // stolen car (blue) – leaves at 12.5 s
+  let bc={x:thiefCar[0],y:thiefCar[1],a:Math.PI/2};
+  if(t>12.5){const k=seg(t,12.5,13.5),k2=seg(t,13.5,16);bc={x:thiefCar[0],y:lerp(thiefCar[1],110,k),a:Math.PI/2+Math.PI*k*.5};if(k>=1){bc={x:lerp(thiefCar[0],W+80,k2),y:110,a:0};}}
+  car(bc.x,bc.y,CARC[1],bc.a+(t>12.5&&t<13.5?Math.PI:0),t>4&&t<12.5,t);
+  // police chase
+  if(t>13.6&&t<17){car(lerp(-60,W+120,seg(t,13.6,16.6)),104,'#eceff1',0,0,t,'cop');}
+  // thieves' van
+  let van=null;if(t>7&&t<22){const vin=seg(t,7,8.3),vout=seg(t,19.5,21.5);van={x:t<19.5?lerp(W+70,300,vin):lerp(300,-90,vout),y:442};car(van.x,van.y,'#263238',Math.PI,0,t,'van');}
+  // security car
+  let sc=null;if(t>8.6){const k=seg(t,8.6,9.8);sc={x:lerp(W+70,215,k),y:110};if(t>21)sc.x=lerp(215,-80,seg(t,21,23));car(sc.x,sc.y,'#f5f5f5',Math.PI,0,t,'sec');}
+  night();
+  // ---------- people ----------
+  const P=[]; // [y, drawFn] sorted by y
+  // patrol guards (0-5 s walk, then run)
+  const pg=[{im:GU[0],p:[[40,140],[320,140]],ph:0},{im:GU[1],p:[[320,410],[40,410]],ph:.5}];
+  const g1=(()=>{ // guard 1
+    if(t<5){const k=(t/5);return {x:lerp(40,320,k),y:140,row:1,face:1,cone:0};}
+    if(t<6.2)return {x:lerp(320-0,150,seg(t,5,6.2)),y:lerp(140,200,seg(t,5,6.2)),row:2,face:-1,angry:1};
+    if(t<7.6)return {x:150,y:200,row:4,fr:2,face:-1,radio:1};
+    if(t<12)return {x:lerp(150,118,seg(t,7.6,8.2)),y:225,row:2,face:-1,angry:1,fight:t>8.2};
+    if(t<15)return {x:118,y:225,row:3,face:-1,angry:1,fight:t<13.4};
+    if(t<20)return {x:lerp(118,250,seg(t,15,19)),y:lerp(225,430,seg(t,15,19)),row:1,face:1};
+    return {x:250,y:430,row:5,face:1};})();
+  const g2=(()=>{
+    if(t<5)return {x:lerp(320,40,t/5),y:410,row:1,face:-1,cone:Math.PI};
+    if(t<8.4)return {x:lerp(40,180,seg(t,5,7)),y:lerp(410,370,seg(t,5,7)),row:2,face:1,angry:1};
+    if(t<14.5)return {x:lerp(180,240,seg(t,8.4,9.6)),y:lerp(370,420,seg(t,8.4,9.6)),row:t<9.6?2:3,face:1,angry:1,fight:t>9.6&&t<12.8};
+    if(t<20)return {x:lerp(240,262,seg(t,14.5,16)),y:430,row:0,face:1};
+    return {x:262,y:430,row:5,face:-1};})();
+  [g1,g2].forEach((g,i)=>P.push([g.y,()=>{if(g.cone!=null&&t<5)cone(g.x,g.y-14,g.cone);
+    spr(pg[i].im,g.row,g.fr,g.x,g.y,46,g.face,g.row===2?12:8,t);
+    if(g.angry&&!g.fight)tag(g.x+10,g.y-48,'😠','#fff',13);if(g.radio)tag(g.x,g.y-50,'📻 BACKUP!','#64b5f6',11);}]));
+  // backup guards from the security car (9.8 s)
+  if(sc&&t>9.8){[[0,GU[2],[150,330]],[1,GU[3],[205,440]]].forEach(([i,im,to])=>{let g;
+    if(t<11)g={x:lerp(215+i*14,to[0],seg(t,9.8,11)),y:lerp(124,to[1],seg(t,9.8,11)),row:2,face:-1};
+    else if(t<15.5)g={x:to[0],y:to[1],row:3,face:i?1:-1,fight:t<14.2};
+    else if(t<21)g={x:lerp(to[0],222+i*16,seg(t,15.5,18)),y:lerp(to[1],124,seg(t,15.5,18)),row:1,face:1};
+    else return;P.push([g.y,()=>{spr(im,g.row,null,g.x,g.y,46,g.face,g.row===2?12:8,t);if(!g.fight&&t<11)tag(g.x,g.y-50,'😠','#fff',12);}]);});}
+  // thieves
+  const th=[];
+  // A amateur – sneaks to blue car, breaks in, caught by guard 1
+  th.push((()=>{const im=TH[0];if(t<4)return {im,x:lerp(-20,104,t/4),y:lerp(300,230,t/4),row:1,face:1};
+    if(t<8.2)return {im,x:104,y:230,row:3,face:1};
+    if(t<13.4)return {im,x:104,y:230,row:3,face:1,fight:1};
+    if(t<15)return {im,x:104,y:230,row:4,fr:Math.min(3,Math.floor((t-13.4)*2.5)),face:1,caught:1};
+    if(t<19)return {im,x:lerp(104,236,seg(t,15,19)),y:lerp(230,438,seg(t,15,19)),row:5,face:1,caught:1};return null;})());
+  // B pro – escapes with the car
+  th.push((()=>{const im=TH[1];if(t<4)return {im,x:lerp(-20,150,t/4),y:lerp(240,215,t/4),row:1,face:1,pro:1};
+    if(t<12.5)return {im,x:150,y:215,row:3,face:-1,pro:1};return null;})());
+  // C gang boss + D helper out of the van
+  if(van&&t>8.3){th.push((()=>{const im=TH[2];if(t<9.6)return {im,x:lerp(300,240,seg(t,8.3,9.6)),y:lerp(442,415,seg(t,8.3,9.6)),row:2,face:-1,boss:1};
+      if(t<12.8)return {im,x:240,y:415,row:3,face:-1,boss:1,fight:1,hp:1-seg(t,9.6,12.8)*.85};
+      if(t<14.5)return {im,x:240,y:415,row:4,fr:Math.min(3,Math.floor((t-12.8)*2.5)),face:-1,boss:1,caught:1,hp:.12};
+      if(t<19)return {im,x:lerp(240,250,seg(t,14.5,19)),y:lerp(415,440,seg(t,14.5,19)),row:5,face:1,boss:1,caught:1};return null;})());
+    th.push((()=>{const im=TH[3];if(t<9.6)return {im,x:lerp(300,160,seg(t,8.6,10.6)),y:lerp(442,345,seg(t,8.6,10.6)),row:2,face:-1};
+      if(t<14.2)return {im,x:lerp(300,160,seg(t,8.6,10.6)),y:lerp(442,345,seg(t,8.6,10.6)),row:t<11?2:3,face:-1,fight:t>11};
+      if(t<15.5)return {im,x:160,y:345,row:4,fr:Math.min(3,Math.floor((t-14.2)*2.5)),face:-1,caught:1};
+      if(t<19)return {im,x:lerp(160,262,seg(t,15.5,19)),y:lerp(345,440,seg(t,15.5,19)),row:5,face:1,caught:1};return null;})());}
+  th.filter(Boolean).forEach(o=>P.push([o.y,()=>{const h=o.boss?62:44;
+    if(o.boss){X.save();X.globalAlpha=.5+.3*Math.sin(t*6);X.fillStyle='#ff1744';X.beginPath();X.ellipse(o.x,o.y,20,6,0,0,7);X.fill();X.restore();}
+    spr(o.im,o.row,o.fr,o.x,o.y,h,o.face,o.row===2?12:7,t);
+    if(o.fight)dust(o.x-o.face*6,o.y,t);
+    if(o.hp!=null)hpBar(o.x,o.y-h-14,o.hp);
+    else if(o.caught)tag(o.x,o.y-h-4,'⛓ CAUGHT','#7CFC9A',10);
+    else if(o.pro)tag(o.x,o.y-h-4,'🦹 PRO','#b39ddb',10);
+    else if(t>3)tag(o.x,o.y-h-4,'🦹 THIEF','#ff6b6b',10);}]));
+  P.sort((a,b)=>a[0]-b[0]).forEach(p=>p[1]());
+  // events
+  if(t>4)once('alarm',()=>fl(130,190,'🚨 ALARM!','#ff5252'));
+  if(t>12.6)once('steal',()=>{const loss=Math.round(cash*.1);cash-=loss;fl(150,170,'💸 −'+fmt(loss)+' (10%)','#ff5252');});
+  if(t>13.5)once('a',()=>fl(104,180,'+🧰 25','#7CFC9A'));
+  if(t>14.3)once('d',()=>fl(160,295,'+🧰 25','#7CFC9A'));
+  if(t>13)once('c',()=>fl(240,345,'+💎 40','#80deea'));
+  floats.forEach(f=>{f.t+=dt;const o=1-seg(f.t,1.4,2);X.globalAlpha=Math.max(0,o);tag(f.x,f.y-f.t*22,f.s,f.c,14);X.globalAlpha=1;});
+  // banners
+  banner('🚨 2 THIEVES! one is a PRO','#ff5252',4,t);
+  banner('📻 GUARD CALLS BACKUP!','#64b5f6',6.3,t);
+  banner('🚐 THIEF REINFORCEMENTS + GANG BOSS!','#ff9100',8,t);
+  banner('🚓 SECURITY CAR: 2 MORE GUARDS!','#7CFC9A',10.2,t);
+  banner('🚔 PRO ESCAPED – POLICE CHASE!','#ffeb3b',13,t);
+  // HUD
+  X.fillStyle='rgba(0,0,0,.6)';rr(8,8,150,26,9);X.fill();tag(83,26,'💵 '+fmt(cash),'#ffe082',15);
+  X.fillStyle='rgba(0,0,0,.6)';rr(170,8,120,26,9);X.fill();tag(230,26,'🛡️ SECURITY LV 6','#90caf9',11);
+  // result card
+  if(t>21.5){const k=seg(t,21.5,22);X.save();X.globalAlpha=k;X.fillStyle='rgba(0,0,0,.55)';X.fillRect(0,0,W,H);
+    X.translate(W/2,H/2);X.scale(.8+.2*k,.8+.2*k);
+    const g=X.createLinearGradient(0,-120,0,120);g.addColorStop(0,'#2b3d52');g.addColorStop(1,'#141d28');X.fillStyle=g;rr(-150,-120,300,240,18);X.fill();X.strokeStyle='#ffd54a';X.lineWidth=3;X.stroke();
+    tag(0,-86,'RAID STOPPED!','#ffd54a',26);tag(0,-60,'3 / 4 thieves caught  ·  Gang Boss ✔','#fff',12);
+    const R=[['🧰','Builder Kit','+50','#ffcc80'],['🎫','Crew Tickets','+3','#a5d6a7'],['💎','Diamonds','+40','#80deea'],['📋','Most Wanted bounty','+60 🧰','#ffab91']];
+    R.forEach((r,i)=>{const y=-28+i*30;X.fillStyle='rgba(255,255,255,.06)';rr(-130,y-15,260,25,8);X.fill();X.textAlign='left';tag(-112,y+3,r[0],'#fff',15);X.font='800 13px Body';X.textAlign='left';X.fillStyle='#dfe8f1';X.fillText(r[1],-90,y+2);X.textAlign='right';tag(118,y+3,r[2],r[3],15);});
+    tag(0,104,'Lost: 💸 −'+fmt(12400000-cash)+' (1 car)','#ff6b6b',12);X.restore();}
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+})();
+</script></body></html>
