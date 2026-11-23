@@ -2394,7 +2394,40 @@ function bgBlit(c,y0,y1){y0=Math.max(0,Math.floor(y0));y1=Math.min(H,Math.ceil(y
   if(!B.zoom&&!B.sx&&!B.sy){const a=Math.round(y0*DPR),b=Math.min(c.height,Math.round(y1*DPR));g.setTransform(1,0,0,1,0,0);g.drawImage(c,0,a,c.width,b-a,0,a,c.width,b-a);camT();}
   else g.drawImage(c,0,y0*DPR,c.width,(y1-y0)*DPR,0,y0,W,y1-y0);}
 function tiled(c,par,y,h){const LW=B.LW,o=((B.scroll*par)%LW+LW)%LW;g.drawImage(c,-o,y,LW,h);if(LW-o<W)g.drawImage(c,LW-o,y,LW,h);}
+// v16-244 (Marius 23 nov: battle background pictures) – campaign stages use Marius' painted backgrounds + light animated effects.
+// World 1 Scrapyard: zones 1-2 junkyard, 3-4 desert · 2 Refinery: factory · 3 Frozen · 4 Neon · 5 Volcano · every chapter boss: boss arena.
+// Acts 2-15 get a light colour shift (same idea as bioVariant). Scaled ONCE into a cached canvas (like the tower arena) = cheap on budget phones.
+const CBG={},CBGC={};
+function cbgKey(){const s=B&&B.stage;if(!s||s.c==null||B.tw)return null;if(s.boss)return 'boss_arena';const t=s.c%5;return t===0?(s.z<2?'junkyard':'desert'):['','factory','frozen','neon','volcano'][t];}
+function cbgImg(){const k=cbgKey();if(!k)return null;const f=k+(LOWRES&&!HD?'_low':'');if(!CBG[f]){const im=new Image();im.decoding='async';im.src='img/bbg/bg_'+f+'.webp';CBG[f]=im;}return CBG[f];}
+function cbgFilter(){const a=Math.floor((B.stage.c||0)/5),A=ACTS[a];if(!A||!A.bio)return 'none';const m=A.bio,h=Math.round(clamp((m.h||0)*.4,-50,50)),sa=clamp(m.s||1,.6,1.3),l=clamp(m.l||1,.68,1.12);return 'hue-rotate('+h+'deg) saturate('+sa+') brightness('+l+')';}
+function drawCBG(im,t){const k=Math.max(W/1024,H/1536)*1.04,ox=(W-1024*k)/2,oy=-12*k,cw=Math.round(W*BDPR),ch=Math.round(H*BDPR),flt=cbgFilter(),key=im.src+cw+'x'+ch+flt;
+  let c=CBGC.c;if(!c||CBGC.k!==key){c=CBGC.c=CBGC.c||document.createElement('canvas');c.width=cw;c.height=ch;const x=c.getContext('2d',{alpha:false});x.filter=flt;x.drawImage(im,ox*BDPR,oy*BDPR,1024*k*BDPR,1536*k*BDPR);x.filter='none';CBGC.k=key;}
+  g.drawImage(c,0,0,cw,ch,0,0,W,H);
+  const X=v=>ox+v*k,Y=v=>oy+v*k,K=cbgKey(),P=B.bgP;
+  const glow=(x,y,r,col,a)=>{const q=g.createRadialGradient(x,y,1,x,y,r);q.addColorStop(0,col+a+')');q.addColorStop(1,col+'0)');g.fillStyle=q;circ(g,x,y,r);};
+  const sparks=(x,y,per,ph)=>{const p=((t+ph)%per)/per;if(p>.4)return;const q=p/.4;glow(x,y,26*k*2,'rgba(255,200,90,',.55*(1-q));
+    for(let i=0;i<12;i++){const a=-Math.PI*(.05+.9*((i*7%12)/12)),v=(40+(i*13%30))*k*2;g.fillStyle='rgba(255,'+(230-i*9)+',90,'+(1-q)+')';g.fillRect(x+Math.cos(a)*v*q,y+Math.sin(a)*v*q+70*k*q*q*2,2.2,2.2);}};
+  const puffs=(x,y,n,sp,col)=>{for(let i=0;i<n;i++){const p=(t*sp+i/n)%1;g.fillStyle=col+(.3*(1-p))+')';circ(g,x+Math.sin(p*4+i)*14*k*2+p*30*k*2,y-p*140*k*2,(12+p*40)*k*2);}};
+  if(K==='junkyard'){sparks(X(300),Y(492),1.6,0);glow(X(570),Y(270),60*k*2,'rgba(255,190,90,',.12+.06*Math.sin(t*2));}
+  else if(K==='desert'){glow(X(925),Y(155),120*k,'rgba(255,250,210,',.35+.1*Math.sin(t*1.3));
+    for(let i=0;i<18;i++){const p=(t*.12+i*.0557)%1,x=W*1.1-p*W*1.3,y=Y(700)+(i*37%9)*(H*.04)+Math.sin(t*2+i)*6;g.fillStyle='rgba(240,200,140,'+(.35*Math.sin(p*Math.PI))+')';ell(g,x,y,10*k*2,1.6);}}
+  else if(K==='factory'){sparks(X(300),Y(330),1.1,0);sparks(X(300),Y(330),1.1,.55);puffs(X(390),Y(190),5,.18,'rgba(220,210,230,');puffs(X(745),Y(560),4,.15,'rgba(200,200,220,');
+    glow(X(465),Y(430),90*k*2,'rgba(255,140,40,',.18+.1*Math.sin(t*3.1));}
+  else if(K==='neon'){const f1=(Math.sin(t*9)>.92||((t*.5)%5)<.15)?.2:.55;glow(X(235),Y(180),95*k*2,'rgba(0,229,255,',f1);glow(X(80),Y(130),70*k*2,'rgba(255,60,220,',.35+.15*Math.sin(t*2.3));
+    glow(X(720),Y(320),60*k*2,'rgba(255,60,220,',.3+.15*Math.sin(t*3.7));
+    if(!P.rain){g.strokeStyle='rgba(190,215,255,.35)';g.lineWidth=1;g.beginPath();for(let i=0;i<60;i++){const p=(t*1.5*(1+i%4*.15)+i*.0619)%1,x=((i*53.3+t*40)%(W+80)+W+80)%(W+80)-40,y=p*H*1.1-20;g.moveTo(x,y);g.lineTo(x-5,y+15);}g.stroke();}}
+  else if(K==='frozen'){for(let i=0;i<3;i++){const a=.1+.07*Math.sin(t*.8+i*2),x=X(380+i*160)+Math.sin(t*.4+i)*30*k*2;const q=g.createLinearGradient(0,Y(30),0,Y(240));q.addColorStop(0,'rgba(80,255,170,0)');q.addColorStop(.5,'rgba(80,255,170,'+a+')');q.addColorStop(1,'rgba(120,80,255,0)');g.fillStyle=q;ell(g,x,Y(130),110*k*2,90*k*2);}
+    glow(X(345),Y(483),40*k*2,'rgba(255,190,80,',.35+.2*Math.sin(t*4));
+    if(!P.snow){for(let i=0;i<40;i++){const p=(t*.12+i*.0731)%1,x=((i*61.7+t*20)%(W+40)+W+40)%(W+40)-20;g.fillStyle='rgba(255,255,255,.7)';circ(g,x+Math.sin(t*1.5+i)*8,p*H,1+(i%3)*.6);}}}
+  else if(K==='volcano'){puffs(X(690),Y(90),6,.1,'rgba(60,45,45,');glow(X(690),Y(100),120*k*2,'rgba(255,120,30,',.2+.12*Math.sin(t*1.7));glow(X(170),Y(400),110*k*2,'rgba(255,150,40,',.15+.1*Math.sin(t*2.6));
+    g.fillStyle='rgba(255,90,20,'+(.04+.04*Math.sin(t*2))+')';g.fillRect(0,Y(560),W,H);
+    for(let i=0;i<24;i++){const p=(t*.1*(1+i%3*.3)+i*.137)%1,x=((i*97.3+t*8*(i%2?1:-1))%W+W)%W,y=H*.95-p*H*.8;g.fillStyle='rgba(255,'+(140+(i%3)*30)+',60,'+(.9*(1-p))+')';g.fillRect(x+Math.sin(t*2+i)*10,y,2,2);}}
+  else if(K==='boss_arena'){const fl=(t%6.5);if(fl<.18){g.fillStyle='rgba(200,220,255,'+(.35*(1-fl/.18))+')';g.fillRect(0,0,W,H);}
+    for(const [sx,sy,ph] of [[145,85,0],[925,115,1.7]]){const a=.12+.08*Math.sin(t*1.4+ph);g.fillStyle='rgba(255,220,150,'+a+')';g.beginPath();g.moveTo(X(sx),Y(sy));g.lineTo(X(512)-(sx<512?220:-220)*k+Math.sin(t*.6+ph)*60*k*2,Y(760));g.lineTo(X(512)-(sx<512?-40:40)*k+Math.sin(t*.6+ph)*60*k*2,Y(760));g.closePath();g.fill();}
+    glow(X(610),Y(390),120*k*2,'rgba(255,140,40,',.22+.14*Math.sin(t*2.2));}}
 function drawBG(t){const P=B.bgP;
+  {const im=cbgImg();if(im&&im.complete&&im.naturalWidth){drawCBG(im,t);return;}}
   if(B.tw){const im=twArenaImg();if(im.complete&&im.naturalWidth){ // v16-60: the arena picture is scaled ONCE into a screen-sized canvas (cheaper every frame on slow phones)
     const cw=Math.round(W*BDPR),ch=Math.round(H*BDPR),key=im.src+cw+'x'+ch;let c=TWA.c;
     if(!c||TWA.ck!==key){c=TWA.c=TWA.c||document.createElement('canvas');c.width=cw;c.height=ch;const x=c.getContext('2d',{alpha:false}),k=Math.max(W/1024,H/1536)*1.04*BDPR,w=1024*k;x.drawImage(im,(cw-w)/2,-12*k,w,1536*k);TWA.ck=key;}
