@@ -4058,6 +4058,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:84,d:'Nov 23, 2026',ic:'📅',t:'New Check-in page',l:['The <b>5000 FREE SUMMONS</b> page has a brand-new look: TODAY\'s rewards, a big <b>CLAIM</b> button and a progress bar to <b>5000</b> tickets.','Same rewards as before: <b>10 Recruit + 10 Crew + 10 Gear</b> tickets every day, nothing random. Missing a day never resets your progress.']},
  {id:83,d:'Nov 23, 2026',ic:'⚖️',t:'BALANCE UPDATE – a longer road to the top',l:['<b>MYTHIC heroes are much stronger</b>: a fresh Mythic is now as strong as a Legendary +10, and every AWAKENING gives more.','<b>Hero levels</b> cost more Essence (after Lv 10), but <b>every level gives twice the stats</b> and every ASCENSION (20 levels) gives a <b>big boost</b>.','<b>Garage upgrades</b> need more parts (after LV 2) – every level is a real goal now.','Duplicate heroes that are already maxed now give <b>diamonds</b>.','Campaign monsters and <b>Dungeons</b> are tougher, and <b>Mythic gear</b> is rarer – every Mythic drop is special.']},
  {id:82,d:'Nov 22, 2026',ic:'🏁',t:'TORQUE GRAND PRIX – a ONE-TIME event!',l:['A huge <b>28-day</b> event – it happens <b>only once</b> and never comes back. Open <b>EVENTS</b> → tap the <b>GRAND PRIX</b> banner.','Do <b>missions</b> (daily, weekly, event) → earn <b>GP Tokens</b> → climb the <b>Grand Prix Road</b> (50 tiers). <b>Tier 50 = a MYTHIC hero of your choice</b>, free!','Spend tokens in the <b>GP Shop</b>, take a free <b>Pit-Stop Chest</b> every week, fill the <b>SERVER GOAL</b> together (gifts for everyone).','<b>LEGENDS</b>: the TOP of your server wins prestige prizes – golden statue, trophy #1, animated frame … <b>FIRST OVER THE LINE</b>: the first 10 who finish the ULTIMATE mission win extra prizes.']},
  {id:81,d:'Nov 22, 2026',ic:'🔑',t:'Dungeons: 100 floors',l:['Every dungeon now has <b>100 floors</b> (was 30). Floors 1-30 stay the same.','After floor 30 the monsters get <b>much stronger</b> – floor 100 is for the strongest teams in the game.','Bigger rewards: <b style="color:#ff6b6b">MYTHIC</b> gear (Scrap Mine) and <b style="color:#ff6b6b">MYTHIC</b> set pieces (Gear Forge) from floor <b>61</b>, NITRO BOOST up to <b>+30%</b>, more cash, Essence and Gear Parts.','Boss floors <b>40, 50 … 100</b> give <b>×2</b> cash, Essence and Gear Parts.','The <b>DUNGEON MASTER</b> title (floor 50 in all 4 dungeons) can now be won.']},
@@ -4168,13 +4169,18 @@ $('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').oncli
 function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTML=TKI+' '+G.h.tk;
   if(xpMode==='ci'){T.textContent='5000 FREE SUMMONS';const n=G.c5.n,rd=ciReady(),got=c5Got(n),blk=Math.floor((rd?n:Math.max(0,n-1))/30)*30;
     S.textContent=got>=C5_TOTAL?'ALL 5000 TICKETS COLLECTED!':'DAY '+(rd?n+1:n)+' OF '+C5_DAYS+' · LOG IN EVERY DAY';
-    let h='<div class="c5Top"><div class="c5Big">'+got.toLocaleString()+'<small> / '+C5_TOTAL.toLocaleString()+'</small></div><div class="c5Lbl">FREE SUMMON TICKETS COLLECTED</div><div class="c5Bar"><i style="width:'+(got/C5_TOTAL*100).toFixed(1)+'%"></i></div>'+
-      '<div class="c5Each">Every day: '+TKI+' ×10 Recruit · '+CTI+' ×10 Crew · '+GTI+' ×10 Gear</div></div>';
-    h+='<div class="c5Grid">';for(let d=blk;d<Math.min(blk+30,C5_DAYS);d++){const done=d<n,now=rd&&d===n,r=c5Rw(d);
-      h+='<div class="c5D'+(done?' done':'')+(now?' now':'')+((d+1)%30===0||d===C5_DAYS-1?' big':'')+'"><b>DAY '+(d+1)+'</b><span>'+(done?'✓':(r?(r.tk+r.ct+r.gt):0))+'</span></div>';}
+    /* v16-191: new Check-in page from Marius's picture (img/ci/*, tools/ci_cut.py). Game ticket icons on top (one icon per element). */
+    const r=c5Rw(n)||{tk:0,ct:0,gt:0},TK=[['img/ticket.webp','RECRUIT',r.tk],['img/cticket.webp','CREW',r.ct],['img/gticket.webp','GEAR',r.gt]];
+    let h='<div class="c5H"><img src="img/ci/c5_hero.webp" alt=""></div>';
+    h+='<div class="c5T"><div class="c5Tk">'+TK.map(t=>'<div><img src="'+t[0]+'" alt=""><b>'+t[1]+'<br>TICKET</b><span>×'+t[2]+'</span></div>').join('')+'</div>'+
+      '<button class="c5Go'+(rd?'':' off')+'" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'CLAIM':got>=C5_TOTAL?'ALL COLLECTED':'COME BACK TOMORROW')+'</button></div>';
+    h+='<div class="c5g">';for(let d=blk;d<Math.min(blk+30,C5_DAYS);d++){const done=d<n,now=rd&&d===n,q=c5Rw(d),big=(d+1)%30===0||d===C5_DAYS-1;
+      h+='<div class="c5d'+(done?' done':'')+(now?' now':'')+(big&&!now?' big':'')+'"><b>DAY '+(d+1)+'</b><img src="img/ticket.webp" alt=""><span>'+(q?(q.tk+q.ct+q.gt):0)+'</span>'+(done?'<i>✔</i>':'')+'</div>';}
     h+='</div>';
-    const r=c5Rw(n);h+='<button class="xBtn" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'✅ CLAIM DAY '+(n+1)+' · +'+(r.tk+r.ct+r.gt)+' TICKETS':got>=C5_TOTAL?'🏆 All collected':'✓ Claimed today – come back tomorrow')+'</button>';
-    h+='<div class="xNote">Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.</div>';
+    const MS=[500,1000,1500,2000,2500,3000,3500,4000,4500,5000],MX=[9.2,18.2,27,35.6,44.2,52.8,61.4,70.1,78.9,90];
+    h+='<div class="c5P"><div class="c5Pt"><img src="img/ticket.webp" alt=""><b>'+got.toLocaleString('en-US')+'</b>&nbsp;/ '+C5_TOTAL.toLocaleString('en-US')+' TICKETS</div>'+
+      '<div class="c5Pb"><i style="width:'+(got/C5_TOTAL*100).toFixed(1)+'%"></i></div>'+MS.map((m,i)=>got>=m?'<em style="left:'+MX[i]+'%">✔</em>':'').join('')+'</div>';
+    h+='<div class="xNote">Every day: 10 Recruit + 10 Crew + 10 Gear tickets. Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.</div>';
     B.innerHTML=h;const g=$('ciGo');if(g)g.onclick=()=>{if(!ciReady())return;const r=c5Rw(G.c5.n);giveRw(r);G.c5.n++;G.c5.day=dayKey();save();
       toast('📅 Day '+G.c5.n+': '+rwHtml(r).replace(/<br>/g,' · '),3500);renderXP();updX();};return;}
   if(xpMode==='news'){T.textContent='NEWS';S.textContent='LATEST UPDATES';
@@ -4372,6 +4378,32 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 .rsAct .rsA.gold{border-image-source:url(img/ui8/btn_gold_s.webp);color:#2a1600;text-shadow:0 1px 0 #ffe9a0;font-size:16px}
 .rsAct .rsA.blue{border-image-source:url(img/ui8/btn_blue_s.webp);color:#fff;text-shadow:0 2px 0 #062050}
 .rsAct .rsA img{height:1.2em;vertical-align:-.25em}
+
+/* v16-191 CHECK-IN from Marius's picture */
+.c5H{margin:-2px -4px 0}.c5H img{display:block;width:100%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent),linear-gradient(transparent,#000 8%,#000 90%,transparent);-webkit-mask-composite:source-in;mask-composite:intersect}
+.c5T{position:relative;container-type:inline-size;aspect-ratio:765/467;background:url(img/ci/c5_today.webp) center/100% 100% no-repeat;margin:2px 0 8px}
+.c5Tk{position:absolute;left:7%;width:86%;top:18%;height:52%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center}
+.c5Tk>div{display:flex;flex-direction:column;align-items:center;gap:1cqw}
+.c5Tk img{width:20cqw;filter:drop-shadow(0 0 2.5cqw #ffb30099)}
+.c5Tk b{font:900 3.6cqw/1.05 Game,system-ui;color:#fff;text-align:center;text-shadow:0 1px 0 #000,0 0 3px #000}
+.c5Tk span{min-width:15cqw;padding:.6cqw 3cqw;border-radius:2cqw;background:linear-gradient(#ffcf4a,#c98600);box-shadow:inset 0 0 0 .5cqw #fff3,0 0 0 .5cqw #6b4400;font:900 5cqw/1.2 Game,system-ui;color:#fff;text-align:center;text-shadow:0 2px 0 #6b3a00}
+.c5Go{position:absolute;left:22%;width:56%;top:74.5%;height:20%;border:0;background:none;padding:0;font:900 9cqw/1 Game,system-ui;color:#fff7d6;text-shadow:0 .5cqw 0 #8a3300,0 0 1.5cqw #7a2a00;-webkit-text-stroke:.3cqw #7a2c00;cursor:pointer}
+.c5Go.off{font-size:4.6cqw;color:#fff;background:#0009;border-radius:3cqw;clip-path:polygon(3% 0,97% 0,100% 30%,100% 70%,97% 100%,3% 100%,0 70%,0 30%)}
+.c5Go:active:not(.off){transform:scale(.96)}
+.c5g{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-bottom:8px}
+.c5d{position:relative;aspect-ratio:126/190;background:url(img/ci/c5_n.webp) center/100% 100% no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:9% 4% 12%;container-type:inline-size}
+.c5d.now{background-image:url(img/ci/c5_c.webp);filter:drop-shadow(0 0 5px #ffb300)}
+.c5d.big{background-image:url(img/ci/c5_c.webp);filter:hue-rotate(250deg) saturate(1.2)}
+.c5d b{font:900 20cqw/1 Game,system-ui;color:#ffe9a8;text-shadow:0 1px 0 #000;white-space:nowrap}
+.c5d img{width:58%}.c5d span{font:900 26cqw/1 Game,system-ui;color:#fff;text-shadow:0 1px 0 #000,0 0 3px #000}
+.c5d.done img,.c5d.done span,.c5d.done b{opacity:.45}
+.c5d i{position:absolute;left:0;right:0;bottom:6%;text-align:center;font:900 34cqw/1 system-ui;color:#3bea4f;text-shadow:0 2px 0 #0a5a12,0 0 4px #000;font-style:normal}
+.c5P{position:relative;container-type:inline-size;aspect-ratio:972/240;background:url(img/ci/c5_prog.webp) center/100% 100% no-repeat;margin-bottom:6px}
+.c5Pt{position:absolute;left:25%;width:50%;top:7%;height:16%;display:flex;align-items:center;justify-content:center;font:900 4.4cqw/1 Game,system-ui;color:#fff;text-shadow:0 1px 0 #000;white-space:nowrap}
+.c5Pt img{height:7cqw;margin-right:1.5cqw}.c5Pt b{color:#ffd54a;font-size:5.2cqw}
+.c5Pb{position:absolute;left:5.6%;width:78.6%;top:40%;height:14.5%;border-radius:9cqw;background:#0b0e16;box-shadow:inset 0 0 0 .4cqw #c9a040,inset 0 .6cqw 1cqw #000;overflow:hidden}
+.c5Pb i{display:block;height:100%;border-radius:9cqw;background:linear-gradient(#ffd27a,#ff8a00 55%,#d35400);box-shadow:0 0 2cqw #ff9800}
+.c5P em{position:absolute;top:59%;transform:translateX(-50%);font:900 4.2cqw/1 system-ui;color:#3bea4f;text-shadow:0 1px 0 #063,0 0 3px #000;font-style:normal;pointer-events:none}
 </style>
 </body>
 </html>
