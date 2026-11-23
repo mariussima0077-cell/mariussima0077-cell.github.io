@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=202;
+const CV=203;
 async function call(op,b){if(!API())return {err:'offline'};try{const r=await fetch(API()+'/api/on/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID(),cv:CV,...b})});const j=await r.json();if(j&&j.err==='update')needUpd();if(j&&j.err==='integrity')integMsg();return j;}catch(e){return {err:'network'};}}
 // v16-105: online modes only in the official app from Google Play on a real phone (Play Integrity) – the game itself stays playable
 let integShown=0;function integMsg(){if(integShown)return;integShown=1;if(window.SEC&&SEC.integ)SEC.integ();const t=window.__TE;if(t&&t.toast)t.toast('🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.',5000);}
@@ -32,10 +32,10 @@ function needUpd(){if(document.getElementById('updNeed'))return;const d=document
 
 // ------------------------------------------------------------------ titles, frames, leagues
 const TT={vip10:['t5','VIP LEGEND','Reach VIP 10'],vip5:['t3','VIP STAR','Reach VIP 5'],fdr:['t5','FOUNDER','Founder Pass (Shop)'],rail:['t4','RAIL BARON','Rail Pass active (Shop)'],king:['t5','TORQUE KING','Be #1 of the campaign on your server'],cup:['t5','CUP CHAMPION','Win a Weekend Cup'],leg:['t4','ARENA LEGEND','Reach LEGEND in the Arena'],glad:['t4','ARENA GLADIATOR','Reach GOLD in the Arena'],
- boss:['t3','BOSS SLAYER','Reach campaign stage 5-1'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 3-1'],rook:['t0','ROOKIE','Start the game'],
+ boss:['t3','BOSS SLAYER','Reach campaign stage 3-21'],gear:['t3','GEAR GURU','Own a Legendary gear item'],speed:['t2','SPEED DEMON','Reach Reputation 10'],chat:['t2','GARAGE TALKER','Write 100 chat messages'],wr:['t1','WRENCH MASTER','Reach campaign stage 2-11'],rook:['t0','ROOKIE','Start the game'],
  // v16-174: 12 new titles (Marius: more titles on the profile) – kept forever once reached (G.ttl)
  sky:['t5','SKY BREAKER','Reach floor 500 in Torque Tower'],awk:['t5','AWAKENED','Awaken a Mythic hero'],bhunt:['t4','BOSS HUNTER','Claim the last World Boss reward of a day'],dgm:['t4','DUNGEON MASTER','Reach floor 50 in all 4 Dungeons'],
- trny:['t4','TRAIN TYCOON','Send 100 trains in Rail Wars'],raid:['t4','RAIL RAIDER','Win 50 train attacks in Rail Wars'],hard:['t4','HARDCORE','Reach HARD MODE stage 5-20'],coll:['t3','COLLECTOR','Own 10 classic cars in the Collection Garage'],
+ trny:['t4','TRAIN TYCOON','Send 100 trains in Rail Wars'],raid:['t4','RAIL RAIDER','Win 50 train attacks in Rail Wars'],hard:['t4','HARDCORE','Reach HARD MODE stage 4-10'],coll:['t3','COLLECTOR','Own 10 classic cars in the Collection Garage'],
  lucky:['t3','LUCKY STAR','Own a Mythic hero'],twr:['t3','TOWER CLIMBER','Reach floor 100 in Torque Tower'],gty:['t3','GARAGE TYCOON','Get a building to level 50'],daily:['t2','DAILY GRINDER','Check in 30 days']};
 const TORD=['fdr','rail','king','cup','sky','awk','leg','bhunt','dgm','trny','raid','hard','glad','coll','lucky','twr','gty','boss','gear','speed','daily','chat','wr','rook'];
 const tt=k=>{const x=TT[k]||TT.rook;return `<i class="tt ${x[0]}">${x[1]}</i>`;};

@@ -501,7 +501,7 @@ async function botTick(env) {
   const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>?").bind(now - 3 * DAY).first()).n;
   // v16-189: bots climb to the level of the REAL players (median stage of the active ones, ×0.4-1.0), not to a tiny stage
   const rb = (await db.prepare("SELECT best FROM prof WHERE srv=1 AND substr(pid,1,4) NOT IN ('bot_','tst_') AND t>? ORDER BY best").bind(now - 7 * DAY).all()).results.map(r => r.best | 0);
-  const med = rb.length ? rb[Math.floor(rb.length / 2)] : 60, tgOf = () => Math.max(20, Math.min(1500, Math.round(med * bRnd(.4, 1.0))));
+  const med = rb.length ? rb[Math.floor(rb.length / 2)] : 60, tgOf = () => Math.max(20, Math.min(2250, Math.round(med * bRnd(.4, 1.0))));
   if (real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];   // ~1 a day (cron every 10 min)
       await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); } }
   else if (bots.length < BOT_MAX && (bots.length < BOT_FAST || !bots.some(b => b.created > now - BOT_EVERY))) {
@@ -542,7 +542,7 @@ export async function online(op, b, env) {
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
     const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, team = cleanTeam(b.team), lang = String(b.lang || 'en').slice(0, 12);
-    const best = num(s.best, 0, 1500) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 1400) | 0, pw = teamPow(team);   // v16-129: garage levels go to 100 (14 buildings → 1400)
+    const best = num(s.best, 0, 2250) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 1400) | 0, pw = teamPow(team);   // v16-129: garage levels go to 100 (14 buildings → 1400)
     const cl = Array.isArray(b.unl) ? b.unl : [];
     // v16-122: FOUNDER only with a purchase Google confirmed (purchases table) – the test account (tst_…) may claim it
     const fdr = cl.includes('fdr') && (String(b.pid).startsWith('tst_') || !!(await db.prepare("SELECT 1 FROM purchases WHERE sku='founder_pass' AND state='ok' AND pid IN (" + [b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].slice(0, 6).map(() => '?').join(',') + ") LIMIT 1").bind(b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)).first()));

@@ -85,7 +85,7 @@ css.textContent=`
 #cpChap{display:flex;align-items:center;gap:8px;background:#000a;border:1px solid #ffb30044;border-radius:12px;padding:4px}
 #cpChN{flex:1;text-align:center;line-height:1.1}#cpChN b{display:block;font-size:15px;letter-spacing:.5px;text-shadow:0 1px 0 #000}#cpChN small{font-size:10px;color:#c8a27c;font-weight:800}
 .chA{width:40px;height:34px;border-radius:10px;border:1px solid #ffb30088;background:linear-gradient(#3a2614,#1d120a);color:#ffd54a;font-size:22px;font-weight:900;padding:0}.chA.off{opacity:.45}
-#cpPath{height:2280px}
+#cpPath{height:3340px}
 .node img{width:62%;height:62%;object-fit:contain;pointer-events:none}
 .node.mini{width:78px;height:78px;margin:-39px 0 0 -39px;background:radial-gradient(circle at 50% 35%,#8a3a12,#2a0a04);border-width:4px}
 .mon.bossm{width:100px;border-color:#ff525288}
@@ -691,23 +691,23 @@ for(const k in MSKIN){const [id,h,n,hue]=MSKIN[k],M=MON[k];M.dr0=M.dr||k;M.dr='s
 MON.wyrm.lc='#40c4ff';MON.tanker.lz=[150,95];MON.omega.lz=[150,110];MON.titan.lz=[20,120];MON.wyrm.lz=[125,128];MON.plow.lz=[70,150];MON.plow.lc='#ffd740';MON.crusher.desc=MON.sludge.desc=MON.frost.desc=MON.neonc.desc=MON.magma.desc='Mini-boss · stinger dive';
 for(const k in MON){const M=MON[k];M.dr=M.dr||k;M.sc=M.sc||1;M.big=M.big||1;M.b=M.b||'';}
 
-// 5 chapters × 20 stages · 4 zones of 5 stages each
+// 5 chapters × 30 stages (v16-203, was 20) · 4 zones of 8/7/8/7 stages
 const CHAP=[
  {n:'Scrapyard Wastes',col:'#ff8f00',bios:[0,1,2,3],zones:['Rusty Junkyard','Smog Valley','Burning Stacks',"Titan's Foundry"],
   pool:[['imp','tire'],['imp','tire','snake','drone','hopper'],['tire','snake','drone','spider','hopper'],['spider','drone','snake','brute']],mini:'crusher',boss:'titan',
-  names:['Rust Gate','Tire Hills','Crushed Row','Bolt Alley','Wreck Ridge','Smog Valley','Muffler Marsh','Oil Lake','Fume Gate','Crusher Pit','Burning Stacks','Magnet Yard','Cinder Walk','Furnace Road','Ember Heap','Slag River','Gear Graveyard','Molten Gate','Foundry Steps',"Titan's Foundry"]},
+  names:['Rust Gate','Tire Hills','Crushed Row','Bolt Alley','Wreck Ridge','Hubcap Hollow','Scrap Ramp','Chassis Lane','Smog Valley','Muffler Marsh','Oil Lake','Fume Gate','Exhaust Flats','Soot Corner','Crusher Pit','Burning Stacks','Magnet Yard','Cinder Walk','Furnace Road','Ember Heap','Spark Alley','Ash Pile','Coal Chute','Slag River','Gear Graveyard','Molten Gate','Foundry Steps','Rivet Bridge','Smelter Row',"Titan's Foundry"]},
  {n:'Toxic Refinery',col:'#76ff03',bios:[4,5,6,7],zones:['Acid Swamp','Pipe Maze','Tank Farm','Refinery Core'],
   pool:[['imp','canister','tire'],['canister','snake','battery','drone','crab'],['battery','canister','spider','drone','crab'],['battery','canister','brute','airbag']],mini:'sludge',boss:'tanker',
-  names:['Green Gate','Acid Puddles','Rot Marsh','Bubble Bog','Sludge Pond','Pipe Maze','Valve Street','Leaky Joints','Steam Vents','Sludge Pit','Tank Farm','Barrel Hill','Fuel Depot','Pump Station','Chem Lab','Toxic Tower','Flare Stack','Reactor Walk','Core Gate','Acid Throne']},
+  names:['Green Gate','Acid Puddles','Rot Marsh','Bubble Bog','Sludge Pond','Fizz Creek','Drum Dump','Mold Meadow','Pipe Maze','Valve Street','Leaky Joints','Steam Vents','Gauge Room','Drain Tunnel','Sludge Pit','Tank Farm','Barrel Hill','Fuel Depot','Pump Station','Chem Lab','Silo Row','Hazmat Yard','Tar Pits','Toxic Tower','Flare Stack','Reactor Walk','Core Gate','Vapor Deck','Catalyst Hall','Acid Throne']},
  {n:'Frozen Pass',col:'#80d8ff',bios:[8,9,10,11],zones:['Snow Road','Ice Bridges','Frost Peaks','Glacier Depot'],
   pool:[['wiper','imp','tire'],['wiper','hubcap','drone','snake','scorp'],['hubcap','wiper','brake','battery','scorp'],['wiper','hubcap','brake','airbag']],mini:'frost',boss:'plow',
-  names:['Snow Gate','Slush Lane','Chain Road','Frozen Jam','Wiper Woods','Ice Bridge','Black Ice','Salt Barns','Avalanche Turn','Frost Pit','Frost Peaks','Blizzard Pass','Crystal Cave','Pine Hairpin','Summit Garage','Glacier Depot','Plow Yard','Ice Wall','Frozen Gate','Plow King Hall']},
+  names:['Snow Gate','Slush Lane','Chain Road','Frozen Jam','Wiper Woods','Sleet Hill','Icicle Arch','Snowdrift Bend','Ice Bridge','Black Ice','Salt Barns','Avalanche Turn','Frozen Lake','Hail Ridge','Frost Pit','Frost Peaks','Blizzard Pass','Crystal Cave','Pine Hairpin','Summit Garage','Polar Station','Frostbite Gap','Cold Forge','Glacier Depot','Plow Yard','Ice Wall','Frozen Gate','Tundra Run','Rime Hall','Plow King Hall']},
  {n:'Neon Highway',col:'#ff4fd8',bios:[12,13,14,15],zones:['City Lights','Tunnel Run','Skyline Ramp','Turbo Arena'],
   pool:[['turbo','horn','imp'],['turbo','horn','hubcap','drone','goblin'],['turbo','horn','wraith','battery','goblin'],['turbo','wraith','gearbox','hubcap']],mini:'neonc',boss:'wyrm',
-  names:['Neon Gate','Taxi Rank','Billboard Row','Night Market','Drift Corner','Tunnel Run','Echo Tube','Toll Booth','Speed Trap','Neon Pit','Skyline Ramp','Overpass','Rooftop Lot','Laser Bridge','Street Race','Turbo Arena','Nitro Lane','Boost Ring','Wyrm Gate','Turbo Wyrm Nest']},
+  names:['Neon Gate','Taxi Rank','Billboard Row','Night Market','Drift Corner','Arcade Alley','Chrome Mile','Hologram Plaza','Tunnel Run','Echo Tube','Toll Booth','Speed Trap','Subway Loop','Strobe Gate','Neon Pit','Skyline Ramp','Overpass','Rooftop Lot','Laser Bridge','Street Race','Glow Garage','Pulse Avenue','Sky Bridge','Turbo Arena','Nitro Lane','Boost Ring','Wyrm Gate','Afterburn Strip','Redline Ring','Turbo Wyrm Nest']},
  {n:'Volcano Forge',col:'#ff3d00',bios:[16,17,18,19],zones:['Ash Fields','Lava Rivers','Forge Halls','Omega Core'],
   pool:[['bat','gearbox','imp'],['bat','gearbox','turbo','canister','moth'],['bat','wraith','brake','horn','moth'],['bat','gearbox','airbag','wraith']],mini:'magma',boss:'omega',
-  names:['Ash Gate','Smoke Fields','Ember Road','Cinder Dunes','Lava Bridge','Lava River','Obsidian Ford','Magma Falls','Fire Hollow','Magma Pit','Forge Halls','Anvil Row','Piston Hall','Crank Forge','Cast Yard','Omega Core','Blast Furnace','Molten Heart','Last Gate','Omega Engine']}];
+  names:['Ash Gate','Smoke Fields','Ember Road','Cinder Dunes','Lava Bridge','Pumice Flats','Sulfur Vents','Scorch Trail','Lava River','Obsidian Ford','Magma Falls','Fire Hollow','Basalt Steps','Ember Cave','Magma Pit','Forge Halls','Anvil Row','Piston Hall','Crank Forge','Cast Yard','Hammer Works','Ingot Vault','Bellows Bridge','Omega Core','Blast Furnace','Molten Heart','Last Gate','Inferno Gate','Core Reactor','Omega Engine']}];
 const BIO=[
  {n:'Rust Gate',sky:['#3f86c6','#f6c98d','#f39a5b'],sun:'#fff1c1',sunY:.42,sunR:.11,far:'#7a5546',far2:'#5e3f33',ga:'#9b7650',gb:'#4f3322',haze:'rgba(255,196,130,.32)',rim:'rgba(255,230,170,.55)',mid:.15},
  {n:'Smog Valley',sky:['#2b1a4a','#8a4a6e','#e08a5c'],sun:'#ffd9a8',sunY:.72,sunR:.09,far:'#3a2840',far2:'#2a1d30',ga:'#6b5040',gb:'#24180f',haze:'rgba(170,190,90,.22)',rim:'rgba(255,190,140,.45)',stacks:1,smog:1,mid:.3},
@@ -788,18 +788,20 @@ for(let a=1;a<ACTS.length;a++)for(let t=0;t<5;t++){const B0=CHAP[t],A=ACTS[a],nb
   CHAP.push({n:CH_NAMES[t][a],col:colX(CH_COL[t],{h:A.mh*.35,s:1.1}),bios,zones:B0.zones.map(z=>z.startsWith(A.n)?z.replace(A.n,'Ultima'):A.n+' '+z),pool,mini:monClone(B0.mini,a),boss:monClone(a>=10&&NBOSS[t]?NBOSS[t]:B0.boss,a),
     names:B0.names.map(x=>x.startsWith(A.n)?x.replace(A.n,'Ultima'):A.n+' '+x),act:a});}
 CHAP.forEach((C,i)=>{C.n=CH_NAMES[i%5][Math.floor(i/5)];});
-const NCH=CHAP.length,SPC=20,NST=NCH*SPC;
+// v16-203 (Marius 23 nov: 'more stages per chapter' → B: 30 per chapter, 75 chapters = 2250 stages). Stage index i keeps its difficulty
+// (stages 1-1500 exactly as before), only the chapter / label changes. OC(i) = the OLD chapter (20 stages) – gear drops & Ascended stay by stage.
+const NCH=CHAP.length,SPC=30,NST=NCH*SPC,MINI_J=14,BOSS_J=SPC-1,ZOF=j=>Math.floor(j*4/SPC),ZS=z=>Math.ceil(z*SPC/4),OC=i=>Math.floor(i/20);
 function seeded(n){let s=n||1;return()=>{s=(s*16807)%2147483647;return s/2147483647;};}
 const STAGES=[];
-CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=Math.floor(j/5),R=seeded(911+c*131+j*17),pool=C.pool[z],pk=()=>pool[Math.floor(R()*pool.length)];
+CHAP.forEach((C,c)=>{for(let j=0;j<SPC;j++){const z=ZOF(j),R=seeded(911+c*131+j*17),pool=C.pool[z],pk=()=>pool[Math.floor(R()*pool.length)];
   const n0=Math.min(5,3+Math.floor(j/6)+(c>0?1:0)),mk=n=>{const w=[];for(let k=0;k<n;k++)w.push(pk());return w;};
   let w;
   if(c===0&&j===0)w=[['imp','imp','tire'],['tire','imp','imp','tire']];
-  else if(j===9)w=[mk(n0),mk(Math.min(5,n0+1)),[C.mini,pk(),pk()]];
-  else if(j===19)w=[mk(n0),mk(Math.min(5,n0+1)),[C.boss]];
+  else if(j===MINI_J)w=[mk(n0),mk(Math.min(5,n0+1)),[C.mini,pk(),pk()]];
+  else if(j===BOSS_J)w=[mk(n0),mk(Math.min(5,n0+1)),[C.boss]];
   else if(j%5===4)w=[mk(n0),mk(n0),mk(Math.min(5,n0+1))];
   else w=[mk(n0),mk(Math.min(5,n0+(j%2)))];
-  STAGES.push({n:C.names[j],c,j,bio:C.bios[z],w,boss:j===19,mini:j===9});}});
+  STAGES.push({n:C.names[j],c,j,z,oc:OC(c*SPC+j),bio:C.bios[z],w,boss:j===BOSS_J,mini:j===MINI_J});}});
 // v14: 1000 stages. Chapter 1 as before, then a steady climb to the last boss (5-20 ≈ ×26, 50-20 ≈ ×345)
 const SMK=[[19,6.12],[99,26],[239,66],[439,112],[639,215],[839,300],[999,345],[1099,395],[1199,450],[1299,515],[1399,585],[1499,665]]; // v16-139: acts 11-15 (+500 stages) climb at the act-10 pace
  // tested: these bosses need ≈ Myth/Leg +5 Epic Lv10 · +10 Leg Lv15 · +20 Leg Lv25 · +30 Myth Lv30 · +40 Myth Lv40 · +50 Myth Lv50
@@ -813,8 +815,10 @@ const hardOK=()=>TE().G.cp.best>=SPC;
 // EG = how much stronger the very last stage / floor is than before. Computed by tools/endgame.py (python3 tools/endgame.py --apply) – re-run it after new content that raises power.
 const EG={camp:3.171,hard:0.87,tw:5.958,ct:3.591}; // EG-LINE (written by tools/endgame.py)
 const EGK=(K,x,a,b)=>K===1||x<=a?1:Math.pow(K,Math.min(1,(x-a)/(b-a)));
+// v16-203: stages 1501-2250 (acts 11-15 got 30 stages per chapter) – a second ramp on top: NORMAL 2250 = 1.0 × max, HARD 2250 = 2.0 × max
+const EG2={camp:1.45,hard:0.92}; // EG2-LINE (written by tools/endgame.py)
 const MONX=1.25,DG_HARD=1.3; // v16-190 (Marius 22 nov): campaign monsters +25%, Dungeons +30%
-const stageMulN=i=>MONX*stageMul0(i)*HK(i)*EGK(EG.camp,i,999,1499);
+const stageMulN=i=>MONX*stageMul0(i)*HK(i)*EGK(EG.camp,i,999,1499)*EGK(EG2.camp,i,1499,2249);
 // v16-201 (Marius 23 nov: "hard must be hard"): HARD chapter N opens only after NORMAL N, so its first stage must not be weaker than the NORMAL boss of N.
 // HARD_RAMP: stage 1 of a hard chapter = NORMAL boss power ×HARD_FLOOR, then it climbs smoothly to the old hard boss (×HARD_K) – chapter ends unchanged.
 const HARD_FLOOR=1.1,HRC={};
@@ -822,7 +826,7 @@ const wPow=i=>{const s=STAGES[i];let p=0;s.w.forEach(w=>w.forEach(t=>{const M=MO
 const HARD_RAMP=i=>{const c=Math.floor(i/SPC),a=c*SPC,b=Math.min(NST-1,a+SPC-1),j=i-a;let f=HRC[c];
   if(f==null){const P=x=>stageMulN(x)*stEase(x)*wPow(x);f=Math.max(1,HARD_FLOOR*P(b)/(HARD_K*P(a)));if(TE().expMul)HRC[c]=f;}
   return Math.pow(f,1-j/(SPC-1));};
-const stageMul=i=>stageMulN(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499)*HARD_RAMP(i):1);
+const stageMul=i=>stageMulN(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499)*EGK(EG2.hard,i,1499,2249)*HARD_RAMP(i):1);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
 const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a normal team has 3-4 roles (+5-10%) → monsters +7% (from stage 15); 5 roles = a bit easier, 1-2 roles = a bit harder
 // v16-161 (Marius 22 nov: "the power got bigger → make every stage and tower stronger, nobody should reach the end fast"): PK follows how much a normal team of that stage gained
@@ -833,7 +837,7 @@ const stageMulB=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++)
 // v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
 const CP_MON=.25; // v16-99: .35→.25 – gear does not cost money any more (Gear Parts), money is only for the garage
 const REWARDX=i=>{const r=REWARD(i);if(!HM)return r;const o={};for(const k in r)o[k]=typeof r[k]==='number'?Math.round(r[k]*HARD_RW/(k==='money'?10:1))*(k==='money'?10:1):r[k];return o;};
-const REWARD=i=>{const s=STAGES[i];return {money:Math.round(CP_MON*(i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?5:s.mini?3:1,gtk:s.boss?5:s.mini?3:1,ct:s.boss?3:s.mini?1:0,dm:s.boss?100:s.mini?30:10};};
+const REWARD=i=>{const s=STAGES[i];return {money:Math.round(CP_MON*(i<20?250*Math.pow(1.2,i):250*Math.pow(1.2,19)*Math.pow(1+(i-19)*.05,1.5))/10)*10,tk:s.boss?7:s.mini?4:1,gtk:s.boss?7:s.mini?4:1,ct:s.boss?4:s.mini?2:0,dm:s.boss?140:s.mini?45:10};}; // v16-203: 30-stage chapters – boss / mini rewards up so every 30 stages give 1.5× of the old 20
 const sLabel=i=>(HM?'H ':'')+(STAGES[i].c+1)+'-'+(STAGES[i].j+1);
 
 // ---------------------------------------------------------------- GEAR (works only in battles)
@@ -2615,12 +2619,12 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
   let html='';const lab=sLabel(si);
   if(win){const st=B.deaths===0?3:B.deaths<=2?2:1;const first=si>=P.best;const R=REWARDX(si);const money=first?R.money:Math.round(R.money*.25/10)*10,tk=first?R.tk:0;
     G.money+=money;if(first)P.best=si+1;P.stars[si]=Math.max(P.stars[si]||0,st);if(first&&!B.sim&&!B.tw&&window.SEC&&SEC.rcpt)SEC.rcpt({si,h:HM,ms:Date.now()-(B.w0||Date.now()),pw:B.pw0,sp:B.spd});
-    const drops=[];const big=S0.boss||S0.mini;const n=first?(S0.boss?2:1):(big||Math.random()<.4?1:0);for(let k=0;k<n;k++)drops.push(dropItem(S0.c,big));
+    const drops=[];const big=S0.boss||S0.mini;const n=first?(S0.boss?2:1):(big||Math.random()<.4?1:0);for(let k=0;k<n;k++)drops.push(dropItem(S0.oc,big));
     let sold=0;drops.forEach(d=>{if(d.sold){sold+=d.sold;G.gp=(G.gp||0)+d.sold;}});
     const gtk=first?R.gtk:0;if(gtk)GSD().tk+=gtk;
     const ct=first?R.ct:0,dmw=first?R.dm:0;if(ct)G.h.ct+=ct;if(dmw)G.dm=(G.dm||0)+dmw;
-    const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?3:S0.mini?1:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3:S0.mini?1.5:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);
-    const PU=T.PART_U?T.PART_U():1,pkr=T.pkRoles?T.pkRoles(PU*(first?(S0.boss?150:S0.mini?80:50):5)*hk):{},pkb=Math.round(PU*(first?(S0.boss?156:S0.mini?78:52):4)*hk);if(T.pkAdd){for(const k in pkr)T.pkAdd(k,pkr[k]);T.pkAdd('bk',pkb);} // v16-129: garage parts from stages // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
+    const hk=HM?HARD_RW:1,ess=Math.round(T.ESS_U()*(first?(S0.boss?4:S0.mini?1.5:.5):.1)*hk),gpw=Math.round(T.GP_U()*(first?(S0.boss?3.75:S0.mini?2:1):.25)*hk);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);
+    const PU=T.PART_U?T.PART_U():1,pkr=T.pkRoles?T.pkRoles(PU*(first?(S0.boss?195:S0.mini?100:50):5)*hk):{},pkb=Math.round(PU*(first?(S0.boss?199:S0.mini?100:52):4)*hk);if(T.pkAdd){for(const k in pkr)T.pkAdd(k,pkr[k]);T.pkAdd('bk',pkb);} // v16-129: garage parts from stages // v16-99 // v16-37: bosses give Crew Tickets + Diamonds
     T.save();if(tk)T.addTickets(tk,'Campaign '+lab);
     const chDone=first&&S0.boss&&S0.c<NCH-1;
     // v16-47: Marius' VICTORY page – stars on the emblem (missing ones greyed), rewards in the 4 slots
@@ -2654,12 +2658,12 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
     if(a==='next'){if(si<NST-1&&chOpen(STAGES[si+1].c)){CPX().ch=STAGES[si+1].c;showMap();openCard(si+1);}else showMap();}else if(a==='retry'){safeStart(si,teamHeroes());}else if(a==='team'){showMap();openGear(null,si);}
     else if(a==='gear'){showMap();openGear();}else if(a==='gsum'){showMap();gsOpenSm();}else if(a==='hsum'){showMap();openGear(null,si);const T2=TE();if(T2.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T2.openSummon('m');}}else showMap();};}
 
-// ---------------------------------------------------------------- campaign map (5 chapters × 20 stages)
-const PH=2280;
-const NODEX=j=>j===19?50:(j%2?70:30)+(j%4===1?6:j%4===3?-6:0);
-const NODEY=j=>PH-110-j*106-(j===19?24:0);
+// ---------------------------------------------------------------- campaign map (v16-203: 30 stages per chapter)
+const PH=266+(SPC-1)*106; // 20 stages = 2280 px as before
+const NODEX=j=>j===BOSS_J?50:(j%2?70:30)+(j%4===1?6:j%4===3?-6:0);
+const NODEY=j=>PH-110-j*106-(j===BOSS_J?24:0);
 const chOpen=c=>CPX().best>=c*SPC&&(!HM||TE().G.cp.best>=(c+1)*SPC);
-function curCh(){const P=CPX();let c=P.ch;if(c==null||c<0||c>=NCH||!chOpen(c)){c=Math.min(NCH-1,Math.floor(Math.min(P.best,NST-1)/SPC));while(c>0&&!chOpen(c))c--;}P.ch=c;return c;}
+function curCh(){const P=CPX();if(P.spc!==SPC){P.spc=SPC;P.ch=null;}let c=P.ch;if(c==null||c<0||c>=NCH||!chOpen(c)){c=Math.min(NCH-1,Math.floor(Math.min(P.best,NST-1)/SPC));while(c>0&&!chOpen(c))c--;}P.ch=c;return c;}
 // v15: new map look (from the player's picture) – dirt ground, junkyard props cut from the picture, metal road, metal stage pads
 const UIM={};function uim(n){if(UIM[n])return UIM[n];const i=new Image();i.onload=()=>{if(root.classList.contains('open')&&!$('bt').classList.contains('open')){clearTimeout(uim.t);uim.t=setTimeout(()=>drawPath(curCh()),60);}};i.src='img/ui/'+n+'.webp';return UIM[n]=i;}
 const PROPS_L=['pr_crane','pr_cars','pr_redcar','pr_fence','pr_barrierL'],PROPS_R=['pr_shed','pr_barrels','pr_tires'];
@@ -2676,7 +2680,7 @@ function zoneSign(x,cx,cy,k,txt,col){const im=uim('pr_sign');const w=272*k*1.05,
   x.save();x.translate(cx-w*.02,cy-h*.18);x.rotate(-.025);x.textAlign='center';x.textBaseline='middle';let fs=Math.min(19,w*.85/Math.max(5,Math.max(l1.length,l2.length))*1.7);x.font='900 '+fs+'px Game,system-ui';
   x.shadowColor=col;x.shadowBlur=10;x.fillStyle='#ffe9a8';x.strokeStyle='#4a2200';x.lineWidth=3;
   [[l1,l2?-fs*.58:0],[l2,fs*.62]].forEach(([t,dy])=>{if(!t)return;x.strokeText(t,0,dy);x.fillText(t,0,dy);});x.restore();}
-function drawPath(c){const C=CHAP[c],cv2=$('cpPathCv'),w=cv2.clientWidth||Math.min(520,innerWidth),h=PH,d=Math.min(2,window.devicePixelRatio||1);cv2.width=w*d;cv2.height=h*d;const x=cv2.getContext('2d');x.scale(d,d);
+function drawPath(c){const C=CHAP[c],cv2=$('cpPathCv'),w=cv2.clientWidth||Math.min(520,innerWidth),h=PH,d=Math.min(1.5,window.devicePixelRatio||1);cv2.parentNode.style.height=PH+'px';cv2.width=w*d;cv2.height=h*d;const x=cv2.getContext('2d');x.scale(d,d);
   const k=w/839,R=seeded(11+c*31);
   // ground (tile cut from the picture)
   const gi=uim('ground');if(gi.complete&&gi.naturalWidth){x.save();const pat=x.createPattern(gi,'repeat');const ts=.62;x.scale(ts,ts);x.fillStyle=pat;x.fillRect(0,0,w/ts,h/ts);x.restore();}else{x.fillStyle='#5b3f2c';x.fillRect(0,0,w,h);}
@@ -2695,11 +2699,11 @@ function drawPath(c){const C=CHAP[c],cv2=$('cpPathCv'),w=cv2.clientWidth||Math.m
     const n=R()<.5?'pr_puddle':R()<.6?'pr_tire1':'pr_barrels2',im=uim(n);if(!im.complete||!im.naturalWidth)continue;const sc=k*(n==='pr_barrels2'?.7:.9),iw=im.naturalWidth*sc,ih=im.naturalHeight*sc;x.drawImage(im,px-iw/2,py-ih/2,iw,ih);}
   // props: on the side opposite each stage pad
   let li=Math.floor(R()*9),ri=Math.floor(R()*9);
-  for(let j=SPC-1;j>=0;j--){const left=NODEX(j)<50,py=NODEY(j)+(R()-.5)*30;if(j%5===0)continue;
+  for(let j=SPC-1;j>=0;j--){const left=NODEX(j)<50,py=NODEY(j)+(R()-.5)*30;if(ZS(ZOF(j))===j)continue;
     if(left){const useR=R()<.62;if(useR)propDraw(x,PROPS_R[(ri++)%PROPS_R.length],'R',py,k,false);else propDraw(x,PROPS_L[(li++)%PROPS_L.length],'L',py,k,true);}
     else{const useL=R()<.62;if(useL)propDraw(x,PROPS_L[(li++)%PROPS_L.length],'L',py,k,false);else propDraw(x,PROPS_R[(ri++)%PROPS_R.length],'R',py,k,true);}}
   // zone colours (each world / act gets its own colour over the same junkyard look)
-  for(let z=0;z<4;z++){const P=BIO[C.bios[z]],y1=z===0?h:NODEY(z*5)+53,y0=z===3?0:NODEY(z*5+5)+53;
+  for(let z=0;z<4;z++){const P=BIO[C.bios[z]],y1=z===0?h:NODEY(ZS(z))+53,y0=z===3?0:NODEY(ZS(z+1))+53;
     x.save();x.beginPath();x.rect(0,y0,w,y1-y0);x.clip();
     const base=C.bios[z]===0;if(!base){x.globalCompositeOperation='color';x.globalAlpha=.42;x.fillStyle=P.ga;x.fillRect(0,y0,w,y1-y0);}
     if(P.night){x.globalCompositeOperation='multiply';x.globalAlpha=.55;x.fillStyle='#4a5a8a';x.fillRect(0,y0,w,y1-y0);}
@@ -2712,7 +2716,7 @@ function drawPath(c){const C=CHAP[c],cv2=$('cpPathCv'),w=cv2.clientWidth||Math.m
     if(P.ash||P.smog){x.fillStyle='rgba(200,200,200,.10)';for(let i=0;i<6;i++)ell(x,R2()*w,y0+R2()*(y1-y0),70,26);}
     x.restore();
     // zone sign (like "RUSTY JUNKYARD →" in the picture)
-    const j0=z*5,left=NODEX(j0)<50;zoneSign(x,left?w*.75:w*.25,NODEY(j0)+(j0===0?60:6),k,C.zones[z],C.col);}
+    const j0=ZS(z),left=NODEX(j0)<50;zoneSign(x,left?w*.75:w*.25,NODEY(j0)+(j0===0?60:6),k,C.zones[z],C.col);}
   // vignette at the sides
   const vg=x.createLinearGradient(0,0,w,0);vg.addColorStop(0,'rgba(0,0,0,.35)');vg.addColorStop(.12,'rgba(0,0,0,0)');vg.addColorStop(.88,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=vg;x.fillRect(0,0,w,h);}
 function showMap(){const T=TE(),G=T.G;GR();try{teamHeroes().forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){} // v16-27: get the team's animations ready before the fight (only those, not all)
@@ -2732,7 +2736,7 @@ $('cpTk').innerHTML=TKI+' '+G.h.tk;const c=curCh(),C=CHAP[c];
 // v14: 50 chapters – tap the chapter name for the full list
 // v16-74: NORMAL / HARD switch on the campaign map (HARD opens after normal chapter 1)
 function hmBtn(){let b=$('cpHM');if(!b){b=document.createElement('button');b.id='cpHM';$('cpTop').appendChild(b);
-    b.onclick=()=>{const T=TE(),G=T.G;if(!hardOK()){T.toast('🔒 HARD MODE opens after NORMAL chapter 1 (stage 1-20)',2600);return;}
+    b.onclick=()=>{const T=TE(),G=T.G;if(!hardOK()){T.toast('🔒 HARD MODE opens after NORMAL chapter 1 (stage 1-'+SPC+')',2600);return;}
       HM=HM?0:1;G.cp.hm=HM;T.save();showMap();if(HM&&!G.cp.hmSeen){G.cp.hmSeen=1;T.save();popW('HARD MODE','<div style="padding:4px 2px;line-height:1.45">The same chapters with <b style="color:#ff5252">much stronger monsters</b> – and <b style="color:#7CFC9A">×'+HARD_RW+' rewards</b> (money, tickets, diamonds).<br><br>HARD chapter N opens when you clear NORMAL chapter N.</div>');}};}
   b.className=HM?'on':'';const ok=hardOK(),I=(f,c)=>'<img src="img/shop/'+f+'.webp" alt=""'+(c?' class="'+c+'"':'')+'>'; // v16-80: Marius' NORMAL / HARD tabs
   b.innerHTML=I(HM?'hm_n0':'hm_n1')+(!ok?I('hm_h0'):I('hm_h1',HM?'':'off'));}
@@ -2757,12 +2761,12 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
   rws.push([IMGI(itemIconURL('tool',s.boss?5:big?4:3),'1.75em'),first?(s.boss?'2 ★':big?'1 ★':'×1'):(big?'×1':'40%')]);
   const tm=curTeamList();
   $('cpCardBox').classList.add('prepSk');
-  $('cpCardBox').innerHTML=`<div class="ppT"><b>${s.boss?IMGI(glyphURL('skull','#ff8a80'))+' ':s.mini?IMGI(glyphURL('horns','#ffb74d'))+' ':''}${sLabel(i)} · ${s.n}</b><small>CH ${s.c+1} · ${C.zones[Math.floor(s.j/5)].toUpperCase()} · ${s.w.length} WAVES${HM?' · HARD ×'+HARD_RW+' REWARDS':''}${PX.stars[i]?' · '+'⭐'.repeat(PX.stars[i]):''}</small></div>
+  $('cpCardBox').innerHTML=`<div class="ppT"><b>${s.boss?IMGI(glyphURL('skull','#ff8a80'))+' ':s.mini?IMGI(glyphURL('horns','#ffb74d'))+' ':''}${sLabel(i)} · ${s.n}</b><small>CH ${s.c+1} · ${C.zones[s.z].toUpperCase()} · ${s.w.length} WAVES${HM?' · HARD ×'+HARD_RW+' REWARDS':''}${PX.stars[i]?' · '+'⭐'.repeat(PX.stars[i]):''}</small></div>
    <div class="mons" id="cpMons"></div>
    <div class="ppE"><small>ENEMY</small>${ep.toLocaleString()}</div><div class="ppP" style="color:${col}"><small>YOUR TEAM</small>${tp.toLocaleString()}</div>
    ${(()=>{const st=PX.stuck;if(i!==PX.best||!st||st.si!==i)return '';const gk=Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)),nx=gk<GRIT_N?Math.ceil((216e5-(Date.now()-st.t)%216e5)/36e5):0;return `<div class="grit">🔥 NEVER GIVE UP: <b>+${Math.round(gritK(gk)*100)}%</b> HP &amp; attack${gk<GRIT_N?` · next +${gritStep(gk)*100}% in ~${nx}h`:' (max)'}</div>`;})()}
    <div class="ppRT">${first?'FIRST CLEAR':'REPLAY'}</div>${rws.slice(0,4).map((r,k)=>`<div class="ppR ppR${k}"><span>${r[0]}</span><b>${T.numH?T.numH(r[1],'gold',1.1):r[1]}</b></div>`).join('')}
-   <div class="ppG">${(()=>{const d=gdrop(s.c).slice(),a=s.c>=ASC_CH?Math.round(d[5]*.15*Math.min(1,(s.c-ASC_CH+1)/21)*10)/10:0;d[5]=Math.round((d[5]-a)*10)/10;d.push(a);return ['COM','UNC','RAR','EPI','LEG','MYT','ASC'].map((n,k)=>d[k]?`<span style="color:${GG(k).c}">${n} ${d[k]}%</span>`:'').filter(Boolean).join(' ');})()}</div>
+   <div class="ppG">${(()=>{const d=gdrop(s.oc).slice(),a=s.oc>=ASC_CH?Math.round(d[5]*.15*Math.min(1,(s.oc-ASC_CH+1)/21)*10)/10:0;d[5]=Math.round((d[5]-a)*10)/10;d.push(a);return ['COM','UNC','RAR','EPI','LEG','MYT','ASC'].map((n,k)=>d[k]?`<span style="color:${GG(k).c}">${n} ${d[k]}%</span>`:'').filter(Boolean).join(' ');})()}</div>
    ${[0,1,2,3,4].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="team">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
    <button class="ppB" data-a="close" aria-label="Back"></button><button class="ppF" data-a="fight">FIGHT!</button>${!first&&!HM?`<button class="ppSw${cpSwOK()?'':' off'}" data-a="sweep">⚡ SWEEP<small>${cpSwOK()?'no fight':'VIP 4'}</small></button>`:''}`;
   const mc=$('cpMons');const nMon=s.w.flat().length,info=()=>{const d=document.createElement('div');d.className='mon monInfo';d.innerHTML='<b>×'+nMon+'</b><div>'+s.w.length+' WAVES</div>';return d;};
@@ -2774,7 +2778,7 @@ function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i
 const cpSwOK=()=>{try{const T=TE();return !!(T.VP&&T.VP(T.VLV()).sweep);}catch(e){return false;}};
 function cpSweep(si){const T=TE(),G=T.G,P=CPX();if(!cpSwOK()){T.toast('👑 SWEEP opens at VIP 4',2400);return;}if(si>=P.best)return;
   const S0=STAGES[si],R=REWARDX(si),money=Math.round(R.money*.25/10)*10;G.money+=money;
-  const big=S0.boss||S0.mini,drops=[];if(big||Math.random()<.4)drops.push(dropItem(S0.c,big));drops.forEach(d=>{if(d.sold)G.gp=(G.gp||0)+d.sold;});
+  const big=S0.boss||S0.mini,drops=[];if(big||Math.random()<.4)drops.push(dropItem(S0.oc,big));drops.forEach(d=>{if(d.sold)G.gp=(G.gp||0)+d.sold;});
   const ess=Math.round(T.ESS_U()*.1),gpw=Math.round(T.GP_U()*.25);G.ess=(G.ess||0)+ess;G.gp=(G.gp||0)+gpw;if(window.EVT)EVT.q('win',1);T.save();
   T.toast('⚡ SWEEP '+sLabel(si)+': '+T.fmt(money)+' · '+T.ESI+' +'+T.nf(ess)+' · '+T.GPI+' +'+T.nf(gpw)+(drops.length?' · '+itemName(drops[0].it):''),2600);}
 
@@ -3033,7 +3037,7 @@ let gdBack='';function gearGuide(back){gdBack=back||'';const T=TE(),sl='tool',st
    <div class="gdT">Put a <b>second identical piece</b> (same grade + same slot, free in the bag) into it = <b>+1 star</b>.<br>Every star = <b>+${GSTAR_K*100}% main stat</b>. Works for every grade.</div>
    <div class="gdL">${L}</div></div>
   <div class="gdS"><div class="gdH"><i>3</i>${STI('asc')} <span style="color:${ASC.c}">ASCENDED · WHERE TO FIND</span></div>
-   <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from chapter ${ASC_CH+1} (more and more up to chapter 50)<br>• <b>Idle Rewards</b> from chapter ${ASC_CH+1} (small chance for every hour in the chest)<br>• <b>Class Towers</b> floors 350 · 380 · 410 · 440 · 470 · 500 (a full Ascended set of the class)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open any piece ➜ <b>${STI('on')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
+   <div class="gdT"><b style="color:${ASC.c}">ASCENDED</b> pieces cannot be made – they only <b>drop</b>:<br>• <b>Gear Summon</b> (0.02%)<br>• <b>Campaign battles</b> from stage ${sLabel(ASC_CH*20)} (more and more up to stage ${sLabel(999)})<br>• <b>Idle Rewards</b> from stage ${sLabel(ASC_CH*20)} (small chance for every hour in the chest)<br>• <b>Class Towers</b> floors 350 · 380 · 410 · 440 · 470 · 500 (a full Ascended set of the class)<br>Ascended pieces go up to <b>★20</b> (new star color + new stat every 5).<br>Open any piece ➜ <b>${STI('on')} STAR UP</b> at the bottom of its window.<br>SALVAGE never takes Ascended pieces.</div></div>
   <div class="cpRow">${gdBack?'<button class="cpGo alt" data-p="gdback">↩ BACK</button>':''}<button class="cpGo" data-p="x">GOT IT</button></div></div>`;
   pop(x);}
 // v16-42: GEAR UPGRADE animation (Marius: "I see nothing when I upgrade – only after I leave and come back")
@@ -3216,7 +3220,7 @@ function gsResults(res,n,sold){const T=TE(),best=Math.max(...res.map(o=>o.it.r))
    <div class="cpRow"><button class="cpGo${GSD().tk+Math.floor((TE().G.dm||0)/TE().DM_SUM)<n?' dis':''}" data-p="gsAgain" data-n="${n}" style="white-space:nowrap;overflow:hidden;padding:0 12px 0 22px">AGAIN ×${n} ${GTKI}</button><button class="cpGo alt" data-p="gsGear">${IMGI(glyphURL('bag','#ffd9b0'))} EQUIP</button></div><button class="cpGo alt" data-p="x">CLOSE</button>`;
   pop(x);}
 function gsRates(){const T=TE();popW('SUMMON RATES','<div class="wS">GEAR · FOR BATTLES ONLY</div>'+GS_RATE.map((p,r)=>wRowB(r,'<b style="color:'+GG(r).c+'">'+GS_NAMES[r]+'</b>',p+'%','Lv '+GMAXR[r]+(GSUBN[r]?' · +'+GSUBN[r]+' stat'+(GSUBN[r]>1?'s':''):''))).join('')+
-  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons and a <b style="color:#ff3b3b">Mythic</b> every ${GS_PITY.m} summons (now ${GSD().pity.l||0}/${GS_PITY.l} · ${GSD().pity.m||0}/${GS_PITY.m}).</div><div>★ <b>Stars</b>: merge 2 identical pieces (same slot + same grade) → ★1…★5, each star +20% main stat.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic): 0.02% in the summon, or it drops in campaign battles and Idle Rewards from chapter 30. Ascended pieces go up to <b>★20</b>: every 5 stars a new star color (gold → red → purple → rainbow) + a new bonus stat.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
+  `<div class="wP"><div>Every summon gives 1 random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).</div><div><b>Summon x10</b> gives <b>11</b> pieces.</div><div>Guaranteed: a <b>Legendary</b> every ${GS_PITY.l} summons and a <b style="color:#ff3b3b">Mythic</b> every ${GS_PITY.m} summons (now ${GSD().pity.l||0}/${GS_PITY.l} · ${GSD().pity.m||0}/${GS_PITY.m}).</div><div>★ <b>Stars</b>: merge 2 identical pieces (same slot + same grade) → ★1…★5, each star +20% main stat.</div><div style="color:#2ef3ff">✦ <b>Ascended</b> (above Mythic): 0.02% in the summon, or it drops in campaign battles and Idle Rewards from stage ${sLabel(ASC_CH*20)}. Ascended pieces go up to <b>★20</b>: every 5 stars a new star color (gold → red → purple → rainbow) + a new bonus stat.</div><div>No tickets? <b>${T.DM_SUM}</b> ${T.DMI} = 1 summon – you are always asked first.</div></div>
   <div class="wS">WHERE TO GET ${GTKI} GEAR TICKETS</div><div class="wP">First clear of every campaign stage: <b>+1</b> · mini-boss (X-10): <b>+3</b> · boss (X-20): <b>+5</b> · Daily Check-in: <b>+10</b> every day<br>Start: 10 tickets.</div><button class="wHist" data-p="gsHist">📜 SUMMON HISTORY</button>`);}
 function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">Last '+g.hist.length+' of '+g.sum+' gear summons</div>'+(g.hist.length?g.hist.map(o=>wRowB(o.r,'<img src="'+itemIconURL(o.s,o.r)+'" alt=""> <b style="color:'+GG(o.r).c+'">'+GNAMES[o.s][o.r]+'</b>',null,GS_NAMES[o.r])).join(''):'<div class="wP">Nothing yet.</div>'));}
 
@@ -4025,14 +4029,14 @@ function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
 if(window.SEC&&SEC.TEST_ACC){try{if(testFill())setTimeout(()=>location.reload(),300);}catch(e){console.error('testFill',e);}}
 // v16-121 (Marius): Ascended gear also from Idle Rewards – from chapter 30, 0.1% per hour in the chest (seeded: no reroll)
 const IDLE_ASC_H=.001;
-function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.best||0);if(!(hrs>0)||STAGES[b].c<ASC_CH)return null;
+function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.best||0);if(!(hrs>0)||STAGES[b].oc<ASC_CH)return null;
   const it=T.srun('ia',()=>Math.random()<IDLE_ASC_H*hrs?newItem(GSLOT[Math.floor(Math.random()*6)].k,6,rollSet(6)):null);if(it)GR().inv.push(it);return it;}
 // v16-153 (perf): called 20 s after the game went to the background – drops the hero / monster sheets (7-13 MB each in memory)
 // unless a fight is running; they load again by themselves the next time they are drawn.
 function freeMem(){if(running||window.__BATTLE_ON)return;for(const id in SPRD){const d=SPRD[id];if(d.im){d.im=null;d.bi=null;d.fi=null;}}for(const id in MSPR){if(MSPR[id].im)MSPR[id].im=null;}}
 window.CAMPAIGN={peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[roleOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,SETS[set]?set:'all');g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&!h.crew&&lvCan(h.id));}catch(e){return false;}},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[roleOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 CAMPAIGN.ascOne=()=>{const g=GR();const it=newItem(GSLOT[Math.floor(Math.random()*6)].k,6);g.inv.push(it);TE().save();return it;};   // v16-192: Grand Prix Gold/Platinum – 1 Ascended piece
-if(window.SEC&&SEC.TEST_MODE)window.__PW={ep:enemyPower,tw:twPower,ct:ctPower,dg:dgPower,tp:()=>teamPower(curTeamList()),pw:h=>pow(h),hm:v=>{HM=v?1:0;},ni:newItem,eqp:equip,GSLOT,GMAXR,rol:h=>roleOf(h),SETS,hof:id=>heroOf(id),gr:GR,EG,CT_K,DGK:DG_K,NST,twR:twRew,ctR:ctRew,coll:()=>collBon()}; // v16-161: for tools/endgame.py
+if(window.SEC&&SEC.TEST_MODE)window.__PW={ep:enemyPower,tw:twPower,ct:ctPower,dg:dgPower,tp:()=>teamPower(curTeamList()),pw:h=>pow(h),hm:v=>{HM=v?1:0;},ni:newItem,eqp:equip,GSLOT,GMAXR,rol:h=>roleOf(h),SETS,hof:id=>heroOf(id),gr:GR,EG,EG2,CT_K,DGK:DG_K,NST,twR:twRew,ctR:ctRew,coll:()=>collBon()}; // v16-161: for tools/endgame.py
 if(window.SEC&&SEC.TEST_MODE)window.__DEV={hm:v=>{HM=v?1:0;},getB:()=>B,fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
 

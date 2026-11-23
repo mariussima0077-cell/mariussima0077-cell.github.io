@@ -147,7 +147,7 @@ async function report(b, env) {
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'dual', 'same account on 2 phones at the same time (info only)').run(); }
   const bmaxOld = old ? Math.max(old.bmax || 0, old.best || 0) : 0, bmax = Math.max(bmaxOld, s.best | 0);
   // 2) impossible numbers
-  if (s.mythic > 10 ||  /* v16-161: 6 Mythic heroes + 2 Mythic drivers + 2 Mythic guards (was 6 → a full collection could be flagged) */ s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 1500 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
+  if (s.mythic > 10 ||  /* v16-161: 6 Mythic heroes + 2 Mythic drivers + 2 Mythic guards (was 6 → a full collection could be flagged) */ s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 2250 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
   // 3) compared with the last report
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);
@@ -186,7 +186,7 @@ async function report(b, env) {
       const ep = (h ? EP_H : EP_N)[si], ratio = ep / pw; const bad = [];
       if (ratio > POWER_BAD) { nPow++; bad.push('power'); } else if (ratio > POWER_NOTE) bad.push('close');
       if (ms > 0 && ms < RCPT_MIN_MS) { nSpd++; bad.push('fast'); }
-      if (ratio > worst) { worst = ratio; wsi = (h ? 'H ' : '') + (Math.floor(si / 20) + 1) + '-' + (si % 20 + 1); }
+      if (ratio > worst) { worst = ratio; wsi = (h ? 'H ' : '') + (Math.floor(si / 30) + 1) + '-' + (si % 30 + 1); }
       pwLast = pw; rows.push(db.prepare('INSERT INTO rcpt(pid,t,si,h,ms,pw,ep,sp,bad) VALUES(?,?,?,?,?,?,?,?,?)').bind(b.pid, +r.t || now, si, h, ms, Math.round(pw), ep, sp, bad.join(',') || null));
     }
     if (rows.length) await db.batch(rows);
@@ -521,7 +521,7 @@ async function gToken(env) {
 // ------------------------------------------------------------------ v16-157: player card (/admin?key=…&p=PLAYER_ID)
 const fmtN = n => n >= 1e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(Math.round(n));
 function powLine(r) {
-  const ratio = r.ep / Math.max(1, r.pw), lab = (r.h ? 'H ' : '') + (Math.floor(r.si / 20) + 1) + '-' + (r.si % 20 + 1);
+  const ratio = r.ep / Math.max(1, r.pw), lab = (r.h ? 'H ' : '') + (Math.floor(r.si / 30) + 1) + '-' + (r.si % 30 + 1);
   const ic = ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅';
   return `<small>⚔️ team <b>${fmtN(r.pw)}</b> / stage ${lab} <b>${fmtN(r.ep)}</b> ${ic}${r.ms ? ` · ${(r.ms / 1000).toFixed(1)}s${r.ms < RCPT_MIN_MS ? ' ❌' : ''}` : ''}</small>`;
 }
@@ -568,7 +568,7 @@ ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(pid)}">✅ unban</a>
 <small>Charts: last 7 days. Honest = a line that climbs smoothly. Cheat = a vertical jump.</small>
 ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('⚔️ Team power', S.filter(r => r.pw > 0).map(r => [r.t, r.pw]), '#ff8a65', true)}${chart('💰 Money (log)', S.map(r => [r.t, r.money]), '#66bb6a', true)}${chart('🎟️ Tickets', S.map(r => [r.t, r.tk]), '#9fd3ff')}${chart('🏗️ Buildings level', S.map(r => [r.t, r.lv]), '#ce93d8')}
 <h3>⚔️ Battle receipts (new stages won)</h3><div class=c>${rc.length ? `<table><tr><th>when</th><th>stage</th><th>team</th><th>monsters</th><th></th><th>time</th></tr>${rc.map(r => { const ratio = r.ep / Math.max(1, r.pw);
-  return `<tr><td>${d(r.t).slice(6)}</td><td>${r.h ? 'H ' : ''}${Math.floor(r.si / 20) + 1}-${r.si % 20 + 1}</td><td>${fmtN(r.pw)}</td><td>${fmtN(r.ep)}</td><td>${ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅'}</td><td>${(r.ms / 1000).toFixed(1)}s${r.ms && r.ms < RCPT_MIN_MS ? '❌' : ''} ×${r.sp}</td></tr>`; }).join('')}</table>` : '<small>none yet (needs the new game version)</small>'}</div>
+  return `<tr><td>${d(r.t).slice(6)}</td><td>${r.h ? 'H ' : ''}${Math.floor(r.si / 30) + 1}-${r.si % 30 + 1}</td><td>${fmtN(r.pw)}</td><td>${fmtN(r.ep)}</td><td>${ratio > POWER_BAD ? '❌' : ratio > POWER_NOTE ? '⚠️' : '✅'}</td><td>${(r.ms / 1000).toFixed(1)}s${r.ms && r.ms < RCPT_MIN_MS ? '❌' : ''} ×${r.sp}</td></tr>`; }).join('')}</table>` : '<small>none yet (needs the new game version)</small>'}</div>
 <h3>📒 Ledger – what the game gave (per day)</h3><div class=c>${lg.length ? `<table><tr><th>day</th><th>💎</th><th>🎟️</th><th>crew</th><th>gear</th><th>VIP</th></tr>${lg.map(r => `<tr><td>${r.day.slice(5)}</td><td>${fmtN(r.dm)}</td><td>${fmtN(r.tk)}</td><td>${fmtN(r.ct)}</td><td>${fmtN(r.gtk)}</td><td>${fmtN(r.vip)}</td></tr>`).join('')}</table>` : '<small>none yet</small>'}</div>
 <h3>📱 Phones</h3><div class=c>${dv.map(x => `<small>${esc(x.dk).slice(0, 9)}… last ${d(x.t)}</small>`).join('<br>') || '<small>none yet</small>'}${same.length ? `<br><b>Other accounts on this phone:</b><br>${same.map(x => `<a href="?key=${k}&p=${encodeURIComponent(x.pid)}">${NM[x.pid] ? esc(NM[x.pid]) : esc(x.pid).slice(0, 13)}</a> <small>${d(x.t)}</small>`).join('<br>')}` : ''}</div>
 <h3>📜 Events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>none</div>'}`;

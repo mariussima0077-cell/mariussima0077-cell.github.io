@@ -19,9 +19,10 @@ After --apply: run tools/ept_table.py (anti-cheat table of the server) and the u
 import argparse, asyncio, json, os, re, shutil, socket, subprocess, sys, tempfile
 
 RATIO = {'camp': 0.69, 'hard': 1.5, 'tw': 1.03, 'ct': 0.63}
+RATIO2 = {'camp': 1.0, 'hard': 2.0}   # v16-203: the finals at stage 2250 (30 stages per chapter) – EG2 ramp 1500-2250
 HOOK = ("window.__PW={ep:enemyPower,tw:twPower,ct:ctPower,dg:dgPower,tp:()=>teamPower(curTeamList()),pw:h=>pow(h),"
         "hm:v=>{HM=v?1:0;},ni:newItem,eqp:equip,GSLOT,GMAXR,rol:h=>roleOf(h),SETS,hof:id=>heroOf(id),gr:GR,"
-        "EG:typeof EG!=='undefined'?EG:null,CT_K,DGK:DG_K,NST};")
+        "EG:typeof EG!=='undefined'?EG:null,EG2:typeof EG2!=='undefined'?EG2:null,CT_K,DGK:DG_K,NST};")
 
 PAGE_JS = r"""async()=>{const P=__PW,T=__TE,G=T.G,g=P.gr(),out={};
  let seed=12345;const R0=Math.random;Math.random=()=>{seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;};
@@ -45,9 +46,9 @@ PAGE_JS = r"""async()=>{const P=__PW,T=__TE,G=T.G,g=P.gr(),out={};
  const lg=mech.filter(h=>h.gr===4).slice(0,3).map(h=>h.id),my=mech.filter(h=>h.gr===5).slice(0,2).map(h=>h.id);
  mech.forEach(h=>{const o=own(h.id);o.s=h.gr===4?10:h.gr===5?2:h.gr===3?20:30;});lv(250,12);for(const k in G.lv)G.lv[k]=60;team([...lg,...my]);dress([...lg,...my],5,3);out.strong=P.tp();
  // ---- FINALS
- P.hm(0);out.camp=P.ep(P.NST-1);P.hm(1);out.hard=P.ep(P.NST-1);P.hm(0);
+ const I5=Math.min(1499,P.NST-1);P.hm(0);out.camp=P.ep(I5);out.camp2=P.ep(P.NST-1);P.hm(1);out.hard=P.ep(I5);out.hard2=P.ep(P.NST-1);P.hm(0);
  out.tw=P.tw(500);out.ct={};P.CT_K.forEach(k=>out.ct[k]=P.ct(k,500));out.dg={};P.DGK.forEach(k=>out.dg[k]=P.dg(k,30));out.dg100=[31,40,50,60,70,80,90,100].map(f=>Math.max(...P.DGK.map(k=>P.dg(k,f))));
- out.EG=P.EG?Object.assign({},P.EG):null;Math.random=R0;return out;}"""
+ out.EG=P.EG?Object.assign({},P.EG):null;out.EG2=P.EG2?Object.assign({},P.EG2):null;out.NST=P.NST;Math.random=R0;return out;}"""
 
 
 def free_port():
@@ -96,6 +97,7 @@ def report(name, r):
     print(f"  mid-game team          {M(r['mid'])}   (5 Epic +10, Lv 100, Legendary gear ★0)")
     print(f"  campaign NORMAL 1500   {M(r['camp'])}  = {r['camp']/r['max']:.2f} × max")
     print(f"  campaign HARD 1500     {M(r['hard'])}  = {r['hard']/r['max']:.2f} × max")
+    if r.get('camp2'): print(f"  campaign NORMAL {r['NST']}   {M(r['camp2'])}  = {r['camp2']/r['max']:.2f} × max\n  campaign HARD {r['NST']}     {M(r['hard2'])}  = {r['hard2']/r['max']:.2f} × max")
     print(f"  Torque Tower 500       {M(r['tw'])}  = {r['tw']/r['max']:.2f} × max")
     print(f"  Class Towers 500 (max) {M(ct)}  = {ct/r['max']:.2f} × max")
     print(f"  Dungeons floor 30      {M(min(r['dg'].values()))} – {M(max(r['dg'].values()))}")
@@ -109,7 +111,13 @@ def propose(r):
     camp = RATIO['camp'] * mx / (r['camp'] / e['camp'])
     hard = RATIO['hard'] * mx / (r['hard'] / (e['camp'] * e['hard']) * camp)
     tw = RATIO['tw'] * mx / (r['tw'] / e['tw']); cc = RATIO['ct'] * mx / (ct / e['ct'])
-    return {k: round(max(.5 if k == 'hard' else 1, v), 3) for k, v in (('camp', camp), ('hard', hard), ('tw', tw), ('ct', cc))}  # hard may go below 1: HARD = NORMAL × 2.5 already
+    out = {k: round(max(.5 if k == 'hard' else 1, v), 3) for k, v in (('camp', camp), ('hard', hard), ('tw', tw), ('ct', cc))}  # hard may go below 1: HARD = NORMAL × 2.5 already
+    e2 = r.get('EG2')
+    if e2 and r.get('NST', 0) > 1500:   # v16-203: EG2 = the ramp 1500 → NST on top of EG (the stage 1500 values do not change)
+        c2 = RATIO2['camp'] * mx / (r['camp2'] / e2['camp'] / e['camp'] * out['camp'])
+        h2 = RATIO2['hard'] * mx / (r['hard2'] / (e2['camp'] * e2['hard'] * e['camp'] * e['hard']) * out['camp'] * out['hard'] * c2)
+        out['eg2'] = {'camp': round(max(1, c2), 3), 'hard': round(max(.5, h2), 3)}
+    return out
 
 
 def main():
@@ -123,7 +131,11 @@ def main():
         bp = os.path.join(repo, 'battle.js'); s = open(bp).read()
         line = 'const EG={camp:%g,hard:%g,tw:%g,ct:%g}; // EG-LINE (written by tools/endgame.py)' % (eg['camp'], eg['hard'], eg['tw'], eg['ct'])
         s2 = re.sub(r'const EG=\{[^}]*\}; // EG-LINE \(written by tools/endgame\.py\)', line, s)
-        assert s2 != s or line in s, 'EG line not found'; open(bp, 'w').write(s2); print('  written:', line)
+        assert s2 != s or line in s, 'EG line not found'
+        if 'eg2' in eg:
+            l2 = 'const EG2={camp:%g,hard:%g}; // EG2-LINE (written by tools/endgame.py)' % (eg['eg2']['camp'], eg['eg2']['hard'])
+            s2 = re.sub(r'const EG2=\{[^}]*\}; // EG2-LINE \(written by tools/endgame\.py\)', l2, s2); print('  written:', l2)
+        open(bp, 'w').write(s2); print('  written:', line)
     json.dump(res, open('/tmp/endgame.json', 'w'), indent=1)
 
 

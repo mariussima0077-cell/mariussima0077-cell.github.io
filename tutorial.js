@@ -184,6 +184,8 @@ const PG={
   hswipe:{ok:()=>isOpen('gHero')&&!isOpen('cpPop')&&vis(document.getElementById('gNavR')),t:`<b>❮ ❯ NEXT HERO</b>: tap the arrows or <b>swipe left / right</b> on the hero to go to the next one – no need to go back. In your team you go through the <b>5 team heroes</b>.`},
   // v16-179 (Marius 22 nov: more Dungeon floors, harder, more rewards)
   dg100:{ok:()=>isOpen('dg'),t:`<b>DUNGEONS</b> now have <b>100 floors</b>! After floor 30 the monsters get much stronger – and the rewards much bigger: <b style="color:#ff6b6b">MYTHIC</b> gear and set pieces from floor <b>61</b>, NITRO up to <b>+30%</b>, more Essence and Gear Parts, more cash, and <b>×2</b> on every boss floor (40, 50 … 100).`},
+  // v16-203 (Marius 23 nov: more stages per chapter)
+  ch30:{ok:()=>isOpen('cp')&&!isOpen('cpPop')&&!isOpen('bt')&&!isOpen('cpGear')&&!isOpen('cpRes'),t:`<b>CAMPAIGN</b>: every chapter now has <b>30 stages</b> (was 20) – mini-boss at stage <b>15</b>, chapter boss at <b>30</b>, with bigger rewards. <b>2250 stages</b> in total (NORMAL and HARD). Your progress and stars are kept – only the stage numbers changed.`},
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;

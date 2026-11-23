@@ -38,12 +38,13 @@ const PASS = {
   plat: {n:'PLATINUM PASS', mult:2,   idle:4, price:'€9.99', start:600, day:{dm:200, tk:3, gt:2}, spd:1, auto:1},
   dia:  {n:'DIAMOND PASS',  mult:1,   idle:0, price:'€14.99', start:900, day:{dm:300, tk:2}},   // v16-122 (Marius, 21 nov 2026): diamonds only – 9,900 💎 / 30 days, no VIP bonus (same 💎 per € as Platinum)
 };
-// Campaign Funds: rewards at every 5th chapter (NORMAL / HARD)
+// Campaign Funds: rewards at every 3rd chapter (NORMAL / HARD) – v16-203, was every 5th 20-stage chapter
 const FUND = {
   fn: {n:'CAMPAIGN FUND · NORMAL', price:'€9.99', hard:0, ms:[800,800,1000,1000,1000,1200,1200,1200,1500,1500].map((dm,i)=>({dm, tk:i===9?10:5}))},
   fh: {n:'CAMPAIGN FUND · HARD',   price:'€9.99', hard:1, ms:[1200,1200,1500,1500,1500,1800,1800,1800,2200,2200].map((dm,i)=>({dm, tk:i===9?10:5, gt:i===9?5:3}))},
 };
-const SPC = 20;                           // stages per chapter (battle.js)
+const SPC = 30;                           // stages per chapter (battle.js) – v16-203: was 20
+const FSTEP = 3;                          // v16-203: a Campaign Fund reward every 3rd chapter (90 stages, was every 5th of 20 = 100 stages → a bit sooner)
 
 // ---------------- state ----------------
 const PK = () => T().PK;
@@ -120,10 +121,10 @@ let conf='';
 // ---------------- campaign funds ----------------
 function chDone(hard){ const G=T().G; const b=hard?((G.cph&&G.cph.best)||0):((G.cp&&G.cp.best)||0); return Math.floor(b/SPC); }
 function claimFund(k, i){
-  const F=FUND[k], s=S(); if(!PK()[k]||s[k].includes(i)||chDone(F.hard)<(i+1)*5) return;
-  s[k].push(i); give(F.ms[i], F.n+' · '+(F.hard?'H ':'CH ')+((i+1)*5));
+  const F=FUND[k], s=S(); if(!PK()[k]||s[k].includes(i)||chDone(F.hard)<(i+1)*FSTEP) return;
+  s[k].push(i); give(F.ms[i], F.n+' · '+(F.hard?'H ':'CH ')+((i+1)*FSTEP));
 }
-const fundReady = k => PK()[k] ? FUND[k].ms.filter((m,i)=>!S()[k].includes(i)&&chDone(FUND[k].hard)>=(i+1)*5).length : 0;
+const fundReady = k => PK()[k] ? FUND[k].ms.filter((m,i)=>!S()[k].includes(i)&&chDone(FUND[k].hard)>=(i+1)*FSTEP).length : 0;
 
 // ---------------- page ----------------
 const IMG = p => 'img/'+p+'.webp';
@@ -302,7 +303,7 @@ function render(){
       const NM=F.hard?'HARD':'NORMAL', CH=F.hard?'H ':'CH ';   // v16-182: new Campaign Fund cards (Marius' images)
       h+='<div class="card fund fc'+(F.hard?' h':'')+'"><div class="frb">'+(F.hard?'HARD ×1.5':'×6 VALUE')+'</div>'+
         '<div class="ft"><h3>CAMPAIGN FUND<em>'+NM+'</em></h3>'+(own?'<span class="act">OWNED</span>':'')+'</div>'+
-        '<div class="fs">'+(F.hard?'Rewards at every 5th chapter of HARD MODE – bigger rewards.':'Rewards at every 5th chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward!':'')+'</div><div class="ms">'+
+        '<div class="fs">'+(F.hard?'Rewards at every 3rd chapter of HARD MODE – bigger rewards.':'Rewards at every 3rd chapter of the NORMAL campaign.')+' Already passed? Claim at once.'+(own?' Tap a glowing reward!':'')+'</div><div class="ms">'+
         F.ms.map((m,i)=>{ const rd=done>=(i+1)*5, dn=s.includes(i), cl=own&&rd&&!dn;
           return '<div class="'+(dn?'dn':cl?'cl':rd?'rd':'no')+'"'+(cl?' data-c="'+k+':'+i+'"':'')+'><span>'+CH+((i+1)*5)+'</span><b>'+m.dm+IC.dm+'</b><small>+'+m.tk+IC.tk+(m.gt?' +'+m.gt+IC.gt:'')+'</small></div>'; }).join('')+
         '</div><div class="fb"><div class="tot">Total: '+tot.dm.toLocaleString('en')+' '+DMh+'<small>+ '+tot.tk+' Recruit'+(tot.gt?' + '+tot.gt+' Gear':'')+' · progress: '+CH+done+'</small></div>'+(own?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,F.price)+'</button>')+'</div></div>'; }
