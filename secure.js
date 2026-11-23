@@ -181,6 +181,9 @@ function wipe(){
   const KEEP = ['torqueEmpire_packs','torqueEmpire_test','torqueEmpire_test_s','te_dk','te_hd','te_dev','te_tacc','te_tacc_w','te_tpid','te_pids','te_twa'];
   try{ const ks = []; for(let i=0;i<localStorage.length;i++) ks.push(localStorage.key(i));
     for(const k of ks) if(k && (k.startsWith('te_') || k.startsWith('torqueEmpire')) && !KEEP.includes(k)) localStorage.removeItem(k); }catch(e){}
+  // v16-218 (Marius, 23 nov 2026): RESET also removes the VIP Passes (Silver / Gold / Platinum / Diamond). The other packs stay (VIP mechanic, VIP car, speed…).
+  try{ const pk = JSON.parse(localStorage.getItem('torqueEmpire_packs')||'{}')||{}; for(const k of ['sil','sub','plat','dia']) delete pk[k];
+    localStorage.setItem('torqueEmpire_packs', JSON.stringify(pk)); }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99;background:#05070cee;color:#fff;display:flex;align-items:center;justify-content:center;font-family:system-ui;padding:24px;text-align:center';
   d.innerHTML='<div style="max-width:360px;border:2px solid #ffd54a;border-radius:18px;padding:20px;background:#141c2b"><div style="font-size:42px">🔄</div><h2 style="color:#ffd54a;margin:6px 0">Account reset</h2><p style="color:#ddd;line-height:1.45">Your game was reset by the Torque Empire team. A new game starts now – good luck!</p></div>';
