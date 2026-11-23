@@ -554,6 +554,7 @@ const HSK={
  m5_2:{sk:'REBIRTH FLAME',skd:'A giant fire phoenix dives on the enemies: 200% damage to ALL, they burn for 4s. Heals all mechanics 35% + 15% over 4s, team −20% damage taken for 6s. Once per battle it brings back ALL fallen mechanics with 40% HP.'},
  m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
  m5_4:{sk:'STARFIRE RAIN',skd:'A rain of electric spark-plug arrows falls on the biggest group: 240% damage, slow 50% for 3s and they are MARKED (+35% damage taken) for 6s. Long range.'},
+ m5_6:{sk:'RAINBOW TEMPEST',skd:'A tornado of magic rainbow paint falls on the biggest group: 260% damage, slow 50% for 4s and the painted enemies deal −30% damage for 5s. Long range.'},
  m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Long range.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
 const SKP={
@@ -628,14 +629,17 @@ const TAL={m5_0:{n:'OVERLOAD CROWN',v:[.5,.65,.8],d:v=>'Every 4th attack the lig
  m5_2:{n:'REBIRTH FLAME',v:[.4,.55,.7],d:v=>'Once per battle, when Ignis falls he is reborn with '+Math.round(v*100)+'% HP.'},
  m5_3:{n:'IRON WALL',v:[.1,.15,.2],d:v=>'At the start of every wave the whole team gets a shield of '+Math.round(v*100)+'% of Goliath\'s HP.'},
  m5_4:{n:'STAR MARK',v:[.15,.2,.25],d:v=>'The monster Nova hits takes +'+Math.round(v*100)+'% damage from the whole team for 4 s.'},
+ m5_6:{n:'WET PAINT',v:[.2,.25,.3],d:v=>'Every monster Chroma hits is soaked in paint: −'+Math.round(v*100)+'% attack speed for 4 s.'},
  m5_5:{n:'PIERCING RAIL',v:[.6,.75,.9],d:v=>'Every 3rd shot goes through every monster in the line ('+Math.round(v*100)+'% damage).'}};
 const TAL_LV=[320,360,400],talLvOf=lv=>lv>=TAL_LV[2]?3:lv>=TAL_LV[1]?2:lv>=TAL_LV[0]?1:0;
 const talLv=h=>!h||h.crew||h.gr!==5||!TAL[h.id]?0:talLvOf(TE().lvOf?TE().lvOf(h.id):1),TV=u=>TAL[u.h.id].v[u.tl-1];
 function talTxt(u,t){if(!B.sim)num(u.x,headY(u)-14*S,t,'#ff6e6e',0);}
 function talHit(u,tg){const id=u.h.id,v=TV(u);u.tc=(u.tc||0)+1;
   if(id==='m5_0'&&u.tc%4===0){const L=alive(B.mons).filter(m=>m!==tg).sort((a,b)=>dist(a,tg)-dist(b,tg)).slice(0,2);for(const o of L){if(!B.sim){B.fx.push({type:'bolt',x0:tg.x,y0:headY(tg)+16,x1:o.x,y1:headY(o)+16,t:0,d:.22,col:'#ff5252'});}damage(u,o,v,{noCrit:1,skill:1});}if(L.length)talTxt(u,'OVERLOAD!');}
+  else if(id==='m5_6'){wetOn(tg,v);}
   else if(id==='m5_4'){tg.nmk=4;tg.nmv=Math.max(tg.nmk>0?tg.nmv||0:0,v);}
   else if(id==='m5_5'&&u.tc%3===0){let n=0;for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)<.16&&(m.x-u.x)*u.face>0){damage(u,m,v,{noCrit:1,skill:1});n++;}if(n){talTxt(u,'PIERCE ×'+(n+1));if(!B.sim)B.fx.push({type:'beam',x0:u.x,y0:headY(u)+30,x1:u.face>0?W:0,y1:headY(tg)+16,t:0,d:.2,col:'#ff5252',w:3});}}}
+function wetOn(m,v){if(!m||m.dead)return;if(!(m.wpt>0)&&!B.sim)num(m.x,headY(m)-6*S,'WET','#ff80ab',0);m.wpt=4;m.wpv=Math.max(m.wpt>0?m.wpv||0:0,v);} // v16-244 Chroma talent WET PAINT
 function talWave(){for(const g of B.heroes){if(g.dead||!g.tl||g.h.id!=='m5_3')continue;const sh=g.max*TV(g);for(const h of B.heroes)if(!h.dead)h.shield=Math.max(h.shield,sh);talTxt(g,'IRON WALL');}}
 function pasTxt(u,i,txt){if(B.sim)return;const p=PASV[u.role][i];num(u.x,headY(u)-14*S,txt||p.n,'#ffe082',0);}
 const CREW_NAMES=['Rookie Rob','Rookie Dan','Rookie Max','Rookie Ivo','Rookie Sam'];
@@ -1099,9 +1103,9 @@ const SL=(h,long)=>TE().sLbl?TE().sLbl(h,stars(h),long):'+'+stars(h); // v16-161
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
 // v16-127 (preview): BATTLE ROLES – every class keeps its name (garages, towers, sets) and gets a role tag (Marius' 5 badges img/ui12/role_*.webp)
 const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},ranger:{n:'RANGER',c:'#b6f25a'},mage:{n:'MAGE',c:'#d59bff'},support:{n:'SUPPORT',c:'#5ef0a0'}};
-const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank',m5_4:'ranger',m5_5:'ranger'};
+const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank',m5_4:'ranger',m5_5:'ranger',m5_6:'mage'};
 // v16-141: the two Mythic RANGERS shoot from far away (Legend class is melee): range + a bit less HP / DEF
-const MYTH_RNG={m5_4:{rng:215,hp:.8,def:.75,as:1,col:'#9be7ff',w:3},m5_5:{rng:235,hp:.78,def:.7,as:1.12,col:'#18ffff',w:5}};
+const MYTH_RNG={m5_6:{rng:200,hp:.82,def:.75,as:1,col:'#ff4fd8',w:4},m5_4:{rng:215,hp:.8,def:.75,as:1,col:'#9be7ff',w:3},m5_5:{rng:235,hp:.78,def:.7,as:1.12,col:'#18ffff',w:5}};
 function bRoleOf(h){if(!h||h.crew)return null;return MYTH_ROLE[h.id]||CLS2ROLE[roleOf(h)]||null;}
 const RLI=k=>'img/ui12/role_'+k+'.webp';
 const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
@@ -1165,6 +1169,7 @@ m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,
 m5_3:{a:[170.7,246],m:[300,150],v8:{"cw":243,"uw":324.0,"ax":170.7,"rows":[[0,225,300.0,294.7],[225,226,301.3,296.0],[451,273,364.0,340.0],[724,265,353.3,320.0],[989,220,293.3,286.7],[1209,222,296.0,292.0]],ck:5,pk:[5,6,7]},fx8:{"cw":247,"uw":329.3,"ax":165.3,"rows":[[0,315,420.0,397.3]]}}, // v16-132: GOLIATH, THE IRON BULWARK (new Mythic TANK) – 8 frames (tools/v8_hero.py m5_3); ck = shield slam → hex dome (frame 5), pk = dome holds → idle; fxs = hex shield falls → impact (frame 4) → shatters
 m5_4:{a:[118.7,246],m:[190.7,122],col:'#9be7ff',v8:{"cw":188,"uw":250.7,"ax":118.7,"rows":[[0,191,254.7,250.7],[191,192,256.0,252.0],[383,189,252.0,248.0],[572,222,296.0,290.7],[794,195,260.0,254.7],[989,200,266.7,262.7]],"ck":5,"pk":[5,6,7]},fx8:{"cw":181,"uw":241.3,"ax":121.3,"rows":[[0,243,324.0,293.3]]}}, // v16-141: NOVA, THE STARFIRE HUNTRESS (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_4)
 m5_5:{a:[133.3,246],m:[251.3,128],col:'#18ffff',v8:{"cw":216,"uw":288.0,"ax":133.3,"rows":[[0,216,288.0,284.0],[216,209,278.7,272.0],[425,222,296.0,286.7],[647,206,274.7,269.3],[853,203,270.7,266.7],[1056,211,281.3,277.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":353,"uw":470.7,"ax":234.7,"rows":[[0,189,252.0,240.0]]}}, // v16-141: VEGA, THE RAILGUN ACE (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_5)
+m5_6:{a:[112.0,246],m:[188,80],col:'#ff4fd8',v8:{"cw":188,"uw":250.7,"ax":112.0,"rows":[[0,199,265.3,260.0],[199,207,276.0,270.7],[406,190,253.3,249.3],[596,220,293.3,288.0],[816,219,292.0,286.7],[1035,217,289.3,285.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":207,"uw":276.0,"ax":137.3,"rows":[[0,269,358.7,328.0]]}}, // v16-244: CHROMA, THE PAINT TEMPEST (Mythic MAGE, Paint) – 8 frames (tools/v8_hero.py m5_6); ck = spins the staff → rainbow burst (frame 5), pk = paint orbits → idle; fxs = paint tornado → splash (frame 5)
 m5_2:{a:[148.0,246],m:[300,150],fire:1,v8:{cw:237,uw:316.0,ax:148.0,rows:[[0,196,261.3,256.0],[196,191,254.7,250.7],[387,221,294.7,289.3],[608,238,317.3,304.0],[846,196,261.3,257.3],[1042,219,292.0,286.7]],ck:5,pk:[5,6,7]},fx8:{cw:233,uw:310.7,ax:154.7,rows:[[0,290,386.7,348.0]]}}, // v16-128: IGNIS, THE IRON PHOENIX (new Mythic) – 8 frames (tools/v8_hero.py m5_2); ck = plants the staff → wings open → rises → BURST (frame 4), pk = lands → idle; fxs = fire phoenix dives → impact (frame 4) → embers
  // v16-21: Drivers (map only, not in battle). Rows: 0 idle · 1 walk · 2 run · 3 scooter · 4 signature move · 5 tip
  d0_0:{w:384,a:[193,248],m:[300,150]},d0_1:{w:384,a:[197,248],m:[300,150]},d0_2:{w:384,a:[200,248],m:[300,150]},d0_3:{w:384,a:[202,248],m:[300,150]},
@@ -2047,6 +2052,12 @@ const SKF={
    castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2)fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
+ m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
+   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
+   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
+     if(c){const R=135*S,v=u.tl?TV(u):0;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.6,{skill:1});m.slow=Math.max(m.slow,4);m.weak=Math.max(m.weak,5);if(v)wetOn(m,v);}
+       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ff4fd8',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ff80ab',R);}sparks(c.x,fy(c.d)-10*S,16,'#fff59d');}});},
  m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
    if(tg){tg.mark=Math.max(tg.mark,2);if(f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
@@ -2106,7 +2117,7 @@ function unitUpdate(u,dt,foes,friends){
   u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;if(u.enLock>0)u.enLock-=dt;
   if(u.dead){u.deadT+=dt;return;}
   u.stun=Math.max(0,u.stun-dt);u.slow=Math.max(0,u.slow-dt);u.mark=Math.max(0,u.mark-dt);
-  if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
+  if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
     if(u.burnT>=.5){u.burnT=0;if(u.burnSrc)damage(u.burnSrc,u,.22,{noCrit:1,skill:1});if(u.dead)return;}}}
   if(u.hero){u.buff=Math.max(0,u.buff-dt);u.aspd=Math.max(0,u.aspd-dt);u.defB=Math.max(0,u.defB-dt);u.critB=Math.max(0,u.critB-dt);u.taunt=Math.max(0,u.taunt-dt);if(u.nmk>0)u.nmk-=dt;if(u.shield>0)u.shield=Math.max(0,u.shield-u.max*.04*dt);
     if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;heal(u,u.hotA);}}
@@ -2151,7 +2162,7 @@ function unitUpdate(u,dt,foes,friends){
   const spot=u.hero&&u.rng<80*S?meleeSpot(u,tg,range):null;
   if(u.st==='atk'){const prev=u.ap;u.ap+=dt/(u.hero?.42/(u.aspd>0?1+u.aspdK:1):Math.min(.6,u.as*.45));
     if(prev<.55&&u.ap>=.55)doHit(u,tg);
-    if(u.ap>=1){u.st='idle';u.ap=0;u.cd=u.as/(u.aspd>0?1+u.aspdK:1)/(u.tl&&u.h.id==='m5_1'&&B.phase==='fight'&&B.phT<6?1+TV(u):1);}return;}
+    if(u.ap>=1){u.st='idle';u.ap=0;u.cd=u.as/(u.aspd>0?1+u.aspdK:1)/(u.tl&&u.h.id==='m5_1'&&B.phase==='fight'&&B.phT<6?1+TV(u):1)/(u.wpt>0?1-(u.wpv||0):1);}return;}
   u.cd-=dt;
   // spider pounce
   if(u.pounce&&dd<140*S&&dd>u.rng*1.5){u.pounce=0;u.act=null;B.fx.push({type:'dust',x:u.x,y:fy(u.d)});u.x=tg.x-u.face*(bw(u)+bw(tg));u.d=tg.d;damage(u,tg,1.5);shake(4);sparks(tg.x,headY(tg)+20,8);return;}
@@ -2563,7 +2574,7 @@ const FRM=[0,1,2,3,4,5].map(i=>{const im=new Image();im.src='img/fr'+i+'.webp';r
 const FWIN=[[8.5,17.5,83,61.5],[8.5,17.5,83,61.5],[8.5,18,83,61],[15.5,17.5,69,55],[14.5,20.5,71,50],[17.8,21.5,64.4,46.5]]; // window % (same as the Team page)
 const FPLT=[[81,11],[81,11],[81,11],[73.5,9.5],[74.5,9.5],[74.5,9]]; // bottom plate % (top, height)
 const FSTR=[[62,78],[62,78],[62,78],[60,76],[58,74],[96,108]];
-const FACE={m5_4:0.55,m5_5:0.55,m5_3:0.5,m0_0:0.7,m0_1:0.64,m0_2:0.64,m0_3:0.68,m0_4:0.6,m0_5:0.66,m0_6:0.62,m0_7:0.58,m0_8:0.58,m0_9:0.55,m1_0:0.55,m1_1:0.62,m1_2:0.58,m1_3:0.66,m1_4:0.62,m1_5:0.58,m1_6:0.58,m1_7:0.62,m1_8:0.58,m2_0:0.64,m2_1:0.58,m2_2:0.58,m2_3:0.66,m2_4:0.62,m2_5:0.62,m2_6:0.62,m2_7:0.65,m3_0:0.6,m3_1:0.6,m3_2:0.65,m3_3:0.62,m3_4:0.62,m3_5:0.65,m3_6:0.65,m4_0:0.64,m4_1:0.52,m4_2:0.62,m4_3:0.6,m4_4:0.58,m4_5:0.66,m5_0:0.5,m5_1:0.62,m5_2:0.5}; // v16-40: where the face is in each portrait (0-1 of the width) → card window centred on it
+const FACE={m5_6:0.5,m5_4:0.55,m5_5:0.55,m5_3:0.5,m0_0:0.7,m0_1:0.64,m0_2:0.64,m0_3:0.68,m0_4:0.6,m0_5:0.66,m0_6:0.62,m0_7:0.58,m0_8:0.58,m0_9:0.55,m1_0:0.55,m1_1:0.62,m1_2:0.58,m1_3:0.66,m1_4:0.62,m1_5:0.58,m1_6:0.58,m1_7:0.62,m1_8:0.58,m2_0:0.64,m2_1:0.58,m2_2:0.58,m2_3:0.66,m2_4:0.62,m2_5:0.62,m2_6:0.62,m2_7:0.65,m3_0:0.6,m3_1:0.6,m3_2:0.65,m3_3:0.62,m3_4:0.62,m3_5:0.65,m3_6:0.65,m4_0:0.64,m4_1:0.52,m4_2:0.62,m4_3:0.6,m4_4:0.58,m4_5:0.66,m5_0:0.5,m5_1:0.62,m5_2:0.5}; // v16-40: where the face is in each portrait (0-1 of the width) → card window centred on it
 function drawFCard(u,x,y,cw,ch,ready,t){const h=u.h,i=h.crew?0:Math.min(5,h.gr|0),im=FRM[i];
   if(!im.complete||!im.naturalWidth)return false;
   const iw=im.naturalWidth,ih=im.naturalHeight;let s=cw/iw;if(ih*s>ch)s=ch/ih;
