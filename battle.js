@@ -1105,7 +1105,7 @@ function itemIconURL(s,r,set){const key='it'+s+r+(set||'');if(ICC[key])return IC
   x.save();x.shadowColor='rgba(0,0,0,.75)';x.shadowOffsetY=4;x.shadowBlur=6;x.drawImage(itemArtCv(s,r,set),0,0);x.restore();
   const u=c.toDataURL();if(ok)ICC[key]=u;return u;}
 function itemCard(it,extra,cls,ss){const T=TE(),i=Math.min(6,it.r),r=T.FIN[i],p=T.FPL[i];
-  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}${it.set&&ss?' s'+ss:''}" data-it="${it.id}"${it.set&&ss==='On'?` style="--sc:${SETCOL[it.set]||'#ffb300'}"`:''}><div class="fc"><img class="ff" src="img/fr${i}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">${gLvTxt(it)}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
+  return `<div class="gi ${cls||''}${it.r>=6?' asc':''}${it.set&&ss?' s'+ss:''}" data-it="${it.id}"${it.set&&ss==='On'?` style="--sc:${GG(it.r).c}"`:''}><div class="fc"><img class="ff" src="img/fr${i}.webp">${it.sr?gStars(it):''}<img class="fp" src="${itemIconURL(it.s,it.r,it.set)}" style="left:${r[0]}%;top:${r[1]}%;width:${r[2]}%;height:${r[3]}%"><span class="fs" style="top:${p[0]}%;height:${p[1]}%">${gLvTxt(it)}</span>${it.set?`<img class="setB" src="${roleBadge(it.set,48)}" alt="SET">`:''}</div>${extra||''}</div>`;}
 
 // ---------------------------------------------------------------- team helpers
 function myMechs(){const T=TE(),o=[];

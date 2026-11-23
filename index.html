@@ -3476,6 +3476,9 @@ const setName=(cat,k)=>typeof SETN[k]==='object'?SETN[k][cat]:SETN[k];
 const DUP_MONEY=[150,350,800,2000,5000,12000];
 const MYTH_AURA=.10;
 const spName=sp=>sp==='all'?'🌟 All workshops':(ST[sp]?ST[sp].icon+' '+ST[sp].name:'');
+// v16-247 (Marius 23 nov): MYTHIC heroes work only in the workshop of their class (same as battle.js MYTH_CLS)
+const MYTH_GAR={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint'};
+const gSp=h=>h&&h.sp==='all'?(MYTH_GAR[h.id]||'engine'):(h?h.sp:'');
 // v11: +1…+5 = +20% of base each, +6…+50 = +4% each (+50 = ×3.8)
 // v16-40: stars after +5 give less on low grades (an Uncommon +50 was stronger than a Legendary)
 const STAR_KG=[.01,.012,.018,.025,.04,.05];
@@ -3556,7 +3559,7 @@ function heroRefresh(){HVER++;lastPanelKey='';
   CATK.forEach(cat=>{SB[cat]={};SETB[cat].forEach(([k,v],gr)=>{if(setDone(cat,gr))SB[cat][k]=(SB[cat][k]||0)+v;});});
   for(const id in drivers)drivers[id].forEach(d=>d.p.spd=1+drvBonus(id,d.k).spd);}
 function mechBonus(st,j){const o={spd:SB.m.spd||0,inc:SB.m.inc||0,crit:0};
-  const h=heroIn('m|'+st+'|'+j);if(h){const s=own(h.id).s,f=(h.sp==='all'||h.sp===st)?1:0;o.spd+=hv(h,'spd',s)*f;o.inc+=hv(h,'inc',s)*f;o.crit=hv(h,'crit',s)*f;}
+  const h=heroIn('m|'+st+'|'+j);if(h){const s=own(h.id).s,f=gSp(h)===st?1:0;o.spd+=hv(h,'spd',s)*f;o.inc+=hv(h,'inc',s)*f;o.crit=hv(h,'crit',s)*f;}
   for(let k=0;k<PLV(st);k++){const a=heroIn('m|'+st+'|'+k);if(a&&a.gr===5)o.spd+=MYTH_AURA;}
   return o;}
 function guardBonus(){const o={cat:SB.g.cat||0,rew:SB.g.rew||0,shield:0,spd:[SB.g.spd||0,SB.g.spd||0]};
@@ -3883,7 +3886,7 @@ function popAutoBest(){const cat=rosCat,plan=autoPlan(cat),keys=slotsOf(cat);let
   x+='</div><div class="abT">'+L+' (all places together)<br><b>'+pctS(sb)+'</b> ➜ <b class="up">'+pctS(sa)+'</b> <span class="'+(sa-sb>=0?'up':'dn')+'">('+(sa-sb>=0?'▲ ':'▼ ')+pctS(sa-sb)+')</span></div>';
   const pros=[],cons=[];if(sa>sb)pros.push('More '+L.replace(/^\S+ /,'').toLowerCase()+' in total');const emp=ch.filter(c=>!c[1]&&c[2]).length;if(emp)pros.push(emp+' empty place'+(emp>1?'s':'')+' filled');
   const out=ch.filter(c=>c[1]&&!Object.values(plan).includes(c[1])).map(c=>HB[c[1]].n);if(out.length)cons.push('Back to the bench: '+out.join(', '));
-  const half=ch.filter(c=>c[2]&&cat==='m'&&HB[c[2]].sp!=='all'&&HB[c[2]].sp!==c[0].split('|')[1]).length;if(half)cons.push(half+' work outside their speciality (½ bonus)');
+  const half=ch.filter(c=>c[2]&&cat==='m'&&gSp(HB[c[2]])!==c[0].split('|')[1]).length;if(half)cons.push(half+' work outside their speciality (½ bonus)');
   x+='<div class="abPC"><div class="pro"><h4>✅ ADVANTAGES</h4>'+(pros.length?pros.map(p=>'<p>'+p+'</p>').join(''):'<p class="no">—</p>')+'</div><div class="con"><h4>❌ DISADVANTAGES</h4>'+(cons.length?cons.map(p=>'<p>'+p+'</p>').join(''):'<p class="no">none</p>')+'</div></div>';
   pop(x,{plan,cat},'abSk');popBox.insertAdjacentHTML('beforeend','<button class="pB abOK" data-p="abOK">✓ CONFIRM</button><button class="pB grey abNo" data-p="x">CANCEL</button>');}
 $('pop').addEventListener('click',e=>{const t=e.target.closest('[data-p="abOK"]');if(!t||!popCtx||!popCtx.plan)return;const {plan,cat}=popCtx;
@@ -3906,7 +3909,7 @@ function renderRoster(){if(!rosEl.classList.contains('open'))return;const cat=ro
   if(!Object.keys(groups).length)x+='<div class="rsEmpty">No places yet – build and upgrade buildings to unlock places.</div>';
   for(const g in groups){x+='<div class="rsG"><div class="rsGh">'+gName(g)+(g!=='security'&&G.lv[g]?' <small>LV '+G.lv[g]+'</small>':'')+'</div><div class="rsGrid">';
     groups[g].forEach(k=>{const id=curIn(k),h=id&&HB[id];
-      x+='<div class="rsC" data-ro="slot" data-k="'+k+'">'+(h?card(h,own(id),'<small class="bn">'+bonusTxt(k,id)+(cat==='m'&&h.sp!=='all'&&h.sp!==k.split('|')[1]?' · ½':'')+'</small>'):'<div class="hc"><div class="fc emp">+<br><small>EMPTY</small></div><b>tap to add</b></div>')+'<span class="pl">'+slotName(k).replace(/^\S+\s/,'').replace(/^.*· /,'')+'</span></div>';});
+      x+='<div class="rsC" data-ro="slot" data-k="'+k+'">'+(h?card(h,own(id),'<small class="bn">'+bonusTxt(k,id)+(cat==='m'&&gSp(h)!==k.split('|')[1]?' · ½':'')+'</small>'):'<div class="hc"><div class="fc emp">+<br><small>EMPTY</small></div><b>tap to add</b></div>')+'<span class="pl">'+slotName(k).replace(/^\S+\s/,'').replace(/^.*· /,'')+'</span></div>';});
     x+='</div></div>';}
   // bench
   const bench=mine.filter(id=>!whereIs(id)).sort((a,b)=>HB[b].gr-HB[a].gr||own(b).s-own(a).s);
@@ -3992,7 +3995,7 @@ function popHero(id){const h=HB[id],o=own(id),G0=GRADES[h.gr],w=whereIs(id),s=o?
   x+=now.map((t,i)=>'<div class="pR"><span>'+t+'</span>'+(nx?'<em>→ '+nx[i].split(' ')[1]+'</em>':'')+'</div>').join('');
   x+='<div class="pD">'+(isAwk(h)?'<b style="color:#ff6b6b">AWAKENING</b>: duplicate copies wake the hero up – <b>Awakened I → V</b> (copies 1 · 1 · 2 · 2 · 3 = 9). Every tier: much stronger stats · +1 skill level from II · a new portrait at V.'+(o&&mTier(s)<5?' Next tier: <b>'+awkNeed(s).have+' / '+awkNeed(s).need+'</b> copies.':'')+' Mythic Pity: you choose the Mythic (WISH on the Summon page).':h.gr===5?'Every duplicate summon gives <b>+1 ★</b> (max +'+MYTH_MAXC+'). Every +5 the stars change color (gold → red → purple → rainbow): +5% to everything and +1 skill level.':(h.cat==='m'&&h.gr===4?'Every duplicate summon gives <b>+1</b> (max <b>+'+LEG_MAXS+'</b>). each + = <b>+9.5%</b> of base (a Legendary +10 ≈ 2× an Epic +50). A Legendary +0 is always stronger than an Epic +50.':'Every duplicate summon gives <b>+1</b> (max +'+MAXS+'). '+(h.cat==='m'?'Each + adds <b>+1.2%</b> of base (+50 = ×1.6). A hero of a <b>higher grade at +0 is always stronger</b> than this grade at +50.':'Each + adds stats: +1…+5 = +20% of base each, +6…+50 = +4% each.')))+(h.cat==='m'?' Levels: HEROES page → LEVEL UP with '+ESI+' Essence.':'')+'</div>';
   if(h.cat==='m'&&!h.soon&&window.CAMPAIGN&&CAMPAIGN.passives){const sk=CAMPAIGN.skill(h);x+='<div class="sec">IN BATTLE · '+CAMPAIGN.roleName(h).toUpperCase()+'</div><div class="pD" style="text-align:left"><b style="color:#ffd54a">⚔️ '+sk.sk+'</b> (skill) – '+sk.skd+'</div>'+CAMPAIGN.passives(h).map(p=>'<div class="pD" style="text-align:left"><b style="color:#ffe082">'+p.ic+' '+p.n+'</b> (passive, automatic) – '+p.d+'</div>').join('');}
-  if(h.cat==='m'&&h.sp!=='all')x+='<div class="pD">🏁 Works only in <b>'+spName(h.sp)+'</b> (every workshop has its own class).</div>';
+  if(h.cat==='m')x+='<div class="pD">🏁 Works only in <b>'+spName(gSp(h))+'</b> (every workshop has its own class).</div>';
   if(h.cat==='g')x+='<div class="pD">Guards work in the Security office: the desk guard and (Security LV 3+) the patrol guard.</div>';
   if(h.cat==='d')x+='<div class="pD">Drivers work for Arrival Parking (valets), every workshop and the Sales Office.</div>';
   if(o){x+='<div class="sec">WORKS AT</div><div class="pR"><span>'+(w?slotName(w):'— not assigned —')+'</span></div>';
@@ -4003,7 +4006,7 @@ function popHero(id){const h=HB[id],o=own(id),G0=GRADES[h.gr],w=whereIs(id),s=o?
 // v11: what a hero gives in one exact place (bay / desk / driver seat)
 function slotStats(key,id){const c=key[0];if(!id||!own(id)){return c==='m'?[0,0,0,0]:c==='g'?[0,0,0,0]:[0,0];}
   const h=HB[id],s=own(id).s;
-  if(c==='m'){const st=key.split('|')[1],f=(h.sp==='all'||h.sp===st)?1:.5;return [hv(h,'spd',s)*f,hv(h,'inc',s)*f,hv(h,'crit',s)*f,h.gr===5?MYTH_AURA:0];}
+  if(c==='m'){const st=key.split('|')[1],f=gSp(h)===st?1:.5;return [hv(h,'spd',s)*f,hv(h,'inc',s)*f,hv(h,'crit',s)*f,h.gr===5?MYTH_AURA:0];}
   if(c==='g')return [hv(h,'cat',s),hv(h,'spd',s),hv(h,'rew',s),hv(h,'shield',s)];
   return [hv(h,'spd',s),hv(h,'tip',s)];}
 const SLOTL={m:['⚡ Work speed','💰 Job income','🎯 Double pay chance','🔥 Aura (whole workshop)'],g:['🛡️ Thief catch','🏃 Run speed','💰 Thief reward','🔒 Less money lost'],d:['🛵 Driving speed','💵 Tip chance']};
@@ -4021,25 +4024,25 @@ function popCompare(key,id,from){const cur=G.h.as[key]&&own(G.h.as[key])?G.h.as[
   L.forEach((l,i)=>{if(!A[i]&&!B[i])return;const d=A[i]-B[i];
     x+='<div class="cmR"><span>'+l+'</span><b>'+(B[i]?pctS(B[i]):'—')+'</b><b>'+(A[i]?pctS(A[i]):'—')+'</b><b class="'+(d>0.0005?'up':d<-0.0005?'dn':'')+'">'+(Math.abs(d)<0.0005?'=':(d>0?'▲ ':'▼ ')+pctS(d))+'</b></div>';});
   x+='</div>';
-  if(key[0]==='m'){const h=HB[id],st=key.split('|')[1];if(h.sp!=='all'&&h.sp!==st)x+='<div class="pD">⚠️ '+h.n+' – specialist for '+spName(h.sp)+'. In this workshop only <b>half</b> of the bonus.</div>';}
+  if(key[0]==='m'){const h=HB[id],st=key.split('|')[1];if(gSp(h)!==st)x+='<div class="pD">⚠️ '+h.n+' – specialist for '+spName(gSp(h))+'. In this workshop only <b>half</b> of the bonus.</div>';}
   if(w)x+='<div class="pD">📍 '+HB[id].n+' leaves <b>'+slotName(w)+'</b> (that place becomes empty).</div>';
   if(cur)x+='<div class="pD">↩ '+HB[cur].n+' goes back to the bench.</div>';
   x+='<button class="pB" data-p="put" data-k="'+key+'" data-id="'+id+'">✓ CONFIRM</button><button class="pB grey" data-p="cback" data-k="'+key+'" data-id="'+id+'" data-f="'+from+'">CANCEL</button>';
   pop(x);}
 const CAMPAIGN_CLS={engine:'Bruiser',tuning:'Racer',inspect:'Scanner',service:'Medic',paint:'Sprayer',elec:'Shocker'};
-function popSlots(id){const h=HB[id],L=slotsOf(h.cat).filter(k=>h.cat!=='m'||h.sp==='all'||k.split('|')[1]===h.sp);
-  pop('<div class="pT">Where should '+h.n+' work?</div><div class="pD">Tap a place to see the difference before you move him.</div>'+(L.length?L.map(k=>{const cur=heroIn(k),m=h.cat==='m'?(h.sp==='all'||k.split('|')[1]===h.sp):true;
+function popSlots(id){const h=HB[id],L=slotsOf(h.cat).filter(k=>h.cat!=='m'||k.split('|')[1]===gSp(h));
+  pop('<div class="pT">Where should '+h.n+' work?</div><div class="pD">Tap a place to see the difference before you move him.</div>'+(L.length?L.map(k=>{const cur=heroIn(k),m=h.cat==='m'?(k.split('|')[1]===gSp(h)):true;
     return '<div class="pR pk" data-p="cmp" data-f="s" data-k="'+k+'" data-id="'+id+'"><span>'+slotName(k)+(h.cat==='m'?' <b style="color:#7CFC9A">✓</b>':'')+'<br>'+(cur&&cur.id===id?'':cmpHint(k,id))+'</span><em>'+(cur?(cur.id===id?'★ here':'<span style="color:'+GRADES[cur.gr].c+'">'+cur.n+'</span>'):'empty')+'</em></div>';}).join(''):'<div class="pD">No free places yet. Build or upgrade buildings to unlock more.</div>'));}
 function popPicker(key){const cat=key[0],cur=heroIn(key),st=cat==='m'?key.split('|')[1]:'';
-  const L=Object.keys(G.h.own).filter(id=>HB[id].cat===cat&&(cat!=='m'||HB[id].sp==='all'||HB[id].sp===st)).sort((a,b)=>slotStats(key,b)[0]-slotStats(key,a)[0]||pw(b)-pw(a));
+  const L=Object.keys(G.h.own).filter(id=>HB[id].cat===cat&&(cat!=='m'||gSp(HB[id])===st)).sort((a,b)=>slotStats(key,b)[0]-slotStats(key,a)[0]||pw(b)-pw(a));
   if(cat==='m'){ // v16-49: Marius' CHOOSE MECHANIC picture (portrait window · info · shield with the +)
     let x='<div class="kpT">'+slotName(key)+'</div><div class="pD kpD">Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="kpR" data-p="put" data-k="'+key+'" data-id=""><div class="kpI"><b>— Remove '+cur.n+' —</b></div></div>':'');
-    x+=L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=h.sp==='all'||h.sp===st;
+    x+=L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=gSp(h)===st;
       return '<div class="kpR'+(w===key?' on':'')+'" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><img class="kpP" src="'+portrait(h)+'" style="box-shadow:0 0 0 2px '+GRADES[h.gr].c+'"><div class="kpI"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b><small>'+spName(h.sp)+' ✓ · Lv '+lvOf(id)+'</small>'+(w===key?'<small style="color:#eaffd0">★ works here</small>':(w?'<small>at '+slotName(w)+'</small>':'')+cmpHint(key,id))+'</div><div class="kpS">'+sLbl(h,o.s)+'</div></div>';}).join('')
      :'<div class="pD">No '+(CAMPAIGN_CLS[st]||'')+' mechanics for this workshop yet · every workshop takes only its own class (Legend = all).</div>';
     pop(x,null,'chSk');popBox.insertAdjacentHTML('beforeend',L.length?'<button class="pB kpB" data-p="x">CLOSE</button>':'<button class="pB kpB" data-p="gosum" data-c="m">'+TKI+' GO TO SUMMON</button>');return;}
   pop('<div class="pT">'+slotName(key)+'</div><div class="pD">Choose a '+CATS[cat].one.toLowerCase()+'. Best for this place first. Tap to compare before / after.</div>'+(cur?'<div class="pR pk" data-p="put" data-k="'+key+'" data-id=""><span>— Remove '+cur.n+' —</span></div>':'')+
-    (L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=cat==='m'?(h.sp==='all'||h.sp===st):true;
+    (L.length?L.map(id=>{const h=HB[id],o=own(id),w=whereIs(id),m=cat==='m'?(gSp(h)===st):true;
       return '<div class="pR pk" data-p="cmp" data-f="p" data-k="'+key+'" data-id="'+id+'"><span><img class="mini" src="'+portrait(h)+'" style="border-color:'+GRADES[h.gr].c+'"><b style="color:'+GRADES[h.gr].c+'">'+h.n+'</b> '+stars(o.s)+(cat==='m'?'<br><small>'+spName(h.sp)+(m?' ✓':' · ½ bonus here')+'</small>':'')+'<br>'+(w===key?'':cmpHint(key,id))+'</span><em>'+(w===key?'★ here':w?'<small>at '+slotName(w)+'</small>':'')+'</em></div>';}).join('')
     :'<div class="pD">You have no '+CATS[cat].n.toLowerCase()+' yet.</div><button class="pB" data-p="gosum" data-c="'+cat+'">'+TKI+' GO TO SUMMON</button>'));}
 popEl.addEventListener('click',e=>{if(e.target===popEl){closePop();return;}const t=e.target.closest('[data-p]');if(!t)return;const a=t.dataset.p;
@@ -4182,7 +4185,7 @@ function teamRows(id){let keys=[];const T=[];
 
 // v16-121: show what a hero in a building really gives (tester: "I don't see the impact of the heroes in the buildings")
 function heroBonTxt(k,h){const p=k.split('|'),sv=own(h.id).s,pc=v=>'+'+Math.round(v*100)+'%';let t=[];
-  if(p[0]==='m'){if(!(h.sp==='all'||h.sp===p[1]))return '<small class="hbT bad">wrong class · no bonus</small>';t=[['⚡',hv(h,'spd',sv)],['💵',hv(h,'inc',sv)],['🎯',hv(h,'crit',sv)]];}
+  if(p[0]==='m'){if(gSp(h)!==p[1])return '<small class="hbT bad">wrong class · no bonus</small>';t=[['⚡',hv(h,'spd',sv)],['💵',hv(h,'inc',sv)],['🎯',hv(h,'crit',sv)]];}
   else if(p[0]==='d')t=[['⚡',hv(h,'spd',sv)],['💵 tips',hv(h,'tip',sv)]];else if(p[0]==='g')t=[['👮',hv(h,'cat',sv)],['💰',hv(h,'rew',sv)]];
   t=t.filter(x=>x[1]>0);return t.length?'<small class="hbT">'+t.map(x=>x[0]+' '+pc(x[1])).join(' · ')+'</small>':'';}
 function bayMB(c){return c.slot&&c.slot.kind==='bay'?mechBonus(c.slot.st,c.slot.j):{spd:0,inc:0,crit:0};}
@@ -4236,6 +4239,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:113,d:'Nov 23, 2026',ic:'🏭',t:'Mythic heroes: one workshop each',l:['<b>Mythic heroes</b> now work only in the workshop of their class (like every other hero): Torque King – Electronics · Lady Overdrive – Tuning · Ignis – Service · Goliath – Engine Shop · Nova & Vega – Inspection · Chroma – Body & Paint.','A Mythic hero that was in another workshop went back to the bench – put him in his own workshop again.','The set glow now shines in the <b>grade color</b> of the piece.']},
  {id:112,d:'Nov 23, 2026',ic:'🛡️',t:'All gear is SET gear now',l:['<b>Every gear piece</b> (Common → Ascended, from every source) now belongs to one of the <b>6 class sets</b> – all sets have the same chance. Your old pieces got a random set.','Every set piece has its own random <b>SET STAT</b>: Common +2% · Uncommon +3% · Rare +4% · Epic +6% · Legendary +8% · Mythic +10% · Ascended +12%. All set pieces on a hero the <b>same grade</b> → <b>×1.5</b>!','The Legend class is gone: <b>Mythic heroes</b> now belong to the class of their role – Torque King: Electrical · Lady Overdrive: Tuning · Ignis: Service · Goliath: Engine · Nova & Vega: Inspection · Chroma: Paint.','Heroes are stronger now, so <b>all monsters are +30%</b>. The set glow is faster and brighter.']},
  {id:111,d:'Nov 23, 2026',ic:'🌋',t:'New battle backgrounds',l:['Campaign battles now have <b>7 new painted worlds</b>: Junkyard, Desert Highway, Car Factory, Frozen Pass, Neon City, Volcano Forge and the <b>Boss Arena</b> for every chapter boss.','Each world is alive: welding sparks, steam, neon lights, aurora, lava embers and lightning.','Later acts give the same worlds new colours.']},
  {id:110,d:'Nov 23, 2026',ic:'🎨',t:'New MYTHIC hero: Chroma, the Paint Tempest',l:['A new <b>MYTHIC MAGE</b> joins the Hero Summon: <b>Chroma, the Paint Tempest</b> – she fights from far away with her spray-gun staff.','Skill <b>RAINBOW TEMPEST</b>: a tornado of magic paint falls on the biggest group – 260% damage, slow for 4s, and the painted enemies deal −30% damage for 5s.','Talent <b>WET PAINT</b> (Lv 320 / 360 / 400): every monster she hits loses 20 / 25 / 30% attack speed for 4s.']},
@@ -4476,12 +4480,13 @@ window.__TUTX={TOP,cam:()=>({x:camX,y:camY,z:Z,vw:VW,vh:VH}),setCam:(x,y)=>{camX
   rect:id=>id==='parking'?{x:430,y:110,w:345,h:290}:id==='office'?{x:GXL,y:ROWY.D-6,w:GW,h:GD+22}:GAR[id]?{x:GAR[id].x0,y:GAR[id].y0-16,w:GW,h:GD+32}:null,
   sel:()=>sel,closePanel:()=>closePanel(),upCost:id=>PCOST(id,lvT(id)+1),upHave:id=>pkN(partOf(id)),upGive:(id,n)=>pkAdd(partOf(id),n),TKI:()=>TKI};
 // v16-99: one-time update of old saves – heroes get the level that fits their campaign progress (so nothing gets harder), Mythic stars above +20 → 💎300 each, workshops keep only their own class
+function migr247(){if(G.m247)return;G.m247=1;for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.gr===5&&gSp(h)!==st)delete G.h.as[k];}} // v16-247: Mythic heroes only in their own workshop
 function migr99(){if(G.m99)return;G.m99=1;const e=Math.max(1,Math.min(LV_MAX,Math.round(expLv(G.cp.best||0)*.9)));
   for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o)continue;if(h.cat==='m'){o.lv=e;o.a=Math.min(ASC_MAX,Math.floor((e-1)/ASC_STEP));}else{o.lv=o.lv||1;o.a=o.a||0;}
     if(h.gr===5&&h.cat!=='m'&&o.s>MYTH_MAXC){const x=o.s-MYTH_MAXC;o.s=MYTH_MAXC;G.dm=(G.dm||0)+x*300;}}
-  for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&h.sp!=='all'&&h.sp!==st)delete G.h.as[k];}
+  for(const k in G.h.as){if(k[0]!=='m')continue;const h=HB[G.h.as[k]],st=k.split('|')[1];if(h&&gSp(h)!==st)delete G.h.as[k];}
   G.ess=(G.ess||0)+ESS_U()*10;G.gp=(G.gp||0)+GP_U()*20;save();}
-try{migr99();heroRefresh();}catch(e){console.error(e);}
+try{migr99();migr247();heroRefresh();}catch(e){console.error(e);}
 // v16-161 (Marius): Legendary heroes max +10 (extra +11…+50 → 💎150 each), Mythic heroes = AWAKENING with 9 copies (extra copies → 💎1000 each). Nobody gets weaker: +6…+10 and every Awakening tier are stronger than before.
 function migr161(){if(G.m161)return;G.m161=1;let dm=0;for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o||h.cat!=='m')continue;const mx=hMaxS(h),k=h.gr===5?1000:h.gr===4?150:0;if(k&&o.s>mx){dm+=(o.s-mx)*k;o.s=mx;}}
   if(dm){G.dm=(G.dm||0)+dm;setTimeout(()=>toast('💎 +'+dm.toLocaleString()+' · extra hero stars → diamonds (new AWAKENING / Legendary +10)',4200),4000);}save();}
