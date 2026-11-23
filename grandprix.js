@@ -99,7 +99,7 @@ function patSend(k){try{if(window.ONLINE&&ONLINE.call)ONLINE.call('gppat',{k,pid
 function pat(list){if(!Array.isArray(list)||!T()||!T().G)return;const s=S();s.pl=list.slice(0,30);if(!s.pg)s.pg=[];const dk=dKey();if(!s.pd||s.pd.k!==dk)s.pd={k:dk,dm:0,tk:0};
   const sum={},who=[];for(const x of list.slice().reverse()){if(s.pg.includes(x.id))continue;s.pg.push(x.id);if(!live()||x.t<now()-2*DAY)continue;const r=PGIFT[x.k];if(!r)continue;
     for(const k in r){const m=Math.min(r[k],PCAP[k]-s.pd[k]);if(m>0){s.pd[k]+=m;sum[k]=(sum[k]||0)+m;}}who.push(x.n);}
-  s.pg=s.pg.slice(-200);if(Object.keys(sum).length){give(sum);T().toast('👑 '+who.slice(0,2).map(n=>String(n).replace(/[<>&]/g,'')).join(', ')+(who.length>2?' +'+(who.length-2):'')+' became Grand Prix PATRON'+(who.length>1?'S':'')+' – gift: '+rwTxt(sum),4200);}else T().save();try{render();}catch(e){}}
+  s.pg=s.pg.slice(-200);if(Object.keys(sum).length){give(sum);T().toast('<span style="display:block;text-align:center;line-height:1.35">👑 New PATRON: <b>'+String(who[who.length-1]).replace(/[<>&]/g,'').slice(0,14)+'</b>'+(who.length>1?' +'+(who.length-1):'')+'<br>🎁 '+rwTxt(sum)+'</span>',5000,0,1);}else T().save();try{render();}catch(e){}}
 let pkBusy=0;
 async function buyPk(k){if(pkBusy||!window.SEC||!live())return;const P=T().PK;if(P[PKK(k)])return;pkBusy=1;
   try{const ok=await SEC.buy(k);if(!ok)return;P[PKK(k)]=true;T().savePacks();T().save();patSend(k);
