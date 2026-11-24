@@ -161,8 +161,8 @@ function cleanEq(e) { if (!Array.isArray(e)) return []; const seen = new Set();
 function cleanTeam(t) {
   if (!Array.isArray(t)) return [];
   return t.slice(0, 5).map(u => ({id:String(u.id || '').replace(/[^a-z0-9_]/g, '').slice(0, 12), n:clean(u.n).slice(0, 24), gr:num(u.gr, 0, 5) | 0, s:num(u.s, 0, 50) | 0,
-    role:ROLES.includes(u.role) ? u.role : 'crew', hp:num(u.hp, 1, 5e7), atk:num(u.atk, 1, 5e6), def:num(u.def, 0, 5e4), as:num(u.as, .25, 3), crit:num(u.crit, 0, .75),
-    rng:num(u.rng, 20, 300), eg:num(u.eg, 1, 3), pw:num(u.pw, 0, 5e8) | 0, lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
+    role:ROLES.includes(u.role) ? u.role : 'crew', hp:num(u.hp, 1, 5e8), atk:num(u.atk, 1, 5e7), def:num(u.def, 0, 5e4), as:num(u.as, .25, 3), crit:num(u.crit, 0, .75), cdm:num(u.cdm || 1.8, 1.8, 4.8),
+    rng:num(u.rng, 20, 300), eg:num(u.eg, 1, 3), pw:Math.round(num(u.pw, 0, 2e9)), lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
 }
 const teamPow = t => Math.round(t.reduce((a, s) => a + s.hp * .25 + s.atk * 6 * (1 / s.as) + s.def * 4, 0));
 const pubTeam = t => (t || []).map(u => ({id:u.id, n:u.n, gr:u.gr, s:u.s, role:u.role, hp:Math.round(u.hp)}));
@@ -278,7 +278,7 @@ export function arenaSim(ta, td, seed) {
     if (melee(u)) return (fr.length ? fr : e).reduce((a, b) => a.hp < b.hp && R() < .5 ? a : b);
     return R() < .6 ? e.reduce((a, b) => a.hp / a.mhp < b.hp / b.mhp ? a : b) : e[Math.floor(R() * e.length)]; };
   const dmg = (src, tgt, mult, crit) => { let a = 1.7 * src.atk * mult * (src.buff > 0 ? 1.3 : 1) * (.9 + R() * .2);   // ×1.7: arena fights last ~15-30 s a *= 100 / (100 + tgt.def * 3); if (tgt.mark > 0) a *= 1.35;
-    const c = crit || R() < src.crit; if (c) a *= 1.8; a = Math.max(1, Math.round(a)); let left = a;
+    const c = crit || R() < Math.min(.6, src.crit); if (c) a *= src.cdm || 1.8;   // v16-294: crit chance max 60%, CRIT DAMAGE separate a = Math.max(1, Math.round(a)); let left = a;
     if (tgt.shield > 0) { const s = Math.min(tgt.shield, left); tgt.shield -= s; left -= s; }
     tgt.hp -= left; tgt.en = Math.min(100, tgt.en + 10); let ko = 0; if (tgt.hp <= 0) { tgt.hp = 0; tgt.dead = true; ko = 1; } return [tgt.i, a, c ? 1 : 0, ko]; };
   let t = 0; const T_MAX = 75, DT = .1;
