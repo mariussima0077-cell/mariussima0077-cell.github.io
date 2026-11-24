@@ -890,7 +890,7 @@ const STI=(k,t)=>'<img class="sti" src="'+(t&&k!=='off'?'img/ui9/star_'+ST_COL[t
 const ST_COL=['gold','red','purple','rainbow']; // v16-93: Marius' star pictures
 const gStars=it=>it.sr?'<span class="gStr">'+starsH(it.sr,it.r>=6)+'</span>':'';
 function starFood(it){return GR().inv.filter(o=>o!==it&&o.s===it.s&&o.r===it.r&&!ownerOf(o)).sort((a,b)=>(a.set?1:0)-(b.set?1:0)||(a.sr||0)-(b.sr||0)||a.lv-b.lv)[0]||null;}
-const GMAXLV=10,GSUBN=[0,0,1,1,2,2,3],GINV0=150;const GINV_=()=>{try{const T=TE();return GINV0+(T.VP?T.VP(T.VLV()).bag:0);}catch(e){return GINV0;}};
+const GMAXLV=10,GSUBN=[0,0,1,1,2,2,3],GINV0=200;const GINV_=()=>{try{const T=TE();return GINV0+(T.VP?T.VP(T.VLV()).bag:0);}catch(e){return GINV0;}};
 // v16-164 (tester Wazza4ever: "bag full in campaign = the item is gone"): SOFT bag limit – battles / towers / dungeons may fill the bag up to +150 over the limit (nothing lost);
 // while the bag is over its limit only GEAR SUMMON is locked (window BAG FULL → SALVAGE NOW). Only above the hard limit a drop is salvaged (→ parts).
 const GOVER=150,GHARD_=()=>GINV_()+GOVER,bagOver=()=>{try{return GR().inv.length>=GINV_();}catch(e){return false;}}; // v16-122: VIP 3/6/9 = +20 bag slots each

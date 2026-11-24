@@ -259,14 +259,16 @@ function render(){
           '</div><div class="foot"><span class="val"><b>×'+p.val+'</b>VALUE</span>'+(lk?'<button class="buy lock">🔒 '+P(p.k,p.price)+'</button>':'<button class="buy" data-b="'+p.k+'">'+P(p.k,p.price)+'</button>')+'</div></div>'; });
     } else h+='<div class="note">✓ You bought all special offers – thank you!</div>';
     // v16-282 (Marius 24 nov): VIP Truck, VIP Crew Boost and Battle Speed ×3 are no longer sold – players who bought them keep them (OWNED)
-    h+='<div class="sec">FOREVER PACKS</div>'+[
+    // v16-290 (Marius 24 nov): NO forever packs for sale any more (Founder too) – only passes, funds, diamonds and one-time packs. Owners still see what they have (OWNED ✓).
+    const fvOwn=['fdr','car','vip','spd2'].filter(k=>pk[k]);
+    if(fvOwn.length) h+='<div class="sec">YOUR FOREVER PACKS</div>'+[
       ...(NEWP()?[['fdr','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99']]:[]),
       ['fdr_old','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99'],
       ['car','ui3/sp_truck','VIP Truck · Rich Clients','Forever: rich clients, priority in every garage, pay ×2.','€5.99'],
       ['vip','ui3/sp_crew','VIP Crew Boost','Forever: every mechanic +25% speed &amp; money.','€3.99'],
       ['spd2','ui3/sp_speed','Battle Speed ×3','Forever. <ins>Included in the Gold &amp; Platinum Pass.</ins>','€2.99'],
-    ].filter(r=>r[0]!=='fdr_old'&&(!['car','vip','spd2'].includes(r[0])||pk[r[0]])).map(([k,i,n,d,pr])=>'<div class="pack"><div class="th"><img src="'+IMG(i)+'" alt=""></div><div class="tx"><b>'+n+'</b>'+d+'</div>'+(pk[k]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,pr)+'</button>')+'</div>').join('')+
-      '<div class="pack"><div class="th"><img src="img/ui2/i_key.webp" alt=""></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day in every dungeon + SWEEP.'+(on('dg')?' <ins>Active – '+daysLeft('dg')+' days left.</ins>':'')+'</div><button class="buy" data-a="dg">'+P('dg','€2.99')+'</button></div>';
+    ].filter(r=>r[0]!=='fdr_old'&&pk[r[0]]).map(([k,i,n,d,pr])=>'<div class="pack"><div class="th"><img src="'+IMG(i)+'" alt=""></div><div class="tx"><b>'+n+'</b>'+d+'</div>'+(pk[k]?'<button class="buy own">OWNED ✓</button>':'<button class="buy" data-b="'+k+'">'+P(k,pr)+'</button>')+'</div>').join('')+
+      '';
     h+=(SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping a price gives it without payment.<br>'+(SEC.TEST_ACC?'<a href="?tacc=0" style="color:#ffd54a">↩ Back to my normal account</a>':'<a href="?tacc=1" style="color:#ffd54a">🧪 Open the FULL TEST ACCOUNT (hidden from rankings)</a>')+'</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>');
   }
   if(tab==='td'){
@@ -297,6 +299,7 @@ function render(){
       h+='<div class="card vp r"><img class="rbn" src="img/rw/rail_pass_bnr.webp" alt=""><div class="top"><img src="'+IMG('shop/vp_rail')+'" alt="" onerror="this.onerror=null;this.src=\'img/rw/loco4.webp\'"><div><h3>RAIL PASS</h3><div class="sub">Monthly subscription · for train bosses – works with every VIP Pass</div></div></div><ul class="bl">'+
         row('img/ui12/st_token.webp','Street Tokens right away','300')+row('img/ui12/st_token.webp','Street Tokens every day','+100')+row('img/rw/loco0.webp','Trains a day','4 (+1)')+row('img/rw/loco0.webp','Train fills in','45 min')+row('img/ui12/st_token.webp','Street Tokens per train','×1.3')+row(IMG('ui3/v_gift'),'Refreshes per train','3 (+1)')+row('img/rw/rw_btn.webp','Rail Wars attacks a day','7 (+2)')+row('img/rw/loco3.webp','Your train is robbed: you lose','only half')+row('img/rw/loco4.webp','Golden locomotive + RAIL BARON title','✓')+
         '</ul><div class="tot">In 30 days: ≈3,300 '+TKI+' as gifts + 30% more from every train</div><div class="foot">'+btn('rail','€4.99')+'</div></div>'; }
+    h+='<div class="sec">DUNGEON PASS · 30 DAYS</div>'+'<div class="pack"><div class="th"><img src="img/ui2/i_key.webp" alt=""></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day in every dungeon + SWEEP.'+(on('dg')?' <ins>Active – '+daysLeft('dg')+' days left.</ins>':'')+'</div><button class="buy" data-a="dg">'+P('dg','€2.99')+'</button></div>';   // v16-290 (Marius): moved here from FOREVER PACKS (it lasts 30 days)
     h+='<div class="note">VIP Passes stack: you can have Silver, Gold, Platinum'+(NEWP()?' and Diamond':'')+' at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
   }
   if(tab==='tf'){
