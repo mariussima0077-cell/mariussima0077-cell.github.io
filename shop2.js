@@ -13,14 +13,14 @@ const today = () => { const d = new Date(now()); return d.getFullYear()+'-'+(d.g
 // ---------------- what is sold ----------------
 // one-time packs, in a chain (the next opens after the previous one is bought)
 const PACKS = [
-  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:10, hero:'m4_1', dm:300,  tk:10, pk:{r:300,bk:1000}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
-  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:8, hero:'m4_3', dm:800,  tk:20, gt:10, pk:{r:600,bk:2000}},
-  {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:7, hero:'m4_0', dm:1500, tk:30, gt:20, pk:{r:1200,bk:4000}},
-  {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:6, hero:'m4_5', dm:3000, tk:50, gt:30, ct:20, pk:{r:2500,bk:8000}},
+  {k:'p1', n:'STARTER PACK', rib:'BEST START', cls:'st0', price:'€0.99', val:9, hero:'m4_1', dm:300,  tk:10, pk:{r:300,bk:1000}},   // v16-129: no more cash in packs (cash buys Cash Roulette spins) → garage parts
+  {k:'p2', n:'ROOKIE PACK',  cls:'st1', price:'€2.99', val:9, hero:'m4_3', dm:800,  tk:24, gt:10, pk:{r:600,bk:2000}},
+  {k:'p3', n:'PRO PACK',     cls:'st2', price:'€5.99', val:10, hero:'m4_0', dm:1500, tk:45, gt:30, pk:{r:1200,bk:4000}},
+  {k:'p4', n:'ELITE PACK',   cls:'st3', price:'€9.99', val:11, hero:'m4_5', dm:3000, tk:65, gt:40, ct:25, pk:{r:2500,bk:8000}},
   // v16-143 (Marius 21 nov): bigger one-time packs – ONLY summon tickets + Dungeon keys (key = keys for EACH of the 4 dungeons). Shown after their products exist in Play (NEWP)
-  {k:'p5', n:'MASTER PACK',  cls:'st4', price:'€19.99', val:5, tk:80,  gt:40,  ct:25,  key:5,  nw:1, bnr:'master'},
-  {k:'p6', n:'LEGEND PACK',  cls:'st5', price:'€49.99', val:5, tk:200, gt:100, ct:60,  key:12, nw:1, bnr:'legend'},
-  {k:'p7', n:'TITAN PACK',   cls:'st6', price:'€99.99', val:5, tk:420, gt:200, ct:120, key:25, nw:1, bnr:'titan'},
+  {k:'p5', n:'MASTER PACK',  cls:'st4', price:'€19.99', val:11, tk:170, gt:100, ct:70,  key:5,  nw:1, bnr:'master'},
+  {k:'p6', n:'LEGEND PACK',  cls:'st5', price:'€49.99', val:12, tk:450, gt:270, ct:180,  key:12, nw:1, bnr:'legend'},
+  {k:'p7', n:'TITAN PACK',   cls:'st6', price:'€99.99', val:13, tk:1000, gt:600, ct:400, key:25, nw:1, bnr:'titan'},
 ];
 const PACKSV = () => PACKS.filter(p=>!p.nw||NEWP());   // the packs the player can see
 const DIAMONDS = [
@@ -36,7 +36,7 @@ const PASS = {
   sil:  {n:'SILVER PASS',   mult:1.2, idle:1, cost:1500, day:{tk:1}},
   gold: {n:'GOLD PASS',     mult:1.5, idle:2, price:'€5.99', start:300, day:{dm:100, tk:2}, spd:1},
   plat: {n:'PLATINUM PASS', mult:2,   idle:4, price:'€9.99', start:600, day:{dm:200, tk:3, gt:2}, spd:1, auto:1},
-  dia:  {n:'DIAMOND PASS',  mult:1,   idle:0, price:'€14.99', start:900, day:{dm:300, tk:2}},   // v16-122 (Marius, 21 nov 2026): diamonds only – 9,900 💎 / 30 days, no VIP bonus (same 💎 per € as Platinum)
+  dia:  {n:'DIAMOND PASS',  mult:1,   idle:0, price:'€14.99', start:900, day:{dm:300, tk:5, gt:3}},   // v16-280 (Marius: dearer = more): +5 Recruit +3 Gear a day → best value of the 3 passes   // v16-122 (Marius, 21 nov 2026): diamonds only – 9,900 💎 / 30 days, no VIP bonus (same 💎 per € as Platinum)
 };
 // Campaign Funds: rewards at every 3rd chapter (NORMAL / HARD) – v16-203, was every 5th 20-stage chapter
 const FUND = {
@@ -290,8 +290,8 @@ function render(){
       row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
       '</ul><div class="tot">In 30 days: 6,600 '+DMh+' + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
     if(NEWP())h+='<div class="card vp d"><div class="rib">MOST DIAMONDS</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_dm'),'Diamonds right away','900')+row(IMG('ui3/v_dm'),'Diamonds every day','+300')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','–',1)+row(IMG('ui3/v_idle'),'Idle Rewards','–',1)+
-      '</ul><div class="tot">In 30 days: 9,900 '+DMh+' + 60 tickets ≈ 159 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
+      row(IMG('ui3/v_dm'),'Diamonds right away','900')+row(IMG('ui3/v_dm'),'Diamonds every day','+300')+row('img/ticket.webp','Recruit Tickets every day','+5')+row('img/gticket.webp','Gear Tickets every day','+3')+row(IMG('ui3/v_crown'),'VIP benefits','–',1)+row(IMG('ui3/v_idle'),'Idle Rewards','–',1)+
+      '</ul><div class="tot">In 30 days: 9,900 '+DMh+' + 240 tickets ≈ 339 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
     if(RAILP()||SEC.TEST_MODE){ const TKI='<img src="img/ui12/st_token.webp" alt="" style="height:1.2em;width:auto;vertical-align:-.25em">';   // v16-155 RAIL PASS
       h+='<div class="card vp r"><img class="rbn" src="img/rw/rail_pass_bnr.webp" alt=""><div class="top"><img src="'+IMG('shop/vp_rail')+'" alt="" onerror="this.onerror=null;this.src=\'img/rw/loco4.webp\'"><div><h3>RAIL PASS</h3><div class="sub">Monthly subscription · for train bosses – works with every VIP Pass</div></div></div><ul class="bl">'+
         row('img/ui12/st_token.webp','Street Tokens right away','300')+row('img/ui12/st_token.webp','Street Tokens every day','+100')+row('img/rw/loco0.webp','Trains a day','4 (+1)')+row('img/rw/loco0.webp','Train fills in','45 min')+row('img/ui12/st_token.webp','Street Tokens per train','×1.3')+row(IMG('ui3/v_gift'),'Refreshes per train','3 (+1)')+row('img/rw/rw_btn.webp','Rail Wars attacks a day','7 (+2)')+row('img/rw/loco3.webp','Your train is robbed: you lose','only half')+row('img/rw/loco4.webp','Golden locomotive + RAIL BARON title','✓')+
