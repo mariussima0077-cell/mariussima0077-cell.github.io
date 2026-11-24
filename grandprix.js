@@ -402,6 +402,6 @@ function hook(){if(!window.EVT||EVT.__gp)return false;const o=EVT.q;EVT.q=functi
   const od=EVT.dot;EVT.dot=function(){try{od.apply(EVT,arguments);}catch(e){}dot();};EVT.__gp=1;return true;}
 function boot(){if(!T()||!T().G||!window.EVT){setTimeout(boot,600);return;}build();hook();if(live())S();dot();
   setInterval(()=>{if(live()&&T()&&T().G){S();dot();}},20000);setInterval(()=>{if(live()&&T()&&T().G){sendSc();finChk();}},300000);}
-window.GPX={open,close,entry,state:()=>S(),live,q,grant,pat,get T0(){return T0();},get T1(){return T1();}};
+window.GPX={open,close,entry,todo:()=>{try{return canClaim();}catch(e){return false;}},state:()=>S(),live,q,grant,pat,get T0(){return T0();},get T1(){return T1();}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

@@ -167,7 +167,7 @@ const PG={
   // v16-238 (Marius 23 nov: VIP gives more on every level) – also for players who already saw the old VIP guide
   vip2:{ok:()=>isOpen('sheet')&&sel0()==='vip',t:`<b>NEW VIP GIFTS</b>: tap <b>DAILY</b> every day – each VIP level adds more: Crew &amp; Gear tickets, more diamonds, <b>Essence</b>, <b>Builder Kit</b>, <b>Dungeon keys</b>. VIP 7 / 10 = extra <b>World Boss keys</b>. Idle now gives more <b>Essence, Gear Parts and garage parts</b> with VIP.`},
   dq2:{ok:()=>isOpen('dq'),t:`<b>DAILY QUESTS</b> now also have <b>battle quests</b>: campaign, towers, Dungeons, Arena, World Boss. Tap a picture (<b>GO ›</b>) to go straight there. Every quest gives <b>VIP points</b>.`},
-  events:{ok:()=>isOpen('ev'),t:`<b>EVENTS</b>: 2 events at the same time, 3 days each. Just play (summon, spend Essence…) to collect points → <b>milestone rewards</b> and <b>TOP 100</b> prizes.`},
+  events:{ok:()=>isOpen('ev'),t:`<b>EVENTS</b>: every event running now has its own banner – <b>tap it</b> to open its page. Just play (summon, spend Essence…) to collect points → <b>milestone rewards</b> and <b>TOP 100</b> prizes. The <b>📅 EVENT CALENDAR</b> below shows what comes next.`},
   checkin:{ok:()=>isOpen('xp')&&!!document.getElementById('ciGo'),t:`<b>DAILY CHECK-IN</b>: come back every day for free tickets. Missing a day <b>never resets</b> your progress – you simply continue.`},
   // v16-143 (Marius 21 nov: "check the training for everything we added today") – one short guide the first time each new page opens
   roles:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b>TEAM ROLES</b>: every hero has a role – <b>TANK</b>, <b>WARRIOR</b>, <b>RANGER</b>, <b>MAGE</b>, <b>SUPPORT</b>. 3 different roles in your team = <b>+5%</b>, 4 = <b>+10%</b>, all 5 = <b>+15%</b> attack &amp; HP. ♻ <b>REBIRTH</b> gives back 100% of a hero's Essence.`},
@@ -177,7 +177,9 @@ const PG={
   pity2:{ok:()=>isOpen('sm')&&!isOpen('res')&&!!document.querySelector('#sm .smWish'),t:`<b>PITY</b>: a <b>Legendary</b> every <b>100</b> summons and a <b style="color:#ff6b6b">MYTHIC</b> every <b>1500</b> Hero summons. Tap the red <b>MYTHIC</b> bar = <b>WISH</b>: you choose which Mythic the pity gives.`},
   awaken:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b style="color:#ff6b6b">AWAKENING</b>: Mythic copies wake the hero up – <b>Awakened I → V</b> (9 copies). Much stronger stats and skill levels. <b>Legendary</b> heroes now go to <b>+10</b> – every + after +5 is much stronger.`},
   starcoll:{ok:()=>vis(document.querySelector('#gcW .scT')),t:`<b>★ STAR COLLECTION</b>: when <b>all</b> your heroes of a color reach a step (+5, +10 … Legendary +2…+10, Mythic Awakened I…V), <b>every battle hero</b> gets the bonus.`},
-  evcal:{ok:()=>isOpen('ev')&&!!document.querySelector('#ev .evSch'),t:`<b>📅 EVENT CALENDAR</b> (button under the event): see the next events with their exact dates. New event: <b>DUNGEON RUSH</b> – every Dungeon key you use counts.`},
+  // v16-274 (Marius): EVENTS HUB
+  evhub:{ok:()=>isOpen('ev')&&!!document.querySelector('#ev .evHt'),t:`<b>EVENTS</b>: every event that is running now has its own banner – <b>tap it</b> to open its page. The <b>📅 EVENT CALENDAR</b> below shows what comes next and when.`},
+  evcal:{ok:()=>isOpen('ev')&&!!document.querySelector('#ev .evCal'),t:`<b>📅 EVENT CALENDAR</b> (under the event banners): see the next events with their exact dates. New event: <b>DUNGEON RUSH</b> – every Dungeon key you use counts.`},
   tw500:{ok:()=>isOpen('tw')||isOpen('ct'),t:`<b>TOWERS</b> now have <b>500 floors</b>. The higher the floor, the bigger every reward. Class Towers: a <b>Mythic set piece</b> every 20 floors after 100 and a full <b style="color:#2ef3ff">ASCENDED SET</b> at floors 350-500.`},
   // v16-164
   bagfull:{ok:()=>isOpen('gBag')&&!isOpen('cpPop'),t:`<b>🎒 GEAR BAG</b>: battles never lose gear – the bag can go <b>over its limit</b>. When the counter is <b style="color:#ff6b6b">red</b>, only <b>GEAR SUMMON</b> is locked until you <b>SALVAGE</b>. Turn on <b>AUTO SALVAGE</b> to keep the bag clean.`},
@@ -211,7 +213,8 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
-  if(k==='vip'&&!seen.includes('p_vip2'))seen.push('p_vip2');   // v16-238: new players already read the new VIP text
+  if(k==='vip'&&!seen.includes('p_vip2'))seen.push('p_vip2');
+  if(k==='events'&&!seen.includes('p_evhub'))seen.push('p_evhub');   // v16-274: new players already read the new EVENTS text   // v16-238: new players already read the new VIP text
   MINI='p_'+k;L=[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];
   running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},900);
 window.__TUT={start:()=>{MINI=null;L=S;start(true);},go:n=>go(n),end};

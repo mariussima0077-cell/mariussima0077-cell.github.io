@@ -188,33 +188,43 @@ const css=`.evGo{display:inline-block;margin-left:4px;padding:1px 8px;border-rad
 #ev .evSch{display:block;width:100%;margin:10px 0 4px;padding:11px;border:0;border-radius:14px;background:linear-gradient(#3a2d5c,#1d1533);box-shadow:inset 0 0 0 2px #ffd54a,0 4px 10px #0008;font:400 16px Lilita,Game,system-ui;color:#ffe082;text-shadow:0 2px 0 #000}
 #ev .evCal{display:flex;align-items:center;gap:10px;margin:5px 0;padding:8px 10px;border-radius:12px;background:linear-gradient(90deg,#2a1f44,#150f24);box-shadow:inset 4px 0 0 var(--c),inset 0 0 0 1px #5d4a8588}#ev .evCal.on{box-shadow:inset 4px 0 0 var(--c),inset 0 0 0 2px #ffd54a;background:linear-gradient(90deg,#3d2c10,#1a1230)}
 #ev .evCal i{flex:none;width:30px;text-align:center;font-style:normal;font-size:20px}#ev .evCal i .tki{height:28px;width:auto}#ev .evCal div{flex:1;min-width:0}#ev .evCal b{display:block;font:400 14.5px Lilita,Game,system-ui;color:#fff;letter-spacing:.3px}#ev .evCal small{display:block;font:700 11px Game,system-ui;color:#c9b6ff}#ev .evCal em{flex:none;font:400 12px Lilita,Game,system-ui;font-style:normal;color:#ffd54a;text-align:right;max-width:30%}
-#ev .evL{padding:3px 10px 3px 4px;font-size:15px}#ev .evL b{font-weight:400;color:#ffe082}`;
-let el,tab='A',view='main';
+#ev .evL{padding:3px 10px 3px 4px;font-size:15px}#ev .evL b{font-weight:400;color:#ffe082}
+#ev .evTabs:empty{display:none}
+#ev .evHt{width:100%;margin:0 0 12px;cursor:pointer;transition:transform .1s}#ev .evHt:active{transform:scale(.97)}
+#ev .evBan .evHs{margin-top:6px;font:400 12.5px Lilita,Game,system-ui;letter-spacing:.3px;color:#f0e6ff;text-shadow:0 2px 0 #000}#ev .evHs b{font-weight:400;color:#ffe082}
+#ev .evBan .evHd,#ev .evGp .evHd{position:absolute;right:5%;top:9%;width:16px;height:16px}
+#ev .evGp{position:relative;box-sizing:border-box;aspect-ratio:900/360;border-radius:14px;overflow:hidden;background:url(img/gp/bg.webp) center 30%/cover;box-shadow:inset 0 0 0 3px #ffcf5a,0 0 16px #ffb30077,0 6px 10px #000a}
+#ev .evGp img{position:absolute;left:50%;top:44%;height:78%;transform:translate(-50%,-50%);filter:drop-shadow(0 3px 6px #000)}
+#ev .evGp span{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);white-space:nowrap;padding:3px 10px;border-radius:9px;background:#e2213bdd;font:400 12px Lilita,Game,system-ui;color:#fff;letter-spacing:.3px}`;
+let el,tab='A',view='hub';   // v16-274 (Marius): EVENTS HUB – like the Battle Hub: one banner per LIVE event, tap = its own page; calendar under them
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);el=document.createElement('div');el.id='ev';
   el.innerHTML='<div class="evTop"><button class="evX" data-e="x">↩</button><div class="evTi">EVENTS</div></div><div class="evTabs" id="evTabs"></div><div class="evB" id="evBody"></div>';document.body.appendChild(el);
   el.addEventListener('click',e=>{const t=e.target.closest('[data-e]');if(!t)return;const a=t.dataset.e;
-    if(a==='x'){if(view!=='main'){view='main';render();return;}el.classList.remove('open');dot();}
+    if(a==='x'){if(view==='rank'||view==='sched'){view='main';render();return;}if(view==='main'){view='hub';render();return;}el.classList.remove('open');dot();}
+    else if(a==='ev'){tab=t.dataset.t;view='main';render();el.querySelector('.evB').scrollTop=0;}
+    else if(a==='gp'){if(window.GPX)GPX.open();}
     else if(a==='tab'){tab=t.dataset.t;view='main';render();}
     else if(a==='cl')claim(t.dataset.t,+t.dataset.i);
     else if(a==='rk'){view='rank';render();showRank();}
     else if(a==='spin')spin();
     else if(a==='sch'){view='sched';render();}
-    else if(a==='go'){const tb=tab,w=window.GOTO?GOTO(t.dataset.k,()=>{open();tab=tb;render();}):null;if(w){el.classList.remove('open');if(window.GPX)GPX.close();}}   // v16-214: GO → the page of the quest, back here when it is closed
+    else if(a==='go'){const tb=tab,w=window.GOTO?GOTO(t.dataset.k,()=>{open(tb);}):null;if(w){el.classList.remove('open');if(window.GPX)GPX.close();}}   // v16-214: GO → the page of the quest, back here when it is closed
     else if(a==='wq'){const B=S().B,w=B.w,x=QL(B.k).find(z=>z[0]===t.dataset.q);if(!x||w.got[x[0]]||(w.q[x[0]]||0)<x[2])return;w.got[x[0]]=1;w.sp+=x[3];T().save();T().toast((B.k==='key'?'🔑':'🎡')+' +'+x[3]+' free spin',1800);render();}});}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 function render(){if(!el||!el.classList.contains('open'))return;const s=S();
-  document.getElementById('evTabs').innerHTML=['A','B'].map(tr=>'<b data-e="tab" data-t="'+tr+'" class="'+(tab===tr?'on':'')+'">'+evTabIc(EV[s[tr].k])+' '+EV[s[tr].k].n+(trTodo(tr)?RD_:'')+'</b>').join('');
+  document.getElementById('evTabs').innerHTML='';
+  if(view==='hub'){const b=document.getElementById('evBody');b.style.removeProperty('--c');b.innerHTML=hubHtml();return;}
   const st=s[tab],E=EV[st.k],c=cur(tab),sc=isW(st.k)?st.w.used:st.sc,body=document.getElementById('evBody');body.style.setProperty('--c',E.col);
   if(view==='sched'){body.innerHTML=schedHtml();return;}
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
-  let h=(window.GPX?GPX.entry():'')+'<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
+  let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
   h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+NH(T().nf(sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+(EGO[st.k]?' <b class="evGo" data-e="go" data-k="'+EGO[st.k]+'">GO ›</b>':'')+'</div>';
   if(st.k==='cash'){const w=st.w,p=cwPrice(w),can=!spinning&&w.used<CW_MAX&&T().G.money>=p;h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">'+(w.used>=CW_MAX?'MAX SPINS':'SPIN · '+T().fmt(p))+'</button><div class="evP">Spins: <b>'+w.used+' / '+CW_MAX+'</b> · your cash: <b>'+T().fmt(T().G.money)+'</b> · next spin costs ×1.15</div><div class="evP">Prizes grow with your campaign stage. Parts upgrade your garages (LV 1-100).</div></div>';}
   else if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left'+(can?RD_:'')+'</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
     h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+(!ok&&x[0]!=='login'?' <b class="evGo" data-e="go" data-k="'+x[0]+'">GO ›</b>':'')+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+(ok&&!got?RD_:'')+'</button></div>';}).join('');}
   h+='<div class="evS">MILESTONE REWARDS</div>'+E.m.map((m,i)=>{const g=goal(st,m[0]),ok=sc>=g,got=st.cl.includes(i);return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+evGoalIc(E)+NH(T().nf(g),T().nf(g).length>5?.85:1.1)+'</div><div class="r'+(Object.values(realRw(st,m[1])).filter(Boolean).length>1?' two':'')+'">'+rwBig(realRw(st,m[1]))+'<div class="evPb"><i style="width:'+Math.min(100,sc/g*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="cl" data-t="'+tab+'" data-i="'+i+'">'+(got?'✓':'CLAIM')+(ok&&!got?RD_:'')+'</button></div>';}).join('');
   h+='<button class="evRk" data-e="rk">TOP 100 RANKING</button>'+rkPrizes(st);
-  const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div><button class="evSch" data-e="sch">📅 EVENT CALENDAR</button>';
+  const nx=cur(tab,c.end+1000);h+='<div class="evNx">NEXT: '+evTabIc(EV[nx.k])+' '+EV[nx.k].n+' · starts in '+left(nx.start-Date.now())+'</div><button class="evSch" data-e="x">↩ ALL EVENTS</button>';
   body.innerHTML=h;if(isW(st.k)){wKind=st.k;drawWheel(document.getElementById('evWh'));}}
 function rkPrizes(st){const k=EV[st.k].tkk,ic=k==='gt'?GT:k==='ct'?CT:k==='tk'?TK:'';return '<div class="evS">RANKING PRIZES</div><div class="evSn">sent by Mail when the event ends</div><div class="evPz">'+RANKRW.map(r=>'<div class="evPr">'+MDL(r[0],r[0]===r[1]?r[0]:r[0]+'-'+r[1])+'<span class="pz">'+rwBig(Object.assign({dm:k==='dm'?r[2]*1.5:r[2]},ic?{[k]:r[3]}:{}))+'</span></div>').join('')+'</div>';}
 async function showRank(){const r=await rank(tab),L=document.getElementById('evRkL');if(!L)return;if(!r){L.innerHTML='<div class="evP" style="text-align:center;margin:20px">The ranking needs internet. Your score is saved and sent later.</div>';return;}
@@ -225,9 +235,20 @@ const DTF=t=>new Date(t).toLocaleString('en-GB',{weekday:'short',day:'numeric',m
 function schedHtml(){const now=Date.now(),L=[];for(const tr of ['A','B']){let t=now;for(let n=0;n<6;n++){const c=cur(tr,t);L.push({tr,...c});t=c.end+1000;}}
   L.sort((a,b)=>a.start-b.start||a.tr.localeCompare(b.tr));
   return '<div class="evS">EVENT CALENDAR</div><div class="evSn">2 events at the same time · each one lasts 3 days · your phone time</div>'+L.map(e=>{const E=EV[e.k],on=e.start<=now;return '<div class="evCal'+(on?' on':'')+'" style="--c:'+E.col+'"><i>'+evTabIc(E)+'</i><div><b>'+E.n+'</b><small>'+DTF(e.start)+' → '+DTF(e.end)+'</small></div><em>'+(on?'NOW · '+left(e.end-now)+' left':'in '+left(e.start-now))+'</em></div>';}).join('')+'<button class="evSch" data-e="x">↩ BACK</button>';}
+// v16-274 EVENTS HUB: Grand Prix (only once it has started) + the 2 live time events, each with its own banner; then the calendar
+const gpOn=()=>{const G=window.GPX;if(!G)return false;const a=G.T0,b=G.T1,n=Date.now();return a!==Infinity&&n>=a&&n<b+7*864e5;};
+function tileHtml(tr){const st=S()[tr],E=EV[st.k],c=cur(tr),sc=isW(st.k)?st.w.used:st.sc,r=rk[st.id]&&rk[st.id].rank;
+  return '<div class="evBan pic evHt" data-e="ev" data-t="'+tr+'" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ '+left(c.end-Date.now())+' left</div><div class="evHs">'+E.u.toUpperCase()+': <b>'+T().nf(sc)+'</b>'+(r?' · #'+r:'')+'</div>'+(trTodo(tr)?'<i class="rdd evHd"></i>':'')+'</div>';}
+function hubHtml(){let h='<div class="evS">LIVE NOW</div>';
+  if(gpOn()){const G=GPX,L=G.live();h+='<div class="evGp evHt" data-e="gp"><img src="img/gp/logo.webp" alt="TORQUE GRAND PRIX"><span>'+(L?'LIVE · ONE TIME ONLY':'FINISHED · claim your rewards')+'</span>'+(G.todo&&G.todo()?'<i class="rdd evHd"></i>':'')+'</div>';}
+  h+=tileHtml('A')+tileHtml('B');
+  return h+calHtml();}
+function calHtml(){const now=Date.now(),L=[];for(const tr of ['A','B']){let t=cur(tr).end+1000;for(let n=0;n<4;n++){const c=cur(tr,t);L.push({tr,...c});t=c.end+1000;}}
+  L.sort((a,b)=>a.start-b.start||a.tr.localeCompare(b.tr));
+  return '<div class="evS">📅 EVENT CALENDAR</div><div class="evSn">coming next · each event lasts 3 days · your phone time</div>'+L.map(e=>{const E=EV[e.k];return '<div class="evCal" style="--c:'+E.col+'"><i>'+evTabIc(E)+'</i><div><b>'+E.n+'</b><small>'+DTF(e.start)+' → '+DTF(e.end)+'</small></div><em>in '+left(e.start-now)+'</em></div>';}).join('');}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function open(){build();S();view='main';el.classList.add('open');render();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}if(!spinning&&view==='main')render();},30000);}
+function open(tr){build();S();if(typeof tr==='string'){tab=tr;view='main';}else view='hub';el.classList.add('open');render();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}if(!spinning&&(view==='main'||view==='hub'))render();},30000);}
 window.EVT={add,q,tick,open,dot,state:S,cur};
-function boot(){if(!T()||!T().G){setTimeout(boot,500);return;}S();dmL=T().G.dm||0;const b=document.getElementById('evBtn');if(b)b.onclick=open;dot();setInterval(()=>{S();dot();},60000);setTimeout(send,8000);}
+function boot(){if(!T()||!T().G){setTimeout(boot,500);return;}S();dmL=T().G.dm||0;const b=document.getElementById('evBtn');if(b)b.onclick=()=>open();dot();setInterval(()=>{S();dot();},60000);setTimeout(send,8000);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
