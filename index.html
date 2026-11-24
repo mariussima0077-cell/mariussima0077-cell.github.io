@@ -4455,15 +4455,19 @@ if(!G.ci)G.ci={n:0,day:''};if(!G.c5)G.c5={n:0,day:''};if(!G.nw)G.nw=0;if(!G.ml)G
 const CI=[{tk:2},{ct:2},{tk:3},{ct:2},{tk:3},{ct:3},{tk:5,ct:3}]; // only tickets (Marius)
 const ciMoney=h=>Math.max(500,Math.round(idleRate()*h/100)*100);
 // v16-37: 5000 FREE SUMMONS – every day 10 Recruit + 10 Crew + 10 Gear tickets (fixed, nothing random) until 5000 tickets in total (167 days)
-const C5_TOTAL=5000,C5_DAY=10,C5_DAYS=Math.ceil(C5_TOTAL/(C5_DAY*3));
-const c5Got=n=>Math.min(C5_TOTAL,n*C5_DAY*3);
-function c5Rw(n){const left=C5_TOTAL-c5Got(n);if(left<=0)return null;const a=Math.min(C5_DAY,left),b=Math.min(C5_DAY,left-a),c=Math.min(C5_DAY,left-a-b);return {tk:a,ct:b,gt:c};}
+// v16-283 (Marius 24 nov): 20 of each ticket a day (was 10) – same 5000 in total, finished much sooner. G.c5.o = days already claimed at 10 (old saves)
+const C5_TOTAL=5000,C5_DAY=20,C5_OLD=10;if(G.c5.o==null)G.c5.o=G.c5.n;
+const c5Got=n=>{const o=Math.min(n,G.c5.o||0);return Math.min(C5_TOTAL,o*C5_OLD*3+(n-o)*C5_DAY*3);};
+const c5Day=d=>d<(G.c5.o||0)?C5_OLD:C5_DAY;
+const C5_DAYS_=()=>{const o=G.c5.o||0;return o+Math.ceil(Math.max(0,C5_TOTAL-o*C5_OLD*3)/(C5_DAY*3));};
+function c5Rw(n){const left=C5_TOTAL-c5Got(n),D=c5Day(n);if(left<=0)return null;const a=Math.min(D,left),b=Math.min(D,left-a),c=Math.min(D,left-a-b);return {tk:a,ct:b,gt:c};}
 const ciReady=()=>G.c5.day!==dayKey()&&!!c5Rw(G.c5.n);
 const GTI='<img class="tki" src="img/gticket.webp">';
 function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.money)a.push('💰 '+fmt(r.money));if(r.tk)a.push(TKI+' ×'+r.tk);if(r.ct)a.push(CTI+' ×'+r.ct);if(r.gt)a.push(GTI+' ×'+r.gt);if(r.dm)a.push(DMI+' ×'+r.dm);if(r.vipTo)a.push('👑 VIP '+r.vipTo);if(r.heroes)a.push('🔴 '+r.heroes.length+' Mythic heroes');if(r.ascSet)a.push('✦ Ascended gear set ×'+Object.keys(r.ascSet).length);return a.join('<br>');}
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:131,d:'Nov 24, 2026',ic:'📅',t:'Check-in: 20 of each!',l:['<b>5000 FREE SUMMONS</b> now gives <b>20 Recruit + 20 Crew + 20 Gear</b> tickets every day (was 10) – you get all 5000 much faster.']},
  {id:130,d:'Nov 24, 2026',ic:'🔧',t:'Slot upgrades',l:['Gear upgrades <b>+1 … +50</b> now stay on the hero\'s <b>SLOT</b>: swap the piece and the <b>+</b> stays.','A badge in the corner of each slot shows its level – a new colour every <b>+5</b>.','Upgrades of pieces in the bag were refunded 100% in Gear Parts. Rebirth also gives back the slot upgrades.']},
  {id:129,d:'Nov 24, 2026',ic:'👑',t:'New VIP 1-10 + bigger packs',l:['Every purchase gives <b>VIP points</b> (1 € = 10). VIP 10 = 10,000 €. Daily Quests give 1 point each.','Every new VIP level opens a <b>big chest</b>: diamonds, lots of summon tickets and a <b>FULL GEAR SET of your choice</b> (Epic → Mythic, VIP 10 = Ascended) + Legendary heroes at VIP 4 and 8. <b>VIP 10</b>: a Mythic hero of your choice.','Every VIP level: <b>+1 h Idle</b> and <b>+10%</b> on all Idle Rewards.','Shop: bigger packs now give <b>more per €</b>. Diamond Pass: +5 Recruit +3 Gear tickets every day.','Your VIP level stayed the same.']},
  {id:128,d:'Nov 24, 2026',ic:'💎',t:'Diamond bonus + SWEEP',l:['Diamond packs in the Shop: your <b>1st</b> purchase of each pack gives <b>×3</b>, the <b>2nd</b> gives <b>×2</b>.','Campaign <b>SWEEP</b> (VIP 4+): up to <b>5 a day</b> – the counter is on the button.']},
@@ -4622,19 +4626,19 @@ function xpClose(){if(xpMode==='mail'&&xpMail){xpMail='';renderXP();return;}xpEl
 $('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').onclick=()=>xpOpen('news');$('mlBtn').onclick=()=>xpOpen('mail');$('rwSBtn').onclick=()=>{if(window.STREET)STREET.open();};
 function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTML=TKI+' '+G.h.tk;
   if(xpMode==='ci'){T.textContent='5000 FREE SUMMONS';const n=G.c5.n,rd=ciReady(),got=c5Got(n),blk=Math.floor((rd?n:Math.max(0,n-1))/30)*30;
-    S.textContent=got>=C5_TOTAL?'ALL 5000 TICKETS COLLECTED!':'DAY '+(rd?n+1:n)+' OF '+C5_DAYS+' · LOG IN EVERY DAY';
+    S.textContent=got>=C5_TOTAL?'ALL 5000 TICKETS COLLECTED!':'DAY '+(rd?n+1:n)+' OF '+C5_DAYS_()+' · LOG IN EVERY DAY';
     /* v16-191: new Check-in page from Marius's picture (img/ci/*, tools/ci_cut.py). Game ticket icons on top (one icon per element). */
     const r=c5Rw(n)||{tk:0,ct:0,gt:0},TK=[['img/ticket.webp','RECRUIT',r.tk],['img/cticket.webp','CREW',r.ct],['img/gticket.webp','GEAR',r.gt]];
     let h='<div class="c5H"><img src="img/ci/c5_hero.webp" alt=""></div>';
     h+='<div class="c5T"><div class="c5Tk">'+TK.map(t=>'<div><img src="'+t[0]+'" alt=""><b>'+t[1]+'<br>TICKET</b><span>×'+t[2]+'</span></div>').join('')+'</div>'+
       '<button class="c5Go'+(rd?'':' off')+'" id="ciGo"'+(rd?'':' disabled')+'>'+(rd?'CLAIM<i class="rdd" style="right:4%;top:8%"></i>':got>=C5_TOTAL?'ALL COLLECTED':'COME BACK TOMORROW')+'</button></div>';
-    h+='<div class="c5g">';for(let d=blk;d<Math.min(blk+30,C5_DAYS);d++){const done=d<n,now=rd&&d===n,q=c5Rw(d),big=(d+1)%30===0||d===C5_DAYS-1;
+    h+='<div class="c5g">';for(let d=blk;d<Math.min(blk+30,C5_DAYS_());d++){const done=d<n,now=rd&&d===n,q=c5Rw(d),big=(d+1)%30===0||d===C5_DAYS_()-1;
       h+='<div class="c5d'+(done?' done':'')+(now?' now':'')+(big&&!now?' big':'')+'"><b>DAY '+(d+1)+'</b><img src="img/ticket.webp" alt=""><span>'+(q?(q.tk+q.ct+q.gt):0)+'</span>'+(done?'<i>✔</i>':'')+'</div>';}
     h+='</div>';
     const MS=[500,1000,1500,2000,2500,3000,3500,4000,4500,5000],MX=[9.2,18.2,27,35.6,44.2,52.8,61.4,70.1,78.9,90];
     h+='<div class="c5P"><div class="c5Pt"><img src="img/ticket.webp" alt=""><b>'+got.toLocaleString('en-US')+'</b>&nbsp;/ '+C5_TOTAL.toLocaleString('en-US')+' TICKETS</div>'+
       '<div class="c5Pb"><i style="width:'+(got/C5_TOTAL*100).toFixed(1)+'%"></i></div>'+MS.map((m,i)=>got>=m?'<em style="left:'+MX[i]+'%">✔</em>':'').join('')+'</div>';
-    h+='<div class="xNote">Every day: 10 Recruit + 10 Crew + 10 Gear tickets. Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.</div>';
+    h+='<div class="xNote">Every day: 20 Recruit + 20 Crew + 20 Gear tickets. Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.</div>';
     B.innerHTML=h;const g=$('ciGo');if(g)g.onclick=()=>{if(!ciReady())return;const r=c5Rw(G.c5.n);giveRw(r);G.c5.n++;G.c5.day=dayKey();save();
       toast('📅 Day '+G.c5.n+': '+rwHtml(r).replace(/<br>/g,' · '),3500);renderXP();updX();};return;}
   if(xpMode==='news'){T.textContent='NEWS';S.textContent='LATEST UPDATES';
