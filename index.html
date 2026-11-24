@@ -1012,11 +1012,43 @@ html body .dgPS span{font-size:10px!important}
 .gPed .rdt{font:900 9px/15px Game,system-ui!important;margin:0!important;color:#fff!important;text-shadow:0 1px 1px #7a0010!important;top:16%!important;right:-6%!important}#gBtns .cpGo,.rsA{position:relative}
 @keyframes rdxP{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 </style>
+<style>/* v16-286 (Marius 24 nov): NEW TOP BAR – one piece img/ui2/hud2.webp (2162x316 → 1300x190): avatar + frame in the left ring, NAME, VIP badge, TITLE, then money · diamonds · REP · cars · shop. Big text + a few light CSS animations (transform/opacity only). */
+#hud{height:62px;padding:3px 4px 0;align-items:flex-start}
+#hud #hudBar{width:min(100%,620px);aspect-ratio:2162/316;max-height:none;background-image:url(img/ui2/hud2.webp)}
+#hud #hudAv{position:absolute;left:6.5%;top:51%;height:102%;width:auto;aspect-ratio:58/62;margin:0;transform:translate(-50%,-50%);z-index:3}
+#hud #hudAv:after{content:"";position:absolute;inset:-6%;border-radius:22%;box-shadow:0 0 7px 2px #ffd54a;opacity:0;z-index:-1;animation:hAvG 3.2s ease-in-out infinite;will-change:opacity}
+#hud #hudAv:active{transform:translate(-50%,-50%) scale(.93)}
+@keyframes hAvG{0%,100%{opacity:0}50%{opacity:.8}}
+#hud #hudNm{left:14.2%;width:17%;top:20.6%;height:29.1%;display:block;text-align:center;overflow:hidden;font:400 21cqh/29.1cqh Lilita,Game,system-ui;color:#fff;letter-spacing:0;pointer-events:auto;cursor:pointer}
+#hud #hudEd{left:29.9%;width:3.1%;top:6%;height:30%;z-index:4;background:#1b2430;display:flex;align-items:center;justify-content:center;font:normal 18cqh/1 system-ui;pointer-events:auto;cursor:pointer;border-radius:50%;box-shadow:0 0 0 1.5px #ffd54a,0 2px 3px #000}#hud #hudEd:active{transform:scale(.85)}
+#hud #hudVip{left:13.64%;width:4.49%;top:52.5%;height:29%;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;animation:hVip 2.6s ease-in-out infinite}
+#hud #hudVip img{height:118%;width:auto;filter:drop-shadow(0 1px 2px #000)}
+#hud #hudVip.h0{opacity:.35}
+@keyframes hVip{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+#hud #hudTt{left:19.4%;width:11.8%;top:57%;height:20.6%;display:block;text-align:center;overflow:hidden;font:400 15cqh/20.6cqh Lilita,Game,system-ui;letter-spacing:.4px;color:#cfd8e3;pointer-events:auto;cursor:pointer}
+#hud #hudTt.t5{color:#ff7a52}#hud #hudTt.t4{color:#ffd54a}#hud #hudTt.t3{color:#e0a0ff}#hud #hudTt.t2{color:#8fd0ff}#hud #hudTt.t1{color:#7dff8a}
+#hud #money,#hud #dmH,#hud #sold{top:30%;height:36%;transform:none;display:flex;align-items:center;justify-content:center;font:400 27cqh/1 Lilita,Game,system-ui;letter-spacing:.2px}
+#hud #money{left:38.2%;width:8.9%}#hud #dmH{left:52.8%;width:7.6%}#hud #sold{left:81.7%;width:7.6%}
+#hud #repPill{left:67.2%;width:7.3%;top:27%;height:40%}
+#hud #rep{left:0;right:0;top:0;transform:none;height:56%;display:flex;align-items:center;justify-content:center;font:400 17cqh/1 Lilita,Game,system-ui;color:#fff2c4}
+#hud .rb{left:2%;right:2%;top:72%;height:16%}
+#hud #shopBtn{left:89.9%;width:8.2%;top:20%;height:56%;animation:hShop 5s ease-in-out infinite}
+@keyframes hShop{0%,86%,100%{transform:none}89%{transform:rotate(-7deg) scale(1.06)}92%{transform:rotate(6deg) scale(1.06)}95%{transform:rotate(-3deg)}}
+#hud #incH{left:38%;top:100%;margin-top:-6px;font:400 12px Lilita,Game,system-ui}
+#hud #hudSh{left:12%;width:77%;top:14%;height:66%;overflow:hidden;border-radius:6px;pointer-events:none;z-index:0}
+#hud #hudSh:before{content:"";position:absolute;top:0;bottom:0;left:0;width:18%;background:linear-gradient(100deg,transparent,#ffffff2e,transparent);transform:translateX(-120%) skewX(-18deg);animation:hSh 7s ease-in-out infinite;will-change:transform}
+@keyframes hSh{0%,72%{transform:translateX(-120%) skewX(-18deg)}100%{transform:translateX(620%) skewX(-18deg)}}
+#hud .hBump{animation:hBump .45s ease-out}
+@keyframes hBump{0%{transform:scale(1)}35%{transform:scale(1.22)}100%{transform:scale(1)}}
+body #side2{top:max(60px,calc(min(100vw - 8px,620px)*316/2162 + 9px))}
+#hud.hLow #hudSh,#hud.hLow #hudAv:after{display:none}
+@media (prefers-reduced-motion:reduce){#hud *,#hud *:before{animation:none!important}}
+</style>
 </head>
 <body>
 <canvas id="game"></canvas>
 <div id="fx"></div>
-<div id="hud"><div id="hudAv" class="av" aria-label="My profile"></div><div id="hudBar">
+<div id="hud"><div id="hudBar"><div id="hudAv" class="av" aria-label="My profile"></div><b id="hudNm"></b><i id="hudEd" aria-label="Change name">✏️</i><span id="hudVip"></span><b id="hudTt"></b><i id="hudSh"></i>
   <span id="money">$0</span><span id="incH"></span>
   <span id="dmH">0</span>
   <div id="repPill"><span id="rep">REP 1</span><span class="rb"><i id="repBar"></i></span></div>
@@ -1385,6 +1417,7 @@ function circ(x,y,r){X.beginPath();X.arc(x,y,r,0,Math.PI*2);X.fill();}
 function lerpA(a,b,t){let d=((b-a+Math.PI*3)%(Math.PI*2))-Math.PI;return a+d*t;}
 function angDiff(a,b){return Math.abs(((b-a+Math.PI*3)%(Math.PI*2))-Math.PI);}
 // v16-10: HUD numbers shrink to stay inside their box
+function hBump(id){const e=$(id);if(!e||!e.isConnected)return;e.classList.remove('hBump');void e.offsetWidth;e.classList.add('hBump');}
 function fitT(el){el.style.fontSize='';const w=el.clientWidth,sw=el.scrollWidth;if(w>0&&sw>w)el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*w/sw*.97)+'px';}
 addEventListener('resize',()=>setTimeout(()=>['money','rep','sold'].forEach(i=>fitT($(i))),60));
 function fmt(n){n=Math.round(n);if(n>=1e15)return '$'+(n/1e15).toFixed(2)+'Qa';if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(n>=1e4)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toLocaleString('en-US');}
@@ -4416,7 +4449,7 @@ function bayMB(c){return c.slot&&c.slot.kind==='bay'?mechBonus(c.slot.st,c.slot.
 heroRefresh();
 
 // =================== HUD ===================
-let lastM=-1,lastS=-1,lastX=-1,lastDm=-1;
+let lastM=-1,lastS=-1,lastX=-1,lastDm=-1;let lastVL=-1;setTimeout(()=>{window._hI=1;if(window.GFX&&GFX.eff==='low')$('hud').classList.add('hLow');},4000);
 let lastV=-1,lastQ=-1;
 let lastTk=-1,lastIdle=-1;
 // v16-120: GRADUAL UNLOCK of the map buttons (Marius: a new player must not see everything at once). Battle, Heroes, Summon, Idle,
@@ -4435,8 +4468,8 @@ function dotLbl(){rwSide();const S=(id,t)=>{const d=$(id);if(d&&d.dataset.t!==t)
 let hudN=0;function hud(){hudN++;if(hudN%30===1){sideLock();const R=incRates();$('incH').textContent=R.ok&&R.tot>0?'+'+fmt(R.tot)+'/h':'';}if(hudN%20===0&&rosEl.classList.contains('open'))renderRoster();if(hudN%120===1){const d=$('rosDot');if(d)d.style.display=rosHint()?'block':'none';}if(hudN%60===31){try{const c=$('cpDot');if(c){c.classList.toggle('on',!!(window.CAMPAIGN&&CAMPAIGN.todo&&CAMPAIGN.todo()));c.classList.toggle('ex',!!(window.CAMPAIGN&&CAMPAIGN.dgTodo&&CAMPAIGN.dgTodo()));}const v=$('vipDot');if(v)v.classList.toggle('on',!!(VLV&&(G.vipD!==dayK()||G.vipW!==weekK())));dotLbl();}catch(e){}}if(hudN%120===61){const d=$('heDot');if(d)d.style.display=window.CAMPAIGN&&CAMPAIGN.heroDot&&CAMPAIGN.heroDot()?'block':'none';}{const n=G.h.tk+(G.h.ct||0);if(n!==lastTk){lastTk=n;const t=$('tkDot');t.style.display=n?'flex':'none';t.textContent=n>99?'99+':n;}}
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
-  const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
-  if(G.xp!==lastX){lastX=G.xp;$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
+  if(VLV!==lastVL){lastVL=VLV;window.ONLINE&&ONLINE.hud&&ONLINE.hud();}const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));if(window._hI)hBump('dmH');}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
+  if(G.xp!==lastX){lastX=G.xp;if(window._hI&&$('rep').textContent!=='REP '+G.rep)hBump('repPill');$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
 // v16-141: NEXT GOAL removed + automatic notifications muted (Marius 21 nov)
 function autoToast(){}
@@ -4467,6 +4500,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:132,d:'Nov 24, 2026',ic:'✨',t:'New top bar',l:['A brand new <b>top bar</b> in one piece: your <b>avatar + frame</b>, your <b>NAME</b>, your <b>VIP badge</b> and your <b>TITLE</b> are now always visible.','Bigger numbers for money, diamonds, REP and cars sold.','Tap your <b>name</b> or the ✏️ → <b>change your name</b>. Tap your avatar or title → <b>your profile</b>. Tap the VIP badge → <b>VIP</b>.']},
  {id:131,d:'Nov 24, 2026',ic:'📅',t:'Check-in: 20 of each!',l:['<b>5000 FREE SUMMONS</b> now gives <b>20 Recruit + 20 Crew + 20 Gear</b> tickets every day (was 10) – you get all 5000 much faster.']},
  {id:130,d:'Nov 24, 2026',ic:'🔧',t:'Slot upgrades',l:['Gear upgrades <b>+1 … +50</b> now stay on the hero\'s <b>SLOT</b>: swap the piece and the <b>+</b> stays.','A badge in the corner of each slot shows its level – a new colour every <b>+5</b>.','Upgrades of pieces in the bag were refunded 100% in Gear Parts. Rebirth also gives back the slot upgrades.']},
  {id:129,d:'Nov 24, 2026',ic:'👑',t:'New VIP 1-10 + bigger packs',l:['Every purchase gives <b>VIP points</b> (1 € = 10). VIP 10 = 10,000 €. Daily Quests give 1 point each.','Every new VIP level opens a <b>big chest</b>: diamonds, lots of summon tickets and a <b>FULL GEAR SET of your choice</b> (Epic → Mythic, VIP 10 = Ascended) + Legendary heroes at VIP 4 and 8. <b>VIP 10</b>: a Mythic hero of your choice.','Every VIP level: <b>+1 h Idle</b> and <b>+10%</b> on all Idle Rewards.','Shop: bigger packs now give <b>more per €</b>. Diamond Pass: +5 Recruit +3 Gear tickets every day.','Your VIP level stayed the same.']},

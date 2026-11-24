@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=284;window.TE_CV=CV;
+const CV=286;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -1027,7 +1027,16 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 addButtons();
 // v16-269 (Marius 23 nov): my avatar + frame in the top bar (next to the money) → tap = MY PROFILE page (alone, without the online tabs)
 function hudAv(){const e=document.getElementById('hudAv');if(!e)return;let ic=LS('te_icon'),fr=+(LS('te_hfr')||0);if(ME){ic=ME.icon||ic;fr=ME.frame|0;LS('te_hfr',String(fr));}
-  const k=ic+'|'+fr;if(e.dataset.k===k)return;e.dataset.k=k;e.innerHTML=avf(ic,fr);}
-{const e=document.getElementById('hudAv');if(e){hudAv();e.onclick=()=>openHub('olProf',{solo:true});}}
-window.ONLINE={help:helpOpen,brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
+  const k=ic+'|'+fr;if(e.dataset.k!==k){e.dataset.k=k;e.innerHTML=avf(ic,fr);}hudInfo();}
+// v16-286 (Marius 24 nov): the new top bar also shows MY NAME, my VIP badge and my TITLE (cached → visible at once on start, also offline)
+function hudInfo(){const n=document.getElementById('hudNm'),v=document.getElementById('hudVip'),t=document.getElementById('hudTt');if(!n)return;
+  if(ME){LS('te_hnm',ME.name||'');LS('te_htt',ME.title||'');LS('te_hhv',ME.hv?'1':'0');}
+  const nm=LS('te_hnm')||'PLAYER',tk=LS('te_htt')||'',x=TT[tk]||TT.rook,vl=(()=>{try{return typeof VLV==='number'?VLV:0}catch(e){return 0}})(),hv=LS('te_hhv')==='1';
+  const k=nm+'|'+tk+'|'+vl+'|'+hv;if(n.dataset.k===k)return;n.dataset.k=k;
+  n.textContent=nm;t.textContent=x[1];t.className=x[0];
+  v.innerHTML=vl>0?`<img src="img/vip/v${Math.min(10,vl)}.webp" alt="VIP ${vl}">`:'<b style="font:400 30cqh Lilita,Game;color:#9aa7b4">VIP<br>0</b>';v.classList.toggle('h0',hv||vl<=0);
+  const fitT=e=>{e.style.fontSize='';for(let i=0;i<3;i++){const w=e.clientWidth,sw=e.scrollWidth;if(!(w>0&&sw>w))break;e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)*w/sw*.95)+'px';}};
+  requestAnimationFrame(()=>{fitT(n);fitT(t);});if(document.fonts)document.fonts.ready.then(()=>{fitT(n);fitT(t);});}
+{const e=document.getElementById('hudAv');if(e){hudAv();const prof=()=>openHub('olProf',{solo:true});e.onclick=prof;const ed=()=>{prof();let k=0;const iv=setInterval(()=>{if(ME){clearInterval(iv);nameModal();}else if(++k>24)clearInterval(iv);},250);};['hudNm','hudEd'].forEach(id=>{const x=document.getElementById(id);if(x)x.onclick=ed;});{const x=document.getElementById('hudTt');if(x)x.onclick=prof;}const v=document.getElementById('hudVip');if(v)v.onclick=()=>{if(typeof openPanel==='function')openPanel('vip');else prof();};}}
+window.ONLINE={hud:hudInfo,help:helpOpen,brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
 })();
