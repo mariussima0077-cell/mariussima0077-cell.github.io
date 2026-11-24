@@ -104,7 +104,7 @@ html,body{margin:0;height:100%;background:#16202a;overflow:hidden;font-family:Ga
 #shBtn:disabled{background:#2c3946;color:#6f8090;box-shadow:none}
 #zoom{position:fixed;right:10px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:5}
 #zoom button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(13,20,27,.82);color:#ffd54a;font-size:24px;font-weight:900;line-height:1;padding:0}
-#toast{position:fixed;left:50%;top:calc(min(100vw - 8px,620px)*421/2167 + 12px);transform:translateX(-50%);background:rgba(13,20,27,.94);border:1px solid #ffb30088;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:700;z-index:30;opacity:0;transition:opacity .4s;pointer-events:none;text-align:center;max-width:88vw}
+#toast{position:fixed;left:50%;top:calc(var(--hbw)/5.05 + 16px);transform:translateX(-50%);background:rgba(13,20,27,.94);border:1px solid #ffb30088;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:700;z-index:30;opacity:0;transition:opacity .4s;pointer-events:none;text-align:center;max-width:88vw}
 #loader{position:fixed;inset:0;z-index:10;background:#0b1420;transition:opacity .5s}
 #loader:has(#updS) #lpanel{visibility:hidden}
 span.numP{display:inline-flex;align-items:flex-end;white-space:nowrap;line-height:1}span.numP i{display:inline-block;background-repeat:no-repeat;flex:none}
@@ -1012,33 +1012,34 @@ html body .dgPS span{font-size:10px!important}
 .gPed .rdt{font:900 9px/15px Game,system-ui!important;margin:0!important;color:#fff!important;text-shadow:0 1px 1px #7a0010!important;top:16%!important;right:-6%!important}#gBtns .cpGo,.rsA{position:relative}
 @keyframes rdxP{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 </style>
-<style>/* v16-288 (Marius 24 nov): NEW TOP BAR on 2 ROWS – img/ui2/hud3.webp (2167x421 → 1300x253; first try hud2.webp was too cramped): avatar + frame in the left ring, NAME, VIP badge, TITLE, then money · diamonds · REP · cars · shop. Big text + a few light CSS animations (transform/opacity only). */
-#hud{height:calc(min(100vw - 8px,620px)*421/2167 + 4px);padding:3px 4px 0;align-items:flex-start}
-#hud #hudBar{width:min(100%,620px);aspect-ratio:2167/421;max-height:none;background-image:url(img/ui2/hud3.webp)}
-#hud #hudAv{position:absolute;left:7.1%;top:52%;height:86%;width:auto;aspect-ratio:58/62;margin:0;transform:translate(-50%,-50%);z-index:3}
-#hud #hudAv:active{transform:translate(-50%,-50%) scale(.93)}
-#hud #hudNm{left:17.6%;width:20%;top:18%;height:32.8%;display:block;text-align:center;overflow:hidden;font:400 22cqh/32.8cqh Lilita,Game,system-ui;color:#fff;letter-spacing:0;pointer-events:auto;cursor:pointer}
-#hud #hudEd{left:38.3%;width:2.6%;top:21%;height:26%;display:flex;align-items:center;justify-content:center;font:normal 17cqh/1 system-ui;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 1px 1px #000)}#hud #hudEd:active{transform:scale(.85)}
-#hud #hudVip{left:16.9%;width:5.9%;top:55.1%;height:29.5%;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;animation:hVip 2.6s ease-in-out infinite}
+<style>/* v16-288 (Marius 24 nov): NEW TOP BAR on 2 ROWS – img/ui2/hud4.webp (2151x426 → 1300x257), avatar + frame OUTSIDE the bar on its left (v16-289: no ring; hud2/hud3 = older tries): avatar + frame in the left ring, NAME, VIP badge, TITLE, then money · diamonds · REP · cars · shop. Big text + a few light CSS animations (transform/opacity only). */
+:root{--hbw:calc((min(100vw,640px) - 19px)/1.185)}
+#hud{height:calc(var(--hbw)/5.05 + 12px);padding:3px 4px 0;align-items:flex-start;gap:3px}
+#hud #hudBar{width:var(--hbw);flex:none;aspect-ratio:2151/426;max-height:none;background-image:url(img/ui2/hud4.webp)}
+#hud #hudAv{position:relative;flex:none;height:calc(var(--hbw)/5.05 + 8px);width:auto;aspect-ratio:58/62;margin:0;transform:none;z-index:3}
+#hud #hudAv:active{transform:scale(.93)}
+#hud #hudNm{left:3.6%;width:23.8%;top:15.5%;height:32.2%;display:block;text-align:center;overflow:hidden;font:400 22cqh/32.2cqh Lilita,Game,system-ui;color:#fff;letter-spacing:0;pointer-events:auto;cursor:pointer}
+#hud #hudEd{left:27.4%;width:2.8%;top:19%;height:25%;display:flex;align-items:center;justify-content:center;font:normal 17cqh/1 system-ui;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 1px 1px #000)}#hud #hudEd:active{transform:scale(.85)}
+#hud #hudVip{left:3.1%;width:6.4%;top:51.6%;height:31.2%;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;animation:hVip 2.6s ease-in-out infinite}
 #hud #hudVip img{height:112%;width:auto;filter:drop-shadow(0 1px 2px #000)}
 #hud #hudVip.h0{opacity:.6}#hud #hudVip b{font:400 13cqh/1 Lilita,Game,system-ui;color:#c9d3dd;text-align:center;text-shadow:0 1px 0 #000}
 @keyframes hVip{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-#hud #hudTt{left:24.2%;width:16.7%;top:58%;height:24.7%;display:block;text-align:center;overflow:hidden;font:400 16cqh/24.7cqh Lilita,Game,system-ui;letter-spacing:0;color:#cfd8e3;pointer-events:auto;cursor:pointer}
+#hud #hudTt{left:10.8%;width:19.4%;top:55.2%;height:25.4%;display:block;text-align:center;overflow:hidden;font:400 16cqh/25.4cqh Lilita,Game,system-ui;letter-spacing:0;color:#cfd8e3;pointer-events:auto;cursor:pointer}
 #hud #hudTt.t5{color:#ff7a52}#hud #hudTt.t4{color:#ffd54a}#hud #hudTt.t3{color:#e0a0ff}#hud #hudTt.t2{color:#8fd0ff}#hud #hudTt.t1{color:#7dff8a}
-#hud #money,#hud #dmH,#hud #sold{top:20.4%;height:25.7%;transform:none;display:flex;align-items:center;justify-content:center;font:400 21cqh/1 Lilita,Game,system-ui;letter-spacing:.2px}
-#hud #money{left:50.4%;width:12.4%}#hud #dmH{left:70.8%;width:13%}#hud #sold{left:70.8%;width:13%;top:54.6%}
-#hud #repPill{left:50.4%;width:12.4%;top:52%;height:26%}
+#hud #money,#hud #dmH,#hud #sold{top:16%;height:27.7%;transform:none;display:flex;align-items:center;justify-content:center;font:400 21cqh/1 Lilita,Game,system-ui;letter-spacing:.2px}
+#hud #money{left:40%;width:16%}#hud #dmH{left:64.6%;width:17%}#hud #sold{left:64.6%;width:17%;top:51.6%}
+#hud #repPill{left:40%;width:16%;top:52%;height:26%}
 #hud #rep{left:0;right:0;top:0;transform:none;height:56%;display:flex;align-items:center;justify-content:center;font:400 14cqh/1 Lilita,Game,system-ui;color:#fff2c4}
-#hud .rb{left:1%;right:6%;top:78%;height:17%}
-#hud #shopBtn{left:85.3%;width:12.6%;top:17.3%;height:66%;animation:hShop 5s ease-in-out infinite}
+#hud .rb{left:2%;right:5%;top:72%;height:19%}
+#hud #shopBtn{left:83.9%;width:13.5%;top:13.6%;height:69.2%;animation:hShop 5s ease-in-out infinite}
 @keyframes hShop{0%,86%,100%{transform:none}89%{transform:rotate(-7deg) scale(1.06)}92%{transform:rotate(6deg) scale(1.06)}95%{transform:rotate(-3deg)}}
-#hud #incH{left:50%;top:100%;margin-top:-6px;font:400 12px Lilita,Game,system-ui}
-#hud #hudSh{left:15%;width:83%;top:12%;height:74%;overflow:hidden;border-radius:6px;pointer-events:none;z-index:0}
+#hud #incH{left:40%;top:100%;margin-top:-6px;font:400 12px Lilita,Game,system-ui}
+#hud #hudSh{left:2%;width:96%;top:10%;height:78%;overflow:hidden;border-radius:6px;pointer-events:none;z-index:0}
 #hud #hudSh:before{content:"";position:absolute;top:0;bottom:0;left:0;width:18%;background:linear-gradient(100deg,transparent,#ffffff2e,transparent);transform:translateX(-120%) skewX(-18deg);animation:hSh 7s ease-in-out infinite;will-change:transform}
 @keyframes hSh{0%,72%{transform:translateX(-120%) skewX(-18deg)}100%{transform:translateX(620%) skewX(-18deg)}}
 #hud .hBump{animation:hBump .45s ease-out}
 @keyframes hBump{0%{transform:scale(1)}35%{transform:scale(1.22)}100%{transform:scale(1)}}
-body #side2{top:max(60px,calc(min(100vw - 8px,620px)*421/2167 + 12px))}
+body #side2{top:max(60px,calc(var(--hbw)/5.05 + 16px))}
 #hud.hLow #hudSh{display:none}#hud.hLow #hudVip,#hud.hLow #shopBtn{animation:none}
 @media (prefers-reduced-motion:reduce){#hud *,#hud *:before{animation:none!important}}
 </style>
@@ -1046,7 +1047,7 @@ body #side2{top:max(60px,calc(min(100vw - 8px,620px)*421/2167 + 12px))}
 <body>
 <canvas id="game"></canvas>
 <div id="fx"></div>
-<div id="hud"><div id="hudBar"><div id="hudAv" class="av" aria-label="My profile"></div><b id="hudNm"></b><i id="hudEd" aria-label="Change name">✏️</i><span id="hudVip"></span><b id="hudTt"></b><i id="hudSh"></i>
+<div id="hud"><div id="hudAv" class="av" aria-label="My profile"></div><div id="hudBar"><b id="hudNm"></b><i id="hudEd" aria-label="Change name">✏️</i><span id="hudVip"></span><b id="hudTt"></b><i id="hudSh"></i>
   <span id="money">$0</span><span id="incH"></span>
   <span id="dmH">0</span>
   <div id="repPill"><span id="rep">REP 1</span><span class="rb"><i id="repBar"></i></span></div>
