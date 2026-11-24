@@ -11,8 +11,10 @@ const TOK='img/ui12/st_token.webp',TI=e=>'<img class="tki stTok" src="'+TOK+'" a
 const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
 // v16-280 (Marius 24 nov): tickets only as ×10 (10 × 500) · Essence = an ITEM "2h Idle Essence" kept in YOUR ITEMS – when you USE it, it gives
 // 2 hours of idle Essence for the stage you are at THEN (worth more the further you get)
-const SHOP=[['tk10',5000],['gt10',5000],['ct10',5000],['k_vault',500],['k_mine',500],['k_forge',500],['k_lab',500],['eb',250]];
-const N10={tk10:'tk',gt10:'gt',ct10:'ct'},ebN=()=>{try{return Math.max(1,T().idleCalc(2).ess);}catch(e){return essN();}};   // Marius 21 nov: every ticket and every key = 500 (Essence still provisional)
+// v16-283 (Marius): price stays 500 – one buy = 10 tickets, max 3 buys a day of each ticket type
+const SHOP=[['tk10',500],['gt10',500],['ct10',500],['k_vault',500],['k_mine',500],['k_forge',500],['k_lab',500],['eb',250]];
+const N10={tk10:'tk',gt10:'gt',ct10:'ct'},TMAX=3,dk=()=>{const d=new Date((window.SEC&&SEC.now)?SEC.now():Date.now());return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();},
+  tDay=s=>{if(!s.td||s.td.d!==dk())s.td={d:dk()};return s.td;},tLeft=(s,k)=>N10[k]?TMAX-(tDay(s)[k]||0):99,ebN=()=>{try{return Math.max(1,T().idleCalc(2).ess);}catch(e){return essN();}};   // Marius 21 nov: every ticket and every key = 500 (Essence still provisional)
 const essN=()=>Math.round((T().ESS_U?T().ESS_U():300)*2);
 function itIcon(k){if(N10[k])k=N10[k];if(k==='eb')return '<span style="position:relative;display:inline-block">'+T().ESI+'<small style="position:absolute;right:-6px;bottom:-4px;font:900 9px system-ui;color:#ffd54a;text-shadow:0 1px 2px #000">2h</small></span>';if(k[0]==='k')return '<img class="tki" src="img/dg/k_'+k.slice(2)+'.webp" alt="">';if(k==='tk')return '<img class="tki" src="img/ticket.webp" alt="">';if(k==='ct')return '<img class="tki" src="img/cticket.webp" alt="">';if(k==='gt')return '<img class="tki" src="img/gticket.webp" alt="">';return T().ESI;}
 function itName(k){if(k[0]==='k')return DGN[k.slice(2)]+' Key';return {tk:'Recruit Ticket',gt:'Gear Ticket',ct:'Crew Ticket',tk10:'10 Recruit Tickets',gt10:'10 Gear Tickets',ct10:'10 Crew Tickets',eb:'2h Idle Essence',ess:T().nf(essN())+' Essence'}[k];}
@@ -98,11 +100,11 @@ async function attack(id){if(busy)return;if(D&&D.atks<=0)return T().toast('⚔�
   r.onEnd=()=>{open();load(true);};el.classList.remove('open');O().play(r,false);}
 // v16-169 (Marius 22 nov, Alex 700→200): the Street Shop asks YES / NO before it spends, keeps the last 20 purchases
 // (shown under the shop) and tells the server (event 'stshop' on the player card in /admin).
-function buy(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it)return;if(s.tok<it[1])return T().toast(TI()+' Not enough Street Tokens ('+T().nf(it[1])+')',2200);
+function buy(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it)return;if(tLeft(s,k)<=0)return T().toast('Max '+TMAX+' a day for '+itName(k)+' · come back tomorrow',2200);if(s.tok<it[1])return T().toast(TI()+' Not enough Street Tokens ('+T().nf(it[1])+')',2200);
   if(!el||el.querySelector('.stCf'))return;const c=document.createElement('div');c.className='stCf';
   c.innerHTML='<div class="box"><div class="ic">'+itIcon(k)+'</div><b>Buy '+(N10[k]?'':'1 ')+itName(k)+'?</b>'+(k==='eb'?'<span>An item: USE it later = 2 hours of idle Essence for your stage at that moment (now '+T().ESI+' '+T().nf(ebN())+')</span>':'')+'<span>for '+TI()+' '+T().nf(it[1])+' Street Tokens</span><div class="bt"><button data-c="0">NO</button><button class="g" data-c="1">YES, BUY</button></div></div>';
   c.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-c]');if(!b&&e.target!==c)return;c.remove();if(b&&b.dataset.c==='1')buyNow(k);});el.appendChild(c);}
-function buyNow(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it||s.tok<it[1])return;
+function buyNow(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it||s.tok<it[1]||tLeft(s,k)<=0)return;if(N10[k]){const t=tDay(s);t[k]=(t[k]||0)+1;}
   s.tok-=it[1];if(k[0]==='k'){if(window.DGK)DGK.add(k.slice(2),1);}else if(k==='eb')s.eb=(s.eb||0)+1;else if(N10[k])T().giveRw({[N10[k]]:10});else if(k==='ess')T().giveRw({ess:essN()});else T().giveRw({[k]:1});
   (s.log=s.log||[]).unshift([Date.now(),k,it[1],s.tok]);s.log=s.log.slice(0,20);
   T().save();T().toast(itIcon(k)+' '+(N10[k]?'+':'+1 ')+itName(k)+(k==='eb'?' · in YOUR ITEMS – use it when you want':''),2400);render();
@@ -134,7 +136,7 @@ function render(){if(!el||!el.classList.contains('open')||rfBusy)return;const G=
   h+='<div class="btns"><button class="y" data-s="list">🔄 NEW TRAINS</button></div>';
   if(D.hits.length){h+='<div class="stS">ATTACKS ON YOUR TRAINS</div><div class="card">'+D.hits.map(x=>'<div class="hl">'+esc(x.an)+' attacked your <span style="color:'+GC(x.g)+'">'+GN(x.g)+'</span> train – '+(x.win?'<b>stole '+T().nf(x.steal)+'</b>':'<b class="ok">your team won</b>')+'</div>').join('')+'</div>';}
   body.innerHTML=h+shopH(st);}
-function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'+SHOP.map(([k,p])=>'<div class="stI"><div class="ic">'+itIcon(k)+'</div><div class="nm">'+itName(k)+'</div><button class="g'+(st.tok<p?' dis':'')+'" data-s="buy" data-k="'+k+'">'+TI()+' '+T().nf(p)+'</button></div>').join('')+'</div>'+itemsH(st)+logH(st);}
+function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'+SHOP.map(([k,p])=>'<div class="stI"><div class="ic">'+itIcon(k)+'</div><div class="nm">'+itName(k)+(N10[k]?'<br><small>'+tLeft(st,k)+' / '+TMAX+' today</small>':'')+'</div><button class="g'+(st.tok<p||tLeft(st,k)<=0?' dis':'')+'" data-s="buy" data-k="'+k+'">'+TI()+' '+T().nf(p)+'</button></div>').join('')+'</div>'+itemsH(st)+logH(st);}
 function open(){build();el.classList.add('open');render();load();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}
   const now=Date.now();if(D&&D.mine&&D.mine.some(t=>t.t1<=now))load(true);else render();},1000);}
 // a row for the building panels (Car Wash, Gas Station, Car Factory, Rail Terminal)
