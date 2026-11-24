@@ -61,7 +61,7 @@ let lv0=0,tk0=0,hc0=0,best0=0;
 // v16-122 (Marius): a BIG gift at the end so players don't skip – announced in the first bubble
 const GIFT={dm:1000,tk:10};
 const giftH=()=>`<div class="gift"><span>${TE().DMI} ${GIFT.dm}</span><span>${X().TKI()} ${GIFT.tk}</span><span><img class="tki" src="img/cticket.webp"> ${GIFT.tk}</span><span><img class="tki" src="img/gticket.webp"> ${GIFT.tk}</span></div>`;
-// v16-292 (Marius 24 nov): NEW OPENING – a WOW fight with 7 borrowed Mythics → free Summon ×10 (a LEGENDARY guaranteed) → first battle →
+// v16-292 (Marius 24 nov): NEW OPENING – a WOW fight with 5 borrowed Mythics (v16-293: was 7) → free Summon ×10 (a LEGENDARY guaranteed) → first battle →
 // Gear Summon ×10 (the full EPIC set of that Legendary's class, put on him) → then the garage tour.
 let DEMO=0;
 const legN=()=>{try{const h=TE().HB[G.tutHero];return h?h.n:'your Legendary';}catch(e){return 'your Legendary';}};
@@ -105,13 +105,16 @@ function place(L,T,Wd,H){const s=(e,a,b,c,d)=>{e.style.left=a+'px';e.style.top=b
   if(Wd<=0&&H<=0){for(const k in tb)s(tb[k],0,0,0,0);return;}
   s(tb.T,0,0,innerWidth,T);s(tb.B,0,T+H,innerWidth,innerHeight-T-H);s(tb.L,0,T,L,H);s(tb.R,L+Wd,T,innerWidth-L-Wd,H);}
 let L=S,MINI=null;
-function go(n){i=n;cur=L[i];skipArm=0;lastTx='';if(!cur){end();return;}
+// v16-293 (Marius 24 nov): NO SKIP for new players – they must learn the game. The SKIP link only shows in a replay (FORCE)
+// or as a safety exit if one step stays stuck for 2 minutes (a bug must never lock a player in the tutorial).
+let stepT=Date.now();const stuck=()=>Date.now()-stepT>120000;
+function go(n){i=n;cur=L[i];skipArm=0;lastTx='';stepT=Date.now();if(!cur){end();return;}
   if(!MINI&&!FORCE&&G.tutS!==i){G.tutS=i;try{save();}catch(e){}}   // v16-122: remember that the tutorial was started
   if(cur.enter)try{cur.enter();}catch(e){}
   setPose(cur.p||(cur.gift?'cheer':i===0&&!MINI?'talk':(cur.el||cur.w)?'point':'talk'));
   if(cur.w){camTo(R[cur.w]());try{if(sel0()&&!cur.tap)closePanel();}catch(e){}}
   nx.textContent=cur.next||'';nx.style.display=cur.next?'':'none';
-  dots.textContent=MINI?'':(i+1)+' / '+L.length;sk.style.visibility=cur.gift||MINI?'hidden':'';
+  dots.textContent=MINI?'':(i+1)+' / '+L.length;sk.style.visibility=cur.gift||MINI||(!FORCE&&!stuck())?'hidden':'';
   bub.style.animation='none';void bub.offsetWidth;bub.style.animation='';}
 function end(){root.remove();running=false;window.__TUTON=false;
   if(MINI){(G.tutM=G.tutM||[]).push(MINI);MINI=null;L=S;try{save();}catch(e){}return;}
@@ -122,7 +125,7 @@ nx.onclick=()=>{if(FORCE&&cur&&!cur.gift&&isOpen('sm')&&cur.tap){const b=documen
   go(i+1);};
 sk.onclick=()=>{if(!skipArm){skipArm=1;sk.textContent='SKIP = NO GIFT · TAP AGAIN';setTimeout(()=>{skipArm=0;sk.textContent='SKIP TUTORIAL';},2500);return;}if(!MINI&&!FORCE&&cur&&!G.tut){G.tutK=i+1;}end();};   // v16-275: remember WHERE it was skipped (admin)
 let running=false;
-function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;if(!MINI&&progressed()){G.tut=1;try{save();}catch(e){}root.remove();running=false;window.__TUTON=false;return;}
+function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;if(!MINI&&!FORCE&&!cur.gift&&stuck()&&sk.style.visibility==='hidden')sk.style.visibility='';if(!MINI&&progressed()){G.tut=1;try{save();}catch(e){}root.remove();running=false;window.__TUTON=false;return;}
   camStep();
   if(cur.done){let ok=false;try{ok=cur.done();}catch(e){}if(ok){go(i+1);return;}}
   const t=typeof cur.t==='function'?cur.t():cur.t;if(t!==lastTx){tx.innerHTML=t||'';lastTx=t;}

@@ -4265,8 +4265,8 @@ function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.b
 // v16-153 (perf): called 20 s after the game went to the background – drops the hero / monster sheets (7-13 MB each in memory)
 // unless a fight is running; they load again by themselves the next time they are drawn.
 function freeMem(){if(running||window.__BATTLE_ON)return;TCACHE.clear();hdIm=null;hdId='';for(const id in SPRD){const d=SPRD[id];if(d.im){d.im=null;d.bi=null;d.fi=null;}}for(const id in MSPR){if(MSPR[id].im)MSPR[id].im=null;}}
-// v16-292 (Marius 24 nov): TUTORIAL OPENING – 7 borrowed MYTHICS against 2 giant bosses, big effects, a sure win (~25 s). No rewards, no progress.
-function demoFight(cb){const T=TE(),HB=T.HB;const team=Object.keys(HB).map(k=>HB[k]).filter(h=>h.cat==='m'&&h.gr===5).slice(0,7);if(!team.length){if(cb)cb(true);return;}
+// v16-292 (Marius 24 nov): TUTORIAL OPENING – 5 borrowed MYTHICS (v16-293: was 7 – a normal team of 5) against 2 giant bosses, big effects, a sure win (~25 s). No rewards, no progress.
+function demoFight(cb){const T=TE(),HB=T.HB;const team=Object.keys(HB).map(k=>HB[k]).filter(h=>h.cat==='m'&&h.gr===5).slice(0,5);if(!team.length){if(cb)cb(true);return;}
   team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});
   const w=[['omega','hydra']],F={demo:1,cb,f:0,w,mod:-1,eq:0,mul:1,st:{n:'THE CITY IS UNDER ATTACK!',bio:18,w,boss:1}};
   root.classList.add('open');safeStart(0,team,F);if(!B||!B.tw||!B.tw.demo)return;
