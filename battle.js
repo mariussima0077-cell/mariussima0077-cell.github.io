@@ -851,7 +851,7 @@ const stageMulN=i=>MONX*stageMul0(i)*HK(i)*EGK(EG.camp,i,999,1499)*EGK(EG2.camp,
 const HARD_FLOOR=1.1,HRC={};
 const wPow=i=>{const s=STAGES[i];let p=0;s.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=M.hp*.25+M.atk*6+M.def*4;}));return p/s.w.length;};
 const HARD_RAMP=i=>{const c=Math.floor(i/SPC),a=c*SPC,b=Math.min(NST-1,a+SPC-1),j=i-a;let f=HRC[c];
-  if(f==null){const P=x=>stageMulN(x)*stEase(x)*wPow(x);f=Math.max(1,HARD_FLOOR*P(b)/(HARD_K*P(a)));if(TE().expMul)HRC[c]=f;}
+  if(f==null){const P=x=>stageMulN(x)*stEase0(x)*wPow(x);f=Math.max(1,HARD_FLOOR*P(b)/(HARD_K*P(a)));if(TE().expMul)HRC[c]=f;}
   return Math.pow(f,1-j/(SPC-1));};
 const stageMul=i=>stageMulN(i)*(HM?HARD_K*EGK(EG.hard,i,999,1499)*EGK(EG2.hard,i,1499,2249)*HARD_RAMP(i):1);
 const GK=i=>1+.12*Math.min(1,Math.max(0,i-15)/45)+.03*Math.min(1,Math.max(0,i-60)/240); // v16-134: monsters grow like a normal team of that stage grew with the new GMUL (Common/Rare early ≈ ×1.0-1.1, Epic/Legendary mid ≈ ×1.2)
@@ -1161,7 +1161,20 @@ function bestTeam(){return myMechs().slice(0,5).map(h=>h.id);} // v16-122 (Mariu
 function teamPower(list){const L=list.filter(Boolean),k=1+teamRoles(L.filter(h=>!h.crew)).bon;return Math.round(L.reduce((a,h)=>a+pow(h)*(h.crew?1:k),0));} // v16-136: + TEAM ROLES bonus
 // v15: early bosses are easier (no long wall at the start of the game)
 const BEASE=c=>[.42,.55,.68,.8,.8][c]??.72; // v16-40: 2-month test – chapter bosses were walls of 7-13 days (5-20 .9→.8, chapter 6+ 1→.72)
-const stEase=i=>{const s=STAGES[i];return s.boss?BEASE(s.c):s.mini?(1+BEASE(s.c))/2:1;};
+const stEase0=i=>{const s=STAGES[i];return s.boss?BEASE(s.c):s.mini?(1+BEASE(s.c))/2:1;};
+// v16-297 (Marius 24 nov: "it grows then falls, grows then falls – start with a power and let every stage grow a little"):
+// zone 1 monsters are ~2.5× weaker than zone 4 → every chapter began ~60% weaker than the end of the one before, and the boss (×BEASE) was weaker than stage 29.
+// SMOOTH: every stage gets a target power = 31-stage average of the old values (only the zone saw-tooth goes away, the level stays ~the same),
+// then forced to rise at least +0.05% per stage → EVERY stage is a little stronger than the one before (NORMAL and HARD separately).
+// Zones only change which monsters you see. expMul (hero level expected) is left out of the curve and multiplied back – it only goes up.
+const SM_STEP=1.0005,SMC={},SM_U0=17*30-1,SM_UK=1.15; // SM_U0 = stage 17-30, SM_UK = +15% per chapter after it
+const smX=i=>stageMul(i)/(TE().expMul?TE().expMul(i):1);
+const smCurve=h=>{const o0=HM;HM=h;const N=STAGES.length,L=[],o=[];for(let i=0;i<N;i++)L.push(Math.log(smX(i)*stEase0(i)*wPow(i)));
+  for(let i=0;i<N;i++){const H=Math.min(15,i,N-1-i);let t=0;for(let k=i-H;k<=i+H;k++)t+=L[k];const v=Math.exp(t/(2*H+1));o.push(i?Math.max(v,o[i-1]*SM_STEP):v);}
+  // v16-297 (Marius 24 nov: 'uniform'): from the end of chapter 17 to 75-30 every chapter is a fixed +15% (power the player SEES, hero level included)
+  const EX=i=>TE().expMul?TE().expMul(i):1,a=SM_U0,P0=o[a]*EX(a);for(let i=a+1;i<N;i++)o[i]=P0*Math.pow(SM_UK,(i-a)/SPC)/EX(i);
+  HM=o0;return o;};
+const stEase=i=>{const h=HM?1:0;let C=SMC[h];if(!C){C=smCurve(h);if(TE().expMul)SMC[h]=C;}return C[i]/(smX(i)*wPow(i));};
 function enemyPower(i){const s=STAGES[i],k=stageMul(i)*stEase(i);let p=0;s.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*k;}));return Math.round(p/s.w.length*1.05);}
 function crewPortrait(k){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
   const bg=g.createRadialGradient(64,48,6,64,64,92);bg.addColorStop(0,'#8d6e63');bg.addColorStop(.6,'#3e2723');bg.addColorStop(1,'#120a06');g.fillStyle=bg;g.fillRect(0,0,128,128);
