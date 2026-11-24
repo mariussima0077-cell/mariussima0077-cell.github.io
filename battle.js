@@ -1444,11 +1444,15 @@ function eye(g,x,y,r,col,t,k){g.fillStyle=col;circ(g,x,y,r);g.fillStyle='rgba(25
 // v16-rage (24 nov, Marius test): ENRAGE while the ultimate charges (bar 80-100%) – ONLY visual: coloured glow around the hero (pulsing), a little bigger, embers rising
 const RAGEC={m5_0:'#ffb300',m5_1:'#ff3d00',m5_2:'#ff9100',m5_3:'#ffd54a',m5_4:'#40c4ff',m5_5:'#b388ff',m5_6:'#e040fb'},RAGE_D=4;
 // Marius: rage BEFORE the skill – grows while the bar fills from 80% to 100%, stays while it is ready, and goes out fast (0.35 s) once he casts
+// v16-296 (Marius: 'each one a different colour'): Mythic = their own colour, every other hero = its own bright colour from its id (always the same for that hero)
+const RAGEX={};function rageCol(id){if(!id)return '#ff7043';if(RAGEC[id])return RAGEC[id];if(!RAGEX[id]){const P=['#ff1744','#ff9100','#ffea00','#76ff03','#00e5ff','#2979ff','#d500f9','#ff4081','#1de9b6','#ffc400','#651fff','#00b0ff'];let h=0;for(const ch of id)h=(h*31+ch.charCodeAt(0))%9973;RAGEX[id]=P[h%P.length];}return RAGEX[id];}
 function rageK(u){if(!u.hero||u.dead||!B||B.phase!=='fight')return 0;let k=0;
   if(u.act&&u.act.k==='cast')k=Math.max(0,1-u.act.t/.35);else if(u.rageT!==undefined&&B.t-u.rageT<.35)k=0;else k=clamp((u.en-80)/20,0,1);
   return k;}
 function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;const rk=rageK(u);
-  if(rk>0){const col=RAGEC[u.h&&u.h.id]||GGLOW[u.h&&u.h.r]||'#ff7043',pl=.5+.5*Math.sin(t*9),sc0=u.sc;u.sc*=1+.05*rk;
+  if(rk>0){const col=rageCol(u.h&&u.h.id),pl=.5+.5*Math.sin(t*9),sc0=u.sc;u.sc*=1+.05*rk;
+    {const R=56*S*u.sc*(1+.08*pl),cy=u.sy-46*S*u.sc,gg=g.createRadialGradient(u.sx,cy,R*.12,u.sx,cy,R);gg.addColorStop(0,col);gg.addColorStop(1,'rgba(0,0,0,0)');
+      g.save();g.globalCompositeOperation='lighter';g.globalAlpha=rk*(.34+.16*pl);g.fillStyle=gg;g.beginPath();g.ellipse(u.sx,cy,R*.8,R*1.15,0,0,6.283);g.fill();g.restore();} /* v16-296: coloured aura behind the hero (cheap – works on LOW graphics too) */
     if(!LOWRES){g.save();g.shadowColor=col;g.shadowBlur=(22+14*pl)*S*rk;GA=rk;f(g,u,t);g.shadowBlur=(8+4*pl)*S*rk;f(g,u,t);g.restore();}GA=1;f(g,u,t); /* low graphics: no glow blur (costly on cheap phones), only the light pass + embers */
     g.save();g.globalCompositeOperation='lighter';GA=rk*(.18+.17*pl);f(g,u,t);GA=1;
     g.fillStyle=col;for(let i=0;i<7;i++){const p=(t*.9+i*.143)%1,x=u.sx+Math.sin(i*2.4+t*2)*24*S*u.sc,y=u.sy-p*95*S*u.sc;g.globalAlpha=rk*(1-p)*.9;g.beginPath();g.arc(x,y,(2.6-1.6*p)*S,0,6.283);g.fill();}
@@ -2037,7 +2041,7 @@ function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
 function pushWide(u,ta,o){if(!WD(u))return false;B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
 // v16-ready (24 nov, Marius): ULTIMATE READY – looping ground aura (16 frames, 4x4) under a Mythic while his ultimate is charged;
 // during the cast it CHARGES (grows ×1.4, brighter, extra glow) and fades out at the end of the cast
-const READY8={m5_0:'img/fx/ready_m5_0.webp'},READYI={};function readyImg(id){if(!READY8[id])return null;let i=READYI[id];if(!i){i=READYI[id]=new Image();i.decoding='async';i.src=READY8[id];}return i;}
+/* v16-296 (Marius): no ring under the heroes any more – ENRAGE (coloured glow) for everyone instead */ const READY8={},READYI={};function readyImg(id){if(!READY8[id])return null;let i=READYI[id];if(!i){i=READYI[id]=new Image();i.decoding='async';i.src=READY8[id];}return i;}
 function drawReady(g,u,t){const id=u.h&&u.h.id,im=id&&READY8[id]&&readyImg(id);if(!im||!im.naturalWidth||u.dead)return;
   const cst=u.act&&u.act.k==='cast',rd=u.en>=100&&!u.act&&B.phase==='fight';if(!cst&&!rd){u.rdA=0;return;}
   u.rdA=Math.min(1,(u.rdA||0)+.08);let al=u.rdA,glow=0;
