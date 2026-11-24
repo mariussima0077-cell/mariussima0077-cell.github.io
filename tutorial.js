@@ -109,7 +109,7 @@ function end(){root.remove();running=false;window.__TUTON=false;
 nx.onclick=()=>{if(FORCE&&cur&&!cur.gift&&isOpen('sm')&&cur.tap){const b=document.querySelector('#smBox [data-a="back"]');if(b)b.click();go(i+2);return;}if(cur&&cur.gift&&!FORCE){G.dm=(G.dm||0)+GIFT.dm;G.h.tk+=GIFT.tk;G.h.ct=(G.h.ct||0)+GIFT.tk;G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+GIFT.tk;try{save();toast('🎁 Welcome gift: '+GIFT.dm+' diamonds + '+GIFT.tk+' Recruit, '+GIFT.tk+' Crew and '+GIFT.tk+' Gear Tickets',4000);}catch(e){}}
   if(cur&&cur.gift&&FORCE){try{toast('Preview: the gift is not given (test only)',2500);}catch(e){}}
   go(i+1);};
-sk.onclick=()=>{if(!skipArm){skipArm=1;sk.textContent='SKIP = NO GIFT · TAP AGAIN';setTimeout(()=>{skipArm=0;sk.textContent='SKIP TUTORIAL';},2500);return;}end();};
+sk.onclick=()=>{if(!skipArm){skipArm=1;sk.textContent='SKIP = NO GIFT · TAP AGAIN';setTimeout(()=>{skipArm=0;sk.textContent='SKIP TUTORIAL';},2500);return;}if(!MINI&&!FORCE&&cur&&!G.tut){G.tutK=i+1;}end();};   // v16-275: remember WHERE it was skipped (admin)
 let running=false;
 function loop(){if(!running)return;requestAnimationFrame(loop);if(!cur)return;if(!MINI&&progressed()){G.tut=1;try{save();}catch(e){}root.remove();running=false;window.__TUTON=false;return;}
   camStep();
@@ -210,6 +210,8 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   gogo:{ok:()=>isOpen('gpx')&&vis(document.querySelector('#gpx [data-g=go]')),t:`<b>GO</b>: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have <b>GO</b> too.`},
   // v16-254 (Marius 23 nov: Thieves 2.0)
   thieves2:{ok:()=>isOpen('sheet')&&sel0()==='security'&&!!document.querySelector('#sheet .mwB'),t:`<b>THIEVES 2.0</b>: thieves come in groups – <b>★ PRO</b>, <b>👑 GANG BOSS</b> and sometimes a whole <b style="color:#ff6b6b">GANG RAID</b>. Guards get <b>BACKUP</b> and <b>K9 dogs</b>. Caught = Builder Kit, Crew Tickets, diamonds; escaped = part of your cash stolen. <b>MOST WANTED</b>: catch the 3 thieves on the board today for a bounty.`},
+  // v16-275 (Marius 24 nov): Rail Wars was the only page without a guide
+  railw:{ok:()=>isOpen('st'),t:`<b>RAIL WARS</b>: new cars from the <b>Car Factory</b> get fuel, a wash and go up on the train. When it is full, <b>SEND</b> it (3 trains a day) for <b>Street Tokens</b>. A higher train grade (Car Wash · Gas Station · Factory levels, or <b>REFRESH</b>) = more tokens. Attack other players' trains (5 a day) and spend your tokens in the <b>STREET SHOP</b>.`},
   classic:{ok:()=>isOpen('ccP'),t:`<b>CLASSIC COLLECTION</b>: buy classic cars with your <b>garage cash</b>. Every car gives tickets over time and makes <b>all heroes stronger</b> – forever.`}};
 setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.tutS!=null&&!progressed())))return;  // not during / before the main tutorial            // only after the main tutorial (done or skipped)
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;

@@ -88,7 +88,9 @@ async function ensureG(env) {
   if (gReady) return; const db = env.DB;
   for (const q of ['ALTER TABLE players ADD COLUMN bmax INTEGER DEFAULT 0', 'ALTER TABLE players ADD COLUMN shadow INTEGER DEFAULT 0',
     'ALTER TABLE players ADD COLUMN sig TEXT', 'ALTER TABLE players ADD COLUMN pw INTEGER DEFAULT 0', 'ALTER TABLE players ADD COLUMN dk TEXT',
-    'ALTER TABLE snaps ADD COLUMN pw INTEGER DEFAULT 0']) { try { await db.prepare(q).run(); } catch (e) {} }
+    'ALTER TABLE snaps ADD COLUMN pw INTEGER DEFAULT 0',
+    'ALTER TABLE players ADD COLUMN gv INTEGER DEFAULT 0',   // v16-275: game version + tutorial step (admin)
+    'ALTER TABLE players ADD COLUMN tu INTEGER DEFAULT -2']) { try { await db.prepare(q).run(); } catch (e) {} }
   await db.batch([
     db.prepare('CREATE TABLE IF NOT EXISTS devs(dk TEXT, pid TEXT, t INTEGER, PRIMARY KEY(dk, pid))'),
     db.prepare('CREATE INDEX IF NOT EXISTS devs_pid ON devs(pid, t)'),
@@ -269,6 +271,7 @@ async function report(b, env) {
     VALUES(?1,?2,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21,?22,?23,?24)
     ON CONFLICT(pid) DO UPDATE SET last=?2,ver=?3,app=?4,money=?5,sold=?6,xp=?7,vip=?8,lv=?9,best=?10,tk=?11,gtk=?12,heroes=?13,stars=?14,mythic=?15,score=?16,banned=?17,reason=COALESCE(?18,reason),flags=?19,bmax=?20,shadow=?21,sig=?22,pw=?23,dk=COALESCE(?24,dk)`)
     .bind(b.pid, now, b.v | 0, b.app | 0, s.money | 0, s.sold | 0, s.xp | 0, s.vip | 0, s.lv | 0, s.best | 0, s.tk | 0, s.gtk | 0, s.heroes | 0, s.stars | 0, s.mythic | 0, score, banned, why.length && pts ? why.join(' · ') : null, flags, bmax, shadow, [...kinds].join(',') || null, Math.round(pwLast) || 0, dk).run();
+  if (b.gv) await db.prepare('UPDATE players SET gv=?, tu=? WHERE pid=?').bind(b.gv | 0, Number.isFinite(+b.tu) ? Math.max(-1, Math.min(999, +b.tu | 0)) : -2, b.pid).run();   // v16-275
   await db.prepare('INSERT INTO snaps(pid,t,money,lv,tk,vip,best,pw) VALUES(?,?,?,?,?,?,?,?)').bind(b.pid, now, s.money | 0, s.lv | 0, s.tk | 0, s.vip | 0, s.best | 0, Math.round(pwLast) || 0).run();
   if (pts) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, banned ? 'ban' : 'flag', why.join(' · ')).run();
   try { await ensureStats(env); await db.prepare('INSERT OR IGNORE INTO seen(day,pid) VALUES(?,?)').bind(parisDay(now), b.pid).run(); } catch (e) {}   // daily stats: who played on which day
@@ -675,6 +678,76 @@ async function giftPage(url, env) {
   return PAGE('Gift', `<h2>✅ ${dm.toLocaleString('en')} 💎 → ${escH(nm)}</h2><div class=c>${g && g.sent ? '📬 It is in his Mail now (he claims it in the game).' : '⏳ Saved. It goes into his Mail the next time he is online.'}</div>${card}<br><br>${back}`);
 }
 
+// ------------------------------------------------------------------ v16-275 (Marius 24 nov): admin – where players stop · purchases € · versions · Mail to ALL
+const TUT_STEPS = ['Welcome', 'Parking', 'Inspection', 'Sales office', 'Tap Service', 'Upgrade', 'Open Summon', 'Summon ×10', 'Close Summon', 'Tap Battle', 'Open Campaign', 'Tap stage', 'FIGHT', 'In the battle', 'Back to the map', 'Daily Quests', 'Idle Rewards', 'Final gift'];
+const tuLabel = v => v === -2 || v == null ? '❔ unknown (left before v16-275)' : v === -1 ? '😶 tutorial never started' : v >= 200 ? '✅ finished' : v >= 100 ? `⏭️ SKIPPED at step ${v - 99} · ${TUT_STEPS[v - 100] || '?'}` : `🚪 QUIT at step ${v + 1} · ${TUT_STEPS[v] || '?'}`;
+const PLAY_EUR = {vip_car:5.99, vip_mechanic:3.99, battle_speed_x2:2.99, vip_pass_monthly:5.99, dungeon_pass_30d:2.99, vip_pass_platinum:9.99, pack_starter:.99, pack_rookie:2.99, pack_pro:5.99, pack_elite:9.99, pack_master:19.99, pack_legend:49.99, pack_titan:99.99,
+  diamonds_300:1.99, diamonds_800:4.99, diamonds_1700:9.99, diamonds_3600:19.99, diamonds_9500:49.99, diamonds_20000:99.99, fund_normal:9.99, fund_hard:9.99, vip_pass_diamond:14.99, founder_pass:4.99, rail_pass_monthly:4.99, gp_silver:4.99, gp_gold:9.99, gp_plat:19.99};
+const eur = n => (Math.round(n * 100) / 100).toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+async function quitHtml(env) {   // players who started in the last 30 days and did not come back for 3+ days: where did they stop?
+  const db = env.DB, now = Date.now(), D = 864e5, e = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const all = (await db.prepare('SELECT best, tu, last, first FROM players WHERE first>? AND banned=0').bind(now - 30 * D).all()).results;
+  const gone = all.filter(p => p.last < now - 3 * D), stay = all.length - gone.length;
+  if (!all.length) return '<h3 id=quit>🚪 Where players stop (new in 30 days)</h3><div class=c>No new players yet.</div>';
+  const tu = {}; for (const p of gone) { const k = p.tu == null ? -2 : p.tu >= 200 ? 200 : p.tu; tu[k] = (tu[k] || 0) + 1; }
+  const BK = [[0, 0, 'no stage won'], [1, 5, '1 – 5'], [6, 10, '6 – 10'], [11, 20, '11 – 20'], [21, 30, '21 – 30 (end of chapter 1)'], [31, 60, '31 – 60'], [61, 120, '61 – 120'], [121, 1e9, '121+']];
+  const bar = (n, t) => `<span style="display:inline-block;height:9px;width:${Math.max(2, Math.round(120 * n / Math.max(1, t)))}px;background:#ffd54a;border-radius:4px;vertical-align:middle"></span>`;
+  const row = (l, n, t) => `<tr style="border-top:1px solid #ffffff14"><td>${l}</td><td style="text-align:right"><b>${n}</b></td><td style="text-align:right">${Math.round(100 * n / Math.max(1, t))}%</td><td>${bar(n, t)}</td></tr>`;
+  const T = '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  return `<h3 id=quit>🚪 Where players stop (new in 30 days)</h3><div class=c>New players: <b>${all.length}</b> · still playing: <b style="color:#7dff8a">${stay}</b> · gone (3+ days away): <b style="color:#ff8a80">${gone.length}</b></div>` + (gone.length ? `
+<div class=c><b>Tutorial of the players who left</b>${T}${Object.keys(tu).map(Number).sort((a, b) => a - b).map(k => row(e(tuLabel(k)), tu[k], gone.length)).join('')}</table></div>
+<div class=c><b>Last campaign stage of the players who left</b>${T}${BK.map(b => [b[2], gone.filter(p => (p.best | 0) >= b[0] && (p.best | 0) <= b[1]).length]).filter(x => x[1]).map(x => row(x[0], x[1], gone.length)).join('')}</table>
+<small>The biggest bar = where the game is too hard, too slow or not clear. The tutorial step is known only for players who played with v16-275 or newer.</small></div>` : '');
+}
+async function buyHtml(env) {   // purchases confirmed by Google: € per day + the last 25
+  const db = env.DB, now = Date.now(), e = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const rs = (await db.prepare("SELECT pid, sku, type, t FROM purchases WHERE state='ok' ORDER BY t DESC").all()).results;
+  if (!rs.length) return '<h3 id=buys>💳 Purchases</h3><div class=c>No purchases yet.</div>';
+  const day = {}, sku = {}; let tot = 0;
+  for (const r of rs) { const v = PLAY_EUR[r.sku] || 0, d = parisDay(r.t); tot += v; (day[d] = day[d] || {n:0, v:0}).n++; day[d].v += v; (sku[r.sku] = sku[r.sku] || {n:0, v:0}).n++; sku[r.sku].v += v; }
+  const NM = await pnames(db, [...new Set(rs.slice(0, 25).map(r => r.pid))]), dt = t => new Date(t).toLocaleString('sv-SE', {timeZone:'Europe/Paris'}).slice(5, 16);
+  const days = Object.keys(day).sort().reverse().slice(0, 14), T = '<table style="width:100%;border-collapse:collapse;font-size:13px">', tr = 'style="border-top:1px solid #ffffff14"';
+  return `<h3 id=buys>💳 Purchases</h3><div class=c>Total: <b style="color:#7dff8a;font-size:16px">${eur(tot)}</b> · ${rs.length} purchases · this month: <b>${eur(rs.filter(r => parisDay(r.t).slice(0, 7) === parisDay(now).slice(0, 7)).reduce((a, r) => a + (PLAY_EUR[r.sku] || 0), 0))}</b>
+<br><small>Shop prices (with VAT). Google keeps 15% and the VAT goes to the state → you get about <b>${eur(tot * .85 / 1.2)}</b>. A subscription counts once, when it is first bought (renewals are not in this list).</small></div>
+<div class=c><b>Per day (Paris time)</b>${T}${days.map(d => `<tr ${tr}><td>${d.slice(5)}</td><td style="text-align:right">${day[d].n}×</td><td style="text-align:right"><b>${eur(day[d].v)}</b></td></tr>`).join('')}</table></div>
+<details class=c><summary><b>Per pack</b></summary>${T}${Object.keys(sku).sort((a, b) => sku[b].v - sku[a].v).map(k => `<tr ${tr}><td>${e(k)}</td><td style="text-align:right">${sku[k].n}×</td><td style="text-align:right"><b>${eur(sku[k].v)}</b></td></tr>`).join('')}</table></details>
+<details class=c><summary><b>Last 25 purchases</b></summary>${rs.slice(0, 25).map(r => `<small>${dt(r.t)}</small> · <a href="?key=${encodeURIComponent(env.ADMIN_KEY)}&p=${encodeURIComponent(r.pid)}"><b style="color:#fff">${e(NM[r.pid] || r.pid.slice(0, 10))}</b></a> · ${e(r.sku)} · <b>${eur(PLAY_EUR[r.sku] || 0)}</b>`).join('<br>')}</details>`;
+}
+async function verHtml(env) {   // game version of the players active in the last 7 days
+  const rs = (await env.DB.prepare('SELECT gv, COUNT(*) n FROM players WHERE last>? GROUP BY gv ORDER BY gv DESC').bind(Date.now() - 7 * 864e5).all()).results;
+  const tot = rs.reduce((a, r) => a + r.n, 0); if (!tot) return '';
+  return `<h3>📦 Game versions (active 7 days)</h3><div class=c>${rs.map(r => `<b>${r.gv ? 'v16-' + r.gv : 'older than v16-275'}</b>: ${r.n} (${Math.round(100 * r.n / tot)}%)`).join('<br>')}<br><small>The web version updates by itself; the app needs the new version from Google Play only when the Android part changes.</small></div>`;
+}
+function bcastForm(key) {
+  const I = 'padding:8px;border-radius:8px;border:0;font-size:15px;box-sizing:border-box';
+  return `<details class=c style="border-color:#ab47bc88"><summary><b style="color:#e1a6ff">📢 Mail to ALL players</b> <small>(announcement or gift after a bug)</small></summary><form style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><input type=hidden name=key value="${escH(key)}"><input type=hidden name=bc value=1>
+<input name=title required maxlength=60 placeholder="Title (e.g. Sorry for the bug!)" style="${I};flex:1 1 100%"><textarea name=msg required maxlength=800 rows=3 placeholder="Message" style="${I};flex:1 1 100%"></textarea>
+<input name=dm type=number min=0 max=100000 placeholder="💎" style="${I};flex:1 1 22%"><input name=tk type=number min=0 max=100 placeholder="🎟️ Recruit" style="${I};flex:1 1 22%"><input name=gt type=number min=0 max=100 placeholder="⚙️ Gear" style="${I};flex:1 1 22%"><input name=ct type=number min=0 max=100 placeholder="🎖️ Crew" style="${I};flex:1 1 22%">
+<select name=srv style="${I};flex:1 1 100%"><option value=0>All servers</option><option value=1>Server 1</option><option value=2>Server 2</option><option value=3>Server 3</option></select>
+<button style="padding:8px 14px;border-radius:8px;border:0;background:#ab47bc;color:#fff;font-weight:bold;flex:1 1 100%">PREVIEW →</button><small>Everybody with an online profile gets it in MAIL (you confirm on the next page). Torque Guard counts mail diamonds → nobody is flagged.</small></form></details>`;
+}
+async function bcastPage(url, env) {
+  const db = env.DB, key = env.ADMIN_KEY, k = encodeURIComponent(key), P = url.searchParams, back = `<a href="/admin?key=${k}">← back</a>`;
+  await db.prepare('CREATE TABLE IF NOT EXISTS bcast(id INTEGER PRIMARY KEY AUTOINCREMENT, nonce TEXT UNIQUE, t INTEGER, srv INTEGER, title TEXT, body TEXT, rw TEXT, n INTEGER)').run();
+  const title = (P.get('title') || '').trim().slice(0, 60), msg = (P.get('msg') || '').trim().slice(0, 800), srv = Math.max(0, Math.min(99, P.get('srv') | 0));
+  const n = (x, m) => Math.max(0, Math.min(m, Math.floor(+P.get(x) || 0))), rw = {}; const dm = n('dm', 100000), tk = n('tk', 100), gt = n('gt', 100), ct = n('ct', 100);
+  if (dm) rw.dm = dm; if (tk) rw.tk = tk; if (gt) rw.gt = gt; if (ct) rw.ct = ct;
+  const hist = (await db.prepare('SELECT * FROM bcast ORDER BY id DESC LIMIT 10').all()).results, dt = t => new Date(t).toLocaleString('sv-SE', {timeZone:'Europe/Paris'}).slice(5, 16);
+  const histH = hist.length ? `<div class=c><b>Sent before</b><br>${hist.map(h => `<small>${dt(h.t)} · ${h.srv ? 'server ' + h.srv : 'all'} · ${h.n} players</small> <b>${escH(h.title)}</b> <small>${escH(h.rw)}</small>`).join('<br>')}</div>` : '';
+  if (!title || !msg) return PAGE('Mail to all', back + '<div class=c>Write a title and a message.</div>' + histH);
+  const who = srv ? db.prepare('SELECT COUNT(*) n FROM prof WHERE srv=?').bind(srv) : db.prepare('SELECT COUNT(*) n FROM prof');
+  const cnt = ((await who.first()) || {n:0}).n, rwT = [dm && dm.toLocaleString('en') + ' 💎', tk && tk + ' Recruit', gt && gt + ' Gear', ct && ct + ' Crew'].filter(Boolean).join(' + ') || 'no gift (only a message)';
+  const nonce = P.get('nonce');
+  if (!nonce) { const nn = crypto.randomUUID(), q = new URLSearchParams(P); q.set('nonce', nn);
+    return PAGE('Mail to all', back + `<div class=c style="border-color:#ab47bc"><h2>📢 Send to ${cnt.toLocaleString('en')} players${srv ? ' (server ' + srv + ')' : ''}?</h2><b>${escH(title)}</b><br>${escH(msg).replace(/\n/g, '<br>')}<br><br>🎁 ${rwT}<br><br><a href="/admin?${q}" style="display:inline-block;padding:10px 18px;border-radius:10px;background:#ab47bc;color:#fff;font-weight:800;text-decoration:none">✅ YES, SEND TO EVERYBODY</a></div>` + histH); }
+  const ins = await db.prepare('INSERT OR IGNORE INTO bcast(nonce,t,srv,title,body,rw,n) VALUES(?,?,?,?,?,?,?)').bind(nonce.slice(0, 64), Date.now(), srv, title, msg, JSON.stringify(rw), cnt).run();
+  if (!ins.meta || !ins.meta.changes) return PAGE('Mail to all', back + '<div class=c>✅ Already sent (the page was opened again – nothing sent twice).</div>' + histH);
+  const now = Date.now(), R = JSON.stringify(rw);
+  if (srv) await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) SELECT uid,?,?,?,?,? FROM prof WHERE srv=?').bind(now, '📢', title, msg, R, srv).run();
+  else await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) SELECT uid,?,?,?,?,? FROM prof').bind(now, '📢', title, msg, R).run();
+  return PAGE('Mail to all', back + `<div class=c style="border-color:#7dff8a"><h2>✅ Sent to ${cnt.toLocaleString('en')} players</h2>It is in their MAIL now. 🎁 ${rwT}</div>` + histH);
+}
+
 // ------------------------------------------------------------------ admin page (open it on your phone)
 async function admin(url, env) {
   if (!env.ADMIN_KEY || url.searchParams.get('key') !== env.ADMIN_KEY) return new Response('no', {status:403});
@@ -705,7 +778,8 @@ async function admin(url, env) {
 <a href="/admin?key=${k}&p=${encodeURIComponent(rst)}">← back</a><div class=c><h2>🔄 RESET “${e3(nm)}”?</h2>Everything goes back to 0: local save on the phone, cloud save, rankings, Arena, chat messages, Mail.<br>VIP Passes are removed. The other paid packs stay (VIP mechanic, VIP car…).<br>The phone starts a <b>NEW GAME</b> the next time the game is open and online.<br><a class=b href="/admin?key=${k}&reset=${encodeURIComponent(rst)}&ok=1">YES, RESET</a></div>`, {headers:{'content-type':'text/html;charset=utf-8'}});
     await wipePlayer(env, rst);
     return new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>body{font-family:system-ui;background:#0b1019;color:#eee;padding:16px}a{color:#9fd3ff}</style><h2>✅ “${e3(nm)}” reset</h2><p>New game at the next start (game open + internet).</p><a href="/admin?key=${k}">← back to admin</a>`, {headers:{'content-type':'text/html;charset=utf-8'}}); }
-  if (url.searchParams.has('gift')) return giftPage(url, env);   // v16-233b: 💎 SEND DIAMONDS (asks first)
+  if (url.searchParams.has('gift')) return giftPage(url, env);
+  if (url.searchParams.has('bc')) return bcastPage(url, env);   // v16-275: 📢 Mail to ALL players (asks first)   // v16-233b: 💎 SEND DIAMONDS (asks first)
   if (url.searchParams.get('p')) return playerCard(url, env, url.searchParams.get('p'));
   const q = (url.searchParams.get('q') || '').trim().toLowerCase().slice(0, 20);   // v16-179: search a player by name
   if (q) { let rs = []; try { rs = (await db.prepare('SELECT pid,name,best,lv,t FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 30').bind('%' + q + '%').all()).results; } catch (e) {}
@@ -740,6 +814,7 @@ async function admin(url, env) {
   const errs = await errList(env);   // v16-263
   const tks = (await db.prepare('SELECT * FROM tickets WHERE st=0 OR t>? ORDER BY st, t DESC LIMIT 40').bind(Date.now() - 3 * 864e5).all()).results;   // v16-265
   const TN = await pnames(db, tks.map(t => t.pid));
+  let quitH = '', buyH = '', verH = ''; try { quitH = await quitHtml(env); } catch (e) { quitH = '<div class=c>quit stats: ' + escH(String(e)) + '</div>'; } try { buyH = await buyHtml(env); } catch (e) {} try { verH = await verHtml(env); } catch (e) {}   // v16-275
   const TC = {bug:'🐞 Bug', buy:'💳 Purchase', acc:'👤 Account', pl:'🚩 Player', idea:'💡 Idea', oth:'❓ Other'};
   const stats = !st ? '' : `<h3>📊 Players per day (Paris time)</h3><div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
 <div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th></tr>${st.days.map(x => { const r = st.ret[x];
@@ -747,8 +822,9 @@ async function admin(url, env) {
 <small>“Active” is counted from the day this update went live (older days show “–”). “New” works for the past too (players inactive 180+ days are removed).</small></div>`;
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
-<h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>${giftForm(env.ADMIN_KEY, '')}<div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
+<h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>${giftForm(env.ADMIN_KEY, '')}${bcastForm(env.ADMIN_KEY)}<div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
 ${stats}
+${quitH}${buyH}${verH}
 <h3 id=sup>🆘 Support (${tks.filter(t => !t.st).length} open)</h3>${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
   return `<div class=c style="${t.st ? 'opacity:.55' : 'border-color:#ff8a80'}"><b>${TC[t.cat] || t.cat}</b> · <a href="?key=${k}&p=${encodeURIComponent(t.pid)}"><b style="color:#fff">${esc(TN[t.pid] || I.name || '(no name)')}</b></a> <small>${d(t.t)} · v${I.cv || '?'} · ${esc(I.g || '')} · S${I.srv || '?'}</small><br>${esc(t.txt)}<br><small>${esc(String(I.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>
   ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}

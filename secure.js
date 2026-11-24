@@ -160,6 +160,7 @@ async function report(force){
     s:{money:Math.round(G.money), sold:G.sold, xp:G.xp, vip:G.vip, lv:Object.keys(G.lv).reduce((a,k)=>a+(k==="rail"?0:G.lv[k]),0), best:G.cp?G.cp.best:0,
        tk:G.h.tk, gtk:(G.gear&&G.gear.tk)||0, heroes:own.length, stars:own.reduce((a,id)=>a+(G.h.own[id].s||0),0), mythic:own.filter(id=>t.HB[id]&&t.HB[id].gr===5).length},
     flags:[...flags], pids:PIDS,
+    gv:window.TE_CV|0, tu:G.tut?(G.tutK?99+G.tutK:200):(G.tutS==null?-1:G.tutS|0),   // v16-275: game version + tutorial step (admin: where players stop)
     dk:DK, sid:SID, rc:RC.slice(-60), lg:Object.assign({}, GAIN),   // v16-157: install key, battle receipts, ledger (gains since the last report)
     // v16-104: packs this phone says it owns – the server compares them with the purchases Google confirmed
     pk:Object.keys(t.PK||{}).filter(k=>SKU[k] && !CONS(k) && (SUBS(k) ? +t.PK[k] > Date.now() : t.PK[k]===true))};

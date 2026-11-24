@@ -728,7 +728,7 @@ export async function online(op, b, env) {
   }
   if (op === 'chat') {
     const ch = b.ch === 'a' ? 'a' : 'w', lang = langOf(b.lang), since = b.since | 0;
-    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv, p.unl FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.sys<>2 AND c.id>? ORDER BY c.id DESC LIMIT 40`   // v16-273 (Marius 24 nov): Mythic / Ascended announcements = only the banner on top, no longer in the chat)
+    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv, p.unl FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.sys<>2 AND c.id>? ORDER BY c.id DESC LIMIT 40`)   // v16-273 (Marius 24 nov): Mythic / Ascended announcements = only the banner on top, no longer in the chat
       .bind(p.srv, ch, since).all()).results.reverse();
     const todo = rows.filter(m => !m.sys && m.lang !== lang && b.tr !== false && !JSON.parse(m.tr || '{}')[lang]).slice(-12);
     await Promise.all(todo.map(async m => { const t = await translate(env, m.txt, m.lang, lang); if (t === null) return; const tr = JSON.parse(m.tr || '{}'); tr[lang] = t; m.tr = JSON.stringify(tr);
