@@ -693,7 +693,7 @@ export async function online(op, b, env) {
     if (team.length) await db.prepare('INSERT OR IGNORE INTO arena(uid,srv,season,pts,w,l,tk,tkt,opp,peak,t) VALUES(?,?,?,?,0,0,?,?,?,?,0)').bind(p.uid, p.srv, seasonOf(now), START_PTS, ARENA_TK, now, '[]', START_PTS).run();
     await giftDm(env, b.pid, p.uid);   // v16-162
     const inbox = (await db.prepare('SELECT COUNT(*) n FROM inbox WHERE uid=? AND got=0').bind(p.uid).first()).n;
-    const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0').bind(p.srv, 'w').first();
+    const last = await db.prepare('SELECT MAX(id) id FROM chat WHERE srv=? AND ch=? AND hid=0 AND sys<>2').bind(p.srv, 'w').first();
     const ar = await db.prepare('SELECT tk, tkt, season FROM arena WHERE uid=?').bind(p.uid).first();
     const atk = ar ? (ar.season !== seasonOf(now) ? ATK(p) : Math.min(ATK(p), ar.tk + Math.floor((now - ar.tkt) / TK_EVERY))) : ATK(p);
     return {ok:true, me:pub(p, {chg:p.chg, unl:[...unlocks(p)], named:!p.name.startsWith('Mechanic'), vip:p.vip | 0, hv:p.hv | 0}), inbox, chatLast:last && last.id || 0, arenaTk:atk, time:now, gp0:gpT0(p.srv) || undefined, gp1:gpT0(p.srv) ? await gpEnd(env, p.srv) : undefined, pat:await patList(env, p.srv), ann:await annList(env, p.srv, b.annId)};
@@ -728,7 +728,7 @@ export async function online(op, b, env) {
   }
   if (op === 'chat') {
     const ch = b.ch === 'a' ? 'a' : 'w', lang = langOf(b.lang), since = b.since | 0;
-    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv, p.unl FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.id>? ORDER BY c.id DESC LIMIT 40`)
+    const rows = (await db.prepare(`SELECT c.*, p.name, p.icon, p.frame, p.title, p.cc, p.vip, p.hv, p.unl FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.srv=? AND c.ch=? AND c.hid=0 AND c.sys<>2 AND c.id>? ORDER BY c.id DESC LIMIT 40`   // v16-273 (Marius 24 nov): Mythic / Ascended announcements = only the banner on top, no longer in the chat)
       .bind(p.srv, ch, since).all()).results.reverse();
     const todo = rows.filter(m => !m.sys && m.lang !== lang && b.tr !== false && !JSON.parse(m.tr || '{}')[lang]).slice(-12);
     await Promise.all(todo.map(async m => { const t = await translate(env, m.txt, m.lang, lang); if (t === null) return; const tr = JSON.parse(m.tr || '{}'); tr[lang] = t; m.tr = JSON.stringify(tr);

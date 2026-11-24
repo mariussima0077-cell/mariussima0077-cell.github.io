@@ -183,6 +183,9 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-273 (24 nov 2026) – anunțurile MYTHIC / ASCENDED nu mai apar în chat
+- Doar banner-ul auriu sus pe ecran (~6,5 s) pentru tot serverul; chatul WORLD nu le mai arată (server: `c.sys<>2`). Patronii Grand Prix rămân în chat (sys=1).
+
 ## ✅ v16-272 (24 nov 2026) – erori de joc: stack + status OPEN / 👍 DONE în /admin
 - Jocul trimite acum și stack-ul (primele 4 rânduri) și linia REALĂ a erorii (nu linia de re-throw 4629 din `frame()`).
 - /admin „🐞 Game errors”: fiecare eroare are 🔧 OPEN (de reparat) sau ↩️ CAME BACK; butonul 👍 DONE (cu confirmare) o ascunde după ce e rezolvată.
