@@ -1251,7 +1251,7 @@ const SPK=.37,SPCELL=192;
 for(const id in SPRD)SPRD[id].id=id;
 // v16-107: skill sheets/booms are decoded in the background (off the main thread) at battle start → the first ultimate no longer stutters
 function warmIm(im){if(!im||!im.decode)return;const d=()=>{im.decode().catch(()=>{});};if(im.complete&&im.naturalWidth)d();else im.addEventListener('load',d,{once:true});}
-function sprLoad(d){if(!d.im){if(WIDE8[d.id])wideImg(d.id);if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
+function sprLoad(d){if(!d.im){if(WIDE8[d.id])wideImg(d.id);if(ALLY8[d.id])allyImg(d.id);if(ALLY8[d.id+'r'])allyImg(d.id+'r');if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
 // v16-94: draws frame (r,c) of a sprite at the feet point (0,0), k = screen units per 256-cell unit. v8 = 8 frames per row, each row its own height
 function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.im,c*v.cw,R[0],v.cw,R[1],-v.ax*k,-R[3]*k,v.uw*k,R[2]*k);return;}
   const w=d.w||256,cw=w*SPCELL/256;X.drawImage(d.im,c*cw,r*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);}
@@ -2050,6 +2050,9 @@ const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
 const WIDE8={m5_0:'img/fx/wide_m5_0.webp',m5_1:'img/fx/wide_m5_1.webp',m5_2:'img/fx/wide_m5_2.webp',m5_3:'img/fx/wide_m5_3.webp',m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp'},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
+// v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
+const ALLY8={m5_0:'img/fx/ally_m5_0.webp',m5_1:'img/fx/ally_m5_1.webp',m5_2:'img/fx/ally_m5_2.webp',m5_2r:'img/fx/ally_m5_2r.webp'},ALLYI={};function allyImg(id){if(!ALLY8[id])return null;let i=ALLYI[id];if(!i){i=ALLYI[id]=new Image();i.decoding='async';i.src=ALLY8[id];}return i;}
+function allyFx(id,hs,d){const im=allyImg(id);if(!im||!im.naturalWidth)return false;let k=0;for(const h of (hs||alive(B.heroes)))B.fx.push({type:'ally8',t:-(k++)*.06,d:d||1.3,im,u:h});return true;}
 function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
 function pushWide(u,ta,o){if(!WD(u))return false;B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
 // v16-ready (24 nov, Marius): ULTIMATE READY – looping ground aura (16 frames, 4x4) under a Mythic while his ultimate is charged;
@@ -2136,7 +2139,7 @@ const SKF={
    castAct(u,wd?1.0:.85,()=>{for(const m of alive(B.mons))B.fx.push({type:'gear',x:m.x+rnd(-10,10),tgt:m,y0:-40,t:wd?-rnd(0,.12):-rnd(0,.5),d:wd?.42:.55,src:u,r:rnd(15,21)*S,mult:3.2,hide:!!wd});
    if(!wd)for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
    const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:wd?-.35:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(!wd&&u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
-   teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});});},
+   teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});allyFx('m5_0');});},
  m5_3(u){ // v16-132: Goliath's IRON FORTRESS – the hex shield (fxs) falls on the biggest group; impact (fxs frame 4) = end of his slam (skill frame 5 = dome) = damage + stun; he taunts with a big shield, the team gets shields + less damage
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
    const wd=c&&pushWide(u,.72,{dd:c.d});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
@@ -2173,12 +2176,13 @@ const SKF={
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(12);B.flash=.35;
      for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ff9100',40*S);}
      if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff9100',110*S);}
-     const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);if(f8)B.fx.push({type:'sheet8',t:-.1,d:.96,sp:u.spr,x:d.x,dd:d.d});else B.fx.push({type:'ring',x:d.x,y:fy(d.d),t:0,d:.6,r:60*S,col:'#ff9100',ground:1});}}
+     const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);if(allyImg('m5_2r')&&allyImg('m5_2r').naturalWidth){d.rvFx=1;allyFx('m5_2r',[d],1.7);}else if(f8)B.fx.push({type:'sheet8',t:-.1,d:.96,sp:u.spr,x:d.x,dd:d.d});else B.fx.push({type:'ring',x:d.x,y:fy(d.d),t:0,d:.6,r:60*S,col:'#ff9100',ground:1});}}
+     allyFx('m5_2',alive(B.heroes).filter(h=>!h.rvFx),1.5);for(const h of B.heroes)h.rvFx=0;
      for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
  m5_1(u){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0],wdl=c0&&pushWide(u,(WD(u)?.75:.45)+Math.max(0,(c0.x-u.x)/(1100*S)),{dd:c0.d});castAct(u,wdl?.75:.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
    if(u.spr&&u.spr.fx8&&!wdl){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
-   teamBuff({aspd:6,aspdK:.3,crit:6,col:'#ff5252',txt:'OVERDRIVE!'});});}};
+   teamBuff({aspd:6,aspdK:.3,crit:6,col:'#ff5252',txt:'OVERDRIVE!'});allyFx('m5_1');});}};
 
 // ---------------------------------------------------------------- monster specials
 function monSpecial(m,dt){const hs=alive(B.heroes);if(!hs.length)return false;
@@ -2619,6 +2623,8 @@ function drawFx(t){
     else if(f.type==='oil'){const u=f.u;if(!u.dead){const [x,y]=sxy(u);for(let i=0;i<6;i++){const p=(k*1.4+i*.17)%1;g.globalAlpha=1-p;g.fillStyle=i%2?'#69f0ae':'#b9f6ca';circ(g,x+Math.sin(i*2.1)*14,y-90*dsc(u.d)+p*70*dsc(u.d),2.5);}
       g.globalAlpha=(1-k)*.5;g.fillStyle='#69f0ae';ell(g,x,y,26,7);}}
     else if(f.type==='plus'){const u=f.u;const [x,y]=sxy(u);g.globalAlpha=1-k;g.fillStyle=f.col||'#69f0ae';g.font='900 14px Game,system-ui';g.textAlign='center';g.fillText('✚',x+8,y-70*dsc(u.d)-k*20);}
+    else if(f.type==='ally8'){const h=f.u,im=f.im;if(h&&!h.dead&&im&&im.naturalWidth){const fw=im.naturalWidth/4,fh=im.naturalHeight/2,w=118*S*dsc(h.d),hh=w*fh/fw,q=Math.min(7.999,k*8),c=Math.floor(q),fr=q-c,x=h.x-w/2,y=fy(h.d)-(h.lift||0)-hh*(1-90/512);
+      g.globalAlpha=c<7?1-fr*fr:1;g.drawImage(im,(c%4)*fw,Math.floor(c/4)*fh,fw,fh,x,y,w,hh);if(c<7&&fr>0){g.globalAlpha=Math.min(1,fr*1.6);g.drawImage(im,((c+1)%4)*fw,Math.floor((c+1)/4)*fh,fw,fh,x,y,w,hh);}}}
     else if(f.type==='wide8'&&f.beam){const im=f.im,u=f.u;if(im&&im.naturalWidth&&u){const [bx,by]=muzzle(u,40,40),fw=im.naturalWidth,fh=im.naturalHeight/8,w=Math.max(60*S,W+30*S-bx),h=w*fh/fw*1.15,
       q=Math.min(7.999,f.t<f.ta?4*f.t/f.ta:4+4*(f.t-f.ta)/f.tb),c=Math.floor(q),fr=q-c,A=k>.93?(1-k)/.07:1;
       g.globalAlpha=A*(c<7?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,bx-6*S,by-h/2,w,h);if(c<7&&fr>0){g.globalAlpha=A*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,bx-6*S,by-h/2,w,h);}}}
