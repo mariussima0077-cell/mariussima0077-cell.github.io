@@ -1041,7 +1041,7 @@ html body .dgPS span{font-size:10px!important}
 #hud .hBump{animation:hBump .45s ease-out}
 @keyframes hBump{0%{transform:scale(1)}35%{transform:scale(1.22)}100%{transform:scale(1)}}
 body #side2{top:max(60px,calc(min(100vw - 8px,620px)*316/2162 + 9px))}
-#hud.hLow #hudSh,#hud.hLow #hudAv:after{display:none}
+#hud.hLow #hudSh,#hud.hLow #hudAv:after{display:none}#hud.hLow #hudVip,#hud.hLow #shopBtn{animation:none}
 @media (prefers-reduced-motion:reduce){#hud *,#hud *:before{animation:none!important}}
 </style>
 </head>
@@ -4449,7 +4449,7 @@ function bayMB(c){return c.slot&&c.slot.kind==='bay'?mechBonus(c.slot.st,c.slot.
 heroRefresh();
 
 // =================== HUD ===================
-let lastM=-1,lastS=-1,lastX=-1,lastDm=-1;let lastVL=-1;setTimeout(()=>{window._hI=1;if(window.GFX&&GFX.eff==='low')$('hud').classList.add('hLow');},4000);
+let lastM=-1,lastS=-1,lastX=-1,lastDm=-1;let lastVL=-1;{const lo=()=>{if(window.GFX&&GFX.eff==='low')$('hud').classList.add('hLow');else $('hud').classList.remove('hLow');};lo();setInterval(lo,3000);}setTimeout(()=>{window._hI=1;},4000);
 let lastV=-1,lastQ=-1;
 let lastTk=-1,lastIdle=-1;
 // v16-120: GRADUAL UNLOCK of the map buttons (Marius: a new player must not see everything at once). Battle, Heroes, Summon, Idle,
