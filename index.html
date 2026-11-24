@@ -1015,17 +1015,16 @@ html body .dgPS span{font-size:10px!important}
 <style>/* v16-286 (Marius 24 nov): NEW TOP BAR – one piece img/ui2/hud2.webp (2162x316 → 1300x190): avatar + frame in the left ring, NAME, VIP badge, TITLE, then money · diamonds · REP · cars · shop. Big text + a few light CSS animations (transform/opacity only). */
 #hud{height:62px;padding:3px 4px 0;align-items:flex-start}
 #hud #hudBar{width:min(100%,620px);aspect-ratio:2162/316;max-height:none;background-image:url(img/ui2/hud2.webp)}
-#hud #hudAv{position:absolute;left:6.5%;top:51%;height:102%;width:auto;aspect-ratio:58/62;margin:0;transform:translate(-50%,-50%);z-index:3}
-#hud #hudAv:after{content:"";position:absolute;inset:-6%;border-radius:22%;box-shadow:0 0 7px 2px #ffd54a;opacity:0;z-index:-1;animation:hAvG 3.2s ease-in-out infinite;will-change:opacity}
+#hud #hudAv{position:absolute;left:6.2%;top:50%;height:90%;width:auto;aspect-ratio:58/62;margin:0;transform:translate(-50%,-50%);z-index:3}
 #hud #hudAv:active{transform:translate(-50%,-50%) scale(.93)}
 @keyframes hAvG{0%,100%{opacity:0}50%{opacity:.8}}
-#hud #hudNm{left:14.2%;width:17%;top:20.6%;height:29.1%;display:block;text-align:center;overflow:hidden;font:400 21cqh/29.1cqh Lilita,Game,system-ui;color:#fff;letter-spacing:0;pointer-events:auto;cursor:pointer}
-#hud #hudEd{left:29.9%;width:3.1%;top:6%;height:30%;z-index:4;background:#1b2430;display:flex;align-items:center;justify-content:center;font:normal 18cqh/1 system-ui;pointer-events:auto;cursor:pointer;border-radius:50%;box-shadow:0 0 0 1.5px #ffd54a,0 2px 3px #000}#hud #hudEd:active{transform:scale(.85)}
+#hud #hudNm{left:14.2%;width:14.6%;top:20.6%;height:29.1%;display:block;text-align:center;overflow:hidden;font:400 21cqh/29.1cqh Lilita,Game,system-ui;color:#fff;letter-spacing:0;pointer-events:auto;cursor:pointer}
+#hud #hudEd{left:28.9%;width:2.4%;top:22%;height:26%;display:flex;align-items:center;justify-content:center;font:normal 17cqh/1 system-ui;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 1px 1px #000)}#hud #hudEd:active{transform:scale(.85)}
 #hud #hudVip{left:13.64%;width:4.49%;top:52.5%;height:29%;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;animation:hVip 2.6s ease-in-out infinite}
 #hud #hudVip img{height:118%;width:auto;filter:drop-shadow(0 1px 2px #000)}
-#hud #hudVip.h0{opacity:.35}
+#hud #hudVip.h0{opacity:.6}#hud #hudVip b{font:400 15cqh/1 Lilita,Game,system-ui;color:#c9d3dd;text-align:center;text-shadow:0 1px 0 #000}
 @keyframes hVip{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-#hud #hudTt{left:19.4%;width:11.8%;top:57%;height:20.6%;display:block;text-align:center;overflow:hidden;font:400 15cqh/20.6cqh Lilita,Game,system-ui;letter-spacing:.4px;color:#cfd8e3;pointer-events:auto;cursor:pointer}
+#hud #hudTt{left:19.4%;width:11.8%;top:57%;height:20.6%;display:block;text-align:center;overflow:hidden;font:400 17cqh/20.6cqh Lilita,Game,system-ui;letter-spacing:0;color:#cfd8e3;pointer-events:auto;cursor:pointer}
 #hud #hudTt.t5{color:#ff7a52}#hud #hudTt.t4{color:#ffd54a}#hud #hudTt.t3{color:#e0a0ff}#hud #hudTt.t2{color:#8fd0ff}#hud #hudTt.t1{color:#7dff8a}
 #hud #money,#hud #dmH,#hud #sold{top:30%;height:36%;transform:none;display:flex;align-items:center;justify-content:center;font:400 27cqh/1 Lilita,Game,system-ui;letter-spacing:.2px}
 #hud #money{left:38.2%;width:8.9%}#hud #dmH{left:52.8%;width:7.6%}#hud #sold{left:81.7%;width:7.6%}
@@ -1041,7 +1040,7 @@ html body .dgPS span{font-size:10px!important}
 #hud .hBump{animation:hBump .45s ease-out}
 @keyframes hBump{0%{transform:scale(1)}35%{transform:scale(1.22)}100%{transform:scale(1)}}
 body #side2{top:max(60px,calc(min(100vw - 8px,620px)*316/2162 + 9px))}
-#hud.hLow #hudSh,#hud.hLow #hudAv:after{display:none}#hud.hLow #hudVip,#hud.hLow #shopBtn{animation:none}
+#hud.hLow #hudSh{display:none}#hud.hLow #hudVip,#hud.hLow #shopBtn{animation:none}
 @media (prefers-reduced-motion:reduce){#hud *,#hud *:before{animation:none!important}}
 </style>
 </head>
