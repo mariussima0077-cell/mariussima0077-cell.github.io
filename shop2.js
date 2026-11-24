@@ -263,7 +263,8 @@ function render(){
     // v16-282 (Marius 24 nov): VIP Truck, VIP Crew Boost and Battle Speed ×3 are no longer sold – players who bought them keep them (OWNED)
     // v16-290 (Marius 24 nov): NO forever packs for sale any more (Founder too) – only passes, funds, diamonds and one-time packs. Owners still see what they have (OWNED ✓).
     const fvOwn=['fdr','car','vip','spd2'].filter(k=>pk[k]);
-    if(fvOwn.length) h+='<div class="sec">YOUR FOREVER PACKS</div>'+[
+    // v16-295 (Marius 24 nov): the YOUR FOREVER PACKS list is removed from the Shop – owners keep the effects, nothing is shown
+    if(0&&fvOwn.length) h+='<div class="sec">YOUR FOREVER PACKS</div>'+[
       ...(NEWP()?[['fdr','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99']]:[]),
       ['fdr_old','shop/founder','Founder Pass','Forever: Battle Speed ×3 + the FOUNDER frame &amp; title on your profile (ranking, chat, Arena).','€4.99'],
       ['car','ui3/sp_truck','VIP Truck · Rich Clients','Forever: rich clients, priority in every garage, pay ×2.','€5.99'],

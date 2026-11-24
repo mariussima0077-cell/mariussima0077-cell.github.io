@@ -991,8 +991,8 @@ function setBlock(k,n,L,cur){if(!L||!L.length)return '<div class="setBl"><div><s
   `<div class="${same?'on':''}"><b style="font-size:11px!important">×${SET_SAME}</b><span>All set pieces the same grade${same?'':' (not yet)'}</span><i>${same?'✓':'🔒'}</i></div></div>`;}
 // v16-51: HERO COLLECTION = battle bonus (replaces the old Mechanics collection income bonus). Complete a color → all battle heroes get it
 const CBON=[[['hp',5]],[['atk',5]],[['def',8]],[['hp',8]],[['atk',10]],[['hp',8],['atk',8],['def',8]]]; // v16-161 (Marius): stronger (was 3/3/5/5/6/5)
-// v16-161 (Marius): STAR COLLECTION – when ALL battle heroes of a grade reach a step, every battle hero gets the bonus (Common–Epic: +5…+50 · Legendary: +2…+10 · Mythic: Awakened I…V)
-const SC_TH=[[5,10,20,30,40,50],[5,10,20,30,40,50],[5,10,20,30,40,50],[5,10,20,30,40,50],[2,4,6,8,10],[1,2,3,4,5]];
+// v16-161 (Marius): STAR COLLECTION – when ALL battle heroes of a grade reach a step, every battle hero gets the bonus (Common–Epic: +5…+50 · Legendary: +3…+15 · Mythic: Awakened I…V)
+const SC_TH=[[5,10,20,30,40,50],[5,10,20,30,40,50],[5,10,20,30,40,50],[5,10,20,30,40,50],[3,6,9,12,15],[1,2,3,4,5]]; // v16-301: Legendary max +15
 const SC_B=[[['hp',[1,1,2,2,2,3]]],[['atk',[1,1,2,2,2,3]]],[['def',[2,2,2,3,3,3]]],[['crit',[1,1,1,1,1,2]]],[['atk',[3,3,4,4,6]],['hp',[3,3,4,4,6]]],[['atk',[3,3,4,5,5]],['hp',[3,3,4,5,5]],['def',[3,3,4,5,5]]]];
 function scInfo(){const T=TE(),L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon);return [0,1,2,3,4,5].map(gr=>{const a=L.filter(h=>h.gr===gr),v=a.map(h=>{const o=T.G.h.own[h.id];return !o?-1:gr===5?T.mTier(o.s):o.s;}),mn=a.length?Math.min(...v):-1;
   return {gr,tot:a.length,mn,steps:SC_TH[gr].filter(t=>mn>=t).length,next:SC_TH[gr].find(t=>mn<t),low:a.filter((h,i)=>v[i]===mn).length};});}
