@@ -61,23 +61,34 @@ let lv0=0,tk0=0,hc0=0,best0=0;
 // v16-122 (Marius): a BIG gift at the end so players don't skip – announced in the first bubble
 const GIFT={dm:1000,tk:10};
 const giftH=()=>`<div class="gift"><span>${TE().DMI} ${GIFT.dm}</span><span>${X().TKI()} ${GIFT.tk}</span><span><img class="tki" src="img/cticket.webp"> ${GIFT.tk}</span><span><img class="tki" src="img/gticket.webp"> ${GIFT.tk}</span></div>`;
+// v16-292 (Marius 24 nov): NEW OPENING – a WOW fight with 7 borrowed Mythics → free Summon ×10 (a LEGENDARY guaranteed) → first battle →
+// Gear Summon ×10 (the full EPIC set of that Legendary's class, put on him) → then the garage tour.
+let DEMO=0;
+const legN=()=>{try{const h=TE().HB[G.tutHero];return h?h.n:'your Legendary';}catch(e){return 'your Legendary';}};
+const closeAll=()=>{try{const p=$('cpPop');if(p)p.classList.remove('open');}catch(e){}try{if(isOpen('res')){const r=$('res');r.classList.remove('open');}}catch(e){}try{const b=document.querySelector('#smBox [data-a="back"]');if(isOpen('sm')&&b)b.click();}catch(e){}};
 const S=[
  {t:()=>`Welcome to <b>TORQUE EMPIRE</b>, boss! I'm Mama Rosa, your chief mechanic. Let me show you around – it only takes a minute.<br><b>Finish the tutorial for a big gift:</b>`+giftH(),next:'LET\'S GO'},
- {w:'parking',t:`Customer cars arrive here, at the <b>ARRIVAL PARKING</b>. Valet drivers take them to the workshops by themselves.`,next:'NEXT'},
- {w:'inspect',t:`<b>INSPECTION</b> checks every car and decides what must be repaired and which workshop it visits.`,next:'NEXT'},
- {w:'office',t:`When a car is fixed, the <b>SALES OFFICE</b> sells it and you get the money. It all runs by itself – even while you are away!`,next:'NEXT'},
- {w:'service',tap:1,t:`Upgrades make your garage faster and richer. <b>Tap the SERVICE workshop.</b>`,done:()=>isOpen('sheet')&&sel0()==='service'},
- {el:()=>$('shBtn'),tap:1,enter:function(){lv0=G.lv.service||0;this.next=FORCE?'NEXT':'';if(!FORCE){try{const n=X().upHave('service'),c=upCost();if(n<c){X().upGive('service',c-n);save();}}catch(e){}}},t:()=>`Tap <b>UPGRADE</b>: more mechanics, faster work and bigger pay. Buildings are upgraded with <b>PARTS</b> (not money) – you get them from battles, salvage and Idle Rewards.`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>(G.lv.service||0)>lv0},
- {el:()=>$('smBtn'),tap:1,enter:()=>{try{closePanel();}catch(e){}},t:`Your mechanics are also <b>HEROES</b>! Open <b>SUMMON</b> – you have free Recruit Tickets.`,done:()=>isOpen('sm')},
- {el:()=>document.querySelector('#smBox [data-a="sum"][data-n="10"]')||document.querySelector('#smBox [data-a="sum"]'),tap:1,enter:function(){tk0=G.h.tk;hc0=(G.h.hist||[]).length;this.next=FORCE?'NEXT':'';},t:()=>`Tap <b>×10</b> to recruit 11 heroes at once!`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>G.h.tk<tk0||(G.h.hist||[]).length!==hc0||isOpen('res')},
- {el:()=>isOpen('res')?null:document.querySelector('#smBox [data-a="back"]'),tap:1,top:1,p:'thumb',t:`Nice team! Heroes <b>work in your garage</b> and <b>fight in battles</b>. Now close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
- {el:()=>$('cpBtn'),tap:1,t:`Monsters made of car parts are attacking the city! Tap <b>BATTLE</b>.`,done:()=>isOpen('hub')||isOpen('cp')},
+ {t:`Monsters made of car parts are attacking the city! Look what <b>MYTHIC</b> heroes can do…`,next:'WATCH!'},
+ {hide:1,enter:()=>{DEMO=0;try{window.CAMPAIGN.demoFight(()=>{DEMO=1;});}catch(e){DEMO=1;}},done:()=>DEMO===1},
+ {el:()=>$('smBtn'),tap:1,p:'cheer',enter:()=>{G.tutLeg=1;try{closePanel();}catch(e){}},t:`WOW! Want heroes like that? Let's get <b>YOUR</b> first team. Open <b>SUMMON</b> – it's free!`,done:()=>isOpen('sm')},
+ {el:()=>document.querySelector('#smBox [data-a="sum"][data-n="10"]')||document.querySelector('#smBox [data-a="sum"]'),tap:1,enter:function(){tk0=G.h.tk;hc0=(G.h.hist||[]).length;this.next=FORCE?'NEXT':'';},t:()=>`Tap <b>×10</b> to recruit 11 heroes – one <b>LEGENDARY</b> is guaranteed!`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>G.h.tk<tk0||(G.h.hist||[]).length!==hc0||isOpen('res')},
+ {el:()=>isOpen('res')?null:document.querySelector('#smBox [data-a="back"]'),tap:1,top:1,p:'thumb',t:()=>`<b>${legN()}</b> joined you! Heroes <b>fight in battles</b> and <b>work in your garage</b>. Close these pages to continue.`,done:()=>!isOpen('sm')&&!isOpen('res')},
+ {el:()=>$('cpBtn'),tap:1,t:`Now it's your turn to fight! Tap <b>BATTLE</b>.`,done:()=>isOpen('hub')||isOpen('cp')},
  {el:()=>document.querySelector('#hub.open [data-hb="camp"]'),tap:1,t:`Open the <b>CAMPAIGN</b>.`,done:()=>vis(document.querySelector('#cpPath .node.cur'))&&!isOpen('hub')},
  {el:()=>document.querySelector('#cpPath .node.cur'),tap:1,enter:()=>{best0=G.cp.best;},t:`Tap your stage.`,done:()=>isOpen('cpCard')},
  {el:()=>document.querySelector('#cpCard.open .ppF'),tap:1,t:`Your best heroes are already in the team. Press <b>FIGHT!</b>`,done:()=>isOpen('bt')},
  {hide:1,done:()=>isOpen('cpRes')},
- {el:()=>isOpen('cpRes')?document.querySelector('#cpResBox [data-a="map"]'):isOpen('hub')?document.querySelector('#hub [data-hb="back"]'):isOpen('cp')?document.getElementById('cpBack'):null,tap:1,top:1,res:1,t:()=>(G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear.`:`So close! Make your heroes stronger with gear and try again later.`)+(isOpen('cpRes')?` Tap <b>CAMPAIGN</b>, then <b>↩</b> to go back to your garage.`:` Tap <b>↩</b> to go back to your garage.`),done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
- {el:()=>$('dqBtn'),t:`<b>DAILY QUESTS</b>: finish them every day for VIP points, diamonds and tickets.`,next:'NEXT'},
+ {el:()=>isOpen('cpRes')?document.querySelector('#cpResBox [data-a="map"]'):isOpen('hub')?document.querySelector('#hub [data-hb="back"]'):isOpen('cp')?document.getElementById('cpBack'):null,tap:1,top:1,res:1,t:()=>(G.cp.best>best0?`<b>VICTORY!</b> Battles give money, tickets, diamonds and gear.`:`So close! Gear will make your heroes stronger.`)+(isOpen('cpRes')?` Tap <b>CAMPAIGN</b>, then <b>↩</b> to go back.`:` Tap <b>↩</b> to go back.`),done:()=>!isOpen('cp')&&!isOpen('hub')&&!isOpen('bt')&&!isOpen('cpRes')},
+ {el:()=>$('smBtn'),tap:1,enter:()=>{try{if(G.tutHero)G.tutSet={set:window.CAMPAIGN.tutSetFor(G.tutHero),hid:G.tutHero};}catch(e){}},t:()=>`Let's make <b>${legN()}</b> even stronger with <b>GEAR</b>. Open <b>SUMMON</b> again.`,done:()=>isOpen('sm')},
+ {el:()=>document.querySelector('#smBox [data-a="cat"][data-c="gear"]'),tap:1,t:`Tap <b>GEAR</b>.`,done:()=>!!document.querySelector('#smBox [data-a="gsum"][data-n="10"]')},
+ {el:()=>document.querySelector('#smBox [data-a="gsum"][data-n="10"]'),tap:1,enter:function(){this.next=FORCE?'NEXT':'';},t:()=>`Tap <b>×10</b> – a full <b>EPIC SET</b> for <b>${legN()}</b> is waiting!`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>!G.tutSet||isOpen('cpPop')},
+ {p:'thumb',t:()=>`The <b>EPIC SET</b> is already on <b>${legN()}</b> – 6 pieces = a big set bonus! Better gear = more power in every battle.`,next:'NEXT'},
+ {enter:()=>closeAll(),w:'parking',t:`This is your <b>GARAGE</b>. Customer cars arrive at the <b>ARRIVAL PARKING</b>. Valet drivers take them to the workshops by themselves.`,next:'NEXT'},
+ {w:'inspect',t:`<b>INSPECTION</b> checks every car and decides what must be repaired and which workshop it visits.`,next:'NEXT'},
+ {w:'office',t:`When a car is fixed, the <b>SALES OFFICE</b> sells it and you get the money. It all runs by itself – even while you are away!`,next:'NEXT'},
+ {w:'service',tap:1,t:`Upgrades make your garage faster and richer. <b>Tap the SERVICE workshop.</b>`,done:()=>isOpen('sheet')&&sel0()==='service'},
+ {el:()=>$('shBtn'),tap:1,enter:function(){lv0=G.lv.service||0;this.next=FORCE?'NEXT':'';if(!FORCE){try{const n=X().upHave('service'),c=upCost();if(n<c){X().upGive('service',c-n);save();}}catch(e){}}},t:()=>`Tap <b>UPGRADE</b>: more mechanics, faster work and bigger pay. Buildings are upgraded with <b>PARTS</b> (not money) – you get them from battles, salvage and Idle Rewards.`+(FORCE?' <small>(replay: tap NEXT)</small>':''),done:()=>(G.lv.service||0)>lv0},
+ {el:()=>$('dqBtn'),enter:()=>{try{closePanel();}catch(e){}},t:`<b>DAILY QUESTS</b>: finish them every day for diamonds and tickets.`,next:'NEXT'},
  {el:()=>$('idBtn'),t:`<b>IDLE REWARDS</b>: your garage keeps earning while you are offline. Collect it here!`,next:'NEXT'},
  {t:()=>`That's it, boss! Here is your welcome gift. Now build your <b>TORQUE EMPIRE</b>!`+giftH(),next:'START',gift:1},
 ];

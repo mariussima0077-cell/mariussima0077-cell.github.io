@@ -688,7 +688,7 @@ async function giftPage(url, env) {
 }
 
 // ------------------------------------------------------------------ v16-275 (Marius 24 nov): admin – where players stop · purchases € · versions · Mail to ALL
-const TUT_STEPS = ['Welcome', 'Parking', 'Inspection', 'Sales office', 'Tap Service', 'Upgrade', 'Open Summon', 'Summon ×10', 'Close Summon', 'Tap Battle', 'Open Campaign', 'Tap stage', 'FIGHT', 'In the battle', 'Back to the map', 'Daily Quests', 'Idle Rewards', 'Final gift'];
+const TUT_STEPS = ['Welcome', 'Monsters attack', 'Mythic demo fight', 'Open Summon', 'Summon ×10', 'Close Summon', 'Tap Battle', 'Open Campaign', 'Tap stage', 'FIGHT', 'In the battle', 'Back to the map', 'Open Summon (gear)', 'Tap GEAR', 'Gear Summon ×10', 'Epic set on', 'Parking', 'Inspection', 'Sales office', 'Tap Service', 'Upgrade', 'Daily Quests', 'Idle Rewards', 'Final gift'];   // v16-292: new opening (steps before v16-292 had other numbers)
 const tuLabel = v => v === -2 || v == null ? '❔ unknown (left before v16-275)' : v === -1 ? '😶 tutorial never started' : v >= 200 ? '✅ finished' : v >= 100 ? `⏭️ SKIPPED at step ${v - 99} · ${TUT_STEPS[v - 100] || '?'}` : `🚪 QUIT at step ${v + 1} · ${TUT_STEPS[v] || '?'}`;
 const PLAY_EUR = {vip_car:5.99, vip_mechanic:3.99, battle_speed_x2:2.99, vip_pass_monthly:5.99, dungeon_pass_30d:2.99, vip_pass_platinum:9.99, pack_starter:.99, pack_rookie:2.99, pack_pro:5.99, pack_elite:9.99, pack_master:19.99, pack_legend:49.99, pack_titan:99.99,
   diamonds_300:1.99, diamonds_800:4.99, diamonds_1700:9.99, diamonds_3600:19.99, diamonds_9500:49.99, diamonds_20000:99.99, fund_normal:9.99, fund_hard:9.99, vip_pass_diamond:14.99, founder_pass:4.99, rail_pass_monthly:4.99, gp_silver:4.99, gp_gold:9.99, gp_plat:19.99};
