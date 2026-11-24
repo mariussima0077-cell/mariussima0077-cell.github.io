@@ -3929,7 +3929,7 @@ function summon(cat,n){const P=G.h.pity[cat],out=[];let tl=cat==='m'&&G.tutLeg&&
 const freeOK=()=>false; // v16: VIP Pass no longer gives a free (random) summon – no paid random items
 
 // ---------- DOM: summon page (my picture) ----------
-const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui9/auto_auto.webp','img/ui9/auto_stop.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
+const smEl=$('sm'),smBox=$('smBox');['img/ui4/sum_bg.webp','img/ui9/res_bg.webp','img/ui9/res_t.webp','img/ui9/res_b1.webp','img/ui9/res_b10.webp','img/ui9/res_crew.webp','img/ui9/auto_auto.webp','img/ui9/auto_stop.webp','img/ui5/gsum_bg2.webp','img/ui8/bar_empty.webp','img/ui4/hsum_h.webp','img/ui5/coin.webp','img/ui5/fusion.webp','img/ui5/fill_g.webp'].forEach(u=>{(new Image()).src=u;});let smCat='m',smKey='';
 const smMap=()=>TALL.map(921,1532,[[764,.25],[1012,.2],[1097,.15],[1258,.15],[1324,.25]]);
 function smSize(){TALL.size(smBox,smMap());smKey='';}
 // v16-228: ticket count on the summon tab that has tickets (red pill)
@@ -4110,7 +4110,7 @@ function stars(s){return '<span class="stn">★+'+s+'</span>';}
 function showResults(res,cat,n,hd){
   let h='<div class="resT">'+CATS[cat].ic+' '+CATS[cat].title+(hd?' AUTO SUMMON':' SUMMON ×'+res.length)+'</div>'+(hd||'')+'<div class="resG'+(res.length>1?' many':'')+'">';
   res.forEach((r,i)=>{const H=HB[r.id],o=own(r.id);
-    const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?(isAwk(H)?(r.awk?'<i class="up awk">AWAKENED '+ROM[r.awk]+'!</i>':'<i class="up">COPY '+awkNeed(o.s).have+'/'+awkNeed(o.s).need+'</i>'):'<i class="up">+'+o.s+' ★</i>'):'<i class="mx">MAX '+(r.dm?DMI+'+'+r.dm:ESI+'+'+nfmt(r.ess||0))+(r.mc?' '+MCI+'+'+r.mc:'')+'</i>';
+    const tagT=r.r==='new'?'<i class="nw">NEW!</i>':r.r==='star'?(isAwk(H)?(r.awk?'<i class="up awk">AWAKENED '+ROM[r.awk]+'!</i>':'<i class="up">COPY '+awkNeed(o.s).have+'/'+awkNeed(o.s).need+'</i>'):''):'<i class="mx">MAX '+(r.dm?DMI+'+'+r.dm:ESI+'+'+nfmt(r.ess||0))+(r.mc?' '+MCI+'+'+r.mc:'')+'</i>';
     h+='<div class="rc g'+H.gr+'" style="animation-delay:'+(i*.16)+'s">'+card(H,o,tagT)+'</div>';});
   const best=Math.max(...res.map(r=>HB[r.id].gr));
   h+='</div><div class="resB"><button data-r="1">Summon ×1 · '+TIK(cat)+'1</button><button data-r="10" class="gold">Summon ×10 · '+TIK(cat)+'10</button></div><button class="resCrew" data-crew="'+cat+'">👥 SEE MY CREW · who to replace</button><div class="resH">Tap outside to close · '+TIK(cat)+' '+tkN(cat)+' tickets left</div>';
@@ -4920,6 +4920,18 @@ html body #toast img{height:18px;width:auto;max-width:28px;object-fit:contain;ve
 html body #toast .tsH{font:15px Game,system-ui;letter-spacing:1px;color:#ffd54a;margin-bottom:5px}
 html body #toast .tsR{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
 html body #toast .ti{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;background:#0008;border-radius:999px;padding:3px 9px;box-shadow:inset 0 0 0 1px #ffcf5a44;font:900 13px system-ui}
+
+/* v16-298 (Marius): summon RESULTS window dressed with the Summon page pictures (portal scene, title plate, blue/gold buttons, laurel plate) */
+#res{background:radial-gradient(ellipse at 50% 30%,rgba(40,120,255,.22),rgba(4,8,18,.0) 60%),linear-gradient(rgba(5,10,22,.15),rgba(5,10,22,.55) 30%,#070d1c 46%),url(img/ui9/res_bg.webp) 50% 0/max(100%,560px) auto no-repeat,#070d1c!important}
+#res.best3{background:radial-gradient(ellipse at 50% 30%,rgba(170,60,255,.4),rgba(4,8,18,0) 62%),linear-gradient(rgba(5,10,22,.15),rgba(5,10,22,.55) 30%,#0c0a1e 46%),url(img/ui9/res_bg.webp) 50% 0/max(100%,560px) auto no-repeat,#0c0a1e!important}
+#res.best4{background:radial-gradient(ellipse at 50% 30%,rgba(255,190,30,.42),rgba(4,8,18,0) 62%),linear-gradient(rgba(5,10,22,.15),rgba(5,10,22,.55) 30%,#120f12 46%),url(img/ui9/res_bg.webp) 50% 0/max(100%,560px) auto no-repeat,#120f12!important}
+#res.best5{background:radial-gradient(ellipse at 50% 30%,rgba(255,40,30,.48),rgba(4,8,18,0) 62%),linear-gradient(rgba(5,10,22,.15),rgba(5,10,22,.55) 30%,#170a0e 46%),url(img/ui9/res_bg.webp) 50% 0/max(100%,560px) auto no-repeat,#170a0e!important}
+#res .resT{width:min(92vw,420px);aspect-ratio:600/103;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0 10% 2px;background:url(img/ui9/res_t.webp) 0 0/100% 100% no-repeat;font-size:min(4.6vw,20px);white-space:nowrap;margin-bottom:14px;filter:drop-shadow(0 4px 8px #000a)}
+#res .resB{width:min(94vw,430px);gap:8px}
+#res .resB button,#res .resB button.gold{flex:1;aspect-ratio:480/162;padding:0 6% 2px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:url(img/ui9/res_b1.webp) 0 0/100% 100% no-repeat!important;color:#fff;text-shadow:0 2px 0 #0b2f6b,0 0 6px #000a;font:900 min(3.5vw,15px)/1.15 Game,system-ui;white-space:nowrap;filter:drop-shadow(0 4px 6px #000a)}
+#res .resB button.gold{background-image:url(img/ui9/res_b10.webp)!important;color:#3a2200;text-shadow:0 1px 0 #fff6}
+#res .resB button:active{transform:scale(.96)}
+#res .resCrew{width:min(88vw,400px);height:auto;aspect-ratio:700/141;padding:0 14% 2px;border:0;border-radius:0;box-shadow:none;background:url(img/ui9/res_crew.webp) 0 0/100% 100% no-repeat;color:#3a2200;text-shadow:0 1px 0 #fff8;font:900 min(3.6vw,15px) Game,system-ui;filter:drop-shadow(0 4px 6px #000a)}
 </style>
 </body>
 </html>
