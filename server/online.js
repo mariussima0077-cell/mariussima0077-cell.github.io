@@ -136,6 +136,7 @@ async function ensure(env) {
   ]);
   try { await db.prepare('ALTER TABLE prof ADD COLUMN hv INTEGER DEFAULT 0').run(); } catch (e) {}
   try { await db.prepare('ALTER TABLE prof ADD COLUMN rp INTEGER DEFAULT 0').run(); } catch (e) {}
+  try { await db.prepare("ALTER TABLE prof ADD COLUMN pname TEXT DEFAULT ''").run(); } catch (e) {}   // v16-278: the name before an admin "reset name" (↩️ restore)
   try { await db.prepare("ALTER TABLE prof ADD COLUMN bot TEXT DEFAULT ''").run(); } catch (e) {}   // v16-167: filler bots (JSON plan)   // v16-155: RAIL PASS – subscription end (ms), checked against Google purchases at every sync   // v16-122: HIDE VIP (others do not see the VIP level)
   try { await db.prepare('ALTER TABLE arena ADD COLUMN med INTEGER DEFAULT 0').run(); } catch (e) {}   // v16-212 ARENA MEDALS
   try { await db.prepare("ALTER TABLE arena ADD COLUMN ams TEXT DEFAULT ''").run(); } catch (e) {}      // v16-212 milestones claimed {s:season, c:[i]}
@@ -847,6 +848,21 @@ export async function online(op, b, env) {
   return {err:'not found'};
 }
 
+// v16-278 (Marius 24 nov: "I reset some names by mistake, put them back"): profiles still called Mechanic<uid> that HAD a real name before –
+// found in pname (resets from now on) or in the last name the server wrote next to them (Arena history, Rail Wars hits, Grand Prix patrons, Support tickets)
+async function nameLost(db) {
+  const ps = (await db.prepare("SELECT uid, srv, pname FROM prof WHERE name='Mechanic'||uid AND (bot IS NULL OR bot='')").all()).results; if (!ps.length) return [];
+  const best = {}, put = (uid, n, t) => { n = String(n || '').trim(); if (!n || /^mechanic\d*$/i.test(n) || n.startsWith('#tmp')) return; if (!best[uid] || t > best[uid].t) best[uid] = {n, t}; };
+  const q = async (sql) => { try { return (await db.prepare(sql).all()).results; } catch (e) { return []; } };
+  for (const r of await q("SELECT a uid, an n, MAX(t) t FROM ahist GROUP BY a, an")) put(r.uid, r.n, r.t);
+  for (const r of await q("SELECT d uid, dn n, MAX(t) t FROM ahist GROUP BY d, dn")) put(r.uid, r.n, r.t);
+  for (const r of await q("SELECT uid, an n, MAX(t) t FROM rwhit GROUP BY uid, an")) put(r.uid, r.n, r.t);
+  for (const r of await q("SELECT uid, name n, MAX(t) t FROM gpat GROUP BY uid, name")) put(r.uid, r.n, r.t);
+  for (const r of await q("SELECT uid, info, t FROM tickets")) { try { put(r.uid, JSON.parse(r.info || '{}').name, r.t); } catch (e) {} }
+  const out = []; for (const p of ps) { const old = p.pname || (best[p.uid] && best[p.uid].n); if (old) out.push({uid:p.uid, srv:p.srv, old:old.slice(0, 16), from:p.pname ? 'saved' : 'history'}); }
+  return out;
+}
+
 // ------------------------------------------------------------------ admin: chat moderation (/admin/chat?key=…)
 export async function onlineAdmin(url, env) {
   await ensure(env); const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY), now = Date.now();
@@ -854,20 +870,25 @@ export async function onlineAdmin(url, env) {
   if (del) await db.prepare('UPDATE chat SET hid=2 WHERE id=?').bind(del | 0).run();
   if (mute) { const [uid, days] = mute.split(':'); await db.prepare('UPDATE prof SET mute=? WHERE uid=?').bind(now + (+days || 1) * DAY, uid | 0).run(); }
   if (unmute) await db.prepare('UPDATE prof SET mute=0 WHERE uid=?').bind(unmute | 0).run();
-  if (rename) { await db.prepare("UPDATE prof SET name='Mechanic'||uid, nlow='mechanic'||uid WHERE uid=?").bind(rename | 0).run(); }
-  if (del || mute || unmute || rename) return Response.redirect(url.origin + '/admin/chat?key=' + k, 302);
+  if (rename) { await db.prepare("UPDATE prof SET pname=CASE WHEN name LIKE 'Mechanic%' THEN pname ELSE name END, name='Mechanic'||uid, nlow='mechanic'||uid WHERE uid=?").bind(rename | 0).run(); }   // v16-278: keeps the old name
+  const restore = url.searchParams.get('restore'), restoreAll = url.searchParams.get('restoreall');
+  if (restore || restoreAll) { const list = await nameLost(db), pick = restoreAll ? list : list.filter(r => r.uid === (restore | 0));
+    for (const r of pick) { const ex = await db.prepare('SELECT uid FROM prof WHERE srv=? AND nlow=? AND uid<>?').bind(r.srv, r.old.toLowerCase(), r.uid).first();
+      if (!ex) await db.prepare("UPDATE prof SET name=?, nlow=?, pname='' WHERE uid=? AND name='Mechanic'||uid").bind(r.old, r.old.toLowerCase(), r.uid).run(); } }
+  if (del || mute || unmute || rename || restore || restoreAll) return Response.redirect(url.origin + '/admin/chat?key=' + k, 302);
   const esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
   const rep = (await db.prepare('SELECT c.*, p.name FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.rep>0 AND c.hid<2 ORDER BY c.rep DESC, c.id DESC LIMIT 50').all()).results;
   const last = (await db.prepare('SELECT c.*, p.name FROM chat c LEFT JOIN prof p ON p.uid=c.uid WHERE c.sys=0 AND c.hid<2 ORDER BY c.id DESC LIMIT 60').all()).results;
-  const muted = (await db.prepare('SELECT uid, name, mute FROM prof WHERE mute>?').bind(now).all()).results;
+  const muted = (await db.prepare('SELECT uid, name, mute FROM prof WHERE mute>?').bind(now).all()).results, lost = await nameLost(db);
   const st = await db.prepare('SELECT COUNT(*) n, SUM(t>?) d FROM prof').bind(now - DAY).first();
   const row = m => `<div class=c><small>${d(m.t)} · S${m.srv} · #${m.uid} <b>${esc(m.name)}</b> · ${esc(m.lang)}${m.rep ? ` · <b class=b>🚩 ${m.rep}</b>` : ''}${m.hid ? ' · hidden' : ''}</small><br>${esc(m.txt)}<br>
-    <a href="?key=${k}&del=${m.id}">🗑️ delete</a> · <a href="?key=${k}&mute=${m.uid}:1">🔇 mute 1 day</a> · <a href="?key=${k}&mute=${m.uid}:7">🔇 7 days</a> · <a href="?key=${k}&mute=${m.uid}:3650">⛔ forever</a> · <a href="?key=${k}&rename=${m.uid}">✏️ reset name</a></div>`;
+    <a href="?key=${k}&del=${m.id}">🗑️ delete</a> · <a href="?key=${k}&mute=${m.uid}:1">🔇 mute 1 day</a> · <a href="?key=${k}&mute=${m.uid}:7">🔇 7 days</a> · <a href="?key=${k}&mute=${m.uid}:3650">⛔ forever</a> · <a href="?key=${k}&rename=${m.uid}" onclick="return confirm('Reset the name of #${m.uid}?')">✏️ reset name</a></div>`;
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Chat</title>
 <style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}a{color:#9fd3ff}small{color:#9fb0c0}</style>
 <h1>💬 Torque Chat – moderation</h1><div class=c>Profiles: <b>${st.n}</b> · active 24h: <b>${st.d || 0}</b> · <a href="/admin?key=${k}">🛡️ back to Torque Guard</a></div>
 <h3>🚩 Reported (${rep.length}) – 3 reports hide a message by itself</h3>${rep.map(row).join('') || '<div class=c>Nothing reported 👍</div>'}
+<h3>↩️ Names reset (${lost.length})</h3>${lost.length ? `<div class=c><a href="?key=${k}&restoreall=1" onclick="return confirm('Give back ALL ${lost.length} names?')"><b>↩️ RESTORE ALL</b></a></div>` + lost.map(r => `<div class=c>#${r.uid} · S${r.srv} · Mechanic${r.uid} → <b>${esc(r.old)}</b> <small>(${r.from})</small> · <a href="?key=${k}&restore=${r.uid}">↩️ restore</a></div>`).join('') : '<div class=c>nothing to restore 👍</div>'}
 <h3>🔇 Muted</h3>${muted.map(m => `<div class=c>#${m.uid} ${esc(m.name)} until ${d(m.mute)} · <a href="?key=${k}&unmute=${m.uid}">unmute</a></div>`).join('') || '<div class=c>nobody</div>'}
 <h3>Last messages</h3>${last.map(row).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
