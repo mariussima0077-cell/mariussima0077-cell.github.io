@@ -287,9 +287,15 @@ async function scan(env) {
     const r = await db.prepare('SELECT MIN(t) t0, MAX(t) t1, MIN(money) m0, MAX(money) m1, MIN(vip) v0, MAX(vip) v1 FROM snaps WHERE pid=? AND t>?').bind(p.pid, now - day).first();
     if (!r || !r.t0) continue;
     const dt = (r.t1 - r.t0) / 1000, why = [];
-    if (r.m1 - r.m0 > capPerSec(p.lv) * dt / 4 + 5e7) why.push('24h money too high');
+    // v16-276 (Wazza4ever 24 nov): the snapshots mix ALL phones of one account (app + browser, different saves) → a jump between
+    // two phones looked like "+480 VIP in 24 h" while the game really gave 165. Now the LEDGER (what the game really gave, today +
+    // yesterday) must ALSO be too high – a phone switch alone is never a flag.
+    const lg2 = (await db.prepare('SELECT SUM(m) m, SUM(vip) v FROM ledg WHERE pid=? AND day>=?').bind(p.pid, parisDay(now - day)).first()) || {};
+    const capM = capPerSec(p.lv) * dt / 4 + 5e7;
+    if (r.m1 - r.m0 > capM && (lg2.m || 0) > capM) why.push('24h money too high');
     const nb24 = ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(p.pid, now - day).first()) || {n:0}).n;   // v16-122
-    if (r.v1 - r.v0 > 400 + nb24 * 2100 && !isGift(p.pid)) why.push('24h VIP points too high');
+    const capV = 400 + nb24 * 2100;
+    if (r.v1 - r.v0 > capV && (lg2.v || 0) > capV && !isGift(p.pid)) why.push('24h VIP points too high');
     // v16-151: the bot runs every 10 min – a 24h rule may add points only ONCE per 24h (before: +50 every 10 min = ban in 20 min)
     if (why.length && await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'bot:%'").bind(p.pid, now - day).first()) continue;
     if (why.length) {
