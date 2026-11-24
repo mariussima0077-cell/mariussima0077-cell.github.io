@@ -1238,7 +1238,7 @@ const SPK=.37,SPCELL=192;
 for(const id in SPRD)SPRD[id].id=id;
 // v16-107: skill sheets/booms are decoded in the background (off the main thread) at battle start → the first ultimate no longer stutters
 function warmIm(im){if(!im||!im.decode)return;const d=()=>{im.decode().catch(()=>{});};if(im.complete&&im.naturalWidth)d();else im.addEventListener('load',d,{once:true});}
-function sprLoad(d){if(!d.im){d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
+function sprLoad(d){if(!d.im){if(WIDE8[d.id])wideImg(d.id);if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
 // v16-94: draws frame (r,c) of a sprite at the feet point (0,0), k = screen units per 256-cell unit. v8 = 8 frames per row, each row its own height
 function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.im,c*v.cw,R[0],v.cw,R[1],-v.ax*k,-R[3]*k,v.uw*k,R[2]*k);return;}
   const w=d.w||256,cw=w*SPCELL/256;X.drawImage(d.im,c*cw,r*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);}
@@ -1441,7 +1441,20 @@ function drawHero(g,u,t){
 let GA=1;
 function eye(g,x,y,r,col,t,k){g.fillStyle=col;circ(g,x,y,r);g.fillStyle='rgba(255,255,255,.85)';circ(g,x-r*.3,y-r*.3,r*.3);g.globalAlpha*=.35;g.fillStyle=col;circ(g,x,y,r*2.2+Math.sin(t*6+k)*.6);g.globalAlpha=Math.min(1,g.globalAlpha/.35);}
 // v16-161 (Marius 22 nov, 13:02: "no effects, only stats"): AWAKENING has no battle effects – only stats (u.awk kept for info)
-function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;f(g,u,t);
+// v16-rage (24 nov, Marius test): ENRAGE while the ultimate charges (bar 80-100%) – ONLY visual: coloured glow around the hero (pulsing), a little bigger, embers rising
+const RAGEC={m5_0:'#ffb300',m5_1:'#ff3d00',m5_2:'#ff9100',m5_3:'#ffd54a',m5_4:'#40c4ff',m5_5:'#b388ff',m5_6:'#e040fb'},RAGE_D=4;
+// Marius: rage BEFORE the skill – grows while the bar fills from 80% to 100%, stays while it is ready, and goes out fast (0.35 s) once he casts
+function rageK(u){if(!u.hero||u.dead||!B||B.phase!=='fight')return 0;let k=0;
+  if(u.act&&u.act.k==='cast')k=Math.max(0,1-u.act.t/.35);else if(u.rageT!==undefined&&B.t-u.rageT<.35)k=0;else k=clamp((u.en-80)/20,0,1);
+  return k;}
+function drawUnit(g,u,t){const f=u.hero?drawHero:drawMonster;GA=1;const rk=rageK(u);
+  if(rk>0){const col=RAGEC[u.h&&u.h.id]||GGLOW[u.h&&u.h.r]||'#ff7043',pl=.5+.5*Math.sin(t*9),sc0=u.sc;u.sc*=1+.05*rk;
+    if(!LOWRES){g.save();g.shadowColor=col;g.shadowBlur=(22+14*pl)*S*rk;GA=rk;f(g,u,t);g.shadowBlur=(8+4*pl)*S*rk;f(g,u,t);g.restore();}GA=1;f(g,u,t); /* low graphics: no glow blur (costly on cheap phones), only the light pass + embers */
+    g.save();g.globalCompositeOperation='lighter';GA=rk*(.18+.17*pl);f(g,u,t);GA=1;
+    g.fillStyle=col;for(let i=0;i<7;i++){const p=(t*.9+i*.143)%1,x=u.sx+Math.sin(i*2.4+t*2)*24*S*u.sc,y=u.sy-p*95*S*u.sc;g.globalAlpha=rk*(1-p)*.9;g.beginPath();g.arc(x,y,(2.6-1.6*p)*S,0,6.283);g.fill();}
+    g.restore();u.sc=sc0;
+    if(u.flash>0){g.save();g.globalCompositeOperation='lighter';GA=Math.min(1,u.flash)*.75;f(g,u,t);GA=1;g.restore();}return;}
+  f(g,u,t);
   if(u.flash>0&&!u.dead){g.save();g.globalCompositeOperation='lighter';GA=Math.min(1,u.flash)*.75;f(g,u,t);GA=1;g.restore();}}
 const MDRAW={
  imp(g,u,t){const ph=u.wph,lunge=u.st==='atk'?Math.sin(u.ap*Math.PI)*8:0;g.translate(lunge,0);
@@ -1980,7 +1993,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
-function cast(u){if(!canCast(u))return;u.en=0;u.enLock=3;B.flash=.15;if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
+function cast(u){if(!canCast(u))return;u.en=0;u.rageT=B.t;u.enLock=3;B.flash=.15;if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
   if(!(B.banner&&B.banner.img))B.banner={u,t:0,name:skOf(u.h).sk}; // v16-237: the MINI BOSS picture banner is not cut by a skill banner
   const R=u.role,ms=alive(B.mons);
   if(SKF[u.h.id]){B.hk=u.skK||1;try{SKF[u.h.id](u,ms);}finally{B.hk=1;}return;}
@@ -2017,6 +2030,26 @@ function imgFx(k,x,y,w,d,o){B.fx.push(Object.assign({type:'imgfx',k,x,y,w,t:0,d}
 function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 // v16-256 (Marius: "keep what I gave you"): when the hero's own effect sheet (fxs) is loaded, the extra code-drawn effects of his skill are skipped
 const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
+const WIDE8={m5_0:'img/fx/wide_m5_0.webp',m5_1:'img/fx/wide_m5_1.webp',m5_2:'img/fx/wide_m5_2.webp',m5_3:'img/fx/wide_m5_3.webp',m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp'},WIDEI={};
+// v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
+const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
+function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
+function pushWide(u,ta,o){if(!WD(u))return false;B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
+// v16-ready (24 nov, Marius): ULTIMATE READY – looping ground aura (16 frames, 4x4) under a Mythic while his ultimate is charged;
+// during the cast it CHARGES (grows ×1.4, brighter, extra glow) and fades out at the end of the cast
+const READY8={m5_0:'img/fx/ready_m5_0.webp'},READYI={};function readyImg(id){if(!READY8[id])return null;let i=READYI[id];if(!i){i=READYI[id]=new Image();i.decoding='async';i.src=READY8[id];}return i;}
+function drawReady(g,u,t){const id=u.h&&u.h.id,im=id&&READY8[id]&&readyImg(id);if(!im||!im.naturalWidth||u.dead)return;
+  const cst=u.act&&u.act.k==='cast',rd=u.en>=100&&!u.act&&B.phase==='fight';if(!cst&&!rd){u.rdA=0;return;}
+  u.rdA=Math.min(1,(u.rdA||0)+.08);let al=u.rdA,glow=0;
+  if(cst){const p=Math.min(1,u.act.t/Math.max(.01,u.act.dur));glow=Math.min(1,p/.55);al=p>.85?(1-p)/.15:1;}
+  // READY = only the small ring at his feet (the flames / gears of the picture are cut off, ~hero width) so 5 ready heroes are not a mess;
+  // CAST = the full picture (flames + gears) grows out of the ring
+  const fw=im.naturalWidth/4,fh=im.naturalHeight/4,fi=Math.floor(t*16)%16,sx=(fi%4)*fw,sy=Math.floor(fi/4)*fh;
+  g.save();
+  if(!cst){const w=88*S*u.sc,h=w*fh/fw,cut=.5;g.globalAlpha=al*.9;g.drawImage(im,sx,sy+fh*cut,fw,fh*(1-cut),u.sx-w/2,u.sy-h*.76+h*cut,w,h*(1-cut));}
+  else{const w=88*S*u.sc*(1+.75*glow),h=w*fh/fw,cut=.5*(1-glow);g.globalAlpha=al;g.drawImage(im,sx,sy+fh*cut,fw,fh*(1-cut),u.sx-w/2,u.sy-h*.76+h*cut,w,h*(1-cut));
+    g.globalCompositeOperation='lighter';g.globalAlpha=al*glow*(.4+.2*Math.sin(t*30));g.drawImage(im,sx,sy+fh*cut,fw,fh*(1-cut),u.sx-w/2,u.sy-h*.76+h*cut,w,h*(1-cut));}
+  g.restore();}function wideImg(id){if(!WIDE8[id])return null;let i=WIDEI[id];if(!i){i=WIDEI[id]=new Image();i.decoding='async';i.src=WIDE8[id];}return i;}
 function castAct(u,dur,fire){u.act={k:'cast',t:0,dur,fire};u.st='cast';}
 const SKF={
  m3_0(u,ms){const P=skp(u),f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Viktor's ENGINE DROP – he throws the engine from where he stands (no more leap); it falls on the biggest group (fxs frame 2 = lands = damage); same numbers as before
@@ -2079,14 +2112,18 @@ const SKF={
    // v16-106: Rex's fire trail → explosion (frame 5) on the first enemy in his lane, timed with his arrival
    if(u.spr&&u.spr.fx8){const ln=alive(B.mons).filter(m=>m.x>u.x&&Math.abs(m.d-u.d)<.2).sort((a,b)=>a.x-b.x)[0];if(ln){const tt=Math.max(0,(ln.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.5),d:.96,sp:u.spr,x:ln.x,dd:ln.d});}}};
    if(u.spr&&u.spr.v8)castAct(u,.4,go);else go();},
- m5_0(u,ms){castAct(u,.85,()=>{for(const m of alive(B.mons))B.fx.push({type:'gear',x:m.x+rnd(-10,10),tgt:m,y0:-40,t:-rnd(0,.5),d:.55,src:u,r:rnd(15,21)*S,mult:3.2});
-   for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
-   const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
+ m5_0(u,ms){
+   // v16-wide (24 nov, Marius test): WIDE GEAR APOCALYPSE – one 8-frame sheet over the whole enemy line, starts with the cast (sigil opens), slower (2.6 s)
+   const wi=wideImg('m5_0'),wd=wi&&wi.naturalWidth?2.6:0;
+   if(wd){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0];B.fx.push({type:'wide8',t:0,d:wd,im:wi,dd:c0?c0.d:.5});}
+   castAct(u,wd?1.0:.85,()=>{for(const m of alive(B.mons))B.fx.push({type:'gear',x:m.x+rnd(-10,10),tgt:m,y0:-40,t:wd?-rnd(0,.12):-rnd(0,.5),d:wd?.42:.55,src:u,r:rnd(15,21)*S,mult:3.2,hide:!!wd});
+   if(!wd)for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
+   const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:wd?-.35:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(!wd&&u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
    teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});});},
  m5_3(u){ // v16-132: Goliath's IRON FORTRESS – the hex shield (fxs) falls on the biggest group; impact (fxs frame 4) = end of his slam (skill frame 5 = dome) = damage + stun; he taunts with a big shield, the team gets shields + less damage
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
-   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
-   castAct(u,.7,()=>{u.post=.6;shake(14);B.flash=.25;
+   const wd=c&&pushWide(u,.72,{dd:c.d});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,wd?1.2:.7,()=>{u.post=.6;shake(14);B.flash=.25;
      if(c){const R=120*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ffca28',36*S);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ffca28',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ffb300',R);debris(c.x,fy(c.d),8,['#6d4c41','#ffca28','#9e9e9e']);}}
      if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);if(!f8)B.fx.push({type:'ring',x:u.x,y:fy(u.d),t:0,d:.6,r:70*S,col:'#ffca28',ground:1});}
@@ -2095,35 +2132,35 @@ const SKF={
      teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
  m5_4(u){ // v16-141: Nova's STARFIRE RAIN – the arrow rain (fxs) falls on the biggest group; impact = fxs frame 5 = end of her shot up (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
-   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
-   castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
+   const wd=c&&pushWide(u,.9,{dd:c.d,drop:'m5_4'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
  m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
-   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
-   castAct(u,.7,()=>{u.post=.6;shake(10);B.flash=.18;
+   const wd=c&&pushWide(u,1.2,{dd:c.d,imp:6});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,wd?2.0:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=135*S,v=u.tl?TV(u):0;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.6,{skill:1});m.slow=Math.max(m.slow,4);m.weak=Math.max(m.weak,5);if(v)wetOn(m,v);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ff4fd8',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff80ab',R);}sparks(c.x,fy(c.d)-10*S,16,'#fff59d');}});},
  m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
-   if(tg){tg.mark=Math.max(tg.mark,2);if(f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
-   castAct(u,.7,()=>{u.post=.6;shake(12);B.flash=.2;if(!tg)return;
-     const [bx,by]=muzzle(u,40,40),ty=headY(tg)+16*dsc(tg.d);B.fx.push({type:'beam',x0:bx,y0:by,x1:W+40*S,y1:ty,t:0,d:.45,col:'#18ffff',w:9});
+   const wdv=tg&&pushWide(u,.72,{beam:1});if(tg){tg.mark=Math.max(tg.mark,2);if(f8&&!wdv)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
+   castAct(u,wdv?1.2:.7,()=>{u.post=.6;shake(12);B.flash=.2;if(!tg)return;
+     const [bx,by]=muzzle(u,40,40),ty=headY(tg)+16*dsc(tg.d);if(!wdv)B.fx.push({type:'beam',x0:bx,y0:by,x1:W+40*S,y1:ty,t:0,d:.45,col:'#18ffff',w:9});
      if(!tg.dead)damage(u,tg,5.5,{skill:1,crit:1});
      for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S){damage(u,m,1.6,{skill:1});if(FX2&&!FV8(u))fxs('circle_05','#18ffff',m.x,headY(m)+16*dsc(m.d),{d:.25,s0:14*S,s1:48*S});}
      sparks(tg.x,ty,16,'#e0ffff');});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
-   if(c&&f8)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
-   castAct(u,.7,()=>{u.post=.6;shake(12);B.flash=.35;
+   const wd=c&&pushWide(u,.9,{dd:c.d,drop:'m5_2'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(12);B.flash=.35;
      for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ff9100',40*S);}
      if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff9100',110*S);}
      const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);if(f8)B.fx.push({type:'sheet8',t:-.1,d:.96,sp:u.spr,x:d.x,dd:d.d});else B.fx.push({type:'ring',x:d.x,y:fy(d.d),t:0,d:.6,r:60*S,col:'#ff9100',ground:1});}}
      for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
- m5_1(u){castAct(u,.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
-   if(u.spr&&u.spr.fx8){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
+ m5_1(u){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0],wdl=c0&&pushWide(u,(WD(u)?.75:.45)+Math.max(0,(c0.x-u.x)/(1100*S)),{dd:c0.d});castAct(u,wdl?.75:.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
+   if(u.spr&&u.spr.fx8&&!wdl){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
    teamBuff({aspd:6,aspdK:.3,crit:6,col:'#ff5252',txt:'OVERDRIVE!'});});}};
 
 // ---------------------------------------------------------------- monster specials
@@ -2332,7 +2369,7 @@ function fxUpdate(f,dt){
     for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);m.mark=Math.max(m.mark,P.mark||7);if(P.slow)m.slow=Math.max(m.slow,P.slow);damage(f.src,m,P.mult||1.2,{skill:1});sparks(m.x,headY(m)+20,6,SC);if(FX2&&!FV8(f.src)){const my=headY(m)+22*dsc(m.d);fxs('magic_02',SC,m.x,my,{d:.7,s0:20*S,s1:80*S,vr:3,ease:1});fxs('circle_05','#a7ffeb',m.x,my,{d:.35,s0:20*S,s1:60*S});}}}
   else if(f.type==='chain'&&!f.done&&f.t>=0){f.done=true;if(!f.b.dead){damage(f.src,f.b,f.mult,{skill:1});f.b.stun=Math.max(f.b.stun,f.stun||1.5);sparks(f.b.x,headY(f.b)+20,10,'#80d8ff',200);}shake(3);
     if(FX2&&!FV8(f.src)){const a=f.a,b=f.b,ax=a.x,ay=a.hero?fy(a.d)-44*dsc(a.d):headY(a)+20,bx=b.x,by=headY(b)+20;fxBolt(ax,ay,bx,by,'#40c4ff',80);fxs('spark_02','#80d8ff',bx,by,{d:.4,s0:40*S,s1:100*S,rot:rnd(0,TAU),ease:1});fxBurst(bx,by,'#40c4ff',36*S);}}
-  else if(FX2&&f.type==='gear'&&!f.done&&f.t>=0){const gx=f.tgt&&f.tgt.x!==undefined?f.tgt.x:f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5),gy=lerp(f.y0,ty,Math.min(1,f.t/f.d/.85));fxs('flame_04','#ff9100',gx,gy-f.r*.6,{d:.22,s0:f.r*2.6,s1:f.r*1.2,a0:.7,rot:rnd(-.3,.3)});
+  else if(FX2&&f.type==='gear'&&!f.hide&&!f.done&&f.t>=0){const gx=f.tgt&&f.tgt.x!==undefined?f.tgt.x:f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5),gy=lerp(f.y0,ty,Math.min(1,f.t/f.d/.85));fxs('flame_04','#ff9100',gx,gy-f.r*.6,{d:.22,s0:f.r*2.6,s1:f.r*1.2,a0:.7,rot:rnd(-.3,.3)});
     if(f.t>=f.d*.85)fxUpdateGear(f);}
   else if(f.type==='gear'&&!f.done&&f.t>=f.d*.85)fxUpdateGear(f);
   else if(f.type==='puddle'){f.tick+=dt;if(f.tick>.5){f.tick=0;for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.d0)*(FY1-FY0)*1.25)<f.r){damage(f.src,m,.22,{noCrit:1,skill:1});m.slow=Math.max(m.slow,.6);}}}
@@ -2565,6 +2602,38 @@ function drawFx(t){
     else if(f.type==='oil'){const u=f.u;if(!u.dead){const [x,y]=sxy(u);for(let i=0;i<6;i++){const p=(k*1.4+i*.17)%1;g.globalAlpha=1-p;g.fillStyle=i%2?'#69f0ae':'#b9f6ca';circ(g,x+Math.sin(i*2.1)*14,y-90*dsc(u.d)+p*70*dsc(u.d),2.5);}
       g.globalAlpha=(1-k)*.5;g.fillStyle='#69f0ae';ell(g,x,y,26,7);}}
     else if(f.type==='plus'){const u=f.u;const [x,y]=sxy(u);g.globalAlpha=1-k;g.fillStyle=f.col||'#69f0ae';g.font='900 14px Game,system-ui';g.textAlign='center';g.fillText('✚',x+8,y-70*dsc(u.d)-k*20);}
+    else if(f.type==='wide8'&&f.beam){const im=f.im,u=f.u;if(im&&im.naturalWidth&&u){const [bx,by]=muzzle(u,40,40),fw=im.naturalWidth,fh=im.naturalHeight/8,w=Math.max(60*S,W+30*S-bx),h=w*fh/fw*1.15,
+      q=Math.min(7.999,f.t<f.ta?4*f.t/f.ta:4+4*(f.t-f.ta)/f.tb),c=Math.floor(q),fr=q-c,A=k>.93?(1-k)/.07:1;
+      g.globalAlpha=A*(c<7?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,bx-6*S,by-h/2,w,h);if(c<7&&fr>0){g.globalAlpha=A*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,bx-6*S,by-h/2,w,h);}}}
+    else if(f.type==='wide8'){const im=f.im;if(im&&im.naturalWidth){const ms=alive(B.mons);let x0=W*.5,x1=W,dm=f.dd;if(ms.length){x0=Math.min(...ms.map(m=>m.x));x1=Math.max(...ms.map(m=>m.x));dm=Math.max(...ms.map(m=>m.d));}
+      const w=W*1.15,cx=clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/8,h=w*fh/fw*1.25,gy=fy(dm)+18*S,A=k>.93?(1-k)/.07:1;
+      const IP=f.imp||4;let q=f.ta?Math.min(7.999,f.t<f.ta?IP*f.t/f.ta:IP+(8-IP)*(f.t-f.ta)/f.tb):Math.min(7.999,k*8),sh=1;/* v16-wide2: imp = the impact frame (Chroma v2: frame 7) */let gs=1;
+      // v16-grow (Marius: Chroma's tornadoes stay on the ground and grow): frames 3-4 (tornadoes on the ground) swirl back and forth while they grow ×0.35→×1.15, then the burst
+      let gr=null;if(f.grow){const T=f.t,a1=.4,a2=.68,top0=gy-h*.97,hi=Math.min(top0,H*.13);
+        // A: rainbow cloud high in the sky (frames 1→2), drifting down a little · B: the tornadoes stretch from the cloud down to the ground (frames 2→3, the picture is pulled long, top comes down to normal)
+        // C: tornadoes on the ground swirl and grow ×1→×1.2 (frames 3↔4) · D: the burst (frame 5+), back to ×1
+        if(T<a1){q=T/a1*.999;const y=lerp(hi,hi+(top0-hi)*.15,T/a1);gr=[cx-w*.5,y,w,h];}
+        else if(T<a2){const p=(T-a1)/(a2-a1),e=p*p*(3-2*p);q=1+p*.999;const y=lerp(hi+(top0-hi)*.15,top0,e);gr=[cx-w*.5,y,w,gy+h*.03-y];}
+        else if(T<f.ta){const p=(T-a2)/(f.ta-a2);q=2.5-.5*Math.cos((T-a2)*8);gs=1+.2*p;}
+        else gs=1.2-.2*Math.min(1,(T-f.ta)/.5);}
+      // v16-drop (Marius: arrows / phoenix must really fall from the sky): the falling objects are ONE sprite cut from his sheet, moved by code from the top
+      // of the screen to the ground; his sheet starts only when they land (frame 4 = landing → frame 5 = impact)
+      if(f.drop){const di=dropImg(f.drop),L=.28;if(f.t<f.ta-L){sh=0;}else if(f.t<f.ta)q=3+(f.t-(f.ta-L))/L;
+        if(di&&di.naturalWidth&&f.t<f.ta+.05){const dw=di.naturalWidth,dh=di.naturalHeight;g.save();
+          if(f.drop==='m5_4'){if(!f.ar){f.ar=[];for(let i=0;i<24;i++)f.ar.push({x:Math.random(),z:Math.random(),st:(i/24)*(f.ta-.34)+rnd(0,.05)});}
+            const ah=100*S,aw=ah*dw/dh,fd=.34;
+            for(const a of f.ar){const p=(f.t-a.st)/fd;if(p<0||p>1.08)continue;const pp=Math.min(1,p),tx=cx-w*.42+a.x*w*.84,ty=gy-6*S-a.z*h*.18,y0=H*.04-ah,
+              y=lerp(y0,ty,pp),x=tx+(1-pp)*(ty-y0)*.55;g.globalAlpha=p>1?Math.max(0,(1.08-p)/.08):1;g.drawImage(di,x-aw*.15,y-ah*.92,aw,ah);}}
+          else{const p=clamp(f.t/(f.ta-.2),0,1),e=p*p,pw=w*(.42+.38*e),ph=pw*dh/dw,x=lerp(cx-w*.25,cx,e),y=lerp(H*.02,gy-h*.55,e);
+            g.globalCompositeOperation='lighter';for(let j=3;j>=1;j--){const pj=Math.max(0,p-j*.06),ej=pj*pj;g.globalAlpha=.18*(4-j)/3;g.drawImage(di,lerp(cx-w*.25,cx,ej)-pw/2,lerp(H*.02,gy-h*.55,ej)-ph/2,pw,ph);}
+            g.globalCompositeOperation='source-over';g.globalAlpha=f.t>f.ta-.2?Math.max(0,1-(f.t-(f.ta-.2))/.25):1;g.drawImage(di,x-pw/2,y-ph/2,pw,ph);}
+          g.restore();}}
+      if(sh){const c=Math.floor(q),fr=q-c,zz=(1+.04*fr)*gs,ww=w*zz,hh=h*zz,A2=A*(f.drop&&f.t<f.ta?Math.min(1,(q-3)*2.5):1);
+      // v16-wide: only 8 pictures → each frame melts into the next (cross-fade) + a slow push-in, so it is smooth, not 'in pieces'
+      if(gr){g.globalAlpha=A2*(c<7?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,gr[0],gr[1],gr[2],gr[3]);if(c<7&&fr>0){g.globalAlpha=A2*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,gr[0],gr[1],gr[2],gr[3]);}}else{
+      g.globalAlpha=A2*(c<7?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,cx-ww/2,gy-hh*.97,ww,hh);
+      if(c<7&&fr>0){g.globalAlpha=A2*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,cx-w*gs/2,gy-h*gs*.97,w*gs,h*gs);}}}}}
+    else if(f.type==='gear'&&f.hide){}
     else if(f.type==='gear'){const x=f.tgt&&f.tgt.x!==undefined?(f.lx||f.tgt.x):f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5);const y=lerp(f.y0,ty,Math.min(1,k/.85));
       if(k<.85){g.translate(x,y);g.rotate(t*12);gearShape(f.r,'#ffd54a');g.rotate(-t*12);g.globalAlpha=.25;g.fillStyle='#ffab00';g.fillRect(-2,-80,4,70);}}
     else if(f.type==='sh8'){const h=f.u,d=f.sp,v=d&&d.fx8;if(!h||h.dead||!(h.shield>0)){f.t=f.d;}else if(v&&d.fi&&d.fi.naturalWidth){const R=v.rows[0],kk=SPK*dsc(h.d)*.36,a=Math.min(1,f.t*4);g.globalAlpha=a*(.75+.2*Math.sin(f.t*5));g.translate(h.x+20*S*dsc(h.d),fy(h.d)-6*S+Math.sin(f.t*3)*2*S);g.drawImage(d.fi,f.c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
@@ -2752,7 +2821,7 @@ function render(){const t=B.real;tintN=0;g.setTransform(DPR,0,0,DPR,0,0);
   B.sx=sx;B.sy=sy;if(sx||sy){g.fillStyle='#000';g.fillRect(0,0,W,H);}g.save();camT();
   drawBG(t);drawTele(t);drawGroundFx();drawFx2(true);
   const all=[...B.heroes,...B.mons].sort((a,b)=>a.d-b.d||(a.dead?-1:1));
-  for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?bossK(u):1.22);drawUnit(g,u,B.t);}
+  for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?bossK(u):1.22);if(u.hero)drawReady(g,u,B.t);drawUnit(g,u,B.t);}
   for(const u of all)bars(u);
   drawProj(t);drawFx(t);drawParts();drawFx2(false);camT();drawNums();
   g.restore();
