@@ -162,7 +162,8 @@ function cleanTeam(t) {
   if (!Array.isArray(t)) return [];
   return t.slice(0, 5).map(u => ({id:String(u.id || '').replace(/[^a-z0-9_]/g, '').slice(0, 12), n:clean(u.n).slice(0, 24), gr:num(u.gr, 0, 5) | 0, s:num(u.s, 0, 50) | 0,
     role:ROLES.includes(u.role) ? u.role : 'crew', hp:num(u.hp, 1, 5e8), atk:num(u.atk, 1, 5e7), def:num(u.def, 0, 5e4), as:num(u.as, .25, 3), crit:num(u.crit, 0, .75), cdm:num(u.cdm || 1.8, 1.8, 4.8),
-    rng:num(u.rng, 20, 300), eg:num(u.eg, 1, 3), pw:Math.round(num(u.pw, 0, 2e9)), lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
+    rng:num(u.rng, 20, 300), eg:1, sd:num(u.sd || 1, 1, 3),   // v16-299: no Skill charge any more → SKILL DAMAGE (sd)
+     pw:Math.round(num(u.pw, 0, 2e9)), lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
 }
 const teamPow = t => Math.round(t.reduce((a, s) => a + s.hp * .25 + s.atk * 6 * (1 / s.as) + s.def * 4, 0));
 const pubTeam = t => (t || []).map(u => ({id:u.id, n:u.n, gr:u.gr, s:u.s, role:u.role, hp:Math.round(u.hp)}));
@@ -289,8 +290,8 @@ export function arenaSim(ta, td, seed) {
       if (u.stun > 0) continue; u.cd -= DT * (u.slow > 0 ? .6 : 1); if (u.cd > 0) continue;
       const e = alive(1 - u.side); if (!e.length) break;
       if (u.en >= 100) {                      // ---------- SKILL (one per role, like the campaign)
-        u.en = 0; u.cd = u.as * 1.2; const ev = {t, a:u.i, k:'sk', r:u.role, h:[]};
-        if (u.role === 'service') { const al = alive(u.side); al.forEach(o => { const v = Math.round(o.mhp * .32); o.hp = Math.min(o.mhp, o.hp + v); ev.h.push([o.i, -v, 0, 0]); }); }
+        u.en = 0; u.cd = u.as * 1.2; const ev = {t, a:u.i, k:'sk', r:u.role, h:[]}, oA = u.atk, K = u.sd || 1; u.atk *= K;   // v16-299: SKILL DAMAGE
+        if (u.role === 'service') { const al = alive(u.side); al.forEach(o => { const v = Math.round(o.mhp * .32 * K); o.hp = Math.min(o.mhp, o.hp + v); ev.h.push([o.i, -v, 0, 0]); }); }
         else if (u.role === 'engine') { const tg = pick(u); if (tg) { ev.h.push(dmg(u, tg, 2.2)); tg.stun = 1.2; } u.shield = Math.round(u.mhp * .15); }
         else if (u.role === 'tuning') { const tg = pick(u); if (tg) ev.h.push(dmg(u, tg, 2.6, true)); }
         else if (u.role === 'inspect') { e.forEach(o => { ev.h.push(dmg(u, o, 1.2)); o.mark = 7; }); }
@@ -298,7 +299,7 @@ export function arenaSim(ta, td, seed) {
         else if (u.role === 'elec') { for (let j = 0; j < 4; j++) { const l = alive(1 - u.side); if (!l.length) break; const o = l[Math.floor(R() * l.length)]; ev.h.push(dmg(u, o, 1.1)); o.stun = Math.max(o.stun, .8); } }
         else if (u.role === 'all') { e.forEach(o => ev.h.push(dmg(u, o, 1.6))); alive(u.side).forEach(o => o.buff = 6); }
         else { const tg = pick(u); if (tg) ev.h.push(dmg(u, tg, 2.5)); }
-        log.push(ev); continue;
+        u.atk = oA; log.push(ev); continue;
       }
       const tg = pick(u); if (!tg) continue;                  // ---------- normal attack
       u.cd = u.as; u.en = Math.min(100, u.en + 25 * u.eg);

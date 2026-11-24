@@ -878,7 +878,7 @@ const GSLOT=[
  {k:'chip',n:'ECU Chip',ic:'chip',st:'en'}];
 const GS={};GSLOT.forEach(s=>GS[s.k]=s);
 const GSTAT={atk:{n:'Attack',ic:'atk',col:'#ff7043',v:[6,10,15,22,30,40,52]},hp:{n:'HP',ic:'heart',col:'#66bb6a',v:[6,10,15,22,30,40,52]},def:{n:'Defense',ic:'shield',col:'#42a5f5',v:[8,13,20,28,38,50,65]},
- crit:{n:'Crit chance',ic:'crit',col:'#ffca28',v:[3,4,6,8,11,15,19]},cdmg:{n:'Crit damage',ic:'cdmg',col:'#ff3d3d',v:[6,8,11,14,18,22,22]},aspd:{n:'Attack speed',ic:'aspd',col:'#26c6da',v:[4,6,9,13,17,22,28]},en:{n:'Skill charge',ic:'energy',col:'#ffab00',v:[6,10,15,22,30,40,52]}};
+ crit:{n:'Crit chance',ic:'crit',col:'#ffca28',v:[3,4,6,8,11,15,19]},cdmg:{n:'Crit damage',ic:'cdmg',col:'#ff3d3d',v:[6,8,11,14,18,22,22]},aspd:{n:'Attack speed',ic:'aspd',col:'#26c6da',v:[4,6,9,13,17,22,28]},en:{n:'Skill damage',ic:'energy',col:'#ffab00',v:[6,10,15,22,30,40,52]}};
 const GNAMES={tool:['Rusty Wrench','Steel Wrench','Torque Wrench','Impact Gun','Golden Ratchet','Titan Breaker','Celestial Driver'],helm:['Cloth Cap','Hard Hat','Welding Mask','Carbon Helmet','Golden Helmet','Crown of Gears','Halo of Torque'],
  vest:['Old Overalls','Work Vest','Kevlar Apron','Armored Vest','Golden Plate','Mythic Exo-Suit','Starforged Exo-Suit'],glove:['Cotton Gloves','Leather Gloves','Grip Gloves','Shock Gloves','Golden Gauntlets','Titan Fists','Nova Gauntlets'],
  boots:['Old Sneakers','Work Boots','Steel Toes','Racing Boots','Golden Boots','Nitro Boots','Warp Boots'],chip:['Basic Fuse','ECU Chip','Tuned ECU','Stage 2 ECU','Golden ECU','Quantum ECU','Singularity ECU']};
@@ -1147,12 +1147,12 @@ function rTag(h,sz){const k=bRoleOf(h);if(!k)return '';const r=BROLE[k];return `
 function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its,h.id),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
   const gk=h.crew||!TE().garB?1:1+TE().garB(clsOf(h)); // v16-129: the garage that trains this class (LV 1-100) → +ATK & HP
   const MR=MYTH_RNG[h.id]||{}; // v16-141: Mythic rangers
-  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)*(MR.hp||1)),atk:R.atk*m*gk*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100)*(MR.def||1),mv:R.mv,rng:MR.rng||R.rng,as:R.as*(MR.as||1)/(1+softCap(b.aspd,60,150)/100),crit:Math.min(CRIT_CAP,R.crit+b.crit/100),cdm:CRIT_DM+softCap(b.cdmg||0,150,300)/100,eg:1+softCap(b.en,60,120)/100,b};}
-// v16-98: Skill charge / Attack speed – full value up to +60%, then they grow slower and never pass +120% / +150% (max gear made ultimates non-stop)
+  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)*(MR.hp||1)),atk:R.atk*m*gk*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100)*(MR.def||1),mv:R.mv,rng:MR.rng||R.rng,as:R.as*(MR.as||1)/(1+softCap(b.aspd,60,150)/100),crit:Math.min(CRIT_CAP,R.crit+b.crit/100),cdm:CRIT_DM+softCap(b.cdmg||0,150,300)/100,eg:1,sd:1+softCap(b.en,80,200)/100,b};} // v16-299 (Marius 24 nov): 'en' = SKILL DAMAGE now (skills hit harder), no faster ultimate any more
+// v16-98: Attack speed – full value up to +60%, then slower, never above +150% · v16-299: Skill damage full up to +80%, then slower, never above +200%
 // v16-294 (Marius 24 nov): CRIT CHANCE max 60% (also with buffs) · CRIT DAMAGE separate: base 180%, gloves / extra stats add more (full up to +150%, then slower, never above +300%)
 const CRIT_CAP=.6,CRIT_DM=1.8;
 function softCap(x,K,C){return x<=K?x:K+(C-K)*(1-Math.exp(-(x-K)/(C-K)));}
-function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+s.crit*((s.cdm||CRIT_DM)-1)-R.crit*(CRIT_DM-1))*(1+(s.eg-1)*.25)+s.def*4);}
+function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+s.crit*((s.cdm||CRIT_DM)-1)-R.crit*(CRIT_DM-1))*(1+((s.sd||1)-1)*.25)+s.def*4);}
 function pow(h,ov){return powS(unitStats(h,ov),ROLE[roleOf(h)]);}
 function crewHero(k){return {id:'crew'+k,crew:true,n:CREW_NAMES[k],gr:0,cat:'m',sp:'crew',f:false};}
 function teamHeroes(){const T=TE(),ids=(T.G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&T.G.h.own[id]);
@@ -1825,7 +1825,7 @@ const GRIT_N=24,gritK=n=>n<=8?n*.075:.6+(n-8)*.15,gritStep=n=>n<8?.075:.15;
 function grit(si){const P=CPX(),st=P.stuck;if(!st||st.si!==si||si!==P.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
 function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=(1+(B.grit||0)+(B.nit||0))*(1+(B.trb||0)); // v16-136: TEAM ROLES bonus (+5/10/15% ATK & HP)
   return {hero:1,h,awk:!h.crew&&h.gr===5&&TE().mTier?TE().mTier(stars(h)):0,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,cdm:s.cdm,eg:s.eg,
-    skK:h.crew?1:1+.06*((TE().skLv?TE().skLv(h.id):1)-1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),tl:talLv(h),tc:0,shots:0,fcT:3,ekCd:0,swT:0};}
+    skK:h.crew?1:(1+.06*((TE().skLv?TE().skLv(h.id):1)-1))*(s.sd||1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),tl:talLv(h),tc:0,shots:0,fcT:3,ekCd:0,swT:0};}
 function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);if(HM&&!B.tw){fxImg('hm_ring');fxImg('hm_aura');}const m=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);
   return {hero:0,t,k:rnd(0,9),name:M.n,boss:!!M.boss,hp:M.hp*m*1.25,max:M.hp*m*1.25,atk:M.atk*m,def:M.def*(1+Math.min(B.si,19)*.06),mv:M.mv*S,rng:M.rng*S,as:M.as,crit:.05,H:M.h,fly:!!M.fly,
     x:0,d:0,face:-1,st:'walk',ap:0,cd:rnd(.3,1),wph:rnd(0,6),roll:0,stun:0,slow:0,mark:0,weak:0,burn:0,burnT:0,ice:0,tw:0,flash:0,hurt:0,dot:0,dead:false,deadT:0,act:null,
@@ -3070,7 +3070,7 @@ function miniCard(h,lab){if(!h)return `<div class="mc"><div class="mcI empty">�
   return `<div class="mc"><div class="mcI" style="border-color:${gcol(h)}"><img src="${portraitURL(h)}"><img class="rb" src="${roleBadge(clsOf(h))}"></div><b style="color:${gcol(h)}">${h.n}</b><small>${lab}</small></div>`;}
 const bigN=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e9?(v/1e9).toFixed(2)+'B':a>=1e6?(v/1e6).toFixed(2)+'M':v.toLocaleString();}; // v16-113: 1.67M instead of 1 668 436 (fits on a phone)
 const STROWS=[['heart','HP',s=>s.hp,bigN],['atk','Attack',s=>s.atk,bigN],['shield','Defense',s=>s.def,v=>Math.round(v)],
- ['crit','Crit chance',s=>s.crit*100,v=>v.toFixed(1)+'%'],['cdmg','Crit damage',s=>(s.cdm||CRIT_DM)*100,v=>Math.round(v)+'%'],['aspd','Attack speed',s=>1/s.as,v=>v.toFixed(2)+'/s'],['energy','Skill charge',s=>(s.eg-1)*100,v=>'+'+Math.round(v)+'%']];
+ ['crit','Crit chance',s=>s.crit*100,v=>v.toFixed(1)+'%'],['cdmg','Crit damage',s=>(s.cdm||CRIT_DM)*100,v=>Math.round(v)+'%'],['aspd','Attack speed',s=>1/s.as,v=>v.toFixed(2)+'/s'],['energy','Skill damage',s=>((s.sd||1)-1)*100,v=>'+'+Math.round(v)+'%']];
 function dTxt(a,b,fmt){const d=b-a;if(Math.abs(d)<1e-6)return '<b>=</b>';const pc=a>0.0001?' ('+(d>0?'+':'')+Math.round(d/a*100)+'%)':'';return `<b class="${d>0?'up':'dn'}">${d>0?'▲':'▼'} ${fmt(Math.abs(d))}${pc}</b>`;}
 // stat table + advantages / disadvantages
 function cmpBlock(sa,sb,pa,pb,extraPros,extraCons,hideZero){const pros=[...(extraPros||[])],cons=[...(extraCons||[])];
@@ -3257,7 +3257,7 @@ function pedGo(){if(!pedRaf)pedRaf=requestAnimationFrame(pedLoop);}
 // v16-51: HERO COLLECTION page (battle bonus). Until Marius' picture arrives it is drawn with CSS.
 // v16-52: HERO COLLECTION on Marius' picture (img/ui4/coll.webp, 1024×1536) – positions in % of the picture
 const cP=(x,y,w,h)=>`left:${x/10.24}%;top:${y/15.36}%;width:${w/10.24}%;height:${h/15.36}%;`;
-const CROWY=[610,742,870,998,1122,1247],GSH={hp:'HP',atk:'ATK',def:'DEF',crit:'CRIT',cdmg:'CRIT DMG',aspd:'SPEED',en:'ENERGY'};
+const CROWY=[610,742,870,998,1122,1247],GSH={hp:'HP',atk:'ATK',def:'DEF',crit:'CRIT',cdmg:'CRIT DMG',aspd:'SPEED',en:'SKILL DMG'};
 const cbTxt=t=>t.every(([,v])=>v===t[0][1])?t.map(([k])=>GSH[k]).join(' · ')+' +'+t[0][1]+'%':t.map(([k,v])=>GSH[k]+' +'+v+'%').join(' ');
 function renderColl(){const T=TE(),C=collInfo(),tot=C.reduce((a,c)=>a+c.tot,0),n=C.reduce((a,c)=>a+c.n,0),b=collBon();
   const act=Object.keys(b).filter(k=>b[k]).map(k=>GSTAT[k].n+' +'+b[k]+'%');
@@ -3914,7 +3914,7 @@ function mini(X,id,an,t,x,y,hgt,face,ph){const d=SPRD[id];if(!sprOK(d))return fa
 
 // v16-45: ARENA (online PvP) – the battle team as numbers for the server (stats incl. gear) + a pose drawer for the arena fight
 function arenaTeam(){const L=curTeamList().filter(Boolean),tb=1+teamRoles(L.filter(h=>!h.crew)).bon;return L.map(h=>{const s=unitStats(h),R=ROLE[roleOf(h)];if(!h.crew&&tb>1){s.hp=Math.round(s.hp*tb);s.atk*=tb;} // v16-136: TEAM ROLES bonus also in the Arena
-  return {id:h.id,n:h.n,gr:h.gr||0,s:stars(h),role:roleOf(h),hp:s.hp,atk:Math.round(s.atk*10)/10,def:Math.round(s.def*10)/10,as:Math.round(s.as*1000)/1000,crit:Math.round(s.crit*1000)/1000,cdm:Math.round((s.cdm||CRIT_DM)*100)/100,rng:s.rng,eg:Math.round(s.eg*100)/100,pw:powS(s,R),lv:h.crew?0:TE().lvOf(h.id),a:h.crew?0:TE().ascOf(h.id),eq:h.crew?[]:heroGear(h.id).map(it=>({s:it.s,r:it.r,lv:it.lv,sr:it.sr||0,set:it.set||''}))};});} // v16-176: level + gear for the opponent profile
+  return {id:h.id,n:h.n,gr:h.gr||0,s:stars(h),role:roleOf(h),hp:s.hp,atk:Math.round(s.atk*10)/10,def:Math.round(s.def*10)/10,as:Math.round(s.as*1000)/1000,crit:Math.round(s.crit*1000)/1000,cdm:Math.round((s.cdm||CRIT_DM)*100)/100,rng:s.rng,eg:1,sd:Math.round((s.sd||1)*100)/100,pw:powS(s,R),lv:h.crew?0:TE().lvOf(h.id),a:h.crew?0:TE().ascOf(h.id),eq:h.crew?[]:heroGear(h.id).map(it=>({s:it.s,r:it.r,lv:it.lv,sr:it.sr||0,set:it.set||''}))};});} // v16-176: level + gear for the opponent profile
 // v16-176 (Marius): look at ANOTHER player's hero – gear list built from the compact items the server keeps (s, r, lv, sr, set)
 function peekGear(eq){eq=(eq||[]).filter(it=>it&&GS[it.s]&&it.r>=0&&it.r<=6);const by={};eq.forEach(it=>by[it.s]=it);
   return '<div class="pkG">'+GSLOT.map(sl=>{const it=by[sl.k];if(!it)return '<div class="pkI off"><div class="pkE">'+sl.n+'</div></div>';const st=GSTAT[sl.st],x={...it,id:0,lv:Math.max(1,it.lv|0)};
