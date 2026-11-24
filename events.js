@@ -240,7 +240,7 @@ const gpOn=()=>{const G=window.GPX;if(!G)return false;const a=G.T0,b=G.T1,n=Date
 function tileHtml(tr){const st=S()[tr],E=EV[st.k],c=cur(tr),sc=isW(st.k)?st.w.used:st.sc,r=rk[st.id]&&rk[st.id].rank;
   return '<div class="evBan pic evHt" data-e="ev" data-t="'+tr+'" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ '+left(c.end-Date.now())+' left</div><div class="evHs">'+E.u.toUpperCase()+': <b>'+T().nf(sc)+'</b>'+(r?' · #'+r:'')+'</div>'+(trTodo(tr)?'<i class="rdd evHd"></i>':'')+'</div>';}
 function hubHtml(){let h='<div class="evS">LIVE NOW</div>';
-  if(gpOn()){const G=GPX,L=G.live();h+='<div class="evGp evHt" data-e="gp"><img src="img/gp/logo.webp" alt="TORQUE GRAND PRIX"><span>'+(L?'LIVE · ONE TIME ONLY':'FINISHED · claim your rewards')+'</span>'+(G.todo&&G.todo()?'<i class="rdd evHd"></i>':'')+'</div>';}
+  if(gpOn()){const G=GPX,L=G.live();h+='<div class="evBan pic evHt" data-e="gp" style="--c:#ffb300;--b:url(img/ui9/evb_gp.webp)"><h3>TORQUE<br>GRAND PRIX</h3><div class="evT">'+(L?'🏁 LIVE NOW':'🏁 FINISHED')+'</div><div class="evHs">'+(L?'ONE TIME ONLY':'claim your rewards')+'</div>'+(G.todo&&G.todo()?'<i class="rdd evHd"></i>':'')+'</div>';}   // Marius' Grand Prix banner (24 nov)
   h+=tileHtml('A')+tileHtml('B');
   return h+calHtml();}
 function calHtml(){const now=Date.now(),L=[];for(const tr of ['A','B']){let t=cur(tr).end+1000;for(let n=0;n<4;n++){const c=cur(tr,t);L.push({tr,...c});t=c.end+1000;}}
