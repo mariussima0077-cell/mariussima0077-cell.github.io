@@ -598,8 +598,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 /* v16-254 Thieves 2.0 */
 .gRaidB{position:fixed;left:50%;top:22%;width:min(92vw,420px);transform:translate(-50%,-50%);z-index:9000;pointer-events:none;filter:drop-shadow(0 6px 14px #000a);animation:gRaid 2.9s ease-out forwards}
 @keyframes gRaid{0%{transform:translate(-50%,-50%) scale(2.2);opacity:0}12%{transform:translate(-50%,-50%) scale(.92);opacity:1}18%{transform:translate(-50%,-50%) scale(1.04)}22%,80%{transform:translate(-50%,-50%) scale(1)}25%,31%{margin-left:-5px}28%,34%{margin-left:5px}37%{margin-left:0}100%{transform:translate(-50%,-50%) scale(1.1);opacity:0}}
-.raidC{position:fixed;inset:0;z-index:8990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);animation:rcIn .25s ease-out}
-@keyframes rcIn{from{opacity:0}}
+.raidC{position:fixed;inset:0;z-index:8990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);animation:raidIn .25s ease-out}
+@keyframes raidIn{from{opacity:0}}
 .raidC .rcB{width:min(86vw,320px);background:linear-gradient(#2b3d52,#141d28);border:3px solid #ffd54a;border-radius:18px;padding:14px 14px 12px;text-align:center;color:#fff;box-shadow:0 10px 30px #000a;animation:rcPop .35s cubic-bezier(.2,1.6,.4,1)}
 @keyframes rcPop{from{transform:scale(.6)}}
 .raidC h3{margin:0;font:900 26px Game,system-ui;color:#ffd54a;text-shadow:0 2px 0 #000}
@@ -4443,6 +4443,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:127,d:'Nov 24, 2026',ic:'🛠',t:'Summon fix',l:['Fixed: after a summon the result cards stayed <b>invisible</b>. Your heroes, crew and gear now show up again.']},
  {id:126,d:'Nov 24, 2026',ic:'🚂',t:'Rail Wars guide',l:['The first time you open <b>RAIL WARS</b>, Mama Rosa explains how the train, the Street Tokens and the attacks work.']},
  {id:125,d:'Nov 24, 2026',ic:'🎉',t:'New EVENTS page',l:['Tap <b>EVENTS</b>: every event that is running now has its <b>own banner</b> – Torque Grand Prix and the 2 time events.','Tap a banner to open that event\'s page. ↩ brings you back to all events.','The <b>📅 EVENT CALENDAR</b> is right under the banners: the next events with their exact dates.']},
  {id:124,d:'Nov 23, 2026',ic:'👤',t:'Your avatar in the top bar',l:['Your <b>avatar with your frame</b> is now at the top left, next to your money.','Tap it to open <b>MY PROFILE</b> (name, icon, frame, title, graphics, help) – the PROFILE tab left the online pages.']},
