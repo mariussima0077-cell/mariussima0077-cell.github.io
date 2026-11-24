@@ -80,12 +80,13 @@ function give(r, why){
 // called after a successful payment (and by SEC.restore for purchases found again)
 function grant(k, quiet){
   const p=PACKS.find(x=>x.k===k); if(p){ PK()[k]=true; t_save(); give(p, quiet?'Restored '+p.n:p.n); return; }
-  const d=DIAMONDS.find(x=>x.k===k); if(d){ const s=S(), x2=!s.fx[k]; s.fx[k]=1; give({dm:d.dm*(x2?2:1)}, x2?'Diamonds ×2 (first time)':'Diamonds'); return; }
+  const d=DIAMONDS.find(x=>x.k===k); if(d){ const s=S(), m=dmX(k); s.fx[k]=(s.fx[k]|0)+1; give({dm:d.dm*m}, m>1?'Diamonds ×'+m+(m===3?' (first time)':' (second time)'):'Diamonds'); return; }   // v16-279 (Marius): 1st ×3 · 2nd ×2 · then normal (each pack on its own)
   if(k==='fn'||k==='fh'){ PK()[k]=true; t_save(); if(!quiet) T().toast('🏁 '+FUND[k].n+' unlocked! Claim your rewards.',4000); render(); return; }
   if(k==='plat'||k==='sub'||k==='dia'){ passTick(); T().vipRefresh(); render(); return; }
   if(k==='rail'){ passTick(); render(); return; }
 }
 const t_save = () => T().savePacks();
+const dmX = k => { const n=S().fx[k]|0; return n===0?3:n===1?2:1; };
 
 // the pass: start bonus once per new period + daily gift + Platinum auto-collect
 function passTick(){
@@ -268,8 +269,8 @@ function render(){
     h+=(SEC.TEST_MODE?'<div class="note">🧪 TEST MODE (owner): tapping a price gives it without payment.<br>'+(SEC.TEST_ACC?'<a href="?tacc=0" style="color:#ffd54a">↩ Back to my normal account</a>':'<a href="?tacc=1" style="color:#ffd54a">🧪 Open the FULL TEST ACCOUNT (hidden from rankings)</a>')+'</div>':!SEC.STORE_BUILD?'<div class="note">📱 Packs are available in the Torque Empire app on Google Play.</div>':'<div class="note">Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.</div>');
   }
   if(tab==='td'){
-    h+='<div class="sec">DIAMONDS</div><div class="dgrid">'+DIAMONDS.map(d=>{ const x2=!S().fx[d.k];
-      return '<div class="dp'+(d.big?' big':'')+'">'+(x2?'<span class="x2">×2</span>':'')+'<img src="'+IMG(d.ic)+'" alt=""><b>'+d.dm.toLocaleString('en')+'</b><small>'+(x2?'first time: '+(d.dm*2).toLocaleString('en'):'')+'</small><button class="buy" data-b="'+d.k+'">'+P(d.k,d.price)+'</button></div>'; }).join('')+'</div>';
+    h+='<div class="sec">DIAMONDS</div><div class="dgrid">'+DIAMONDS.map(d=>{ const m=dmX(d.k);
+      return '<div class="dp'+(d.big?' big':'')+'">'+(m>1?'<span class="x2">×'+m+'</span>':'')+'<img src="'+IMG(d.ic)+'" alt=""><b>'+d.dm.toLocaleString('en')+'</b><small>'+(m>1?(m===3?'1st time: ':'2nd time: ')+(d.dm*m).toLocaleString('en'):'')+'</small><button class="buy" data-b="'+d.k+'">'+P(d.k,d.price)+'</button></div>'; }).join('')+'</div>';
     h+='<div class="note">100 '+DMh+' = 1 summon (you are always asked first). Rate Info and the Legendary pity (every 500 summons) stay the same.</div>';
   }
   if(tab==='tv'){
