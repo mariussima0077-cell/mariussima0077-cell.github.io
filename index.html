@@ -46,10 +46,14 @@ window.GFX=(()=>{const L=k=>{try{return localStorage.getItem(k);}catch(e){return
   function send(){tm=0;const api=window.SEC&&SEC.api&&SEC.api();if(!api){if(q.length)tm=setTimeout(send,5000);return;}
     const b=q;q=[];b.forEach(e=>{try{fetch(api+'/api/err',{method:'POST',headers:{'content-type':'application/json'},keepalive:true,
       body:JSON.stringify({pid:window.SEC&&SEC.PID,cv:window.TE_CV||0,g:window.GFX?GFX.eff+'/'+GFX.tier:'',ua:navigator.userAgent,...e})}).catch(()=>{});}catch(x){}});}
-  function add(m,s,l){m=String(m||'').slice(0,300);if(!m||/^Script error\.?$/.test(m)||/ResizeObserver loop/.test(m))return;
-    s=String(s||'').replace(location.origin,'').split('?')[0];const k=m+'|'+s+'|'+l;if(seen.has(k)||n>=5)return;seen.add(k);n++;q.push({m,s,l:+l||0});if(!tm)tm=setTimeout(send,3000);}
-  addEventListener('error',e=>{if(e&&e.target&&e.target!==window&&!e.error)return;add(e.message||(e.error&&e.error.message),e.filename,e.lineno);});
-  addEventListener('unhandledrejection',e=>{const r=e&&e.reason;if(!r||r.name==='AbortError')return;add('(promise) '+(r.message||r),r.stack&&(r.stack.match(/https?:\/\/[^\s)]+/)||[''])[0].replace(/:\d+:\d+$/,''),0);});
+  // v16-272: the stack (first 4 lines) goes too, and file:line is taken from the stack – the real place of the error, not the re-throw
+  function stk(x){return String(x||'').split('\n').map(r=>r.trim()).filter(r=>/^at |@/.test(r)).slice(0,4).join(' ← ').split(location.origin).join('').replace(/\?[^:\s)]*/g,'').slice(0,400);}
+  function add(m,s,l,st){m=String(m||'').slice(0,300);if(!m||/^Script error\.?$/.test(m)||/ResizeObserver loop/.test(m))return;
+    st=stk(st);const f=String(st).match(/(\/[^\s():]*\.(?:html|js)):(\d+):\d+/);if(f){s=f[1];l=f[2];}
+    s=String(s||'').replace(location.origin,'').split('?')[0];const k=m+'|'+s+'|'+l;if(seen.has(k)||n>=5)return;seen.add(k);n++;q.push({m,s,l:+l||0,st});if(!tm)tm=setTimeout(send,3000);}
+  window.TE_ERR=e=>{try{add(e&&e.message||e,'',0,e&&e.stack);}catch(x){}};
+  addEventListener('error',e=>{if(e&&e.target&&e.target!==window&&!e.error)return;add(e.message||(e.error&&e.error.message),e.filename,e.lineno,e.error&&e.error.stack);});
+  addEventListener('unhandledrejection',e=>{const r=e&&e.reason;if(!r||r.name==='AbortError')return;add('(promise) '+(r.message||r),'',0,r.stack);});
 })();</script>
 <script src="xfer.js"></script>
 <style>
@@ -4626,7 +4630,7 @@ cv.addEventListener('pointerdown',()=>{touchT=performance.now();});addEventListe
 function mapCover(){const c=document.getElementById('cp');if(c&&c.classList.contains('open'))return 2;const o=document.getElementById('onl');if(o&&o.classList.contains('open'))return 2;const sw=document.getElementById('st');if(sw&&sw.classList.contains('open'))return 1;for(const e of MAPCOV)if(e&&e.classList.contains('open'))return 1;return 0;}
 // v16-266 (Marius 23 nov: „jocul are freeze cu totul, nu se mișcă nimic”): one error in a frame used to stop the map loop for good.
 // Now the loop always goes on; the error is sent once to Torque Guard (/admin „🐞 Game errors”).
-function frame(now){try{frame0(now);}catch(e){requestAnimationFrame(frame);console.error(e);if(!frame.n){frame.n=1;setTimeout(()=>{throw e;},0);}}}
+function frame(now){try{frame0(now);}catch(e){requestAnimationFrame(frame);console.error(e);if(!frame.n){frame.n=1;if(window.TE_ERR)TE_ERR(e);else setTimeout(()=>{throw e;},0);}}} // v16-272: sent with its stack (real line)
 function frame0(now){
   if(started){const idle=window.__BATTLE_ON||mapCover()||!gest&&!zAnim&&Math.abs(vX)<2&&Math.abs(vY)<2&&now-touchT>1500;if(now-last<(idle?31:14.5)){requestAnimationFrame(frame);return;}}
   const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);

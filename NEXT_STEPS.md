@@ -183,6 +183,11 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-272 (24 nov 2026) – erori de joc: stack + status OPEN / 👍 DONE în /admin
+- Jocul trimite acum și stack-ul (primele 4 rânduri) și linia REALĂ a erorii (nu linia de re-throw 4629 din `frame()`).
+- /admin „🐞 Game errors”: fiecare eroare are 🔧 OPEN (de reparat) sau ↩️ CAME BACK; butonul 👍 DONE (cu confirmare) o ascunde după ce e rezolvată.
+- DE FĂCUT: eroarea „reading 'x'” (v271, S21 Ultra) NU e încă reparată – așteptăm să revină cu 📍 stack, apoi o reparăm.
+
 ## ✅ v16-258 (23 nov 2026) – THIEVES 2.0 LIVE
 - Cod: blocul „THIEVES 2.0” din `index.html` (`startRaid`, `THF`, `XG`, `mwGet`), sprite-uri noi în `battle.js` SPRD: `tb` Big Tony (Gang Boss), `tc` Crowbar Carl, `td` Shadow Kid, `te` Lockpick Leo (Masked Runner v1, ușa ștearsă), `k9d` câine, `k9g` gardian K9. UI: `img/thief/` (mw_board, mw_poster, gang_raid).
 - Raiduri: solo / duo (25% dubă cu întăriri) / BOSS (de 3×/zi, Security ≥3, dubă cu boss + 2) / GANG RAID (1×/zi, Security ≥4, 4 pe jos + dubă cu boss + 3, banner). Hoț scăpat = −5% (amator) / −10% (PRO) / −20% (boss) din cash, redus cu Security (−4,5%/nivel) și scutul gardienilor; doar cât jocul e deschis.
