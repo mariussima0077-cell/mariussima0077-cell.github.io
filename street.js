@@ -9,10 +9,13 @@
 const T=()=>window.__TE, O=()=>window.ONLINE;
 const TOK='img/ui12/st_token.webp',TI=e=>'<img class="tki stTok" src="'+TOK+'" alt=""'+(e?' style="height:'+e+'"':'')+'>';
 const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
-const SHOP=[['tk',500],['gt',500],['ct',500],['k_vault',500],['k_mine',500],['k_forge',500],['k_lab',500],['ess',250]];   // Marius 21 nov: every ticket and every key = 500 (Essence still provisional)
+// v16-280 (Marius 24 nov): tickets only as ×10 (10 × 500) · Essence = an ITEM "2h Idle Essence" kept in YOUR ITEMS – when you USE it, it gives
+// 2 hours of idle Essence for the stage you are at THEN (worth more the further you get)
+const SHOP=[['tk10',5000],['gt10',5000],['ct10',5000],['k_vault',500],['k_mine',500],['k_forge',500],['k_lab',500],['eb',250]];
+const N10={tk10:'tk',gt10:'gt',ct10:'ct'},ebN=()=>{try{return Math.max(1,T().idleCalc(2).ess);}catch(e){return essN();}};   // Marius 21 nov: every ticket and every key = 500 (Essence still provisional)
 const essN=()=>Math.round((T().ESS_U?T().ESS_U():300)*2);
-function itIcon(k){if(k[0]==='k')return '<img class="tki" src="img/dg/k_'+k.slice(2)+'.webp" alt="">';if(k==='tk')return '<img class="tki" src="img/ticket.webp" alt="">';if(k==='ct')return '<img class="tki" src="img/cticket.webp" alt="">';if(k==='gt')return '<img class="tki" src="img/gticket.webp" alt="">';return T().ESI;}
-function itName(k){if(k[0]==='k')return DGN[k.slice(2)]+' Key';return {tk:'Recruit Ticket',gt:'Gear Ticket',ct:'Crew Ticket',ess:T().nf(essN())+' Essence'}[k];}
+function itIcon(k){if(N10[k])k=N10[k];if(k==='eb')return '<span style="position:relative;display:inline-block">'+T().ESI+'<small style="position:absolute;right:-6px;bottom:-4px;font:900 9px system-ui;color:#ffd54a;text-shadow:0 1px 2px #000">2h</small></span>';if(k[0]==='k')return '<img class="tki" src="img/dg/k_'+k.slice(2)+'.webp" alt="">';if(k==='tk')return '<img class="tki" src="img/ticket.webp" alt="">';if(k==='ct')return '<img class="tki" src="img/cticket.webp" alt="">';if(k==='gt')return '<img class="tki" src="img/gticket.webp" alt="">';return T().ESI;}
+function itName(k){if(k[0]==='k')return DGN[k.slice(2)]+' Key';return {tk:'Recruit Ticket',gt:'Gear Ticket',ct:'Crew Ticket',tk10:'10 Recruit Tickets',gt10:'10 Gear Tickets',ct10:'10 Crew Tickets',eb:'2h Idle Essence',ess:T().nf(essN())+' Essence'}[k];}
 function S(){const G=T().G;if(!G.st)G.st={tok:0};return G.st;}
 function give(n){if(!(n>0))return;S().tok+=n;T().save();}
 const left=ms=>{const s=Math.max(0,ms/1000|0),h=s/3600|0,m=(s%3600)/60|0,x=s%60;return h?h+'h '+String(m).padStart(2,'0')+'m':m+':'+String(x).padStart(2,'0');};
@@ -64,7 +67,7 @@ let el,D=null,busy=false;
 function build(){if(el)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);el=document.createElement('div');el.id='st';
   el.innerHTML='<div class="stTop"><button class="stX" data-s="x">↩</button></div><div class="stB" id="stBody"></div>';document.body.appendChild(el);
   el.addEventListener('click',e=>{const t=e.target.closest('[data-s]');if(!t)return;const a=t.dataset.s;
-    if(a==='x')close();else if(a==='rf')refresh();else if(a==='send')send();else if(a==='atk')attack(+t.dataset.i);else if(a==='list')load(true);else if(a==='buy')buy(t.dataset.k);else if(a==='rp'){close();if(window.SHOP2)SHOP2.open('tv');}});}
+    if(a==='x')close();else if(a==='rf')refresh();else if(a==='send')send();else if(a==='atk')attack(+t.dataset.i);else if(a==='list')load(true);else if(a==='buy')buy(t.dataset.k);else if(a==='useeb')useEb();else if(a==='rp'){close();if(window.SHOP2)SHOP2.open('tv');}});}
 function close(){if(el)el.classList.remove('open');clearInterval(open.t);}
 async function load(force){if(!O()){D={err:'offline'};render();return;}if(busy&&!force)return;busy=true;if(RP()&&!load.sy){load.sy=1;await O().sync();}const r=await O().call('rw',{});busy=false;D=r;if(r&&r.ok)await claimAll();render();}
 async function claimAll(){if(!D||!D.mine)return;const now=Date.now();for(const t of D.mine.filter(t=>t.t1<=now)){const r=await O().call('rwclaim',{id:t.id});
@@ -97,15 +100,17 @@ async function attack(id){if(busy)return;if(D&&D.atks<=0)return T().toast('⚔�
 // (shown under the shop) and tells the server (event 'stshop' on the player card in /admin).
 function buy(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it)return;if(s.tok<it[1])return T().toast(TI()+' Not enough Street Tokens ('+T().nf(it[1])+')',2200);
   if(!el||el.querySelector('.stCf'))return;const c=document.createElement('div');c.className='stCf';
-  c.innerHTML='<div class="box"><div class="ic">'+itIcon(k)+'</div><b>Buy 1 '+itName(k)+'?</b><span>for '+TI()+' '+T().nf(it[1])+' Street Tokens</span><div class="bt"><button data-c="0">NO</button><button class="g" data-c="1">YES, BUY</button></div></div>';
+  c.innerHTML='<div class="box"><div class="ic">'+itIcon(k)+'</div><b>Buy '+(N10[k]?'':'1 ')+itName(k)+'?</b>'+(k==='eb'?'<span>An item: USE it later = 2 hours of idle Essence for your stage at that moment (now '+T().ESI+' '+T().nf(ebN())+')</span>':'')+'<span>for '+TI()+' '+T().nf(it[1])+' Street Tokens</span><div class="bt"><button data-c="0">NO</button><button class="g" data-c="1">YES, BUY</button></div></div>';
   c.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-c]');if(!b&&e.target!==c)return;c.remove();if(b&&b.dataset.c==='1')buyNow(k);});el.appendChild(c);}
 function buyNow(k){const s=S(),it=SHOP.find(x=>x[0]===k);if(!it||s.tok<it[1])return;
-  s.tok-=it[1];if(k[0]==='k'){if(window.DGK)DGK.add(k.slice(2),1);}else if(k==='ess')T().giveRw({ess:essN()});else T().giveRw({[k]:1});
+  s.tok-=it[1];if(k[0]==='k'){if(window.DGK)DGK.add(k.slice(2),1);}else if(k==='eb')s.eb=(s.eb||0)+1;else if(N10[k])T().giveRw({[N10[k]]:10});else if(k==='ess')T().giveRw({ess:essN()});else T().giveRw({[k]:1});
   (s.log=s.log||[]).unshift([Date.now(),k,it[1],s.tok]);s.log=s.log.slice(0,20);
-  T().save();T().toast(itIcon(k)+' +1 '+itName(k),2200);render();
+  T().save();T().toast(itIcon(k)+' '+(N10[k]?'+':'+1 ')+itName(k)+(k==='eb'?' · in YOUR ITEMS – use it when you want':''),2400);render();
   try{if(O())O().call('stbuy',{k,p:it[1],left:s.tok});}catch(e){}}
+function useEb(){const s=S();if(!(s.eb>0))return;const n=ebN();s.eb--;T().giveRw({ess:n});(s.log=s.log||[]).unshift([Date.now(),'use_eb',0,s.tok]);s.log=s.log.slice(0,20);T().save();T().toast(T().ESI+' +'+T().nf(n)+' Essence (2h idle)',2400);render();}
+function itemsH(st){if(!(st.eb>0))return '';return '<div class="stS">YOUR ITEMS</div><div class="stSh"><div class="stI"><div class="ic">'+itIcon('eb')+'</div><div class="nm">2h Idle Essence ×'+st.eb+'<br><small>now '+T().ESI+' '+T().nf(ebN())+'</small></div><button class="g" data-s="useeb">USE</button></div></div>';}
 function logH(st){if(!st.log||!st.log.length)return '';const d=t=>new Date(t).toLocaleString([],{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-  return '<div class="stS">YOUR PURCHASES</div><div class="card">'+st.log.map(([t,k,p,l])=>'<div class="hl">'+d(t)+' · '+itName(k)+' · −'+TI()+' '+T().nf(p)+' <small>(left '+T().nf(l)+')</small></div>').join('')+'</div>';}
+  return '<div class="stS">YOUR PURCHASES</div><div class="card">'+st.log.map(([t,k,p,l])=>'<div class="hl">'+d(t)+' · '+(k==='use_eb'?'USED 2h Idle Essence':itName(k)+' · −'+TI()+' '+T().nf(p))+' <small>(left '+T().nf(l)+')</small></div>').join('')+'</div>';}
 function trainImg(g,w,me){return '<img class="tr" src="img/rw/'+(me&&RP()?'loco_gold':'loco'+g)+'.webp" alt=""'+(w?' style="width:'+w+'"':'')+'>';}
 function render(){if(!el||!el.classList.contains('open')||rfBusy)return;const G=T().G,body=document.getElementById('stBody'),now=Date.now(),st=S();let h='';
   h+='<div class="stBal">'+TI()+'<b>'+T().nf(st.tok)+'</b><span>STREET TOKENS<br>for the Street Shop</span></div>';
@@ -129,7 +134,7 @@ function render(){if(!el||!el.classList.contains('open')||rfBusy)return;const G=
   h+='<div class="btns"><button class="y" data-s="list">🔄 NEW TRAINS</button></div>';
   if(D.hits.length){h+='<div class="stS">ATTACKS ON YOUR TRAINS</div><div class="card">'+D.hits.map(x=>'<div class="hl">'+esc(x.an)+' attacked your <span style="color:'+GC(x.g)+'">'+GN(x.g)+'</span> train – '+(x.win?'<b>stole '+T().nf(x.steal)+'</b>':'<b class="ok">your team won</b>')+'</div>').join('')+'</div>';}
   body.innerHTML=h+shopH(st);}
-function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'+SHOP.map(([k,p])=>'<div class="stI"><div class="ic">'+itIcon(k)+'</div><div class="nm">'+itName(k)+'</div><button class="g'+(st.tok<p?' dis':'')+'" data-s="buy" data-k="'+k+'">'+TI()+' '+T().nf(p)+'</button></div>').join('')+'</div>'+logH(st);}
+function shopH(st){return '<div class="stS">STREET SHOP</div><div class="stSh">'+SHOP.map(([k,p])=>'<div class="stI"><div class="ic">'+itIcon(k)+'</div><div class="nm">'+itName(k)+'</div><button class="g'+(st.tok<p?' dis':'')+'" data-s="buy" data-k="'+k+'">'+TI()+' '+T().nf(p)+'</button></div>').join('')+'</div>'+itemsH(st)+logH(st);}
 function open(){build();el.classList.add('open');render();load();clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}
   const now=Date.now();if(D&&D.mine&&D.mine.some(t=>t.t1<=now))load(true);else render();},1000);}
 // a row for the building panels (Car Wash, Gas Station, Car Factory, Rail Terminal)

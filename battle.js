@@ -149,7 +149,7 @@ css.textContent=`
 .gh span{position:absolute;bottom:0;left:0;right:0;font-size:8.5px;font-weight:900;text-align:center;background:#000c;padding:3px 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #gMain{display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 10px}
 .gCol{display:flex;flex-direction:column;gap:6px;width:78px}
-.gsl{text-align:center}.gsl small{display:block;font-size:9px;font-weight:900;color:#c8a27c;letter-spacing:.5px;margin-top:-2px}
+.gsl{text-align:center}.gsl{position:relative}.slvB{position:absolute;right:-4px;top:-6px;z-index:3;min-width:26px;padding:2px 5px;border-radius:8px;font:900 12px/14px system-ui,sans-serif;color:#111;background:var(--c);border:1.5px solid #1a1206;box-shadow:0 0 6px var(--c);pointer-events:none;text-align:center}.slvB.mx{background:linear-gradient(90deg,#ffd54a,#fff3b0,#ffb300,#ffd54a);background-size:200% 100%;animation:slvMx 1.6s linear infinite}@keyframes slvMx{to{background-position:-200% 0}}.slvN{margin:6px 0;font-size:11px;text-align:left}.gsl small{display:block;font-size:9px;font-weight:900;color:#c8a27c;letter-spacing:.5px;margin-top:-2px}
 .gse{aspect-ratio:220/236;border:2px dashed #ffb30055;border-radius:14px;background:#0006;display:flex;align-items:center;justify-content:center}.gse img{width:55%}.gse.sm{width:56px;font-size:20px;color:#ffb30088}
 .gMid{flex:1;max-width:170px;text-align:center}.gPor{width:130px;margin:0 auto}.gMid>b{display:block;font-size:15px;margin-top:2px}.gMid>small{display:block;font-size:10.5px;color:#c8a27c;font-weight:800;margin-top:2px}
 .gPow{margin-top:6px;display:inline-block;background:#000a;border:1px solid #ffd54a66;border-radius:10px;padding:4px 10px;font-weight:900;color:#ffd54a;font-size:16px}
@@ -900,6 +900,10 @@ function GR(){const G=TE().G;if(!G.gear)G.gear={inv:[],eq:{},nid:1,kit:0};const 
   if(!g.m246){g.m246=1;for(const it of g.inv){if(!SETS[it.set])it.set=rollSet();if(!it.ss)it.ss=rollSS();}} // v16-246: old pieces get a random set + set stat
   if(!g.m205){g.m205=1;let gp=0;for(const it of g.inv){if(it.r>=6){const o=mainOld(it);let sr=it.sr||0;while(sr<GSTARMAX6&&mainV({...it,sr})<o)sr++;for(let l=1;l<(it.lv||1);l++)gp+=gpCost({...it,lv:l});it.sr=sr;it.lv=1;}
     else if(it.sr){const o=mainOld(it);let lv=it.lv||1;while(lv<GLV_MAX&&mainV({...it,lv,sr:0})<o)lv++;it.lv=lv;delete it.sr;}}if(gp){const G=TE().G;G.gp=(G.gp||0)+gp;}}
+  // v16-280: the + of every WORN piece becomes the + of its slot; a piece in the bag with a + → back to +1 and 100% of its Gear Parts returned
+  if(!g.m280){g.m280=1;const sv=g.slv||(g.slv={}),own={};for(const hid in g.eq)for(const s in g.eq[hid])own[g.eq[hid][s]]=hid;let gp=0;
+    for(const it of g.inv){if(it.r>=6||(it.lv||1)<=1)continue;const o=own[it.id];if(o){(sv[o]||(sv[o]={}))[it.s]=Math.max(sv[o][it.s]||1,it.lv);}else{for(let l=1;l<it.lv;l++)gp+=gpCost0({...it,lv:l});it.lv=1;}}
+    if(gp){const G=TE().G;G.gp=(G.gp||0)+gp;g.m280gp=gp;}}
   return g;}
 function newItem(s,r,set){const g=TE().G.gear;const st=GS[s].st,others=Object.keys(GSTAT).filter(k=>k!==st),sub=[];
   for(let i=0;i<GSUBN[r];i++){const k=others.splice(Math.floor(Math.random()*others.length),1)[0];sub.push([k,Math.round(GSTAT[k].v[r]*.4*10)/10]);}
@@ -930,8 +934,20 @@ function salvPk(list){const T=TE(),U=T.PART_U?T.PART_U():1,EU=T.ESS_U?T.ESS_U():
   if(it.set&&CLS2ROLE[it.set])o[CLS2ROLE[it.set]]=(o[CLS2ROLE[it.set]]||0)+n;else{const q=T.pkRoles?T.pkRoles(n):{};for(const k in q)o[k]=(o[k]||0)+q[k];}}return o;}
 function salvPkGive(list){const T=TE(),o=salvPk(list);o.ess=Math.max(o.ess>0?1:0,Math.round(o.ess||0));if(!o.ess)delete o.ess;if(o.ess)T.G.ess=(T.G.ess||0)+o.ess;if(T.pkAdd)for(const k in o)if(k!=='ess')T.pkAdd(k,o[k]);return o;}
 const pkTxt=o=>{const T=TE();return Object.keys(o).map(k=>(k==='ess'?T.ESI:T.PKI?T.PKI(k):'')+' +'+T.nf(o[k])).join(' ');};
-const salvageV=it=>Math.max(1,Math.round(4*Math.pow(it.r+1,1.8)*(it.r>=6?1:1+.5*(Math.min(it.lv,GLV_MAX)-1))*(1+(it.sr||0)))); // v16-99: salvage gives GEAR PARTS (= old money ÷ 10)
-const gpCost=it=>Math.max(1,Math.round(upCost(it)/10)); // v16-99: gear upgrades cost GEAR PARTS, money stays for the garage
+const salvageV=it=>Math.max(1,Math.round(4*Math.pow(it.r+1,1.8)*(1+(it.sr||0)))); // v16-99: salvage gives GEAR PARTS (= old money ÷ 10)
+const gpCost0=it=>Math.max(1,Math.round(upCost(it)/10)); // v16-99 cost per piece (v16-280: only for the refund of old upgrades)
+// v16-280 (Marius 24 nov): SLOT UPGRADES – the +1 … +50 belongs to the hero's SLOT (g.slv[hero][slot]), not to the piece ("classic" system).
+// Any Common–Mythic piece put in that slot gets the slot's +. Ascended keeps its own stars. A free piece in the bag is +1.
+// The cost no longer depends on the grade of the piece (else: upgrade with a Common, then swap in a Mythic) – it grows with the level, ×2 (never lost now)
+const slotCost=lv=>Math.max(1,2*Math.round(150*Math.pow(1+(lv-1)/10,1.6)*Math.pow(1.4,Math.min(lv,10)-1)*Math.pow(1.08,Math.max(0,lv-10))/10));
+const gpCost=it=>slotCost(it.lv||1);
+const SLV=(hid,s)=>{const v=GR().slv;return (v&&v[hid]&&v[hid][s])||1;};
+const eLv=(it,hid)=>it.r>=6||!hid?it.lv:SLV(hid,it.s);
+function slvSync(){const g=GR(),sv=g.slv||(g.slv={}),own={};for(const hid in g.eq)for(const s in g.eq[hid])own[g.eq[hid][s]]=hid;
+  for(const it of g.inv){if(it.r>=6)continue;const o=own[it.id];it.lv=(o&&sv[o]&&sv[o][it.s])||1;}}
+function slvRefund(hid){const g=GR(),v=(g.slv||{})[hid];let c=0;if(v)for(const s in v)for(let l=1;l<v[s];l++)c+=slotCost(l);return c;}
+const slvTier=lv=>Math.min(10,Math.floor((lv||1)/5));
+const SLV_COL=['#9e9e9e','#ffffff','#69f0ae','#40c4ff','#448aff','#b388ff','#ea5cff','#ff4081','#ff9100','#ff1744','#ffd54a']; // corner badge colour: every +5 a new colour
 const GPN=n=>TE().GPI+' '+TE().nf(n);
 function ownerOf(it){const eq=GR().eq;for(const hid in eq)for(const s in eq[hid])if(eq[hid][s]===it.id)return hid;return null;}
 function heroGear(hid,ov){const eq=GR().eq[hid]||{},o=[];for(const sl of GSLOT){const it=ov&&(sl.k in ov)?ov[sl.k]:itemById(eq[sl.k]);if(it)o.push(it);}return o;}
@@ -983,7 +999,7 @@ function collInfo(){const T=TE(),L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon);retu
 function collBon(){const T=TE(),O=T.G.h.own;let ss=0;for(const id in O)ss+=O[id].s||0;const k=Object.keys(T.G.h.disc).length+'/'+Object.keys(O).length+'/'+ss;if(k===cbK&&cbV)return cbV;const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};
   collInfo().forEach(c=>{if(c.tot&&c.n>=c.tot)CBON[c.gr].forEach(([s,v])=>b[s]+=v);});
   scInfo().forEach(c=>SC_B[c.gr].forEach(([st,a])=>{for(let i=0;i<c.steps;i++)b[st]+=a[i];}));cbK=k;cbV=b;return b;}
-function gearBon(items){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};for(const it of items){b[GS[it.s].st]+=mainV(it);for(const [k,v] of it.sub)b[k]+=subV(it,v);}return b;}
+function gearBon(items,hid){const b={atk:0,hp:0,def:0,crit:0,aspd:0,en:0};for(let it of items){if(hid&&it.r<6)it={...it,lv:eLv(it,hid)};b[GS[it.s].st]+=mainV(it);for(const [k,v] of it.sub)b[k]+=subV(it,v);}return b;} // v16-280: + of the hero's slot
 // item picture: rarity glow + drawn glyph
 // ---------------------------------------------------------------- v14: item pictures – every grade has its own drawing (36 items)
 const IMAT=[{b:'#8d6e57',h:'#c9a68a',l:'#4a3527',a:'#b5562a',t:'#d9c3a5'},{b:'#8fa3a0',h:'#eef6f3',l:'#4d5d59',a:'#43c463',t:'#2e7d32'},{b:'#3f7fd6',h:'#d6ecff',l:'#123a78',a:'#40c4ff',t:'#82b1ff'},
@@ -1126,7 +1142,7 @@ const RLI=k=>'img/ui12/role_'+k+'.webp';
 const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
 function teamRoles(tl){const have=new Set(tl.filter(Boolean).map(bRoleOf).filter(Boolean));return {have,n:have.size,bon:TR_BON[have.size]||0};}
 function rTag(h,sz){const k=bRoleOf(h);if(!k)return '';const r=BROLE[k];return `<span class="rTag" style="--rc:${r.c}"><img src="${RLI(k)}" style="width:${sz||'1.35em'};height:${sz||'1.35em'}">${r.n}</span>`;}
-function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
+function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its,h.id),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
   const gk=h.crew||!TE().garB?1:1+TE().garB(clsOf(h)); // v16-129: the garage that trains this class (LV 1-100) → +ATK & HP
   const MR=MYTH_RNG[h.id]||{}; // v16-141: Mythic rangers
   return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)*(MR.hp||1)),atk:R.atk*m*gk*(1+b.atk/100),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100)*(MR.def||1),mv:R.mv,rng:MR.rng||R.rng,as:R.as*(MR.as||1)/(1+softCap(b.aspd,60,150)/100),crit:Math.min(.75,R.crit+b.crit/100),eg:1+softCap(b.en,60,120)/100,b};}
@@ -3072,7 +3088,7 @@ function popLvl(h){const T=TE(),G=T.G,id=h.id,lv=T.lvOf(id),cap=T.lvCap(id),a=T.
 // ---------------------------------------------------------------- GEAR page (separate page · gear works only in battles)
 let gPrev=null;   // v16-158: hero page preview of a hero you don't own (from Hero Collection)
 let gRet=null,gsel=null,gfil='all',gsalv=0,gsort='pow',gpgFrom='';
-function cleanGear(){const T=TE(),g=GR();for(const hid in g.eq){if(!T.G.h.own[hid]){delete g.eq[hid];continue;}for(const s in g.eq[hid])if(!itemById(g.eq[hid][s]))delete g.eq[hid][s];}}
+function cleanGear(){const T=TE(),g=GR();for(const hid in g.eq){if(!T.G.h.own[hid]){delete g.eq[hid];continue;}for(const s in g.eq[hid])if(!itemById(g.eq[hid][s]))delete g.eq[hid][s];}slvSync();}
 function gHero(){if(gPrev&&TE().HB[gPrev])return TE().HB[gPrev];const L=myMechs();if(!L.length)return null;if(!gsel||!L.find(h=>h.id===gsel))gsel=L[0].id;return TE().HB[gsel];}
 function openGear(hid,si){cleanGear();if(hid)gsel=hid;tsi=si!=null?si:Math.min(CPX().best,NST-1);openTeam.render=renderGear;$('cpGear').classList.add('open');gpg='';renderGear();gPage(hid?'hero':'');$('gBody').scrollTop=0;}
 // v16-228 (Marius 23 nov): the red-dot TRAIL – every dot leads to the next dot and says WHAT to do (LV UP / GEAR)
@@ -3104,7 +3120,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   $m('gHeroes').innerHTML=L.length?L.map(m=>{const ng=heroGear(m.id).length;return `<div class="gh${m.id===gsel?' on':''}" data-h="${m.id}" style="border-color:${gcol(m)}"><img src="${portraitURL(m)}"><img class="rb" src="${roleBadge(clsOf(m))}">${bRoleOf(m)?`<img class="rr" src="${RLI(bRoleOf(m))}">`:''}${team.includes(m.id)?'<i>TEAM</i>'+RDT(heroWhy(m)):''}${fz(m.id)?'<b class="up">FUSE ✓</b>':''}<em class="st">${SL(m)}</em><em class="lv${lvCan(m.id)?' up':''}">Lv ${T.lvOf(m.id)}${lvCan(m.id)?' ▲':''}</em>${ng?`<em class="gc">⚙${ng}</em>`:''}<b class="pw">⚔ ${pow(m).toLocaleString()}</b><span>${m.n}</span></div>`;}).join(''):'<div class="gEmpty" style="grid-column:1/-1">No heroes yet – summon your first heroes!</div>';
   $m('gHSB').innerHTML='<b>HERO SUMMON</b><span><img src="img/ticket.webp" alt="">'+T.G.h.tk.toLocaleString()+'</span>';
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon your first heroes – they fight and wear gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
-  const eq=g.eq[h.id]||{};const HSK_=setKeyOf(h,heroGear(h.id));const slotBox=sl=>{const it=itemById(eq[sl.k]);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it,'','',it.set?(it.set===HSK_?'On':'Off'):''):''}</div>`;}; // v16-240 (Marius): set piece on the right class glows all the time
+  const eq=g.eq[h.id]||{};const HSK_=setKeyOf(h,heroGear(h.id));const slotBox=sl=>{const it=itemById(eq[sl.k]),lv=SLV(h.id,sl.k),tr=slvTier(lv);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it,'','',it.set?(it.set===HSK_?'On':'Off'):''):''}${lv>1?`<b class="slvB${tr>=10?' mx':''}" style="--c:${SLV_COL[tr]}">+${lv}</b>`:''}</div>`;}; // v16-280: slot + in the corner, a new colour every +5 // v16-240 (Marius): set piece on the right class glows all the time
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
   $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'');
   $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>${SL(h,1)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(clsOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[clsOf(h)].n}${h.gr===5?' '+starsH(stars(h)||0,0,1):''}</small>${rTag(h)}<div class="gPow">${IMGI(PWU,'1.2em','-.22em')} ${pow(h).toLocaleString()}</div>`;
@@ -3191,7 +3207,8 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
   let x=`<div class="itW"><button class="itX" data-p="x">✕</button><div class="itHave" title="Your Gear Parts">${TE().GPI}<span><small>YOU HAVE</small>${T.nf(G.gp||0)}</span></div><div class="itIc">${itemCard(it)}</div>
    <div class="itNm"><b style="color:${GG(it.r).c}">${itemName(it)}</b><small>${GG(it.r).n} ${sl.n} · ${it.r>=6?starsH(it.sr||0,1,1)+' '+(it.sr||0)+'/'+GSTARMAX6:'+'+it.lv+' / +'+GLV_MAX}</small>${it.set?`<small class="itSet">${IMGI(roleBadge(it.set),'1.2em','-.3em')} ${SETS[it.set].n.toUpperCase()} SET · ${ROLE[it.set].n} only</small>`:''}</div>
    <div class="itSt">${rows.slice(0,4).join('')}</div>
-   <div class="itBt">${b1}<button class="b2${mx||(G.gp||0)<c?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?(it.r>=6?'★ STARS ONLY':'MAX +'+GLV_MAX):`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${GPN(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${GPN(salvageV(it))}</small></button></div></div><div class="itMore">`;
+   <div class="itBt">${b1}<button class="b2${mx||(G.gp||0)<c||(!o&&it.r<6)?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?(it.r>=6?'★ STARS ONLY':'MAX +'+GLV_MAX):!o&&it.r<6?`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>equip first</small>`:`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${GPN(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${GPN(salvageV(it))}</small></button></div></div><div class="itMore">`;
+  if(it.r<6)x+=`<div class="gNote slvN">🔧 The <b>+</b> belongs to the hero's <b>${sl.n.toUpperCase()} SLOT</b>, not to the piece${o?` · <b style="color:${SLV_COL[slvTier(it.lv)]}">${oh?oh.n:''} ${sl.n} slot +${it.lv}</b>`:''}. Swap the piece – the + stays on the slot.</div>`;
   if(h){const cur=itemById((g.eq[h.id]||{})[it.s]);
     if(o===h.id){x+=`<div class="cpSec">IF YOU UNEQUIP IT FROM ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:null},[],[`${sl.n} slot becomes empty`]);}
     else{const xc=[],xp=[];if(cur)xc.push(`Replaces <b style="color:${GG(cur.r).c}">${itemName(cur)}</b> Lv ${cur.lv} (goes back to the bag)`);
@@ -3217,7 +3234,7 @@ let gdBack='';function gearGuide(back){gdBack=back||'';const T=TE(),sl='tool',st
    <div class="gdT">Common ➜ Mythic come from <b>Gear Summon</b>, the Campaign and Dungeons.<br><b style="color:${ASC.c}">ASCENDED</b> is the new grade above Mythic.</div></div>
   <div class="gdS"><div class="gdH"><i>2</i>ENHANCE +1 – +${GLV_MAX} · ${STI('asc')} STARS ONLY ON ASCENDED</div>
    <div class="gdEq">${itemCard(it(5,0,1))}<em class="to">➜</em>${itemCard(M0)}</div>
-   <div class="gdT"><b>Common ➜ Mythic</b>: ENHANCE with Gear Parts up to <b>+${GLV_MAX}</b>. Every <b>+5</b> unlocks a bonus: +5 … +40 = extra stats <b>+${GMS_SK*100}%</b> each, <b>+45</b> = main stat ×${GMS_M45}, <b>+50</b> = main stat ×2 in total.<br><b style="color:${ASC.c}">ASCENDED</b> has no levels – a new Ascended (★0) is already <b>stronger than a Mythic +50</b>. Only Ascended get <b>stars ★1 – ★20</b> (another Ascended piece of the same slot = +1 star).<br><b>A Mythic can NOT become Ascended</b> – Ascended only drops (see 3).</div>
+   <div class="gdT"><b>Common ➜ Mythic</b>: ENHANCE with Gear Parts up to <b>+${GLV_MAX}</b> – the <b>+ stays on the hero's SLOT</b> when you swap the piece. Every <b>+5</b> unlocks a bonus: +5 … +40 = extra stats <b>+${GMS_SK*100}%</b> each, <b>+45</b> = main stat ×${GMS_M45}, <b>+50</b> = main stat ×2 in total.<br><b style="color:${ASC.c}">ASCENDED</b> has no levels – a new Ascended (★0) is already <b>stronger than a Mythic +50</b>. Only Ascended get <b>stars ★1 – ★20</b> (another Ascended piece of the same slot = +1 star).<br><b>A Mythic can NOT become Ascended</b> – Ascended only drops (see 3).</div>
    <div class="gdL">${L}</div></div>
   <div class="gdS"><div class="gdH"><i>3</i>${STI('asc')} <span style="color:${ASC.c}">ASCENDED · WHERE TO FIND</span></div>
    <div class="gdEq">${itemCard(A0)}<em class="vs">🎁<small>DROP<br>ONLY</small></em></div>
@@ -3241,7 +3258,7 @@ function upFx(it,v0,p0){const T=TE(),st=GSTAT[GS[it.s].st],col=GG(it.r).c,h=gHer
   document.querySelectorAll(`#cpPopBox .iTop>.gi, #cpPopBox .itIc>.gi, #cpGear .gi[data-it="${it.id}"]`).forEach(e=>{e.classList.remove('upHit');void e.offsetWidth;e.classList.add('upHit');});
   const u=bx.querySelector('.iUp');if(u){u.classList.remove('upHit2');void u.offsetWidth;u.classList.add('upHit2');}
   const m=bx.querySelector('.iSt.main b');if(m){m.classList.remove('upHit2');void m.offsetWidth;m.classList.add('upHit2');}}
-function equip(hid,it){const g=GR(),o=ownerOf(it);if(o)delete g.eq[o][it.s];if(!g.eq[hid])g.eq[hid]={};g.eq[hid][it.s]=it.id;}
+function equip(hid,it){const g=GR(),o=ownerOf(it);if(o)delete g.eq[o][it.s];if(!g.eq[hid])g.eq[hid]={};g.eq[hid][it.s]=it.id;slvSync();}
 // v16-83 (Marius: "first check if the set is better, then the normal pieces"): the hero's OWN class set is tried first –
 // 2, 3 … all slots with a set piece (the set slots that lose the least go first), the other slots get the best normal item.
 // The plan with the highest Power wins; if no set plan beats the normal one, the normal (best item per slot) plan is used.
@@ -3327,18 +3344,18 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
      else{ok=T.ascend(h.id);if(!ok){T.toast(T.ascMC(T.ascOf(h.id))?'Not enough Mythic Core for the Core Ascension':'Not enough Essence for the Ascension',2200);return;}T.toast('✦ ASCENSION '+T.ascOf(h.id)+'! '+h.n+' · max Lv '+T.lvCap(h.id)+' · skill Lv '+T.skLv(h.id),2800);}
      renderGear();popLvl(h);return;}
   if(a==='hreb'){const h=T.HB[el.dataset.h];if(!h)return;const id=h.id,e=T.rebirthVal(id),geq=Object.keys(GR().eq[id]||{}).length;
-     pop(`<div class="pT">♻ REBIRTH · <span style="color:${gcol(h)}">${h.n}</span></div><div class="pD" style="text-align:left">${h.n} goes back to <b>Lv 1</b> with <b>no Ascension</b> (skill Lv 1).<br>• you get back <b>100%</b> of the Essence: ${T.ESI} <b>+${T.nf(e)}</b>${T.rebirthMC(id)?` and the Mythic Core: ${T.MCI} <b>+${T.nf(T.rebirthMC(id))}</b>`:''}<br>• ${geq?'<b>'+geq+'</b> gear piece'+(geq>1?'s go':' goes')+' back to the BAG (upgrades and stars stay on the pieces)':'no gear equipped'}<br>• stars <b>${SL(h)}</b> stay (summons can't be undone)<br>• free · use the Essence on any hero</div>
+     pop(`<div class="pT">♻ REBIRTH · <span style="color:${gcol(h)}">${h.n}</span></div><div class="pD" style="text-align:left">${h.n} goes back to <b>Lv 1</b> with <b>no Ascension</b> (skill Lv 1).<br>• you get back <b>100%</b> of the Essence: ${T.ESI} <b>+${T.nf(e)}</b>${T.rebirthMC(id)?` and the Mythic Core: ${T.MCI} <b>+${T.nf(T.rebirthMC(id))}</b>`:''}<br>• ${geq?'<b>'+geq+'</b> gear piece'+(geq>1?'s go':' goes')+' back to the BAG (Ascended stars stay on the pieces)':'no gear equipped'}${slvRefund(id)?'<br>• slot upgrades back to +1 · you get back <b>100%</b> of the Gear Parts: '+GPN(slvRefund(id)):''}<br>• stars <b>${SL(h)}</b> stay (summons can't be undone)<br>• free · use the Essence on any hero</div>
        <button class="cpGo red" data-p="hrebOK" data-h="${id}">♻ REBIRTH NOW</button><button class="cpGo alt" data-p="hrebNo" data-h="${id}">CANCEL</button>`);return;}
   if(a==='hrebNo'){const h=T.HB[el.dataset.h];if(h)popLvl(h);else closePop();return;}
-  if(a==='hrebOK'){const h=T.HB[el.dataset.h];if(!h)return;const g=GR(),n=Object.keys(g.eq[h.id]||{}).length;delete g.eq[h.id];const e=T.rebirth(h.id);T.save();renderGear();closePop();
-     T.toast('♻ '+h.n+' reborn · '+T.ESI+' +'+T.nf(e)+' Essence'+(n?' · '+n+' gear → BAG':''),3000);return;}
+  if(a==='hrebOK'){const h=T.HB[el.dataset.h];if(!h)return;const g=GR(),n=Object.keys(g.eq[h.id]||{}).length,sg=slvRefund(h.id);delete g.eq[h.id];if(g.slv)delete g.slv[h.id];if(sg)G.gp=(G.gp||0)+sg;slvSync();const e=T.rebirth(h.id);T.save();renderGear();closePop();
+     T.toast('♻ '+h.n+' reborn · '+T.ESI+' +'+T.nf(e)+' Essence'+(n?' · '+n+' gear → BAG':'')+(sg?' · '+GPN(sg):''),3000);return;}
   if(a==='tok'){const k=+el.dataset.k,id=el.dataset.id;if(id)tsel[k]=id;else tsel.splice(k,1);tSave();closePop();openTeam.render&&openTeam.render();return;}
   if(a==='bok'){tsel=tBest();tSave();closePop();openTeam.render&&openTeam.render();return;}
   const it=el.dataset.it?itemById(+el.dataset.it):null,h=gHero();
   if(a==='eq'&&it&&h){equip(h.id,it);T.save();closePop();renderGear();T.toast('✓ '+itemName(it)+' equipped on '+h.n,1800);return;}
-  if(a==='ueq'&&it){const o=ownerOf(it);if(o)delete GR().eq[o][it.s];T.save();closePop();renderGear();return;}
-  if(a==='up'&&it){const c=gpCost(it);if((G.gp||0)<c){T.toast('Not enough Gear Parts ('+GPN(c)+') · salvage gear, Dungeons, campaign, Idle Rewards',2600);return;}if(it.lv>=gMax(it))return;
-    const v0=mainV(it),p0=gHero()?pow(gHero()):0;G.gp-=c;it.lv++;T.save();renderGear();popItem(it.id,true);upFx(it,v0,p0);return;}
+  if(a==='ueq'&&it){const o=ownerOf(it);if(o)delete GR().eq[o][it.s];slvSync();T.save();closePop();renderGear();return;}
+  if(a==='up'&&it){const ow=ownerOf(it);if(!ow&&it.r<6){T.toast('Equip it first – the upgrade (+) belongs to the hero\'s SLOT',2400);return;}const c=gpCost(it);if((G.gp||0)<c){T.toast('Not enough Gear Parts ('+GPN(c)+') · salvage gear, Dungeons, campaign, Idle Rewards',2600);return;}if(it.lv>=gMax(it))return;
+    const v0=mainV(it),p0=gHero()?pow(gHero()):0;G.gp-=c;{const g=GR(),sv=g.slv||(g.slv={});(sv[ow]||(sv[ow]={}))[it.s]=it.lv+1;slvSync();}T.save();renderGear();popItem(it.id,true);upFx(it,v0,p0);return;}
   if(a==='star'&&it){const f=starFood(it);if(!f)return;
     if(gstar!==it.id+a){gstar=it.id+a;el.innerHTML='TAP AGAIN<small>'+itemName(f)+' '+gLvTxt(f)+' is used</small>';return;}gstar='';
     const g=GR(),p0=gHero()?pow(gHero()):0;g.inv.splice(g.inv.indexOf(f),1);
@@ -3346,8 +3363,8 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
     T.save();renderGear();popItem(it.id,true);const dp=gHero()&&ownerOf(it)===gHero().id?pow(gHero())-p0:0;
     T.toast(a==='star'?'★ STAR UP! '+itemName(it)+' ★'+it.sr+(dp>0?' · Power +'+dp.toLocaleString():''):'✦ ASCENDED! '+itemName(it)+' is now Ascended',2600);return;}
   if(a==='salv'&&it){if(!gsalv){gsalv=1;el.innerHTML=el.closest('.itBt')?'TAP AGAIN<small>to salvage</small>':'TAP AGAIN TO SALVAGE (+'+T.nf(salvageV(it))+' parts)';el.classList.remove('alt');el.classList.add('red');el.style.background='linear-gradient(#ff8a80,#c62828)';el.style.color='#fff';return;}
-    const o=ownerOf(it);if(o)delete GR().eq[o][it.s];const g=GR();g.inv.splice(g.inv.indexOf(it),1);G.gp=(G.gp||0)+salvageV(it);const spk=salvPkGive([it]);T.save();closePop();renderGear();T.toast('🔨 Salvaged for '+GPN(salvageV(it))+' '+pkTxt(spk),1800);return;}
-  if(a==='aok'&&h){const ov=autoPlan(h),g=GR(),rob=[];if(!g.eq[h.id])g.eq[h.id]={};for(const sl of GSLOT){const b=ov[sl.k];if(b){const o=ownerOf(b);if(o&&o!==h.id)rob.push([o,sl.k]);equip(h.id,b);}else delete g.eq[h.id][sl.k];}for(const [o,k] of rob)aeRefill(o,k);T.save();closePop();renderGear();return;}
+    const o=ownerOf(it);if(o)delete GR().eq[o][it.s];slvSync();const g=GR();g.inv.splice(g.inv.indexOf(it),1);G.gp=(G.gp||0)+salvageV(it);const spk=salvPkGive([it]);T.save();closePop();renderGear();T.toast('🔨 Salvaged for '+GPN(salvageV(it))+' '+pkTxt(spk),1800);return;}
+  if(a==='aok'&&h){const ov=autoPlan(h),g=GR(),rob=[];if(!g.eq[h.id])g.eq[h.id]={};for(const sl of GSLOT){const b=ov[sl.k];if(b){const o=ownerOf(b);if(o&&o!==h.id)rob.push([o,sl.k]);equip(h.id,b);}else delete g.eq[h.id][sl.k];}for(const [o,k] of rob)aeRefill(o,k);slvSync();T.save();closePop();renderGear();return;}
   if(a==='nok'&&h){GR().eq[h.id]={};T.save();closePop();renderGear();return;}
   if(a==='svok'){const g=GR(),L=(svPick||[]).filter(it=>g.inv.includes(it)&&!ownerOf(it));let sum=0;const spk=salvPkGive(L);L.forEach(it=>{sum+=salvageV(it);g.inv.splice(g.inv.indexOf(it),1);});G.gp=(G.gp||0)+sum;window.__lastSpk=spk;T.save();closePop();renderGear();renderSalv();svFx(L.length,sum);if(Object.keys(spk).length)T.toast('🔨 Garage parts + Essence: '+pkTxt(spk),2800);return;}});
 
@@ -4232,7 +4249,7 @@ function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
   G.cp.best=NST;for(let i=0;i<NST;i++)G.cp.stars[i]=3;G.cph={best:NST,stars:{},ch:0};for(let i=0;i<NST;i++)G.cph.stars[i]=3;
   // gear: a full Ascended ★5 Lv 60 class set for every Legendary + Mythic battle hero + a few Mythic pieces to try STAR UP / ASCEND
   const hs=myMechs().filter(h=>h.gr>=4);g.inv=[];g.eq={};
-  hs.forEach(h=>{GSLOT.forEach(sl=>{const it=newItem(sl.k,6,clsOf(h));it.lv=GMAXR[6];it.sr=5;g.inv.push(it);equip(h.id,it);});});
+  hs.forEach(h=>{const sv=g.slv||(g.slv={});sv[h.id]={};GSLOT.forEach(sl=>{sv[h.id][sl.k]=GLV_MAX;const it=newItem(sl.k,6,clsOf(h));it.lv=GMAXR[6];it.sr=5;g.inv.push(it);equip(h.id,it);});});
   GSLOT.forEach(sl=>{for(let k=0;k<2;k++){const it=newItem(sl.k,5);it.lv=GMAXR[5];g.inv.push(it);}});
   G.cp.team=myMechs().slice(0,5).map(h=>h.id);
   T.save();return true;}
@@ -4250,7 +4267,7 @@ CAMPAIGN.sets=()=>SETK.map(k=>({k,n:SETS[k].n,c:SETCOL[k],cls:({engine:'Engine',
 CAMPAIGN.giftSet=(set,r)=>{const g=GR();const L=GSLOT.map(sl=>newItem(sl.k,r,set));L.forEach(it=>g.inv.push(it));TE().save();return L;};
 CAMPAIGN.ascOne=()=>{const g=GR();const it=newItem(GSLOT[Math.floor(Math.random()*6)].k,6);g.inv.push(it);TE().save();return it;};   // v16-192: Grand Prix Gold/Platinum – 1 Ascended piece
 if(window.SEC&&SEC.TEST_MODE)window.__PW={sv:L=>salvPkGive(L),ap:(h,t)=>autoPlan(h,t),pa:id=>{if(id)gsel=id;const h=gHero();popAuto();const p=document.querySelector(".cpPop.open,#cpPop,.pop.open");return (h?h.n:"nohero")+" | "+((document.getElementById("cpPopBox")||{}).textContent.slice(0,500))+" | "+[...document.querySelectorAll("[class*=pop],[id*=op]")].filter(e=>e.offsetParent).map(e=>e.id||e.className).slice(0,8).join(",");},own:it=>ownerOf(it),ref:aeRefill,ep:enemyPower,tw:twPower,ct:ctPower,dg:dgPower,tp:()=>teamPower(curTeamList()),pw:h=>pow(h),hm:v=>{HM=v?1:0;},ni:newItem,eqp:equip,GSLOT,GMAXR,rol:h=>roleOf(h),SETS,hof:id=>heroOf(id),gr:GR,EG,EG2,CT_K,DGK:DG_K,NST,twR:twRew,ctR:ctRew,coll:()=>collBon()}; // v16-161: for tools/endgame.py
-if(window.SEC&&SEC.TEST_MODE)window.__DEV={heroPg:id=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();gsel=id;gpgFrom='';renderGear();gPage('hero');},hm:v=>{HM=v?1:0;},getB:()=>B,fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
+if(window.SEC&&SEC.TEST_MODE)window.__DEV={gearT:()=>({GR,equip,newItem,slvSync,pow,SLV,popItem,renderGear,gpCost,unitStats}),heroPg:id=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();gsel=id;gpgFrom='';renderGear();gPage('hero');},hm:v=>{HM=v?1:0;},getB:()=>B,fin:w=>finish(w),card:i=>{rootOn();showMap();openCard(i);},ctOpen:k=>ctOpen(k),twOpen:()=>twOpen(),popItem:id=>popItem(id),openGSum:()=>{root.classList.add('open');window.__BATTLE_ON=true;openGear();openGSum();},CP:()=>window.CAMPAIGN,startBattle:(si,ids)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(si,(ids||bestTeam()).map(heroOf));},get B(){return B;},gr:()=>GR(),newItem,gPage,openGear,sel:id=>{gsel=id;renderGear();gPage('hero');},tower:f=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(f);startBattle(F.eq,bestTeam().map(heroOf),F);},twFloor:f=>twFloor(f),ctFloor,ct:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=ctFloor(k,f);startBattle(F.eq,ctTeam(k).length?ctTeam(k):bestTeam().map(heroOf),F);},wb:()=>{root.classList.add('open');window.__BATTLE_ON=true;const w=wbG();w.n=0;wbGo();},wbG:()=>wbG(),dg:(k,f)=>{root.classList.add('open');window.__BATTLE_ON=true;startBattle(dgEq(f),bestTeam().map(heroOf),dgFloor(k,f));},dgG:()=>dgG(),dgOpen:k=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,DG_UNLOCK);dgOpen(k);},dgPass:()=>dgPassWin(),wbSet:i=>{WBF=i;},wbOpen:()=>{const G=TE().G;G.cp.best=Math.max(G.cp.best,WB_UNLOCK);wbOpen();},towerW:(w,mul)=>{root.classList.add('open');window.__BATTLE_ON=true;const F=twFloor(1);F.w=[w];F.st.w=F.w;F.mod=-1;F.st.n='TEST';F.mul=mul||.2;startBattle(F.eq,bestTeam().map(heroOf),F);},simRun:(si,ids,t)=>{window.__SIM=1;try{return simRun(si,(ids||bestTeam()).map(heroOf),t);}finally{window.__SIM=0;}}};
 })();
 
 (function(){const st=document.createElement('style');st.textContent='.dgBn{color:#7CFC9A!important;text-shadow:0 0 6px #00e67688,0 1px 0 #000;margin-left:3px}';document.head.appendChild(st);})();
