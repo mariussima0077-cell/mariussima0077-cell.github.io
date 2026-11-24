@@ -2630,8 +2630,8 @@ function drawHUD(t){HIT=[];const top=10,bh=38;
   g.textAlign='center';const tt=(B.wbB?'WORLD BOSS':B.tw&&B.tw.dg?'DUNGEON':B.tw?'TOWER':sLabel(B.si))+' · '+B.stage.n.toUpperCase();let fs=Math.round(15*S);g.font='900 '+fs+'px Game,system-ui';while(fs>9&&g.measureText(tt).width>W-250){fs--;g.font='900 '+fs+'px Game,system-ui';}g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(tt,W/2,top+17);g.fillStyle='#ffe0b2';g.fillText(tt,W/2,top+17);
   const nw=B.wbB?0:B.stage.w.length;for(let i=0;i<nw;i++){const x=W/2+(i-(nw-1)/2)*22,y=top+33;const boss=B.stage.w[i].some(m=>MON[m].boss);g.fillStyle=i<B.wave?'#66bb6a':i===B.wave?'#ffb300':'rgba(255,255,255,.25)';
     if(boss){g.font='900 13px Game,system-ui';g.fillText('💀',x,y+5);}else{rr(g,x-7,y-3,14,7,3);g.fill();}}
-  if(ibtn(W-104,top-2,44,B.spd===3?'x3':B.spd===2?'x2':B.spd===1.5?'x15':'x1','spd')){if(B.spd===1.5&&!TE().spd2())g.drawImage(badgeCv('lock','#8d6e63',64),W-104+32,top-6,16,16);}
-  else{btn(W-112,top,48,bh,'×'+B.spd,B.spd>1,'spd');if(B.spd===1.5&&!TE().spd2()){g.drawImage(badgeCv('lock','#8d6e63',64),W-112+36,top-4,16,16);}}
+  if(ibtn(W-104,top-2,44,B.spd===3?'x3':B.spd===2?'x2':B.spd===1.5?'x15':'x1','spd')){if(B.spd===1.5&&!(TE().spdX?TE().spdX():TE().spd2()))g.drawImage(badgeCv('lock','#8d6e63',64),W-104+32,top-6,16,16);}
+  else{btn(W-112,top,48,bh,'×'+B.spd,B.spd>1,'spd');if(B.spd===1.5&&!(TE().spdX?TE().spdX():TE().spd2())){g.drawImage(badgeCv('lock','#8d6e63',64),W-112+36,top-4,16,16);}}
   if(!ibtn(W-54,top-2,44,B.auto?'aon':'aoff','auto'))btn(W-58,top,48,bh,'AUTO',B.auto,'auto','#66bb6a');
   if(B.wbB)wbHUD(t,top);
   else if(B.bossBar&&!B.bossBar.dead){const b=B.bossBar,bw=W*.8,x=W*.1,y=top+50;g.fillStyle='rgba(0,0,0,.75)';rr(g,x-2,y-2,bw+4,16,8);g.fill();
@@ -2726,7 +2726,8 @@ function drawCenterText(t){let txt=null,sub=null;
   if(!txt)return;const s=1+Math.max(0,.3-(B.phT%10))*1.2;g.save();g.translate(W/2,H*.27);g.scale(s,s);g.textAlign='center';g.font='900 '+Math.round(38*S)+'px Game,system-ui';g.lineWidth=7;g.lineJoin='round';g.strokeStyle='#1a0800';g.strokeText(txt,0,0);
   const gr=g.createLinearGradient(0,-30,0,6);gr.addColorStop(0,'#fff8e1');gr.addColorStop(1,B.phase==='lose'||txt.includes('BOSS')?'#ff5252':'#ffa000');g.fillStyle=gr;g.fillText(txt,0,0);
   if(sub){g.font='900 '+Math.round(16*S)+'px Game,system-ui';g.lineWidth=4;g.strokeText(sub,0,26);g.fillStyle='#ffccbc';g.fillText(sub,0,26);}g.restore();}
-function spdOK(v){const own=TE().spd2();if((v===2||v===3)&&own)return 3; // v16-121: the pack gives ×3 (was ×2 – tester: too small next to the free ×1.5)
+function spdOK(v){const own=TE().spdX?TE().spdX():(TE().spd2()?3:0);if((v===2||v===3)&&own)return own; // v16-291: Silver / Gold Pass ×2 · Platinum / Diamond Pass ×3
+ // v16-121: the pack gives ×3 (was ×2 – tester: too small next to the free ×1.5)
  if(v===1.5||v===2||v===3)return 1.5;return 1;}
 function drawOffer(t){g.fillStyle='rgba(0,0,0,.78)';g.fillRect(0,0,W,H);HIT=[];const bw=Math.min(330,W*.86),bh2=300,x=W/2-bw/2,y=H*.22;
   const gr=g.createLinearGradient(0,y,0,y+bh2);gr.addColorStop(0,'#3a2410');gr.addColorStop(1,'#150c06');g.fillStyle=gr;rr(g,x,y,bw,bh2,18);g.fill();g.strokeStyle='#ffb300';g.lineWidth=2.5;g.stroke();
@@ -2769,7 +2770,7 @@ function loop(now){if(!running)return;raf=requestAnimationFrame(loop);if(now-las
   if(LOWRES2&&!HD&&B.lowRes&&!B.lowRes2&&B.phase==='march'&&B.phT<.2){B.lowRes2=true;bsize(true);}}
 cv.addEventListener('pointerdown',e=>{if(!B)return;const R=cv.getBoundingClientRect(),x=(e.clientX-R.left)*W/(R.width||W),y=(e.clientY-R.top)*H/(R.height||H),P=6;for(const h of HIT){if(x>=h.x-P&&x<=h.x+h.w+P&&y>=h.y-P&&y<=h.y+h.h+P){
   if(h.id==='pause'){B.paused=true;}else if(h.id==='resume'){B.paused=false;lastT=performance.now();}else if(h.id==='retreat'){B.paused=false;B.res=1;finish(false,true);}
-  else if(h.id==='spd'){if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(TE().spd2())B.spd=3;else{B.offer=true;B.paused=true;}}else B.spd=1;TE().G.cp.spd=B.spd;}
+  else if(h.id==='spd'){const sx=TE().spdX?TE().spdX():(TE().spd2()?3:0);if(B.spd===1)B.spd=1.5;else if(B.spd===1.5){if(sx)B.spd=sx;else{B.spd=1;TE().toast('⏩ Battle Speed ×2: Silver or Gold Pass · ×3: Platinum or Diamond Pass (Shop → VIP PASS)',3800);}}else B.spd=1;TE().G.cp.spd=B.spd;}
   else if(h.id==='buy'){if(B.buying)return;B.buying=1;const T=TE(); // v16-75: real payment (before: unlocked for free!)
     SEC.buy('spd2').then(ok=>{B.buying=0;if(!ok)return;T.PK.spd2=true;T.savePacks();B.spd=3;T.G.cp.spd=3;B.offer=false;B.paused=false;lastT=performance.now();T.toast('⏩ Battle Speed ×3 unlocked forever!',3000);});}
   else if(h.id==='nobuy'){B.offer=false;B.paused=false;B.spd=1;TE().G.cp.spd=1;lastT=performance.now();}else if(h.id==='auto'){B.auto=!B.auto;TE().G.cp.auto=B.auto;}
@@ -3890,7 +3891,7 @@ function wbG(){const G=TE().G;if(!G.wb)G.wb={d:'',n:0,dmg:0,best:0,cl:[],L:0,wk:
   if(w.tv!==2){w.tv=2;w.cl=(w.cl||[]).map(i=>WB_TIER.findIndex(q=>q.b===WB_OLDB[i])).filter(i=>i>=0);}
   if(w.wk!==wbWeek()){w.wk=wbWeek();w.wd=0;w.wbest=0;}
   return w;}
-const wbVip=()=>{try{const T=TE();return T.VP?T.VP(T.VLV()).wbk||0:0;}catch(e){return 0;}},wbKMax=()=>WB_KEYS+wbVip(); // v16-238: VIP 7 +1 · VIP 10 +2 keys a day
+const wbVip=()=>{try{const T=TE();return T.VP?T.VP(T.VLV()).wbk||0:0;}catch(e){return 0;}},wbKMax=()=>WB_KEYS+wbVip()+passKeys('wk'); // v16-238: VIP 7 +1 · VIP 10 +2 keys a day
 const wbKeys=()=>Math.max(0,wbKMax()-wbG().n);
 const wbTierSt=i=>{const w=wbG();return w.cl.includes(i)?2:w.dmg>=WB_TIER[i].b*w.L?1:0;}; // 0 locked · 1 ready · 2 claimed
 const wbReady=()=>wbOK()&&(wbKeys()>0||WB_TIER.some((q,i)=>wbTierSt(i)===1));
@@ -4063,7 +4064,8 @@ function dgG(){const G=TE().G;if(!G.dg)G.dg={d:'',n:{},b:{},c:{mine:0,forge:0},n
   return g;}
 const dgPass=()=>{const P=TE().PK;return !!(P&&P.dg&&P.dg>Date.now());};
 const dgVip=()=>{try{const T=TE();return T.VP?T.VP(T.VLV()):{dkey:0,sweep:false};}catch(e){return {dkey:0,sweep:false};}};
-const dgMax=()=>DG_FREE+(dgPass()?DG_PASS:0)+dgVip().dkey; // v16-122: VIP 5 +1 · VIP 10 +2 keys a day
+function passKeys(w){try{return window.SHOP2&&SHOP2.keys?SHOP2.keys(w):0;}catch(e){return 0;}} // v16-291: Gold / Platinum / Diamond Pass +1 key a day each
+const dgMax=()=>DG_FREE+(dgPass()?DG_PASS:0)+dgVip().dkey+passKeys('dk'); // v16-122: VIP 5 +1 · VIP 10 +2 keys a day
 const dgSw=()=>dgPass()||dgVip().sweep; // v16-122: SWEEP also from VIP 4
 const dgDay=k=>Math.max(0,dgMax()-dgG().n[k]);   // today's keys left (the unused ones move to the stock at midnight – v16-143)
 const dgBon=k=>{const g=dgG();return Math.max(0,(g.x&&g.x[k])||0);};   // v16-120 KEY ROULETTE bonus keys: they stack, never expire

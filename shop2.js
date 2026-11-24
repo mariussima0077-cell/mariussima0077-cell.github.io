@@ -32,11 +32,13 @@ const DIAMONDS = [
   {k:'d6', dm:20000, price:'€99.99', ic:'ui3/sp_chest', big:1},
 ];
 // VIP Pass tiers – v16-84: they STACK (one of each can be active at once, bonuses add up). gold = the old subscription product vip_pass_monthly (PK.sub = expiry)
+// v16-291 (Marius 24 nov): SILVER & GOLD = FOREVER, paid with diamonds that come straight back (a goal for free players) · PLATINUM & DIAMOND = monthly (same prices), much richer.
+// All 4 stack. spd = battle speed (2 = ×2, 3 = ×3) · dk = +1 key a day in every dungeon · wk = +1 World Boss key a day · st = tickets of each kind right away
 const PASS = {
-  sil:  {n:'SILVER PASS',   mult:1.2, idle:1, cost:1500, day:{tk:1}},
-  gold: {n:'GOLD PASS',     mult:1.5, idle:2, price:'€5.99', start:300, day:{dm:100, tk:2}, spd:1},
-  plat: {n:'PLATINUM PASS', mult:2,   idle:4, price:'€9.99', start:600, day:{dm:200, tk:3, gt:2}, spd:1, auto:1},
-  dia:  {n:'DIAMOND PASS',  mult:1,   idle:0, price:'€14.99', start:900, day:{dm:300, tk:5, gt:3}},   // v16-280 (Marius: dearer = more): +5 Recruit +3 Gear a day → best value of the 3 passes   // v16-122 (Marius, 21 nov 2026): diamonds only – 9,900 💎 / 30 days, no VIP bonus (same 💎 per € as Platinum)
+  sil:  {n:'SILVER PASS',   mult:1, idle:1, cost:1500, perm:1, day:{tk:1, ct:1, gt:1}, spd:2},
+  gold: {n:'GOLD PASS',     mult:1, idle:2, cost:3000, perm:1, day:{tk:2, ct:2, gt:2}, spd:2, dk:1},
+  plat: {n:'PLATINUM PASS', mult:2, idle:3, price:'€9.99',  start:1000, st:10, day:{dm:250, tk:5, ct:5, gt:5}, spd:3, dk:1, wk:1, auto:1},
+  dia:  {n:'DIAMOND PASS',  mult:2, idle:3, price:'€14.99', start:3000, st:30, day:{dm:350, tk:10, ct:10, gt:10}, spd:3, dk:1, wk:1},
 };
 // Campaign Funds: rewards at every 3rd chapter (NORMAL / HARD) – v16-203, was every 5th 20-stage chapter
 const FUND = {
@@ -50,18 +52,18 @@ const FSTEP = 3;                          // v16-203: a Campaign Fund reward eve
 // ---------------- state ----------------
 const PK = () => T().PK;
 const S = () => { const G=T().G; if(!G.shop) G.shop={fx:{}, day:'', ge:0, pe:0, fn:[], fh:[]}; const s=G.shop; s.fx=s.fx||{}; s.fn=s.fn||[]; s.fh=s.fh||[]; return s; };
-const on = k => (PK()[k]||0) > now();
+const on = k => { const v=PK()[k]; return v===true || (v||0) > now(); };   // v16-291: true = forever
 // v16-123: Diamond Pass + Founder Pass are shown only after their products exist in Play Console (Marius does it before the opening)
 const NEWP = () => true;   // v16-151 (22 nov 2026): founder_pass, vip_pass_diamond, pack_master/legend/titan are now active in Play Console
 // v16-155 RAIL PASS (Marius 22 nov 2026): 4.99 €/month for RAIL WARS. NOT a VIP Pass (no VIP bonus, no Idle) – own card in the VIP PASS tab.
 // Shown to players only after rail_pass_monthly exists in Play Console (RAILP → true); the owner's TEST MODE always sees it.
 const RAILP = () => false;
 const RAIL = {start:300, day:100};   // Street Tokens: right away + every day (≈3,300 a month = 6 items in the Street Shop)
-const expKey = {sil:'sil', gold:'sub', plat:'plat', dia:'dia', rail:'rail'};
-function tier(){ if(on('plat')) return 'plat'; if(on('sub')) return 'gold'; if(on('sil')) return 'sil'; if(on('dia')) return 'dia'; return null; }   // the best active one (name / colour)
-const actv = () => ['sil','gold','plat','dia'].filter(k=>on(expKey[k]));                       // v16-84: every active pass
+const expKey = {sil:'sil', gold:'gpm', plat:'plat', dia:'dia', rail:'rail'};   // v16-291: gold = 'gpm' (forever); the old monthly Gold ('sub') still counts until it ends
+function tier(){ if(on('dia')) return 'dia'; if(on('plat')) return 'plat'; if(on('gpm')||on('sub')) return 'gold'; if(on('sil')) return 'sil'; return null; }   // the best active one (name / colour)
+const actv = () => ['sil','gold','plat','dia'].filter(k=>on(expKey[k])||(k==='gold'&&on('sub')));                       // v16-84: every active pass
 const stackMult = () => { const a=actv(); return a.length ? Math.round((1+a.reduce((x,k)=>x+PASS[k].mult-1,0))*10)/10 : PASS.gold.mult; };  // +20% / +50% / +100% add up
-const daysLeft = k => Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
+const daysLeft = k => PK()[k]===true ? 9999 : Math.max(1, Math.ceil(((PK()[k]||0)-now())/DAY));
 
 // ---------------- giving things ----------------
 function rwText(r){ const a=[];
@@ -91,8 +93,8 @@ const dmX = k => { const n=S().fx[k]|0; return n===0?3:n===1?2:1; };
 // the pass: start bonus once per new period + daily gift + Platinum auto-collect
 function passTick(){
   const t=T(); if(!t||!t.G||!api.live) return; const s=S(), tr=tier();
-  for(const [k,key,f] of [['gold','sub','ge'],['plat','plat','pe'],['dia','dia','de']]){
-    const e=PK()[key]||0; if(e>now() && e!==s[f]){ s[f]=e; give({dm:PASS[k].start}, PASS[k].n); } }
+  for(const [k,key,f] of [['plat','plat','pe'],['dia','dia','de']]){
+    const e=PK()[key]||0; if(e>now() && e!==s[f]){ s[f]=e; const P=PASS[k]; give({dm:P.start, tk:P.st, ct:P.st, gt:P.st}, P.n); } }
   for(const k of actv()){ s.dd=s.dd||{}; if(s.dd[k]!==today()){ s.dd[k]=today(); if(s.day!==today()+k) give(PASS[k].day, PASS[k].n+' · daily gift'); } }   // v16-84: every active pass gives its own gift (s.day = old one-gift key, so no double gift today)
   if(on('rail') && window.STREET){ const e=PK().rail; if(e!==s.re){ s.re=e; STREET.give(RAIL.start); t.toast('🚆 RAIL PASS: +'+RAIL.start+' Street Tokens',3500); }   // v16-155
     if(s.rd!==today()){ s.rd=today(); STREET.give(RAIL.day); t.toast('🚆 RAIL PASS · daily gift: +'+RAIL.day+' Street Tokens',3500); } }
@@ -104,12 +106,12 @@ let busy=false;
 async function buy(k){
   if(busy) return; busy=true;
   try{
-    if(k==='sil'){                                       // paid with diamonds earned in the game
-      const G=T().G, c=PASS.sil.cost;
-      if(on('sil')){ T().toast('Silver Pass is already active.',2500); return; }
-      if((G.dm||0)<c){ T().toast(DMh+' Not enough diamonds ('+(G.dm||0).toLocaleString('en')+' / '+c.toLocaleString('en')+')',3000); return; }
-      if(conf!=='sil'){ conf='sil'; render(); setTimeout(()=>{ if(conf==='sil'){ conf=''; render(); } },4000); return; }
-      conf=''; G.dm-=c; PK().sil=now()+30*DAY; t_save(); T().save(); T().vipRefresh(); T().toast('🥈 Silver Pass active for 30 days!',3500); passTick(); render(); return;
+    if(k==='sil'||k==='gpm'){                          // v16-291: FOREVER, paid with diamonds that come straight back
+      const P=k==='sil'?PASS.sil:PASS.gold, G=T().G, c=P.cost;
+      if(PK()[k]===true){ T().toast(P.n+' is already yours.',2500); return; }
+      if((G.dm||0)<c){ T().toast(DMh+' You need '+c.toLocaleString('en')+' diamonds ('+(G.dm||0).toLocaleString('en')+' / '+c.toLocaleString('en')+') – you get them all back right away!',3500); return; }
+      if(conf!==k){ conf=k; render(); setTimeout(()=>{ if(conf===k){ conf=''; render(); } },4000); return; }
+      conf=''; G.dm-=c; PK()[k]=true; t_save(); G.dm+=c; T().save(); T().vipRefresh(); T().toast((k==='sil'?'🥈 ':'🥇 ')+P.n+' is yours forever! '+c.toLocaleString('en')+' diamonds back!',4000); passTick(); render(); return;
     }
     if((k==='sub'||k==='plat'||k==='dia'||k==='rail') && on(k)){ T().toast(k==='rail'?'The Rail Pass is already active.':'This VIP Pass is already active.',3000); return; }   // v16-84: other passes may be active
     const ok = await Promise.race([SEC.buy(k), new Promise(res=>setTimeout(()=>res(false),200e3))]);   // v16-78: the button never stays dead
@@ -279,28 +281,30 @@ function render(){
   if(tab==='tv'){
     const row=(ic,n,v,no)=>'<li'+(no?' class="no"':'')+'><img src="'+ic+'" alt="">'+n+'<b>'+v+'</b></li>';
     const btn=(k,label,dm)=>{ const key=expKey[k];
+      if(dm){ if(PK()[key]===true) return '<span class="tot">Yours forever</span><button class="buy own">OWNED ✓</button>';
+        return '<span class="tot">Forever · all '+PASS[k].cost.toLocaleString('en')+' '+DMh+' come back right away</span><button class="buy dm'+(conf===key?' cf':'')+'" data-b="'+key+'">'+(conf===key?'CONFIRM?':IC.dm+PASS[k].cost.toLocaleString('en'))+'</button>'; }
       if(on(key)) return '<span class="tot">Active – '+daysLeft(key)+' days left</span><button class="buy own">ACTIVE ✓</button>';
-      if(dm) return '<span class="tot">30 days · no renewal</span><button class="buy dm'+(conf==='sil'?' cf':'')+'" data-b="sil">'+(conf==='sil'?'CONFIRM?':IC.dm+PASS.sil.cost.toLocaleString('en'))+'</button>';
       return '<span class="tot">'+label+' / month · cancel anytime</span><button class="buy" data-b="'+key+'">'+P(key,label)+'</button>'; };
-    h+='<div class="sec">VIP PASS · 30 DAYS'+(actv().length?' · <span style="color:#7CFC9A">'+(actv().length>1?actv().length+' ACTIVE · ×'+stackMult().toFixed(1).replace(/\.0$/,''):PASS[tr].n)+'</span>':'')+'</div>';
-    h+='<div class="card vp s"><div class="top"><img src="'+IMG('shop/vp_sil')+'" alt=""><div><h3>SILVER PASS</h3><div class="sub">Free to play – paid with diamonds you earn</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_crown'),'VIP benefits','×1.2')+row(IMG('ui3/v_idle'),'Idle Rewards','+1 h')+row('img/ticket.webp','Recruit Ticket every day','+1')+row(IMG('ui3/v_dm'),'Diamonds every day','–',1)+row(IMG('ui3/sp_speed'),'Battle Speed ×3','–',1)+
+    const TK3=(n,w)=>row('img/ticket.webp','Recruit + Crew + Gear tickets '+w,n+' + '+n+' + '+n);
+    h+='<div class="sec">VIP PASS'+(actv().length?' · <span style="color:#7CFC9A">'+actv().length+' ACTIVE</span>':'')+'</div>';
+    h+='<div class="card vp s"><div class="top"><img src="'+IMG('shop/vp_sil')+'" alt=""><div><h3>SILVER PASS</h3><div class="sub">FOREVER · paid with diamonds – you get them all back</div></div></div><ul class="bl">'+
+      TK3(1,'every day')+row(IMG('ui3/v_idle'),'Idle Rewards','+1 h')+row(IMG('ui3/sp_speed'),'Battle Speed','×2')+
       '</ul><div class="foot">'+btn('sil','',1)+'</div></div>';
-    h+='<div class="card vp g"><div class="rib">POPULAR</div><div class="top"><img src="'+IMG('shop/vp_gold')+'" alt=""><div><h3>GOLD PASS</h3><div class="sub">Monthly subscription</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_dm'),'Diamonds right away','300')+row(IMG('ui3/v_dm'),'Diamonds every day','+100')+row('img/ticket.webp','Recruit Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×1.5')+row(IMG('ui3/v_idle'),'Idle Rewards','+2 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+
-      '</ul><div class="tot">In 30 days: 3,300 '+DMh+' + 60 tickets ≈ 93 summons</div><div class="foot">'+btn('gold','€5.99')+'</div></div>';
-    h+='<div class="card vp p"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription · everything from Gold, and more</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_dm'),'Diamonds right away','600')+row(IMG('ui3/v_dm'),'Diamonds every day','+200')+row('img/ticket.webp','Recruit Tickets every day','+3')+row('img/gticket.webp','Gear Tickets every day','+2')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+4 h')+row(IMG('ui3/sp_speed'),'Battle Speed ×3','✓')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
-      '</ul><div class="tot">In 30 days: 6,600 '+DMh+' + 150 tickets ≈ 216 summons</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
-    if(NEWP())h+='<div class="card vp d"><div class="rib">MOST DIAMONDS</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · for summoners – the most diamonds</div></div></div><ul class="bl">'+
-      row(IMG('ui3/v_dm'),'Diamonds right away','900')+row(IMG('ui3/v_dm'),'Diamonds every day','+300')+row('img/ticket.webp','Recruit Tickets every day','+5')+row('img/gticket.webp','Gear Tickets every day','+3')+row(IMG('ui3/v_crown'),'VIP benefits','–',1)+row(IMG('ui3/v_idle'),'Idle Rewards','–',1)+
-      '</ul><div class="tot">In 30 days: 9,900 '+DMh+' + 240 tickets ≈ 339 summons</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
+    h+='<div class="card vp g"><div class="top"><img src="'+IMG('shop/vp_gold')+'" alt=""><div><h3>GOLD PASS</h3><div class="sub">FOREVER · paid with diamonds – you get them all back</div></div></div><ul class="bl">'+
+      TK3(2,'every day')+row(IMG('ui2/i_key'),'Dungeon keys every day','+1 each')+row(IMG('ui3/v_idle'),'Idle Rewards','+2 h')+row(IMG('ui3/sp_speed'),'Battle Speed','×2')+
+      '</ul>'+(on('sub')&&PK().gpm!==true?'<div class="tot">Your monthly Gold Pass counts until it ends ('+daysLeft('sub')+' days).</div>':'')+'<div class="foot">'+btn('gold','',1)+'</div></div>';
+    h+='<div class="card vp p"><div class="rib">POPULAR</div><div class="top"><img src="'+IMG('shop/vp_plat')+'" alt=""><div><h3>PLATINUM PASS</h3><div class="sub">Monthly subscription</div></div></div><ul class="bl">'+
+      row(IMG('ui3/v_dm'),'Right away','1,000 '+DMh+' + 10 of each ticket')+row(IMG('ui3/v_dm'),'Diamonds every day','+250')+TK3(5,'every day')+row(IMG('ui2/i_key'),'Dungeon keys every day','+1 each')+row('img/wb/key.webp','World Boss key every day','+1')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+3 h')+row(IMG('ui3/sp_speed'),'Battle Speed','×3')+row(IMG('ui3/v_garage'),'Idle Rewards collected by themselves','✓')+
+      '</ul><div class="tot">In 30 days: 8,500 '+DMh+' + 480 tickets</div><div class="foot">'+btn('plat','€9.99')+'</div></div>';
+    if(NEWP())h+='<div class="card vp d"><div class="rib">BEST</div><div class="top"><img src="'+IMG('shop/vp_dia')+'" alt=""><div><h3>DIAMOND PASS</h3><div class="sub">Monthly subscription · the richest</div></div></div><ul class="bl">'+
+      row(IMG('ui3/v_dm'),'Right away','3,000 '+DMh+' + 30 of each ticket')+row(IMG('ui3/v_dm'),'Diamonds every day','+350')+TK3(10,'every day')+row(IMG('ui2/i_key'),'Dungeon keys every day','+1 each')+row('img/wb/key.webp','World Boss key every day','+1')+row(IMG('ui3/v_crown'),'VIP benefits','×2')+row(IMG('ui3/v_idle'),'Idle Rewards','+3 h')+row(IMG('ui3/sp_speed'),'Battle Speed','×3')+
+      '</ul><div class="tot">In 30 days: 13,500 '+DMh+' + 990 tickets</div><div class="foot">'+btn('dia','€14.99')+'</div></div>';
     if(RAILP()||SEC.TEST_MODE){ const TKI='<img src="img/ui12/st_token.webp" alt="" style="height:1.2em;width:auto;vertical-align:-.25em">';   // v16-155 RAIL PASS
       h+='<div class="card vp r"><img class="rbn" src="img/rw/rail_pass_bnr.webp" alt=""><div class="top"><img src="'+IMG('shop/vp_rail')+'" alt="" onerror="this.onerror=null;this.src=\'img/rw/loco4.webp\'"><div><h3>RAIL PASS</h3><div class="sub">Monthly subscription · for train bosses – works with every VIP Pass</div></div></div><ul class="bl">'+
         row('img/ui12/st_token.webp','Street Tokens right away','300')+row('img/ui12/st_token.webp','Street Tokens every day','+100')+row('img/rw/loco0.webp','Trains a day','4 (+1)')+row('img/rw/loco0.webp','Train fills in','45 min')+row('img/ui12/st_token.webp','Street Tokens per train','×1.3')+row(IMG('ui3/v_gift'),'Refreshes per train','3 (+1)')+row('img/rw/rw_btn.webp','Rail Wars attacks a day','7 (+2)')+row('img/rw/loco3.webp','Your train is robbed: you lose','only half')+row('img/rw/loco4.webp','Golden locomotive + RAIL BARON title','✓')+
         '</ul><div class="tot">In 30 days: ≈3,300 '+TKI+' as gifts + 30% more from every train</div><div class="foot">'+btn('rail','€4.99')+'</div></div>'; }
     h+='<div class="sec">DUNGEON PASS · 30 DAYS</div>'+'<div class="pack"><div class="th"><img src="img/ui2/i_key.webp" alt=""></div><div class="tx"><b>Dungeon Pass · 30 days</b>+2 keys a day in every dungeon + SWEEP.'+(on('dg')?' <ins>Active – '+daysLeft('dg')+' days left.</ins>':'')+'</div><button class="buy" data-a="dg">'+P('dg','€2.99')+'</button></div>';   // v16-290 (Marius): moved here from FOREVER PACKS (it lasts 30 days)
-    h+='<div class="note">VIP Passes stack: you can have Silver, Gold, Platinum'+(NEWP()?' and Diamond':'')+' at the same time – every pass gives its own daily gift, and the bonuses add up (VIP benefits +20% / +50% / +100%, Idle +1 h / +2 h / +4 h). The daily gifts arrive the first time you open the game each day. VIP points still come only from Daily Quests.</div>';
+    h+='<div class="note">All VIP Passes stack: every pass gives its own daily gift and its own keys, the Idle hours add up, and the fastest Battle Speed counts. The daily gifts arrive the first time you open the game each day.</div>';
   }
   if(tab==='tf'){
     h+='<div class="sec">CAMPAIGN FUNDS · BUY ONCE</div>';
@@ -351,8 +355,9 @@ const api = window.SHOP2 = {
   mult: stackMult,
   idleH: () => actv().reduce((x,k)=>x+PASS[k].idle,0),
   PASSN: () => actv().map(k=>PASS[k].n.replace(' PASS','')).join(' + ')+(actv().length>1?' PASS':(actv().length?' PASS':'')),
-  days: () => { const a=actv(); return a.length?Math.min(...a.map(k=>daysLeft(expKey[k]))):0; },
-  spd: () => actv().some(k=>PASS[k].spd),
+  spd: () => actv().reduce((x,k)=>Math.max(x,PASS[k].spd||0),0),   // v16-291: 0 / 2 / 3
+  keys: w => actv().reduce((x,k)=>x+(PASS[k][w]||0),0),             // v16-291: 'dk' dungeon keys · 'wk' World Boss keys
+  days: () => { const a=actv().filter(k=>!PASS[k].perm); return a.length?Math.min(...a.map(k=>daysLeft(k==='gold'?'sub':expKey[k]))):0; },
   railVis: () => RAILP() || !!(window.SEC && SEC.TEST_MODE), railOn: () => on('rail'),   // v16-155
 };
 // start: first check after the save is loaded, then every minute (new day, new subscription period, Platinum auto-collect)
