@@ -4455,7 +4455,7 @@ if(!G.ci)G.ci={n:0,day:''};if(!G.c5)G.c5={n:0,day:''};if(!G.nw)G.nw=0;if(!G.ml)G
 const CI=[{tk:2},{ct:2},{tk:3},{ct:2},{tk:3},{ct:3},{tk:5,ct:3}]; // only tickets (Marius)
 const ciMoney=h=>Math.max(500,Math.round(idleRate()*h/100)*100);
 // v16-37: 5000 FREE SUMMONS – every day 10 Recruit + 10 Crew + 10 Gear tickets (fixed, nothing random) until 5000 tickets in total (167 days)
-// v16-283 (Marius 24 nov): 20 of each ticket a day (was 10) – same 5000 in total, finished much sooner. G.c5.o = days already claimed at 10 (old saves)
+// v16-284 (Marius 24 nov): 20 of each ticket a day (was 10) – same 5000 in total, finished much sooner. G.c5.o = days already claimed at 10 (old saves)
 const C5_TOTAL=5000,C5_DAY=20,C5_OLD=10;if(G.c5.o==null)G.c5.o=G.c5.n;
 const c5Got=n=>{const o=Math.min(n,G.c5.o||0);return Math.min(C5_TOTAL,o*C5_OLD*3+(n-o)*C5_DAY*3);};
 const c5Day=d=>d<(G.c5.o||0)?C5_OLD:C5_DAY;
