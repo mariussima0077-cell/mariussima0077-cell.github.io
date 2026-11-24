@@ -215,8 +215,11 @@ async function report(b, env) {
     // v16-122: purchases give VIP points (1 € = 20) → allow 2,100 per confirmed purchase since the last report
     const nb = old ? ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(b.pid, old.last - 6e5).first()) || {n:0}).n : 0;
     // v16-143: a confirmed purchase may bring up to 450 tickets (TITAN PACK)
-    if (s.tk - old.tk > 100 + dt / 45 + nb * 450) add(30, 'econ', `tickets +${s.tk - old.tk}`);
-    if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450 && !dual) add(30, 'econ', `gear tickets +${s.gtk - old.gtk}`);
+    // v16-285 (Marius 24 nov): tickets from Mail (📢 Mail to ALL, Cup…) are never cheating – no limit any more in /admin
+    let mTk = 0, mGt = 0; try { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(b.pid).first();
+      if (pr) for (const m of (await db.prepare('SELECT rw FROM inbox WHERE uid=? AND got=1 AND t>?').bind(pr.uid, now - 7 * 864e5).all()).results) { const r = JSON.parse(m.rw || '{}'); mTk += +(r.tk || 0); mGt += +(r.gt || 0); } } catch (e) {}
+    if (s.tk - old.tk > 100 + dt / 45 + nb * 450 + mTk) add(30, 'econ', `tickets +${s.tk - old.tk}`);
+    if (s.gtk - old.gtk > 100 + dt / 45 + nb * 450 + mGt && !dual) add(30, 'econ', `gear tickets +${s.gtk - old.gtk}`);
     if (s.vip - old.vip > 200 + dt * 160 / 86400 + nb * 2100 && !isGift(b.pid)) add(35, 'econ', `vip +${s.vip - old.vip}`);
     // v16-151 (Wazza4ever banned 22 nov): AUTO NEXT (v16-25) + battle speed x3 + a strong team clear easy stages in ~8 s each
     // while the game is just left ON → old limit (30 + 1 per 90 s) banned honest players. Now ~1 stage per 5 s, only 15 pts.
@@ -728,7 +731,7 @@ function bcastForm(key) {
   const I = 'padding:8px;border-radius:8px;border:0;font-size:15px;box-sizing:border-box';
   return `<details class=c style="border-color:#ab47bc88"><summary><b style="color:#e1a6ff">📢 Mail to ALL players</b> <small>(announcement or gift after a bug)</small></summary><form style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><input type=hidden name=key value="${escH(key)}"><input type=hidden name=bc value=1>
 <input name=title required maxlength=60 placeholder="Title (e.g. Sorry for the bug!)" style="${I};flex:1 1 100%"><textarea name=msg required maxlength=800 rows=3 placeholder="Message" style="${I};flex:1 1 100%"></textarea>
-<input name=dm type=number min=0 max=100000 placeholder="💎" style="${I};flex:1 1 22%"><input name=tk type=number min=0 max=100 placeholder="🎟️ Recruit" style="${I};flex:1 1 22%"><input name=gt type=number min=0 max=100 placeholder="⚙️ Gear" style="${I};flex:1 1 22%"><input name=ct type=number min=0 max=100 placeholder="🎖️ Crew" style="${I};flex:1 1 22%">
+<input name=dm type=number min=0 max=${GIFT_MAX} placeholder="💎" style="${I};flex:1 1 22%"><input name=tk type=number min=0 max=${GIFT_MAX} placeholder="🎟️ Recruit" style="${I};flex:1 1 22%"><input name=gt type=number min=0 max=${GIFT_MAX} placeholder="⚙️ Gear" style="${I};flex:1 1 22%"><input name=ct type=number min=0 max=${GIFT_MAX} placeholder="🎖️ Crew" style="${I};flex:1 1 22%">
 <select name=srv style="${I};flex:1 1 100%"><option value=0>All servers</option><option value=1>Server 1</option><option value=2>Server 2</option><option value=3>Server 3</option></select>
 <button style="padding:8px 14px;border-radius:8px;border:0;background:#ab47bc;color:#fff;font-weight:bold;flex:1 1 100%">PREVIEW →</button><small>Everybody with an online profile gets it in MAIL (you confirm on the next page). Torque Guard counts mail diamonds → nobody is flagged.</small></form></details>`;
 }
@@ -736,7 +739,7 @@ async function bcastPage(url, env) {
   const db = env.DB, key = env.ADMIN_KEY, k = encodeURIComponent(key), P = url.searchParams, back = `<a href="/admin?key=${k}">← back</a>`;
   await db.prepare('CREATE TABLE IF NOT EXISTS bcast(id INTEGER PRIMARY KEY AUTOINCREMENT, nonce TEXT UNIQUE, t INTEGER, srv INTEGER, title TEXT, body TEXT, rw TEXT, n INTEGER)').run();
   const title = (P.get('title') || '').trim().slice(0, 60), msg = (P.get('msg') || '').trim().slice(0, 800), srv = Math.max(0, Math.min(99, P.get('srv') | 0));
-  const n = (x, m) => Math.max(0, Math.min(m, Math.floor(+P.get(x) || 0))), rw = {}; const dm = n('dm', 100000), tk = n('tk', 100), gt = n('gt', 100), ct = n('ct', 100);
+  const n = (x, m) => Math.max(0, Math.min(m, Math.floor(+P.get(x) || 0))), rw = {}; const dm = n('dm', GIFT_MAX), tk = n('tk', GIFT_MAX), gt = n('gt', GIFT_MAX), ct = n('ct', GIFT_MAX);   // v16-285: no small limits (Marius)
   if (dm) rw.dm = dm; if (tk) rw.tk = tk; if (gt) rw.gt = gt; if (ct) rw.ct = ct;
   const hist = (await db.prepare('SELECT * FROM bcast ORDER BY id DESC LIMIT 10').all()).results, dt = t => new Date(t).toLocaleString('sv-SE', {timeZone:'Europe/Paris'}).slice(5, 16);
   const histH = hist.length ? `<div class=c><b>Sent before</b><br>${hist.map(h => `<small>${dt(h.t)} · ${h.srv ? 'server ' + h.srv : 'all'} · ${h.n} players</small> <b>${escH(h.title)}</b> <small>${escH(h.rw)}</small>`).join('<br>')}</div>` : '';
