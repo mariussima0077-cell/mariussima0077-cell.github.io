@@ -555,7 +555,7 @@ const HSK={
  m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
  m5_4:{sk:'STARFIRE RAIN',skd:'A rain of electric spark-plug arrows falls on the biggest group: 240% damage, slow 50% for 3s and they are MARKED (+35% damage taken) for 6s. Long range.'},
  m5_6:{sk:'RAINBOW TEMPEST',skd:'A tornado of magic rainbow paint falls on the biggest group: 260% damage, slow 50% for 4s and the painted enemies deal −30% damage for 5s. Long range.'},
- m5_7:{sk:'PIT STOP',skd:'A racing ambulance drives through the team: heals every hero 25% HP, gives a shield of 15% HP and +30% ultimate energy to the others. Long range healer.'},
+ m5_7:{sk:'PIT STOP',skd:'A racing ambulance drives through the team: heals every hero 25% HP, gives a shield of 15% HP and +20% ultimate energy to the others. Long range healer.'},
  m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Long range.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
 const SKP={
@@ -2267,10 +2267,10 @@ const SKF={
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
- m5_7(u){ // v16-328: Doc Volta's PIT STOP – the ambulance (wide sheet, drawn over the HEROES) drives through the team; impact = heal 25% + shield 15% + 30% ultimate energy for the others
+ m5_7(u){ // v16-328: Doc Volta's PIT STOP – the ambulance (wide sheet, drawn over the HEROES) drives through the team; impact = heal 25% + shield 15% + 20% ultimate energy for the others (v16-333: was 30, budget phones)
    const wd=pushWide(u,1.2,{heroes:1});
    castAct(u,wd?1.2:.7,()=>{u.post=.6;B.flash=.12;const k=1+(u.tl?TV(u):0);
-     for(const h of alive(B.heroes)){heal(h,h.max*.25*k);h.shield=Math.max(h.shield,h.max*.15);if(h!==u)h.en=Math.min(100,(h.en||0)+30);if(!B.sim)sparks(h.x,headY(h)+10*dsc(h.d),6,'#b9f6ca');}
+     for(const h of alive(B.heroes)){heal(h,h.max*.25*k);h.shield=Math.max(h.shield,h.max*.15);if(h!==u)h.en=Math.min(100,(h.en||0)+20);if(!B.sim)sparks(h.x,headY(h)+10*dsc(h.d),6,'#b9f6ca');}
      teamBuff({def:0,col:'#69f0ae',txt:'PIT STOP'});});},
  m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
