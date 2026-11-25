@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=317;window.TE_CV=CV;
+const CV=319;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -696,6 +696,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
    <h3>TITLE</h3><div class="tlist">${TORD.map(k=>`<div class="${k===ME.title?'sel':''} ${tOk(k)?'':'o-lock'}" data-tt="${k}">${tt(k)}<span>${TT[k][2]}</span><b>${tOk(k)?(k===ME.title?'✅':''):'🔒'}</b></div>`).join('')}</div>
    <h3>HELP & SUPPORT</h3><div class="tlist"><div data-help="1">🆘 WRITE TO US<span>A bug, a purchase, your account or an idea – we answer in your MAIL</span><b>›</b></div></div>
    <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${(()=>{const G=window.GFX||{man:'auto',eff:'std'},TN={hd:'HD',std:'STANDARD',low:'LOW'};return [['auto','⚙️ AUTO · recommended','The game checked your phone → <b>'+TN[G.man==='auto'?G.eff:(G.tier==='lo'?'low':'std')]+'</b> for you'],['hd','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory'],['std','🖼️ STANDARD','Sharp picture, normal battery use'],['low','🍃 LOW · SMOOTH','For older phones – lighter picture, no lag, less battery']].map(g=>`<div class="${G.man===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${G.man===g[0]?'✅':''}</b></div>`).join('');})()}</div>
+   <h3>SOUND</h3><div class="tlist" id="olSnd">${(()=>{const on=!window.TE_SND||window.TE_SND.on;return [[1,'🔊 BATTLE SOUNDS ON','Hits, explosions, victory'],[0,'🔇 BATTLE SOUNDS OFF','Silent battles']].map(o=>`<div class="${(o[0]===1)===on?'sel':''}" data-snd="${o[0]}">${o[1]}<span>${o[2]}</span><b>${(o[0]===1)===on?'✅':''}</b></div>`).join('');})()}</div>
    <div class="o-note">Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.<br>Player ID ${ME.uid} · <u data-a="mutes">muted players (${mutes.size})</u></div>`;}
 async function setProf(set,paid){const r=await call('prof',{set,paid});
   if(r.ok){ME={...ME,...r.me};renderProf();hudAv();return r;}
@@ -706,6 +707,7 @@ $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
   if(e.target.closest('[data-help]')){helpForm();return;}
+  const sd=e.target.closest('[data-snd]');if(sd){if(window.TE_SND)window.TE_SND.set(sd.dataset.snd==='1');toast(sd.dataset.snd==='1'?'🔊 Battle sounds ON':'🔇 Battle sounds OFF',1500);renderProf();return;}
   const gx=e.target.closest('[data-gfx]');if(gx){const v=gx.dataset.gfx,G=window.GFX;if(!G||G.man===v)return;G.set(v);try{T().save();}catch(x){}toast({auto:'⚙️ AUTO graphics',hd:'✨ HD graphics ON',std:'🖼️ STANDARD graphics',low:'🍃 LOW graphics'}[v]+' – restarting…',1500);setTimeout(()=>location.reload(),1200);return;}
   const ic=e.target.closest('[data-ic]');if(ic){LS('te_icon',ic.dataset.ic);await setProf({icon:ic.dataset.ic});return;}
   const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+((FR.find(x=>x[0]===+fr.dataset.fr)||[])[2]||'Locked'),2500);return;}await setProf({frame:+fr.dataset.fr});return;}
