@@ -205,15 +205,20 @@ export async function giftDm(env, pid, uid) {
 // v16-233b (23 nov 2026, Marius): 💎 diamonds sent by hand from /admin (table agift, created in worker.js ensureG).
 // Delivered as ONE inbox Mail at the next check-in / online sync (at once if the player already has an online profile).
 // The LEDGER rule in worker.js adds these diamonds to the daily maximum (30 days) → the player is never flagged/banned for them.
+// v16-313 (Marius 25 nov): a gift can also hold Recruit / Gear / Crew tickets and Dungeon keys (each of the 4 dungeons)
+let agReady = false;
+export async function agEnsure(db) { if (agReady) return; for (const c of ['tk', 'gt', 'ct', 'dk']) { try { await db.prepare('ALTER TABLE agift ADD COLUMN ' + c + ' INTEGER DEFAULT 0').run(); } catch (e) {} } agReady = true; }
+export const agRw = g => { const r = {}; if (g.dm > 0) r.dm = g.dm | 0; if (g.tk > 0) r.tk = g.tk | 0; if (g.gt > 0) r.gt = g.gt | 0; if (g.ct > 0) r.ct = g.ct | 0; if (g.dk > 0) r.keys = {vault:g.dk | 0, mine:g.dk | 0, forge:g.dk | 0, lab:g.dk | 0}; return r; };
+export const agTxt = g => [g.dm > 0 && (g.dm | 0).toLocaleString('en') + ' Diamonds', g.tk > 0 && g.tk + ' Recruit tickets', g.gt > 0 && g.gt + ' Gear tickets', g.ct > 0 && g.ct + ' Crew tickets', g.dk > 0 && g.dk + ' keys for every Dungeon'].filter(Boolean).join(', ');
 export async function adminGifts(env, pid, uid) {
-  try { const db = env.DB, ag = (await db.prepare('SELECT id,dm,msg FROM agift WHERE pid=? AND sent=0 ORDER BY id').bind(pid).all()).results;
+  try { const db = env.DB; await agEnsure(db); const ag = (await db.prepare('SELECT id,dm,tk,gt,ct,dk,msg FROM agift WHERE pid=? AND sent=0 ORDER BY id').bind(pid).all()).results;
     if (!ag.length) return 0;
     if (!(uid > 0)) { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(pid).first(); uid = pr && pr.uid; }
     if (!(uid > 0)) return 0;
     let n = 0; for (const g of ag) {
       if (!(await db.prepare('UPDATE agift SET sent=1, ts=? WHERE id=? AND sent=0 RETURNING id').bind(Date.now(), g.id).first())) continue;   // never twice
-      const body = (g.msg ? g.msg + '\n\n' : 'Thank you for playing Torque Empire! ') + 'Here are ' + (g.dm | 0).toLocaleString('en') + ' Diamonds. Good luck!';
-      const m = await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?) RETURNING id').bind(uid, Date.now(), '💎', 'Gift from Torque Studios', body, JSON.stringify({dm:g.dm | 0})).first();
+      const body = (g.msg ? g.msg + '\n\n' : 'Thank you for playing Torque Empire! ') + 'Here are ' + agTxt(g) + '. Good luck!';
+      const m = await db.prepare('INSERT INTO inbox(uid,t,ic,title,body,rw) VALUES(?,?,?,?,?,?) RETURNING id').bind(uid, Date.now(), '🎁', 'Gift from Torque Studios', body, JSON.stringify(agRw(g))).first();
       await db.prepare('UPDATE agift SET mid=? WHERE id=?').bind(m && m.id, g.id).run(); n++; }
     return n; } catch (e) { return 0; }
 }

@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=312;window.TE_CV=CV;
+const CV=313;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -735,11 +735,11 @@ function peekHero(h,p){const c=C(),g=Math.max(0,Math.min(5,gradeOf(h.id))),nm=hN
 
 // ------------------------------------------------------------------ INBOX (Arena / Cup rewards)
 async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 No connection');return;}
-  const rwTxt=w=>[w.dm?DMh+' '+w.dm:'',w.tk?TKh+' '+w.tk+' Recruit':'',w.gt?GTh+' '+w.gt+' Gear':'',w.ct?CTh+' '+w.ct+' Crew':''].filter(Boolean).join(' · ');
+  const kN=w=>w.keys?Object.values(w.keys).reduce((a,v)=>a+(v|0),0):0,rwTxt=w=>[w.dm?DMh+' '+w.dm:'',w.tk?TKh+' '+w.tk+' Recruit':'',w.gt?GTh+' '+w.gt+' Gear':'',w.ct?CTh+' '+w.ct+' Crew':'',kN(w)?'🔑 '+kN(w)+' Dungeon keys':''].filter(Boolean).join(' · '); // v16-313: + Dungeon keys from admin gifts
   modal(`<h4>🎁 Rewards</h4>${r.list.length?r.list.map(m=>`<div class="ib"><span class="o-ic">${esc(m.ic)}</span><div><b>${esc(m.title)}</b>${esc(m.body)}${rwTxt(m.rw)?`<br><span class="rw2">${rwTxt(m.rw)}</span>`:''}</div></div>`).join(''):'<p style="text-align:center">Nothing new.</p>'}
    <div class="ok"><button class="btn gray" data-m="no">CLOSE</button>${r.list.length?'<button class="btn shine" data-m="ok">CLAIM ALL</button>':''}</div>`,
-   async b=>{if(b!=='ok')return true;const tot={};for(const m of r.list){const c=await call('claim',{id:m.id});if(c.ok)for(const k in c.rw)tot[k]=(tot[k]||0)+c.rw[k];}
-     const t=T();if(t&&t.giveRw){t.giveRw(tot);t.save();}toast('🎁 '+(rwTxt(tot)||'Claimed'),3500);inboxN=0;hdr();dots();return true;});}
+   async b=>{if(b!=='ok')return true;const tot={};for(const m of r.list){const c=await call('claim',{id:m.id});if(c.ok)for(const k in c.rw){if(k==='keys'){tot.keys=tot.keys||{};for(const q in c.rw.keys)tot.keys[q]=(tot.keys[q]||0)+(c.rw.keys[q]|0);}else tot[k]=(tot[k]||0)+c.rw[k];}}
+     const t=T();if(tot.keys&&window.DGK)for(const q in tot.keys)DGK.add(q,tot.keys[q]);if(t&&t.giveRw){const g=Object.assign({},tot);delete g.keys;t.giveRw(g);t.save();}toast('🎁 '+(rwTxt(tot)||'Claimed'),3500);inboxN=0;hdr();dots();return true;});}
 
 // ------------------------------------------------------------------ modal helper
 function modal(html,cb){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="box"><button class="mX" data-mx aria-label="close">✕</button>${html}</div>`;root.appendChild(d);

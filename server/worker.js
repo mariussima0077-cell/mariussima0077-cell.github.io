@@ -12,7 +12,7 @@
 //                           is stored – never the e-mail or the name. Table `accounts` is created by itself.
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
 
-import {online, onlineCron, onlineAdmin, giftDm, isGiftDm, adminGifts} from './online.js';
+import {online, onlineCron, onlineAdmin, giftDm, isGiftDm, adminGifts, agEnsure, agTxt} from './online.js';
 import {EP_N, EP_H} from './ept.js';   // v16-157: enemy power of every campaign stage (made by tools/ept_table.py)
 
 // v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
@@ -400,15 +400,16 @@ async function dailyStats(env) {
   // D1 retention: new players of day X who were seen again on day X+1 (2 queries in total)
   const newp = (await db.prepare('SELECT pid, first FROM players WHERE first>?').bind(now - 31 * day).all()).results;
   const seenNew = new Set((await db.prepare('SELECT s.day || s.pid k FROM seen s JOIN players p ON p.pid=s.pid WHERE p.first>?').bind(now - 31 * day).all()).results.map(r => r.k));
-  const ret = {};
+  const ret = {}, ret7 = {};
   for (const r of newp) {
     const d0 = parisDay(r.first), d1 = parisDay(r.first + day); if (d1 > days[0]) continue;
     const x = ret[d0] || (ret[d0] = {n:0, b:0}); x.n++; if (seenNew.has(d1 + r.pid)) x.b++;
+    const d7 = parisDay(r.first + 7 * day); if (d7 <= days[0]) { const y = ret7[d0] || (ret7[d0] = {n:0, b:0}); y.n++; if (seenNew.has(d7 + r.pid)) y.b++; }   // v16-313: D7
   }
   const fresh = {}; for (const r of newp) { const d = parisDay(r.first); fresh[d] = (fresh[d] || 0) + 1; }
   const on = await db.prepare('SELECT SUM(last>?) m10, SUM(last>?) h1, SUM(last>?) d7, SUM(last>?) d30 FROM players').bind(now - 6e5, now - 36e5, now - 7 * day, now - 30 * day).first();
   await db.prepare('DELETE FROM seen WHERE day<?').bind(parisDay(now - 90 * day)).run();
-  return {days, dau, fresh, ret, on};
+  return {days, dau, fresh, ret, ret7, on};
 }
 
 async function ensureInteg(env) {
@@ -605,6 +606,14 @@ function chart(title, pts, col, log) {
   const path = pts.map((p, i) => (i ? 'L' : 'M') + sx(p[0]).toFixed(1) + ',' + sy(vs[i]).toFixed(1)).join('');
   return `<div class=c><b>${title}</b> <small>${fmtN(pts[0][1])} → <b>${fmtN(pts[pts.length - 1][1])}</b></small><svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block"><path d="${path}" fill="none" stroke="${col}" stroke-width="2"/><text x="4" y="${H - 2}" fill="#9fb0c0" font-size="10">${new Date(t0).toISOString().slice(5, 16).replace('T', ' ')}</text><text x="${W - 4}" y="${H - 2}" fill="#9fb0c0" font-size="10" text-anchor="end">${new Date(t1).toISOString().slice(5, 16).replace('T', ' ')}</text></svg></div>`;
 }
+// v16-313 (Marius 25 nov): on the player card – how much he paid (list), VIP points, server
+async function moneyCard(env, pid, p) {
+  const db = env.DB, dt = t => new Date(t).toLocaleString('sv-SE', {timeZone:'Europe/Paris'}).slice(0, 16);
+  let rs = [], srv = '?'; try { rs = (await db.prepare("SELECT sku, t FROM purchases WHERE pid=? AND state='ok' ORDER BY t DESC").bind(pid).all()).results; } catch (e) {}
+  try { const r = await db.prepare('SELECT srv FROM prof WHERE pid=?').bind(pid).first(); if (r) srv = r.srv || 1; } catch (e) {}
+  const tot = rs.reduce((a, r) => a + (PLAY_EUR[r.sku] || 0), 0);
+  return `<div class=c style="border-color:#7dff8a88">💳 Paid: <b style="color:#7dff8a;font-size:16px">${eur(tot)}</b> (${rs.length} purchase${rs.length === 1 ? '' : 's'}) · ⭐ VIP <b>${[0,50,200,500,1000,2500,5000,10000,20000,50000,100000].filter(x => x > 0 && (p.vip | 0) >= x).length}</b> <small>(${fmtN(p.vip | 0)} points)</small> · 🌍 server <b>${escH(srv)}</b>${rs.length ? `<details><summary><small>see the purchases</small></summary>${rs.map(r => `<small>${dt(r.t)}</small> · ${escH(r.sku)} · <b>${eur(PLAY_EUR[r.sku] || 0)}</b>`).join('<br>')}</details>` : ''}</div>`;
+}
 async function playerCard(url, env, pid) {
   const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY), esc = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
@@ -629,7 +638,7 @@ async function playerCard(url, env, pid) {
 <div class=c>${p.banned ? '🚫 <b style="color:#ff8a80">BANNED</b>' : `⚠️ score <b>${p.score}</b>`}${p.shadow ? ` · 👻 hidden${p.shadow === 2 ? ' (by you)' : ''}` : ''} · kinds: <b>${esc(p.sig || '–')}</b><br>${esc(p.reason || '')}<br>
 <small>first seen ${d(p.first)} · last ${d(p.last)} · app ${p.app ? 'Play' : 'browser'} · stage ${p.best} (best ever ${Math.max(p.bmax || 0, p.best)}) · buildings lv ${p.lv} · heroes ${p.heroes} (${p.mythic} Mythic)</small><br>
 ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(pid)}">clear</a> · ${p.shadow ? `<a href="?key=${k}&unshadow=${encodeURIComponent(pid)}">👁️ show again</a>` : `<a href="?key=${k}&shadow=${encodeURIComponent(pid)}">👻 hide (shadow)</a>`}`}</div>
-${giftForm(env.ADMIN_KEY, pid)}${await giftList(db, pid)}<div class=c><a href="?key=${k}&reset=${encodeURIComponent(pid)}" style="color:#ff8a80;font-weight:bold">🔄 RESET – start from 0</a> <small>(asks first)</small></div>
+${await moneyCard(env, pid, p)}<details class=c><summary><b>🎁 Send a gift</b></summary>${giftForm(env.ADMIN_KEY, pid)}</details>${await giftList(db, pid)}<div class=c><a href="?key=${k}&reset=${encodeURIComponent(pid)}" style="color:#ff8a80;font-weight:bold">🔄 RESET – start from 0</a> <small>(asks first)</small></div>
 <h3>🛡️ Battle team (last online sync)</h3><div class=c>${tmHtml}</div>
 <small>Charts: last 7 days. Honest = a line that climbs smoothly. Cheat = a vertical jump.</small>
 ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('⚔️ Team power', S.filter(r => r.pw > 0).map(r => [r.t, r.pw]), '#ff8a65', true)}${chart('💰 Money (log)', S.map(r => [r.t, r.money]), '#66bb6a', true)}${chart('🎟️ Tickets', S.map(r => [r.t, r.tk]), '#9fd3ff')}${chart('🏗️ Buildings level', S.map(r => [r.t, r.lv]), '#ce93d8')}
@@ -647,24 +656,28 @@ ${chart('🏁 Campaign stage', S.map(r => [r.t, r.best]), '#ffd54a')}${chart('�
 const GIFT_MAX = 10000000;
 const escH = s => String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const PAGE = (t, b) => new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>${t}</title><style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:14px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:12px;margin:8px 0;font-size:15px;line-height:1.5}a{color:#9fd3ff}small{color:#9fb0c0}a.b{display:inline-block;margin-top:10px;padding:11px 18px;border-radius:10px;background:#29b6f6;color:#001;font-weight:bold;text-decoration:none}</style>${b}`, {headers:{'content-type':'text/html;charset=utf-8'}});
-function giftForm(key, pid) {
+function giftForm(key, pid) {   // v16-313: 💎 + Recruit / Gear / Crew tickets + Dungeon keys
   const I = 'padding:8px;border-radius:8px;border:0;font-size:15px;box-sizing:border-box';
-  return `<form class=c style="display:flex;flex-wrap:wrap;gap:6px;border-color:#29b6f688"><b style="width:100%;color:#7fd8ff">💎 Send diamonds</b><input type=hidden name=key value="${escH(key)}">
+  return `<form style="display:flex;flex-wrap:wrap;gap:6px"><input type=hidden name=key value="${escH(key)}">
 ${pid ? `<input type=hidden name=gift value="${escH(pid)}">` : `<input name=gift required placeholder="player name or Player ID" style="${I};flex:1 1 100%">`}
-<input name=dm type=number min=1 max=${GIFT_MAX} required placeholder="💎 amount" style="${I};flex:1 1 40%"><input name=msg maxlength=200 placeholder="message (optional)" style="${I};flex:1 1 50%">
-<button style="padding:8px 14px;border-radius:8px;border:0;background:#29b6f6;font-weight:bold;flex:1 1 100%">SEND 💎</button><small>Goes into the player's Mail. Torque Guard knows it → no flag, no ban.</small></form>`;
+<input name=dm type=number min=0 max=${GIFT_MAX} placeholder="💎 Diamonds" style="${I};flex:1 1 45%"><input name=tk type=number min=0 max=${GIFT_MAX} placeholder="🎟️ Recruit" style="${I};flex:1 1 45%">
+<input name=gt type=number min=0 max=${GIFT_MAX} placeholder="⚙️ Gear tickets" style="${I};flex:1 1 45%"><input name=ct type=number min=0 max=${GIFT_MAX} placeholder="🎖️ Crew tickets" style="${I};flex:1 1 45%">
+<input name=dk type=number min=0 max=1000 placeholder="🔑 keys (each Dungeon)" style="${I};flex:1 1 100%"><input name=msg maxlength=200 placeholder="message (optional)" style="${I};flex:1 1 100%">
+<button style="padding:9px 14px;border-radius:8px;border:0;background:#29b6f6;font-weight:bold;flex:1 1 100%">SEND GIFT 🎁</button><small>Fill only what you want to give. It goes into the player's Mail. Torque Guard knows it → no flag, no ban.</small></form>`;
 }
 async function giftList(db, pid) {
-  let r = []; try { r = (await db.prepare('SELECT a.dm,a.msg,a.t,a.sent,a.ts,i.got FROM agift a LEFT JOIN inbox i ON i.id=a.mid WHERE a.pid=? ORDER BY a.id DESC LIMIT 10').bind(pid).all()).results; } catch (e) {}
+  let r = []; try { await agEnsure(db); r = (await db.prepare('SELECT a.dm,a.tk,a.gt,a.ct,a.dk,a.msg,a.t,a.sent,a.ts,i.got FROM agift a LEFT JOIN inbox i ON i.id=a.mid WHERE a.pid=? ORDER BY a.id DESC LIMIT 10').bind(pid).all()).results; } catch (e) {}
   if (!r.length) return '';
   const d = t => new Date(t).toISOString().slice(5, 16).replace('T', ' ');
-  return `<div class=c><b>💎 Diamonds you sent</b><br>${r.map(g => `<small>${d(g.t)}</small> <b>${(g.dm | 0).toLocaleString('en')}</b> 💎 · ${g.got ? '✅ claimed' : g.sent ? '📬 in his Mail' : '⏳ waiting (sent when he goes online)'}${g.msg ? `<br><small>“${escH(g.msg)}”</small>` : ''}`).join('<br>')}</div>`;
+  return `<details class=c><summary><b>🎁 Gifts you sent (${r.length})</b></summary>${r.map(g => `<small>${d(g.t)}</small> ${escH(agTxt(g))} · ${g.got ? '✅ claimed' : g.sent ? '📬 in his Mail' : '⏳ waiting (sent when he goes online)'}${g.msg ? `<br><small>“${escH(g.msg)}”</small>` : ''}`).join('<br>')}</details>`;
 }
 async function giftPage(url, env) {
   const db = env.DB, key = env.ADMIN_KEY, k = encodeURIComponent(key), q = (url.searchParams.get('gift') || '').trim().slice(0, 64);
-  const dm = Math.floor(+url.searchParams.get('dm') || 0), msg = (url.searchParams.get('msg') || '').trim().slice(0, 200), back = `<a href="/admin?key=${k}">← back</a>`;
+  const num = (x, m) => Math.max(0, Math.min(m, Math.floor(+url.searchParams.get(x) || 0)));
+  const dm = num('dm', GIFT_MAX), G = {dm, tk:num('tk', GIFT_MAX), gt:num('gt', GIFT_MAX), ct:num('ct', GIFT_MAX), dk:num('dk', 1000)}, msg = (url.searchParams.get('msg') || '').trim().slice(0, 200), back = `<a href="/admin?key=${k}">← back</a>`;
+  const gT = agTxt(G), gQ = `&dm=${G.dm}&tk=${G.tk}&gt=${G.gt}&ct=${G.ct}&dk=${G.dk}`; await agEnsure(db);
   if (!q) return PAGE('Gift', back + '<div class=c>Write a player name or Player ID.</div>');
-  if (!(dm >= 1 && dm <= GIFT_MAX)) return PAGE('Gift', back + `<div class=c>Amount must be 1 – ${GIFT_MAX.toLocaleString('en')} 💎.</div>`);
+  if (!gT) return PAGE('Gift', back + '<div class=c>Write at least one amount (💎, tickets or keys).</div>');
   // who? exact Player ID · start of a Player ID (8+ characters) · exact name · part of a name
   let rs = [];
   try { rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE pid=?').bind(q).all()).results;
@@ -673,18 +686,18 @@ async function giftPage(url, env) {
     if (!rs.length) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 20').bind('%' + q.toLowerCase() + '%').all()).results; } catch (e) {}
   if (!rs.length) { const pl = await db.prepare('SELECT pid,best FROM players WHERE pid=? OR (length(?)>=8 AND pid LIKE ?) LIMIT 2').bind(q, q, q + '%').all().catch(() => ({results:[]}));
     rs = pl.results.map(r => ({pid:r.pid, name:'', best:r.best})); }   // player without an online profile yet (gift waits)
-  const link = r => `/admin?key=${k}&gift=${encodeURIComponent(r.pid)}&dm=${dm}&msg=${encodeURIComponent(msg)}`;
+  const link = r => `/admin?key=${k}&gift=${encodeURIComponent(r.pid)}${gQ}&msg=${encodeURIComponent(msg)}`;
   if (!rs.length) return PAGE('Gift', back + `<div class=c>Nobody found for “${escH(q)}”.</div>`);
-  if (rs.length > 1) return PAGE('Gift', back + `<h2>Which player? (💎 ${dm.toLocaleString('en')})</h2>` + rs.map(r => `<div class=c><a href="${link(r)}"><b>${escH(r.name || '(no name)')}</b></a><br><small>${escH(r.pid)} · stage ${r.best | 0}</small></div>`).join(''));
+  if (rs.length > 1) return PAGE('Gift', back + `<h2>Which player? (${escH(gT)})</h2>` + rs.map(r => `<div class=c><a href="${link(r)}"><b>${escH(r.name || '(no name)')}</b></a><br><small>${escH(r.pid)} · stage ${r.best | 0}</small></div>`).join(''));
   const P = rs[0], nm = P.name || P.pid.slice(0, 13) + '…', card = `<a href="/admin?key=${k}&p=${encodeURIComponent(P.pid)}">← back to ${escH(nm)}</a>`;
   const nonce = url.searchParams.get('n');
-  if (!nonce) return PAGE('Gift', card + `<div class=c style="border-color:#29b6f6"><h2>💎 Send ${dm.toLocaleString('en')} diamonds?</h2>To: <b>${escH(nm)}</b><br><small>${escH(P.pid)}</small>${msg ? `<br>Message: “${escH(msg)}”` : ''}<br>It goes into his Mail${P.name ? '' : ' (he has no online profile yet → it is sent when he goes online with a name)'}. No flag, no ban.<br><a class=b href="${link(P)}&n=${Date.now().toString(36) + Math.random().toString(36).slice(2, 8)}">YES, SEND 💎</a></div>`);
+  if (!nonce) return PAGE('Gift', card + `<div class=c style="border-color:#29b6f6"><h2>🎁 Send ${escH(gT)}?</h2>To: <b>${escH(nm)}</b><br><small>${escH(P.pid)}</small>${msg ? `<br>Message: “${escH(msg)}”` : ''}<br>It goes into his Mail${P.name ? '' : ' (he has no online profile yet → it is sent when he goes online with a name)'}. No flag, no ban.<br><a class=b href="${link(P)}&n=${Date.now().toString(36) + Math.random().toString(36).slice(2, 8)}">YES, SEND 🎁</a></div>`);
   const now = Date.now();
-  const ins = await db.prepare('INSERT OR IGNORE INTO agift(pid,dm,msg,t,nonce) VALUES(?,?,?,?,?)').bind(P.pid, dm, msg || null, now, nonce.slice(0, 40)).run();
-  if (ins.meta && ins.meta.changes) { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(P.pid, now, 'gift', `💎 ${dm} diamonds sent by admin${msg ? ' – ' + msg : ''}`).run();
+  const ins = await db.prepare('INSERT OR IGNORE INTO agift(pid,dm,tk,gt,ct,dk,msg,t,nonce) VALUES(?,?,?,?,?,?,?,?,?)').bind(P.pid, G.dm, G.tk, G.gt, G.ct, G.dk, msg || null, now, nonce.slice(0, 40)).run();
+  if (ins.meta && ins.meta.changes) { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(P.pid, now, 'gift', `🎁 ${gT} sent by admin${msg ? ' – ' + msg : ''}`).run();
     await adminGifts(env, P.pid); }
   const g = await db.prepare('SELECT sent FROM agift WHERE nonce=?').bind(nonce.slice(0, 40)).first();
-  return PAGE('Gift', `<h2>✅ ${dm.toLocaleString('en')} 💎 → ${escH(nm)}</h2><div class=c>${g && g.sent ? '📬 It is in his Mail now (he claims it in the game).' : '⏳ Saved. It goes into his Mail the next time he is online.'}</div>${card}<br><br>${back}`);
+  return PAGE('Gift', `<h2>✅ ${escH(gT)} → ${escH(nm)}</h2><div class=c>${g && g.sent ? '📬 It is in his Mail now (he claims it in the game).' : '⏳ Saved. It goes into his Mail the next time he is online.'}</div>${card}<br><br>${back}`);
 }
 
 // ------------------------------------------------------------------ v16-275 (Marius 24 nov): admin – where players stop · purchases € · versions · Mail to ALL
@@ -721,6 +734,33 @@ async function buyHtml(env) {   // purchases confirmed by Google: € per day + 
 <div class=c><b>Per day (Paris time)</b>${T}${days.map(d => `<tr ${tr}><td>${d.slice(5)}</td><td style="text-align:right">${day[d].n}×</td><td style="text-align:right"><b>${eur(day[d].v)}</b></td></tr>`).join('')}</table></div>
 <details class=c><summary><b>Per pack</b></summary>${T}${Object.keys(sku).sort((a, b) => sku[b].v - sku[a].v).map(k => `<tr ${tr}><td>${e(k)}</td><td style="text-align:right">${sku[k].n}×</td><td style="text-align:right"><b>${eur(sku[k].v)}</b></td></tr>`).join('')}</table></details>
 <details class=c><summary><b>Last 25 purchases</b></summary>${rs.slice(0, 25).map(r => `<small>${dt(r.t)}</small> · <a href="?key=${encodeURIComponent(env.ADMIN_KEY)}&p=${encodeURIComponent(r.pid)}"><b style="color:#fff">${e(NM[r.pid] || r.pid.slice(0, 10))}</b></a> · ${e(r.sku)} · <b>${eur(PLAY_EUR[r.sku] || 0)}</b>`).join('<br>')}</details>`;
+}
+// v16-313 (Marius 25 nov): 🏁 how far the players are (NORMAL by chapter, HARD, top 20) – for balancing
+async function progHtml(env) {
+  const db = env.DB, now = Date.now(), D = 864e5, e = s => escH(s), lab = i => (Math.floor(i / 30) + 1) + '-' + (i % 30 + 1);
+  const ps = (await db.prepare('SELECT pid, best, pw, last FROM players WHERE last>? AND banned=0').bind(now - 7 * D).all()).results;
+  if (!ps.length) return '<div class=c>Nobody active in 7 days.</div>';
+  let H = {}; try { for (const r of (await db.prepare('SELECT pid, MAX(si) m FROM rcpt WHERE h=1 GROUP BY pid').all()).results) H[r.pid] = r.m; } catch (e) {}
+  const BK = [[1, 1], [2, 5], [6, 10], [11, 20], [21, 30], [31, 40], [41, 50], [51, 75], [76, 100]], ch = p => Math.floor((p.best | 0) / 30) + 1;
+  const T = '<table style="width:100%;border-collapse:collapse;font-size:13px">', tr = 'style="border-top:1px solid #ffffff14"';
+  const bar = n => `<span style="display:inline-block;height:9px;width:${Math.max(2, Math.round(110 * n / ps.length))}px;background:#ffd54a;border-radius:4px;vertical-align:middle"></span>`;
+  const hn = ps.filter(p => H[p.pid] != null).length, top = [...ps].sort((a, b) => (b.best | 0) - (a.best | 0) || (b.pw | 0) - (a.pw | 0)).slice(0, 20), NM = await pnames(db, top.map(p => p.pid));
+  const ago = t => { const m = (now - t) / 6e4; return m < 60 ? Math.round(m) + ' min' : m < 1440 ? Math.round(m / 60) + ' h' : Math.round(m / 1440) + ' d'; };
+  return `<div class=c>Active players (7 days): <b>${ps.length}</b> · playing HARD: <b>${hn}</b> · best stage: <b>${lab(Math.max(...ps.map(p => p.best | 0)))}</b> · strongest team: <b>${fmtN(Math.max(...ps.map(p => p.pw | 0)))}</b></div>
+<div class=c><b>NORMAL – which chapter they are in</b>${T}${BK.map(b => [b, ps.filter(p => ch(p) >= b[0] && ch(p) <= b[1]).length]).filter(x => x[1]).map(([b, n]) => `<tr ${tr}><td>ch. ${b[0] === b[1] ? b[0] : b[0] + '–' + b[1]}</td><td style="text-align:right"><b>${n}</b></td><td>${bar(n)}</td></tr>`).join('')}</table></div>
+<div class=c><b>Top 20 (campaign)</b>${T}<tr style="color:#ffd54a;text-align:left"><th>player</th><th>stage</th><th>HARD</th><th>team</th><th>seen</th></tr>${top.map(p => `<tr ${tr}><td><a href="?key=${encodeURIComponent(env.ADMIN_KEY)}&p=${encodeURIComponent(p.pid)}">${e(NM[p.pid] || p.pid.slice(0, 8))}</a></td><td>${lab(p.best | 0)}</td><td>${H[p.pid] != null ? 'H ' + lab(H[p.pid]) : '–'}</td><td>${fmtN(p.pw | 0)}</td><td><small>${ago(p.last)}</small></td></tr>`).join('')}</table>
+<small>Team = power at the last online sync. HARD = the highest HARD stage won (from the battle receipts).</small></div>`;
+}
+// v16-313: 💎 economy – what the game gave per day (from the ledger every phone sends) + who got the most diamonds in 7 days
+async function econHtml(env) {
+  const db = env.DB, now = Date.now(), D = 864e5;
+  const rs = (await db.prepare('SELECT day, COUNT(*) n, SUM(dm) dm, SUM(tk) tk, SUM(gtk) gt, SUM(ct) ct FROM ledg WHERE day>=? GROUP BY day ORDER BY day DESC').bind(parisDay(now - 13 * D)).all()).results;
+  if (!rs.length) return '<div class=c>No data yet.</div>';
+  const T = '<table style="width:100%;border-collapse:collapse;font-size:13px">', tr = 'style="border-top:1px solid #ffffff14"', av = (a, n) => fmtN(Math.round((a || 0) / Math.max(1, n)));
+  const tp = (await db.prepare('SELECT pid, SUM(dm) dm, SUM(tk) tk FROM ledg WHERE day>=? GROUP BY pid ORDER BY dm DESC LIMIT 10').bind(parisDay(now - 6 * D)).all()).results, NM = await pnames(db, tp.map(r => r.pid));
+  return `<div class=c><b>Per day (all players)</b>${T}<tr style="color:#ffd54a;text-align:left"><th>day</th><th>players</th><th>💎</th><th>🎟️</th><th>⚙️</th><th>🎖️</th></tr>${rs.map(r => `<tr ${tr}><td>${r.day.slice(5)}</td><td>${r.n}</td><td><b>${fmtN(r.dm || 0)}</b></td><td>${fmtN(r.tk || 0)}</td><td>${fmtN(r.gt || 0)}</td><td>${fmtN(r.ct || 0)}</td></tr>`).join('')}</table></div>
+<div class=c><b>Average for ONE player per day</b>${T}<tr style="color:#ffd54a;text-align:left"><th>day</th><th>💎</th><th>🎟️</th><th>⚙️</th><th>🎖️</th></tr>${rs.slice(0, 7).map(r => `<tr ${tr}><td>${r.day.slice(5)}</td><td><b>${av(r.dm, r.n)}</b></td><td>${av(r.tk, r.n)}</td><td>${av(r.gt, r.n)}</td><td>${av(r.ct, r.n)}</td></tr>`).join('')}</table><small>If the average climbs day after day, the game gives too much (or someone found a hole).</small></div>
+<div class=c><b>Most 💎 in 7 days</b><br>${tp.map(r => `<a href="?key=${encodeURIComponent(env.ADMIN_KEY)}&p=${encodeURIComponent(r.pid)}">${escH(NM[r.pid] || r.pid.slice(0, 8))}</a> <b>${fmtN(r.dm || 0)}</b> 💎 · ${fmtN(r.tk || 0)} 🎟️`).join('<br>')}</div>`;
 }
 async function verHtml(env) {   // game version of the players active in the last 7 days
   const rs = (await env.DB.prepare('SELECT gv, COUNT(*) n FROM players WHERE last>? GROUP BY gv ORDER BY gv DESC').bind(Date.now() - 7 * 864e5).all()).results;
@@ -825,24 +865,44 @@ async function admin(url, env) {
   const TN = await pnames(db, tks.map(t => t.pid));
   let quitH = '', buyH = '', verH = ''; try { quitH = await quitHtml(env); } catch (e) { quitH = '<div class=c>quit stats: ' + escH(String(e)) + '</div>'; } try { buyH = await buyHtml(env); } catch (e) {} try { verH = await verHtml(env); } catch (e) {}   // v16-275
   const TC = {bug:'🐞 Bug', buy:'💳 Purchase', acc:'👤 Account', pl:'🚩 Player', idea:'💡 Idea', oth:'❓ Other'};
-  const stats = !st ? '' : `<h3>📊 Players per day (Paris time)</h3><div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
-<div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th></tr>${st.days.map(x => { const r = st.ret[x];
-  return `<tr style="border-top:1px solid #ffffff14"><td>${x.slice(5)}</td><td><b>${st.dau[x] ?? '–'}</b></td><td>${st.fresh[x] || 0}</td><td>${r && r.n ? `${r.b}/${r.n} (${Math.round(100 * r.b / r.n)}%)` : '–'}</td></tr>`; }).join('')}</table>
-<small>“Active” is counted from the day this update went live (older days show “–”). “New” works for the past too (players inactive 180+ days are removed).</small></div>`;
+  // v16-313 (Marius 25 nov: "fă pagina mai easy, nu așa încărcată"): summary on top, quick menu, every section folds (tap to open)
+  const SEC = (id, t, b, open) => `<details id=${id} class=sec${open ? ' open' : ''}><summary>${t}</summary>${b}</details>`;
+  const noH = x => String(x || '').replace(/^\s*<h3[^>]*>[\s\S]*?<\/h3>/, '');
+  let progH = '', ecoH = '', eur7 = {d:0, m:0}; try { progH = await progHtml(env); } catch (e) { progH = '<div class=c>' + escH(String(e)) + '</div>'; } try { ecoH = await econHtml(env); } catch (e) { ecoH = '<div class=c>' + escH(String(e)) + '</div>'; }
+  try { const now = Date.now(), td = parisDay(now); for (const r of (await db.prepare("SELECT sku,t FROM purchases WHERE state='ok' AND t>?").bind(now - 32 * 864e5).all()).results) { const v = PLAY_EUR[r.sku] || 0, dd = parisDay(r.t); if (dd === td) eur7.d += v; if (dd.slice(0, 7) === td.slice(0, 7)) eur7.m += v; } } catch (e) {}
+  const openT = tks.filter(t => !t.st).length, nBan = bad.filter(p => p.banned).length, nFlag = bad.length - nBan;
+  const stats = !st ? '<div class=c>no stats yet</div>' : `<div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
+<div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th><th>Back after 7 days</th></tr>${st.days.map(x => { const r = st.ret[x], r7 = st.ret7[x];
+  return `<tr style="border-top:1px solid #ffffff14"><td>${x.slice(5)}</td><td><b>${st.dau[x] ?? '–'}</b></td><td>${st.fresh[x] || 0}</td><td>${r && r.n ? `${r.b}/${r.n} (${Math.round(100 * r.b / r.n)}%)` : '–'}</td><td>${r7 && r7.n ? `${r7.b}/${r7.n} (${Math.round(100 * r7.b / r7.n)}%)` : '–'}</td></tr>`; }).join('')}</table>
+<small>“Back next day” / “Back after 7 days” = new players of that day who opened the game again 1 day / 7 days later (good games: ~35% and ~15%).</small></div>`;
+  const chip = (h, t, c) => `<a class=chip href="#${h}" onclick="var e=document.getElementById('${h}');if(e)e.open=true"${c ? ` style="border-color:${c}"` : ''}>${t}</a>`;
   const html = `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><title>Torque Guard</title>
-<style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}</style>
-<h1>🛡️ Torque Guard</h1><form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>${giftForm(env.ADMIN_KEY, '')}${bcastForm(env.ADMIN_KEY)}<div class=c><a href="/admin/chat?key=${k}">💬 Chat moderation →</a></div><div class=c>Players: <b>${tot.n}</b> · active 24h: <b>${tot.d || 0}</b> · purchases OK: <b>${buys.n}</b><br>🔒 Play Integrity (${esc(env.INTEGRITY || 'log')}): <b>${ig.g || 0}</b> OK of <b>${ig.n || 0}</b> phones (3 days)</div>
-${stats}
-${quitH}${buyH}${verH}
-<h3 id=sup>🆘 Support (${tks.filter(t => !t.st).length} open)</h3>${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
+<style>body{font-family:system-ui;background:#0b1019;color:#eee;margin:0;padding:12px}h1{color:#ffd54a;font-size:22px;margin:4px 0 8px}.c{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:10px;margin:8px 0;font-size:13px}.b{color:#ff8a80}.f{color:#ffd54a}a{color:#9fd3ff}small{color:#9fb0c0}
+.sec{margin:8px 0;border-radius:12px;background:#101724;border:1px solid #ffffff1a}.sec>summary{padding:12px;font-weight:800;font-size:15px;cursor:pointer;list-style:none}.sec>summary::-webkit-details-marker{display:none}.sec>summary:after{content:'▸';float:right;color:#ffd54a}.sec[open]>summary:after{content:'▾'}.sec[open]{padding:0 8px 6px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.kp div{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:8px;text-align:center;font-size:11px;color:#9fb0c0}.kp b{display:block;font-size:19px;color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.chip{padding:7px 10px;border-radius:999px;background:#1b2537;border:1px solid #ffffff22;text-decoration:none;color:#e8f2ff;font-size:13px;font-weight:700}</style>
+<h1>🛡️ Torque Guard</h1>
+<div class=kp><div><b>${st ? st.on.m10 || 0 : '–'}</b>🟢 online now</div><div><b>${tot.d || 0}</b>active 24h</div><div><b>${tot.n}</b>players</div>
+<div><b style="color:#7dff8a">${eur(eur7.d)}</b>today</div><div><b style="color:#7dff8a">${eur(eur7.m)}</b>this month</div><div><b style="color:${openT ? '#ff8a80' : '#fff'}">${openT}</b>support open</div>
+<div><b style="color:${errs.length ? '#ffb74d' : '#fff'}">${errs.length}</b>game errors</div><div><b style="color:${nFlag ? '#ffd54a' : '#fff'}">${nFlag}</b>flagged</div><div><b>${nBan}</b>banned</div></div>
+<form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>
+<div class=chips>${chip('sup', '🆘 Support' + (openT ? ' (' + openT + ')' : ''), openT ? '#ff8a80' : '')}${chip('errs', '🐞 Errors' + (errs.length ? ' (' + errs.length + ')' : ''), errs.length ? '#ffb74d' : '')}${chip('gift', '🎁 Gift')}${chip('mall', '📢 Mail all')}${chip('stats', '📊 Players')}${chip('prog', '🏁 Progress')}${chip('eco', '💎 Economy')}${chip('buys', '💳 Purchases')}${chip('quit', '🚪 Who quits')}${chip('bad', '⚠️ Cheaters')}${chip('ver', '📦 Versions')}${chip('integ', '🔒 Integrity')}${chip('ev', '📜 Events')}<a class=chip href="/admin/chat?key=${k}">💬 Chat</a></div>
+${SEC('sup', `🆘 Support (${tks.filter(t => !t.st).length} open)`, `${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
   return `<div class=c style="${t.st ? 'opacity:.55' : 'border-color:#ff8a80'}"><b>${TC[t.cat] || t.cat}</b> · <a href="?key=${k}&p=${encodeURIComponent(t.pid)}"><b style="color:#fff">${esc(TN[t.pid] || I.name || '(no name)')}</b></a> <small>${d(t.t)} · v${I.cv || '?'} · ${esc(I.g || '')} · S${I.srv || '?'}</small><br>${esc(t.txt)}<br><small>${esc(String(I.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>
-  ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}
-<h3 id=errs>🐞 Game errors (7 days)${errs.length > 1 ? ` <a href="?key=${k}&efix=all" style="font-size:13px">👍 all done</a>` : ''}</h3>${errs.length ? errs.map(r => `<div class=c><a href="?key=${k}&efix=${encodeURIComponent(r.h)}" onclick="return confirm('Problem solved? The error will be hidden (it comes back by itself if a newer version still has it).')" style="float:right;padding:4px 10px;border-radius:8px;background:#2e7d32;color:#fff;text-decoration:none;font-weight:800">👍 DONE</a><span style="display:inline-block;padding:2px 8px;border-radius:8px;background:${r.fx ? '#c62828' : '#ef6c00'};color:#fff;font-weight:800;font-size:12px;margin-bottom:4px">${r.fx ? '↩️ CAME BACK after the fix' : '🔧 OPEN – to fix'}</span><br><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>${r.st ? `<br><small style="font-family:monospace;color:#9fb3c8;word-break:break-all">📍 ${esc(r.st)}</small>` : ''}</div>`).join('') : '<div class=c>No errors 👍</div>'}
-<h3>🔒 Play Integrity – why (3 days)</h3><div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
-<details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>
-<h3>Flagged / banned</h3><small>👻 = hidden (shadow): plays normally but is out of rankings, opponents and prizes. Ban needs a PROOF or 2 different kinds of signs. Points go down 10 a day with honest play.</small>${bad.map(p => { const r = lastR[p.pid], pv = r ? powLine(r) : '';
-  return `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b>${p.shadow ? ' 👻' : ''} · ${who(p.pid)} <small>${esc(p.pid).slice(0, 13)}…</small><br>${esc(p.reason)}<br><small>kinds: <b>${esc(p.sig || '–')}</b>${(p.sig || '').includes('proof') || (p.sig || '').split(',').length >= 2 ? ' (ban possible)' : ' (1 kind → no automatic ban)'} · flags: ${esc(p.flags)}</small><br>${pv ? pv + '<br>' : ''}<small>money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br><a href="?key=${k}&p=${encodeURIComponent(p.pid)}">📈 player card</a> · ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`; }).join('') || '<div class=c>Nobody flagged 👍</div>'}
-<h3>🔎 To check (no points, 3 days)</h3>${rv.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${e.pid !== '-' ? `<a href="?key=${k}&p=${encodeURIComponent(e.pid)}">${NM[e.pid] ? esc(NM[e.pid]) : esc(e.pid).slice(0, 10)}</a>` : ''}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>Nothing 👍</div>'}
-<h3>Last events</h3>${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${NM[e.pid] ? esc(NM[e.pid]) : esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`;
+  ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}`, openT > 0)}
+${SEC('errs', `🐞 Game errors (${errs.length})`, `${errs.length > 1 ? `<div class=c><a href="?key=${k}&efix=all">👍 mark ALL as done</a></div>` : ''}${errs.length ? errs.map(r => `<div class=c><a href="?key=${k}&efix=${encodeURIComponent(r.h)}" onclick="return confirm('Problem solved? The error will be hidden (it comes back by itself if a newer version still has it).')" style="float:right;padding:4px 10px;border-radius:8px;background:#2e7d32;color:#fff;text-decoration:none;font-weight:800">👍 DONE</a><span style="display:inline-block;padding:2px 8px;border-radius:8px;background:${r.fx ? '#c62828' : '#ef6c00'};color:#fff;font-weight:800;font-size:12px;margin-bottom:4px">${r.fx ? '↩️ CAME BACK after the fix' : '🔧 OPEN – to fix'}</span><br><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>${r.st ? `<br><small style="font-family:monospace;color:#9fb3c8;word-break:break-all">📍 ${esc(r.st)}</small>` : ''}</div>`).join('') : '<div class=c>No errors 👍</div>'}`, errs.length > 0)}
+${SEC('gift', '🎁 Send a gift to one player', giftForm(env.ADMIN_KEY, ''))}
+${SEC('mall', '📢 Mail to ALL players', noH(bcastForm(env.ADMIN_KEY)).replace(/^<details[^>]*><summary>[\s\S]*?<\/summary>/, '').replace(/<\/details>$/, ''))}
+${SEC('stats', '📊 Players per day', stats)}
+${SEC('prog', '🏁 Player progress', progH)}
+${SEC('eco', '💎 Economy – what the game gave', ecoH)}
+${SEC('buys', '💳 Purchases', noH(buyH) || '<div class=c>No purchases yet.</div>')}
+${SEC('quit', '🚪 Where new players stop', noH(quitH))}
+${SEC('bad', '⚠️ Flagged / banned (' + bad.length + ')', `<small>👻 = hidden (shadow): plays normally but is out of rankings, opponents and prizes. Ban needs a PROOF or 2 different kinds of signs. Points go down 10 a day with honest play.</small>${bad.map(p => { const r = lastR[p.pid], pv = r ? powLine(r) : '';
+  return `<div class=c><b class="${p.banned ? 'b' : 'f'}">${p.banned ? '🚫 BANNED' : '⚠️ score ' + p.score}</b>${p.shadow ? ' 👻' : ''} · ${who(p.pid)} <small>${esc(p.pid).slice(0, 13)}…</small><br>${esc(p.reason)}<br><small>kinds: <b>${esc(p.sig || '–')}</b>${(p.sig || '').includes('proof') || (p.sig || '').split(',').length >= 2 ? ' (ban possible)' : ' (1 kind → no automatic ban)'} · flags: ${esc(p.flags)}</small><br>${pv ? pv + '<br>' : ''}<small>money ${p.money} · lv ${p.lv} · stage ${p.best} · last ${d(p.last)}</small><br><a href="?key=${k}&p=${encodeURIComponent(p.pid)}">📈 player card</a> · ${p.banned ? `<a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">✅ unban</a>` : `<a href="?key=${k}&ban=${encodeURIComponent(p.pid)}">🚫 ban</a> · <a href="?key=${k}&unban=${encodeURIComponent(p.pid)}">clear</a>`}</div>`; }).join('') || '<div class=c>Nobody flagged 👍</div>'}` + `<h4 style="margin:10px 4px 2px">🔎 To check (no points, 3 days)</h4>${rv.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${e.pid !== '-' ? `<a href="?key=${k}&p=${encodeURIComponent(e.pid)}">${NM[e.pid] ? esc(NM[e.pid]) : esc(e.pid).slice(0, 10)}</a>` : ''}</small><br>${esc(e.detail)}</div>`).join('') || '<div class=c>Nothing 👍</div>'}`)}
+${SEC('ver', '📦 Game versions (7 days)', noH(verH))}
+${SEC('integ', '🔒 Play Integrity (' + (ig.g || 0) + ' OK of ' + (ig.n || 0) + ')', `<div class=c>${igr.map(r => `<b>${r.n}</b> × ${esc(r.r === 'app=PLAY_RECOGNIZED dev=MEETS_DEVICE_INTEGRITY lic=LICENSED · old or foreign token' ? '⏳ good phone, last check from before the v16-120 fix (app not opened since)' : r.r)}`).join('<br>') || 'no checks yet'}</div>
+<details class=c><summary>Last 15 checks</summary>${igl.map(r => `<small>${d(r.t)} · ${esc(r.pid).slice(0, 10)}</small> ${r.ok ? '✅' : '❌'} ${esc(r.err || `app=${r.app} dev=${r.dev || 'none'} lic=${r.lic}`)}`).join('<br>')}</details>`)}
+${SEC('ev', '📜 Last events', `${ev.map(e => `<div class=c><small>${d(e.t)} · ${esc(e.kind)} · ${NM[e.pid] ? esc(NM[e.pid]) : esc(e.pid).slice(0, 10)}</small><br>${esc(e.detail)}</div>`).join('')}`)}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
 }
