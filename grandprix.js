@@ -50,7 +50,7 @@ const mWk=m=>m[5]||0,mOpen=m=>wkN()>=mWk(m);
 const MIC={sold:'🛠️',win:'⚔️',sum:'🎰',dgk:'🗝️',lvl:'⬆️',idle:'💤',login:'📅',ult:'🏁',esum:'🎰',stg:'⚔️',ctw:'🗼',bld:'🏭',hero:'🧩',edgk:'🗝️',abst:'⚔️',leg5:'⭐',atw:'🗼',asc:'✦',leg10:'🌟',awk:'👑'};
 // ---------------------------------------------------------------- road (free lane) – rewards cycle every 10 tiers; tier 50 = MYTHIC of your choice
 const RD=[{dm:300},{tk:8},{essU:6},{key:5},{gt:8},{bkU:6},{ct:8},{dm:450},{tk:15},{essU:12}];
-const MYTH=['m5_0','m5_2','m5_3','m5_4','m5_5','m5_1','m5_6'];
+const MYTH=['m5_0','m5_2','m5_3','m5_4','m5_5','m5_1','m5_6','m5_7'];
 const FINAL_BONUS={dm:1500,tk:15,key:10};
 const FINAL2={dm:3000,tk:25,gt:15,key:15};   // v16-228 tier 100
 const rdOf=i=>{const r=RD[(i-1)%10];return i>MID?mul(r,1.5):r;};   // tiers 51-99 = ×1.5

@@ -52,6 +52,7 @@ HEROES = {
   'm5_6': ('chroma', {'idle': 435, 'run': 399, 'attack': 411, 'skill': 390, 'hitko': 392, 'win': 413, 'fx': 330}),
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
+HEROES['m5_7'] = ('volta', {'idle': 412, 'run': 390, 'attack': 437, 'skill': 405, 'hitko': 393, 'win': 434, 'fx': 330})   # v16-328 DOC VOLTA (new Mythic SUPPORT). REF = frame 1 hair-top → feet (drone excluded); attack = every 2nd frame of attack16a/b
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
 SRC = 'img/sheets/%s/%s_%%s.webp' % (HEROES[HID][0], HID)
 ROWS = ['idle', 'run', 'attack', 'skill', 'hitko', 'win']
@@ -66,12 +67,13 @@ SPECKS = {'m5_5', 'm5_4', 'm5_3', 'm5_2', 'm3_0', 'm3_1', 'm3_2', 'm3_4', 'm3_5'
 KEEPBLUE = {'m4_2', 'm4_3', 'm4_4', 'm5_4', 'm5_5', 'm5_6'}   # v16-141 Nova: navy hair + blue-white electric arrow tips
    # v16-106: + Sofia's crown gem, Otto's blue tablet / ear piece / clock glow   # v16-96 Duke: blue diamonds / ice crystals (cyan) must stay blue, not turn grey
 
+GREENGLOW = {'m5_7'}
 PURPLEGLOW = {'m3_0', 'm3_1', 'm3_3', 'm3_5', 'm3_6'}   # v16-125 Nina: nitro smoke + rocket flame stay purple   # v16-113 Aria: neon swooshes + tornado haze → lilac, not grey
 
 def despill(a, n=''):
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     gr = (g > r) | (g > b + (r - b) * .8)
-    if HID in KEEPBLUE: gr &= g > b + 6
+    if HID in KEEPBLUE or HID in GREENGLOW: gr &= g > b + 6
     fl = gr & (r > 2 * b + 20)
     sm = gr & ~fl
     a = a.copy()
@@ -80,7 +82,9 @@ def despill(a, n=''):
     tint = ((0, 6), (1, 2), (2, 0))
     if HID in KEEPBLUE and n == 'fx': v = np.maximum(r, b); tint = ((0, -40), (1, 0), (2, 25))  # teal glow → icy blue, not grey
     if HID in ('m3_2', 'm3_4') and n in ('fx', 'skill', 'attack'): tint = ((0, 18), (1, -28), (2, 34))   # v16-108 Gloria: paint spill edges → purple, not grey
+    if HID in GREENGLOW: v = np.maximum(r, b); tint = ((0, -25), (1, 70), (2, 5))   # v16-328 Doc Volta: his crosses / rifle / healing light are GREEN → mint glow, not grey
     if HID in PURPLEGLOW: tint = ((0, 10), (1, -8), (2, 24))   # v16-109 Ohm: lightning haze stays lilac, not grey smoke
+    if HID in GREENGLOW: sm = sm & (a[..., 3] < 225); fl = fl & (a[..., 3] < 225)   # v16-328: opaque teal hair / green parts stay as drawn – only the see-through glow is tinted
     for k, o in tint: a[..., k] = np.where(sm, np.clip(v + o, 0, 255), a[..., k])
     return a
 
@@ -129,6 +133,7 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
        'm5_3': {('attack', 3): 'fade:R', ('skill', 4): 'fadeS', ('skill', 5): 'fadeS', ('skill', 3): 'fadeS', ('skill', 2): 'none', ('fx', 4): 'fade', ('fx', 5): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_4': {**{('attack', i): 'none' for i in range(8)}, ('win', 2): 'fade', ('win', 1): 'fade:R', ('attack', 3): 'fade:R', ('skill', 1): 'none', ('skill', 5): 'none', ('hitko', 2): 'none', ('skill', 4): 'fade:T', ('fx', 0): 'fade:T', ('fx', 1): 'fade:T', ('fx', 2): 'fade:T', ('fx', 3): 'fade:T', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_5': {('attack', 3): 'fade:R', ('attack', 4): 'fade:R', ('skill', 3): 'fade:R', ('skill', 4): 'fade:R', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
+       'm5_7': {(n, i): 'fadeS' for n in ('idle', 'run', 'attack', 'skill', 'hitko', 'win', 'fx') for i in range(8)},   # v16-328 Doc Volta: no smears (muzzle flash / KO body touch the cell edge)
        'm5_6': {(n, i): 'fade' for n in ('idle', 'run', 'attack', 'skill', 'hitko', 'win', 'fx') for i in range(8)},   # v16-244 Chroma: paint / staff touch the cell edges → soft fade everywhere (no smears)
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}
