@@ -2420,6 +2420,8 @@ function unitUpdate(u,dt,foes,friends){
   const tx=spot?spot[0]:tg.x-u.face*range*.85,dx=tx-u.x,ddp=((spot?spot[1]:tg.d)-u.d)*(FY1-FY0);const L=Math.hypot(dx,ddp)||1;
   if(u.hero){const lp=u.lp;if(lp){const mv=Math.hypot(u.x-lp[0],(u.d-lp[1])*(FY1-FY0));u.stk=mv<sp*.35?(u.stk||0)+dt:Math.max(0,(u.stk||0)-dt*2);}u.lp=[u.x,u.d];}
   u.x+=dx/L*Math.min(sp,L);u.d+=ddp/L*Math.min(sp,L)/(FY1-FY0)*(spot?1:.8);u.d=clamp(u.d,.02,.98);u.x=clamp(u.x,14*S,W-14*S);
+  // v16-335 (Marius: "câteodată aleargă pe loc"): a hero who is blocked (pushed back / crowded, barely moves) stands in idle instead of running on the spot
+  if(u.hero&&(u.stk||0)>.15){u.st='idle';return;}
   u.st='walk';u.wph+=dt*(u.hero?11:9)*(u.charge?2:1);if(u.t==='tire')u.roll+=dt*(u.charge?14:7)*u.face;
 }
 // v16-46: melee mechanics no longer fight for the same spot. Each one takes his own place around the monster
@@ -2506,10 +2508,11 @@ function step(dt){B.t+=dt;B.phT+=dt;
     else if(!alive(B.mons).length&&!B.proj.length){if(B.wave<B.stage.w.length-1){B.phase='march';B.phT=0;B.wave++;B.bossBar=null;
         for(const h of alive(B.heroes)){heal(h,h.max*.15);h.act=null;h.lift=0;h.sP=null;h.sT=null;}formation();}
       else{B.phase='win';B.phT=0;for(const h of B.heroes)if(!h.dead)h.st='win';if(!B.sim)sfx('win');}}}
-  else if(B.phase==='march'){let done=true;for(const u of alive(B.heroes)){const dx=u.fx-u.x,ddp=u.fd-u.d;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),210*S*dt);u.d+=Math.sign(ddp)*Math.min(Math.abs(ddp),.8*dt);
-      u.face=1;u.st='walk';u.wph+=dt*11;u.stun=0;if(Math.abs(dx)>2||Math.abs(ddp)>.01)done=false;}
+  // v16-335 (Marius: "câteodată aleargă pe loc"): on a STILL background (painted campaign picture / tower arena) the heroes and monsters that reached their place stand in idle – before they kept running on the spot until the next wave
+  else if(B.phase==='march'){let done=true;const stBG=!!(cbgImg()||B.tw);for(const u of alive(B.heroes)){const dx=u.fx-u.x,ddp=u.fd-u.d;u.x+=Math.sign(dx)*Math.min(Math.abs(dx),210*S*dt);u.d+=Math.sign(ddp)*Math.min(Math.abs(ddp),.8*dt);
+      const go=Math.abs(dx)>2||Math.abs(ddp)>.01;u.face=1;u.st=go||!stBG?'walk':'idle';u.wph+=dt*11;u.stun=0;if(go)done=false;}
     B.scroll+=dt*240*S;if(B.phT>.3&&!B.spawned){B.spawned=true;spawnWave();for(const m of B.mons)if(m.b!=='titan')m.x+=W*.4;}
-    for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.62+.1*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=(m.mv+240*S)*dt;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*9;}}
+    for(const m of B.mons){if(m.b==='titan')continue;const tx=W*(.62+.1*(B.mons.indexOf(m)%3));if(m.x>tx){m.x-=(m.mv+240*S)*dt;m.st='walk';m.wph+=dt*9;if(m.t==='tire')m.roll-=dt*9;}else if(stBG)m.st='idle';}
     if(B.phT>4&&!done){for(const u of alive(B.heroes)){u.x=fin(u.fx)?u.fx:W*.25;u.d=fin(u.fd)?u.fd:.5;}done=true;} // v16-206: a march can never hang
     if(B.phT>1.05&&done){B.phase='fight';B.phT=0;B.spawned=false;B.wdT=B.t;punch(.03);talWave();}}
   else if(B.phase==='win'){for(const u of B.heroes){if(!u.dead)u.st='win';u.flash=Math.max(0,u.flash-dt*6);if(u.dead)u.deadT+=dt;}if(B.phT>1.6&&!B.res){B.res=1;if(!B.sim){mbPay();finish(true);}}}
