@@ -53,6 +53,7 @@ HEROES = {
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HEROES['m5_7'] = ('volta', {'idle': 412, 'run': 390, 'attack': 437, 'skill': 405, 'hitko': 393, 'win': 434, 'fx': 330})   # v16-328 DOC VOLTA (new Mythic SUPPORT). REF = frame 1 hair-top → feet (drone excluded); attack = every 2nd frame of attack16a/b
+HEROES['m5_8'] = ('shade', {'idle': 349, 'run': 356, 'attack': 345, 'skill': 345, 'hitko': 349, 'win': 349, 'fx': 345})   # SHADE, THE GHOST RIDER (demo)
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
 SRC = 'img/sheets/%s/%s_%%s.webp' % (HEROES[HID][0], HID)
 ROWS = ['idle', 'run', 'attack', 'skill', 'hitko', 'win']
@@ -134,6 +135,7 @@ EXT = {'m4_0': {('fx', 3): 'fade', ('fx', 4): 'fade', ('fx', 5): 'fade', ('skill
        'm5_4': {**{('attack', i): 'none' for i in range(8)}, ('win', 2): 'fade', ('win', 1): 'fade:R', ('attack', 3): 'fade:R', ('skill', 1): 'none', ('skill', 5): 'none', ('hitko', 2): 'none', ('skill', 4): 'fade:T', ('fx', 0): 'fade:T', ('fx', 1): 'fade:T', ('fx', 2): 'fade:T', ('fx', 3): 'fade:T', ('fx', 4): 'fade', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_5': {('attack', 3): 'fade:R', ('attack', 4): 'fade:R', ('skill', 3): 'fade:R', ('skill', 4): 'fade:R', ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'},
        'm5_7': {(n, i): 'fadeS' for n in ('idle', 'run', 'attack', 'skill', 'hitko', 'win', 'fx') for i in range(8)},   # v16-328 Doc Volta: no smears (muzzle flash / KO body touch the cell edge)
+       'm5_8': {(n, i): 'fadeS' for n in ('idle', 'run', 'attack', 'skill', 'hitko', 'win', 'fx') for i in range(8)},
        'm5_6': {(n, i): 'fade' for n in ('idle', 'run', 'attack', 'skill', 'hitko', 'win', 'fx') for i in range(8)},   # v16-244 Chroma: paint / staff touch the cell edges → soft fade everywhere (no smears)
        'm5_1': {('fx', 4): 'fade', ('fx', 5): 'fade', ('fx', 6): 'fade', ('fx', 7): 'fade', ('skill', 3): 'fade',
                 ('hitko', 5): 'none', ('hitko', 6): 'none', ('hitko', 7): 'none'}}

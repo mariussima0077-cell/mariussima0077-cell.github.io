@@ -555,6 +555,7 @@ const HSK={
  m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
  m5_4:{sk:'STARFIRE RAIN',skd:'A rain of electric spark-plug arrows falls on the biggest group: 240% damage, slow 50% for 3s and they are MARKED (+35% damage taken) for 6s. Long range.'},
  m5_6:{sk:'RAINBOW TEMPEST',skd:'A tornado of magic rainbow paint falls on the biggest group: 260% damage, slow 50% for 4s and the painted enemies deal −30% damage for 5s. Long range.'},
+ m5_8:{sk:'EXHAUST PHANTOM',skd:'Shade vanishes in black exhaust smoke, appears behind the weakest enemy and strikes with a red X: 380% damage, always critical.'},
  m5_7:{sk:'PIT STOP',skd:'A racing ambulance drives through the team: heals every hero 25% HP, gives a shield of 15% HP and +20% ultimate energy to the others. Long range healer.'},
  m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Long range.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
@@ -633,6 +634,7 @@ const TAL={m5_0:{n:'OVERLOAD CROWN',v:[.5,.65,.8],d:v=>'Every 4th attack the lig
  m5_3:{n:'IRON WALL',v:[.1,.15,.2],d:v=>'At the start of every wave the whole team gets a shield of '+Math.round(v*100)+'% of Goliath\'s HP.'},
  m5_4:{n:'STAR MARK',v:[.15,.2,.25],d:v=>'The monster Nova hits takes +'+Math.round(v*100)+'% damage from the whole team for 4 s.'},
  m5_6:{n:'WET PAINT',v:[.2,.25,.3],d:v=>'Every monster Chroma hits is soaked in paint: −'+Math.round(v*100)+'% attack speed for 4 s.'},
+ m5_8:{n:'SHADOW STEP',v:[.3,.4,.5],d:v=>'After Shade evades a hit, his next hit is a sure critical with +'+Math.round(v*100)+'% critical damage.'},
  m5_7:{n:'FIRST AID',v:[.1,.15,.2],d:v=>'Doc Volta\'s heals are +'+Math.round(v*100)+'% stronger. Phase II: the healed hero also gets a 5% HP shield. Phase III: +5% ultimate energy too.'},
  m5_5:{n:'PIERCING RAIL',v:[.6,.75,.9],d:v=>'Every 3rd shot goes through every monster in the line ('+Math.round(v*100)+'% damage).'}};
 const TAL_LV=[320,360,400],talLvOf=lv=>lv>=TAL_LV[2]?3:lv>=TAL_LV[1]?2:lv>=TAL_LV[0]?1:0;
@@ -992,7 +994,7 @@ const SETCOL={engine:'#ff6d00',tuning:'#00b0ff',inspect:'#2979ff',service:'#00e5
 const SETK=Object.keys(SETS),SET_STATS=['atk','hp','def','crit','aspd','en'],SET_P=[2,3,4,6,8,10,12],SET_SAME=1.5;
 const rollSet=()=>SETK[Math.floor(Math.random()*SETK.length)],rollSS=()=>SET_STATS[Math.floor(Math.random()*SET_STATS.length)];
 // Mythic heroes now belong to the class of their battle role (the mage Torque King → Electrical, Chroma → Paint)
-const MYTH_CLS={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec'};
+const MYTH_CLS={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec',m5_8:'tuning'};
 function clsOf(h){if(!h)return 'engine';if(h.crew)return 'crew';const k=h.sp||'all';return k==='all'?(MYTH_CLS[h.id]||'engine'):k;}
 // v16-166 (tester Wazza4ever: "the set buff does not apply on Goliath"; Marius OK): MYTHIC heroes (class Legend) count the Torque King set OR the set of
 // the class that matches their battle ROLE (Goliath tank → Iron Piston, Ignis support → Field Medic, mage → Color Storm / Thunder Coil …) – the one with more pieces
@@ -1161,7 +1163,7 @@ function awkLine(h,short){const T=TE(),s=stars(h)||0;if(!T.isAwk||!T.isAwk(h))re
 function roleOf(h){return h.crew?'crew':(h.sp||'all');}
 // v16-127 (preview): BATTLE ROLES – every class keeps its name (garages, towers, sets) and gets a role tag (Marius' 5 badges img/ui12/role_*.webp)
 const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},ranger:{n:'RANGER',c:'#b6f25a'},mage:{n:'MAGE',c:'#d59bff'},support:{n:'SUPPORT',c:'#5ef0a0'}};
-const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank',m5_4:'ranger',m5_5:'ranger',m5_6:'mage',m5_7:'support'};
+const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank',m5_4:'ranger',m5_5:'ranger',m5_6:'mage',m5_7:'support',m5_8:'warrior'};
 // v16-141: the two Mythic RANGERS shoot from far away (Legend class is melee): range + a bit less HP / DEF
 const MYTH_RNG={m5_7:{rng:210,hp:.85,def:.8,as:1,col:'#69f0ae',w:4},m5_6:{rng:200,hp:.82,def:.75,as:1,col:'#ff4fd8',w:4},m5_4:{rng:215,hp:.8,def:.75,as:1,col:'#9be7ff',w:3},m5_5:{rng:235,hp:.78,def:.7,as:1.12,col:'#18ffff',w:5}};
 function bRoleOf(h){if(!h||h.crew)return null;return MYTH_ROLE[h.id]||CLS2ROLE[roleOf(h)]||null;}
@@ -1242,6 +1244,7 @@ m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,
 m5_3:{a:[170.7,246],m:[300,150],v8:{"cw":243,"uw":324.0,"ax":170.7,"rows":[[0,225,300.0,294.7],[225,226,301.3,296.0],[451,273,364.0,340.0],[724,265,353.3,320.0],[989,220,293.3,286.7],[1209,222,296.0,292.0]],ck:5,pk:[5,6,7]},fx8:{"cw":247,"uw":329.3,"ax":165.3,"rows":[[0,315,420.0,397.3]]}}, // v16-132: GOLIATH, THE IRON BULWARK (new Mythic TANK) – 8 frames (tools/v8_hero.py m5_3); ck = shield slam → hex dome (frame 5), pk = dome holds → idle; fxs = hex shield falls → impact (frame 4) → shatters
 m5_4:{a:[118.7,246],m:[190.7,122],col:'#9be7ff',v8:{"cw":188,"uw":250.7,"ax":118.7,"rows":[[0,191,254.7,250.7],[191,192,256.0,252.0],[383,189,252.0,248.0],[572,222,296.0,290.7],[794,195,260.0,254.7],[989,200,266.7,262.7]],"ck":5,"pk":[5,6,7]},fx8:{"cw":181,"uw":241.3,"ax":121.3,"rows":[[0,243,324.0,293.3]]}}, // v16-141: NOVA, THE STARFIRE HUNTRESS (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_4)
 m5_5:{a:[133.3,246],m:[251.3,128],col:'#18ffff',v8:{"cw":216,"uw":288.0,"ax":133.3,"rows":[[0,216,288.0,284.0],[216,209,278.7,272.0],[425,222,296.0,286.7],[647,206,274.7,269.3],[853,203,270.7,266.7],[1056,211,281.3,277.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":353,"uw":470.7,"ax":234.7,"rows":[[0,189,252.0,240.0]]}}, // v16-141: VEGA, THE RAILGUN ACE (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_5)
+m5_8:{a:[160.0,246],m:[260,150],col:'#ff1744',v8:{"cw":232,"uw":309.3,"ax":160.0,"rows":[[0,200,266.7,262.7],[200,201,268.0,262.7],[401,192,256.0,250.7],[593,223,297.3,290.7],[816,200,266.7,262.7],[1016,200,266.7,262.7]],"pk":[7]},fx8:{"cw":232,"uw":309.3,"ax":154.7,"rows":[[0,222,296.0,274.7]]}}, // DEMO: SHADE, THE GHOST RIDER
 m5_7:{a:[128.0,246],m:[206.7,146],col:'#69f0ae',v8:{"cw":181,"uw":241.3,"ax":128.0,"rows":[[0,197,262.7,258.7],[197,192,256.0,252.0],[389,191,254.7,250.7],[580,220,293.3,286.7],[800,191,254.7,245.3],[991,192,256.0,250.7]]},fx8:{"cw":203,"uw":270.7,"ax":134.7,"rows":[[0,267,356.0,344.0]]}}, // v16-328: DOC VOLTA, THE PIT MEDIC (Mythic SUPPORT, class Elec) – 8 frames (tools/v8_hero.py m5_7)
 m5_6:{a:[112.0,246],m:[188,80],col:'#ff4fd8',v8:{"cw":188,"uw":250.7,"ax":112.0,"rows":[[0,199,265.3,260.0],[199,207,276.0,270.7],[406,190,253.3,249.3],[596,220,293.3,288.0],[816,219,292.0,286.7],[1035,217,289.3,285.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":207,"uw":276.0,"ax":137.3,"rows":[[0,269,358.7,328.0]]}}, // v16-244: CHROMA, THE PAINT TEMPEST (Mythic MAGE, Paint) – 8 frames (tools/v8_hero.py m5_6); ck = spins the staff → rainbow burst (frame 5), pk = paint orbits → idle; fxs = paint tornado → splash (frame 5)
 m5_2:{a:[148.0,246],m:[300,150],fire:1,v8:{cw:237,uw:316.0,ax:148.0,rows:[[0,196,261.3,256.0],[196,191,254.7,250.7],[387,221,294.7,289.3],[608,238,317.3,304.0],[846,196,261.3,257.3],[1042,219,292.0,286.7]],ck:5,pk:[5,6,7]},fx8:{cw:233,uw:310.7,ax:154.7,rows:[[0,290,386.7,348.0]]}}, // v16-128: IGNIS, THE IRON PHOENIX (new Mythic) – 8 frames (tools/v8_hero.py m5_2); ck = plants the staff → wings open → rises → BURST (frame 4), pk = lands → idle; fxs = fire phoenix dives → impact (frame 4) → embers
@@ -1497,7 +1500,7 @@ let GA=1;
 function eye(g,x,y,r,col,t,k){g.fillStyle=col;circ(g,x,y,r);g.fillStyle='rgba(255,255,255,.85)';circ(g,x-r*.3,y-r*.3,r*.3);g.globalAlpha*=.35;g.fillStyle=col;circ(g,x,y,r*2.2+Math.sin(t*6+k)*.6);g.globalAlpha=Math.min(1,g.globalAlpha/.35);}
 // v16-161 (Marius 22 nov, 13:02: "no effects, only stats"): AWAKENING has no battle effects – only stats (u.awk kept for info)
 // v16-rage (24 nov, Marius test): ENRAGE while the ultimate charges (bar 80-100%) – ONLY visual: coloured glow around the hero (pulsing), a little bigger, embers rising
-const RAGEC={m5_0:'#ffb300',m5_1:'#ff3d00',m5_2:'#ff9100',m5_3:'#ffd54a',m5_4:'#40c4ff',m5_5:'#b388ff',m5_6:'#e040fb',m5_7:'#69f0ae'},RAGE_D=4;
+const RAGEC={m5_0:'#ffb300',m5_1:'#ff3d00',m5_2:'#ff9100',m5_3:'#ffd54a',m5_4:'#40c4ff',m5_5:'#b388ff',m5_6:'#e040fb',m5_7:'#69f0ae',m5_8:'#ff1744'},RAGE_D=4;
 // Marius: rage BEFORE the skill – grows while the bar fills from 80% to 100%, stays while it is ready, and goes out fast (0.35 s) once he casts
 // v16-296 (Marius: 'each one a different colour'): Mythic = their own colour, every other hero = its own bright colour from its id (always the same for that hero)
 const RAGEX={};function rageCol(id){if(!id)return '#ff7043';if(RAGEC[id])return RAGEC[id];if(!RAGEX[id]){const P=['#ff1744','#ff9100','#ffea00','#76ff03','#00e5ff','#2979ff','#d500f9','#ff4081','#1de9b6','#ffc400','#651fff','#00b0ff'];let h=0;for(const ch of id)h=(h*31+ch.charCodeAt(0))%9973;RAGEX[id]=P[h%P.length];}return RAGEX[id];}
@@ -1986,6 +1989,7 @@ function mbPay(){if(!B.mb)return;try{const T=TE(),G=T.G,e=Math.max(1,Math.round(
 // Heroes now block at most DEF_CAP of a hit, so POWER shows the real strength again.
 const DEF_CAP=.6;
 function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
+  if(tgt.hero&&!o.sure&&tgt.h&&tgt.h.id==='m5_8'&&!tgt.stun&&Math.random()<.3){pasTxt(tgt,1,'EVADE');tgt.sstep=1;return 0;} // DEMO Shade: 30% evade
   if(tgt.hero&&!o.sure){const dg=pv(tgt,'tuning',1);if(dg&&!tgt.stun&&Math.random()*100<dg){pasTxt(tgt,1,'DODGE');return 0;}}
   let a=src.atk*mult*(src.buff>0?1.3:1)*rnd(.9,1.1);if(src.hero&&src.skK>1&&(o.skill||mult>1.15))a*=src.skK; // v16-99: skill level (+6% skill damage per level)
   a*=tgt.hero?Math.max(1-DEF_CAP,100/(100+tgt.def*3)):100/(100+tgt.def*3);/* v16-235: hero armor max -60% (DEF_CAP) */if(tgt.mark>0)a*=1.35;if(tgt.nmk>0&&src.hero)a*=1+(tgt.nmv||0);
@@ -1994,7 +1998,8 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   else if(tgt.hero){const ir=pv(tgt,'engine',0);if(ir)a*=1-ir/100;}
   if(tgt.defB>0)a*=.8;if(src.weak>0)a*=.7;
   if(tgt.wbB&&src.hero&&src.role===B.tw.weak)a*=1.3; // v16-60 WORLD BOSS: the weak class deals +30%
-  const crit=o.crit||(!o.noCrit&&Math.random()<Math.min(src.hero?CRIT_CAP:1,src.crit+(src.critB>0?.15:0)));if(crit)a*=src.cdm||CRIT_DM;
+  let ss=0;if(src.hero&&src.sstep&&!o.skill){ss=1;src.sstep=0;if(src.tl)a*=1+TV(src);if(!B.sim)talTxt(src,'SHADOW STEP');}
+  const crit=o.crit||ss||(!o.noCrit&&Math.random()<Math.min(src.hero?CRIT_CAP:1,src.crit+(src.critB>0?.15:0)));if(crit)a*=src.cdm||CRIT_DM;
   a=Math.max(1,Math.round(a));let left=a;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
   tgt.hp-=left;tgt.flash=1;tgt.hurt=1;
@@ -2291,6 +2296,11 @@ const SKF={
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
+ m5_8(u){ // DEMO Shade's EXHAUST PHANTOM: he vanishes (skill row = black smoke), appears behind the weakest enemy (fxs = him bursting out + red X), then comes back
+   const ms=alive(B.mons);if(!ms.length)return;let tg=ms[0];for(const m of ms)if(m.hp<tg.hp)tg=m;const f8=FV8(u),D=1.05;
+   if(f8)B.fx.push({type:'sheet8',t:-D,d:1.0,sp:u.spr,x:tg.x+30*S,dd:tg.d});
+   B.fx.push({type:'call',t:-(D+.62),d:.05,fn:()=>{if(tg.dead)return;shake(14);B.flash=.2;damage(u,tg,3.8,{skill:1,crit:1});for(const m of alive(B.mons))if(m!==tg&&Math.hypot(m.x-tg.x,(m.d-tg.d)*(FY1-FY0)*1.25)<80*S)damage(u,m,1.2,{skill:1});if(!B.sim)sparks(tg.x,headY(tg)+20*dsc(tg.d),16,'#ff1744');}});
+   for(const k of [0,.55,1.1])B.fx.push({type:'call',t:-(D+k),d:.05,fn:()=>{u.post=.6;}});castAct(u,D,()=>{});},
  m5_7(u){ // v16-328: Doc Volta's PIT STOP – the ambulance (wide sheet, drawn over the HEROES) drives through the team; impact = heal 25% + shield 15% + 20% ultimate energy for the others (v16-333: was 30, budget phones)
    const wd=pushWide(u,1.2,{heroes:1});
    castAct(u,wd?1.2:.7,()=>{u.post=.6;B.flash=.12;const k=1+(u.tl?TV(u):0);
@@ -2435,6 +2445,7 @@ function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
     for(const k of [0,1,-1,2,-2,3,-3]){const g=gap(k);if(g<0)continue;const sc=Math.min(g,56*S)/S-Math.abs(k-cur)*9-Math.abs(k)*4;if(sc>bs){bs=sc;best=k;}}u.sK=best;}
   const p=at(u.sK);p[1]=clamp(p[1],.02,.98);u.sP=p;return p;}
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
+  if(u.hero&&u.h&&u.h.id==='m5_8'){for(let k=0;k<3;k++)B.fx.push({type:'call',t:-k*.14,d:.05,fn:()=>{if(!tg.dead){damage(u,tg,.4);if(!B.sim)sparks(x,y,5,'#ff1744');}}});return;} // DEMO Shade: 3 quick hits × 40%
   if(u.hero&&u.tl)talHit(u,tg);
   if(u.hero){const R=u.role,MR=MYTH_RNG[u.h&&u.h.id];
     if(MR||R==='inspect'||R==='elec'||R==='service'||R==='paint')shotFx(u,MR?MR.col:(u.spr&&u.spr.col)||rageCol(u.h&&u.h.id)); // v16-322: recoil + muzzle flash
@@ -4556,7 +4567,38 @@ function demoFight(cb){const T=TE(),HB=T.HB;const team=Object.keys(HB).map(k=>HB
   root.classList.add('open');safeStart(0,team,F);if(!B||!B.tw||!B.tw.demo)return;
   B.spd=1.5;B.auto=true;let dps=0,hp=0;B.heroes.forEach(u=>{u.max*=40;u.hp=u.max;hp+=u.max;dps+=u.atk/(u.as||1);});
   B.mons.forEach((m,i)=>{m.max=m.hp=Math.max(3000,dps*12);m.atk=hp/B.heroes.length*.01;m.d=i?.74:.26;m.x=W*(i?.84:.72);});B.bossBar=B.mons[0];}
-window.CAMPAIGN={demoFight,tutSetFor:id=>{const h=TE().HB[id];const k=h?clsOf(h):'';return SETS[k]?k:SETK[0];},todo:()=>{const o=hubTodo();return o.boss||o.dg||o.arena;},dgTodo:()=>!!hubTodo().dg,peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[clsOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,set);g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&heroWhy(h));}catch(e){return false;}},heroWhy:()=>{try{const a=[...new Set(curTeamList().map(heroWhy).filter(Boolean))];return a.length>1?'×'+a.length:a[0]||'';}catch(e){return '';}},hubWhy:()=>{const o=hubTodo();return o.dg?'':o.boss?'BOSS':o.arena?'FIGHT':'';},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),sumQ:n=>gsummon(n,0,1),sumQP:n=>gsummon(n,1,1),res:(r,n,s,hd)=>gsResults(r,n,s,hd),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[clsOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+
+// v16-336 (Marius 26 nov): TRAINING ROOM – ONLY on the owner's full test account (SEC.TEST_ACC). Pick any 5 heroes + any campaign stage
+// as the enemy, fight with no rewards / no progress (tw.demo), then come back here. Used to test new heroes (Shade) before players get them.
+let TRN=null;
+function trainRoom(){if(!(window.SEC&&SEC.TEST_ACC))return;const T=TE(),HB=T.HB;
+  if(!TRN){let o={};try{o=JSON.parse(sessionStorage.getItem('te_trn')||'{}');}catch(e){}TRN={ids:(o.ids||[]).filter(id=>HB[id]),si:Math.min(STAGES.length-1,o.si||0),f:o.f||'m'};}
+  const sv=()=>{try{sessionStorage.setItem('te_trn',JSON.stringify(TRN));}catch(e){}};
+  let d=document.getElementById('trR');if(!d){d=document.createElement('div');d.id='trR';document.body.appendChild(d);
+    const st=document.createElement('style');st.textContent='#trR{position:fixed;inset:0;z-index:60;background:radial-gradient(#1b2030,#07080c);color:#fff;font:700 12px Game,system-ui;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px)}#trR h2{margin:2px 0 6px;text-align:center;color:#ffd54a;font:900 18px Game,system-ui}#trR .sl{display:flex;gap:5px;justify-content:center;margin-bottom:6px}#trR .sl div{width:58px;height:58px;border:2px dashed #ffffff44;border-radius:9px;background:#0006 center/cover}#trR .tb{display:flex;gap:4px;justify-content:center;margin:4px 0}#trR button{background:#2a3142;color:#fff;border:1px solid #ffffff33;border-radius:8px;padding:6px 10px;font:800 12px Game,system-ui}#trR button.on{background:#c62828;border-color:#ffd54a}#trR .gd{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:5px;align-content:start;padding:2px}#trR .h{position:relative;border:2px solid;border-radius:9px;overflow:hidden;background:#000}#trR .h img{width:100%;display:block;aspect-ratio:1}#trR .h span{position:absolute;left:0;right:0;bottom:0;background:#000b;font:700 8.5px system-ui;text-align:center;padding:1px;white-space:nowrap;overflow:hidden}#trR .h.sel{outline:3px solid #ffd54a;filter:brightness(1.15)}#trR .h.sel:after{content:"✓";position:absolute;top:2px;right:4px;color:#ffd54a;font:900 16px system-ui;text-shadow:0 0 3px #000}#trR .en{background:#0008;border:1px solid #ffffff22;border-radius:10px;padding:6px;margin:6px 0}#trR input[type=range]{width:100%}#trR .bt{display:flex;gap:8px}#trR .bt button{flex:1;padding:11px;font-size:15px}#trR .go{background:linear-gradient(#ff5252,#b71c1c)!important;border-color:#ffd54a!important}';document.head.appendChild(st);}
+  const PRE=[[0,'1-1'],[299,'10-30'],[899,'30-30'],[1499,'50-30'],[1900,'64-11'],[STAGES.length-1,'END']];
+  const draw=()=>{const list=Object.keys(HB).map(k=>HB[k]).filter(h=>h&&!h.crew&&!h.soon&&(TRN.f==='all'||(TRN.f==='m'?h.cat==='m'&&h.gr===5:h.gr===4))).sort((a,b)=>(b.gr-a.gr)||(a.id<b.id?1:-1));
+    d.innerHTML='<h2>🎯 TRAINING ROOM</h2><div style="text-align:center;opacity:.7;font-size:10.5px;margin-top:-4px;margin-bottom:6px">test account only · no rewards · no progress</div>'+
+    '<div class="sl">'+[0,1,2,3,4].map(i=>{const h=HB[TRN.ids[i]];return '<div data-r="'+i+'" style="'+(h?'border:2px solid '+GRC[h.gr]+';background-image:url('+T.portrait(h)+')':'')+'"></div>';}).join('')+'</div>'+
+    '<div class="tb">'+[['m','MYTHIC'],['l','LEGENDARY'],['all','ALL']].map(([k,n])=>'<button data-f="'+k+'" class="'+(TRN.f===k?'on':'')+'">'+n+'</button>').join('')+'</div>'+
+    '<div class="gd">'+list.map(h=>'<div class="h'+(TRN.ids.includes(h.id)?' sel':'')+'" data-h="'+h.id+'" style="border-color:'+GRC[h.gr]+'"><img loading="lazy" src="'+T.portrait(h)+'" alt=""><span>'+(h.n||h.id).split(',')[0]+'</span></div>').join('')+'</div>'+
+    '<div class="en">ENEMY: <b style="color:#ffd54a">stage '+sLabel(TRN.si)+'</b> · '+STAGES[TRN.si].n+(STAGES[TRN.si].boss?' · BOSS':'')+'<input type="range" min="0" max="'+(STAGES.length-1)+'" value="'+TRN.si+'" id="trSi"><div class="tb">'+PRE.map(([i,n])=>'<button data-s="'+i+'">'+n+'</button>').join('')+'</div></div>'+
+    '<div class="bt"><button data-a="x">✖ CLOSE</button><button data-a="go" class="go">⚔ FIGHT</button></div>';};
+  draw();d.style.display='flex';
+  d.onclick=e=>{const t=e.target.closest('[data-h],[data-r],[data-f],[data-s],[data-a]');if(!t)return;
+    if(t.dataset.h){const id=t.dataset.h,i=TRN.ids.indexOf(id);if(i>=0)TRN.ids.splice(i,1);else if(TRN.ids.length<5)TRN.ids.push(id);else T.toast('Max 5 heroes – tap one to remove it',1800);}
+    else if(t.dataset.r){TRN.ids.splice(+t.dataset.r,1);}
+    else if(t.dataset.f){TRN.f=t.dataset.f;}
+    else if(t.dataset.s){TRN.si=+t.dataset.s;}
+    else if(t.dataset.a==='x'){d.style.display='none';sv();return;}
+    else if(t.dataset.a==='go'){if(!TRN.ids.length){T.toast('Pick at least 1 hero',1600);return;}sv();d.style.display='none';trainFight();return;}
+    sv();const sc=d.querySelector('.gd').scrollTop;draw();d.querySelector('.gd').scrollTop=sc;};
+  d.oninput=e=>{if(e.target.id==='trSi'){TRN.si=+e.target.value;const b=d.querySelector('.en b');if(b)b.textContent='stage '+sLabel(TRN.si);}};
+  d.onchange=e=>{if(e.target.id==='trSi'){sv();const sc=d.querySelector('.gd').scrollTop;draw();d.querySelector('.gd').scrollTop=sc;}};}
+function trainFight(){const T=TE(),team=TRN.ids.map(heroOf).filter(Boolean),si=TRN.si,S0=STAGES[si];team.forEach(h=>{const dd=sprOf(h);if(dd)sprLoad(dd);});
+  const F={demo:1,cb:()=>trainRoom(),f:0,w:S0.w,mod:-1,eq:si,mul:stageMul(si)*stEase(si),st:{n:'TRAINING · '+sLabel(si),bio:S0.bio,w:S0.w,boss:S0.boss}};
+  root.classList.add('open');window.__BATTLE_ON=true;safeStart(si,team,F);}
+window.CAMPAIGN={demoFight,trainRoom,tutSetFor:id=>{const h=TE().HB[id];const k=h?clsOf(h):'';return SETS[k]?k:SETK[0];},todo:()=>{const o=hubTodo();return o.boss||o.dg||o.arena;},dgTodo:()=>!!hubTodo().dg,peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[clsOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,set);g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&heroWhy(h));}catch(e){return false;}},heroWhy:()=>{try{const a=[...new Set(curTeamList().map(heroWhy).filter(Boolean))];return a.length>1?'×'+a.length:a[0]||'';}catch(e){return '';}},hubWhy:()=>{const o=hubTodo();return o.dg?'':o.boss?'BOSS':o.arena?'FIGHT':'';},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),sumQ:n=>gsummon(n,0,1),sumQP:n=>gsummon(n,1,1),res:(r,n,s,hd)=>gsResults(r,n,s,hd),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[clsOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 // v16-280: VIP set box – 6 pieces of one class set, grade r, into the bag (not equipped)
 CAMPAIGN.sets=()=>SETK.map(k=>({k,n:SETS[k].n,c:SETCOL[k],cls:({engine:'Engine',tuning:'Tuning',inspect:'Inspection',service:'Service',paint:'Body & Paint',elec:'Electronics'})[k]||k}));
 CAMPAIGN.giftSet=(set,r)=>{const g=GR();const L=GSLOT.map(sl=>newItem(sl.k,r,set));L.forEach(it=>g.inv.push(it));TE().save();return L;};

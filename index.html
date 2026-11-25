@@ -3709,7 +3709,8 @@ const ROSTER={
   ['Diesel Dave:engine','Carlos Clutch:engine','Max Brake:service','Rafael Chrome:paint','Elena Spark:elec:f','Lena Wire:elec:f','Kenji Scan:inspect','Tess Turbo:tuning:f'],
   ['Viktor the Surgeon:engine','Big Mo:service','Gloria Gloss:paint:f','Professor Ohm:elec','Hawk-Eye Hugo:inspect','Aria Neon:tuning:f','Nitro Nina:tuning:f'],
   ['Grigore Iron Hands:engine','Mama Rosa:service:f','Duke Diamond:paint','Sofia Lightning:elec:f','Oracle Otto:inspect','Rex Redline:tuning'],
-  ['The Torque King:all','Lady Overdrive:all:f','Ignis, the Iron Phoenix:all','Goliath, the Iron Bulwark:all','Nova, the Starfire Huntress:all:f','Vega, the Railgun Ace:all','Chroma, the Paint Tempest:all:f','Doc Volta, the Pit Medic:all'],
+  ['The Torque King:all','Lady Overdrive:all:f','Ignis, the Iron Phoenix:all','Goliath, the Iron Bulwark:all','Nova, the Starfire Huntress:all:f','Vega, the Railgun Ace:all','Chroma, the Paint Tempest:all:f','Doc Volta, the Pit Medic:all'].concat(window.SEC&&SEC.TEST_ACC?['Shade, the Ghost Rider:all']:[]),   // v16-336: SHADE (m5_8) – only on the owner's test account (Training Room) until Marius releases him
+
   ['?','?']],
  g:[
   ['Barry Badge','Gus Gate','Walt Watch','Fred Flash','Tina Torch:f','Ned Night','Carl Cam'],
@@ -3746,7 +3747,7 @@ const DUP_MONEY=[150,350,800,2000,5000,12000];
 const MYTH_AURA=.10;
 const spName=sp=>sp==='all'?'🌟 All workshops':(ST[sp]?ST[sp].icon+' '+ST[sp].name:'');
 // v16-247 (Marius 23 nov): MYTHIC heroes work only in the workshop of their class (same as battle.js MYTH_CLS)
-const MYTH_GAR={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec'};
+const MYTH_GAR={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec',m5_8:'tuning'};
 const gSp=h=>h&&h.sp==='all'?(MYTH_GAR[h.id]||'engine'):(h?h.sp:'');
 // v11: +1…+5 = +20% of base each, +6…+50 = +4% each (+50 = ×3.8)
 // v16-40: stars after +5 give less on low grades (an Uncommon +50 was stronger than a Legendary)
@@ -3855,7 +3856,7 @@ function addTickets(n,why){G.h.tk+=n;save();if(why)toast(''+TKI+' +'+n+' Recruit
 const PCACHE={};
 function hashS(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 // v16-5: Marius' own pictures for these heroes (cut from his sprite sheets)
-const HPIC={m5_7:1,m5_6:1,m5_4:1,m5_5:1,m5_3:1,m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,m5_2:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1,g2_0:1,g2_1:1,g2_2:1,g2_3:1,g2_4:1,g3_0:1,g3_1:1,g3_2:1,g3_3:1,g3_4:1,g4_0:1,g4_1:1,g4_2:1,g4_3:1,g5_0:1,g5_1:1};
+const HPIC={m5_8:1,m5_7:1,m5_6:1,m5_4:1,m5_5:1,m5_3:1,m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,m5_2:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1,g2_0:1,g2_1:1,g2_2:1,g2_3:1,g2_4:1,g3_0:1,g3_1:1,g3_2:1,g3_3:1,g3_4:1,g4_0:1,g4_1:1,g4_2:1,g4_3:1,g5_0:1,g5_1:1};
 function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/hero/'+key+'.webp';if(PCACHE[key])return PCACHE[key];
   const S=128,cv2=document.createElement('canvas');cv2.width=cv2.height=S;const g=cv2.getContext('2d');
   let sd=hashS(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
@@ -4851,7 +4852,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const hadSW=!!nav
 <script src="events.js"></script>
 <script src="grandprix.js"></script>
 <script src="street.js"></script>
-<script>if(window.SEC&&SEC.TEST_ACC){const b=document.createElement('a');b.href='?tacc=0';b.textContent='🧪 TEST ACCOUNT · hidden from rankings';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 2px);z-index:9;font:800 10px Game,system-ui;color:#ffd54a;background:#000a;border:1px solid #ffd54a88;border-radius:9px;padding:2px 8px;white-space:nowrap;text-decoration:none;pointer-events:none';document.body.appendChild(b);}</script>
+<script>if(window.SEC&&SEC.TEST_ACC){const b=document.createElement('a');b.href='?tacc=0';b.textContent='🧪 TEST ACCOUNT · hidden from rankings';b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 2px);z-index:9;font:800 10px Game,system-ui;color:#ffd54a;background:#000a;border:1px solid #ffd54a88;border-radius:9px;padding:2px 8px;white-space:nowrap;text-decoration:none;pointer-events:none';document.body.appendChild(b);const t=document.createElement('button');t.id='trBtn';t.textContent='🎯 TRAINING';t.style.cssText='position:fixed;right:6px;top:42%;z-index:9;font:900 11px Game,system-ui;color:#fff;background:linear-gradient(#ff5252,#b71c1c);border:2px solid #ffd54a;border-radius:10px;padding:7px 8px;box-shadow:0 2px 8px #000a';t.onclick=()=>{if(window.CAMPAIGN&&CAMPAIGN.trainRoom)CAMPAIGN.trainRoom();};document.body.appendChild(t);setInterval(()=>{t.style.display=window.__BATTLE_ON?'none':'';},700);}</script>
 <style id="ui10btn">
 /* v16-118 – Marius 20 nov: "the same X and Back buttons everywhere". ONE close (red, img/ui8/ic_close) for windows/popups,
    ONE back (grey + gold arrow, img/ui8/ic_back) for full pages – both made from Marius' button art (tools/ui10_btn.py).
