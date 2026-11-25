@@ -42,7 +42,7 @@ if (ann && ann.type === 0) { await api('PATCH', `/channels/${ann.id}`, { type: 5
 let n = 0n;
 const sid = () => String(((BigInt(Date.now()) - 1420070400000n) << 22n) + (n++));
 ch = await api('GET', `/guilds/${GUILD}/channels`);
-const defaults = ['👋┃welcome', '📜┃rules', '📢┃announcements', '💬┃general', '📸┃screenshots', '🧠┃tips-and-guides',
+const defaults = ['👋┃welcome', '📜┃rules', '📢┃announcements', '🌍┃global-chat', '📸┃screenshots', '🧠┃tips-and-guides',
   '⚔️┃arena-and-pvp', '🎲┃off-topic', '🐞┃bug-reports', '💡┃suggestions', '❓┃help'].map(id).filter(Boolean);
 const langIds = ch.filter(c => c.type === 0 && c.parent_id === ch.find(x => x.type === 4 && x.name === '🌍 LANGUAGES')?.id);
 defaults.push(...langIds.map(c => c.id));
