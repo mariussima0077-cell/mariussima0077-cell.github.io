@@ -23,7 +23,7 @@ def frames16(ref):
     out = []
     for n, cs in (('attack', ca), ('attack', cb)):
         for i, c in enumerate(cs):
-            e = np.clip(V.extend(c, None), 0, 255).astype(np.uint8)
+            e = np.clip(V.extend(c, os.environ.get('EXT') or None), 0, 255).astype(np.uint8)   # EXT=none: no smearing of capes cut by the cell edge (Nova/Vega/Chroma)
             im = Image.fromarray(e, 'RGBA'); w, h = im.size
             im = im.resize((round(w * s), round(h * s)), Image.LANCZOS)
             out.append((im, (ax + V.P) * s, (ay + V.P) * s))
