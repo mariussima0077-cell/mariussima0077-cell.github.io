@@ -302,13 +302,15 @@ setTimeout(restore, 4000);
 // The app asks Google for a sealed token; only our server can open it (server/worker.js → integrity). Once per 12 h.
 async function integ(force){
   if(!isCap || !API || TEST_ACC) return; const P = Capacitor.Plugins && Capacitor.Plugins.TEIntegrity;
-  const last = +(LS('te_integ_t')||0); if(!force && Date.now()-last < 12*3600e3) return;
+  const last = +(LS('te_integ_t')||0); if(!force && SK && Date.now()-last < 12*3600e3) return;   // v16-331: no session key yet → check now
   let r = {err:'no plugin (old app)'};
   const nonce = (PID.replace(/[^A-Za-z0-9]/g,'').slice(0,12) + Date.now().toString(36) + Math.random().toString(36).slice(2,12)).padEnd(24,'x');
   if(P){ try{ r = await P.token({nonce}); }catch(e){ r = {err:String((e&&e.message)||e)}; } }
   try{ const a = await fetch(API+'/api/integrity',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:PID, nonce, token:r.token||'', err:r.err||''})});
-    const j = await a.json(); if(j.ok) LS('te_integ_t', String(Date.now())); }catch(e){}
+    const j = await a.json(); if(j.ok) LS('te_integ_t', String(Date.now()));
+    if(j.sk){ SK = j.sk; LS('te_sk', j.sk); } }catch(e){}   // v16-331: session key from the server (only for a good Google verdict)
 }
+let SK = LS('te_sk') || '';
 setTimeout(integ, 6000);
 
 // ---------- v16-154: KEEP THE SCREEN ON while the game is open (tester Wazza4ever, 22 nov: the phone went to sleep on the game) ----------
@@ -323,5 +325,5 @@ document.addEventListener('visibilitychange', keepAwake);
 addEventListener('pointerdown', keepAwake, {passive:true});
 keepAwake();
 
-window.SEC = {rcpt, integ:()=>integ(true), PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, wipe, flags:()=>[...flags], report:()=>report(true), api:()=>API};
+window.SEC = {rcpt, integ:()=>integ(true), sk:()=>SK, PID, pids:()=>PIDS.slice(), TEST_MODE, TEST_ACC, taccOn, taccOff, SAVE_KEY:TEST_ACC?'torqueEmpire_test':'torqueEmpire_v15', STORE_BUILD, buy, prices, restore, rebase, sign, now, flag, wipe, flags:()=>[...flags], report:()=>report(true), api:()=>API};
 })();

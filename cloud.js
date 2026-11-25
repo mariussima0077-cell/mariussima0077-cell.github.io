@@ -21,7 +21,7 @@ let sess = LS('te_sess'), syncedT = +(LS('te_cloud_t')||0), lastHash = '', lastO
 
 async function call(op, body, keep){
   if(!API() || TACC) return {err:'offline'};
-  try{ const r = await fetch(API()+'/api/cloud/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),keepalive:!!keep}); const j = await r.json(); if(j && j.wipe && window.SEC && SEC.wipe) SEC.wipe(); return j; }
+  try{ const r = await fetch(API()+'/api/cloud/'+op,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({sk:window.SEC&&SEC.sk?SEC.sk():undefined},body)),keepalive:!!keep}); const j = await r.json(); if(j && j.wipe && window.SEC && SEC.wipe) SEC.wipe(); return j; }
   catch(e){ return {err:'network'}; }
 }
 function h32(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36); }

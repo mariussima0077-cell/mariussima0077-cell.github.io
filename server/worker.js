@@ -127,12 +127,12 @@ export default {
       if (url.pathname === '/api/purchase' && req.method === 'POST') return json(await purchase(await req.json(), env));
       if (url.pathname.startsWith('/api/cloud/') && req.method === 'POST') { const op = url.pathname.slice(11), b = await req.json();
         if (op === 'save' && await isWiped(env, b && b.pid)) return json({err:'wiped', wipe:1});   // v16-215: the old save must not come back
-        if (op === 'save' && !(await integOk(env, b && b.pid))) return json({err:'integrity'});
+        if (op === 'save' && !(await integOk(env, b && b.pid, b && b.sk))) return json({err:'integrity'});
         return json(await cloud(op, b, env)); }
       if (url.pathname === '/api/integrity' && req.method === 'POST') return json(await integrity(await req.json(), env));
       if (url.pathname.startsWith('/api/on/') && req.method === 'POST') { const op = url.pathname.slice(8), b = await req.json();
         if (await isWiped(env, b && b.pid)) return json({err:'wiped', wipe:1});
-        if (INTEG_OPS.includes(op) && !(await integOk(env, b && b.pid))) return json({err:'integrity'});   // v16-105: only when INTEGRITY = 'enforce'
+        if (INTEG_OPS.includes(op) && !(await integOk(env, b && b.pid, b && b.sk))) return json({err:'integrity'});   // v16-105: only when INTEGRITY = 'enforce'
         return json(await online(op, b, env)); }
       if (url.pathname.startsWith('/api/xfer/') && req.method === 'POST') return json(await xfer(url.pathname.slice(10), await req.json(), env));
       if (url.pathname === '/admin/chat') return env.ADMIN_KEY && url.searchParams.get('key') === env.ADMIN_KEY ? onlineAdmin(url, env) : new Response('no', {status:403});
@@ -420,12 +420,20 @@ async function dailyStats(env) {
 async function ensureInteg(env) {
   if (integReady) return;
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS integ(pid TEXT PRIMARY KEY, t INTEGER, app TEXT, dev TEXT, lic TEXT, ok INTEGER, err TEXT)').run();
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS integsk(h TEXT PRIMARY KEY, pid TEXT, t INTEGER)').run();   // v16-331 session keys (hash only)
   integReady = true;
 }
-async function integOk(env, pid) {
+// v16-331 SESSION KEY (Marius 25 nov: anti-hack): a good Google verdict gives the APP a random key (`sk`, kept only as a SHA-256 hash here).
+// Every protected request must carry it. A browser / PC never gets one (it cannot make a Google token), so it can no longer reuse the OK
+// of a real phone with the same player ID. Each phone of the same account has its own key (several rows per pid). Valid 26 h (app renews every 12 h).
+const SK_LIFE = 26 * 3600e3;
+const skHash = async sk => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('te-sk:' + sk)))].map(x => x.toString(16).padStart(2, '0')).join('');
+async function integOk(env, pid, sk) {
   if (env.INTEGRITY !== 'enforce') return true;
   if (typeof pid !== 'string' || pid.startsWith('tst_')) return true;            // the owner's test account
   await ensureInteg(env);
+  if (typeof sk !== 'string' || sk.length < 20 || sk.length > 80) return false;
+  if (!(await env.DB.prepare('SELECT 1 FROM integsk WHERE h=? AND pid=? AND t>?').bind(await skHash(sk), pid, Date.now() - SK_LIFE).first())) return false;
   const r = await env.DB.prepare('SELECT t, ok FROM integ WHERE pid=?').bind(pid).first();
   return !!(r && r.ok && Date.now() - r.t < 864e5);   // v16-330: 24 h (was 3 days – a token from the real app was good for 3 days in a browser); the app checks every 12 h
 }
@@ -457,6 +465,11 @@ async function integrity(b, env) {
   const good = fresh && app === 'PLAY_RECOGNIZED' && dev.includes('MEETS_DEVICE_INTEGRITY') && lic !== 'UNLICENSED';
   await save(app, dev, lic, good, fresh ? null : 'stale:' + (okN ? '' : ` nonce(got ${String(rq.nonce || '-').slice(0, 26)} want ${String(b.nonce).slice(0, 26)})`) + (okT ? '' : ` time(${Math.round((now - (+rq.timestampMillis || 0)) / 1000)}s)`) + (okP ? '' : ` pkg(${rq.requestPackageName || '-'})`));
   if (!good) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'integ', `app=${app} dev=${dev || 'none'} lic=${lic}${fresh ? '' : ' stale'}`).run();
+  if (good) {   // v16-331: a new session key for THIS app install
+    const sk = [...crypto.getRandomValues(new Uint8Array(24))].map(x => x.toString(16).padStart(2, '0')).join('');
+    await db.prepare('INSERT OR REPLACE INTO integsk(h,pid,t) VALUES(?,?,?)').bind(await skHash(sk), b.pid, now).run();
+    await db.prepare('DELETE FROM integsk WHERE t<?').bind(now - 3 * 864e5).run();
+    return {ok:true, good, sk}; }
   return {ok:true, good};
 }
 
