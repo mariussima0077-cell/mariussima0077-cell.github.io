@@ -13,6 +13,9 @@ sys.argv = [sys.argv[0], HID] + sys.argv[2:]
 sys.path.insert(0, os.path.dirname(__file__))
 import v8_hero as V
 
+# heroes whose attack crosses the 384-px columns in v8_hero (WIDE) → same wide cells for both 16-frame sheets
+_w = V.WIDE.get(HID)
+if isinstance(_w, dict) and _w.get('attack'): _w['attack16a'] = _w['attack']   # (sheet B: simple split – Ignis' fire of frame 9 touches the hero of frame 10)
 def frames16(ref):
     s = V.OLDH / ref * V.APU
     ca = V.cells('attack16a'); cb = V.cells('attack16b')
