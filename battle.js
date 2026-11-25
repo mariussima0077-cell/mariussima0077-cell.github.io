@@ -2610,8 +2610,14 @@ function tiled(c,par,y,h){const LW=B.LW,o=((B.scroll*par)%LW+LW)%LW;g.drawImage(
 // World 1 Scrapyard: zones 1-2 junkyard, 3-4 desert · 2 Refinery: factory · 3 Frozen · 4 Neon · 5 Volcano · every chapter boss: boss arena.
 // Acts 2-15 get a light colour shift (same idea as bioVariant). Scaled ONCE into a cached canvas (like the tower arena) = cheap on budget phones.
 const CBG={},CBGC={};
-function cbgKey(){const s=B&&B.stage;if(!s||s.c==null||B.tw)return null;if(s.boss)return 'boss_arena';const t=s.c%5;return t===0?(s.z<2?'junkyard':'desert'):['','factory','frozen','neon','volcano'][t];}
-function cbgImg(){const k=cbgKey();if(!k)return null;const f=k+(LOWRES&&!HD?'_low':'');if(!CBG[f]){const im=new Image();im.decoding='async';im.src='img/bbg/bg_'+f+'.webp';CBG[f]=im;}return CBG[f];}
+function cbgKeyS(s){if(!s||s.c==null)return null;if(s.boss)return 'boss_arena';const t=s.c%5;return t===0?(s.z<2?'junkyard':'desert'):['','factory','frozen','neon','volcano'][t];}
+function cbgKey(){return B&&!B.tw?cbgKeyS(B.stage):null;}
+function cbgLoad(k){if(!k)return null;const f=k+(LOWRES&&!HD?'_low':'');if(!CBG[f]){const im=new Image();im.decoding='async';im.src='img/bbg/bg_'+f+'.webp';CBG[f]=im;}return CBG[f];}
+function cbgImg(){const k=cbgKey(),im=cbgLoad(k);if(!im||(im.complete&&im.naturalWidth))return im;const o=CBG[k]||CBG[k+'_low'];return o&&o.complete&&o.naturalWidth?o:im;} // LOW switched mid-fight → keep the picture already loaded
+// v16-323 (Marius: "la fiecare Battle câteva secunde apare harta veche din cod"): the battle picture is loaded while the player is still on the campaign map,
+// and if it is still not ready when the fight starts, a plain dark screen is shown instead of the old code-drawn background (only if the picture failed → old background)
+function cbgPre(i){try{const s=STAGES[i];if(!s)return;const im=cbgLoad(cbgKeyS(s));if(im&&im.decode)im.decode().catch(()=>{});const c=s.c;if(c!=null&&STAGES[c*SPC+SPC-1])cbgLoad(cbgKeyS(STAGES[c*SPC+SPC-1]));}catch(e){}}
+function bgWait(){const q=g.createLinearGradient(0,0,0,H);q.addColorStop(0,'#1a1410');q.addColorStop(1,'#0b0908');g.fillStyle=q;g.fillRect(0,0,W,H);}
 function cbgFilter(){const a=Math.floor((B.stage.c||0)/5),A=ACTS[a];if(!A||!A.bio)return 'none';const m=A.bio,h=Math.round(clamp((m.h||0)*.4,-50,50)),sa=clamp(m.s||1,.6,1.3),l=clamp(m.l||1,.68,1.12);return 'hue-rotate('+h+'deg) saturate('+sa+') brightness('+l+')';}
 function drawCBG(im,t){const k=Math.max(W/1024,H/1536)*1.04,ox=(W-1024*k)/2,oy=-12*k,cw=Math.round(W*BDPR),ch=Math.round(H*BDPR),flt=cbgFilter(),key=im.src+cw+'x'+ch+flt;
   let c=CBGC.c;if(!c||CBGC.k!==key){c=CBGC.c=CBGC.c||document.createElement('canvas');c.width=cw;c.height=ch;const x=c.getContext('2d',{alpha:false});x.filter=flt;x.drawImage(im,ox*BDPR,oy*BDPR,1024*k*BDPR,1536*k*BDPR);x.filter='none';CBGC.k=key;}
@@ -2639,8 +2645,8 @@ function drawCBG(im,t){const k=Math.max(W/1024,H/1536)*1.04,ox=(W-1024*k)/2,oy=-
     for(const [sx,sy,ph] of [[145,85,0],[925,115,1.7]]){const a=.12+.08*Math.sin(t*1.4+ph);g.fillStyle='rgba(255,220,150,'+a+')';g.beginPath();g.moveTo(X(sx),Y(sy));g.lineTo(X(512)-(sx<512?220:-220)*k+Math.sin(t*.6+ph)*60*k*2,Y(760));g.lineTo(X(512)-(sx<512?-40:40)*k+Math.sin(t*.6+ph)*60*k*2,Y(760));g.closePath();g.fill();}
     glow(X(610),Y(390),120*k*2,'rgba(255,140,40,',.22+.14*Math.sin(t*2.2));}}
 function drawBG(t){const P=B.bgP;
-  {const im=cbgImg();if(im&&im.complete&&im.naturalWidth){drawCBG(im,t);return;}}
-  if(B.tw){const im=twArenaImg();if(im.complete&&im.naturalWidth){ // v16-60: the arena picture is scaled ONCE into a screen-sized canvas (cheaper every frame on slow phones)
+  {const im=cbgImg();if(im){if(im.complete&&im.naturalWidth){drawCBG(im,t);return;}if(!im.complete){bgWait();return;}}}
+  if(B.tw){const im=twArenaImg();if(!im.complete){bgWait();return;}if(im.complete&&im.naturalWidth){ // v16-60: the arena picture is scaled ONCE into a screen-sized canvas (cheaper every frame on slow phones)
     const cw=Math.round(W*BDPR),ch=Math.round(H*BDPR),key=im.src+cw+'x'+ch;let c=TWA.c;
     if(!c||TWA.ck!==key){c=TWA.c=TWA.c||document.createElement('canvas');c.width=cw;c.height=ch;const x=c.getContext('2d',{alpha:false}),k=Math.max(W/1024,H/1536)*1.04*BDPR,w=1024*k;x.drawImage(im,(cw-w)/2,-12*k,w,1536*k);TWA.ck=key;}
     g.drawImage(c,0,0,cw,ch,0,0,W,H);return;}}
@@ -3101,6 +3107,7 @@ $('cpTk').innerHTML=TKI+' '+G.h.tk;const c=curCh(),C=CHAP[c];
   $('cpChN').innerHTML=`<b style="color:${HM?'#ff5252':C.col}">${HM?'HARD · ':''}${C.n}</b><small>${done}/${SPC} stages · ${stc}/${SPC*3} ⭐</small>`;
   hmBtn();root.classList.toggle('hm',!!HM);
   $('cpPrev').classList.toggle('off',c===0);$('cpNext').classList.toggle('off',c>=NCH-1||!chOpen(c+1));$('cpNext').innerHTML=c<NCH-1&&!chOpen(c+1)?IMGI(glyphURL('lock','#ffd54a'),'.8em','-.05em'):'›';
+  cbgPre(Math.min(PX.best,NST-1));cbgPre(c*SPC);
   const P=$('cpPath');P.querySelectorAll('.node').forEach(n=>n.remove());drawPath(c);
   for(let j=0;j<SPC;j++){const i=c*SPC+j,s=STAGES[i];const d=document.createElement('div');const lock=i>PX.best,cur=i===PX.best;d.className='node'+(s.boss?' boss':s.mini?' mini':'')+(lock?' lock':'')+(cur?' cur':'');
     d.style.left=NODEX(j)+'%';d.style.top=NODEY(j)+'px';
@@ -3126,7 +3133,7 @@ function monPreview(t){const c=document.createElement('canvas');c.width=136;c.he
   if(M.sp){const d=MSPR[M.sp],k=M.h/d.ih;u.sc=Math.min(50/(d.ay*k),64/(d.w*k));u.sx=34;u.sy=57;
     if(!msprOK(M.sp)){msprLoad(M.sp).im.addEventListener('load',()=>{x.clearRect(0,0,68,58);GA=1;drawMonster(x,u,1.3);},{once:true});}}
   GA=1;drawMonster(x,u,1.3);return c;}
-function openCard(i){const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i>=PX.best,R=REWARDX(i);const types=[...new Set(s.w.flat())];
+function openCard(i){cbgPre(i);const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.c],first=i>=PX.best,R=REWARDX(i);const types=[...new Set(s.w.flat())];
   const tp=teamPower(curTeamList()),ep=enemyPower(i);
   const col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';const big=s.boss||s.mini;
   // v16-49: stage card = Marius' battle-prep picture (img/ui3/prep.webp): title plate, 3 enemy windows, VS power bar, 4 reward boxes, 5 team boxes, BACK + FIGHT
@@ -3862,7 +3869,7 @@ function hubGo(k){if(k==='back'){hubClose();return;}
   if(k==='camp')return;                       // the campaign map is already under the hub
   if(k==='tower'){twOpen();return;}
   if(k==='class'){ctOpen();return;}
-  if(k==='arena'||k==='cup'){close();HUBS.from=0;if(window.ONLINE)ONLINE.open(k==='arena'?'olArena':'olCupS',{solo:1});}}
+  if(k==='arena'||k==='cup'){close();HUBS.from=0;if(window.ONLINE)ONLINE.open(k==='arena'?'olArena':'olCupS',{solo:1,hub:1});}}
 hubEl.addEventListener('click',e=>{const el=e.target.closest('[data-hb]');if(el)hubGo(el.dataset.hb);});
 // back from a mode that was opened from the hub → the hub again
 function backToHub(){if(HUBS.from){HUBS.from=0;hubEl.classList.add('open');hubRender();return true;}return false;}

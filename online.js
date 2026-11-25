@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=322;window.TE_CV=CV;
+const CV=323;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -478,8 +478,10 @@ setTimeout(sync,12000);
 // ------------------------------------------------------------------ open / close / tabs
 // v16-231 (Marius: "Arena easier to reach, not from the chat"): opened from the BATTLE HUB → SOLO page (no Chat/Ranking bar), ✕ goes back to the Battle Hub
 function openHub(s,o){if(!API()){toast('📶 Online features need an internet connection');return;}
-  root.classList.toggle('solo',!!(o&&o.solo));root.classList.add('open');open_=true;window.__ONLINE_ON=true;show(s||'olRank');sync().then(()=>{if(cur==='olProf')renderProf();});}
-function closeHub(noBack){const so=root.classList.contains('solo')&&noBack!==1;root.classList.remove('open','solo');open_=false;window.__ONLINE_ON=false;stopPolls();closeMenu();if(so&&window.CAMPAIGN&&CAMPAIGN.hub)try{CAMPAIGN.hub();}catch(e){}}
+  root.classList.toggle('solo',!!(o&&o.solo));backHub=!!(o&&o.hub);root.classList.add('open');open_=true;window.__ONLINE_ON=true;show(s||'olRank');sync().then(()=>{if(cur==='olProf')renderProf();});}
+// v16-323 (Marius: "apăs pe cadrul meu, ies afară → îmi deschide Battle"): back to the Battle Hub ONLY when the page was opened from the Battle Hub (o.hub), not from the HUD avatar / quests
+let backHub=false;
+function closeHub(noBack){const so=root.classList.contains('solo')&&noBack!==1&&backHub;backHub=false;root.classList.remove('open','solo');open_=false;window.__ONLINE_ON=false;stopPolls();closeMenu();if(so&&window.CAMPAIGN&&CAMPAIGN.hub)try{CAMPAIGN.hub();}catch(e){}}
 function stopPolls(){for(const k in polls){clearInterval(polls[k]);delete polls[k];}}
 function show(s){cur=s;stopPolls();closeMenu();
   root.querySelectorAll('.nav b').forEach(x=>x.classList.toggle('on',x.dataset.s===s));root.querySelectorAll('.scr').forEach(x=>x.classList.toggle('on',x.id===s));hdr();
