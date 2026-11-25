@@ -49,9 +49,8 @@ else {
   if (now - (H.run || 0) > 35 * 60e3) out.push({ key: 'stale-' + new Date().toISOString().slice(0, 13), lvl: 'red', txt: `🔴 The server tests did not run for ${Math.round((now - (H.run || 0)) / 60e3)} min – the 10-min cron may be stopped.` });
   for (const a of (H.alerts || []).slice().reverse()) if (now - a.t < 6 * 3600e3) out.push({ key: 'A' + a.id, lvl: a.lvl, txt: a.txt, t: a.t });
 }
+const { ch, dev } = await channel();   // made the first time (private), then only found
 if (!out.length) { console.log('nothing new', H ? (H.ok ? '🟢 all OK' : '🔴 not OK') : ''); process.exit(0); }
-
-const { ch, dev } = await channel();
 const last = await api('GET', `/channels/${ch.id}/messages?limit=100`);
 const posted = new Set(); for (const m of last) for (const e of m.embeds || []) { const f = e.footer && e.footer.text || ''; const k = f.match(/#(\S+)$/); if (k) posted.add(k[1]); }
 let newRed = 0;
