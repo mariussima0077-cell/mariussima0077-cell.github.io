@@ -11,6 +11,7 @@ async function api(method, path, body) {
   for (let i = 0; i < 5; i++) {
     const res = await fetch(API + path, { method, headers: { Authorization: `Bot ${TOKEN}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
     if (res.status === 429) { const j = await res.json(); await sleep((j.retry_after || 1) * 1000 + 200); continue; }
+    if (method === 'DELETE' && res.status === 404) return null;
     if (!res.ok) throw new Error(`${method} ${path} -> ${res.status} ${await res.text()}`);
     await sleep(300);
     return res.status === 204 ? null : res.json();
