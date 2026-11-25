@@ -1271,7 +1271,10 @@ const SPK=.37,SPCELL=192;
 for(const id in SPRD)SPRD[id].id=id;
 // v16-107: skill sheets/booms are decoded in the background (off the main thread) at battle start → the first ultimate no longer stutters
 function warmIm(im){if(!im||!im.decode)return;const d=()=>{im.decode().catch(()=>{});};if(im.complete&&im.naturalWidth)d();else im.addEventListener('load',d,{once:true});}
-function sprLoad(d){if(!d.im){if(WIDE8[d.id])wideImg(d.id);if(ALLY8[d.id])allyImg(d.id);if(ALLY8[d.id+'r'])allyImg(d.id+'r');if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
+// v16-324 (Marius 25 nov: "only the ATTACK"): Mythic attacks with 16 frames (his 2 ChatGPT sheets, tools/at16_hero.py) – one row img/hero/at16_<id>.webp; LOW graphics keep the 8 frames of the atlas
+const AT16={m5_0:{cw:310,uw:413.3,ax:210.7,n:16,rows:[[0,214,285.3,273.3]]},m5_1:{cw:277,uw:369.3,ax:188.0,n:16,rows:[[0,174,232.0,225.3]]}},AT16I={};
+function at16(id){const m=AT16[id];let lo=false;try{lo=LOWRES;}catch(e){}if(!m||lo)return null;let o=AT16I[id];if(!o){const im=new Image();im.decoding='async';im.src='img/hero/at16_'+id+'.webp';o=AT16I[id]={im,v8:m};}return o.im.complete&&o.im.naturalWidth?o:null;}
+function sprLoad(d){if(!d.im){if(AT16[d.id])at16(d.id);if(WIDE8[d.id])wideImg(d.id);if(ALLY8[d.id])allyImg(d.id);if(ALLY8[d.id+'r'])allyImg(d.id+'r');if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
 // v16-94: draws frame (r,c) of a sprite at the feet point (0,0), k = screen units per 256-cell unit. v8 = 8 frames per row, each row its own height
 function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.im,c*v.cw,R[0],v.cw,R[1],-v.ax*k,-R[3]*k,v.uw*k,R[2]*k);return;}
   const w=d.w||256,cw=w*SPCELL/256;X.drawImage(d.im,c*cw,r*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);}
@@ -1326,7 +1329,8 @@ function drawSprHero(g,u,t,d,alpha){const [r,c,fr]=sprFrame(u,t);
   if(d.noKO&&u.dead)g.rotate(-Math.min(1,u.deadT*2.2)*Math.PI/2*.92); // no KO picture → falls over
   if(u.rcl>0)g.translate(-u.rcl/.18*6,0); // v16-322: recoil of a shot
   const [qx,qy]=sqz(u,t);if(qx!==1||qy!==1)g.scale(qx,qy);
-  g.globalAlpha=alpha*GA;sprBlit(g,d,r,c,k);
+  const A16=u.st==='atk'&&d.v8&&r===2?at16(d.id):null;
+  g.globalAlpha=alpha*GA;if(A16)sprBlit(g,A16,0,Math.min(A16.v8.n-1,Math.floor(u.ap*A16.v8.n)),k);else sprBlit(g,d,r,c,k);
   if(d.v8&&fr>.04&&!LOWRES&&!u.dead){g.globalAlpha=alpha*GA*fr;sprBlit(g,d,r,(c+1)%8,k);}
   g.restore();}
 function portraitCv(h){const k='cv'+h.id;if(PIMG[k])return PIMG[k].complete===false||PIMG[k].naturalWidth===0?null:PIMG[k];
