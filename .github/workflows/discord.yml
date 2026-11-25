@@ -6,7 +6,7 @@ on:
       action:
         description: "setup = build the server (once) | announce = post an update"
         type: choice
-        options: [announce, setup]
+        options: [announce, setup, migrate]
         default: announce
       version:
         description: "Version (for announce), e.g. v16-150"
@@ -29,6 +29,12 @@ jobs:
           BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
         run: node discord/setup.mjs
+      - name: Restructure server
+        if: ${{ inputs.action == 'migrate' }}
+        env:
+          BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+        run: node discord/migrate.mjs
       - name: Announce update
         if: ${{ inputs.action == 'announce' }}
         env:
