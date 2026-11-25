@@ -4,20 +4,28 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "setup = build the server (once) | announce = post an update"
+        description: "announce = post in #announcements | setup / migrate / community = server admin (already done)"
         type: choice
-        options: [announce, setup, migrate]
+        options: [announce, setup, migrate, community]
         default: announce
+      kind:
+        description: "soon = upcoming update (what it will contain) | live = update is out now"
+        type: choice
+        options: [soon, live]
+        default: live
       version:
-        description: "Version (for announce), e.g. v16-150"
+        description: "Version, e.g. v16-150"
         required: false
       notes:
-        description: "Patch notes separated by | (e.g. New hero|Arena fix|Faster loading)"
+        description: "Contents separated by | (e.g. New hero|Arena fix|Faster loading)"
         required: false
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    env:
+      BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,22 +33,18 @@ jobs:
           node-version: 20
       - name: Setup server
         if: ${{ inputs.action == 'setup' }}
-        env:
-          BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
         run: node discord/setup.mjs
       - name: Restructure server
         if: ${{ inputs.action == 'migrate' }}
-        env:
-          BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
         run: node discord/migrate.mjs
+      - name: Community + Onboarding
+        if: ${{ inputs.action == 'community' }}
+        run: node discord/community.mjs
       - name: Announce update
         if: ${{ inputs.action == 'announce' }}
         env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_UPDATES_WEBHOOK }}
-          PING_ROLE_ID: ${{ secrets.DISCORD_PING_ROLE_ID }}
           PLAY_URL: ${{ vars.PLAY_URL }}
           VERSION: ${{ inputs.version }}
           NOTES: ${{ inputs.notes }}
-        run: node discord/announce.mjs "$VERSION" "$NOTES"
+          KIND: ${{ inputs.kind }}
+        run: node discord/announce.mjs "$VERSION" "$NOTES" "$KIND"
