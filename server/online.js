@@ -278,8 +278,8 @@ export function arenaSim(ta, td, seed) {
   const pick = (u) => { const e = alive(1 - u.side); if (!e.length) return null; const fr = e.filter(melee);
     if (melee(u)) return (fr.length ? fr : e).reduce((a, b) => a.hp < b.hp && R() < .5 ? a : b);
     return R() < .6 ? e.reduce((a, b) => a.hp / a.mhp < b.hp / b.mhp ? a : b) : e[Math.floor(R() * e.length)]; };
-  const dmg = (src, tgt, mult, crit) => { let a = 1.7 * src.atk * mult * (src.buff > 0 ? 1.3 : 1) * (.9 + R() * .2);   // ×1.7: arena fights last ~15-30 s
-    // OFF since v16-45 (was hidden at the end of the comment above): a *= 100 / (100 + tgt.def * 3); if (tgt.mark > 0) a *= 1.35;  → Arena ignores DEF + MARK; turning it on = much longer fights (re-balance first)
+  const dmg = (src, tgt, mult, crit) => { let a = 3.4 * src.atk * mult * (src.buff > 0 ? 1.3 : 1) * (.9 + R() * .2);   // v16-309: ×3.4 (DEF on, like the campaign) → arena fights last ~15-30 s
+    a *= Math.max(1 - .6, 100 / (100 + tgt.def * 3)); if (tgt.mark > 0) a *= 1.35;   // v16-309 (Marius): DEF + MARK like the campaign (heroes block max 60% = DEF_CAP)
     const c = crit || R() < Math.min(.6, src.crit); if (c) a *= src.cdm || 1.8;   // v16-294: crit chance max 60%, CRIT DAMAGE separate
     a = Math.max(1, Math.round(a)); let left = a;   // v16-308: was inside the comment → 'left is not defined' = EVERY arena fight crashed
     if (tgt.shield > 0) { const s = Math.min(tgt.shield, left); tgt.shield -= s; left -= s; }
