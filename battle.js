@@ -618,10 +618,12 @@ const PASV={
           {n:'PRECISION',ic:'🔍',v:[0,0,0,15,20,25],d:v=>`+${v}% damage to marked enemies.`}],
  all:[{n:'LEADER',ic:'👑',v:[4,5,6,7,8,10],d:v=>`All mechanics deal +${v}% damage while this hero stands.`},
       {n:'SECOND WIND',ic:'❤️',v:[0,0,0,2,2.5,3],d:v=>`Under 50% HP: regenerates ${v}% HP every second.`}]};
-const pasN=h=>!h||h.crew||!PASV[roleOf(h)]?0:h.gr>=3?2:1;
-function pasOf(h){const n=pasN(h),o=[];for(let i=0;i<n;i++){const p=PASV[roleOf(h)][i];o.push({n:p.n,ic:p.ic,d:p.d(p.v[h.gr])});}return o;}
+// v16-304 (Marius 25 nov, choice B): MYTHIC heroes get the 2 passives of THEIR CLASS (MYTH_CLS: Nova → Scanner WEAK SPOT + PRECISION …), no more LEADER / SECOND WIND
+const pasCls=h=>!h||h.crew?'crew':h.gr===5&&typeof MYTH_CLS!=='undefined'&&MYTH_CLS[h.id]?MYTH_CLS[h.id]:roleOf(h);
+const pasN=h=>!h||h.crew||!PASV[pasCls(h)]?0:h.gr>=3?2:1;
+function pasOf(h){const n=pasN(h),o=[];for(let i=0;i<n;i++){const p=PASV[pasCls(h)][i];o.push({n:p.n,ic:p.ic,d:p.d(p.v[h.gr])});}return o;}
 // in battle: pv(u,'engine',0) → the number of that passive if this unit has it, else 0
-const pv=(u,role,i)=>u&&u.hero&&u.role===role&&u.pn>i?PASV[role][i].v[u.h.gr]:0;
+const pv=(u,role,i)=>u&&u.hero&&(u.pr||u.role)===role&&u.pn>i?PASV[role][i].v[u.h.gr]:0;
 // v16-210 (Marius 23 nov): MYTHIC TALENTS – one unique passive per Mythic battle hero, unlocked in 3 phases on the way to Lv 400
 // (I at Lv 320, II at Lv 360, III at Lv 400 – no extra price: the levels already cost Mythic Core). Numbers only, existing effects.
 const TAL={m5_0:{n:'OVERLOAD CROWN',v:[.5,.65,.8],d:v=>'Every 4th attack the lightning jumps to 2 more monsters ('+Math.round(v*100)+'% damage).'},
@@ -641,7 +643,14 @@ function talHit(u,tg){const id=u.h.id,v=TV(u);u.tc=(u.tc||0)+1;
   else if(id==='m5_5'&&u.tc%3===0){let n=0;for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)<.16&&(m.x-u.x)*u.face>0){damage(u,m,v,{noCrit:1,skill:1});n++;}if(n){talTxt(u,'PIERCE ×'+(n+1));if(!B.sim)B.fx.push({type:'beam',x0:u.x,y0:headY(u)+30,x1:u.face>0?W:0,y1:headY(tg)+16,t:0,d:.2,col:'#ff5252',w:3});}}}
 function wetOn(m,v){if(!m||m.dead)return;if(!(m.wpt>0)&&!B.sim)num(m.x,headY(m)-6*S,'WET','#ff80ab',0);m.wpt=4;m.wpv=Math.max(m.wpt>0?m.wpv||0:0,v);} // v16-244 Chroma talent WET PAINT
 function talWave(){for(const g of B.heroes){if(g.dead||!g.tl||g.h.id!=='m5_3')continue;const sh=g.max*TV(g);for(const h of B.heroes)if(!h.dead)h.shield=Math.max(h.shield,sh);talTxt(g,'IRON WALL');}}
-function pasTxt(u,i,txt){if(B.sim)return;const p=PASV[u.role][i];num(u.x,headY(u)-14*S,txt||p.n,'#ffe082',0);}
+// v16-304: the on-hit class passives for MYTHIC heroes (WEAK SPOT, STATIC / SHORT CIRCUIT, STICKY PAINT) – same rules as the class heroes
+function mythHit(u,tg,x,y){if(!u.hero||u.role!=='all'||!u.pr||u.pr==='all'||!tg)return;const c=u.pr;
+  if(c==='inspect'){const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
+  else if(c==='paint'){const sp=pv(u,'paint',0);if(sp&&!tg.dead)tg.slow=Math.max(tg.slow,sp);}
+  else if(c==='elec'){const sc=pv(u,'elec',1);if(sc&&!tg.dead&&Math.random()*100<sc){tg.stun=Math.max(tg.stun,.6);pasTxt(u,1);}
+    const stc=pv(u,'elec',0);if(stc&&Math.random()*100<stc){let o=null,bd=170*S;for(const m of B.mons){if(m.dead||m===tg)continue;const d2=dist(tg,m);if(d2<bd){bd=d2;o=m;}}
+      if(o){const oy=headY(o)+16*dsc(o.d);if(!B.sim)B.fx.push({type:'bolt',x0:x,y0:y,x1:o.x,y1:oy,t:0,d:.22,col:u.spr&&u.spr.col});damage(u,o,.6,{noCrit:1});}}}}
+function pasTxt(u,i,txt){if(B.sim)return;const p=PASV[u.pr||u.role][i];num(u.x,headY(u)-14*S,txt||p.n,'#ffe082',0);}
 const CREW_NAMES=['Rookie Rob','Rookie Dan','Rookie Max','Rookie Ivo','Rookie Sam'];
 
 // monsters (stats at stage scale 1) · dr = drawing, b = special behaviour, at = attack type
@@ -1825,7 +1834,7 @@ const GRIT_N=24,gritK=n=>n<=8?n*.075:.6+(n-8)*.15,gritStep=n=>n<8?.075:.15;
 function grit(si){const P=CPX(),st=P.stuck;if(!st||st.si!==si||si!==P.best)return 0;return gritK(Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)));}
 function mkHeroUnit(h,i,n){const s=unitStats(h),r=roleOf(h),gk=(1+(B.grit||0)+(B.nit||0))*(1+(B.trb||0)); // v16-136: TEAM ROLES bonus (+5/10/15% ATK & HP)
   return {hero:1,h,awk:!h.crew&&h.gr===5&&TE().mTier?TE().mTier(stars(h)):0,spr:sprOf(h),land:0,role:r,look:lookOf(h),k:i*1.7,name:h.crew?h.n:h.n,hp:s.hp*gk,max:s.hp*gk,atk:s.atk*gk,def:s.def,mv:s.mv*S,rng:s.rng*S,as:s.as,crit:s.crit,cdm:s.cdm,eg:s.eg,
-    skK:h.crew?1:(1+.06*((TE().skLv?TE().skLv(h.id):1)-1))*(s.sd||1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),tl:talLv(h),tc:0,shots:0,fcT:3,ekCd:0,swT:0};}
+    skK:h.crew?1:(1+.06*((TE().skLv?TE().skLv(h.id):1)-1))*(s.sd||1),x:0,d:0,face:1,st:'idle',ap:0,cd:rnd(0,.6),wph:rnd(0,6),en:0,stun:0,slow:0,mark:0,buff:0,aspd:0,aspdK:0,defB:0,critB:0,shield:0,flash:0,hurt:0,hot:0,hotT:0,taunt:0,dead:false,deadT:0,hits:0,act:null,slot:i,pn:pasN(h),pr:pasCls(h),tl:talLv(h),tc:0,shots:0,fcT:3,ekCd:0,swT:0};}
 function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);if(HM&&!B.tw){fxImg('hm_ring');fxImg('hm_aura');}const m=B.tw?B.tw.mul:stageMul(B.si)*stEase(B.si);
   return {hero:0,t,k:rnd(0,9),name:M.n,boss:!!M.boss,hp:M.hp*m*1.25,max:M.hp*m*1.25,atk:M.atk*m,def:M.def*(1+Math.min(B.si,19)*.06),mv:M.mv*S,rng:M.rng*S,as:M.as,crit:.05,H:M.h,fly:!!M.fly,
     x:0,d:0,face:-1,st:'walk',ap:0,cd:rnd(.3,1),wph:rnd(0,6),roll:0,stun:0,slow:0,mark:0,weak:0,burn:0,burnT:0,ice:0,tw:0,flash:0,hurt:0,dot:0,dead:false,deadT:0,act:null,
@@ -2295,7 +2304,7 @@ function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
   if(u.hero&&u.tl)talHit(u,tg);
   if(u.hero){const R=u.role,MR=MYTH_RNG[u.h&&u.h.id];
-    if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2&&!FV8(u))fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');return;} // v16-141: Nova arrow / Vega railgun shot
+    if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2&&!FV8(u))fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');mythHit(u,tg,x,y);return;} // v16-141: Nova arrow / Vega railgun shot
     if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2&&!FV8(u)){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
     else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2&&!FV8(u)){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
       const sc=pv(u,'elec',1);if(sc&&!tg.dead&&Math.random()*100<sc){tg.stun=Math.max(tg.stun,.6);pasTxt(u,1);}
@@ -2304,7 +2313,7 @@ function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
     else if(R==='service')shoot(u,tg,'bolt',1,u.spr&&u.spr.look?{look:u.spr.look}:null);
     else if(R==='paint'){const pc=['#e0457b','#29b6f6','#ffd21a','#76ff03'][u.hits++%4];shoot(u,tg,'paint',1,{col:pc});
       if(sprOK(u.spr)){const [px,py]=muzzle(u);B.fx.push({type:'beam',x0:px,y0:py,x1:x,y1:y,t:0,d:.2,col:u.spr.col||'#ff4fd8',w:5});}}
-    else{const m=R==='all'?1.15:1;damage(u,tg,m);sparks(x,y,R==='engine'?10:6,R==='tuning'?'#40c4ff':'#ffe082');if(R==='engine'||R==='all'){shake(3);if(!tg.boss)tg.x+=6*S;}
+    else{const m=R==='all'?1.15:1;damage(u,tg,m);if(R==='all')mythHit(u,tg,x,y);sparks(x,y,R==='engine'?10:6,R==='tuning'?'#40c4ff':'#ffe082');if(R==='engine'||R==='all'){shake(3);if(!tg.boss)tg.x+=6*S;}
       B.fx.push({type:'slash',x,y,t:0,d:.18,f:u.face,col:R==='tuning'?'#40c4ff':'#fff'});
       if(FX2&&!FV8(u)){const sc=R==='tuning'?'#40c4ff':R==='engine'?'#ff9100':'#ffe082';fxs('slash_02',sc,x-u.face*4*S,y,{d:.2,s0:40*S,s1:64*S,rot:(u.face>0?-Math.PI/2:Math.PI/2)+rnd(-.5,.5),ease:1});fxs('flare_01','#ffffff',x,y,{d:.15,s0:12*S,s1:44*S});}}
     return;}
@@ -3204,12 +3213,12 @@ function gNav(d){if(gpg!=='hero')return;const L=gNavList();if(L.length<2)return;
 // Icons: img/ui9/hs_<heroId>.webp (ultimate) · hs_pas_<class>_<0|1>.webp (passives = per class) · hs_tal_<heroId>.webp (talent, else the old tal_<id>.webp). Missing icon → emoji.
 const HS_X=[16.38,39.73,62.3,84.51],HS_Y=[46.9,46.4,46.4,45.2];
 function hsSlot(i,src,src2,emo,name,tag,lock,k){return `<div class="hsS${lock?' lk':''}" data-sk="${k}" style="left:${HS_X[i]}%;top:${HS_Y[i]}%"><i>${emo}</i>${src?`<img src="${src}" alt="" onerror="${src2?`this.onerror=function(){this.remove()};this.src='${src2}'`:'this.remove()'}">`:''}${lock?`<u>🔒<small>${lock}</small></u>`:''}</div><div class="hsN" style="left:${HS_X[i]}%"><b>${name}</b></div>`;}
-function hsPanel(h){const P=pasOf(h),c=roleOf(h),my=h.gr===5&&!h.crew&&TAL[h.id],tl=talLv(h);
+function hsPanel(h){const P=pasOf(h),c=pasCls(h),my=h.gr===5&&!h.crew&&TAL[h.id],tl=talLv(h);
   let x='<div class="hsP"><div class="hsT">SKILLS</div>'+hsSlot(0,'img/ui9/hs_'+h.id+'.webp','','⚡',skOf(h).sk,'ULTIMATE','','u');
   for(let i=0;i<2;i++)x+=P[i]?hsSlot(i+1,'img/ui9/hs_pas_'+c+'_'+i+'.webp','',P[i].ic,P[i].n,'PASSIVE','','p'+i):hsSlot(i+1,'','','','PASSIVE','Epic +','EPIC+','');
   x+=my?hsSlot(3,'img/ui9/hs_tal_'+h.id+'.webp','img/ui9/tal_'+h.id+'.webp','⭐',TAL[h.id].n,'TALENT'+(tl?' '+['','I','II','III'][tl]:''),tl?'':'Lv '+TAL_LV[0],'t'):hsSlot(3,'','','','TALENT','Mythic only','MYTHIC','');
   return x+'</div>';}
-function hsPop(h,k){if(!h||!k)return;const P=pasOf(h),c=roleOf(h);let t,img,ic,d;
+function hsPop(h,k){if(!h||!k)return;const P=pasOf(h),c=pasCls(h);let t,img,ic,d;
   if(k==='u'){t=skOf(h).sk;img='img/ui9/hs_'+h.id+'.webp';ic='⚡';d=HSK[h.id]?HSK[h.id].skd:'';t+=' <small style="color:#ffb300">ULTIMATE</small>';}
   else if(k[0]==='p'){const p=P[+k[1]];if(!p)return;t=p.n+' <small style="color:#6ab8ff">PASSIVE</small>';img='img/ui9/hs_pas_'+c+'_'+k[1]+'.webp';ic=p.ic;d=p.d;}
   else{const TA=TAL[h.id];if(!TA)return;const tl=talLv(h);t=TA.n+' <small style="color:#d08cff">TALENT</small>';img='img/ui9/hs_tal_'+h.id+'.webp';ic='⭐';
