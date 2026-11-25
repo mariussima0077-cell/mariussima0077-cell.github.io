@@ -596,3 +596,6 @@ Machetă: https://mariussima0077-cell.github.io/preview/shop.html · în joc: te
 ## 22 nov 2026 – v16-183
 - Fix afișaj: rândul „Income now” = măsurătoare LIVE (20 min); de la LV 11 arată câștigul exact al upgrade-ului (+x% pay) + mesaj „LEVEL N! +x% pay”.
 - v16-184 (live, Marius OK fără simulare): piese de garaj – multiplicatorul de campanie PART_U plafonat la ×5 (era ×26) + costuri ×2 de la LV 11. Motiv: Wazza LV 50 într-o săptămână. De urmărit la testeri.
+
+## 25 nov 2026 – v16-314
+- Pagina eroului Mythic: stelele de lângă „Mythic · clasă” arătau numărul de COPII (0-9), deși puterea crește doar la pragurile de Awakening (1·2·4·6·9 copii) → jucătorul vedea +1 stea fără putere în plus. Acum: stelele = treapta AWAKENED (ca în Hero Collection) + „x/y copies → AWK n” (MAX la V). La fel în fereastra Level Up (scos textul vechi „Mythic stars +s / 20”). Echilibrul NU s-a schimbat. **Lipsesc imagini: nimic.**
