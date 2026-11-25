@@ -4485,22 +4485,33 @@ const dgCss=document.createElement('style');dgCss.textContent=`
 .dgPBy{display:flex;align-items:center;justify-content:center;font:900 italic calc(var(--u)*50) Game,system-ui;color:#fff;text-shadow:0 calc(var(--u)*4) 0 #6a2a00;cursor:pointer}.dgPBy:active{transform:scale(.96)}.dgPBy.on{font-size:calc(var(--u)*38);color:#ffe082}
 `;document.head.appendChild(dgCss);
 // v16-91 (Marius): FULL TEST ACCOUNT (owner only, SEC.TEST_ACC) – everything unlocked / maxed, hidden from all rankings on the server
-function testFill(){const T=TE(),G=T.G;let first=!G.tacc;
-  // resources are topped up at every start
-  G.money=Math.max(G.money||0,1e10);G.dm=Math.max(G.dm||0,1e6);G.h.tk=Math.max(G.h.tk||0,10000);G.h.ct=Math.max(G.h.ct||0,10000);const g=GR();g.tk=Math.max(g.tk||0,10000);G.ess=Math.max(G.ess||0,1e12);G.gp=Math.max(G.gp||0,1e10);
-  if(!G.t99){G.t99=1;for(const id in G.h.own){const o=G.h.own[id],h=T.HB[id];if(!h)continue;o.lv=300;o.a=14;if(h.gr===5)o.s=Math.min(o.s||0,20);}first=first||false;T.save();}
-  if(!first){T.save();return false;}
-  G.tacc=1;G.tut=1;G.vip=Math.max(G.vip||0,28000);G.xp=Math.max(G.xp||0,179900);G.rep=30;G.sold=Math.max(G.sold||0,5000);
-  Object.keys(G.lv).forEach(k=>G.lv[k]=10);
-  T.HEROES.forEach(h=>{if(h.soon)return;G.h.own[h.id]={s:T.hMaxS?T.hMaxS(h):(h.gr===5?20:50),lv:300,a:14};G.h.disc[h.id]=1;});G.t99=1;G.m99=1;
-  G.cp.best=NST;for(let i=0;i<NST;i++)G.cp.stars[i]=3;G.cph={best:NST,stars:{},ch:0};for(let i=0;i<NST;i++)G.cph.stars[i]=3;
-  // gear: a full Ascended ★5 Lv 60 class set for every Legendary + Mythic battle hero + a few Mythic pieces to try STAR UP / ASCEND
-  const hs=myMechs().filter(h=>h.gr>=4);g.inv=[];g.eq={};
-  hs.forEach(h=>{const sv=g.slv||(g.slv={});sv[h.id]={};GSLOT.forEach(sl=>{sv[h.id][sl.k]=GLV_MAX;const it=newItem(sl.k,6,clsOf(h));it.lv=GMAXR[6];it.sr=5;g.inv.push(it);equip(h.id,it);});});
-  GSLOT.forEach(sl=>{for(let k=0;k<2;k++){const it=newItem(sl.k,5);it.lv=GMAXR[5];g.inv.push(it);}});
-  G.cp.team=myMechs().slice(0,5).map(h=>h.id);
-  T.save();return true;}
-if(window.SEC&&SEC.TEST_ACC){try{if(testFill())setTimeout(()=>location.reload(),300);}catch(e){console.error('testFill',e);}}
+// v16-332 (Marius 25 nov): the FULL test account is topped up to the CURRENT best at EVERY start (not only the first time):
+// every hero (new ones too) at max stars / max level (Mythic Lv 400 + Core Ascensions) · buildings LV 100 · Ascended ★20 class gear ·
+// campaign normal + hard cleared · lots of every currency. Only ever raises things, never lowers them.
+function testFill(){const T=TE(),G=T.G;let ch=!G.tacc;const up=(o,k,v)=>{if(!((o[k]||0)>=v)){o[k]=v;ch=true;}};
+  const g=GR();G.money=Math.max(G.money||0,1e10);G.dm=Math.max(G.dm||0,1e6);G.h.tk=Math.max(G.h.tk||0,10000);G.h.ct=Math.max(G.h.ct||0,10000);g.tk=Math.max(g.tk||0,10000);
+  G.ess=Math.max(G.ess||0,1e12);G.gp=Math.max(G.gp||0,1e10);G.mc=Math.max(G.mc||0,1e6);
+  const pk=G.upk||(G.upk={});['tank','warrior','ranger','mage','support','bk'].forEach(k=>pk[k]=Math.max(pk[k]||0,1e7));
+  G.tacc=1;G.tut=1;G.t99=1;G.m99=1;up(G,'vip',28000);up(G,'xp',179900);up(G,'rep',30);up(G,'sold',5000);
+  // buildings: LV 10 + 90 extra levels = LV 100 (the ones that can be upgraded)
+  const NOUPB=['collection','export','yard','race','car','rep','shop','vip','inc'],MT=100;G.lx=G.lx||{};
+  Object.keys(G.lv).forEach(k=>{if(NOUPB.includes(k))return;up(G.lv,k,10);up(G.lx,k,MT-10);});
+  // heroes: every hero in the game (also the ones added later), max stars, max level, every ascension
+  T.HEROES.forEach(h=>{if(h.soon)return;const o=G.h.own[h.id]||(G.h.own[h.id]={s:0,lv:1,a:0}),mx=T.hMax?T.hMax(h.id):300;
+    up(o,'s',T.hMaxS?T.hMaxS(h):(h.gr===5?20:50));up(o,'lv',mx);up(o,'a',Math.floor(mx/20)-1);if(!G.h.disc[h.id]){G.h.disc[h.id]=1;ch=true;}});
+  // campaign normal + hard: everything cleared with 3 stars
+  if((G.cp.best||0)<NST){G.cp.best=NST;ch=true;}for(let i=0;i<NST;i++)G.cp.stars[i]=3;
+  G.cph=G.cph||{best:0,stars:{},ch:0};if((G.cph.best||0)<NST){G.cph.best=NST;ch=true;}G.cph.stars=G.cph.stars||{};for(let i=0;i<NST;i++)G.cph.stars[i]=3;
+  // gear: every Legendary + Mythic battle hero wears a full Ascended ★20 class set (only missing / weaker pieces are replaced)
+  const byId={};g.inv.forEach(it=>byId[it.id]=it);g.eq=g.eq||{};const sv=g.slv||(g.slv={});
+  myMechs().filter(h=>h.gr>=4).forEach(h=>{sv[h.id]=sv[h.id]||{};GSLOT.forEach(sl=>{if((sv[h.id][sl.k]||0)<GLV_MAX){sv[h.id][sl.k]=GLV_MAX;ch=true;}
+    const cur=byId[(g.eq[h.id]||{})[sl.k]];if(cur&&cur.r>=6&&(cur.sr||0)>=GSTARMAX6)return;
+    if(cur&&cur.r>=6){cur.sr=GSTARMAX6;cur.lv=GMAXR[6];ch=true;return;}
+    const it=newItem(sl.k,6,clsOf(h));it.lv=GMAXR[6];it.sr=GSTARMAX6;g.inv.push(it);byId[it.id]=it;equip(h.id,it);ch=true;});});
+  if(!g.tst5){g.tst5=1;GSLOT.forEach(sl=>{for(let k=0;k<2;k++){const it=newItem(sl.k,5);it.lv=GMAXR[5];g.inv.push(it);}});ch=true;}
+  if(!G.cp.team||!G.cp.team.length){G.cp.team=myMechs().slice(0,5).map(h=>h.id);ch=true;}
+  T.save();return ch;}
+if(window.SEC&&SEC.TEST_ACC){try{if(testFill()){let k='te_tfr',n=0;try{n=+sessionStorage.getItem(k)||0;sessionStorage.setItem(k,n+1);}catch(e){}if(n<2)setTimeout(()=>location.reload(),300);}}catch(e){console.error('testFill',e);}}
 // v16-121 (Marius): Ascended gear also from Idle Rewards – from chapter 30, 0.1% per hour in the chest (seeded: no reroll)
 const IDLE_ASC_H=.001;
 function idleAsc(hrs){const T=TE(),G=T.G,b=Math.min(STAGES.length-1,G.cp&&G.cp.best||0);if(!(hrs>0)||STAGES[b].oc<ASC_CH)return null;
