@@ -1,0 +1,40 @@
+name: Discord (Torque Bot)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "setup = build the server (once) | announce = post an update"
+        type: choice
+        options: [announce, setup]
+        default: announce
+      version:
+        description: "Version (for announce), e.g. v16-150"
+        required: false
+      notes:
+        description: "Patch notes separated by | (e.g. New hero|Arena fix|Faster loading)"
+        required: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Setup server
+        if: ${{ inputs.action == 'setup' }}
+        env:
+          BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+        run: node discord/setup.mjs
+      - name: Announce update
+        if: ${{ inputs.action == 'announce' }}
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_UPDATES_WEBHOOK }}
+          PING_ROLE_ID: ${{ secrets.DISCORD_PING_ROLE_ID }}
+          PLAY_URL: ${{ vars.PLAY_URL }}
+          VERSION: ${{ inputs.version }}
+          NOTES: ${{ inputs.notes }}
+        run: node discord/announce.mjs "$VERSION" "$NOTES"
