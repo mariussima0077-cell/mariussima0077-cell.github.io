@@ -2001,6 +2001,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(!B.sim&&src.hero&&!tgt.hero&&!o.skill&&!LOWRES&&B.t-(tgt.elT||-9)>.12){tgt.elT=B.t;const [ex,ey]=sxy(tgt);elHit(src,ex,ey-(tgt.H||40)*.5*dsc(tgt.d));} // v16-322
   if(!B.sim){if(!tgt.hero&&!LOWRES&&B.t-(tgt.dbT||-9)>.14){tgt.dbT=B.t;const [hx,hy]=sxy(tgt);hitBits(hx,hy-(tgt.H||40)*.45*dsc(tgt.d),crit?4:2);}sfx(tgt.hero?'thud':crit?'crit':'hit');} // v16-319
   if(tgt.wbB){B.wbD+=left;if((o.skill||crit)&&!(tgt.hurtS>-2))tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
+  if(ULT2&&o.skill&&src.hero&&!tgt.hero&&!B.sim&&!tgt.wbB&&tgt.hp>0&&B.fx.some(f=>f.type==='wide8'&&f.u===src&&!f.heroes&&f.t>f.ta-.25&&f.t<f.ta+.6))B.fx.push({type:'kb',m:tgt,t:0,d:.26,v:(tgt.boss?70:330)*S}); // v16-334: pushed back by the ultimate
   const [x]=sxy(tgt);const y=headY(tgt);
   if(FX2&&!B.sim&&!tgt.hero&&(o.skill||crit)){B.hs=Math.max(B.hs,o.skill?.06:.035);fxs('star_04','#ffffff',x,y+22*dsc(tgt.d),{d:.22,s0:20*S,s1:70*S,rot:rnd(0,1),ease:1});}
   num(x,y,(crit?'💥':'')+a,tgt.hero?'#ff8a80':crit?'#ffd54a':'#ffffff',crit?1:0);if(!tgt.hero){const n=B.nums[B.nums.length-1];n.dv=a;n.crit=crit;}
@@ -2163,7 +2164,30 @@ function allyFx(id,hs,d){return false; /* v16-314 (25 nov, Marius): no more Myth
 function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
 // v16-321 (Marius: 'Nova – the arrows don't come from the top and it's too fast'): with his 23-24 frame sheets the picture's impact = the moment of the damage (end of the cast)
 const WTA={m5_7:1.2,m5_2:1.5,m5_3:1.2,m5_4:1.5,m5_5:1.2,m5_6:2.0};
-function pushWide(u,ta,o){if(!WD(u))return false;if(WTA[u.h.id])ta=WTA[u.h.id];B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
+// v16-334 (Marius 25 nov: "skill-urile nu-mi plac așa mult" – no new sheets): ULT2 = the ultimate picture is a bit smaller (the fight stays visible),
+// the part after the impact is shorter (1.0 s, was 1.5) and the enemies REACT on the impact: pushed back + a short hit-stop + camera punch
+const ULT2=1;
+// v16-334 BLEND (Marius 25 nov: "skill-urile nu par la locul lor, nu aparțin de joc"): the ultimate picture is melted INTO the scene instead of pasted on it –
+// 1) tinted a little with the scene's own light (average colour of the battle background), 2) soft edges (no sticker cut), 3) the bright parts glow into the scene
+// (additive pass), 4) a ground shadow + a coloured light pool on the floor under it, pulsing at the impact. Off on LOWRES.
+const WBL={c:null,x:null};let WPASS=0; // WPASS 1 = the ultimate is drawn on the GROUND (under the fighters), 0 = only a light glow over them
+
+function sceneTint(){try{const c=document.createElement('canvas');c.width=c.height=1;const x=c.getContext('2d');x.drawImage(cv,0,0,cv.width,cv.height*.75,0,0,1,1);const d=x.getImageData(0,0,1,1).data;return [d[0],d[1],d[2]];}catch(e){return null;}}
+function skillCol(im,N){if(im._sc)return im._sc;try{const c=document.createElement('canvas');c.width=40;c.height=14;const x=c.getContext('2d'),fh=im.naturalHeight/N,r=Math.floor(N*.5);x.drawImage(im,0,r*fh,im.naturalWidth,fh,0,0,40,14);
+  const d=x.getImageData(0,0,40,14).data;let R=0,G=0,Bc=0,n=0;for(let i=0;i<d.length;i+=4){const a=d[i+3],l=d[i]+d[i+1]+d[i+2];if(a>140&&l>360){R+=d[i];G+=d[i+1];Bc+=d[i+2];n++;}}
+  im._sc=n?[R/n|0,G/n|0,Bc/n|0]:[255,200,120];}catch(e){im._sc=[255,200,120];}return im._sc;}
+function wideBlend(f,im,c,fh,dx,dy,dw,dh,a){const fw=im.naturalWidth;const ov=f.tint&&!f.heroes&&!WPASS;if(LOWRES||!f.tint){g.globalAlpha=a;g.drawImage(im,0,c*fh,fw,fh,dx,dy,dw,dh);return;}
+  let o=WBL.c;if(!o){o=WBL.c=document.createElement('canvas');WBL.x=o.getContext('2d');}const ow=Math.min(600,fw),oh=Math.round(ow*fh/fw);if(o.width!==ow||o.height!==oh){o.width=ow;o.height=oh;}
+  const x=WBL.x;x.globalCompositeOperation='source-over';x.globalAlpha=1;x.clearRect(0,0,ow,oh);x.drawImage(im,0,c*fh,fw,fh,0,0,ow,oh);
+  const t=f.tint;x.globalCompositeOperation='source-atop';x.globalAlpha=.22;x.fillStyle='rgb('+t[0]+','+t[1]+','+t[2]+')';x.fillRect(0,0,ow,oh); // scene light
+  x.globalCompositeOperation='destination-in';x.globalAlpha=1;const e=Math.round(ow*.07),gl=x.createLinearGradient(0,0,ow,0);gl.addColorStop(0,'rgba(0,0,0,0)');gl.addColorStop(e/ow,'#000');gl.addColorStop(1-e/ow,'#000');gl.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=gl;x.fillRect(0,0,ow,oh);
+  const gt=x.createLinearGradient(0,0,0,oh);gt.addColorStop(0,'rgba(0,0,0,0)');gt.addColorStop(.1,'#000');gt.addColorStop(1,'#000');x.fillStyle=gt;x.fillRect(0,0,ow,oh); // soft edges
+  if(!ov){g.globalAlpha=a;g.drawImage(o,dx,dy,dw,dh);}g.globalCompositeOperation='lighter';g.globalAlpha=a*(ov?.4:.22);g.drawImage(o,dx,dy,dw,dh);g.globalCompositeOperation='source-over';}
+function wideGround(f,im,N,cx,gy,w,q,IP,A){if(LOWRES||!f.tint)return;const sc=skillCol(im,N),p=Math.max(0,1-Math.abs(q-IP)/3),rx=w*.42,ry=26*S;
+  g.save();g.globalAlpha=A*.32;g.fillStyle='#000';g.beginPath();g.ellipse(cx,gy-4*S,rx,ry,0,0,TAU);g.fill();
+  g.globalCompositeOperation='lighter';const r=g.createRadialGradient(cx,gy-6*S,0,cx,gy-6*S,rx);r.addColorStop(0,'rgba('+sc[0]+','+sc[1]+','+sc[2]+','+(.25+.45*p)+')');r.addColorStop(1,'rgba('+sc[0]+','+sc[1]+','+sc[2]+',0)');
+  g.globalAlpha=A;g.fillStyle=r;g.translate(cx,gy-6*S);g.scale(1,ry/rx*1.6);g.translate(-cx,-(gy-6*S));g.beginPath();g.arc(cx,gy-6*S,rx,0,TAU);g.fill();g.restore();}
+function pushWide(u,ta,o){if(!WD(u))return false;if(WTA[u.h.id])ta=WTA[u.h.id];const tb=ULT2?1.0:1.5;B.fx.push(Object.assign({type:'wide8',t:0,tint:ULT2&&!LOWRES&&!B.sim?sceneTint():null,ta:Math.max(.35,ta),tb,d:Math.max(.35,ta)+tb,im:wideImg(u.h.id),u},o||{}));return true;}
 // v16-ready (24 nov, Marius): ULTIMATE READY – looping ground aura (16 frames, 4x4) under a Mythic while his ultimate is charged;
 // during the cast it CHARGES (grows ×1.4, brighter, extra glow) and fades out at the end of the cast
 /* v16-296 (Marius): no ring under the heroes any more – ENRAGE (coloured glow) for everyone instead */ const READY8={},READYI={};function readyImg(id){if(!READY8[id])return null;let i=READYI[id];if(!i){i=READYI[id]=new Image();i.decoding='async';i.src=READY8[id];}return i;}
@@ -2505,6 +2529,8 @@ function fxUpdateGear(f){f.done=true;const x=f.tgt?f.tgt.x:f.x;const y=f.tgt?fy(
   if(f.tgt&&!f.tgt.dead){damage(f.src,f.tgt,f.mult||3,{skill:1});}debris(x,y-6,4,['#ffd54a','#ffca28','#9e9e9e']);shake(6);B.fx.push({type:'ring',x,y,t:0,d:.35,r:40*S,col:'#ffd54a',ground:1});f.lx=x;
   if(FX2&&!FV8(f.src)){fxs('fire_01','#ffab00',x,y-16*S,{d:.45,s0:24*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxShock(x,y,'#ffd54a',40*S);fxScorch(x,y,'#2b1a10',30*S,2);}}
 function fxUpdate(f,dt){if(f.type==='chunks'){chunksStep(f,dt);return;}
+  if(f.type==='kb'){const m=f.m;if(m&&!m.dead){const k=1-f.t/f.d;m.x+=f.v*dt*k*k*2;}return;}
+  if(f.type==='wide8'&&ULT2&&!f.heroes&&!f.imp0&&f.t>=f.ta){f.imp0=1;B.hs=Math.max(B.hs,.1);punch(.06);shake(9);}
   if(f.type==='scan'){if(f.t<0)return;const P=f.p||{},SC=P.col||'#64ffda',x=lerp(f.x,W+20,Math.max(0,f.t/f.d));if(FX2&&Math.random()<.5)fxs('trace_01',SC,x,(FY0+FY1)/2-50*S,{d:.3,s0:(FY1-FY0)+180*S,s1:(FY1-FY0)+180*S,sx:.35,a0:.6});
     for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);m.mark=Math.max(m.mark,P.mark||7);if(P.slow)m.slow=Math.max(m.slow,P.slow);damage(f.src,m,P.mult||1.2,{skill:1});sparks(m.x,headY(m)+20,6,SC);if(FX2&&!FV8(f.src)){const my=headY(m)+22*dsc(m.d);fxs('magic_02',SC,m.x,my,{d:.7,s0:20*S,s1:80*S,vr:3,ease:1});fxs('circle_05','#a7ffeb',m.x,my,{d:.35,s0:20*S,s1:60*S});}}}
   else if(f.type==='chain'&&!f.done&&f.t>=0){f.done=true;if(!f.b.dead){damage(f.src,f.b,f.mult,{skill:1});f.b.stun=Math.max(f.b.stun,f.stun||1.5);sparks(f.b.x,headY(f.b)+20,10,'#80d8ff',200);}shake(3);
@@ -2729,8 +2755,8 @@ function drawGroundFx(){for(const f of B.fx){if(f.type==='puddle'){const a=Math.
     for(let k=0;k<5;k++){g.fillStyle=cols[k];ell(g,f.x+Math.cos(k*1.3)*f.r*.45,f.y+Math.sin(k*2.1)*f.r*.12,f.r*.5,f.r*.15);}g.restore();}
   else if(f.type==='ring'&&f.ground&&f.t>=0){const k=f.t/f.d;g.save();g.globalAlpha=1-k;g.strokeStyle=f.col;g.lineWidth=6*(1-k)+1;g.beginPath();g.ellipse(f.x,f.y,f.r*(.3+k*.8),f.r*.32*(.3+k*.8),0,0,TAU);g.stroke();g.restore();}}}
 function bolt(x0,y0,x1,y1,w,col){const n=7;g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);for(let i=1;i<n;i++){const k=i/n;g.lineTo(lerp(x0,x1,k)+rnd(-7,7),lerp(y0,y1,k)+rnd(-7,7));}g.lineTo(x1,y1);g.stroke();}
-function drawFx(t){
-  for(const f of B.fx){if(f.t<0)continue;const k=f.t/f.d;if(f.type==='chunks'){chunksDraw(g,f);continue;}if(f.type==='elhit'||f.type==='mflash'){elDraw(g,f,k);continue;}g.save();
+function drawFx(t,ow){
+  for(const f of B.fx){if(f.t<0)continue;if(ow&&f.type!=='wide8')continue;const k=f.t/f.d;if(f.type==='chunks'){chunksDraw(g,f);continue;}if(f.type==='elhit'||f.type==='mflash'){elDraw(g,f,k);continue;}g.save();
     if(f.type==='wbfx'){const im=wbFxIm(f.id),X=MSPR[f.id].wb.fx;if(im.complete&&im.naturalWidth){const st=k<.66?Math.min(2,Math.floor(k/.66*3)):3,L=Math.max(40*S,f.x0-f.x1),
         H=clamp(L*X.h/X.w*1.5,70*S,150*S),ang=f.y1!=null?Math.atan2(f.y1-f.y0,f.x1-f.x0)+Math.PI:0;
         g.globalAlpha=k<.82?1:(1-k)/.18;g.translate(f.x0,f.y0);if(ang)g.rotate(ang);g.drawImage(im,0,st*X.h,X.w,X.h,-L,-X.ya*H,L,H);}}
@@ -2753,8 +2779,8 @@ function drawFx(t){
     else if(f.type==='wide8'&&f.beam){const im=f.im,u=f.u;if(im&&im.naturalWidth&&u){const N=wN(im),IP=N>8?(WIDEIP[u.h.id]||4):4,[bx,by]=muzzle(u,40,40),fw=im.naturalWidth,fh=im.naturalHeight/N,w=Math.max(60*S,W+30*S-bx),h=w*fh/fw*1.15,
       q=Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb),c=Math.floor(q),fr=q-c,A=k>.93?(1-k)/.07:1;
       g.globalAlpha=A*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,bx-6*S,by-h/2,w,h);if(c<N-1&&fr>0){g.globalAlpha=A*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,bx-6*S,by-h/2,w,h);}}}
-    else if(f.type==='wide8'){const im=f.im;if(im&&im.naturalWidth){const ms=alive(B.mons);let x0=W*.5,x1=W,dm=f.dd;if(f.heroes){const hs=alive(B.heroes);if(hs.length){x0=Math.min(...hs.map(m=>m.x));x1=Math.max(...hs.map(m=>m.x));dm=Math.max(...hs.map(m=>m.d));}}else if(ms.length){x0=Math.min(...ms.map(m=>m.x));x1=Math.max(...ms.map(m=>m.x));dm=Math.max(...ms.map(m=>m.d));}
-      const N=wN(im),w=W*1.15,cx=f.heroes?clamp((x0+x1)/2,W*.3,W*.5):clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/N,h=w*fh/fw*1.25,gy=fy(dm)+18*S,A=k>.93?(1-k)/.07:1,N8=N<=8,fdrop=N8||f.drop==='m5_4'?f.drop:null; /* v16-321: Nova's arrows fall from the sky again (on top of her new sheet) */
+    else if(f.type==='wide8'){const im=f.im,bl=f.tint&&!f.heroes&&!LOWRES;if(WPASS&&!bl){}else if(im&&im.naturalWidth){const ms=alive(B.mons);let x0=W*.5,x1=W,dm=f.dd;if(f.heroes){const hs=alive(B.heroes);if(hs.length){x0=Math.min(...hs.map(m=>m.x));x1=Math.max(...hs.map(m=>m.x));dm=Math.max(...hs.map(m=>m.d));}}else if(ms.length){x0=Math.min(...ms.map(m=>m.x));x1=Math.max(...ms.map(m=>m.x));dm=bl?ms.reduce((a,m)=>a+m.d,0)/ms.length:Math.max(...ms.map(m=>m.d));}
+      const N=wN(im),w=W*(ULT2?.98:1.15),cx=f.heroes?clamp((x0+x1)/2,W*.3,W*.5):clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/N,h=w*fh/fw*1.25,gy=fy(dm)+(bl?-38:18)*S,A=k>.93?(1-k)/.07:1,N8=N<=8,fdrop=N8||f.drop==='m5_4'?f.drop:null; /* v16-321: Nova's arrows fall from the sky again (on top of her new sheet) */
       const IP=N8?(f.imp||4):(WIDEIP[f.u&&f.u.h?f.u.h.id:'m5_0']||Math.round(N/2));let q=f.ta?Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb):Math.min(N-.001,k*N),sh=1;/* v16-wide2: imp = the impact frame (Chroma v2: frame 7) */let gs=1;
       // v16-grow (Marius: Chroma's tornadoes stay on the ground and grow): frames 3-4 (tornadoes on the ground) swirl back and forth while they grow ×0.35→×1.15, then the burst
       let gr=null;if(f.grow&&N8){const T=f.t,a1=.4,a2=.68,top0=gy-h*.97,hi=Math.min(top0,H*.13);
@@ -2766,7 +2792,7 @@ function drawFx(t){
         else gs=1.2-.2*Math.min(1,(T-f.ta)/.5);}
       // v16-drop (Marius: arrows / phoenix must really fall from the sky): the falling objects are ONE sprite cut from his sheet, moved by code from the top
       // of the screen to the ground; his sheet starts only when they land (frame 4 = landing → frame 5 = impact)
-      if(fdrop){const di=dropImg(fdrop),L=.28;if(N8){if(f.t<f.ta-L){sh=0;}else if(f.t<f.ta)q=3+(f.t-(f.ta-L))/L;}
+      if(fdrop&&!(bl&&!WPASS)){const di=dropImg(fdrop),L=.28;if(N8){if(f.t<f.ta-L){sh=0;}else if(f.t<f.ta)q=3+(f.t-(f.ta-L))/L;}
         if(di&&di.naturalWidth&&f.t<f.ta+.05){const dw=di.naturalWidth,dh=di.naturalHeight;g.save();
           if(fdrop==='m5_4'){if(!f.ar){f.ar=[];for(let i=0;i<24;i++)f.ar.push({x:Math.random(),z:Math.random(),st:(i/24)*(f.ta-.34)+rnd(0,.05)});}
             const ah=100*S,aw=ah*dw/dh,fd=.34;
@@ -2779,8 +2805,9 @@ function drawFx(t){
       if(sh){const c=Math.floor(q),fr=q-c,zz=(1+.04*fr)*gs,ww=w*zz,hh=h*zz,A2=A*(fdrop&&N8&&f.t<f.ta?Math.min(1,(q-3)*2.5):1);
       // v16-wide: only 8 pictures → each frame melts into the next (cross-fade) + a slow push-in, so it is smooth, not 'in pieces'
       if(gr){g.globalAlpha=A2*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,gr[0],gr[1],gr[2],gr[3]);if(c<N-1&&fr>0){g.globalAlpha=A2*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,gr[0],gr[1],gr[2],gr[3]);}}else{
-      g.globalAlpha=A2*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,cx-ww/2,gy-hh*.97,ww,hh);
-      if(c<N-1&&fr>0){g.globalAlpha=A2*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,cx-w*gs/2,gy-h*gs*.97,w*gs,h*gs);}}}}}
+      if(WPASS)wideGround(f,im,N,cx,gy,w,q,IP,A2);
+      wideBlend(f,im,c,fh,cx-ww/2,gy-hh*.97,ww,hh,A2*(c<N-1?1-fr*fr:1));
+      if(c<N-1&&fr>0)wideBlend(f,im,c+1,fh,cx-w*gs/2,gy-h*gs*.97,w*gs,h*gs,A2*Math.min(1,fr*1.6));}}}}
     else if(f.type==='gear'&&f.hide){}
     else if(f.type==='gear'){const x=f.tgt&&f.tgt.x!==undefined?(f.lx||f.tgt.x):f.x,ty=f.tgt?fy(f.tgt.d)-20*dsc(f.tgt.d):fy(.5);const y=lerp(f.y0,ty,Math.min(1,k/.85));
       if(k<.85){g.translate(x,y);g.rotate(t*12);gearShape(f.r,'#ffd54a');g.rotate(-t*12);g.globalAlpha=.25;g.fillStyle='#ffab00';g.fillRect(-2,-80,4,70);}}
@@ -2967,7 +2994,7 @@ function punch(z){if(!B.sim)B.zoom=Math.max(B.zoom||0,z);}
 function render(){const t=B.real;tintN=0;g.setTransform(DPR,0,0,DPR,0,0);
   let sx=0,sy=0;if(B.shake>0){sx=rnd(-1,1)*B.shake;sy=rnd(-1,1)*B.shake*.6;}
   B.sx=sx;B.sy=sy;if(sx||sy){g.fillStyle='#000';g.fillRect(0,0,W,H);}g.save();camT();
-  drawBG(t);drawTele(t);drawGroundFx();drawFx2(true);
+  drawBG(t);drawTele(t);drawGroundFx();if(ULT2&&!LOWRES){WPASS=1;drawFx(t,1);WPASS=0;}drawFx2(true);
   const all=[...B.heroes,...B.mons].sort((a,b)=>a.d-b.d||(a.dead?-1:1));
   for(const u of all){u.sx=u.x;u.sy=fy(u.d)-(u.lift||0);u.sc=dsc(u.d)*(u.hero?1:u.boss?bossK(u):1.22);if(u.hero)drawReady(g,u,B.t);drawUnit(g,u,B.t);}
   for(const u of all)bars(u);
