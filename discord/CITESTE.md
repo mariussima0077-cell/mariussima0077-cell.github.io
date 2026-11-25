@@ -24,3 +24,6 @@
 **Actions → Run workflow → announce**, cu versiunea `v16-150` și notele `Hero nou|Arena fix|Bug fixes`.
 
 După setup, îi poți scoate botului rolul de Administrator, pentru că anunțurile merg prin webhook.
+
+## Anunț liber (text + poze)
+Un folder nou în `discord/posts/<nume>/` cu `text.md` (max 2000 de caractere) și pozele `1.jpg`, `2.jpg`… Când urcă pe `main`, Torque Bot îl postează singur în #announcements (workflow „Discord post”). Se poate reposta din Actions → Discord post → Run workflow → numele folderului.

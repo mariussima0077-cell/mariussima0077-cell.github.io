@@ -1,0 +1,31 @@
+name: Discord post (Torque Bot)
+# Posts automatically when a new/changed discord/posts/<name>/text.md is pushed to main.
+on:
+  push:
+    branches: [main]
+    paths: ['discord/posts/*/text.md']
+  workflow_dispatch:
+    inputs:
+      post:
+        description: "Folder name in discord/posts (e.g. coming-soon)"
+        required: true
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    env:
+      BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Post
+        env:
+          MANUAL: ${{ inputs.post }}
+        run: |
+          if [ -n "$MANUAL" ]; then dirs="discord/posts/$MANUAL"; else
+            dirs=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'discord/posts/*/text.md' | xargs -r -n1 dirname); fi
+          for d in $dirs; do node discord/post.mjs "$d"; done
