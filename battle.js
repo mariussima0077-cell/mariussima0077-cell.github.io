@@ -1324,6 +1324,7 @@ function drawSprHero(g,u,t,d,alpha){const [r,c,fr]=sprFrame(u,t);
   else if(u.trl&&!dash)u.trl=null;
   g.save();g.scale(u.face,1);
   if(d.noKO&&u.dead)g.rotate(-Math.min(1,u.deadT*2.2)*Math.PI/2*.92); // no KO picture → falls over
+  if(u.rcl>0)g.translate(-u.rcl/.18*6,0); // v16-322: recoil of a shot
   const [qx,qy]=sqz(u,t);if(qx!==1||qy!==1)g.scale(qx,qy);
   g.globalAlpha=alpha*GA;sprBlit(g,d,r,c,k);
   if(d.v8&&fr>.04&&!LOWRES&&!u.dead){g.globalAlpha=alpha*GA*fr;sprBlit(g,d,r,(c+1)%8,k);}
@@ -1987,6 +1988,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   a=Math.max(1,Math.round(a));let left=a;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
   tgt.hp-=left;tgt.flash=1;tgt.hurt=1;
+  if(!B.sim&&src.hero&&!tgt.hero&&!o.skill&&!LOWRES&&B.t-(tgt.elT||-9)>.12){tgt.elT=B.t;const [ex,ey]=sxy(tgt);elHit(src,ex,ey-(tgt.H||40)*.5*dsc(tgt.d));} // v16-322
   if(!B.sim){if(!tgt.hero&&!LOWRES&&B.t-(tgt.dbT||-9)>.14){tgt.dbT=B.t;const [hx,hy]=sxy(tgt);hitBits(hx,hy-(tgt.H||40)*.45*dsc(tgt.d),crit?4:2);}sfx(tgt.hero?'thud':crit?'crit':'hit');} // v16-319
   if(tgt.wbB){B.wbD+=left;if((o.skill||crit)&&!(tgt.hurtS>-2))tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
   const [x]=sxy(tgt);const y=headY(tgt);
@@ -2011,6 +2013,30 @@ function kill(u){if(!u.hero&&!B.sim)try{chunks(u);}catch(e){}u.hp=0;u.dead=true;
     if(u.boss){B.flash=.8;punch(.09);}}}
 
 // ---------------------------------------------------------------- v16-319 BATTLE JUICE (Marius 25 nov: the attack demo – "bagă și faza cu atacul")
+// v16-322 (Marius: "the arrows etc. you showed in the demo – for everyone who has something"): every normal hero hit shows his element in his colour
+// (King / electric heroes: small lightning · Nova, Vega: blue shards · Ignis, Lady: fire · paint heroes: paint drops · the rest: shards in their colour)
+function elOf(u){const id=u.h&&u.h.id;if(id==='m5_0'||u.role==='elec')return'elec';if(id==='m5_4'||id==='m5_5')return'ice';if(id==='m5_2'||id==='m5_1')return'fire';if(u.role==='paint'||id==='m5_6')return'paint';return'shard';}
+function elHit(u,x,y){const col=(u.spr&&u.spr.col)||rageCol(u.h&&u.h.id),el=elOf(u),n=el==='elec'?5:7,A=[];for(let i=0;i<n;i++)A.push([i/n*TAU+rnd(-.3,.3),rnd(.7,1.2)]);B.fx.push({type:'elhit',x,y,t:0,d:.26,col,el,A});}
+function shotFx(u,col){if(B.sim)return;u.rcl=.18;if(LOWRES)return;const [mx,my]=muzzle(u,30,40);B.fx.push({type:'mflash',x:mx,y:my,t:0,d:.12,col});}
+function elDraw(g,f,k){g.save();g.globalCompositeOperation='lighter';
+  if(f.type==='mflash'){const r=(14+20*k)*S,gg=g.createRadialGradient(f.x,f.y,1,f.x,f.y,r);gg.addColorStop(0,'#ffffff');gg.addColorStop(.35,f.col);gg.addColorStop(1,'rgba(0,0,0,0)');g.globalAlpha=1-k;g.fillStyle=gg;g.beginPath();g.arc(f.x,f.y,r,0,TAU);g.fill();g.restore();return;}
+  const a=1-k,R=(10+34*k)*S;g.globalAlpha=a;
+  {const gg=g.createRadialGradient(f.x,f.y,1,f.x,f.y,R*.9);gg.addColorStop(0,f.col);gg.addColorStop(1,'rgba(0,0,0,0)');g.globalAlpha=a*.45;g.fillStyle=gg;g.beginPath();g.arc(f.x,f.y,R*.9,0,TAU);g.fill();g.globalAlpha=a;}
+  if(f.el==='elec'){g.strokeStyle=f.col;g.lineWidth=2.4*S;g.lineCap='round';for(const [an,l] of f.A){let x=f.x,y=f.y;g.beginPath();g.moveTo(x,y);for(let j=1;j<=4;j++){const r=R*l*j/4;x=f.x+Math.cos(an)*r+Math.sin(j*7+an*5)*5*S;y=f.y+Math.sin(an)*r+Math.cos(j*5+an*3)*5*S;g.lineTo(x,y);}g.stroke();g.strokeStyle='#ffffff';g.lineWidth=1*S;g.stroke();g.strokeStyle=f.col;g.lineWidth=2.4*S;}}
+  else if(f.el==='paint'){const P=['#e0457b','#29b6f6','#ffd21a','#76ff03',f.col];f.A.forEach(([an,l],i)=>{const r=R*l;g.fillStyle=P[i%P.length];g.beginPath();g.arc(f.x+Math.cos(an)*r,f.y+Math.sin(an)*r+k*14*S,(4.5-2.5*k)*S,0,TAU);g.fill();});}
+  else if(f.el==='fire'){f.A.forEach(([an,l],i)=>{const r=R*l*.8,x=f.x+Math.cos(an)*r,y=f.y+Math.sin(an)*r-k*16*S;g.fillStyle=i%2?'#ffab00':'#ff5722';g.beginPath();g.arc(x,y,(6-3.5*k)*S,0,TAU);g.fill();});}
+  else{g.fillStyle=f.el==='ice'?'#e1f5fe':f.col;for(const [an,l] of f.A){const r0=R*l*.45,r1=R*l*1.05,ca=Math.cos(an),sa=Math.sin(an),w=.2;
+      g.beginPath();g.moveTo(f.x+ca*r1,f.y+sa*r1);g.lineTo(f.x+Math.cos(an+w)*r0,f.y+Math.sin(an+w)*r0);g.lineTo(f.x+Math.cos(an-w)*r0,f.y+Math.sin(an-w)*r0);g.closePath();g.fill();}
+    if(f.el==='ice'){g.strokeStyle=f.col;g.lineWidth=1.4*S;for(const [an,l] of f.A){const r0=R*l*.45,r1=R*l*1.05;g.beginPath();g.moveTo(f.x+Math.cos(an)*r1,f.y+Math.sin(an)*r1);g.lineTo(f.x+Math.cos(an+.2)*r0,f.y+Math.sin(an+.2)*r0);g.stroke();}}}
+  g.restore();}
+// Nova's normal shot = her real arrow (the spark-plug arrow of her ultimate) flying with a glowing trail
+function arrowDraw(p,x,y){const T=p.tr||(p.tr=[]),L=T[T.length-1];T.push([x,y]);if(T.length>6)T.shift();
+  const an=L?Math.atan2(y-L[1],x-L[0]):(p.tx>x?0:Math.PI),im=dropImg('m5_4');
+  if(!im||!im.naturalWidth){g.save();g.strokeStyle='#9be7ff';g.lineWidth=3*S;g.beginPath();g.moveTo(x-Math.cos(an)*26*S,y-Math.sin(an)*26*S);g.lineTo(x,y);g.stroke();g.restore();return;}
+  const ah=52*S,aw=ah*im.naturalWidth/im.naturalHeight,rot=an-Math.PI*.75;
+  g.save();if(!LOWRES){g.globalCompositeOperation='lighter';for(let i=0;i<T.length-1;i++){const [px,py]=T[i];g.save();g.translate(px,py);g.rotate(rot);g.globalAlpha=.07+.07*i;g.drawImage(im,-aw*.3,-ah*.7,aw,ah);g.restore();}
+    const gg=g.createRadialGradient(x,y,1,x,y,24*S);gg.addColorStop(0,'rgba(155,231,255,.8)');gg.addColorStop(1,'rgba(0,0,0,0)');g.globalAlpha=.7;g.fillStyle=gg;g.beginPath();g.arc(x,y,24*S,0,TAU);g.fill();g.globalCompositeOperation='source-over';}
+  g.globalAlpha=1;g.translate(x,y);g.rotate(rot);g.drawImage(im,-aw*.3,-ah*.7,aw,ah);g.restore();}
 function hitBits(x,y,n){for(let k=0;k<n;k++){const a=rnd(-Math.PI*.95,-Math.PI*.05),v=rnd(90,240)*S;part({x,y,vx:Math.cos(a)*v+60*S,vy:Math.sin(a)*v,g:900*S,life:rnd(.6,1),r:rnd(3.2,5.5)*S,col:['#b0bec5','#ffca28','#90a4ae','#8d6e63'][k%4],type:k%2?'bolt':'gear',vr:rnd(-14,14),floor:y+rnd(30,60)*S});}}
 // the monster's own picture cut into 5 pieces that fly away, spin, bounce and fade (normal monsters with a picture, not bosses)
 function chunks(u){const M=MON[u.t];if(!M||!M.sp||u.boss||u.mb||M.b||M.fly)return;const id=M.sp,d=MSPR[id];if(!d||!msprOK(id))return;
@@ -2063,6 +2089,7 @@ function projUpdate(p,dt){
   if(p.type==='paint'&&Math.random()<.4)part({x:p.x,y:fy(p.d)-p.h,vx:0,vy:20,g:200,life:.3,r:1.6,col:p.col,type:'spark'});
   return false;}
 function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
+  if(p.type==='arrow'){damage(s,p.tgt,p.mult);sparks(x,y,6,'#e0f7fa');if(p.tgt)mythHit(s,p.tgt,x,y);return;}
   if(p.type==='bolt'||p.type==='wrench'){damage(s,p.tgt,p.mult,{skill:p.type==='wrench'});sparks(x,y,8,'#ffe082');if(p.type==='wrench'){shake(5);B.fx.push({type:'ring',x,y,t:0,d:.3,r:30*S,col:'#ffd54a'});fxBurst(x,y,'#ffd54a',44*S);fxSpark(x,y,'#ffd54a',6,24*S);}else if(FX2)fxs('flare_01','#e0f7fa',x,y,{d:.18,s0:14*S,s1:46*S});
     if(s.role==='service'&&++s.hits%3===0){const w=alive(B.heroes).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];if(w){heal(w,w.max*.06);B.fx.push({type:'plus',u:w,t:0,d:.7});}}}
   else if(p.type==='paint'){damage(s,p.tgt,p.mult);const sp=pv(s,'paint',0);if(sp&&p.tgt&&!p.tgt.dead)p.tgt.slow=Math.max(p.tgt.slow,sp);for(const m of alive(B.mons))if(m!==p.tgt&&Math.abs(m.x-x)<35*S&&Math.abs(m.d-p.d)<.12)damage(s,m,p.mult*.6,{noCrit:1});
@@ -2293,7 +2320,7 @@ function monAct(m,dt){const a=m.act;a.t+=dt;
 
 // ---------------------------------------------------------------- update
 function unitUpdate(u,dt,foes,friends){
-  u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;if(u.enLock>0)u.enLock-=dt;
+  u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.rcl>0)u.rcl-=dt;if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;if(u.enLock>0)u.enLock-=dt;
   if(u.dead){u.deadT+=dt;return;}
   u.stun=Math.max(0,u.stun-dt);u.slow=Math.max(0,u.slow-dt);u.mark=Math.max(0,u.mark-dt);
   if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
@@ -2369,6 +2396,8 @@ function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
   if(u.hero&&u.tl)talHit(u,tg);
   if(u.hero){const R=u.role,MR=MYTH_RNG[u.h&&u.h.id];
+    if(MR||R==='inspect'||R==='elec'||R==='service'||R==='paint')shotFx(u,MR?MR.col:(u.spr&&u.spr.col)||rageCol(u.h&&u.h.id)); // v16-322: recoil + muzzle flash
+    if(MR&&u.h.id==='m5_4'&&!B.sim){shoot(u,tg,'arrow',1,{spd:950});return;} // v16-322: Nova's real arrow flies (damage when it lands)
     if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2&&!FV8(u))fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');mythHit(u,tg,x,y);return;} // v16-141: Nova arrow / Vega railgun shot
     if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2&&!FV8(u)){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
     else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2&&!FV8(u)){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
@@ -2679,7 +2708,7 @@ function drawGroundFx(){for(const f of B.fx){if(f.type==='puddle'){const a=Math.
   else if(f.type==='ring'&&f.ground&&f.t>=0){const k=f.t/f.d;g.save();g.globalAlpha=1-k;g.strokeStyle=f.col;g.lineWidth=6*(1-k)+1;g.beginPath();g.ellipse(f.x,f.y,f.r*(.3+k*.8),f.r*.32*(.3+k*.8),0,0,TAU);g.stroke();g.restore();}}}
 function bolt(x0,y0,x1,y1,w,col){const n=7;g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(x0,y0);for(let i=1;i<n;i++){const k=i/n;g.lineTo(lerp(x0,x1,k)+rnd(-7,7),lerp(y0,y1,k)+rnd(-7,7));}g.lineTo(x1,y1);g.stroke();}
 function drawFx(t){
-  for(const f of B.fx){if(f.t<0)continue;const k=f.t/f.d;if(f.type==='chunks'){chunksDraw(g,f);continue;}g.save();
+  for(const f of B.fx){if(f.t<0)continue;const k=f.t/f.d;if(f.type==='chunks'){chunksDraw(g,f);continue;}if(f.type==='elhit'||f.type==='mflash'){elDraw(g,f,k);continue;}g.save();
     if(f.type==='wbfx'){const im=wbFxIm(f.id),X=MSPR[f.id].wb.fx;if(im.complete&&im.naturalWidth){const st=k<.66?Math.min(2,Math.floor(k/.66*3)):3,L=Math.max(40*S,f.x0-f.x1),
         H=clamp(L*X.h/X.w*1.5,70*S,150*S),ang=f.y1!=null?Math.atan2(f.y1-f.y0,f.x1-f.x0)+Math.PI:0;
         g.globalAlpha=k<.82?1:(1-k)/.18;g.translate(f.x0,f.y0);if(ang)g.rotate(ang);g.drawImage(im,0,st*X.h,X.w,X.h,-L,-X.ya*H,L,H);}}
@@ -2750,7 +2779,7 @@ function drawFx(t){
     else if(f.type==='dust'){g.globalAlpha=1-k;g.fillStyle='rgba(150,120,90,.5)';ell(g,f.x,f.y,20+k*20,6);}
     g.restore();}}
 function gearShape(r,col){g.fillStyle=col;g.beginPath();for(let i=0;i<20;i++){const a=i/20*TAU,rr2=i%2?r:r*1.28;g.lineTo(Math.cos(a)*rr2,Math.sin(a)*rr2);}g.closePath();g.fill();g.fillStyle='rgba(0,0,0,.35)';circ(g,0,0,r*.4);g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1.5;g.beginPath();g.arc(0,0,r*.75,0,TAU);g.stroke();}
-function drawProj(t){for(const p of B.proj){const x=p.x,y=fy(p.d)-p.h;g.save();g.translate(x,y);
+function drawProj(t){for(const p of B.proj){const x=p.x,y=fy(p.d)-p.h;if(p.type==='arrow'){arrowDraw(p,x,y);continue;}g.save();g.translate(x,y);
   if(p.look==='wrench'){g.rotate(p.rot*1.2);g.fillStyle='#cfd8dc';rr(g,-10,-2,20,4,2);g.fill();circ(g,10,0,4.5);circ(g,-10,0,3.5);g.fillStyle='rgba(255,255,255,.25)';circ(g,0,0,12);}
   else if(p.look==='oil'){g.fillStyle='rgba(255,193,7,.35)';ell(g,-9,0,10,3.5);g.fillStyle='#e0a100';circ(g,0,0,6);g.fillStyle='#ffd54f';circ(g,-2,-2,2.4);}
   else if(p.type==='bolt'){g.rotate(p.rot);g.fillStyle='#b0bec5';g.beginPath();for(let i=0;i<6;i++){const a=i/6*TAU;g.lineTo(Math.cos(a)*4.5,Math.sin(a)*4.5);}g.fill();g.fillStyle='#37474f';circ(g,0,0,1.8);}
