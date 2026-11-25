@@ -57,7 +57,7 @@ const on = k => { const v=PK()[k]; return v===true || (v||0) > now(); };   // v1
 const NEWP = () => true;   // v16-151 (22 nov 2026): founder_pass, vip_pass_diamond, pack_master/legend/titan are now active in Play Console
 // v16-155 RAIL PASS (Marius 22 nov 2026): 4.99 €/month for RAIL WARS. NOT a VIP Pass (no VIP bonus, no Idle) – own card in the VIP PASS tab.
 // Shown to players only after rail_pass_monthly exists in Play Console (RAILP → true); the owner's TEST MODE always sees it.
-const RAILP = () => false;
+const RAILP = () => true;   // v16-317 (25 nov 2026): rail_pass_monthly created + active in Play Console (4,99 €/month)
 const RAIL = {start:300, day:100};   // Street Tokens: right away + every day (≈3,300 a month = 6 items in the Street Shop)
 const expKey = {sil:'sil', gold:'gpm', plat:'plat', dia:'dia', rail:'rail'};   // v16-291: gold = 'gpm' (forever); the old monthly Gold ('sub') still counts until it ends
 function tier(){ if(on('dia')) return 'dia'; if(on('plat')) return 'plat'; if(on('gpm')||on('sub')) return 'gold'; if(on('sil')) return 'sil'; return null; }   // the best active one (name / colour)
