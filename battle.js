@@ -960,7 +960,7 @@ function slvSync(){const g=GR(),sv=g.slv||(g.slv={}),own={};for(const hid in g.e
   for(const it of g.inv){if(it.r>=6)continue;const o=own[it.id];it.lv=(o&&sv[o]&&sv[o][it.s])||1;}}
 function slvRefund(hid){const g=GR(),v=(g.slv||{})[hid];let c=0;if(v)for(const s in v)for(let l=1;l<v[s];l++)c+=slotCost(l);return c;}
 const slvTier=lv=>Math.min(10,Math.floor((lv||1)/5));
-const SLV_COL=['#9e9e9e','#ffffff','#69f0ae','#40c4ff','#448aff','#b388ff','#ea5cff','#ff4081','#ff9100','#ff1744','#ffd54a']; // corner badge colour: every +5 a new colour
+const SLV_COL=['#9e9e9e','#69f0ae','#40c4ff','#448aff','#b388ff','#ea5cff','#ff4081','#ff9100','#ff3d00','#ff1744','#ffd54a']; // v16-311 (Marius): real colour already from +5 (no more white) // corner badge colour: every +5 a new colour
 const GPN=n=>TE().GPI+' '+TE().nf(n);
 function ownerOf(it){const eq=GR().eq;for(const hid in eq)for(const s in eq[hid])if(eq[hid][s]===it.id)return hid;return null;}
 function heroGear(hid,ov){const eq=GR().eq[hid]||{},o=[];for(const sl of GSLOT){const it=ov&&(sl.k in ov)?ov[sl.k]:itemById(eq[sl.k]);if(it)o.push(it);}return o;}
