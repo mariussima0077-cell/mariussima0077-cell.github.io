@@ -614,7 +614,23 @@ export async function onlineCron(env) { await ensure(env);
 // 230 month 1, 450 month 3, 680 month 6; each bot ×0.7-1.3) and their team gets better as they go (like summoning). Online in sessions (~40% of the hours).
 // They NEVER attack (no Arena attacks, no Rail Wars, no chat, no spending) and NEVER get prizes (the prize queries skip 'bot_'). They stay Arena opponents.
 // Old bots (normal names, v<3) are removed. When there are BOT_REAL active real players, about one bot a day goes away.
-const BOT_MAX = 10, BOT_V = 3, BOT_REAL = 30, BOT_REAL_ST = 150;
+const BOT_MAX = 10, BOT_V = 3, BOT_REAL = 30, BOT_REAL_ST = 150, BOT_AUTO_OFF = false;
+// v16-329 (Marius 25 nov: „trebuie să-i pui și la Rail Wars să trimită, să avem ce ataca”): every bot sends its 3 trains a day (RW_SEND) at its own
+// hours (UTC), the train grade grows with its stage. The bots never attack and never claim (the train just ends; the cleanup removes it after 3 days).
+const BOT_RW_H = [[1, 9, 17], [3, 11, 19], [5, 13, 21], [7, 15, 23]], RW_TOK_B = [60, 100, 160, 250, 400, 650];
+const botRwG = (stage, r) => Math.min(5, Math.max(0, (stage < 60 ? 0 : stage < 150 ? 1 : stage < 400 ? 2 : stage < 900 ? 3 : 4) + (r < .3 ? 1 : 0) - (r > .85 ? 1 : 0)));
+async function botTrain(db, b, pl, stage, now) {
+  const hrs = BOT_RW_H[(pl.seed | 0) % 4], h = new Date(now).getUTCHours() + new Date(now).getUTCMinutes() / 60 - ((pl.seed | 0) % 50) / 60;
+  const due = hrs.filter(x => h >= x).length; if (!due) return;
+  const day = dayKey(now); let d = await db.prepare('SELECT * FROM rwday WHERE uid=?').bind(b.uid).first();
+  if (!d) { await db.prepare('INSERT INTO rwday(uid,day,s,a) VALUES(?,?,0,0)').bind(b.uid, day).run(); d = {s:0}; }
+  else if (d.day !== day) { await db.prepare('UPDATE rwday SET day=?, s=0, a=0 WHERE uid=?').bind(day, b.uid).run(); d = {s:0}; }
+  if ((d.s | 0) >= Math.min(due, RW_SEND)) return;
+  if (await db.prepare('SELECT 1 FROM rwtrain WHERE uid=? AND done=0 AND t1>?').bind(b.uid, now).first()) return;   // one train on the way at a time
+  const g = botRwG(stage, Math.random()), cars = 4 + Math.floor(Math.random() * 5), tok = Math.round(RW_TOK_B[g] * cars / 4);
+  await db.prepare('UPDATE rwday SET s=s+1 WHERE uid=?').bind(b.uid).run();
+  await db.prepare('INSERT INTO rwtrain(uid,srv,g,tok,cars,t0,t1) VALUES(?,?,?,?,?,?,?)').bind(b.uid, 1, g, tok, cars, now, now + RW_TRIP).run();
+}
 let botSeen = 0;   // v16-222: the ranking also makes the bots (once per 10 min per server copy), so they appear without waiting for the cron
 const BOT_NAMES = ['LugNutLarry','ClutchNorris','WD40Wendy','BrakeDancer','MufflerMike','TireKicker','DuctTapeDave','PistonPanda','CaptainCarb','NoBrakesNed',
   'HubcapHarry','RevvyMcRev','TurboTurtle','SpannerSusan','GreasyGrandpa','OilSpillBill','SirHonksALot','BumperBetty','WobblyWheel','ChickenTikkaV8'];
@@ -639,7 +655,9 @@ async function botTick(env) {
   for (const b of bots) if (plOf(b).v !== BOT_V) { await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); }   // old bots out
   bots = bots.filter(b => plOf(b).v === BOT_V);
   const real = (await db.prepare("SELECT COUNT(*) n FROM prof WHERE substr(pid,1,4) NOT IN ('bot_','tst_') AND t>? AND best>=?").bind(now - 3 * DAY, BOT_REAL_ST).first()).n;   // v16-222: only players who really play (paid testers who only open the game do not count)
-  if (real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];   // ~1 a day (cron every 10 min)
+  // v16-329 (Marius 25 nov: „nu mai văd boții”): the bots NO LONGER go away by themselves. Before, with ≥30 real players the 1/144 removal ran in the
+  // cron AND in every server copy that opened the ranking → all 10 were gone in about 2 days. Removing them is now Marius' decision (BOT_AUTO_OFF).
+  if (BOT_AUTO_OFF && real >= BOT_REAL) { if (bots.length && Math.random() < 1 / 144) { const b = bots.sort((a, c) => a.created - c.created)[0];
       await db.prepare('DELETE FROM arena WHERE uid=?').bind(b.uid).run(); await db.prepare('DELETE FROM prof WHERE uid=?').bind(b.uid).run(); } }
   else if (bots.length < BOT_MAX) {   // all missing bots right away
     const used = new Set((await db.prepare('SELECT nlow FROM prof WHERE srv=1').all()).results.map(r => r.nlow)), names = BOT_NAMES.filter(n => !used.has(n.toLowerCase()));
@@ -653,6 +671,7 @@ async function botTick(env) {
       await db.prepare('INSERT OR IGNORE INTO arena(uid,srv,season,pts,w,l,tk,tkt,opp,peak,t) VALUES(?,1,?,?,0,0,0,?,?,?,0)').bind(p.uid, seasonOf(now), START_PTS, now, '[]', START_PTS).run(); } }
   for (const b of bots) {   // climb forever at a free-player pace, only while "online"
     const pl = plOf(b);
+    try { const c0 = await db.prepare('SELECT best FROM prof WHERE uid=?').bind(b.uid).first(); if (c0) await botTrain(db, b, pl, Math.max(c0.best | 0, botStage(pl)), now); } catch (e) { console.log('botTrain', e && e.message); }   // v16-329: trains even when „offline”
     await db.prepare('UPDATE arena SET season=?, pts=?, peak=?, w=0, l=0, opp=? WHERE uid=? AND season<>?').bind(seasonOf(now), START_PTS, START_PTS, '[]', b.uid, seasonOf(now)).run();   // new Arena season → bots stay opponents
     const hs = (((pl.seed | 0) + Math.floor(now / HOUR)) * 2654435761) >>> 0; if (hs % 100 >= 40) continue;   // online ~40% of the hours, in sessions
     const cur = await db.prepare('SELECT best, bday, bd0 FROM prof WHERE uid=?').bind(b.uid).first(); if (!cur) continue;
@@ -984,6 +1003,11 @@ export async function selfTest(env) {
   await T('cup', async () => { const r = await call('cup'); return typeof r === 'string' ? r : 'Torque Cup: ' + (r.state || '?'); });
   await T('wb', async () => { const r = await call('wbrank'); return typeof r === 'string' ? r : (r.top || []).length + ' in the World Boss ranking'; });
   await T('mail', async () => { const r = await call('inbox'); return typeof r === 'string' ? r : 'OK'; });
+  await T('bots', async () => {   // v16-329: the 10 filler bots exist, climb and send Rail Wars trains
+    const r = (await db.prepare("SELECT COUNT(*) n, MIN(best) a, MAX(best) z FROM prof WHERE substr(pid,1,4)='bot_'").first()) || {};
+    const tr = (await db.prepare("SELECT COUNT(*) n FROM rwtrain t JOIN prof p ON p.uid=t.uid WHERE substr(p.pid,1,4)='bot_' AND t.t0>?").bind(Date.now() - DAY).first()) || {};
+    if (!(r.n > 0)) throw new Error('no bots online (expected ' + BOT_MAX + ')');
+    return r.n + ' bots · stages ' + r.a + '-' + r.z + ' · ' + (tr.n | 0) + ' Rail Wars trains in 24 h'; });
   await T('rank', async () => { const r = await call('rank'); return typeof r === 'string' ? r : (r.list || []).length + ' players in the ranking'; });
   return out;
 }

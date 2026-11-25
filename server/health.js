@@ -9,7 +9,7 @@ import {selfTest} from './online.js';
 
 const GAME_SW = 'https://mariussima0077-cell.github.io/sw.js';
 export const HNAME = {db:'Database', arena_sim:'Arena fights (test teams)', arena_replay:'Arena / Rail Wars / Cup (last real fights)',
-  rank:'Ranking', chat:'Chat', atop:'Arena top 100', hist:'Arena history', cup:'Torque Cup', wb:'World Boss', mail:'Mail',
+  rank:'Ranking', chat:'Chat', atop:'Arena top 100', hist:'Arena history', cup:'Torque Cup', wb:'World Boss', mail:'Mail', bots:'Bots (10 filler players + Rail Wars trains)',
   cloud:'Cloud save', site:'Game website (GitHub)', gerr:'Game errors (players’ phones)', serr:'Server errors (crashes)'};
 const NO_ALERT = new Set(['serr']);   // server crashes alert by themselves in srvErr (one alert per new error)
 const AREA = {fight:'Arena', arena:'Arena', refresh:'Arena', replay:'Arena', atop:'Arena', hist:'Arena', ashop:'Arena Shop', abuy:'Arena Shop', amile:'Arena Shop',
