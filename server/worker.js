@@ -388,7 +388,7 @@ async function scan(env) {
 //   lic  = LICENSED → installed from Google Play by this Google account
 // Mode = variable INTEGRITY in wrangler.toml: 'log' (only written down, shown on /admin) or 'enforce'
 // (online modes + cloud save only for players with a good result in the last 3 days; the browser and old apps are refused).
-const INTEG_OPS = ['sync', 'fight', 'refresh', 'wbhit', 'evsc', 'gpsc', 'gpfin', 'say', 'prof'];
+const INTEG_OPS = ['sync', 'fight', 'refresh', 'wbhit', 'evsc', 'gpsc', 'gpfin', 'say', 'prof', 'rwsend', 'rwatk', 'rwclaim', 'gcode', 'dlink', 'stbuy', 'abuy', 'ashop', 'claim', 'brag'];   // v16-330: + Rail Wars, gift codes, Discord, shops, mail
 let integReady = false;
 // daily stats (/admin): one row per player per day (Paris time), kept 90 days
 let statsReady = false;
@@ -427,7 +427,7 @@ async function integOk(env, pid) {
   if (typeof pid !== 'string' || pid.startsWith('tst_')) return true;            // the owner's test account
   await ensureInteg(env);
   const r = await env.DB.prepare('SELECT t, ok FROM integ WHERE pid=?').bind(pid).first();
-  return !!(r && r.ok && Date.now() - r.t < 3 * 864e5);
+  return !!(r && r.ok && Date.now() - r.t < 864e5);   // v16-330: 24 h (was 3 days – a token from the real app was good for 3 days in a browser); the app checks every 12 h
 }
 async function integrity(b, env) {
   await ensureInteg(env); const db = env.DB, now = Date.now();

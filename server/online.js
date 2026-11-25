@@ -1,4 +1,4 @@
-import {EP_N} from './ept.js';   // v16-167: bot teams follow the enemy power of their stage
+import {EP_N, EP_H} from './ept.js';   // v16-167: bot teams follow the enemy power of their stage
 // TORQUE ONLINE – part of the Torque Guard bot (Cloudflare Worker + D1). v16-45
 //   • profiles (name / icon / frame / title)      • live battle ranking per server (campaign · power · garage)
 //   • world chat with automatic translation (Cloudflare Workers AI, free daily quota) + bad-word filter, report, admin delete/mute
@@ -27,6 +27,7 @@ const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena 
 // v16-60 WORLD BOSS: weekly damage ranking (week = Monday 00:00 UTC), rewards by mail for the top 100 – same table as WB_RANK in battle.js
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
 const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew','dgr'], B:['ess','dia','wheel','key','cash']};   // v16-120 KEY ROULETTE · v16-129 CASH ROULETTE (added at the END → events 0-3 stay the same)
+const EV_RATE = {hero:1500, gear:1500, crew:1500, dia:400000, dgr:300};   // v16-330: max score per hour of event (summons / diamonds spent / dungeon floors)
 const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40, key:40, cash:25, dgr:3000};   // v16-161: cash was missing (score became NaN) + DUNGEON RUSH
 // v16-193 (Marius 23 nov): TORQUE GRAND PRIX once per server – starts 3 days after the server opens, 28 days. Same dates in cloud.js SERVERS[].open.
 // At the launch reset: set SRV_OPEN[1] = launch day. New server → add its opening date here (and in cloud.js).
@@ -34,6 +35,8 @@ const SRV_OPEN = {1: Date.UTC(2026, 10, 19, 17, 0, 0)}, GP_DELAY = 3 * DAY, GP_L
 // v16-228 (Marius 23 nov): NO TIME LIMIT – the Grand Prix stays open until 10 players finished ALL event missions (final = a Mythic AWAKENED I),
 // then 7 more days for everybody to claim the Road; safety cap 90 days. The CHAMPION missions open week by week → nobody can finish before day 22.
 const GP_PK = {gp1:['gp_silver','SILVER'], gp2:['gp_gold','GOLD'], gp3:['gp_plat','PLATINUM']};   // v16-196 PATRONS
+// v16-330: the most Grand Prix points a player can have t ms after the start (missions in grandprix.js: MD 1510/day, MW 9300/week, ME 25500 + week 2 8000 + week 3 10000 + week 4 16000) +5 %
+const gpMaxPts = t => { const d = Math.max(0, Math.floor(t / DAY)), w = Math.floor(d / 7); return Math.round((1510 * (d + 1) + 9300 * (w + 1) + 25500 + (w >= 1 ? 8000 : 0) + (w >= 2 ? 10000 : 0) + (w >= 3 ? 16000 : 0)) * 1.05); };
 const gpT0 = srv => SRV_OPEN[srv] ? SRV_OPEN[srv] + GP_DELAY : 0;
 async function gpEnd(env, srv) { const t0 = gpT0(srv); if (!t0) return 0; let r = null; try { r = await env.DB.prepare('SELECT tf FROM gpx WHERE srv=? AND fin=10').bind(srv).first(); } catch (e) {}
   return r && r.tf ? Math.min(r.tf + GP_TAIL, t0 + GP_MAX) : t0 + GP_MAX; }
@@ -166,6 +169,21 @@ function cleanTeam(t) {
      pw:Math.round(num(u.pw, 0, 2e9)), lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
 }
 const teamPow = t => Math.round(t.reduce((a, s) => a + s.hp * .25 + s.atk * 6 * (1 / s.as) + s.def * 4, 0));
+// v16-330 ANTI-HACK (Marius 25 nov: „fii tu hacker”): the team comes from the phone → a hacked game could send a team with impossible stats
+// (Arena / Rail Wars / Cup / World Boss). The server now compares the team power with what the player REALLY reached (battle receipts `rcpt`,
+// normal + HARD): max TEAM_K × the monsters of (best stage + 20). Above = the stats are scaled down to the cap + an event for /admin.
+const TEAM_K = 8, TEAM_MIN = 8e4;
+async function capTeam(env, pid, team, best) {
+  if (!team.length || isTst(pid)) return team;
+  let n = -1, h = -1; try { const r = await env.DB.prepare('SELECT MAX(CASE WHEN h=0 THEN si END) n, MAX(CASE WHEN h=1 THEN si END) h FROM rcpt WHERE pid=?').bind(pid).first();
+    if (r) { n = r.n == null ? -1 : r.n | 0; h = r.h == null ? -1 : r.h | 0; } } catch (e) { return team; }   // no receipts table → no check
+  const L = EP_N.length - 1, ref = Math.max(EP_N[Math.min(L, Math.max(0, n) + 20)], h >= 0 ? EP_H[Math.min(L, h + 20)] : 0, EP_N[Math.min(L, Math.min(best | 0, 60))]);
+  const cap = Math.max(TEAM_MIN, ref * TEAM_K), pw = teamPow(team); if (pw <= cap) return team;
+  const f = cap / pw;
+  try { if (!(await env.DB.prepare("SELECT 1 FROM events WHERE pid=? AND kind='teamcap' AND t>?").bind(pid, Date.now() - DAY).first()))
+    await env.DB.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(pid, Date.now(), 'teamcap', `team power ${pw.toLocaleString('en')} > possible ${Math.round(cap).toLocaleString('en')} (stage ${n + 1}${h >= 0 ? ' · HARD ' + (h + 1) : ''}) → cut ×${f.toFixed(3)}`).run(); } catch (e) {}
+  return team.map(u => ({...u, hp:Math.max(1, Math.round(u.hp * f)), atk:Math.max(1, Math.round(u.atk * f)), def:Math.round(u.def * f), pw:Math.round((u.pw || 0) * f)}));
+}
 const pubTeam = t => (t || []).map(u => ({id:u.id, n:u.n, gr:u.gr, s:u.s, role:u.role, hp:Math.round(u.hp)}));
 const viewTeam = t => (t || []).map(u => ({id:u.id, n:u.n, gr:u.gr, s:u.s, role:u.role, hp:Math.round(u.hp), atk:Math.round(u.atk), def:Math.round(u.def), as:u.as, crit:u.crit, pw:u.pw | 0, lv:u.lv | 0, a:u.a | 0, eq:u.eq || []}));   // v16-176: full hero card on the profile
 function ccOf(lang) {
@@ -412,7 +430,7 @@ async function replay(env, id) {
 // Your full train (grade COMMON…MYTHIC, rolled in the game from the Car Wash / Gas Station / Car Factory levels) is SENT: 30 min on the way.
 // Other players on the same server may attack it (the fight = arena simulation vs. your battle team, decided HERE). A won attack steals 20 %
 // of what is still on the train; a train can be robbed at most 2 times. Per day (UTC): 3 trains sent, 5 attacks. The tokens are Street Tokens.
-const RW_SEND = 3, RW_ATK = 5, RW_TRIP = 30 * 60e3, RW_HITS = 2, RW_STEAL = .2, RW_MAXTOK = 20000;
+const RW_SEND = 3, RW_ATK = 5, RW_TRIP = 30 * 60e3, RW_HITS = 2, RW_STEAL = .2, RW_MAXTOK = 20000, RW_CARS = 10, RW_MYTH = 2;   // v16-330: 10 cars = Rail Terminal LV4 (RART in index.html)
 // v16-155 RAIL PASS (Marius 22 nov 2026, 4.99 €/month, rail_pass_monthly): +1 train a day, +2 attacks a day, a robbed train loses only half
 const RP = p => !!p && (+p.rp || 0) > Date.now();
 const rwSendMax = p => RW_SEND + (RP(p) ? 1 : 0), rwAtkMax = p => RW_ATK + (RP(p) ? 2 : 0);
@@ -434,7 +452,12 @@ async function railWars(env, p, op, b) {
   const db = env.DB, now = Date.now();
   if (op === 'rw') return rwView(env, p, now);
   if (op === 'rwsend') {
-    const g = b.g | 0, tok = b.tok | 0, cars = b.cars | 0; if (g < 0 || g > 5 || tok < 1 || tok > RW_MAXTOK || cars < 1 || cars > 20) return {err:'bad'};
+    let g = b.g | 0, tok = b.tok | 0; const cars = b.cars | 0; if (g < 0 || g > 5 || tok < 1 || tok > RW_MAXTOK || cars < 1 || cars > RW_CARS) return {err:'bad'};
+    // v16-330 ANTI-HACK: the coins can be at most what this grade and these cars give in the game (RW_TOK × cars / 4, ×1.3 Rail Pass);
+    // max RW_MYTH Mythic trains a day (the best legal chance is ~16 % with 2 refreshes) → more = sent as Legendary + an event for /admin
+    let down = 0; if (g === 5 && !isTst(p.pid) && (await db.prepare('SELECT COUNT(*) n FROM rwtrain WHERE uid=? AND g=5 AND t0>?').bind(p.uid, now - DAY).first()).n >= RW_MYTH) {
+      g = 4; down = 1; try { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, 'rwcap', 'Rail Wars: more than ' + RW_MYTH + ' MYTHIC trains in 24 h → sent as LEGENDARY').run(); } catch (e) {} }
+    const tmax = Math.ceil(RW_TOK_B[g] * cars / 4 * 1.3) + 1; if (tok > tmax) { if (!isTst(p.pid) && !down) try { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, 'rwcap', `Rail Wars: ${tok} coins asked, max ${tmax} (grade ${g}, ${cars} cars)`).run(); } catch (e) {} tok = tmax; }
     const d = await rwDayRow(env, p, now); if (d.s >= rwSendMax(p)) return {err:'no_sends'};
     if ((await db.prepare('SELECT COUNT(*) n FROM rwtrain WHERE uid=? AND done=0 AND t1>?').bind(p.uid, now).first()).n >= rwSendMax(p)) return {err:'no_sends'};
     await db.prepare('UPDATE rwday SET s=s+1 WHERE uid=?').bind(p.uid).run();
@@ -740,8 +763,8 @@ export async function online(op, b, env) {
   }
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
-    const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, team = cleanTeam(b.team), lang = String(b.lang || 'en').slice(0, 12);
-    const best = num(s.best, 0, 3000) | 0, vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 1400) | 0, pw = teamPow(team);   // v16-129: garage levels go to 100 (14 buildings → 1400)
+    const srv = Math.max(1, Math.min(99, b.srv | 0 || 1)), s = b.s || {}, best = num((b.s || {}).best, 0, 3000) | 0, team = await capTeam(env, b.pid, cleanTeam(b.team), best), lang = String(b.lang || 'en').slice(0, 12);
+    const vip = vipLvOf(await db.prepare('SELECT vip FROM players WHERE pid=?').bind(b.pid).first().then(r => r && r.vip, () => 0)), rep = num(s.rep, 0, 30) | 0, lv = num(s.lv, 0, 1400) | 0, pw = teamPow(team);   // v16-129: garage levels go to 100 (14 buildings → 1400)
     const cl = Array.isArray(b.unl) ? b.unl : [];
     // v16-122: FOUNDER only with a purchase Google confirmed (purchases table) – the test account (tst_…) may claim it
     const fdr = cl.includes('fdr') && (String(b.pid).startsWith('tst_') || !!(await db.prepare("SELECT 1 FROM purchases WHERE sku='founder_pass' AND state='ok' AND pid IN (" + [b.pid, ...(Array.isArray(b.pids) ? b.pids : [])].slice(0, 6).map(() => '?').join(',') + ") LIMIT 1").bind(b.pid, ...(Array.isArray(b.pids) ? b.pids : []).slice(0, 5).map(String)).first()));
@@ -871,10 +894,16 @@ export async function online(op, b, env) {
   }
   if (op === 'gpsc' || op === 'gprank' || op === 'gpfin') {   // v16-185 TORQUE GRAND PRIX
     if (!p) return {err:'noprof'}; const gpE = await gpEnd(env, p.srv); if (!gpT0(p.srv) || now < gpT0(p.srv) || now > gpE + HOUR) return {err:'over'};
-    if (op !== 'gprank') { if (await isBanned(env, b.pid)) return {banned:1}; const sc = Math.round(num(b.sc, 0, GP_CAP));
+    if (op !== 'gprank') { if (await isBanned(env, b.pid)) return {banned:1}; let sc = Math.round(num(b.sc, 0, GP_CAP));
+      // v16-330 ANTI-HACK: never more points than ALL missions open until now give (daily 1510/day + weekly 9300/week + event missions by week)
+      const gmax = gpMaxPts(now - gpT0(p.srv)); if (sc > gmax && !isTst(p.pid)) { if (!(await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='gpcap' AND t>?").bind(p.pid, now - DAY).first()))
+        await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, 'gpcap', `Grand Prix: ${sc} points sent, max possible now ${gmax}`).run(); sc = gmax; }
       await db.prepare('INSERT INTO gpx(uid,srv,sc,t) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET srv=excluded.srv, t=CASE WHEN excluded.sc>gpx.sc THEN excluded.t ELSE gpx.t END, sc=MAX(gpx.sc, excluded.sc)').bind(p.uid, p.srv, sc, now).run(); }
     const me = await db.prepare('SELECT sc, t, fin FROM gpx WHERE uid=?').bind(p.uid).first();
     if (op === 'gpfin') { if (!me || me.sc < GP_FINPTS || now < gpT0(p.srv) + GP_FINAL) return {err:'bad'}; if (me.fin) return {ok:true, pos:me.fin};
+      // v16-330: the CHAMPION missions ask campaign stage 250 → the battle receipts on the server must show it (a hacked score alone is not enough)
+      if (!isTst(p.pid)) { let st = 0; try { const r = await db.prepare('SELECT MAX(si) m FROM rcpt WHERE pid=? AND h=0').bind(p.pid).first(); st = r && r.m != null ? (r.m | 0) + 1 : 0; } catch (e) { st = 999; }
+        if (st < 250) { await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, 'gpcap', `Grand Prix FINISH refused: battle receipts show stage ${st} (< 250)`).run(); return {ok:true, pos:-2}; } }
       // v16-228 Torque Guard checks the player BEFORE he gets a Top 10 place: banned / hidden (shadow) / under check (score ≥ 50) / test account → no place
       const pl = await db.prepare('SELECT banned, shadow, score FROM players WHERE pid=?').bind(p.pid).first();
       if (isTst(p.pid) || (pl && (pl.banned || pl.shadow || (pl.score | 0) >= 50))) return {ok:true, pos:-2};
@@ -895,7 +924,11 @@ export async function online(op, b, env) {
   if (op === 'evsc' || op === 'evrank') {   // v16-99 TIME EVENTS
     if (!p) return {err:'noprof'}; const eid = String(b.eid || ''), m = /^([AB])(\d{1,6})$/.exec(eid); if (!m) return {err:'bad'};
     const tr = m[1], i = +m[2], k = evKind(tr, i), ci = evIdx(now); if (i !== ci && !(i === ci - 1 && now - (EV_E0 + ci * EV_DUR) < HOUR)) return {err:'over'};
-    if (op === 'evsc') { if (await isBanned(env, b.pid)) return {banned:1}; const sc = Math.round(num(b.sc, 0, EV_CAP[k]));
+    if (op === 'evsc') { if (await isBanned(env, b.pid)) return {banned:1}; let sc = Math.round(num(b.sc, 0, EV_CAP[k]));
+      // v16-330 ANTI-HACK: max EV_RATE[k] per hour since the event started (very generous for whales; a hacked score cannot jump to the cap)
+      const ev0 = EV_E0 + i * EV_DUR, emax = EV_RATE[k] ? Math.round(EV_RATE[k] * Math.max(1, (now - ev0) / HOUR)) : 0;
+      if (emax && sc > emax && !isTst(b.pid)) { if (!(await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='evcap' AND t>?").bind(b.pid, now - DAY).first()))
+        await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'evcap', `Event ${k}: score ${sc} sent, max possible now ${emax}`).run(); sc = emax; }
       await db.prepare('INSERT INTO evt(uid,eid,srv,sc,t) VALUES(?,?,?,?,?) ON CONFLICT(uid,eid) DO UPDATE SET srv=excluded.srv, t=CASE WHEN excluded.sc>evt.sc THEN excluded.t ELSE evt.t END, sc=MAX(evt.sc, excluded.sc)').bind(p.uid, eid, p.srv, sc, now).run(); }
     const me = await db.prepare('SELECT sc, t FROM evt WHERE uid=? AND eid=?').bind(p.uid, eid).first();
     const rank = me ? (await db.prepare('SELECT COUNT(*) n FROM evt WHERE eid=? AND srv=? AND (sc>? OR (sc=? AND t<?))').bind(eid, p.srv, me.sc, me.sc, me.t).first()).n + 1 : 0;
