@@ -1432,10 +1432,9 @@ function drawHero(g,u,t){
   g.globalAlpha=alpha*.95*GA;g.fillStyle='rgba(0,0,0,.35)';ell(g,0,0,17,5);
   if(!u.dead){g.strokeStyle=L.gc;g.globalAlpha=GA*alpha*(.55+.25*Math.sin(t*4+u.k));g.lineWidth=2;g.beginPath();g.ellipse(0,0,18,5.5,0,0,TAU);g.stroke();}
   g.globalAlpha=alpha*GA;
-  if(u.shield>0){g.fillStyle='rgba(120,200,255,.18)';ell(g,0,-30,30,36);g.strokeStyle='rgba(160,220,255,.7)';g.lineWidth=1.5;g.beginPath();g.ellipse(0,-30,30,36,0,0,TAU);g.stroke();}
+  // v16-shbar (25 nov, Marius): no more shield bubble around the hero – the SHIELD BAR above the HP bar shows it
   if(sprOK(u.spr)){drawSprHero(g,u,t,u.spr,alpha);g.restore();return;}
   g.scale(u.face,1);g.translate(0,by);if(rot){g.translate(-8,0);g.rotate(rot);g.translate(8,0);}g.rotate(lean);
-  if(u.buff>0&&!u.dead){g.fillStyle='rgba(255,170,0,.22)';ell(g,0,-30,22,34);}
   if(u.h.gr===5&&!u.h.crew&&!u.dead){for(let k=0;k<5;k++){const x=-12+k*6,hh=18+Math.sin(t*9+k*1.7)*7;g.fillStyle=k%2?'rgba(255,120,0,.45)':'rgba(255,214,0,.4)';g.beginPath();g.moveTo(x-5,-8);g.quadraticCurveTo(x,-8-hh,x+5,-8);g.fill();}}
   const dark=hexC(L.suit,-.25),boot='#2b1d14';
   const leg=(a,c)=>{g.save();g.translate(0,-19);g.rotate(a);g.fillStyle=c;rr(g,-4,0,8,15,3);g.fill();g.fillStyle=boot;rr(g,-4,13,12,6,3);g.fill();g.restore();};
@@ -1983,7 +1982,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(src.hero&&!(src.enLock>0))src.en=Math.min(100,src.en+(o.skill?0:11*src.eg)); // v16-98: no charge for 3 s after an ultimate
   if(tgt.hp<=0&&tgt.hero&&tgt.tl&&tgt.h.id==='m5_2'&&!tgt.phx){tgt.phx=1;tgt.hp=Math.round(tgt.max*TV(tgt));tgt.st='idle';talTxt(tgt,'REBIRTH FLAME!');if(!B.sim)B.fx.push({type:'ring',x:tgt.x,y:fy(tgt.d),t:0,d:.6,r:70*S,col:'#ff5252',ground:1});}
   else if(tgt.hp<=0){kill(tgt);const ad=pv(src,'tuning',0);if(ad&&!tgt.hero){src.aspdK=Math.max(src.aspd>0?(src.aspdK||0):0,ad/100);src.aspd=Math.max(src.aspd,4);pasTxt(src,0);}}
-  else if(tgt.hero){const ls=pv(tgt,'engine',1);if(ls&&!tgt.ls&&tgt.hp<tgt.max*.35){tgt.ls=1;tgt.shield=Math.max(tgt.shield,tgt.max*ls/100);tgt.taunt=Math.max(tgt.taunt,3);pasTxt(tgt,1,'LAST STAND!');if(!B.sim)B.fx.push({type:'ring',x:tgt.x,y:fy(tgt.d),t:0,d:.5,r:60*S,col:'#ffd54a',ground:1});}
+  else if(tgt.hero){const ls=pv(tgt,'engine',1);if(ls&&!tgt.ls&&tgt.hp<tgt.max*.35){tgt.ls=1;tgt.shield=Math.max(tgt.shield,tgt.max*ls/100);tgt.taunt=Math.max(tgt.taunt,3);pasTxt(tgt,1,'LAST STAND!');}
     if(tgt.hp<tgt.max*.3)for(const h of B.heroes){const ek=pv(h,'service',1);if(ek&&!h.dead&&h.ekCd<=0){h.ekCd=15;heal(tgt,tgt.max*ek/100);pasTxt(h,1);if(!B.sim)B.fx.push({type:'plus',u:tgt,t:0,d:.7});break;}}}
   return a;}
 function heal(u,amt){if(B.hk>1&&u.hero)amt*=B.hk;if(u.dead||(B.mod==='noheal'&&u.hero))return;const a=Math.round(Math.min(amt,u.max-u.hp));u.hp+=a;if(a>0)num(u.x,headY(u),'+'+a,'#69f0ae');}
@@ -2072,7 +2071,7 @@ const WIDE8={m5_0:'img/fx/wide_m5_0.webp',m5_1:'img/fx/wide_m5_1.webp',m5_2:'img
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
 // v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
 const ALLY8={m5_0:'img/fx/ally_m5_0.webp',m5_1:'img/fx/ally_m5_1.webp',m5_2:'img/fx/ally_m5_2.webp',m5_2r:'img/fx/ally_m5_2r.webp'},ALLYI={};function allyImg(id){if(!ALLY8[id])return null;let i=ALLYI[id];if(!i){i=ALLYI[id]=new Image();i.decoding='async';i.src=ALLY8[id];}return i;}
-function allyFx(id,hs,d){const im=allyImg(id);if(!im||!im.naturalWidth)return false;let k=0;for(const h of (hs||alive(B.heroes)))B.fx.push({type:'ally8',t:-(k++)*.06,d:d||1.3,im,u:h});return true;}
+function allyFx(id,hs,d){return false; /* v16-314 (25 nov, Marius): no more Mythic effects on teammates (BUFF / HEAL / REVIVE) – too many effects on the map; the ultimates stay */const im=allyImg(id);if(!im||!im.naturalWidth)return false;let k=0;for(const h of (hs||alive(B.heroes)))B.fx.push({type:'ally8',t:-(k++)*.06,d:d||1.3,im,u:h});return true;}
 function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
 function pushWide(u,ta,o){if(!WD(u))return false;B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
 // v16-ready (24 nov, Marius): ULTIMATE READY – looping ground aura (16 frames, 4x4) under a Mythic while his ultimate is charged;
@@ -2170,7 +2169,7 @@ const SKF={
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ffca28',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ffb300',R);debris(c.x,fy(c.d),8,['#6d4c41','#ffca28','#9e9e9e']);}}
      if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);if(!f8)B.fx.push({type:'ring',x:u.x,y:fy(u.d),t:0,d:.6,r:70*S,col:'#ffca28',ground:1});}
      // v16-256: every hero with Goliath's shield carries a small copy of HIS shield picture (fxs frame 3) while the shield lasts
-     for(const h of alive(B.heroes)){if(h!==u)h.shield=Math.max(h.shield,h.max*.25);if(f8)B.fx.push({type:'sh8',u:h,sp:u.spr,c:2,t:0,d:6});else if(FX2&&h!==u)fxs('magic_02','#ffd54f',h.x,fy(h.d),{ground:1,d:.9,s0:20*S,s1:80*S,sy:.34,vr:2.5,ease:1});}
+     for(const h of alive(B.heroes)){if(h!==u)h.shield=Math.max(h.shield,h.max*.25);} // v16-shbar: no small shield copy / glow on every hero – the shield bar shows it
      teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
  m5_4(u){ // v16-141: Nova's STARFIRE RAIN – the arrow rain (fxs) falls on the biggest group; impact = fxs frame 5 = end of her shot up (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
@@ -2198,7 +2197,7 @@ const SKF={
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(12);B.flash=.35;
      for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ff9100',40*S);}
      if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff9100',110*S);}
-     const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);if(allyImg('m5_2r')&&allyImg('m5_2r').naturalWidth){d.rvFx=1;allyFx('m5_2r',[d],1.7);}else if(f8)B.fx.push({type:'sheet8',t:-.1,d:.96,sp:u.spr,x:d.x,dd:d.d});else B.fx.push({type:'ring',x:d.x,y:fy(d.d),t:0,d:.6,r:60*S,col:'#ff9100',ground:1});}}
+     const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);/* v16-314: only REBORN! – no extra effect on the revived hero */}}
      allyFx('m5_2',alive(B.heroes).filter(h=>!h.rvFx),1.5);for(const h of B.heroes)h.rvFx=0;
      for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
@@ -2431,7 +2430,7 @@ function fxUpdate(f,dt){
   else if(f.type==='coil'){f.tick+=dt;if(f.tick>=.4){f.tick=0;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],y0=fy(f.dd)-70*dsc(f.dd),y=headY(m)+22*dsc(m.d);
       B.fx.push({type:'bolt',x0:f.x,y0,x1:m.x,y1:y,t:0,d:.22,col:'#e040fb'});damage(f.src,m,.8,{skill:1});m.stun=Math.max(m.stun,.5);sparks(m.x,y,6,'#ea80fc');if(FX2&&!FV8(f.src))fxBolt(f.x,y0,m.x,y,'#e040fb',40);}}}
   else if(f.type==='imgfx'&&f.u&&!f.u.dead){f.x=f.u.x;f.y=headY(f.u)-8*S;}
-  else if(f.type==='plus'&&f.t<dt*1.5&&f.txt)num(f.u.x,headY(f.u)-14,f.txt,f.col||'#69f0ae');
+  // v16-shbar: team buffs no longer write 'ATK+30%' over every hero
 }
 
 // ---------------------------------------------------------------- landscape (painted once per battle)
@@ -2644,7 +2643,7 @@ function drawFx(t){
       g.fillStyle='#ffffff';g.fillRect(x-2,FY0-140,3,FY1-FY0+160);g.globalAlpha=.6;g.strokeStyle=SC;g.lineWidth=1;for(let y=FY0-130;y<FY1+20;y+=12){g.beginPath();g.moveTo(x-40,y);g.lineTo(x,y);g.stroke();}}
     else if(f.type==='oil'){const u=f.u;if(!u.dead){const [x,y]=sxy(u);for(let i=0;i<6;i++){const p=(k*1.4+i*.17)%1;g.globalAlpha=1-p;g.fillStyle=i%2?'#69f0ae':'#b9f6ca';circ(g,x+Math.sin(i*2.1)*14,y-90*dsc(u.d)+p*70*dsc(u.d),2.5);}
       g.globalAlpha=(1-k)*.5;g.fillStyle='#69f0ae';ell(g,x,y,26,7);}}
-    else if(f.type==='plus'){const u=f.u;const [x,y]=sxy(u);g.globalAlpha=1-k;g.fillStyle=f.col||'#69f0ae';g.font='900 14px Game,system-ui';g.textAlign='center';g.fillText('✚',x+8,y-70*dsc(u.d)-k*20);}
+    else if(f.type==='plus'){f.t=f.d;} // v16-shbar: no ✚ over the heroes
     else if(f.type==='ally8'){const h=f.u,im=f.im;if(h&&!h.dead&&im&&im.naturalWidth){const fw=im.naturalWidth/4,fh=im.naturalHeight/2,w=118*S*dsc(h.d),hh=w*fh/fw,q=Math.min(7.999,k*8),c=Math.floor(q),fr=q-c,x=h.x-w/2,y=fy(h.d)-(h.lift||0)-hh*(1-90/512);
       g.globalAlpha=c<7?1-fr*fr:1;g.drawImage(im,(c%4)*fw,Math.floor(c/4)*fh,fw,fh,x,y,w,hh);if(c<7&&fr>0){g.globalAlpha=Math.min(1,fr*1.6);g.drawImage(im,((c+1)%4)*fw,Math.floor((c+1)/4)*fh,fw,fh,x,y,w,hh);}}}
     else if(f.type==='wide8'&&f.beam){const im=f.im,u=f.u;if(im&&im.naturalWidth&&u){const N=wN(im),IP=N>8?(WIDEIP[u.h.id]||4):4,[bx,by]=muzzle(u,40,40),fw=im.naturalWidth,fh=im.naturalHeight/N,w=Math.max(60*S,W+30*S-bx),h=w*fh/fw*1.15,
@@ -2719,7 +2718,7 @@ function drawNums(){g.textAlign='center';g.lineJoin='round';for(const n of B.num
   if(n.dv!=null){const T=TE(),v=n.dv>=1e6?Math.floor(n.dv/1e6)+'M':n.dv>=1e5?Math.floor(n.dv/1e3)+'K':String(n.dv),hh=(n.crit?21:15)*s*S;if(T.numDraw&&T.numDraw(g,v,'dmg',n.x,y,hh,'center')){if(n.crit)T.numDraw(g,'C','dmg',n.x,y-hh*.95,hh*.8,'center');continue;}}
   g.font='900 '+Math.round((n.big?17:13)*s*S)+'px Game,system-ui';g.lineWidth=3.5;g.strokeStyle='rgba(0,0,0,.85)';g.strokeText(n.txt,n.x,y);g.fillStyle=n.col;g.fillText(n.txt,n.x,y);}g.globalAlpha=1;}
 // v16-14: little status icons above the HP bar (buffs on mechanics, debuffs on monsters) – they blink in the last second
-const STI_H=[['buff','atk','#ff7043'],['aspd','aspd','#ffca28'],['critB','crit','#ff4081'],['defB','helm','#42a5f5'],['shield','shield','#90caf9'],['hot','heart','#66bb6a'],['taunt','horns','#e53935']];
+const STI_H=[['buff','atk','#ff7043'],['aspd','aspd','#ffca28'],['critB','crit','#ff4081'],['defB','helm','#42a5f5'],['hot','heart','#66bb6a'],['taunt','horns','#e53935']];
 const STI_M=[['ice','snow','#80d8ff'],['stun','star','#fdd835'],['burn','flame','#ff6d00'],['slow','clock','#ba68c8'],['mark','scan','#26c6da'],['weak','skull','#9e9e9e']];
 function statusIcons(u,x,y){const L=[];for(const [f,ic,col] of u.hero?STI_H:STI_M){const v=u[f]||0;if(v<=0)continue;if(f==='stun'&&u.ice>0)continue;
     const left=f==='shield'?9:v;L.push([ic,col,left]);}
@@ -2731,9 +2730,9 @@ function iceOverlay(u){const y=fy(u.d),hh=(u.H||40)*dsc(u.d)*1.1,w=Math.max(22,h
   g.globalAlpha=.8*Math.min(1,u.ice*2);g.strokeStyle='#e1f5fe';g.lineWidth=1.5;g.stroke();g.restore();}
 function bars(u){if(u.dead)return;const x=u.x,y=headY(u)-6,w=(u.boss?0:u.hero?34:28)*S;
   if(!u.hero&&u.ice>0)iceOverlay(u);
-  statusIcons(u,x,w?y-3*S:y+10*S);if(!w)return;
+  const shb=w&&u.shield>0;statusIcons(u,x,w?y-(shb?8:3)*S:y+10*S);if(!w)return;
   g.fillStyle='rgba(0,0,0,.65)';rr(g,x-w/2-1,y-1,w+2,6,3);g.fill();g.fillStyle=u.hero?'#66bb6a':'#ef5350';rr(g,x-w/2,y,w*Math.max(0,u.hp/u.max),4,2);g.fill();
-  if(u.shield>0){g.fillStyle='#90caf9';g.fillRect(x-w/2,y,w*Math.min(1,u.shield/u.max),1.6);}
+  if(shb){const sw=w*Math.min(1,u.shield/u.max),sy=y-6;g.fillStyle='rgba(0,0,0,.7)';rr(g,x-w/2-1,sy-1,w+2,6,3);g.fill();g.fillStyle='#4fc3f7';rr(g,x-w/2,sy,sw,4,2);g.fill();g.fillStyle='#e1f5fe';g.fillRect(x-w/2+1,sy+.6,Math.max(0,sw-2),1.2);} // v16-shbar (25 nov, Marius): SHIELD BAR above the HP bar – light blue, shrinks as the shield is hit
   if(u.hero){g.fillStyle='rgba(0,0,0,.6)';g.fillRect(x-w/2,y+5,w,2.4);g.fillStyle=u.en>=100?'#ffd54a':'#ffb300aa';g.fillRect(x-w/2,y+5,w*u.en/100,2.4);
 }}
 
