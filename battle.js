@@ -791,13 +791,19 @@ const ACTS=[null,
  {n:'Apex',bio:{h:-55,s:1.2,l:.9},mh:-70,ms:1.3,nw:NW12},
  {n:'Eclipse',bio:{h:200,s:.8,l:.5,night:1,moon:1},mh:205,ms:1.2,mb:.9,nw:NW12},
  {n:'Chaos',bio:{h:-90,s:1.3,l:.75,rain:1,fires:1},mh:290,ms:1.45,nw:NW12},
- {n:'Legend',bio:{h:40,s:1.35,l:.95,fires:1},mh:48,ms:1.55,mb:1.15,nw:NW12}];
+ {n:'Legend',bio:{h:40,s:1.35,l:.95,fires:1},mh:48,ms:1.55,mb:1.15,nw:NW12},
+ // v16-312 (Marius 25 nov: 'bagă 100 de capitole', 30 stages each → 3000 per mode): acts 16-20 – the end stays unbeatable for now
+ {n:'Titan',bio:{h:-20,s:1.05,l:.8,fires:1},mh:15,ms:1.6,mb:1.05,nw:NW12},
+ {n:'Phantom',bio:{h:250,s:.6,l:.5,night:1,moon:1},mh:265,ms:.7,mb:.9,nw:NW12},
+ {n:'Inferno',bio:{h:-35,s:1.4,l:.7,fires:1,lava:1},mh:-15,ms:1.7,nw:NW12},
+ {n:'Celestial',bio:{h:185,s:1.2,l:1.05,snow:1},mh:190,ms:1.3,mb:1.15,nw:NW12},
+ {n:'Doom',bio:{h:-60,s:1.3,l:.55,night:1,fires:1,rain:1},mh:300,ms:1.8,mb:.95,nw:NW12}];
 const CH_NAMES=[
- ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss','Apex Scrap Peaks','Eclipse Junkyard','Chaos Scrapstorm','Legend Scrap Throne'],
- ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss','Apex Acid Towers','Eclipse Refinery','Chaos Chem Storm','Legend Oil Kingdom'],
- ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress','Nemesis Ice Abyss','Apex Glacier','Eclipse Frost Hollow','Chaos Blizzard','Legend Ice Throne'],
- ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway','Nemesis Night Circuit','Apex Speedway','Eclipse Boulevard','Chaos Raceway','Legend Grand Prix'],
- ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno','Nemesis Core','Apex Caldera','Eclipse Forge','Chaos Inferno','Legend Core']];
+ ['Scrapyard Wastes','Rustfall Canyon','Storm Junkyard','Crimson Scrapheap','Midnight Wreckyard','Venom Dump','Frostbite Salvage','Golden Junkpile','Void Graveyard','Omega Scrap Throne','Nemesis Scrap Abyss','Apex Scrap Peaks','Eclipse Junkyard','Chaos Scrapstorm','Legend Scrap Throne','Titan Scrap Fortress','Phantom Scrapyard','Inferno Scrap Pits','Celestial Scrapfield','Doom Scrap Throne'],
+ ['Toxic Refinery','Dusk Oil Fields','Storm Refinery','Blood Oil Swamp','Midnight Chem Works','Venom Lagoon','Frozen Pipeline','Golden Oil Rigs','Void Reactor','Omega Refinery','Nemesis Chem Abyss','Apex Acid Towers','Eclipse Refinery','Chaos Chem Storm','Legend Oil Kingdom','Titan Refinery','Phantom Chem Works','Inferno Oil Lakes','Celestial Refinery','Doom Chem Kingdom'],
+ ['Frozen Pass','Dusk Glacier','Blizzard Peaks','Crimson Tundra','Midnight Icefields','Venom Snowfields','Frostbite Summit','Golden Ice Caves','Void Iceberg','Omega Ice Fortress','Nemesis Ice Abyss','Apex Glacier','Eclipse Frost Hollow','Chaos Blizzard','Legend Ice Throne','Titan Glacier','Phantom Ice Caves','Inferno Frost Rift','Celestial Ice Peaks','Doom Ice Throne'],
+ ['Neon Highway','Sunset Boulevard','Storm Speedway','Crimson Strip','Midnight Expressway','Venom City','Frostbite Freeway','Golden Grand Prix','Void Overpass','Omega Raceway','Nemesis Night Circuit','Apex Speedway','Eclipse Boulevard','Chaos Raceway','Legend Grand Prix','Titan Speedway','Phantom Highway','Inferno Raceway','Celestial Circuit','Doom Grand Prix'],
+ ['Volcano Forge','Dusk Caldera','Thunder Volcano','Crimson Magma Pits','Midnight Forge','Venom Crater','Frostfire Mountain','Golden Foundry','Void Core','Omega Inferno','Nemesis Core','Apex Caldera','Eclipse Forge','Chaos Inferno','Legend Core','Titan Forge','Phantom Caldera','Inferno Core','Celestial Forge','Doom Core']];
 const CH_COL=['#ff8f00','#76ff03','#80d8ff','#ff4fd8','#ff3d00'];
 function colX(c,m){// hue / saturation / lightness change of '#rrggbb' or 'rgba(...)'
   let r,g2,b,a=null,mm;if(c[0]==='#'){r=parseInt(c.substr(1,2),16);g2=parseInt(c.substr(3,2),16);b=parseInt(c.substr(5,2),16);}
@@ -3577,7 +3583,7 @@ function gsHist(){const T=TE(),g=GSD();popW('SUMMON HISTORY','<div class="wS">La
 // 300 floors · one fight per floor · FIXED rewards (first clear only, nothing random) · boss every 10 floors (mini-boss X10, big boss X20)
 // most floors have a modifier · monsters are picked (seeded = always the same per floor) from all of Marius' monsters.
 // Strength: floor f fights like campaign stage ≈ 3 + 3.2·f (floor 300 ≈ stage 50-15). Saved in G.tw = {b: floors cleared}.
-const TW_N=500,TW_UNLOCK=10; // v16-161 (Marius 22 nov): 300 → 500 floors (floor 500 ≈ campaign stage 1500)
+const TW_N=1000,TW_UNLOCK=10,TW_UP=1.0065; // v16-161 (Marius 22 nov): 300 → 500 floors (floor 500 ≈ campaign stage 1500) · v16-312 (Marius 25 nov): 1000 floors – 501-1000 = floor 500 ×1.0065 per floor (×25 at 1000, unbeatable for now), rewards stay at the floor-500 level
 const TW_REG=['imp','tire','snake','drone','spider','brute','battery','canister','wiper','hubcap','horn','turbo','gearbox','bat','wraith','brake','airbag','hopper','crab','scorp','goblin','moth'];
 const TW_MINI=['crusher','sludge','frost','neonc','magma'],TW_BOSS=['titan','tanker','plow','wyrm','omega'];
 const TW_MOD=[
@@ -3598,13 +3604,13 @@ function twFloor(f){const R=seeded(5003+f*97),pk=a=>a[Math.floor(R()*a.length)],
   else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];
   else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=5?-1:(boss||mini||R()<.6)?Math.floor(R()*6):-1;
-  const eq=Math.min(NST-1,Math.round(f<=300?3+f*3.2:963+(f-300)*2.68)); // v16-161: floors 1-300 unchanged, 301-500 climb to stage ~1499
-  const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*EGK(EG.tw,f,300,500); // v16-161: endgame ramp floors 300-500
+  const fe=Math.min(f,500),eq=Math.min(NST-1,Math.round(fe<=300?3+fe*3.2:963+(fe-300)*2.68)); // v16-161: floors 1-300 unchanged, 301-500 climb to stage ~1499 · v16-312: 501+ keep the stage of floor 500
+  const mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*EGK(EG.tw,fe,300,500)*(f>500?Math.pow(TW_UP,f-500):1); // v16-161: endgame ramp floors 300-500
   return {f,w,mod,eq,mul,boss,mini,st:{n:'FLOOR '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
 const EGI=r=>{const T=TE(),a=[];if(r.ess)a.push(T.ESI+' '+T.nf(r.ess));if(r.gp)a.push(T.GPI+' '+T.nf(r.gp));if(r.pk&&T.PKI)for(const k in r.pk)a.push(T.PKI(k)+' '+T.nf(r.pk[k]));return a;}; // v16-99
 const giveEG=r=>{const G=TE().G;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk&&TE().pkAdd)for(const k in r.pk)TE().pkAdd(k,r.pk[k]);}; // v16-129: + garage parts
-function twRew(f){const F=twFloor(f),r={money:REWARD(F.eq).money,dm:5+2*Math.floor(f/100),tk:0,gtk:0,ct:0}; // v16-161 (Marius): every reward grows with the floor
-  if(f%5===0)r.tk=2+Math.floor(f/150);if(f%10===0){r.dm=Math.round((100+f/5)/10)*10;r.gtk=3+Math.floor(f/150);r.ct=1+Math.floor(f/200);}if(f%50===0)r.dm+=400+f;const T=TE(),x=f%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_Ui(F.eq));r.gp=Math.round(x*T.GP_Ui(F.eq));r.pk={bk:Math.round((130+20*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit · v16-161: Essence / Gear Parts by the floor's stage (not yours)
+function twRew(f0){const F=twFloor(f0),f=Math.min(f0,500),r={money:REWARD(F.eq).money,dm:5+2*Math.floor(f/100),tk:0,gtk:0,ct:0}; // v16-312: floors 501-1000 pay like floor 500 (no bigger rewards) // v16-161 (Marius): every reward grows with the floor
+  if(f0%5===0)r.tk=2+Math.floor(f/150);if(f0%10===0){r.dm=Math.round((100+f/5)/10)*10;r.gtk=3+Math.floor(f/150);r.ct=1+Math.floor(f/200);}if(f0%50===0)r.dm+=f0>500?400:400+f;const T=TE(),x=f0%10===0?3:1;r.ess=Math.round(.8*x*T.ESS_Ui(F.eq));r.gp=Math.round(x*T.GP_Ui(F.eq));r.pk={bk:Math.round((130+20*f)*x)};return r;} // v16-129: Torque Tower → Builder Kit · v16-161: Essence / Gear Parts by the floor's stage (not yours)
 const twG=()=>{const G=TE().G;if(!G.tw)G.tw={b:0};return G.tw;};
 const twOK=()=>TE().G.cp.best>=TW_UNLOCK;
 const TWA={};function twArenaImg(){const k=B&&B.tw&&B.tw.wb?'wb':B&&B.tw&&B.tw.dg?'dg_'+B.tw.dg:'im';if(!TWA[k]){TWA[k]=new Image();TWA[k].decoding='async';TWA[k].src=k==='wb'?'img/wb/wb_arena.webp':k.startsWith('dg_')?'img/dg/bt_'+k.slice(3)+'.webp':'img/ui6/tw_arena.webp';}return TWA[k];}
@@ -3781,7 +3787,8 @@ function backToHub(){if(HUBS.from){HUBS.from=0;hubEl.classList.add('open');hubRe
 // only heroes of that class (+ Legend heroes) may fight. Each tower is open on 2 days a week, Sunday all are open.
 // FIXED rewards on the first clear (nothing random): 💎 + coins every floor, a SET PIECE of that class every 5th floor
 // (slot in a fixed order, grade Rare → Epic → Legendary → Mythic), 💎 + gear ticket every 10th. Saved in G.ct = {class: floors cleared}.
-const CT_K=['engine','tuning','inspect','service','paint','elec'],CT_N=500,CT_UNLOCK=20; // v16-161 (Marius 22 nov): 100 → 500 floors
+const CT_K=['engine','tuning','inspect','service','paint','elec'],CT_N=1000,CT_UNLOCK=20,CT_UP=1.0065; // v16-312 (Marius 25 nov): 1000 floors – 501+ ×1.0065 per floor, max MYTHIC set pieces
+ // v16-161 (Marius 22 nov): 100 → 500 floors
 const AR_UNLOCK=20,arOK=()=>TE().G.cp.best>=AR_UNLOCK; // v16-120: ARENA + TORQUE CUP open with the Class Towers (end of chapter 1) – new players are not thrown into PvP
 const CT_DAYS={engine:[1,4],tuning:[1,4],inspect:[2,5],service:[2,5],paint:[3,6],elec:[3,6]};
 const DAYN=['SUN','MON','TUE','WED','THU','FRI','SAT'],DAYL=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
@@ -3798,12 +3805,13 @@ function ctFloor(k,f){const ci=CT_K.indexOf(k),R=seeded(7001+ci*1009+f*97),pk=a=
   if(boss)w=[mk(n),[cl(TW_BOSS[(f/20-1+ci)%5])]];else if(mini)w=[mk(n),[cl(TW_MINI[((f-10)/20+ci)%5]),one(),one()]];
   else if(f%5===0)w=[mk(n),mk(n),mk(Math.min(5,n+1))];else w=[mk(n),mk(Math.min(5,n+(f%2)))];
   const mod=f<=10?-1:(boss||mini||R()<.4)?Math.floor(R()*6):-1;
-  const eq=Math.min(NST-1,Math.round(f<=100?2+f*2.4:242+(f-100)*3.14)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85*EGK(EG.ct,f,300,500); // v16-161: endgame ramp floors 300-500
+  const fe=Math.min(f,500),eq=Math.min(NST-1,Math.round(fe<=100?2+fe*2.4:242+(fe-100)*3.14)),mul=stageMul0(eq)*(boss?.78:mini?.9:1)*(mod>=0?.92:1)*.85*EGK(EG.ct,fe,300,500)*(f>500?Math.pow(CT_UP,f-500):1); // v16-161: endgame ramp floors 300-500
  
   return {f,ct:k,w,mod,eq,mul,boss,mini,st:{n:ROLE[k].n.toUpperCase()+' '+f+(mod>=0?' · '+TW_MOD[mod].n:''),bio:18,w,boss,mini}};}
-const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:f<=300?5:6;const ctSetF=f=>f<=100?f%5===0:f<=300?f%20===0:f>=350&&(f-350)%30===0; // v16-161 (Marius): 101-300 a MYTHIC set piece every 20 floors (10) · 350, 380 … 500 = the 6 pieces of an ASCENDED set
-const ctSlot=f=>f<=100?f/5-1:f<=300?(f-100)/20-1:(f-350)/30;
-function ctRew(k,f){const F=ctFloor(k,f),r={money:Math.round(REWARD(F.eq).money*.5/10)*10,dm:3+Math.floor(f/100),gtk:0,set:null}; // v16-161 (Marius): every reward grows with the floor
+const CT_GR=f=>f<=30?2:f<=60?3:f<=90?4:f<=300||f>500?5:6;const ctSetF=f=>f<=100?f%5===0:f<=300?f%20===0:f<=500?f>=350&&(f-350)%30===0:f%50===0; // v16-312: 501-1000 = a MYTHIC set piece every 50th floor (never Ascended) // v16-161 (Marius): 101-300 a MYTHIC set piece every 20 floors (10) · 350, 380 … 500 = the 6 pieces of an ASCENDED set
+const ctSlot=f=>f<=100?f/5-1:f<=300?(f-100)/20-1:f<=500?(f-350)/30:(f-500)/50-1;
+function ctRew(k,f0){const F=ctFloor(k,f0),f=Math.min(f0,500),r={money:Math.round(REWARD(F.eq).money*.5/10)*10,dm:3+Math.floor(f/100),gtk:0,set:null}; // v16-312: 501-1000 pay like floor 500
+  if(f0>500){if(ctSetF(f0))r.set={s:GSLOT[ctSlot(f0)%6].k,r:CT_GR(f0)};if(f0%10===0){r.dm=Math.round((50+f/10)/5)*5;r.gtk=1+Math.floor(f/200);}const T=TE();r.ess=Math.round(.5*T.ESS_Ui(F.eq));r.gp=Math.round(.6*T.GP_Ui(F.eq));r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f0%10===0?2:1))};return r;} // v16-161 (Marius): every reward grows with the floor
   if(ctSetF(f))r.set={s:GSLOT[ctSlot(f)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=Math.round((50+f/10)/5)*5;r.gtk=1+Math.floor(f/200);}if(f%50===0)r.dm+=200+Math.round(f/2);const T=TE(),x=f>100&&f%5===0&&!ctSetF(f)?2:1;r.ess=Math.round(.5*x*T.ESS_Ui(F.eq));r.gp=Math.round(.6*x*T.GP_Ui(F.eq));r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0||x>1?2:1))};return r;} // v16-129: Class Tower → the parts of its class · v16-161: Essence / Gear Parts by the floor's stage; floors 101+ every 5th floor without a set piece give ×2
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>clsOf(h)===k); // v16-246: Mythic heroes go into the tower of their class
@@ -3851,7 +3859,7 @@ function ctOpen(k){if(!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign
 function ctClose(){ctEl.classList.remove('open');if(!backToHub())close();}
 function ctRules(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>6 towers, one per class · <b>'+CT_N+' floors</b> each.</div><div>Only heroes of that class + <b>Legend</b> heroes fight (your best 5).</div><div>Each tower is open on 2 days a week · <b>SUNDAY all towers are open</b>.</div></div><div class="wS">SCHEDULE</div>';
   CT_K.forEach(k=>x+=wRowB(CT_K.indexOf(k)%6,'<b>'+ROLE[k].n.toUpperCase()+'</b>',null,ctDaysTxt(k)));
-  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Floors 1-100, every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Floors 101-300: a <b>MYTHIC SET PIECE</b> every 20th floor</div><div>Floors 350 · 380 · 410 · 440 · 470 · 500: the 6 pieces of an <b style="color:#2ef3ff">ASCENDED SET</b> of that class</div><div>Every 10th floor (boss): '+T.DMI+' <b>50+</b> · '+GTKI+' <b>1+</b></div><div>Every 50th floor: + '+T.DMI+' <b>200+</b></div><div>The higher the floor, the bigger every reward.</div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
+  x+='<div class="wS">FIXED REWARDS · FIRST CLEAR</div><div class="wP"><div>Every floor: '+T.DMI+' <b>3</b> + coins</div><div>Floors 1-100, every 5th floor: <b>1 SET PIECE</b> of that class (Rare → Epic → Legendary → Mythic)</div><div>Floors 101-300: a <b>MYTHIC SET PIECE</b> every 20th floor</div><div>Floors 350 · 380 · 410 · 440 · 470 · 500: the 6 pieces of an <b style="color:#2ef3ff">ASCENDED SET</b> of that class</div><div>Floors 501-1000: a <b>MYTHIC SET PIECE</b> every 50th floor · very hard, the last floors are for the future</div><div>Every 10th floor (boss): '+T.DMI+' <b>50+</b> · '+GTKI+' <b>1+</b></div><div>Every 50th floor: + '+T.DMI+' <b>200+</b></div><div>The higher the floor, the bigger every reward.</div><div>Nothing is random. Each floor gives its reward only once.</div></div>';
   popW('CLASS TOWERS',x);}
 function ctTRew(k){const t=ctG();let x='<div class="wS">'+ROLE[k].n.toUpperCase()+' TOWER · NEXT SET PIECES</div>';
   for(let f=Math.ceil((t[k]+1)/5)*5,n=0;f<=CT_N&&n<8;f+=5){const r=ctRew(k,f);if(!r.set)continue;n++;const it=SETS[k].p[GSLOT.findIndex(s=>s.k===r.set.s)];
@@ -3978,7 +3986,7 @@ const WBOSS=[{k:'scrap',sp:'scrapzilla2',n:'SCRAPZILLA',weak:'elec',d:'A giganti
   {k:'infp',sp:'inferno2',n:'INFERNO PISTON',weak:'paint',d:'A fire demon made from a giant V12 engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last 20 seconds.'},
   {k:'tows',sp:'tow2',n:'TOW SERPENT',weak:'tuning',d:'A giant serpent made of heavy chains and crane hooks with a tow-truck head: fast lunges along the ground that hit everyone in front of it, many times. No ranged attack. It ENRAGES in the last 20 seconds.'}]; // v16-61 bosses 2-3 · v16-62 boss 4
 // v16-176 (Marius): 12 daily tiers instead of 6 (the old 6 thresholds are kept: 1·3·5·8·12·18 bars) + 2 harder ones (22 · 26 bars)
-const WB_TIER=[{b:1,dm:20},{b:2,dm:10},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:6,dm:20,ct:1},{b:8,dm:40,tk:1},{b:10,dm:25,gt:1},{b:12,dm:50,gt:1,ct:1},{b:15,dm:30,tk:1},{b:18,dm:80,tk:2,gt:1},{b:22,dm:60,tk:1,gt:1,ct:1},{b:26,dm:100,tk:2,gt:2,ct:1}];
+const WB_TIER=[{b:1,dm:20},{b:2,dm:10},{b:3,dm:20,tk:1},{b:5,dm:30,gt:1},{b:6,dm:20,ct:1},{b:8,dm:40,tk:1},{b:10,dm:25,gt:1},{b:12,dm:50,gt:1,ct:1},{b:15,dm:30,tk:1},{b:18,dm:80,tk:2,gt:1},{b:30,dm:60,tk:1,gt:1,ct:1},{b:40,dm:100,tk:2,gt:2,ct:1}]; // v16-312 (Marius 25 nov): the last 2 tiers need much more damage (22 → 30 bars, 26 → 40 bars)
 const WB_OLDB=[1,3,5,8,12,18]; // claimed indexes of the old 6-tier list → new indexes (same day)
 const WB_RANK=[[1,1,{dm:1500,tk:15,gt:10}],[2,3,{dm:1000,tk:10,gt:6}],[4,10,{dm:600,tk:6,gt:4}],[11,50,{dm:300,tk:3,gt:2}],[51,100,{dm:150,tk:2,gt:1}]]; // same table in server/online.js (WB_RW)
 MON.scrap={n:'SCRAPZILLA',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[58,155],dr:'spr_scrapzilla',dr0:'titan',sp:'scrapzilla',sc:1,desc:'World boss'};
@@ -4177,7 +4185,7 @@ const wbCss=document.createElement('style');wbCss.textContent=`
 //  CASH VAULT = cash · SCRAP MINE = one gear piece (slot in a fixed order) · GEAR FORGE = one SET piece (class + slot in a fixed order)
 //  NITRO LAB = NITRO BOOST (+HP & attack for 3 h in Campaign / Torque Tower / Class Towers – not Arena, Cup, World Boss or Dungeons).
 // A key is used only when you WIN (a defeat costs nothing). Gear stats come from a seeded generator → the same item every time.
-const DG_K=['vault','mine','forge','lab'],DG_N=100,DG_UNLOCK=15,DG_FREE=2,DG_PASS=2,DG_DAYS=30,DG_NIT_H=3,DG_PRICE='€2.99';
+const DG_K=['vault','mine','forge','lab'],DG_N=1000,DG_UP=1.0035,DG_UNLOCK=15,DG_FREE=2,DG_PASS=2,DG_DAYS=30,DG_NIT_H=3,DG_PRICE='€2.99';
 const DG={vault:{n:'CASH VAULT',c:'#ffd54a',pool:['hubcap','horn','wiper','imp','gearbox','goblin'],mini:'crusher',boss:'titan',r:'CASH',d:'Lots of cash – for buildings, gear upgrades and classic cars.'},
  mine:{n:'SCRAP MINE',c:'#9be7a0',pool:['tire','spider','brute','gearbox','brake','crab'],mini:'sludge',boss:'plow',r:'GEAR',d:'One gear piece every win. The slot changes in a fixed order (Tool → Helmet → … ). Deeper floors = higher grade.'},
  forge:{n:'GEAR FORGE',c:'#ffab40',pool:['canister','turbo','brute','wraith','imp','scorp'],mini:'magma',boss:'wyrm',r:'SET PIECES',d:'One SET piece every win. Class and slot change in a fixed order. Deeper floors = higher grade.'},
@@ -4205,11 +4213,12 @@ window.DGK={add:dgAddKeys,keys:dgKeys,bon:dgBon,K:DG_K,ok:()=>dgOK()};
 const dgNitro=()=>{try{const g=dgG();return g.nt>Date.now()?g.np:0;}catch(e){return 0;}};
 // v16-179 (Marius 22 nov: "more floors here, harder, and rewards"): 30 → 100 floors. Floors 1-30 stay EXACTLY the same;
 // 31-100 climb to the end of the campaign (stage 1500) and then past it with DG_X → floor 100 ≈ the strongest possible team.
-const dgEq=f=>Math.min(NST-1,Math.round(f<=30?6+f*f*.95:861+(f-30)*9.2));
-const DG_X=f=>f<=30?1:Math.pow(1+DGXA,f-30);const DGXA=.031;
+// v16-312 (Marius 25 nov): 1000 floors – 101-1000 = floor 100 ×1.0035 per floor (×23 at 1000, unbeatable for now); rewards stay at the floor-100 level, max MYTHIC (every 50th floor)
+const dgEq=f=>{f=Math.min(f,100);return Math.min(NST-1,Math.round(f<=30?6+f*f*.95:861+(f-30)*9.2));};
+const DG_X=f=>f<=30?1:Math.pow(1+DGXA,Math.min(f,100)-30)*(f>100?Math.pow(DG_UP,f-100):1);const DGXA=.031;
 // v16-176: floors 61-100 give MYTHIC gear / MYTHIC set pieces (never Ascended – Marius 21 nov), NITRO up to +30%
-const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:f<=60||f%10?4:5,forge:f=>f<=10?2:f<=20?3:f<=60||f%10?4:5} /* v16-190: Mythic only on boss floors 70, 80, 90, 100 */,DG_NIT=f=>f<=10?10:f<=20?15:f<=30?20:f<=60?25:30;
-const DG_RX=f=>(f>30?1+(f-30)/35:1)*(f>30&&f%10===0?2:1),DG_RM=f=>(1+f/30)*DG_RX(f);   // v16-176: Essence / Gear Parts climb faster after floor 30 · boss floors 40, 50 … 100 = ×2
+const DG_GR={mine:f=>f<=5?1:f<=12?2:f<=20?3:f>100?(f%50?4:5):f<=60||f%10?4:5,forge:f=>f<=10?2:f<=20?3:f>100?(f%50?4:5):f<=60||f%10?4:5} /* v16-190: Mythic only on boss floors 70, 80, 90, 100 */,DG_NIT=f=>f<=10?10:f<=20?15:f<=30?20:f<=60?25:30;
+const DG_RX=f=>(f>30?1+(Math.min(f,100)-30)/35:1)*(f>30&&f%10===0?2:1),DG_RM=f=>(1+Math.min(f,100)/30)*DG_RX(f);   // v16-176: Essence / Gear Parts climb faster after floor 30 · boss floors 40, 50 … 100 = ×2
 function dgFloor(k,f){const D=DG[k],ki=DG_K.indexOf(k),R=seeded(9001+ki*1013+f*89),pk=a=>a[Math.floor(R()*a.length)],act=f<=30?Math.min(9,Math.floor((f-1)/3)):Math.min(ACTS.length-1,9+Math.ceil((f-30)/14)),cl=m=>act?monClone(m,act):m;
   const n=Math.min(5,3+Math.floor(f/12)),one=()=>cl(pk(D.pool)),mk=q=>{const w=[];for(let i=0;i<q;i++)w.push(one());return w;};
   const boss=f%10===0,mini=f%5===0&&!boss;let w;
@@ -4270,7 +4279,7 @@ function dgRenderOne(k){const T=TE(),g=dgG(),D=DG[k],M=dgMap(),bx=$('dgBox'),cur
   if(k==='mine'||k==='forge'){const q=dgRew(k,f).gear;p+='<div class="dgL">NEXT: <b>'+(q.set?ROLE[q.set].n.toUpperCase()+' SET · ':'')+GS[q.s].n.toUpperCase()+'</b></div>';}
   h+='<div class="dgP" style="'+gbx(316,46,680,560)+'">'+p+'</div>';
   h+='<div class="dgList" id="dgList" style="'+gbx(62,632,900,630)+'">';
-  for(let i=1;i<=DG_N;i++){const F=dgFloor(k,i),st=i===f?'cur':i<=g.b[k]?'done':i>cur?'lock':F.boss||F.mini?'boss':'norm';
+  for(let i=Math.max(1,cur-40);i<=Math.min(DG_N,cur+40);i++){const F=dgFloor(k,i),st=i===f?'cur':i<=g.b[k]?'done':i>cur?'lock':F.boss||F.mini?'boss':'norm';
     h+='<div class="dgRow '+st+'" data-f="'+i+'"><img src="img/dg/f_'+st+'.webp" alt=""><b class="dgRN">'+i+'</b><div class="dgRT"><b>FLOOR '+i+(F.boss?' · <i>BOSS</i>':F.mini?' · <i>MINI-BOSS</i>':'')+'</b>'+dgRewHtml(k,i)+'</div></div>';}
   h+='</div>';
   const can=ky>0,sw=g.b[k]>0;
@@ -4283,7 +4292,7 @@ function dgPower(k,f){const F=dgFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{
 function dgOpen(k){if(!dgOK()){TE().toast('🔒 DUNGEONS open after campaign stage '+sLabel(DG_UNLOCK),2600);return;}
   rootOn();DGS.k=k||null;if(k)DGS.sel=0;dgEl.classList.add('open');dgRender();}
 function dgClose(){dgEl.classList.remove('open');DGS.k=null;if(!backToHub())close();}
-function dgInfo(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>4 dungeons · <b>'+DG_N+' floors</b> each · a boss every 10th floor.</div><div><b>'+DG_FREE+' free keys</b> a day in EVERY dungeon. A key is used <b>only when you win</b>.</div><div>Keys you do not use <b>stay</b> – they stack up day after day (also the keys from packs and the Key Roulette).</div><div>Win a floor to open the next one. You can replay any floor you reached.</div><div>Floors <b>31-100</b> are much harder – and pay much more: <b style="color:#ff6b6b">MYTHIC</b> gear from floor 61, NITRO up to +30%, more Essence and Gear Parts, <b>×2</b> cash, Essence and Gear Parts on boss floors 40, 50 … 100.</div><div>Rewards are <b>fixed</b> – nothing is random. Dungeons never give diamonds or tickets.</div></div>';
+function dgInfo(){const T=TE();let x='<div class="wS">HOW IT WORKS</div><div class="wP"><div>4 dungeons · <b>'+DG_N+' floors</b> each · a boss every 10th floor.</div><div><b>'+DG_FREE+' free keys</b> a day in EVERY dungeon. A key is used <b>only when you win</b>.</div><div>Keys you do not use <b>stay</b> – they stack up day after day (also the keys from packs and the Key Roulette).</div><div>Win a floor to open the next one. You can replay any floor you reached.</div><div>Floors <b>31-100</b> are much harder – and pay much more: <b style="color:#ff6b6b">MYTHIC</b> gear from floor 61, NITRO up to +30%, more Essence and Gear Parts, <b>×2</b> cash, Essence and Gear Parts on boss floors 40, 50 … 100.</div><div>Floors <b>101-1000</b>: very hard, the last floors are for the future · rewards like floor 100, <b style="color:#ff6b6b">MYTHIC</b> gear every 50th floor.</div><div>Rewards are <b>fixed</b> – nothing is random. Dungeons never give diamonds or tickets.</div></div>';
   DG_K.forEach(k=>{const D=DG[k];x+='<div class="wS">'+D.n+'</div><div class="wP twMP"><img src="img/dg/k_'+k+'.webp" alt=""><span>'+D.d+'</span></div>';
     x+='<div class="wP">'+[1,10,20,30].map(f=>'Floor '+f+': '+dgRewHtml(k,f,k!=='vault')).join('<br>')+'</div>';});
   x+='<div class="wS">DUNGEON PASS · '+DG_PRICE+' · '+DG_DAYS+' DAYS</div><div class="wP"><div>+'+DG_PASS+' keys a day in every dungeon ('+(DG_FREE+DG_PASS)+' instead of '+DG_FREE+').</div><div>SWEEP: finish a floor you already cleared in one tap.</div><div>No automatic renewal.</div></div>';
