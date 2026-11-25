@@ -935,7 +935,9 @@ const mainV=it=>GS[it.s].st==='cdmg'?cdmgV(it):Math.round(GSTAT[GS[it.s].st].v[i
 // v16-294 (Marius 24 nov): GLOVES = CRIT DAMAGE (no more crit chance on gloves: Mythic +50 gave 206% chance). +1 → +50 = ×6.9 · Ascended ★0 = 1.3 × Mythic +50, ★20 ×2.1
 const cdmgV=it=>Math.round(GSTAT.cdmg.v[it.r]*(it.r>=6?6.9*1.3*Math.pow(ASC_STEP,Math.min(GSTARMAX6,it.sr||0)):(1+.05*(Math.min(GLV_MAX,it.lv)-1))*GMS_MUL(it.lv))*10)/10;
 const mainOld=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K:1)*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // before v16-205 (migration only)
-const gLvTxt=it=>it.r>=6?'★'+(it.sr||0):'+'+it.lv;
+// v16-307 (Marius 25 nov): the white band of every piece = LVL of the hero who wears it (follows the hero level automatically). Every LVL = +0.1% main stat, every 10 LVL a BOOST +5% (only ATK / HP / DEF pieces: Tool, Helmet, Work Vest) and a new colour.
+const ILV_ST={atk:1,hp:1,def:1},ILV_L=.1,ILV_10=5,ILV_P=lv=>Math.round(((lv||0)*ILV_L+Math.floor((lv||0)/10)*ILV_10)*10)/10,iLvOf=it=>{const o=ownerOf(it);return o?((TE().lvOf&&TE().lvOf(o))||1):0;},iLvK=lv=>1+ILV_P(lv)/100,iLvCol=lv=>{const t=Math.floor(lv/10);return t?`hsl(${(110+t*9)%360},88%,64%)`:'#e0e0e0';};
+const gLvTxt=it=>{const l=iLvOf(it);return l?`<i style="font-style:normal;color:${iLvCol(l)}">LVL ${l}</i>`:'LVL —';};
 const GMS_LIST=()=>{const o=[];for(let l=5;l<=GLV_MAX;l+=5)o.push([l,l===45?'Main stat ×'+GMS_M45:l===50?'Main stat ×'+GMS_M50.toFixed(2)+' (×2)':'Extra stats +'+GMS_SK*100+'%']);return o;}; // +12% of the base value per level (Lv 50 = ×6.9)
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
@@ -1010,7 +1012,7 @@ function collInfo(){const T=TE(),L=T.HEROES.filter(h=>h.cat==='m'&&!h.soon);retu
 function collBon(){const T=TE(),O=T.G.h.own;let ss=0;for(const id in O)ss+=O[id].s||0;const k=Object.keys(T.G.h.disc).length+'/'+Object.keys(O).length+'/'+ss;if(k===cbK&&cbV)return cbV;const b={atk:0,hp:0,def:0,crit:0,cdmg:0,aspd:0,en:0};
   collInfo().forEach(c=>{if(c.tot&&c.n>=c.tot)CBON[c.gr].forEach(([s,v])=>b[s]+=v);});
   scInfo().forEach(c=>SC_B[c.gr].forEach(([st,a])=>{for(let i=0;i<c.steps;i++)b[st]+=a[i];}));cbK=k;cbV=b;return b;}
-function gearBon(items,hid){const b={atk:0,hp:0,def:0,crit:0,cdmg:0,aspd:0,en:0};for(let it of items){if(hid&&it.r<6)it={...it,lv:eLv(it,hid)};b[GS[it.s].st]+=mainV(it);for(const [k,v] of it.sub)b[k]+=subV(it,v);}return b;} // v16-280: + of the hero's slot
+function gearBon(items,hid){const b={atk:0,hp:0,def:0,crit:0,cdmg:0,aspd:0,en:0};for(let it of items){if(hid&&it.r<6)it={...it,lv:eLv(it,hid)};b[GS[it.s].st]+=hid&&ILV_ST[GS[it.s].st]?Math.round(mainV(it)*iLvK((TE().lvOf&&TE().lvOf(hid))||1)*10)/10:mainV(it);for(const [k,v] of it.sub)b[k]+=subV(it,v);}return b;} // v16-280: + of the hero's slot
 // item picture: rarity glow + drawn glyph
 // ---------------------------------------------------------------- v14: item pictures – every grade has its own drawing (36 items)
 const IMAT=[{b:'#8d6e57',h:'#c9a68a',l:'#4a3527',a:'#b5562a',t:'#d9c3a5'},{b:'#8fa3a0',h:'#eef6f3',l:'#4d5d59',a:'#43c463',t:'#2e7d32'},{b:'#3f7fd6',h:'#d6ecff',l:'#123a78',a:'#40c4ff',t:'#82b1ff'},
@@ -3333,6 +3335,7 @@ let gstar='';function popItem(id,keep){const T=TE(),G=T.G,g=GR(),it=itemById(id)
    <div class="itSt">${rows.slice(0,4).join('')}</div>
    <div class="itBt">${b1}<button class="b2${mx||(G.gp||0)<c||(!o&&it.r<6)?' dis':''}" data-p="${mx?'':'up'}" data-it="${it.id}">${mx?(it.r>=6?'★ STARS ONLY':'MAX +'+GLV_MAX):!o&&it.r<6?`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>equip first</small>`:`${IMGI('img/ui2/i_forge.webp','1.5em','-.45em')}UPGRADE<small>${GPN(c)}</small>`}</button><button class="b3" data-p="salv" data-it="${it.id}">${IMGI('img/ui2/i_scrap.webp','1.5em','-.45em')}SALVAGE<small>+${GPN(salvageV(it))}</small></button></div></div><div class="itMore">`;
   if(it.r<6)x+=`<div class="gNote slvN">🔧 The <b>+</b> belongs to the hero's <b>${sl.n.toUpperCase()} SLOT</b>, not to the piece${o?` · <b style="color:${SLV_COL[slvTier(it.lv)]}">${oh?oh.n:''} ${sl.n} slot +${it.lv}</b>`:''}. Swap the piece – the + stays on the slot.</div>`;
+  if(o&&ILV_ST[sl.st]){const l=iLvOf(it);x+=`<div class="gNote">📈 <b style="color:${iLvCol(l)}">LVL ${l}</b> = level of ${oh?oh.n:'the hero'} · every LVL <b>+0.1%</b>, every 10 LVL <b>BOOST +5%</b> ${st.n} → now <b style="color:${iLvCol(l)}">+${ILV_P(l)}%</b></div>`;}
   if(h){const cur=itemById((g.eq[h.id]||{})[it.s]);
     if(o===h.id){x+=`<div class="cpSec">IF YOU UNEQUIP IT FROM ${h.n.toUpperCase()}</div>`+cmpForHero(h,{[it.s]:null},[],[`${sl.n} slot becomes empty`]);}
     else{const xc=[],xp=[];if(cur)xc.push(`Replaces <b style="color:${GG(cur.r).c}">${itemName(cur)}</b> Lv ${cur.lv} (goes back to the bag)`);
@@ -3465,7 +3468,7 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
       if(gstar!=='rp'+id){gstar='rp'+id;el.classList.add('sel');T2.toast('Tap '+hh.n+' again to open the box',1800);return;}gstar='';G2.rbox--;const r=T2.gain(id);T2.save();T2.heroRefresh&&T2.heroRefresh();closePop();
       if(r.awk&&T2.awakenFx)T2.awakenFx(id,r.awk);else T2.toast('🎁 '+hh.n+(r.r==='new'?' JOINS YOUR TEAM!':' +1 copy'),2600);renderGear();return;}
     if(a==='lvN'||a==='hasc'){const h=T.HB[el.dataset.h];if(!h)return;const p0=pow(h);let ok=0;
-     if(a==='lvN'){ok=T.lvUp(h.id,+el.dataset.n||1);if(!ok){T.toast(T.lvMC(T.lvOf(h.id))?'Not enough Mythic Core · duplicates of maxed heroes':'Not enough Essence · Dungeons, campaign, Idle Rewards, events',2400);return;}T.toast(T.ESI+' '+h.n+' Lv '+T.lvOf(h.id)+' · Power +'+(pow(h)-p0).toLocaleString(),1800);}
+     if(a==='lvN'){ok=T.lvUp(h.id,+el.dataset.n||1);if(!ok){T.toast(T.lvMC(T.lvOf(h.id))?'Not enough Mythic Core · duplicates of maxed heroes':'Not enough Essence · Dungeons, campaign, Idle Rewards, events',2400);return;}T.toast(T.ESI+' '+h.n+' Lv '+T.lvOf(h.id)+' · Power +'+(pow(h)-p0).toLocaleString(),1800);{const l1=T.lvOf(h.id),l0=l1-ok;if(Math.floor(l1/10)>Math.floor(l0/10)&&Object.keys(GR().eq[h.id]||{}).length)setTimeout(()=>T.toast('⚡ GEAR BOOST · LVL '+Math.floor(l1/10)*10+' · ATK / HP / DEF gear +'+ILV_P(l1)+'%',2200),1900);}}
      else{ok=T.ascend(h.id);if(!ok){T.toast(T.ascMC(T.ascOf(h.id))?'Not enough Mythic Core for the Core Ascension':'Not enough Essence for the Ascension',2200);return;}T.toast('✦ ASCENSION '+T.ascOf(h.id)+'! '+h.n+' · max Lv '+T.lvCap(h.id)+' · skill Lv '+T.skLv(h.id),2800);}
      renderGear();popLvl(h);return;}
   if(a==='hreb'){const h=T.HB[el.dataset.h];if(!h)return;const id=h.id,e=T.rebirthVal(id),geq=Object.keys(GR().eq[id]||{}).length;
