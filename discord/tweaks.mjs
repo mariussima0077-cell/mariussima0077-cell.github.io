@@ -26,4 +26,11 @@ for (const c of ch.filter(c => c.parent_id === langCat?.id && c.type === 0)) {
   if (c.name.endsWith('-chat')) continue;
   await api('PATCH', `/channels/${c.id}`, { name: `${c.name}-chat` }); console.log(`${c.name} -> ${c.name}-chat`);
 }
+const NEW = [['🇰🇷┃한국어-chat','한국어 채팅'],['🇨🇳┃中文-chat','中文聊天'],['🇯🇵┃日本語-chat','日本語チャット'],['🇻🇳┃tiếng-việt-chat','Trò chuyện tiếng Việt'],['🇹🇭┃ไทย-chat','แชทภาษาไทย'],['🇮🇳┃हिन्दी-chat','हिन्दी चैट']];
+const now = await api('GET', `/guilds/${GUILD}/channels`);
+for (const [name, topic] of NEW) {
+  if (now.find(c => norm(c.name) === norm(name))) continue;
+  await api('POST', `/guilds/${GUILD}/channels`, { name, type: 0, parent_id: langCat.id, topic: `${topic} • Help & bug reports in English channels`, rate_limit_per_user: 3 });
+  console.log(`+ ${name}`);
+}
 console.log('DONE ✅');
