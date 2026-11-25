@@ -2124,7 +2124,9 @@ const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={}
 const ALLY8={m5_0:'img/fx/ally_m5_0.webp',m5_1:'img/fx/ally_m5_1.webp',m5_2:'img/fx/ally_m5_2.webp',m5_2r:'img/fx/ally_m5_2r.webp'},ALLYI={};function allyImg(id){if(!ALLY8[id])return null;let i=ALLYI[id];if(!i){i=ALLYI[id]=new Image();i.decoding='async';i.src=ALLY8[id];}return i;}
 function allyFx(id,hs,d){return false; /* v16-314 (25 nov, Marius): no more Mythic effects on teammates (BUFF / HEAL / REVIVE) – too many effects on the map; the ultimates stay */const im=allyImg(id);if(!im||!im.naturalWidth)return false;let k=0;for(const h of (hs||alive(B.heroes)))B.fx.push({type:'ally8',t:-(k++)*.06,d:d||1.3,im,u:h});return true;}
 function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
-function pushWide(u,ta,o){if(!WD(u))return false;B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
+// v16-321 (Marius: 'Nova – the arrows don't come from the top and it's too fast'): with his 23-24 frame sheets the picture's impact = the moment of the damage (end of the cast)
+const WTA={m5_2:1.5,m5_3:1.2,m5_4:1.5,m5_5:1.2,m5_6:2.0};
+function pushWide(u,ta,o){if(!WD(u))return false;if(WTA[u.h.id])ta=WTA[u.h.id];B.fx.push(Object.assign({type:'wide8',t:0,ta:Math.max(.35,ta),tb:1.5,d:Math.max(.35,ta)+1.5,im:wideImg(u.h.id),u},o||{}));return true;}
 // v16-ready (24 nov, Marius): ULTIMATE READY – looping ground aura (16 frames, 4x4) under a Mythic while his ultimate is charged;
 // during the cast it CHARGES (grows ×1.4, brighter, extra glow) and fades out at the end of the cast
 /* v16-296 (Marius): no ring under the heroes any more – ENRAGE (coloured glow) for everyone instead */ const READY8={},READYI={};function readyImg(id){if(!READY8[id])return null;let i=READYI[id];if(!i){i=READYI[id]=new Image();i.decoding='async';i.src=READY8[id];}return i;}
@@ -2701,7 +2703,7 @@ function drawFx(t){
       q=Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb),c=Math.floor(q),fr=q-c,A=k>.93?(1-k)/.07:1;
       g.globalAlpha=A*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,bx-6*S,by-h/2,w,h);if(c<N-1&&fr>0){g.globalAlpha=A*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,bx-6*S,by-h/2,w,h);}}}
     else if(f.type==='wide8'){const im=f.im;if(im&&im.naturalWidth){const ms=alive(B.mons);let x0=W*.5,x1=W,dm=f.dd;if(ms.length){x0=Math.min(...ms.map(m=>m.x));x1=Math.max(...ms.map(m=>m.x));dm=Math.max(...ms.map(m=>m.d));}
-      const N=wN(im),w=W*1.15,cx=clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/N,h=w*fh/fw*1.25,gy=fy(dm)+18*S,A=k>.93?(1-k)/.07:1,N8=N<=8,fdrop=N8?f.drop:null;
+      const N=wN(im),w=W*1.15,cx=clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/N,h=w*fh/fw*1.25,gy=fy(dm)+18*S,A=k>.93?(1-k)/.07:1,N8=N<=8,fdrop=N8||f.drop==='m5_4'?f.drop:null; /* v16-321: Nova's arrows fall from the sky again (on top of her new sheet) */
       const IP=N8?(f.imp||4):(WIDEIP[f.u&&f.u.h?f.u.h.id:'m5_0']||Math.round(N/2));let q=f.ta?Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb):Math.min(N-.001,k*N),sh=1;/* v16-wide2: imp = the impact frame (Chroma v2: frame 7) */let gs=1;
       // v16-grow (Marius: Chroma's tornadoes stay on the ground and grow): frames 3-4 (tornadoes on the ground) swirl back and forth while they grow ×0.35→×1.15, then the burst
       let gr=null;if(f.grow&&N8){const T=f.t,a1=.4,a2=.68,top0=gy-h*.97,hi=Math.min(top0,H*.13);
@@ -2713,7 +2715,7 @@ function drawFx(t){
         else gs=1.2-.2*Math.min(1,(T-f.ta)/.5);}
       // v16-drop (Marius: arrows / phoenix must really fall from the sky): the falling objects are ONE sprite cut from his sheet, moved by code from the top
       // of the screen to the ground; his sheet starts only when they land (frame 4 = landing → frame 5 = impact)
-      if(fdrop){const di=dropImg(fdrop),L=.28;if(f.t<f.ta-L){sh=0;}else if(f.t<f.ta)q=3+(f.t-(f.ta-L))/L;
+      if(fdrop){const di=dropImg(fdrop),L=.28;if(N8){if(f.t<f.ta-L){sh=0;}else if(f.t<f.ta)q=3+(f.t-(f.ta-L))/L;}
         if(di&&di.naturalWidth&&f.t<f.ta+.05){const dw=di.naturalWidth,dh=di.naturalHeight;g.save();
           if(fdrop==='m5_4'){if(!f.ar){f.ar=[];for(let i=0;i<24;i++)f.ar.push({x:Math.random(),z:Math.random(),st:(i/24)*(f.ta-.34)+rnd(0,.05)});}
             const ah=100*S,aw=ah*dw/dh,fd=.34;
@@ -2723,7 +2725,7 @@ function drawFx(t){
             g.globalCompositeOperation='lighter';for(let j=3;j>=1;j--){const pj=Math.max(0,p-j*.06),ej=pj*pj;g.globalAlpha=.18*(4-j)/3;g.drawImage(di,lerp(cx-w*.25,cx,ej)-pw/2,lerp(H*.02,gy-h*.55,ej)-ph/2,pw,ph);}
             g.globalCompositeOperation='source-over';g.globalAlpha=f.t>f.ta-.2?Math.max(0,1-(f.t-(f.ta-.2))/.25):1;g.drawImage(di,x-pw/2,y-ph/2,pw,ph);}
           g.restore();}}
-      if(sh){const c=Math.floor(q),fr=q-c,zz=(1+.04*fr)*gs,ww=w*zz,hh=h*zz,A2=A*(fdrop&&f.t<f.ta?Math.min(1,(q-3)*2.5):1);
+      if(sh){const c=Math.floor(q),fr=q-c,zz=(1+.04*fr)*gs,ww=w*zz,hh=h*zz,A2=A*(fdrop&&N8&&f.t<f.ta?Math.min(1,(q-3)*2.5):1);
       // v16-wide: only 8 pictures → each frame melts into the next (cross-fade) + a slow push-in, so it is smooth, not 'in pieces'
       if(gr){g.globalAlpha=A2*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,gr[0],gr[1],gr[2],gr[3]);if(c<N-1&&fr>0){g.globalAlpha=A2*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,gr[0],gr[1],gr[2],gr[3]);}}else{
       g.globalAlpha=A2*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,cx-ww/2,gy-hh*.97,ww,hh);
