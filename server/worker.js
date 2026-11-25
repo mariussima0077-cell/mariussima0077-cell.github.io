@@ -12,7 +12,7 @@
 //                           is stored – never the e-mail or the name. Table `accounts` is created by itself.
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
 
-import {online, onlineCron, onlineAdmin, giftDm, isGiftDm, adminGifts, agEnsure, agTxt} from './online.js';
+import {online, onlineCron, onlineAdmin, giftDm, isGiftDm, adminGifts, agEnsure, agTxt, gcEnsure} from './online.js';
 import {EP_N, EP_H} from './ept.js';
 import {srvErr, areaOf, healthCron, healthApi, healthAct, healthHtml} from './health.js';   // v16-318 🩺 SERVER HEALTH   // v16-157: enemy power of every campaign stage (made by tools/ept_table.py)
 
@@ -772,6 +772,34 @@ async function verHtml(env) {   // game version of the players active in the las
   const tot = rs.reduce((a, r) => a + r.n, 0); if (!tot) return '';
   return `<h3>📦 Game versions (active 7 days)</h3><div class=c>${rs.map(r => `<b>${r.gv ? 'v16-' + r.gv : 'older than v16-275'}</b>: ${r.n} (${Math.round(100 * r.n / tot)}%)`).join('<br>')}<br><small>The web version updates by itself; the app needs the new version from Google Play only when the Android part changes.</small></div>`;
 }
+// v16-320 (Marius 25 nov): 🎟️ GIFT CODES – you make a code here, post it on Discord, players type it in PROFILE → GIFT CODE → reward in MAIL.
+async function gcodeHtml(env) {
+  const db = env.DB, k = encodeURIComponent(env.ADMIN_KEY), I = 'padding:8px;border-radius:8px;border:0;font-size:15px;box-sizing:border-box'; await gcEnsure(db);
+  const rs = (await db.prepare('SELECT * FROM gcodes ORDER BY t DESC LIMIT 30').all()).results, now = Date.now();
+  const d = t => new Date(t).toLocaleString('sv-SE', {timeZone:'Europe/Paris'}).slice(5, 16);
+  return `<form class=c style="display:flex;flex-wrap:wrap;gap:6px"><input type=hidden name=key value="${escH(env.ADMIN_KEY)}"><input type=hidden name=gcnew value=1>
+<input name=code required minlength=3 maxlength=20 placeholder="CODE (e.g. WELCOME500) – letters and numbers" style="${I};flex:1 1 100%;text-transform:uppercase">
+<input name=dm type=number min=0 max=${GIFT_MAX} placeholder="💎 Diamonds" style="${I};flex:1 1 45%"><input name=tk type=number min=0 max=${GIFT_MAX} placeholder="🎟️ Recruit" style="${I};flex:1 1 45%">
+<input name=gt type=number min=0 max=${GIFT_MAX} placeholder="⚙️ Gear tickets" style="${I};flex:1 1 45%"><input name=ct type=number min=0 max=${GIFT_MAX} placeholder="🎖️ Crew tickets" style="${I};flex:1 1 45%">
+<input name=dk type=number min=0 max=1000 placeholder="🔑 keys (each Dungeon)" style="${I};flex:1 1 100%">
+<input name=lim type=number min=0 placeholder="max players (empty = no limit)" style="${I};flex:1 1 45%"><input name=days type=number min=0 max=365 placeholder="days valid (empty = forever)" style="${I};flex:1 1 45%">
+<input name=msg maxlength=200 placeholder="message in the Mail (optional)" style="${I};flex:1 1 100%">
+<button style="padding:9px 14px;border-radius:8px;border:0;background:#66bb6a;font-weight:bold;flex:1 1 100%">CREATE CODE 🎟️</button><small>Each player can use a code only once. Post the code in Discord #announcements.</small></form>
+${rs.length ? rs.map(g => { const st = g.off ? '⛔ stopped' : g.exp && g.exp < now ? '⌛ expired' : g.lim && g.used >= g.lim ? '✅ all used' : '🟢 active';
+  return `<div class=c><b style="font-size:17px;letter-spacing:1px">${escH(g.code)}</b> · ${st}<br>${escH(agTxt(g)) || '(no reward)'}<br><small>used ${g.used}${g.lim ? ' / ' + g.lim : ''} · made ${d(g.t)}${g.exp ? ' · ends ' + d(g.exp) : ' · no end'}${g.msg ? ' · “' + escH(g.msg) + '”' : ''}</small>${g.off ? '' : `<br><a href="/admin?key=${k}&gcoff=${encodeURIComponent(g.code)}" onclick="return confirm('Stop this code? Players cannot use it any more.')" style="color:#ff8a80">⛔ stop code</a>`}</div>`; }).join('') : '<div class=c>No codes yet.</div>'}`;
+}
+async function gcodeAct(url, env) {
+  const db = env.DB, P = url.searchParams, k = encodeURIComponent(env.ADMIN_KEY); await gcEnsure(db);
+  if (P.has('gcoff')) { await db.prepare('UPDATE gcodes SET off=1 WHERE code=?').bind(String(P.get('gcoff')).slice(0, 20)).run(); return Response.redirect(url.origin + '/admin?key=' + k + '#gcode', 302); }
+  const code = String(P.get('code') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20), n = (x, m) => Math.max(0, Math.min(m, Math.floor(+P.get(x) || 0)));
+  const G = {dm:n('dm', GIFT_MAX), tk:n('tk', GIFT_MAX), gt:n('gt', GIFT_MAX), ct:n('ct', GIFT_MAX), dk:n('dk', 1000)}, back = `<a href="/admin?key=${k}#gcode">← back</a>`;
+  if (code.length < 3) return PAGE('Gift code', back + '<div class=c>The code needs 3–20 letters or numbers.</div>');
+  if (!agTxt(G)) return PAGE('Gift code', back + '<div class=c>Write at least one reward (💎, tickets or keys).</div>');
+  const days = n('days', 365), now = Date.now();
+  const r = await db.prepare('INSERT OR IGNORE INTO gcodes(code,dm,tk,gt,ct,dk,lim,exp,t,msg) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(code, G.dm, G.tk, G.gt, G.ct, G.dk, n('lim', 1e9), days ? now + days * 864e5 : 0, now, (P.get('msg') || '').trim().slice(0, 200)).run();
+  if (!r.meta || !r.meta.changes) return PAGE('Gift code', back + `<div class=c>The code <b>${escH(code)}</b> already exists (made before, or the page was opened again).</div>`);
+  return PAGE('Gift code', back + `<div class=c style="border-color:#66bb6a"><h2>✅ Code ${escH(code)} is ready</h2>${escH(agTxt(G))}<br><small>${n('lim', 1e9) ? 'max ' + n('lim', 1e9) + ' players' : 'no player limit'} · ${days ? days + ' days' : 'no end'}</small><br><br>Post it on Discord: players open <b>PROFILE → 🎁 GIFT CODE</b>.</div>`);
+}
 function bcastForm(key) {
   const I = 'padding:8px;border-radius:8px;border:0;font-size:15px;box-sizing:border-box';
   return `<details class=c style="border-color:#ab47bc88"><summary><b style="color:#e1a6ff">📢 Mail to ALL players</b> <small>(announcement or gift after a bug)</small></summary><form style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><input type=hidden name=key value="${escH(key)}"><input type=hidden name=bc value=1>
@@ -833,6 +861,7 @@ async function admin(url, env) {
 <a href="/admin?key=${k}&p=${encodeURIComponent(rst)}">← back</a><div class=c><h2>🔄 RESET “${e3(nm)}”?</h2>Everything goes back to 0: local save on the phone, cloud save, rankings, Arena, chat messages, Mail.<br>VIP Passes are removed. The other paid packs stay (VIP mechanic, VIP car…).<br>The phone starts a <b>NEW GAME</b> the next time the game is open and online.<br><a class=b href="/admin?key=${k}&reset=${encodeURIComponent(rst)}&ok=1">YES, RESET</a></div>`, {headers:{'content-type':'text/html;charset=utf-8'}});
     await wipePlayer(env, rst);
     return new Response(`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>body{font-family:system-ui;background:#0b1019;color:#eee;padding:16px}a{color:#9fd3ff}</style><h2>✅ “${e3(nm)}” reset</h2><p>New game at the next start (game open + internet).</p><a href="/admin?key=${k}">← back to admin</a>`, {headers:{'content-type':'text/html;charset=utf-8'}}); }
+  if (url.searchParams.has('gcnew') || url.searchParams.has('gcoff')) return gcodeAct(url, env);   // v16-320 gift codes
   if (url.searchParams.has('gift')) return giftPage(url, env);
   if (url.searchParams.has('bc')) return bcastPage(url, env);   // v16-275: 📢 Mail to ALL players (asks first)   // v16-233b: 💎 SEND DIAMONDS (asks first)
   if (url.searchParams.get('p')) return playerCard(url, env, url.searchParams.get('p'));
@@ -894,13 +923,14 @@ ${HH.banner}
 <div><b style="color:#7dff8a">${eur(eur7.d)}</b>today</div><div><b style="color:#7dff8a">${eur(eur7.m)}</b>this month</div><div><b style="color:${openT ? '#ff8a80' : '#fff'}">${openT}</b>support open</div>
 <div><b style="color:${errs.length ? '#ffb74d' : '#fff'}">${errs.length}</b>game errors</div><div><b style="color:${nFlag ? '#ffd54a' : '#fff'}">${nFlag}</b>flagged</div><div><b>${nBan}</b>banned</div></div>
 <form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>
-<div class=chips>${chip('health', HH.title, HH.red ? '#ff5252' : '')}${chip('sup', '🆘 Support' + (openT ? ' (' + openT + ')' : ''), openT ? '#ff8a80' : '')}${chip('errs', '🐞 Errors' + (errs.length ? ' (' + errs.length + ')' : ''), errs.length ? '#ffb74d' : '')}${chip('gift', '🎁 Gift')}${chip('mall', '📢 Mail all')}${chip('stats', '📊 Players')}${chip('prog', '🏁 Progress')}${chip('eco', '💎 Economy')}${chip('buys', '💳 Purchases')}${chip('quit', '🚪 Who quits')}${chip('bad', '⚠️ Cheaters')}${chip('ver', '📦 Versions')}${chip('integ', '🔒 Integrity')}${chip('ev', '📜 Events')}<a class=chip href="/admin/chat?key=${k}">💬 Chat</a></div>
+<div class=chips>${chip('health', HH.title, HH.red ? '#ff5252' : '')}${chip('sup', '🆘 Support' + (openT ? ' (' + openT + ')' : ''), openT ? '#ff8a80' : '')}${chip('errs', '🐞 Errors' + (errs.length ? ' (' + errs.length + ')' : ''), errs.length ? '#ffb74d' : '')}${chip('gift', '🎁 Gift')}${chip('gcode', '🎟️ Codes')}${chip('mall', '📢 Mail all')}${chip('stats', '📊 Players')}${chip('prog', '🏁 Progress')}${chip('eco', '💎 Economy')}${chip('buys', '💳 Purchases')}${chip('quit', '🚪 Who quits')}${chip('bad', '⚠️ Cheaters')}${chip('ver', '📦 Versions')}${chip('integ', '🔒 Integrity')}${chip('ev', '📜 Events')}<a class=chip href="/admin/chat?key=${k}">💬 Chat</a></div>
 ${SEC('sup', `🆘 Support (${tks.filter(t => !t.st).length} open)`, `${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
   return `<div class=c style="${t.st ? 'opacity:.55' : 'border-color:#ff8a80'}"><b>${TC[t.cat] || t.cat}</b> · <a href="?key=${k}&p=${encodeURIComponent(t.pid)}"><b style="color:#fff">${esc(TN[t.pid] || I.name || '(no name)')}</b></a> <small>${d(t.t)} · v${I.cv || '?'} · ${esc(I.g || '')} · S${I.srv || '?'}</small><br>${esc(t.txt)}<br><small>${esc(String(I.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>
   ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}`, openT > 0)}
 ${SEC('health', HH.title, HH.sec, HH.red)}
 ${SEC('errs', `🐞 Game errors (${errs.length})`, `${errs.length > 1 ? `<div class=c><a href="?key=${k}&efix=all">👍 mark ALL as done</a></div>` : ''}${errs.length ? errs.map(r => `<div class=c><a href="?key=${k}&efix=${encodeURIComponent(r.h)}" onclick="return confirm('Problem solved? The error will be hidden (it comes back by itself if a newer version still has it).')" style="float:right;padding:4px 10px;border-radius:8px;background:#2e7d32;color:#fff;text-decoration:none;font-weight:800">👍 DONE</a><span style="display:inline-block;padding:2px 8px;border-radius:8px;background:${r.fx ? '#c62828' : '#ef6c00'};color:#fff;font-weight:800;font-size:12px;margin-bottom:4px">${r.fx ? '↩️ CAME BACK after the fix' : '🔧 OPEN – to fix'}</span><br><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>${r.st ? `<br><small style="font-family:monospace;color:#9fb3c8;word-break:break-all">📍 ${esc(r.st)}</small>` : ''}</div>`).join('') : '<div class=c>No errors 👍</div>'}`, errs.length > 0)}
 ${SEC('gift', '🎁 Send a gift to one player', giftForm(env.ADMIN_KEY, ''))}
+${SEC('gcode', '🎟️ Gift codes', await gcodeHtml(env))}
 ${SEC('mall', '📢 Mail to ALL players', noH(bcastForm(env.ADMIN_KEY)).replace(/^<details[^>]*><summary>[\s\S]*?<\/summary>/, '').replace(/<\/details>$/, ''))}
 ${SEC('stats', '📊 Players per day', stats)}
 ${SEC('prog', '🏁 Player progress', progH)}

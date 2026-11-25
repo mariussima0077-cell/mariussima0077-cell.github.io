@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=319;window.TE_CV=CV;
+const CV=320;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -694,6 +694,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
    <h3>ICON · YOUR HEROES</h3><div class="grid" id="olIc">${H.map(h=>ring(h.id,h.id===ME.icon?'sel':'').replace('<div ','<div data-ic="'+h.id+'" ')).join('')||'<small style="color:#8fa0b4">Summon heroes to use them as your icon.</small>'}</div>
    <h3>FRAME</h3><div class="frames">${FR.map(f=>`<div class="${f[0]===ME.frame?'sel':''} ${fOk(f[0])?'':'o-lock'}" data-fr="${f[0]}"><div class="av">${avf(ME.icon,f[0])}</div><small>${f[1]}<br>${fOk(f[0])?(f[0]===ME.frame?'✅ in use':'tap to use'):'🔒 '+f[2]}</small></div>`).join('')}</div>
    <h3>TITLE</h3><div class="tlist">${TORD.map(k=>`<div class="${k===ME.title?'sel':''} ${tOk(k)?'':'o-lock'}" data-tt="${k}">${tt(k)}<span>${TT[k][2]}</span><b>${tOk(k)?(k===ME.title?'✅':''):'🔒'}</b></div>`).join('')}</div>
+   <h3>REWARDS</h3><div class="tlist"><div data-dc="1" style="border-color:#5865F2">💬 DISCORD REWARD<span>Join our Discord: <b style="color:#ffd54a">500 💎 + 10 Recruit + 10 Gear + 10 Crew tickets</b> · gift codes &amp; news about the next updates</span><b>›</b></div><div data-gc="1">🎁 GIFT CODE<span>Type a code from our Discord – the reward comes in your MAIL</span><b>›</b></div></div>
    <h3>HELP & SUPPORT</h3><div class="tlist"><div data-help="1">🆘 WRITE TO US<span>A bug, a purchase, your account or an idea – we answer in your MAIL</span><b>›</b></div></div>
    <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${(()=>{const G=window.GFX||{man:'auto',eff:'std'},TN={hd:'HD',std:'STANDARD',low:'LOW'};return [['auto','⚙️ AUTO · recommended','The game checked your phone → <b>'+TN[G.man==='auto'?G.eff:(G.tier==='lo'?'low':'std')]+'</b> for you'],['hd','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory'],['std','🖼️ STANDARD','Sharp picture, normal battery use'],['low','🍃 LOW · SMOOTH','For older phones – lighter picture, no lag, less battery']].map(g=>`<div class="${G.man===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${G.man===g[0]?'✅':''}</b></div>`).join('');})()}</div>
    <h3>SOUND</h3><div class="tlist" id="olSnd">${(()=>{const on=!window.TE_SND||window.TE_SND.on;return [[1,'🔊 BATTLE SOUNDS ON','Hits, explosions, victory'],[0,'🔇 BATTLE SOUNDS OFF','Silent battles']].map(o=>`<div class="${(o[0]===1)===on?'sel':''}" data-snd="${o[0]}">${o[1]}<span>${o[2]}</span><b>${(o[0]===1)===on?'✅':''}</b></div>`).join('');})()}</div>
@@ -708,6 +709,8 @@ $('olPrB').addEventListener('click',async e=>{
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
   if(e.target.closest('[data-help]')){helpForm();return;}
   const sd=e.target.closest('[data-snd]');if(sd){if(window.TE_SND)window.TE_SND.set(sd.dataset.snd==='1');toast(sd.dataset.snd==='1'?'🔊 Battle sounds ON':'🔇 Battle sounds OFF',1500);renderProf();return;}
+  if(e.target.closest('[data-dc]')){dcForm();return;}
+  if(e.target.closest('[data-gc]')){gcForm();return;}
   const gx=e.target.closest('[data-gfx]');if(gx){const v=gx.dataset.gfx,G=window.GFX;if(!G||G.man===v)return;G.set(v);try{T().save();}catch(x){}toast({auto:'⚙️ AUTO graphics',hd:'✨ HD graphics ON',std:'🖼️ STANDARD graphics',low:'🍃 LOW graphics'}[v]+' – restarting…',1500);setTimeout(()=>location.reload(),1200);return;}
   const ic=e.target.closest('[data-ic]');if(ic){LS('te_icon',ic.dataset.ic);await setProf({icon:ic.dataset.ic});return;}
   const fr=e.target.closest('[data-fr]');if(fr){if(fr.classList.contains('o-lock')){toast('🔒 '+((FR.find(x=>x[0]===+fr.dataset.fr)||[])[2]||'Locked'),2500);return;}await setProf({frame:+fr.dataset.fr});return;}
@@ -761,6 +764,30 @@ function helpForm(){let cat='bug';
       toast({limit:'⏳ You already sent 3 messages today – we will answer soon',short:'✏️ Write a few words first',network:'📶 No connection – try again',update:'⬆️ Update the game first'}[r.err]||'⚠️ Could not send – try again',3500);return false;});
   const C=d.querySelector('#hlC'),mark=()=>C.querySelectorAll('[data-hc]').forEach(x=>{const on=x.dataset.hc===cat;x.style.borderColor=on?'#ffd54a':'#ffd54a55';x.style.background=on?'#ffd54a33':'#00000040';});
   C.addEventListener('click',e=>{const x=e.target.closest('[data-hc]');if(!x)return;e.stopPropagation();cat=x.dataset.hc;mark();});mark();return d;}
+// v16-320 (Marius 25 nov 2026): 💬 DISCORD REWARD (verified: Discord login → Torque Guard asks Discord if the player is on our server) + 🎁 GIFT CODES.
+// Both rewards come as MAIL. Discord gives the login result to discord/link.html (opens in the browser), which sends it to the server.
+const DC_INV='https://discord.gg/KGAJNc7Wcb',DC_APP='1575053906189361185',DC_RED='https://mariussima0077-cell.github.io/discord/link.html';
+const extOpen=u=>{try{const w=window.open(u,'_blank');if(!w)location.href=u;}catch(e){location.href=u;}};
+function dcForm(){if(!API()){toast('📶 Needs an internet connection');return;}
+  const d=modal(`<h4>💬 DISCORD REWARD</h4><div id="dcSt" style="margin:6px 0 10px;font:800 15px Game,system-ui;color:#ffd54a">500 💎 + 10 Recruit + 10 Gear + 10 Crew tickets</div>
+    <p style="margin:0 0 10px;line-height:1.45">Follow us on Discord for <b>GIFT CODES</b>, events and news about the <b>next updates</b>!</p>
+    <div style="text-align:left;line-height:1.5;margin:0 0 12px"><b>1.</b> Join the Torque Empire Discord server.<br><b>2.</b> Come back and tap <b>GET REWARD</b> – log in with Discord, we check that you joined.<br><b>3.</b> The reward arrives in your <b>MAIL</b>. One time per account.</div>
+    <div class="ok" style="flex-wrap:wrap"><button class="btn" data-m="join" style="background:#5865F2;color:#fff">1 · JOIN DISCORD</button><button class="btn" data-m="get">2 · GET REWARD</button></div>`,b=>{
+      if(b==='join'){extOpen(DC_INV);return false;}
+      if(b==='get'){extOpen('https://discord.com/oauth2/authorize?client_id='+DC_APP+'&response_type=token&scope=guilds.members.read&redirect_uri='+encodeURIComponent(DC_RED)+'&state='+encodeURIComponent(PID()+'.'+CV));toast('🎁 After the Discord login, come back and open your MAIL',4000);return false;}
+      return true;});
+  call('dlink',{check:1}).then(r=>{if(r&&r.done){const x=d.querySelector('#dcSt');if(x)x.innerHTML='✅ Reward already claimed – thank you!<br><small style="color:#cfd8e3">Stay on Discord for gift codes and update news.</small>';const g=d.querySelector('[data-m="get"]');if(g)g.style.display='none';}});
+  return d;}
+function gcForm(){if(!API()){toast('📶 Needs an internet connection');return;}
+  const d=modal(`<h4>🎁 GIFT CODE</h4><p style="margin:4px 0 8px">Type a code from our <b>Discord</b> (#announcements).</p>
+    <input id="gcI" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="CODE" style="width:100%;box-sizing:border-box;text-align:center;letter-spacing:2px;text-transform:uppercase;margin:4px 0 10px;border-radius:12px;border:2px solid #ffd54a88;background:#0b1019;color:#fff;padding:12px;font:800 18px Game,system-ui">
+    <div class="ok"><button class="btn gray" data-m="dc" style="background:#5865F2;color:#fff">💬 DISCORD</button><button class="btn" data-m="go">REDEEM</button></div>`,async b=>{
+      if(b==='dc'){extOpen(DC_INV);return false;}
+      if(b!=='go')return true;const c=d.querySelector('#gcI').value.trim();if(c.length<3){toast('✏️ Type the code first',2500);return false;}
+      const r=await call('gcode',{code:c});
+      if(r.ok){toast('🎁 '+(r.txt||'Reward')+' → check your MAIL!',4500);return true;}
+      toast({bad:'❌ This code does not exist',expired:'⌛ This code has expired',used:'✅ You already used this code',gone:'😢 This code was used by too many players',limit:'⏳ Too many wrong codes today – try tomorrow',online:'📶 Go online once first (choose your player name)',network:'📶 No connection – try again',update:'⬆️ Update the game first'}[r.err]||'⚠️ Could not check the code – try again',3500);return false;});
+  setTimeout(()=>{const i=d.querySelector('#gcI');if(i)i.focus();},50);return d;}
 function helpOpen(){if(!API()){toast('📶 HELP needs an internet connection');return;}if(!open_)openHub('olProf');helpForm();}
 
 // ------------------------------------------------------------------ ARENA FIGHT – plays the fight decided by the server
@@ -1040,5 +1067,5 @@ function hudInfo(){const n=document.getElementById('hudNm'),v=document.getElemen
   const fitT=e=>{e.style.fontSize='';for(let i=0;i<3;i++){const w=e.clientWidth,sw=e.scrollWidth;if(!(w>0&&sw>w))break;e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)*w/sw*.95)+'px';}};
   requestAnimationFrame(()=>{fitT(n);fitT(t);});if(document.fonts)document.fonts.ready.then(()=>{fitT(n);fitT(t);});[600,2000,5000].forEach(ms=>setTimeout(()=>{fitT(n);fitT(t);},ms));}
 {const e=document.getElementById('hudAv');if(e){hudAv();const prof=()=>openHub('olProf',{solo:true});e.onclick=prof;const ed=()=>{prof();let k=0;const iv=setInterval(()=>{if(ME){clearInterval(iv);nameModal();}else if(++k>24)clearInterval(iv);},250);};['hudNm','hudEd'].forEach(id=>{const x=document.getElementById(id);if(x)x.onclick=ed;});{const x=document.getElementById('hudTt');if(x)x.onclick=prof;}const v=document.getElementById('hudVip');if(v)v.onclick=()=>{if(typeof openPanel==='function')openPanel('vip');else prof();};}}
-window.ONLINE={hud:hudInfo,help:helpOpen,brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
+window.ONLINE={hud:hudInfo,help:helpOpen,discord:()=>{if(!open_)openHub('olProf');dcForm();},gcode:()=>{if(!open_)openHub('olProf');gcForm();},brag,arTk:()=>arenaTk,name:()=>ME&&ME.name,open:openHub,close:()=>closeHub(1),sync,play:playFight,call,view:viewProfile};
 })();

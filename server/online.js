@@ -210,6 +210,14 @@ let agReady = false;
 export async function agEnsure(db) { if (agReady) return; for (const c of ['tk', 'gt', 'ct', 'dk']) { try { await db.prepare('ALTER TABLE agift ADD COLUMN ' + c + ' INTEGER DEFAULT 0').run(); } catch (e) {} } agReady = true; }
 export const agRw = g => { const r = {}; if (g.dm > 0) r.dm = g.dm | 0; if (g.tk > 0) r.tk = g.tk | 0; if (g.gt > 0) r.gt = g.gt | 0; if (g.ct > 0) r.ct = g.ct | 0; if (g.dk > 0) r.keys = {vault:g.dk | 0, mine:g.dk | 0, forge:g.dk | 0, lab:g.dk | 0}; return r; };
 export const agTxt = g => [g.dm > 0 && (g.dm | 0).toLocaleString('en') + ' Diamonds', g.tk > 0 && g.tk + ' Recruit tickets', g.gt > 0 && g.gt + ' Gear tickets', g.ct > 0 && g.ct + ' Crew tickets', g.dk > 0 && g.dk + ' keys for every Dungeon'].filter(Boolean).join(', ');
+// v16-320: Discord server + reward, gift codes (tables created here, admin page in worker.js)
+const DC_GUILD = '1575053634864156773', DC_RW = {dm:500, tk:10, gt:10, ct:10};
+let gcReady = false;
+export async function gcEnsure(db) { if (gcReady) return; await db.batch([
+  db.prepare('CREATE TABLE IF NOT EXISTS gcodes(code TEXT PRIMARY KEY, dm INTEGER DEFAULT 0, tk INTEGER DEFAULT 0, gt INTEGER DEFAULT 0, ct INTEGER DEFAULT 0, dk INTEGER DEFAULT 0, lim INTEGER DEFAULT 0, used INTEGER DEFAULT 0, exp INTEGER DEFAULT 0, t INTEGER, msg TEXT, off INTEGER DEFAULT 0)'),
+  db.prepare('CREATE TABLE IF NOT EXISTS gcuse(code TEXT, pid TEXT, t INTEGER, PRIMARY KEY(code,pid))'),
+  db.prepare('CREATE TABLE IF NOT EXISTS gctry(pid TEXT, t INTEGER)'),
+  db.prepare('CREATE INDEX IF NOT EXISTS gctry_pid ON gctry(pid,t)')]); gcReady = true; }
 export async function adminGifts(env, pid, uid) {
   try { const db = env.DB; await agEnsure(db); const ag = (await db.prepare('SELECT id,dm,tk,gt,ct,dk,msg FROM agift WHERE pid=? AND sent=0 ORDER BY id').bind(pid).all()).results;
     if (!ag.length) return 0;
@@ -593,6 +601,7 @@ async function rewardsTick(env) {
   await db.prepare('DELETE FROM ahist WHERE t<?').bind(now - 14 * DAY).run();
   await db.prepare('DELETE FROM rwtrain WHERE t1<?').bind(now - 3 * DAY).run(); await db.prepare('DELETE FROM rwhit WHERE t<?').bind(now - 3 * DAY).run();   // v16-146
   await db.prepare('DELETE FROM inbox WHERE (got=1 AND t<?) OR t<?').bind(now - 7 * DAY, now - 60 * DAY).run();
+  try { await db.prepare('DELETE FROM gctry WHERE t<?').bind(now - 2 * DAY).run(); } catch (e) {}   // v16-320
 }
 export async function onlineCron(env) { await ensure(env);
   try { await botTick(env); } catch (e) { console.log('botTick', e && e.message); }   // v16-222: bots FIRST (before, an error/CPU limit in rewards/cup stopped them)
@@ -673,6 +682,42 @@ export async function online(op, b, env) {
     const info = JSON.stringify({cv: b.cv | 0, g: String(b.g || '').slice(0, 30), ua: String(b.ua || '').slice(0, 160), name: p ? p.name : '', srv: p ? p.srv : 0});
     const r = await db.prepare('INSERT INTO tickets(pid,uid,t,cat,txt,info) VALUES(?,?,?,?,?,?) RETURNING id').bind(b.pid, p ? p.uid : 0, now, cat, txt, info).first();
     return {ok:true, id: r && r.id};
+  }
+  // v16-320 (Marius 25 nov): 💬 JOIN DISCORD reward (verified) + 🎁 GIFT CODES. Rewards go to MAIL (ledger counts mail → no flag).
+  // dlink: the player logs in with Discord on discord/link.html (implicit OAuth, scope guilds.members.read) → we ask Discord with HIS token
+  // if he is a member of the Torque Empire server. We keep only a one-way hash of the Discord ID (one Discord account = one reward).
+  if (op === 'dlink') {
+    await db.prepare('CREATE TABLE IF NOT EXISTS dlink(h TEXT PRIMARY KEY, pid TEXT UNIQUE, uid INTEGER, t INTEGER)').run();
+    const done = !!(await db.prepare('SELECT 1 FROM dlink WHERE pid=?').bind(b.pid).first());
+    if (b.check) return {ok:true, done};
+    if (done) return {err:'done'};
+    if (!p) return {err:'online'};
+    const at = String(b.at || '').slice(0, 200); if (!/^[A-Za-z0-9._~-]{10,}$/.test(at)) return {err:'auth'};
+    let r; try { r = await fetch('https://discord.com/api/v10/users/@me/guilds/' + DC_GUILD + '/member', {headers:{authorization:'Bearer ' + at}}); } catch (e) { return {err:'discord'}; }
+    if (r.status === 401) return {err:'auth'};
+    if (r.status === 404 || r.status === 403) return {err:'notmember'};
+    if (!r.ok) return {err:'discord'};
+    const m = await r.json().catch(() => ({})), did = m && m.user && m.user.id; if (!did) return {err:'notmember'};
+    const hb = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('te-dc:' + did)), h = [...new Uint8Array(hb)].map(x => x.toString(16).padStart(2, '0')).join('');
+    const ins = await db.prepare('INSERT OR IGNORE INTO dlink(h,pid,uid,t) VALUES(?,?,?,?)').bind(h, b.pid, p.uid, now).run();
+    if (!ins.meta || !ins.meta.changes) return {err:'used'};
+    await mail(env, p.uid, '💬', 'Welcome to our Discord!', 'Thank you for joining the Torque Empire Discord! Here are 500 Diamonds, 10 Recruit, 10 Gear and 10 Crew tickets. Follow #announcements for GIFT CODES and news about the next updates!', DC_RW);
+    return {ok:true};
+  }
+  if (op === 'gcode') {
+    if (!p) return {err:'online'};
+    await gcEnsure(db);
+    const bad = await db.prepare('SELECT COUNT(*) n FROM gctry WHERE pid=? AND t>?').bind(b.pid, now - DAY).first(); if (bad && bad.n >= 10) return {err:'limit'};
+    const code = String(b.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
+    const g = code.length >= 3 ? await db.prepare('SELECT * FROM gcodes WHERE code=?').bind(code).first() : null;
+    if (!g || g.off) { await db.prepare('INSERT INTO gctry(pid,t) VALUES(?,?)').bind(b.pid, now).run(); return {err:'bad'}; }
+    if (g.exp && g.exp < now) return {err:'expired'};
+    const u = await db.prepare('INSERT OR IGNORE INTO gcuse(code,pid,t) VALUES(?,?,?)').bind(code, b.pid, now).run();
+    if (!u.meta || !u.meta.changes) return {err:'used'};
+    if (!(await db.prepare('UPDATE gcodes SET used=used+1 WHERE code=? AND (lim=0 OR used<lim) RETURNING used').bind(code).first())) {
+      await db.prepare('DELETE FROM gcuse WHERE code=? AND pid=?').bind(code, b.pid).run(); return {err:'gone'}; }
+    await mail(env, p.uid, '🎁', 'Gift code ' + code, (g.msg ? g.msg + '\n\n' : '') + 'Your gift code reward: ' + agTxt(g) + '. Follow our Discord for more codes!', agRw(g));
+    return {ok:true, txt:agTxt(g)};
   }
   if (op === 'sync') {
     if (await isBanned(env, b.pid)) return {banned:1};
