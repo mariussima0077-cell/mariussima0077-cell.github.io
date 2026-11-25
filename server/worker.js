@@ -13,7 +13,8 @@
 // Secrets (Settings → Variables): ADMIN_KEY, SAVE_SALT, GOOGLE_SA (service account JSON), PACKAGE_NAME (e.g. com.torqueempire.game)
 
 import {online, onlineCron, onlineAdmin, giftDm, isGiftDm, adminGifts, agEnsure, agTxt} from './online.js';
-import {EP_N, EP_H} from './ept.js';   // v16-157: enemy power of every campaign stage (made by tools/ept_table.py)
+import {EP_N, EP_H} from './ept.js';
+import {srvErr, areaOf, healthCron, healthApi, healthAct, healthHtml} from './health.js';   // v16-318 🩺 SERVER HEALTH   // v16-157: enemy power of every campaign stage (made by tools/ept_table.py)
 
 // v16-70: players who got VIP as a gift from Marius (personal Mail in the game) – their VIP jump is not cheating
 const GIFT_VIP = ['160672a2'];
@@ -137,11 +138,15 @@ export default {
       if (url.pathname === '/admin/chat') return env.ADMIN_KEY && url.searchParams.get('key') === env.ADMIN_KEY ? onlineAdmin(url, env) : new Response('no', {status:403});
       if (url.pathname === '/admin') return admin(url, env);
       if (url.pathname === '/') return json({ok:true, name:'Torque Guard', time:Date.now()});
+      if (url.pathname === '/api/health') return json(await healthApi(url, env));   // v16-318
       if (url.pathname === '/api/diag') return json(await diag(env));   // v16-82: is the Play API reachable? (no secrets in the answer)
       return json({err:'not found'}, 404);
-    } catch (e) { return json({err:String(e)}, 500); }
+    } catch (e) { await srvErr(env, areaOf(url.pathname), e); return json({err:String(e)}, 500); }   // v16-318: every crash → /admin 🩺 + alert
   },
-  async scheduled(ev, env, ctx) { await ensureG(env); ctx.waitUntil(scan(env)); ctx.waitUntil(onlineCron(env)); }
+  async scheduled(ev, env, ctx) { await ensureG(env);
+    ctx.waitUntil(scan(env).catch(e => srvErr(env, 'Cron: anti-cheat scan', e)));
+    ctx.waitUntil(onlineCron(env).catch(e => srvErr(env, 'Cron: online (Cup, rewards, bots)', e)));
+    ctx.waitUntil(healthCron(env).catch(e => srvErr(env, 'Cron: health tests', e))); }   // v16-318
 };
 
 // ------------------------------------------------------------------ report
@@ -804,6 +809,7 @@ async function admin(url, env) {
   // v16-265 🆘 SUPPORT: answer a ticket (→ the player's Mail) or close it
   await db.prepare('CREATE TABLE IF NOT EXISTS tickets(id INTEGER PRIMARY KEY AUTOINCREMENT, pid TEXT, uid INTEGER, t INTEGER, cat TEXT, txt TEXT, info TEXT, st INTEGER DEFAULT 0, reply TEXT, tr INTEGER)').run();
   const tAns = url.searchParams.get('tans'), tCls = url.searchParams.get('tcls');
+  { const hA = await healthAct(url, env, k); if (hA) return hA; }   // v16-318 ▶️ run tests / 👍 server error done
   const eFix = url.searchParams.get('efix');   // v16-268: ✅ FIXED (one error, or 'all')
   if (eFix) { await errList(env); if (eFix === 'all') await db.prepare('UPDATE errs SET fx=cv, n=0').run(); else await db.prepare('UPDATE errs SET fx=cv, n=0 WHERE h=?').bind(eFix).run();
     return Response.redirect(url.origin + '/admin?key=' + k + '#errs', 302); }
@@ -870,6 +876,7 @@ async function admin(url, env) {
   const noH = x => String(x || '').replace(/^\s*<h3[^>]*>[\s\S]*?<\/h3>/, '');
   let progH = '', ecoH = '', eur7 = {d:0, m:0}; try { progH = await progHtml(env); } catch (e) { progH = '<div class=c>' + escH(String(e)) + '</div>'; } try { ecoH = await econHtml(env); } catch (e) { ecoH = '<div class=c>' + escH(String(e)) + '</div>'; }
   try { const now = Date.now(), td = parisDay(now); for (const r of (await db.prepare("SELECT sku,t FROM purchases WHERE state='ok' AND t>?").bind(now - 32 * 864e5).all()).results) { const v = PLAY_EUR[r.sku] || 0, dd = parisDay(r.t); if (dd === td) eur7.d += v; if (dd.slice(0, 7) === td.slice(0, 7)) eur7.m += v; } } catch (e) {}
+  let HH = {banner:'', sec:'', red:false, title:'🩺 Server health'}; try { HH = await healthHtml(env, k); } catch (e) { HH.banner = '<div class=c>health: ' + escH(String(e)) + '</div>'; }   // v16-318
   const openT = tks.filter(t => !t.st).length, nBan = bad.filter(p => p.banned).length, nFlag = bad.length - nBan;
   const stats = !st ? '<div class=c>no stats yet</div>' : `<div class=c>🟢 online now (10 min): <b>${st.on.m10 || 0}</b> · last hour: <b>${st.on.h1 || 0}</b> · 7 days: <b>${st.on.d7 || 0}</b> · 30 days: <b>${st.on.d30 || 0}</b></div>
 <div class=c><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#ffd54a;text-align:left"><th>Day</th><th>Active</th><th>New</th><th>Back next day</th><th>Back after 7 days</th></tr>${st.days.map(x => { const r = st.ret[x], r7 = st.ret7[x];
@@ -882,14 +889,16 @@ async function admin(url, env) {
 .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.kp div{background:#141c2b;border:1px solid #e0a82e55;border-radius:12px;padding:8px;text-align:center;font-size:11px;color:#9fb0c0}.kp b{display:block;font-size:19px;color:#fff}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.chip{padding:7px 10px;border-radius:999px;background:#1b2537;border:1px solid #ffffff22;text-decoration:none;color:#e8f2ff;font-size:13px;font-weight:700}</style>
 <h1>🛡️ Torque Guard</h1>
+${HH.banner}
 <div class=kp><div><b>${st ? st.on.m10 || 0 : '–'}</b>🟢 online now</div><div><b>${tot.d || 0}</b>active 24h</div><div><b>${tot.n}</b>players</div>
 <div><b style="color:#7dff8a">${eur(eur7.d)}</b>today</div><div><b style="color:#7dff8a">${eur(eur7.m)}</b>this month</div><div><b style="color:${openT ? '#ff8a80' : '#fff'}">${openT}</b>support open</div>
 <div><b style="color:${errs.length ? '#ffb74d' : '#fff'}">${errs.length}</b>game errors</div><div><b style="color:${nFlag ? '#ffd54a' : '#fff'}">${nFlag}</b>flagged</div><div><b>${nBan}</b>banned</div></div>
 <form class=c style="display:flex;gap:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input name=q placeholder="🔎 player name" style="flex:1;padding:8px;border-radius:8px;border:0;font-size:15px"><button style="padding:8px 12px;border-radius:8px;border:0;background:#ffd54a;font-weight:bold">Search</button></form>
-<div class=chips>${chip('sup', '🆘 Support' + (openT ? ' (' + openT + ')' : ''), openT ? '#ff8a80' : '')}${chip('errs', '🐞 Errors' + (errs.length ? ' (' + errs.length + ')' : ''), errs.length ? '#ffb74d' : '')}${chip('gift', '🎁 Gift')}${chip('mall', '📢 Mail all')}${chip('stats', '📊 Players')}${chip('prog', '🏁 Progress')}${chip('eco', '💎 Economy')}${chip('buys', '💳 Purchases')}${chip('quit', '🚪 Who quits')}${chip('bad', '⚠️ Cheaters')}${chip('ver', '📦 Versions')}${chip('integ', '🔒 Integrity')}${chip('ev', '📜 Events')}<a class=chip href="/admin/chat?key=${k}">💬 Chat</a></div>
+<div class=chips>${chip('health', HH.title, HH.red ? '#ff5252' : '')}${chip('sup', '🆘 Support' + (openT ? ' (' + openT + ')' : ''), openT ? '#ff8a80' : '')}${chip('errs', '🐞 Errors' + (errs.length ? ' (' + errs.length + ')' : ''), errs.length ? '#ffb74d' : '')}${chip('gift', '🎁 Gift')}${chip('mall', '📢 Mail all')}${chip('stats', '📊 Players')}${chip('prog', '🏁 Progress')}${chip('eco', '💎 Economy')}${chip('buys', '💳 Purchases')}${chip('quit', '🚪 Who quits')}${chip('bad', '⚠️ Cheaters')}${chip('ver', '📦 Versions')}${chip('integ', '🔒 Integrity')}${chip('ev', '📜 Events')}<a class=chip href="/admin/chat?key=${k}">💬 Chat</a></div>
 ${SEC('sup', `🆘 Support (${tks.filter(t => !t.st).length} open)`, `${tks.length ? tks.map(t => { let I = {}; try { I = JSON.parse(t.info || '{}'); } catch (e) {}
   return `<div class=c style="${t.st ? 'opacity:.55' : 'border-color:#ff8a80'}"><b>${TC[t.cat] || t.cat}</b> · <a href="?key=${k}&p=${encodeURIComponent(t.pid)}"><b style="color:#fff">${esc(TN[t.pid] || I.name || '(no name)')}</b></a> <small>${d(t.t)} · v${I.cv || '?'} · ${esc(I.g || '')} · S${I.srv || '?'}</small><br>${esc(t.txt)}<br><small>${esc(String(I.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>
   ${t.st === 1 ? `<br><small style="color:#7dff8a">✅ answered ${d(t.tr)}: ${esc(t.reply)}</small>` : t.st === 2 ? '<br><small>closed</small>' : `<form style="margin-top:6px"><input type=hidden name=key value="${esc(env.ADMIN_KEY)}"><input type=hidden name=tans value="${t.id}"><textarea name=msg rows=3 placeholder="Answer (goes to his MAIL)" style="width:100%;box-sizing:border-box;border-radius:8px;padding:6px"></textarea><button style="padding:6px 14px;border-radius:8px;border:0;background:#ffd54a;font-weight:800">SEND ANSWER</button> <a href="?key=${k}&tcls=${t.id}">close without answer</a></form>`}</div>`; }).join('') : '<div class=c>No messages 👍</div>'}`, openT > 0)}
+${SEC('health', HH.title, HH.sec, HH.red)}
 ${SEC('errs', `🐞 Game errors (${errs.length})`, `${errs.length > 1 ? `<div class=c><a href="?key=${k}&efix=all">👍 mark ALL as done</a></div>` : ''}${errs.length ? errs.map(r => `<div class=c><a href="?key=${k}&efix=${encodeURIComponent(r.h)}" onclick="return confirm('Problem solved? The error will be hidden (it comes back by itself if a newer version still has it).')" style="float:right;padding:4px 10px;border-radius:8px;background:#2e7d32;color:#fff;text-decoration:none;font-weight:800">👍 DONE</a><span style="display:inline-block;padding:2px 8px;border-radius:8px;background:${r.fx ? '#c62828' : '#ef6c00'};color:#fff;font-weight:800;font-size:12px;margin-bottom:4px">${r.fx ? '↩️ CAME BACK after the fix' : '🔧 OPEN – to fix'}</span><br><b class=f>${r.n}×</b> <small>v${r.cv} · last ${d(r.t)} · first ${d(r.t0)}${r.gfx ? ' · ' + esc(r.gfx) : ''}</small><br>${esc(r.m)}<br><small>${esc(r.src)} · ${esc(String(r.ua || '').replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}</small>${r.st ? `<br><small style="font-family:monospace;color:#9fb3c8;word-break:break-all">📍 ${esc(r.st)}</small>` : ''}</div>`).join('') : '<div class=c>No errors 👍</div>'}`, errs.length > 0)}
 ${SEC('gift', '🎁 Send a gift to one player', giftForm(env.ADMIN_KEY, ''))}
 ${SEC('mall', '📢 Mail to ALL players', noH(bcastForm(env.ADMIN_KEY)).replace(/^<details[^>]*><summary>[\s\S]*?<\/summary>/, '').replace(/<\/details>$/, ''))}

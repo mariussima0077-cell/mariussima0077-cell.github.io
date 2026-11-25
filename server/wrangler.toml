@@ -20,3 +20,7 @@ database_id = "322aec9e-ddaa-4741-874e-5a2105c89523"
 # v16-45: automatic chat translation (Cloudflare Workers AI – free daily quota; if it is used up, players see the original text)
 [ai]
 binding = "AI"
+
+# v16-318 🩺 SERVER HEALTH: the id of the deployed server version → the health tests notice „server updated” and report the result
+[version_metadata]
+binding = "CFV"

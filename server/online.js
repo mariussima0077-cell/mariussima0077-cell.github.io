@@ -901,3 +901,44 @@ export async function onlineAdmin(url, env) {
 <h3>Last messages</h3>${last.map(row).join('')}`;
   return new Response(html, {headers:{'content-type':'text/html;charset=utf-8'}});
 }
+
+// ------------------------------------------------------------------ v16-318 SERVER HEALTH SELF-TEST (Marius 25 nov 2026:
+// „cum putem vedea dacă ceva nu e ok cu serverul după un update… cu arena azi dimineață nu am primit nicio notificare”)
+// Runs the real online code with a filler BOT profile (read-only pages) + arena fights with fixed teams + REPLAYS of the last
+// real fights (Arena / Rail Wars / Cup all use arenaSim). Called by server/health.js every 10 min and right after an update.
+export async function selfTest(env) {
+  await ensure(env); const db = env.DB, out = [];
+  const T = async (k, fn) => { const t0 = Date.now();
+    try { const m = await fn(); out.push({k, ok:1, msg:String(m || 'OK').slice(0, 200), ms:Date.now() - t0}); }
+    catch (e) { out.push({k, ok:0, msg:String(e && e.message || e).slice(0, 200), st:String(e && e.stack || '').slice(0, 400), ms:Date.now() - t0}); } };
+  let bot = null; try { bot = await db.prepare("SELECT pid FROM prof WHERE substr(pid,1,4)='bot_' ORDER BY t DESC LIMIT 1").first(); } catch (e) {}
+  const call = async (op, x) => { if (!bot) return 'skipped (no bot profile)'; let r = await online(op, {pid:bot.pid, cv:Math.max(MIN_CV, 9999), ...(x || {})}, env);
+    if (r && r.err === 'no_profile') { bot = await db.prepare("SELECT pid FROM prof WHERE substr(pid,1,4)='bot_' ORDER BY t DESC LIMIT 1").first();   // the bot was removed meanwhile
+      if (!bot) return 'skipped (no bot profile)'; r = await online(op, {pid:bot.pid, cv:Math.max(MIN_CV, 9999), ...(x || {})}, env); }
+    if (!r || r.err) throw new Error(op + ' → ' + (r ? r.err : 'empty answer')); return r; };
+  await T('db', async () => { const r = await db.prepare('SELECT COUNT(*) n FROM prof').first(); return r.n + ' online profiles'; });
+  await T('arena_sim', () => {
+    const R = ['engine', 'tuning', 'service', 'inspect', 'paint', 'elec', 'all'];
+    const mk = (roles, k) => roles.map((role, i) => ({id:'m0_0', n:'', role, gr:3, s:0, hp:Math.round(9000 * k), atk:400 * k, def:20 + i * 8, as:1 + i * .07, crit:.15, cdm:1.8, sd:1.2, rng:role === 'inspect' || role === 'elec' ? 220 : 34, eg:1}));
+    let dur = 0, wins = 0, tout = 0;
+    for (let s = 1; s <= 30; s++) {
+      const a = mk(R.slice(0, 5), 1 + (s % 5) * .08), d = mk(R.slice(2, 7), 1 + (s % 3) * .1), res = arenaSim(a, d, s * 7919);
+      if (!res || (res.win !== 0 && res.win !== 1) || !(res.dur > 0) || !res.log.length) throw new Error('fight ' + s + ': bad result');
+      for (const ev of res.log) for (const h of ev.h) if (!Number.isFinite(h[1])) throw new Error('fight ' + s + ': damage is not a number');
+      dur += res.dur; wins += res.win; if (res.dur >= 75) tout++;
+    }
+    if (tout > 15) throw new Error(tout + '/30 fights hit the 75 s time limit (damage too low?)');
+    return '30 fights OK · ~' + Math.round(dur / 30) + ' s each · attacker won ' + wins + '/30';
+  });
+  await T('arena_replay', async () => { const rows = (await db.prepare('SELECT id, kind FROM ahist ORDER BY id DESC LIMIT 3').all()).results; if (!rows.length) return 'no fights yet';
+    for (const r of rows) { const x = await replay(env, r.id); if (!x || x.err) throw new Error('replay #' + r.id + ' (' + r.kind + ') → ' + (x ? x.err : 'empty')); }
+    return rows.length + ' last real fights replayed OK'; });
+  await T('chat', async () => { const r = await call('chat', {ch:'w', tr:false}); return typeof r === 'string' ? r : (r.list || []).length + ' last messages'; });
+  await T('atop', async () => { const r = await call('atop'); return typeof r === 'string' ? r : (r.list || []).length + ' in the Arena top'; });
+  await T('hist', async () => { const r = await call('hist'); return typeof r === 'string' ? r : 'OK'; });
+  await T('cup', async () => { const r = await call('cup'); return typeof r === 'string' ? r : 'Torque Cup: ' + (r.state || '?'); });
+  await T('wb', async () => { const r = await call('wbrank'); return typeof r === 'string' ? r : (r.top || []).length + ' in the World Boss ranking'; });
+  await T('mail', async () => { const r = await call('inbox'); return typeof r === 'string' ? r : 'OK'; });
+  await T('rank', async () => { const r = await call('rank'); return typeof r === 'string' ? r : (r.list || []).length + ' players in the ranking'; });
+  return out;
+}
