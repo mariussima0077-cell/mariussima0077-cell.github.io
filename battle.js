@@ -950,7 +950,7 @@ const cdmgV=it=>Math.round(GSTAT.cdmg.v[it.r]*(it.r>=6?6.9*1.3*Math.pow(ASC_STEP
 const mainOld=it=>Math.round(GSTAT[GS[it.s].st].v[it.r]*(it.r>=6?ASC_K:1)*(1+.12*(it.lv-1))*gStarK(it.sr)*10)/10; // before v16-205 (migration only)
 // v16-307 (Marius 25 nov): the white band of every piece = LVL of the hero who wears it (follows the hero level automatically). Every LVL = +0.1% main stat, every 10 LVL a BOOST +5% (only ATK / HP / DEF pieces: Tool, Helmet, Work Vest) and a new colour.
 const ILV_ST={atk:1,hp:1,def:1},ILV_L=.1,ILV_10=5,ILV_P=lv=>Math.round(((lv||0)*ILV_L+Math.floor((lv||0)/10)*ILV_10)*10)/10,iLvOf=it=>{const o=ownerOf(it);return o?((TE().lvOf&&TE().lvOf(o))||1):0;},iLvK=lv=>1+ILV_P(lv)/100,iLvCol=lv=>{const t=Math.floor(lv/10);return t?`hsl(${(110+t*9)%360},88%,64%)`:'#e0e0e0';};
-const gLvTxt=it=>{const l=iLvOf(it);return l?`<i style="font-style:normal;color:${iLvCol(l)}">LVL ${l}</i>`:'LVL —';};
+const gLvTxt=it=>{const l=it._lv||iLvOf(it);return l?`<i style="font-style:normal;color:${iLvCol(l)}">LVL ${l}</i>`:'LVL —';};
 const GMS_LIST=()=>{const o=[];for(let l=5;l<=GLV_MAX;l+=5)o.push([l,l===45?'Main stat ×'+GMS_M45:l===50?'Main stat ×'+GMS_M50.toFixed(2)+' (×2)':'Extra stats +'+GMS_SK*100+'%']);return o;}; // +12% of the base value per level (Lv 50 = ×6.9)
 const itemName=it=>it.set&&SETS[it.set]?SETS[it.set].p[GSLOT.indexOf(GS[it.s])]:GNAMES[it.s][it.r];
 const upCost=it=>Math.round(150*Math.pow(it.r+1,1.6)*Math.pow(1.4,Math.min(it.lv,10)-1)*Math.pow(1.08,Math.max(0,it.lv-10))/10)*10;
@@ -1001,13 +1001,14 @@ function clsOf(h){if(!h)return 'engine';if(h.crew)return 'crew';const k=h.sp||'a
 function setKeys(h){return h&&h.crew?[]:[clsOf(h)];}
 function setKeyOf(h,items){return setKeys(h)[0];}
 function setCount(h,items){const k=setKeyOf(h,items);return items.filter(it=>it.set===k).length;}
-const setSame=L=>L.length>=2&&L.every(o=>o.r===L[0].r);
+// v16-340 (Marius 26 nov: "how can Mythic be better than Transcended?"): ASCENDED counts as MYTHIC here – an Ascended piece no longer breaks a Mythic set ×1.5
+const sgR=r=>Math.min(5,r),setSame=L=>L.length>=2&&L.every(o=>sgR(o.r)===sgR(L[0].r));
 const setPct=(it,same)=>Math.round(SET_P[Math.min(6,it.r)]*(same?SET_SAME:1)*10)/10;
 function setBon(h,items){const b={atk:0,hp:0,def:0,crit:0,cdmg:0,aspd:0,en:0},k=setKeyOf(h,items);if(!SETS[k])return b;const L=items.filter(it=>it.set===k),same=setSame(L);
   for(const it of L)b[it.ss||'atk']+=setPct(it,same);return b;}
 const setTierTxt=t=>t.map(([k,v])=>GSTAT[k].n+' +'+v+'%').join(' · ');
 function setPcs(k,items){return '<div class="setPc">'+GSLOT.map((sl,i)=>{const on=(items||[]).some(it=>it.set===k&&it.s===sl.k);return `<div class="${on?'on':''}"><img src="img/ui4/st_${k}_${sl.k}.webp" alt=""><small>${SETS[k].p[i]}</small></div>`;}).join('')+'</div>';}
-const SET_RULE='Every set piece has 1 random <b>SET STAT</b>: Common +2% · Uncommon +3% · Rare +4% · Epic +6% · Legendary +8% · Mythic +10% · Ascended +12%. All set pieces the <b>same grade</b> (2+) → <b>×1.5</b>.';
+const SET_RULE='Every set piece has 1 random <b>SET STAT</b>: Common +2% · Uncommon +3% · Rare +4% · Epic +6% · Legendary +8% · Mythic +10% · Ascended +12%. All set pieces the <b>same grade</b> (2+) → <b>×1.5</b> (Ascended counts as Mythic).';
 // v16-250 (Marius: "what are these?"): the round badge shows the PIECE ICON (not its name); the piece you opened is marked ◀ THIS PIECE
 const setIco=it=>`<img src="img/ui4/st_${it.set}_${it.s}.webp" alt="" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 1px #000)">`;
 function setBlock(k,n,L,cur){if(!L||!L.length)return '<div class="setBl"><div><span>'+SET_RULE+'</span></div></div>';const same=setSame(L);
@@ -3239,13 +3240,16 @@ function miniCard(h,lab){if(!h)return `<div class="mc"><div class="mcI empty">�
 const bigN=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e9?(v/1e9).toFixed(2)+'B':a>=1e6?(v/1e6).toFixed(2)+'M':v.toLocaleString();}; // v16-113: 1.67M instead of 1 668 436 (fits on a phone)
 const STROWS=[['heart','HP',s=>s.hp,bigN],['atk','Attack',s=>s.atk,bigN],['shield','Defense',s=>s.def,v=>Math.round(v)],
  ['crit','Crit chance',s=>s.crit*100,v=>v.toFixed(1)+'%'],['cdmg','Crit damage',s=>(s.cdm||CRIT_DM)*100,v=>Math.round(v)+'%'],['aspd','Attack speed',s=>1/s.as,v=>v.toFixed(2)+'/s'],['energy','Skill damage',s=>((s.sd||1)-1)*100,v=>'+'+Math.round(v)+'%']];
-function dTxt(a,b,fmt){const d=b-a;if(Math.abs(d)<1e-6)return '<b>=</b>';const pc=a>0.0001?' ('+(d>0?'+':'')+Math.round(d/a*100)+'%)':'';return `<b class="${d>0?'up':'dn'}">${d>0?'▲':'▼'} ${fmt(Math.abs(d))}${pc}</b>`;}
+// v16-340: no red ▼ +0% – same shown value = '='; relative % with 1 decimal under 10%; % stats (crit, skill) show only the difference
+const pcTxt=(a,d,fmt)=>{if(!(a>0.0001)||/%$/.test(fmt(a)))return '';const q=d/a*100,r=Math.abs(q)<10?Math.round(q*10)/10:Math.round(q);return r?' ('+(d>0?'+':'')+r+'%)':'';};
+function dTxt(a,b,fmt){const d=b-a;if(Math.abs(d)<1e-6||fmt(a)===fmt(b))return '<b>=</b>';const pc=pcTxt(a,d,fmt);return `<b class="${d>0?'up':'dn'}">${d>0?'▲':'▼'} ${fmt(Math.abs(d))}${pc}</b>`;}
 // stat table + advantages / disadvantages
 function cmpBlock(sa,sb,pa,pb,extraPros,extraCons,hideZero){const pros=[...(extraPros||[])],cons=[...(extraCons||[])];
   let t='<div class="ct"><div class="ch"><span>Stat</span><b>Before</b><b>After</b><b>Change</b></div>';
   STROWS.forEach(([ic,n,f,fmt])=>{const a=sa?f(sa):0,b=sb?f(sb):0;if(hideZero&&!a&&!b)return;t+=`<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.1em','-.22em')} ${n}</span><b>${sa?fmt(a):'—'}</b><b>${sb?fmt(b):'—'}</b>${dTxt(a,b,fmt)}</div>`;
-    const d=b-a;if(Math.abs(d)>1e-6&&sa&&sb){const pc=a>0.0001?' ('+(d>0?'+':'')+Math.round(d/a*100)+'%)':'';(d>0?pros:cons).push(`${n} ${d>0?'+':'−'}${fmt(Math.abs(d))}${pc}`);}});
-  t+=`<div class="pw"><span>${IMGI(PWU,'1.25em','-.28em')} Power</span><b>${pa.toLocaleString()}</b><b>${pb.toLocaleString()}</b>${dTxt(pa,pb,v=>Math.round(v).toLocaleString())}</div></div>`;
+    const d=b-a;if(Math.abs(d)>1e-6&&sa&&sb&&fmt(a)!==fmt(b)){const pc=pcTxt(a,d,fmt),w=a>0.0001?Math.abs(d/a):1;if(w>=.005)(d>0?pros:cons).push([w,`${n} ${d>0?'+':'−'}${fmt(Math.abs(d))}${pc}`]);}});
+  const srt=L=>L.sort((x,y)=>(Array.isArray(y)?y[0]:9)-(Array.isArray(x)?x[0]:9)).forEach((x,i)=>{if(Array.isArray(x))L[i]=x[1];});srt(pros);srt(cons); // biggest change first, < 0.5% hidden
+  t+=`<div class="pw"><span>${IMGI(PWU,'1.25em','-.28em')} Power</span><b>${bigN(pa)}</b><b>${bigN(pb)}</b>${dTxt(pa,pb,bigN)}</div></div>`;
   t+=`<div class="pc"><div class="pro"><h4>✅ ADVANTAGES</h4>${pros.length?pros.map(x=>'<p>'+x+'</p>').join(''):'<p class="no">none</p>'}</div><div class="con"><h4>❌ DISADVANTAGES</h4>${cons.length?cons.map(x=>'<p>'+x+'</p>').join(''):'<p class="no">none</p>'}</div></div>`;
   return t;}
 
@@ -3569,7 +3573,7 @@ function aeRefill(hid,sk){const h=heroOf(hid);if(!h)return;const g=GR(),K=setKey
   const c=L.filter(it=>it.set===K).sort(aeBetter);let b=c[0];if(!b){let bp=-1;for(const it of L){const p=pow(h,{[sk]:it});if(p>bp){bp=p;b=it;}}}if(b)equip(hid,b);}
 function popAuto(){const T=TE(),g=GR(),h=gHero();if(!h)return;const ov=autoPlan(h),eq=g.eq[h.id]||{};const ch=GSLOT.filter(sl=>(ov[sl.k]?ov[sl.k].id:0)!==(eq[sl.k]||0));
   if(!ch.length){T.toast('⚡ '+h.n+' already wears the best gear',2000);return;}
-  let x=`<div class="pT">Auto equip – before / after</div><div class="pD">Best gear for ${h.n}: the <b>${SETS[clsOf(h)]?SETS[clsOf(h)].n:''}</b> set first (highest grade first), then the strongest free pieces.</div><div class="aeL">`+ch.map(sl=>{const a=itemById(eq[sl.k]),b=ov[sl.k],o=b&&ownerOf(b),oh=o&&o!==h.id?heroOf(o):null;return `<div><small>${sl.n}</small>${a?itemCard(a):'<div class="gse sm">—</div>'}<span>➜</span>${b?itemCard(b):'<div class="gse sm">—</div>'}${oh?`<small style="color:#ffb74d">from ${oh.n}</small>`:''}</div>`;}).join('')+'</div>'+(()=>{const tk=ch.map(sl=>ov[sl.k]).filter(b=>b&&ownerOf(b)&&ownerOf(b)!==h.id);return tk.length?`<div class="pD" style="color:#ffb74d">⚠️ ${tk.length} piece${tk.length>1?'s':''} will be TAKEN from other heroes (not their class set). They get the best free piece from the bag instead.</div>`:'';})();
+  let x=`<div class="pT">Auto equip – before / after</div><div class="pD">Best gear for ${h.n}: the <b>${SETS[clsOf(h)]?SETS[clsOf(h)].n:''}</b> set first (highest grade first), then the strongest free pieces.</div><div class="aeL">`+ch.map(sl=>{const a=itemById(eq[sl.k]),b=ov[sl.k],o=b&&ownerOf(b),oh=o&&o!==h.id?heroOf(o):null;return `<div><small>${sl.n}</small>${a?itemCard(a):'<div class="gse sm">—</div>'}<span>➜</span>${b?itemCard({...b,_lv:(TE().lvOf&&TE().lvOf(h.id))||1}):'<div class="gse sm">—</div>'}${oh?`<small style="color:#ffb74d">from ${oh.n}</small>`:''}</div>`;}).join('')+'</div>'+(()=>{const tk=ch.map(sl=>ov[sl.k]).filter(b=>b&&ownerOf(b)&&ownerOf(b)!==h.id);return tk.length?`<div class="pD" style="color:#ffb74d">⚠️ ${tk.length} piece${tk.length>1?'s':''} will be TAKEN from other heroes (not their class set). They get the best free piece from the bag instead.</div>`:'';})();
   x+=cmpForHero(h,ov,[],[])+`<button class="cpGo" data-p="aok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`;pop(x);}
 function popNone(){const T=TE(),h=gHero();if(!h)return;const eq=GR().eq[h.id]||{};if(!Object.keys(eq).length){T.toast('Nothing equipped',1500);return;}
   const ov={};GSLOT.forEach(s=>ov[s.k]=null);pop(`<div class="pT">Remove all gear?</div><div class="pD">${h.n} – before / after</div>`+cmpForHero(h,ov,[],['All gear goes back to the bag'])+`<button class="cpGo" data-p="nok">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`);}
