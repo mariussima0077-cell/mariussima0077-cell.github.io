@@ -555,7 +555,7 @@ const HSK={
  m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
  m5_4:{sk:'STARFIRE RAIN',skd:'A rain of electric spark-plug arrows falls on the biggest group: 240% damage, slow 50% for 3s and they are MARKED (+35% damage taken) for 6s. Long range.'},
  m5_6:{sk:'RAINBOW TEMPEST',skd:'A tornado of magic rainbow paint falls on the biggest group: 260% damage, slow 50% for 4s and the painted enemies deal −30% damage for 5s. Long range.'},
- m5_8:{sk:'EXHAUST PHANTOM',skd:'Shade vanishes in black exhaust smoke, appears behind the weakest enemy and strikes with a red X: 380% damage, always critical.'},
+ m5_8:{sk:'EXHAUST PHANTOM',skd:'Shade vanishes in black exhaust smoke, appears behind the weakest enemy and strikes with a red X: 380% damage, always critical. Kit: every attack = 3 quick hits, 30% evade, after an evade his next hit is a sure critical (SHADOW STEP).'},
  m5_7:{sk:'PIT STOP',skd:'A racing ambulance drives through the team: heals every hero 25% HP, gives a shield of 15% HP and +20% ultimate energy to the others. Long range healer.'},
  m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Long range.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
@@ -634,7 +634,7 @@ const TAL={m5_0:{n:'OVERLOAD CROWN',v:[.5,.65,.8],d:v=>'Every 4th attack the lig
  m5_3:{n:'IRON WALL',v:[.1,.15,.2],d:v=>'At the start of every wave the whole team gets a shield of '+Math.round(v*100)+'% of Goliath\'s HP.'},
  m5_4:{n:'STAR MARK',v:[.15,.2,.25],d:v=>'The monster Nova hits takes +'+Math.round(v*100)+'% damage from the whole team for 4 s.'},
  m5_6:{n:'WET PAINT',v:[.2,.25,.3],d:v=>'Every monster Chroma hits is soaked in paint: −'+Math.round(v*100)+'% attack speed for 4 s.'},
- m5_8:{n:'SHADOW STEP',v:[.3,.4,.5],d:v=>'After Shade evades a hit, his next hit is a sure critical with +'+Math.round(v*100)+'% critical damage.'},
+ m5_8:{n:'EXECUTION',v:[.3,.45,.6],d:v=>'Shade deals +'+Math.round(v*100)+'% damage to enemies below 30% HP.'},
  m5_7:{n:'FIRST AID',v:[.1,.15,.2],d:v=>'Doc Volta\'s heals are +'+Math.round(v*100)+'% stronger. Phase II: the healed hero also gets a 5% HP shield. Phase III: +5% ultimate energy too.'},
  m5_5:{n:'PIERCING RAIL',v:[.6,.75,.9],d:v=>'Every 3rd shot goes through every monster in the line ('+Math.round(v*100)+'% damage).'}};
 const TAL_LV=[320,360,400],talLvOf=lv=>lv>=TAL_LV[2]?3:lv>=TAL_LV[1]?2:lv>=TAL_LV[0]?1:0;
@@ -1998,7 +1998,8 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   else if(tgt.hero){const ir=pv(tgt,'engine',0);if(ir)a*=1-ir/100;}
   if(tgt.defB>0)a*=.8;if(src.weak>0)a*=.7;
   if(tgt.wbB&&src.hero&&src.role===B.tw.weak)a*=1.3; // v16-60 WORLD BOSS: the weak class deals +30%
-  let ss=0;if(src.hero&&src.sstep&&!o.skill){ss=1;src.sstep=0;if(src.tl)a*=1+TV(src);if(!B.sim)talTxt(src,'SHADOW STEP');}
+  let ss=0;if(src.tl&&src.hero&&src.h&&src.h.id==='m5_8'&&!tgt.hero&&tgt.hp<tgt.max*.3)a*=1+TV(src); // EXECUTION talent (Shade)
+  if(src.hero&&src.sstep&&!o.skill){ss=1;src.sstep=0;if(!B.sim)talTxt(src,'SHADOW STEP');}
   const crit=o.crit||ss||(!o.noCrit&&Math.random()<Math.min(src.hero?CRIT_CAP:1,src.crit+(src.critB>0?.15:0)));if(crit)a*=src.cdm||CRIT_DM;
   a=Math.max(1,Math.round(a));let left=a;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
