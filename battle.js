@@ -2025,7 +2025,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(tgt.wbB&&src.hero&&src.role===B.tw.weak)a*=1.3; // v16-60 WORLD BOSS: the weak class deals +30%
   let ss=0;if(src.tl&&src.hero&&src.h&&src.h.id==='m5_8'&&!tgt.hero&&tgt.hp<tgt.max*.3)a*=1+TV(src); // EXECUTION talent (Shade)
   if(src.hero&&src.sstep&&!o.skill){ss=1;src.sstep=0;if(!B.sim)talTxt(src,'SHADOW STEP');}
-  const crit=o.crit||ss||(!o.noCrit&&Math.random()<Math.min(src.hero?CRIT_CAP:1,src.crit+(src.critB>0?.15:0)));if(crit)a*=src.cdm||CRIT_DM;
+  const crit=o.crit||ss||(src.hero&&tgt.vlock>0)||(!o.noCrit&&Math.random()<Math.min(src.hero?CRIT_CAP:1,src.crit+(src.critB>0?.15:0)));if(crit)a*=src.cdm||CRIT_DM;
   if(!o.skill&&!B.sim&&src.h&&HITFX[src.h.id]&&!tgt.hero&&B.t-(src.hfxT||-9)>.2){src.hfxT=B.t;const H=HITFX[src.h.id];atl8(H.k,tgt,0,{d:.32,f0:crit?H.c:H.n0,n:4,hm:crit?.95:.7,min:60,mid:1});}
   a=Math.max(1,Math.round(a));let left=a;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
@@ -2192,12 +2192,12 @@ function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
 // v16-354: Mythic effect pictures (Marius' own sheets, 4x2 atlases on transparent) – ult impact, status after the ult, status icon, basic hit
 const ATL={};function atl(k){let i=ATL[k];if(!i){i=ATL[k]=new Image();i.decoding='async';i.src='img/fx/'+k+(LOWRES&&k.indexOf('sti_')!==0?'_low':'')+'.webp';}return i;}
-const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1},nmark:{k:'st_m5_4',ic:'sti_m5_4',dur:6,noburn:1}}; // nmark: look + icon of Nova's MARKED // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
-const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3'],m5_4:['ult_m5_4','st_m5_4','sti_m5_4','hit_m5_4']};
-const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4},m5_4:{k:'hit_m5_4',n0:4,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
+const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1},nmark:{k:'st_m5_4',ic:'sti_m5_4',dur:6,noburn:1},vlock:{k:'st_m5_5',ic:'sti_m5_5',dur:4,noburn:1}}; // vlock: LOCK-ON – every hit on it is critical // nmark: look + icon of Nova's MARKED // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
+const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3'],m5_4:['ult_m5_4','st_m5_4','sti_m5_4','hit_m5_4'],m5_5:['ult_m5_5','st_m5_5','sti_m5_5','hit_m5_5']};
+const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4},m5_4:{k:'hit_m5_4',n0:4,c:4},m5_5:{k:'hit_m5_5',n0:4,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
 function mstat(m,s,src,delay){B.fx.push({type:'mstat',s,t:-(delay||0),d:MST[s].dur+.6,tgt:m,x:m.x,dd:m.d,src});}
 function atl8(k,m,delay,o){B.fx.push(Object.assign({type:'atl8',k,t:-(delay||0),d:.9,tgt:m,x:m.x,dd:m.d,f0:0,n:8,hm:1.9},o||{}));}
-const WIDE8={m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
+const WIDE8={m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
 // v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
@@ -2360,12 +2360,11 @@ const SKF={
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ff4fd8',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff80ab',R);}sparks(c.x,fy(c.d)-10*S,16,'#fff59d');}});},
  m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
-   const wdv=tg&&pushWide(u,.72,{beam:1,tg});if(tg){tg.mark=Math.max(tg.mark,2);if(f8&&!wdv)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
-   castAct(u,wdv?1.2:.7,()=>{u.post=.6;shake(12);B.flash=.2;if(!tg)return;
-     const [bx,by]=muzzle(u,40,40),ty=headY(tg)+16*dsc(tg.d);if(!wdv)B.fx.push({type:'beam',x0:bx,y0:by,x1:W+40*S,y1:ty,t:0,d:.45,col:'#18ffff',w:9});
-     if(!tg.dead)damage(u,tg,5.5,{skill:1,crit:1});
-     for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S){damage(u,m,1.6,{skill:1});if(FX2&&!FV8(u))fxs('circle_05','#18ffff',m.x,headY(m)+16*dsc(m.d),{d:.25,s0:14*S,s1:48*S});}
-     sparks(tg.x,ty,16,'#e0ffff');});},
+   // v16-358 (26 nov, Marius): old wide sheet + code beam/circles removed – his OVERDRIVE RAILSHOT picture on the strongest enemy (big) and on every enemy in its lane, then LOCK-ON (all hits on it are critical 4 s)
+   if(tg){tg.mark=Math.max(tg.mark,2);if(!B.sim){atl8('ult_m5_5',tg,.3,{d:1.0,hm:2.1});for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S)atl8('ult_m5_5',m,.4,{d:.9,hm:1.4});}}
+   castAct(u,.75,()=>{u.post=.6;shake(12);if(!tg)return;
+     if(!tg.dead){damage(u,tg,5.5,{skill:1,crit:1});if(!B.sim&&!tg.dead)mstat(tg,'vlock',u,0);}
+     for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S)damage(u,m,1.6,{skill:1});});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    // v16-355 (26 nov, Marius): old wide sheet + code fire/rings removed – his REBIRTH FLAME picture (phoenix dives) on EVERY enemy, then PHOENIX AURA on every mechanic
    if(!B.sim){let i=0;for(const m of alive(B.mons))atl8('ult_m5_2',m,i++*.08,{d:1.0,hm:1.9});}
@@ -2417,7 +2416,7 @@ function unitUpdate(u,dt,foes,friends){
   u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.rcl>0)u.rcl-=dt;if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;if(u.enLock>0)u.enLock-=dt;
   if(u.dead){u.deadT+=dt;return;}
   u.stun=Math.max(0,u.stun-dt);u.slow=Math.max(0,u.slow-dt);u.mark=Math.max(0,u.mark-dt);
-  if(!u.hero){u.ice=Math.max(0,u.ice-dt);if(u.mcrown>0)u.mcrown-=dt;if(u.abrk>0)u.abrk-=dt;if(u.gstun>0)u.gstun-=dt;if(u.nmark>0)u.nmark-=dt;u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
+  if(!u.hero){u.ice=Math.max(0,u.ice-dt);if(u.mcrown>0)u.mcrown-=dt;if(u.abrk>0)u.abrk-=dt;if(u.gstun>0)u.gstun-=dt;if(u.nmark>0)u.nmark-=dt;if(u.vlock>0)u.vlock-=dt;u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
     if(u.burnT>=.5){u.burnT=0;if(u.burnSrc)damage(u.burnSrc,u,.22,{noCrit:1,skill:1});if(u.dead)return;}}}
   if(u.hero){u.buff=Math.max(0,u.buff-dt);u.aspd=Math.max(0,u.aspd-dt);u.defB=Math.max(0,u.defB-dt);u.critB=Math.max(0,u.critB-dt);u.taunt=Math.max(0,u.taunt-dt);if(u.nmk>0)u.nmk-=dt;if(u.shield>0)u.shield=Math.max(0,u.shield-u.max*.04*dt);
     if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;const hs=B.hsrc;B.hsrc=u.hotS;heal(u,u.hotA);B.hsrc=hs;}}
@@ -2918,7 +2917,7 @@ function drawNums(){g.textAlign='center';g.lineJoin='round';for(const n0 of B.nu
   g.font='900 '+Math.round((n.big?17:13)*s*S)+'px Game,system-ui';g.lineWidth=3.5;g.strokeStyle='rgba(0,0,0,.85)';g.strokeText(n.txt,n.x,y);g.fillStyle=n.col;g.fillText(n.txt,n.x,y);}g.globalAlpha=1;}
 // v16-14: little status icons above the HP bar (buffs on mechanics, debuffs on monsters) – they blink in the last second
 const STI_H=[['paura','paura','#ff9100'],['buff','atk','#ff7043'],['aspd','aspd','#ffca28'],['critB','crit','#ff4081'],['defB','helm','#42a5f5'],['hot','heart','#66bb6a'],['taunt','horns','#e53935']];
-const STI_M=[['mcrown','mcrown','#ffb300'],['abrk','abrk','#ff5252'],['gstun','gstun','#ffca28'],['nmark','nmark','#b388ff'],['ice','snow','#80d8ff'],['stun','star','#fdd835'],['burn','flame','#ff6d00'],['slow','clock','#ba68c8'],['mark','scan','#26c6da'],['weak','skull','#9e9e9e']];
+const STI_M=[['mcrown','mcrown','#ffb300'],['abrk','abrk','#ff5252'],['gstun','gstun','#ffca28'],['nmark','nmark','#b388ff'],['vlock','vlock','#18ffff'],['ice','snow','#80d8ff'],['stun','star','#fdd835'],['burn','flame','#ff6d00'],['slow','clock','#ba68c8'],['mark','scan','#26c6da'],['weak','skull','#9e9e9e']];
 function statusIcons(u,x,y){const L=[];for(const [f,ic,col] of u.hero?STI_H:STI_M){const v=u[f]||0;if(v<=0)continue;if(f==='stun'&&(u.ice>0||u.gstun>0))continue;if(f==='burn'&&(u.mcrown>0||u.abrk>0))continue;if(f==='mark'&&u.nmark>0)continue;
     const left=f==='shield'?9:v;L.push([ic,col,left]);}
   if(!L.length)return;const sz=Math.round(13*S),gap=1.5*S,tw=L.length*sz+(L.length-1)*gap;let ix=x-tw/2;
