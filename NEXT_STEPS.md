@@ -262,6 +262,11 @@
 
 > 🗺️ **PLANUL (Marius, 15 nov 2026)**: 1) mai facem update-uri la joc (acum ne axăm pe joc) → 2) apoi trecem pe **Capacitor** (APK normal, update-uri live) → 3) apoi testerii plătiți pentru testul închis (12 × 14 zile) → producție.
 
+## ✅ v16-349 (26 nov 2026) – ROLURI: fiecare rol bun la treaba lui (toți eroii)
+- Tuning (warrior): HP 930→1100, DEF 14→20. Mythic nu mai au toți șablonul „Legend”: `MYTH_RK` în battle.js (Goliath/Anvil HP ×1,35 DEF ×1,4 ATK ×0,8 · Lady Overdrive ATK ×1,15 · Shade ATK ×1,2 HP ×0,85 · Torque King HP ×0,95 · Ignis DEF ×1,15 ATK ×0,85).
+- Bonusuri de rol în bătălie: warrior lifesteal 6–12% după grad · ranger +20% pe boși/mini-boși/World Boss · mage +20% skill damage · support +20% heal și scuturi. Text pe pagina eroului (sub eticheta de rol), fără iconițe noi.
+- Lipsă: nimic.
+
 ## ✅ v16-273 (24 nov 2026) – anunțurile MYTHIC / ASCENDED nu mai apar în chat
 - Doar banner-ul auriu sus pe ecran (~6,5 s) pentru tot serverul; chatul WORLD nu le mai arată (server: `c.sys<>2`). Patronii Grand Prix rămân în chat (sys=1).
 
