@@ -1772,6 +1772,8 @@ Object.assign(MDRAW,{
    hdr(armF,62,0);}
 });
 const FILT=typeof CanvasRenderingContext2D!=='undefined'&&'filter' in CanvasRenderingContext2D.prototype;
+// v16-345 (Marius: 'monsters sometimes big, sometimes small when they attack'): the old atlases had idle/hurt/death rows 15-25% bigger than walk/attack/skill → per-row scale (tools/mon_rowk.py)
+const MROWK={"cbrute":[0.865,1.0,1.0,1.0,0.85,0.883],"crawler":[0.906,1.0,1.0,1.0,1.0,0.917],"esnake":[0.882,1.0,1.0,1.0,0.888,0.861],"hound":[0.828,1.0,1.0,1.0,0.895,0.844],"jtitan":[0.84,1.0,1.0,1.0,1.0,0.903],"ndragon":[0.768,1.0,1.0,1.0,0.826,0.81],"pimp":[0.834,1.0,1.0,1.0,0.869,0.898],"rat":[0.803,1.0,1.0,1.0,0.862,0.93],"towking":[0.843,1.0,1.0,1.0,0.893,0.795],"wasp":[0.809,1.0,1.0,1.0,0.86,0.825],"gbattery":[0.862,1.0,1.0,1.0,0.892,0.786],"gdrone":[0.874,1.0,1.0,1.0,0.871,0.777],"gcan":[0.926,1.0,1.0,1.0,1.0,0.765],"gmantis":[0.819,1.0,1.0,1.0,0.75,0.844],"gsaw":[0.89,1.0,1.0,1.0,0.862,0.888],"ggolem":[0.876,1.0,1.0,1.0,0.863,0.8],"gtanker":[0.843,1.0,1.0,1.0,0.75,0.815],"gbat":[0.806,1.0,1.0,1.0,0.771,0.75],"ghorn":[0.795,1.0,1.0,1.0,0.761,0.75],"gomega":[0.873,1.0,1.0,1.0,0.802,0.861],"bdozer":[0.774,1.0,1.0,1.0,0.75,0.766],"bhydra":[0.819,1.0,1.0,1.0,0.75,0.841],"bkraken":[0.79,1.0,1.0,1.0,0.75,0.764],"bmixer":[0.903,1.0,1.0,1.0,0.799,0.854]};
 function msprLoad(id){const d=MSPR[id];if(!d.im){d.im=new Image();d.im.decoding='async';d.im.src='img/mon/'+id+'.webp';}return d;}
 const msprOK=id=>{const d=msprLoad(id);return d.im.complete&&d.im.naturalWidth>0;};
 function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
@@ -1808,7 +1810,7 @@ function msprFrame(u,t){const a=u.act,id=MON[u.t].sp;
   return[0,Math.floor(t*7+u.k)%6];}
 // drawn facing right like the other monsters (Marius' pictures face left → mirrored here)
 function drawSprMon(g,u,t,id){const M=MON[u.t],d=msprLoad(id);if(!msprOK(id)){MDRAW[M.dr0](g,u,t);return;}
-  let [r,c]=msprFrame(u,t),D=d;const k=M.h/d.ih;const hq=u.dead?0:(u.hurt||0)*(u.hurt||0)*(M.big>1.5||u.boss?.5:1);if(r>=100){const x=d.x;if(!x.im){x.im=new Image();x.im.decoding='async';x.im.src='img/mon/'+id+'_x.webp';}if(x.im.complete&&x.im.naturalWidth){D=x;r-=100;}else{r=0;c=0;}}g.save();g.scale(-1,1);if(hq>0){g.translate(-hq*9,0);g.scale(1+.1*hq,1-.1*hq);} /* v16-319: knocked back + squashed when hit */if(id==='wasp')g.translate(0,-12-Math.sin(t*5+u.k)*3);else if(M.fly)g.translate(0,-38-Math.sin(t*5+u.k)*4);
+  let [r,c]=msprFrame(u,t),D=d;let k=M.h/d.ih;const RK=MROWK[id];if(RK&&r<100&&RK[r])k*=RK[r]; /* v16-345: same body size in every animation row */const hq=u.dead?0:(u.hurt||0)*(u.hurt||0)*(M.big>1.5||u.boss?.5:1);if(r>=100){const x=d.x;if(!x.im){x.im=new Image();x.im.decoding='async';x.im.src='img/mon/'+id+'_x.webp';}if(x.im.complete&&x.im.naturalWidth){D=x;r-=100;}else{r=0;c=0;}}g.save();g.scale(-1,1);if(hq>0){g.translate(-hq*9,0);g.scale(1+.1*hq,1-.1*hq);} /* v16-319: knocked back + squashed when hit */if(id==='wasp')g.translate(0,-12-Math.sin(t*5+u.k)*3);else if(M.fly)g.translate(0,-38-Math.sin(t*5+u.k)*4);
   if(M.hue!=null&&FILT){const fr=tintFr(D,id+(D===d?'':'x'),M,r,c);if(fr){g.drawImage(fr,0,0,D.w,D.h,-D.ax*k,-D.ay*k,D.w*k,D.h*k);g.restore();return;}}
   g.drawImage(D.im,c*D.w,r*D.h,D.w,D.h,-D.ax*k,-D.ay*k,D.w*k,D.h*k);g.restore();}
 // v16-262 (Adi: Torque Tower 'sacadat' from floor ~31): coloured monsters (acts 2+) were re-coloured with canvas filter EVERY frame (~100 ms a frame on a budget phone).
@@ -2287,7 +2289,7 @@ const SKF={
    teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});allyFx('m5_0');});},
  m5_3(u){ // v16-132: Goliath's IRON FORTRESS – the hex shield (fxs) falls on the biggest group; impact (fxs frame 4) = end of his slam (skill frame 5 = dome) = damage + stun; he taunts with a big shield, the team gets shields + less damage
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
-   const wd=c&&pushWide(u,.72,{dd:c.d});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   const wd=c&&pushWide(u,.72,{tg:c,dd:c.d});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,wd?1.2:.7,()=>{u.post=.6;shake(14);B.flash=.25;
      if(c){const R=120*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ffca28',36*S);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ffca28',ground:1});if(FX2)fxShock(c.x,fy(c.d),'#ffb300',R);debris(c.x,fy(c.d),8,['#6d4c41','#ffca28','#9e9e9e']);}}
@@ -2297,12 +2299,12 @@ const SKF={
      teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
  m5_4(u){ // v16-141: Nova's STARFIRE RAIN – the arrow rain (fxs) falls on the biggest group; impact = fxs frame 5 = end of her shot up (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
-   const wd=c&&pushWide(u,.9,{dd:c.d,drop:'m5_4'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   const wd=c&&pushWide(u,.9,{tg:c,dd:c.d,drop:'m5_4'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
  m5_9(u){ // ANVIL's AIRBAG SLAM (test account): he jumps and slams the shield in front of him (skill frame 5); the crash-test shockwave (fxs) = stun ALL 2s + 150%, taunt 4s + shield 50% HP
-   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],wd=c&&pushWide(u,1.2,{dd:c.d});
+   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],wd=c&&pushWide(u,1.2,{tg:c,dd:c.d});
    if(f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:u.x+u.face*70*S,dd:u.d});
    castAct(u,wd?1.2:.7,()=>{u.post=.6;shake(14);B.flash=.22;
      for(const m of alive(B.mons)){damage(u,m,1.5,{skill:1});m.stun=Math.max(m.stun,2);}
@@ -2320,13 +2322,13 @@ const SKF={
      teamBuff({def:0,col:'#69f0ae',txt:'PIT STOP'});});},
  m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
-   const wd=c&&pushWide(u,1.2,{dd:c.d,imp:6});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   const wd=c&&pushWide(u,1.2,{tg:c,dd:c.d,imp:6});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,wd?2.0:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=135*S,v=u.tl?TV(u):0;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.6,{skill:1});m.slow=Math.max(m.slow,4);m.weak=Math.max(m.weak,5);if(v)wetOn(m,v);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#ff4fd8',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff80ab',R);}sparks(c.x,fy(c.d)-10*S,16,'#fff59d');}});},
  m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
-   const wdv=tg&&pushWide(u,.72,{beam:1});if(tg){tg.mark=Math.max(tg.mark,2);if(f8&&!wdv)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
+   const wdv=tg&&pushWide(u,.72,{beam:1,tg});if(tg){tg.mark=Math.max(tg.mark,2);if(f8&&!wdv)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:tg.x,dd:tg.d});}
    castAct(u,wdv?1.2:.7,()=>{u.post=.6;shake(12);B.flash=.2;if(!tg)return;
      const [bx,by]=muzzle(u,40,40),ty=headY(tg)+16*dsc(tg.d);if(!wdv)B.fx.push({type:'beam',x0:bx,y0:by,x1:W+40*S,y1:ty,t:0,d:.45,col:'#18ffff',w:9});
      if(!tg.dead)damage(u,tg,5.5,{skill:1,crit:1});
@@ -2334,7 +2336,7 @@ const SKF={
      sparks(tg.x,ty,16,'#e0ffff');});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
-   const wd=c&&pushWide(u,.9,{dd:c.d,drop:'m5_2'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
+   const wd=c&&pushWide(u,.9,{tg:c,dd:c.d,drop:'m5_2'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(12);B.flash=.35;
      for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);if(FX2&&!FV8(u))fxBurst(m.x,headY(m)+24*dsc(m.d),'#ff9100',40*S);}
      if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff9100',110*S);}
@@ -2342,7 +2344,7 @@ const SKF={
      allyFx('m5_2',alive(B.heroes).filter(h=>!h.rvFx),1.5);for(const h of B.heroes)h.rvFx=0;
      for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
- m5_1(u){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0],wdl=c0&&pushWide(u,(WD(u)?.75:.45)+Math.max(0,(c0.x-u.x)/(1100*S)),{dd:c0.d});castAct(u,wdl?.75:.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
+ m5_1(u){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0],wdl=c0&&pushWide(u,(WD(u)?.75:.45)+Math.max(0,(c0.x-u.x)/(1100*S)),{tg:c0,dd:c0.d});castAct(u,wdl?.75:.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
    if(u.spr&&u.spr.fx8&&!wdl){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
    teamBuff({aspd:6,aspdK:.3,crit:6,col:'#ff5252',txt:'OVERDRIVE!'});allyFx('m5_1');});}};
 
@@ -2802,11 +2804,14 @@ function drawFx(t,ow){
     else if(f.type==='plus'){f.t=f.d;} // v16-shbar: no ✚ over the heroes
     else if(f.type==='ally8'){const h=f.u,im=f.im;if(h&&!h.dead&&im&&im.naturalWidth){const fw=im.naturalWidth/4,fh=im.naturalHeight/2,w=118*S*dsc(h.d),hh=w*fh/fw,q=Math.min(7.999,k*8),c=Math.floor(q),fr=q-c,x=h.x-w/2,y=fy(h.d)-(h.lift||0)-hh*(1-90/512);
       g.globalAlpha=c<7?1-fr*fr:1;g.drawImage(im,(c%4)*fw,Math.floor(c/4)*fh,fw,fh,x,y,w,hh);if(c<7&&fr>0){g.globalAlpha=Math.min(1,fr*1.6);g.drawImage(im,((c+1)%4)*fw,Math.floor((c+1)/4)*fh,fw,fh,x,y,w,hh);}}}
-    else if(f.type==='wide8'&&f.beam){const im=f.im,u=f.u;if(im&&im.naturalWidth&&u){const N=wN(im),IP=N>8?(WIDEIP[u.h.id]||4):4,[bx,by]=muzzle(u,40,40),fw=im.naturalWidth,fh=im.naturalHeight/N,w=Math.max(60*S,W+30*S-bx),h=w*fh/fw*1.15,
-      q=Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb),c=Math.floor(q),fr=q-c,A=k>.93?(1-k)/.07:1;
-      g.globalAlpha=A*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,bx-6*S,by-h/2,w,h);if(c<N-1&&fr>0){g.globalAlpha=A*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,bx-6*S,by-h/2,w,h);}}}
-    else if(f.type==='wide8'){const im=f.im,bl=f.tint&&!f.heroes&&!LOWRES;if(WPASS&&!bl){}else if(im&&im.naturalWidth){const ms=alive(B.mons);let x0=W*.5,x1=W,dm=f.dd;if(f.heroes){const hs=alive(B.heroes);if(hs.length){x0=Math.min(...hs.map(m=>m.x));x1=Math.max(...hs.map(m=>m.x));dm=Math.max(...hs.map(m=>m.d));}}else if(ms.length){x0=Math.min(...ms.map(m=>m.x));x1=Math.max(...ms.map(m=>m.x));dm=bl?ms.reduce((a,m)=>a+m.d,0)/ms.length:Math.max(...ms.map(m=>m.d));}
-      const N=wN(im),w=W*(ULT2?.98:1.15),cx=f.heroes?clamp((x0+x1)/2,W*.3,W*.5):clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/N,h=w*fh/fw*1.25,gy=fy(dm)+(bl?-38:18)*S,A=k>.93?(1-k)/.07:1,N8=N<=8,fdrop=N8||f.drop==='m5_4'?f.drop:null; /* v16-321: Nova's arrows fall from the sky again (on top of her new sheet) */
+    else if(f.type==='wide8'&&f.beam){const im=f.im,u=f.u;if(im&&im.naturalWidth&&u){const N=wN(im),IP=N>8?(WIDEIP[u.h.id]||4):4,[bx,by]=muzzle(u,40,40),fw=im.naturalWidth,fh=im.naturalHeight/N,tt=f.tg&&!f.tg.dead?f.tg:null,ang=f.ang=tt?clamp(Math.atan2(headY(tt)+22*dsc(tt.d)-by,Math.max(40*S,tt.x-bx)),-.45,.45):(f.ang||0),w=Math.max(60*S,(W+30*S-bx)/Math.cos(ang)),h=w*fh/fw*1.0,
+      q=Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb),c=Math.floor(q),fr=q-c,A=(k>.93?(1-k)/.07:1)*.85;g.save();g.translate(bx,by);g.rotate(ang); /* v16-345: the beam points at its target (Marius: 'the laser must go to the monster') */
+      g.globalAlpha=A*(c<N-1?1-fr*fr:1);g.drawImage(im,0,c*fh,fw,fh,-6*S,-h/2,w,h);if(c<N-1&&fr>0){g.globalAlpha=A*Math.min(1,fr*1.6);g.drawImage(im,0,(c+1)*fh,fw,fh,-6*S,-h/2,w,h);}g.restore();}}
+    else if(f.type==='wide8'){const im=f.im,bl=f.tint&&!f.heroes&&!LOWRES;if(WPASS&&!bl){}else if(im&&im.naturalWidth){const ms=alive(B.mons);let x0=W*.5,x1=W,dm=f.dd;if(f.heroes){const hs=alive(B.heroes);if(hs.length){x0=Math.min(...hs.map(m=>m.x));x1=Math.max(...hs.map(m=>m.x));dm=Math.max(...hs.map(m=>m.d));}}else if(ms.length&&f.fr!==B.t){f.fr=B.t; /* v16-345 (Marius: 'the ultimate must go where the monsters are'): follow the targeted group (f.tg = cluster centre), smoothly */
+        let c0=f.tg&&!f.tg.dead?f.tg:null;if(!c0){let bd=1e9;const px=f.cx!=null?f.cx:W*.6;for(const m of ms){const dd2=Math.abs(m.x-px);if(dd2<bd){bd=dd2;c0=m;}}}
+        const gp=ms.filter(m=>Math.abs(m.x-c0.x)<150*S&&Math.abs(m.d-c0.d)<.35),tx=gp.reduce((a,m)=>a+m.x,0)/gp.length,td=bl?gp.reduce((a,m)=>a+m.d,0)/gp.length:Math.max(...gp.map(m=>m.d));
+        if(f.cx==null){f.cx=tx;f.cd=td;}else{f.cx+=(tx-f.cx)*.12;f.cd+=(td-f.cd)*.12;}}
+      if(!f.heroes&&f.cx!=null)dm=f.cd;const N=wN(im),w=W*(ULT2?(f.heroes?.98:.8):1.15),cx=f.heroes?clamp((x0+x1)/2,W*.3,W*.5):f.cx!=null?clamp(f.cx,W*.28,W*.78):clamp((x0+x1)/2,W*.5,W*.62),fw=im.naturalWidth,fh=im.naturalHeight/N,h=w*fh/fw*1.25,gy=fy(dm)+(bl?-38:18)*S,A=(k>.93?(1-k)/.07:1)*(f.heroes?1:.82),N8=N<=8,fdrop=N8||f.drop==='m5_4'?f.drop:null; /* v16-321: Nova's arrows fall from the sky again (on top of her new sheet) */
       const IP=N8?(f.imp||4):(WIDEIP[f.u&&f.u.h?f.u.h.id:'m5_0']||Math.round(N/2));let q=f.ta?Math.min(N-.001,f.t<f.ta?IP*f.t/f.ta:IP+(N-IP)*(f.t-f.ta)/f.tb):Math.min(N-.001,k*N),sh=1;/* v16-wide2: imp = the impact frame (Chroma v2: frame 7) */let gs=1;
       // v16-grow (Marius: Chroma's tornadoes stay on the ground and grow): frames 3-4 (tornadoes on the ground) swirl back and forth while they grow ×0.35→×1.15, then the burst
       let gr=null;if(f.grow&&N8){const T=f.t,a1=.4,a2=.68,top0=gy-h*.97,hi=Math.min(top0,H*.13);
