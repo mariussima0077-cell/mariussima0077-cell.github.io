@@ -996,7 +996,7 @@ const SETCOL={engine:'#ff6d00',tuning:'#00b0ff',inspect:'#2979ff',service:'#00e5
 const SETK=Object.keys(SETS),SET_STATS=['atk','hp','def','crit','aspd','en'],SET_P=[2,3,4,6,8,10,12],SET_SAME=1.5;
 const rollSet=()=>SETK[Math.floor(Math.random()*SETK.length)],rollSS=()=>SET_STATS[Math.floor(Math.random()*SET_STATS.length)];
 // Mythic heroes now belong to the class of their battle role (the mage Torque King → Electrical, Chroma → Paint)
-const MYTH_CLS={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec',m5_8:'tuning',m5_9:'engine'};
+const MYTH_CLS={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'service',m5_8:'tuning',m5_9:'engine'};
 function clsOf(h){if(!h)return 'engine';if(h.crew)return 'crew';const k=h.sp||'all';return k==='all'?(MYTH_CLS[h.id]||'engine'):k;}
 // v16-166 (tester Wazza4ever: "the set buff does not apply on Goliath"; Marius OK): MYTHIC heroes (class Legend) count the Torque King set OR the set of
 // the class that matches their battle ROLE (Goliath tank → Iron Piston, Ignis support → Field Medic, mage → Color Storm / Thunder Coil …) – the one with more pieces
