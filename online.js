@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=366;window.TE_CV=CV;
+const CV=367;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -271,7 +271,7 @@ const css=`
 #onl .pname{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px}
 #onl .pname b{font:900 22px Game,system-ui;text-shadow:0 2px 0 #000}
 #onl .edit{width:30px;height:30px;border-radius:9px;border:0;background:linear-gradient(#fff1a8,#ffb300);box-shadow:0 2px 0 #7a4a00;font-size:14px}
-#onl .pid{position:relative;font:700 10px Game,system-ui;color:#c9b88a;margin-top:5px}
+#onl .pid{position:relative;font:700 10px Game,system-ui;color:#c9b88a;margin-top:5px}#onl #olPrH .pid{position:absolute;margin:0;font:800 8.5px Game,system-ui;color:#cfe3ff}#onl #olPrH .pvip{position:absolute;left:30%;right:12%;top:2.5%;margin:0}#onl #olPrH .pvip small{display:none}
 #onl .stats{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px;margin-bottom:6px}
 #onl .stats div{background:linear-gradient(#1f2937,#111820);box-shadow:0 0 0 1px #3a4656;border-radius:12px;padding:8px 10px;font:700 10px Game,system-ui;color:#8fa0b4}
 #onl .stats div b{display:block;font:900 16px Game,system-ui;color:#ffe27a;margin-top:2px}

@@ -143,7 +143,7 @@ button{font-family:inherit;cursor:pointer}
 #s2 .bar{display:flex;justify-content:center;gap:8px;margin:-6px 10px 6px;flex-wrap:wrap}
 #s2 .cur{display:flex;align-items:center;gap:6px;background:#0d151e;border:1.5px solid #e0aa25;border-radius:999px;padding:4px 12px 4px 6px;font:900 14px Game,system-ui;color:#fff}
 #s2 .cur img{width:22px;height:22px;object-fit:contain}
-#s2 .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:6px 60px 10px 10px;position:sticky;top:0;z-index:2;background:#141d27ee}
+#s2 .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:6px 8px 10px 62px;position:sticky;top:0;z-index:2;background:#141d27}
 #s2 .tabs button{position:relative;border:0;border-radius:12px;padding:8px 2px 6px;font:900 11px Game,system-ui;color:#cfd8e3;background:linear-gradient(#2a3644,#141c26);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #5e4a20;display:flex;flex-direction:column;align-items:center;gap:3px}
 #s2 .tabs button img{width:30px;height:30px;object-fit:contain}
 #s2 .tabs button.on{background:linear-gradient(#5a4210,#2a1c05);color:#ffd54a;box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #ffcf5a,0 0 12px #ffb30066}
