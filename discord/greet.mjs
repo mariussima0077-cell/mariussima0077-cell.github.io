@@ -36,12 +36,24 @@ for (const m of msgs.filter(m => m.type === 7)) {
   console.log(`join: ${m.author?.username} (${m.author?.global_name || ''}) at ${m.timestamp} -> ${why}`);
 }
 const joins = msgs.filter(m => m.type === 7 && !done.has(m.id) && Date.parse(m.timestamp) > since && !m.author?.bot).reverse();
-for (const j of joins) {
-  const u = j.author;
+const todo = joins.map(j => ({ u: j.author, ref: j.id }));
+// fallback (26 nov, Jon): sometimes Discord posts NO "X joined" message → check the member list too
+const greeted = new Set(msgs.filter(m => m.author?.id === guild.application_id).flatMap(m => [...(m.content || '').matchAll(/<@!?(\d+)>/g)].map(x => x[1])));
+for (const t of todo) greeted.add(t.u.id);
+try {
+  const mem = await api('GET', `/guilds/${GUILD}/members?limit=1000`);
+  for (const m of mem) {
+    if (m.user?.bot || Date.parse(m.joined_at) <= since) continue;
+    const st = greeted.has(m.user.id) ? 'already greeted' : m.pending ? 'pending (rules/onboarding not finished)' : 'NEW (no join message)';
+    console.log(`member: ${m.user.username} (${m.user.global_name || ''}) joined ${m.joined_at} -> ${st}`);
+    if (st.startsWith('NEW')) { todo.push({ u: m.user, ref: null }); greeted.add(m.user.id); }
+  }
+} catch (e) { console.log('member list not readable (turn on SERVER MEMBERS INTENT for Torque Bot):', e.message.slice(0, 200)); }
+for (const { u, ref } of todo) {
   await api('POST', `/channels/${welcome}/messages`, {
     content: `👋 Welcome to **Torque Empire**, <@${u.id}>! 🏁🔧`,
     allowed_mentions: { users: [u.id] },
-    message_reference: { message_id: j.id, fail_if_not_exists: false },
+    ...(ref ? { message_reference: { message_id: ref, fail_if_not_exists: false } } : {}),
     embeds: [{
       color: 0xFF6D00,
       title: '🏁 Glad to have you in the garage!',
@@ -68,4 +80,4 @@ for (const j of joins) {
   });
   console.log(`Welcomed ${u.username}`);
 }
-console.log(`DONE ✅ (${joins.length} new member(s))`);
+console.log(`DONE ✅ (${todo.length} new member(s))`);
