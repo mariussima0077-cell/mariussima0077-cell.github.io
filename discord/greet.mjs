@@ -38,7 +38,7 @@ for (const m of msgs.filter(m => m.type === 7)) {
 const joins = msgs.filter(m => m.type === 7 && !done.has(m.id) && Date.parse(m.timestamp) > since && !m.author?.bot).reverse();
 const todo = joins.map(j => ({ u: j.author, ref: j.id }));
 // fallback (26 nov, Jon): sometimes Discord posts NO "X joined" message → check the member list too
-const greeted = new Set(msgs.filter(m => m.author?.id === guild.application_id).flatMap(m => [...(m.content || '').matchAll(/<@!?(\d+)>/g)].map(x => x[1])));
+const greeted = new Set(msgs.filter(m => m.author?.bot).flatMap(m => [...(m.content || '').matchAll(/<@!?(\d+)>/g)].map(x => x[1])));
 for (const t of todo) greeted.add(t.u.id);
 try {
   const mem = await api('GET', `/guilds/${GUILD}/members?limit=1000`);
