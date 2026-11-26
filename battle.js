@@ -1305,7 +1305,7 @@ function at16(id){const m=AT16[id];let lo=false;try{lo=LOWRES;}catch(e){}if(!m||
 // v16-348 (Marius): Shade's EXHAUST PHANTOM in 24 frames (tools/fx24_hero.py m5_8), drawn on the target like the old 8-frame fxs
 const FX24={"m5_8":{"cw":200,"uw":266.7,"ax":133.3,"n":24,"rows":[[0,246,328.0,309.3]]}},FX24I={};
 function fx24Img(id){if(!FX24[id])return null;let i=FX24I[id];if(!i){i=FX24I[id]=new Image();i.decoding='async';i.src='img/hero/fx24_'+id+'.webp';}return i;}
-function sprLoad(d){if(!d.im){if(FX24[d.id])fx24Img(d.id);if(AT16[d.id])at16(d.id);if(WIDE8[d.id])wideImg(d.id);if(ALLY8[d.id])allyImg(d.id);if(ALLY8[d.id+'r'])allyImg(d.id+'r');if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
+function sprLoad(d){if(!d.im){if(d.id==='m5_0')kultImg();if(FX24[d.id])fx24Img(d.id);if(AT16[d.id])at16(d.id);if(WIDE8[d.id])wideImg(d.id);if(ALLY8[d.id])allyImg(d.id);if(ALLY8[d.id+'r'])allyImg(d.id+'r');if(DROP8[d.id])dropImg(d.id);if(READY8[d.id])readyImg(d.id);d.im=new Image();d.im.decoding='async';d.im.src='img/hero/sp_'+d.id+'.webp';if(d.boom){d.bi=new Image();d.bi.src='img/hero/'+d.boom+'.webp';}if(d.fx8){d.fi=new Image();d.fi.decoding='async';d.fi.src='img/hero/fxs_'+d.id+'.webp';}}return d.im;}
 // v16-94: draws frame (r,c) of a sprite at the feet point (0,0), k = screen units per 256-cell unit. v8 = 8 frames per row, each row its own height
 function sprBlit(X,d,r,c,k){const v=d.v8;if(v){const R=v.rows[r];X.drawImage(d.im,c*v.cw,R[0],v.cw,R[1],-v.ax*k,-R[3]*k,v.uw*k,R[2]*k);return;}
   const w=d.w||256,cw=w*SPCELL/256;X.drawImage(d.im,c*cw,r*SPCELL,cw,SPCELL,-d.a[0]*k,-d.a[1]*k,w*k,256*k);}
@@ -2188,7 +2188,8 @@ function imgFx(k,x,y,w,d,o){B.fx.push(Object.assign({type:'imgfx',k,x,y,w,t:0,d}
 function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 // v16-256 (Marius: "keep what I gave you"): when the hero's own effect sheet (fxs) is loaded, the extra code-drawn effects of his skill are skipped
 const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
-const WIDE8={m5_0:'img/fx/wide_m5_0.webp',m5_1:'img/fx/wide_m5_1.webp',m5_2:'img/fx/wide_m5_2.webp',m5_3:'img/fx/wide_m5_3.webp',m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
+let KULTI=null;function kultImg(){if(!KULTI){KULTI=new Image();KULTI.decoding='async';KULTI.src=LOWRES?'img/fx/ult_m5_0_low.webp':'img/fx/ult_m5_0.webp';}return KULTI;} // v16-352 new GEAR APOCALYPSE (4x2 atlas)
+const WIDE8={m5_1:'img/fx/wide_m5_1.webp',m5_2:'img/fx/wide_m5_2.webp',m5_3:'img/fx/wide_m5_3.webp',m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
 // v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
@@ -2301,13 +2302,12 @@ const SKF={
    if(u.spr&&u.spr.fx8){const ln=alive(B.mons).filter(m=>m.x>u.x&&Math.abs(m.d-u.d)<.2).sort((a,b)=>a.x-b.x)[0];if(ln){const tt=Math.max(0,(ln.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.5),d:.96,sp:u.spr,x:ln.x,dd:ln.d});}}};
    if(u.spr&&u.spr.v8)castAct(u,.4,go);else go();},
  m5_0(u,ms){
-   // v16-wide (24 nov, Marius test): WIDE GEAR APOCALYPSE – one 8-frame sheet over the whole enemy line, starts with the cast (sigil opens), slower (2.6 s)
-   const wi=wideImg('m5_0'),wd=wi&&wi.naturalWidth?2.6:0;
-   if(wd){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0];B.fx.push({type:'wide8',t:0,d:wd,im:wi,dd:c0?c0.d:.5});}
-   castAct(u,wd?1.0:.85,()=>{for(const m of alive(B.mons))B.fx.push({type:'gear',x:m.x+rnd(-10,10),tgt:m,y0:-40,t:wd?-rnd(0,.12):-rnd(0,.5),d:wd?.42:.55,src:u,r:rnd(15,21)*S,mult:3.2,hide:!!wd});
-   if(!wd)for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S});
-   const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){B.fx.push({type:'mega',t:wd?-.35:-.75,d:1.1,src:u,x:c.x,dd:c.d});if(!wd&&u.spr&&u.spr.fx8)B.fx.push({type:'sheet8',t:-.28,d:.96,sp:u.spr,x:c.x,dd:c.d});}
-   teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});allyFx('m5_0');});},
+   // v16-352 (26 nov, Marius): NEW GEAR APOCALYPSE – the old wide sheet is gone; his new 8-frame picture (the crown gear crashing down) on EVERY enemy,
+   // a bit bigger than the monster; same numbers as before (320% on everyone + 150% on the biggest group, team ATK+30% DEF UP)
+   castAct(u,.85,()=>{const ms0=alive(B.mons);let i=0;for(const m of ms0){const dl=i++*.11;B.fx.push({type:'kult8',t:-dl,d:1.1,tgt:m,x:m.x,dd:m.d});
+     B.fx.push({type:'gear',x:m.x,tgt:m,y0:-40,t:-(dl+.1),d:.42,src:u,r:18*S,mult:3.2,hide:true});}
+   const c=cluster(ms0,100*S)||ms0[0];if(c)B.fx.push({type:'gear',x:c.x,tgt:c,y0:-40,t:-.2,d:.42,src:u,r:18*S,mult:1.5,hide:true});
+   teamBuff({atk:8,def:8,col:'#ff7043',txt:'ATK+30% DEF UP'});});},
  m5_3(u){ // v16-132: Goliath's IRON FORTRESS – the hex shield (fxs) falls on the biggest group; impact (fxs frame 4) = end of his slam (skill frame 5 = dome) = damage + stun; he taunts with a big shield, the team gets shields + less damage
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];
    const wd=c&&pushWide(u,.72,{tg:c,dd:c.d});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
@@ -2866,6 +2866,8 @@ function drawFx(t,ow){
       if(k<.85){g.translate(x,y);g.rotate(t*12);gearShape(f.r,'#ffd54a');g.rotate(-t*12);g.globalAlpha=.25;g.fillStyle='#ffab00';g.fillRect(-2,-80,4,70);}}
     else if(f.type==='sh8'){const h=f.u,d=f.sp,v=d&&d.fx8;if(!h||h.dead||!(h.shield>0)){f.t=f.d;}else if(v&&d.fi&&d.fi.naturalWidth){const R=v.rows[0],kk=SPK*dsc(h.d)*.36,a=Math.min(1,f.t*4);g.globalAlpha=a*(.75+.2*Math.sin(f.t*5));g.translate(h.x+20*S*dsc(h.d),fy(h.d)-6*S+Math.sin(f.t*3)*2*S);g.drawImage(d.fi,f.c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='fx24'){if(f.tg&&!f.tg.dead){f.x=f.tg.x+30*S;f.dd=f.tg.d;}const v=FX24[f.id],im=fx24Img(f.id);if(v&&im&&im.complete&&im.naturalWidth){const c=Math.min(v.n-1,Math.floor(k*v.n)),R=v.rows[0],kk=SPK*dsc(f.dd)*1.25;g.globalAlpha=k>.94?(1-k)/.06:1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(im,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
+    else if(f.type==='kult8'){if(f.tgt&&!f.tgt.dead){f.x=f.tgt.x;f.dd=f.tgt.d;f.mh=fy(f.tgt.d)-headY(f.tgt);}const im=kultImg();if(im.naturalWidth){const c=Math.min(7,Math.floor(k*8)),cw=im.naturalWidth/4,ch=im.naturalHeight/2,hh=Math.max(150*S*dsc(f.dd),(f.mh||120*S)*1.9),ww=hh*cw/ch;
+      g.globalAlpha=k>.88?(1-k)/.12:1;g.drawImage(im,(c%4)*cw,Math.floor(c/4)*ch,cw,ch,f.x-ww/2,fy(f.dd)+12*S*dsc(f.dd)-hh,ww,hh);}}
     else if(f.type==='sheet8'){if(f.u&&!f.u.dead){f.x=f.u.x;f.dd=f.u.d;}const d=f.sp,v=d.fx8,R=v.rows[0];if(d.fi&&d.fi.complete&&d.fi.naturalWidth){const c=Math.min(7,Math.floor(k*8)),kk=SPK*dsc(f.dd)*1.25;g.globalAlpha=k>.9?(1-k)*10:1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(d.fi,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='imgfx'){const im=FXIM[f.k];if(fxOK(f.k)){const e=1-Math.pow(1-Math.min(1,k*3),3),w=f.w*(f.float?1:(.6+.4*e)),h=w*im.naturalHeight/im.naturalWidth;
         g.globalAlpha=Math.min(1,k*6)*(k<.7?1:1-(k-.7)/.3);if(f.spin){g.translate(f.x,f.y-h/2);g.scale(1+Math.sin(f.t*30)*.03,1);g.drawImage(im,-w/2,-h/2,w,h);}else g.drawImage(im,f.x-w/2,f.y-(f.cloud?h/2:h)-(f.float?Math.sin(f.t*6)*3:0),w,h);}}
