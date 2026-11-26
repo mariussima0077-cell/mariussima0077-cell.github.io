@@ -4,7 +4,7 @@
 // Usage: BOT_TOKEN=.. GUILD_ID=.. node discord/greet.mjs
 const TOKEN = process.env.BOT_TOKEN, GUILD = process.env.GUILD_ID;
 const API = 'https://discord.com/api/v10';
-const MAX_AGE_H = 3; // only joins from the last 3 hours (never spams old members)
+const MAX_AGE_H = 24; // only joins from the last 24 h (GitHub cron can be late by hours; still never spams old members)
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function api(method, path, body) {
   for (let i = 0; i < 5; i++) {
@@ -30,6 +30,11 @@ const link = (n, alt) => { const id = get(n); return id ? `<#${id}>` : alt; };
 const msgs = await api('GET', `/channels/${welcome}/messages?limit=100`);
 const done = new Set(msgs.filter(m => m.author?.id === guild.application_id || (m.author?.bot && m.message_reference)).map(m => m.message_reference?.message_id).filter(Boolean));
 const since = Date.now() - MAX_AGE_H * 3600e3;
+// report: every join message in #welcome and whether it was greeted / why skipped
+for (const m of msgs.filter(m => m.type === 7)) {
+  const why = done.has(m.id) ? 'already greeted' : Date.parse(m.timestamp) <= since ? `older than ${MAX_AGE_H} h` : m.author?.bot ? 'bot' : 'NEW';
+  console.log(`join: ${m.author?.username} (${m.author?.global_name || ''}) at ${m.timestamp} -> ${why}`);
+}
 const joins = msgs.filter(m => m.type === 7 && !done.has(m.id) && Date.parse(m.timestamp) > since && !m.author?.bot).reverse();
 for (const j of joins) {
   const u = j.author;
