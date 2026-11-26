@@ -6,7 +6,7 @@ on:
       action:
         description: "announce = post in #announcements | setup / migrate / community = server admin (already done)"
         type: choice
-        options: [announce, setup, migrate, community, tweaks, betatest, freedm]
+        options: [announce, setup, migrate, community, tweaks, betatest, freedm, avatar]
         default: announce
       kind:
         description: "soon = upcoming update (what it will contain) | live = update is out now"
@@ -46,6 +46,9 @@ jobs:
       - name: Free diamonds channel + announcement
         if: ${{ inputs.action == 'freedm' }}
         run: node discord/freedm.mjs
+      - name: Bot avatar
+        if: ${{ inputs.action == 'avatar' }}
+        run: node discord/avatar.mjs
       - name: Tweaks
         if: ${{ inputs.action == 'tweaks' }}
         run: node discord/tweaks.mjs
