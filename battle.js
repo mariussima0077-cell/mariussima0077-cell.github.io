@@ -559,16 +559,16 @@ const HSK={
  m4_3:{sk:'THUNDERSTORM',skd:'Storm cloud over the enemies: 8 lightning strikes of 150% damage, each stuns 1s. Team: +25% attack speed for 6s.'},
  m4_4:{sk:'TIME WARP',skd:'The All-Seeing Eye bends time: all enemies slowed 50% and marked (+35% damage) for 6s. Team: +40% attack speed for 6s.'},
  m4_5:{sk:'INFERNO DASH',skd:'Rocket-kick dash through every enemy in its lane: 280% damage, always critical, and they burn for 4s.'},
- m5_0:{sk:'GEAR APOCALYPSE',skd:'Flaming gears crash on every enemy: 320% damage + a giant gear on the biggest group (150%). Team: +30% attack and −20% damage taken for 8s.'},
- m5_1:{sk:'OVERDRIVE',skd:'Full throttle: blasts through ALL enemies – 300% damage, always critical, they burn for 4s. Team: +30% attack speed and +15% crit for 6s.'},
+ m5_0:{sk:'GEAR APOCALYPSE',skd:'Flaming gears crash on every enemy: 320% damage + a giant gear on the biggest group (150%). Then MOLTEN CROWN: every hit enemy burns for 4s and takes +15% damage. Team: +30% attack and −20% damage taken for 8s.'},
+ m5_1:{sk:'OVERDRIVE',skd:'Full throttle: blasts through ALL enemies – 300% damage, always critical, then ARMOR BREAK: they burn and lose 30% DEF for 5s. Team: +30% attack speed and +15% crit for 6s.'},
  m5_2:{sk:'REBIRTH FLAME',skd:'A giant fire phoenix dives on the enemies: 200% damage to ALL, they burn for 4s. Heals all mechanics 35% + 15% over 4s, team −20% damage taken for 6s. Once per battle it brings back ALL fallen mechanics with 40% HP.'},
- m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage and stun 1.5s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
+ m5_3:{sk:'IRON FORTRESS',skd:'A giant energy shield crashes on the biggest group: 180% damage, stun 1.5s and SHIELD STUN: they deal −20% damage for 4s. Goliath taunts ALL enemies for 6s with a shield of 60% HP; every mechanic gets a shield of 25% HP and −20% damage taken for 6s.'},
  m5_4:{sk:'STARFIRE RAIN',skd:'A rain of electric spark-plug arrows falls on the biggest group: 240% damage, slow 50% for 3s and they are MARKED (+35% damage taken) for 6s. Long range.'},
  m5_6:{sk:'RAINBOW TEMPEST',skd:'A tornado of magic rainbow paint falls on the biggest group: 260% damage, slow 50% for 4s and the painted enemies deal −30% damage for 5s. Long range.'},
- m5_8:{sk:'EXHAUST PHANTOM',skd:'Shade vanishes in black exhaust smoke, appears behind the weakest enemy and strikes with a red X: 380% damage, always critical. Kit: every attack = 3 quick hits, 30% evade, after an evade his next hit is a sure critical (SHADOW STEP).'},
- m5_9:{sk:'AIRBAG SLAM',skd:'Anvil jumps and slams his car-door shield into the ground: the airbag bursts and a crash-test shockwave hits ALL enemies – 150% damage and stun 2s. He taunts ALL enemies for 4s with a shield of 50% HP.'},
+ m5_8:{sk:'EXHAUST PHANTOM',skd:'Shade vanishes in black exhaust smoke, appears behind the weakest enemy and strikes with a red X: 380% damage, always critical (120% around), then PHANTOM HAUNT: they are slowed for 3s. Kit: every attack = 3 quick hits, 30% evade, after an evade his next hit is a sure critical (SHADOW STEP).'},
+ m5_9:{sk:'AIRBAG SLAM',skd:'Anvil jumps and slams his car-door shield into the ground: the airbag bursts and a crash-test shockwave hits ALL enemies – 150% damage and stun 2s (CRASH DAZED). He taunts ALL enemies for 4s with a shield of 50% HP.'},
  m5_7:{sk:'PIT STOP',skd:'A racing ambulance drives through the team: heals every hero 25% HP, gives a shield of 15% HP and +20% ultimate energy to the others. Long range healer.'},
- m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Long range.'}};
+ m5_5:{sk:'OVERDRIVE RAILSHOT',skd:'The hawk drone marks the strongest enemy, then a giant railgun beam: 550% damage to it (always critical) and 160% to every enemy in its lane. Then LOCK-ON: every hit on it is critical for 4s. Long range.'}};
 // v16-17: unique skills for Common → Epic, made from what each hero does in his sprite sheet. p = numbers used by the class skill code
 const SKP={
  // Bruisers (jump + ground slam)
@@ -2195,7 +2195,9 @@ const ATL={};function atl(k){let i=ATL[k];if(!i){i=ATL[k]=new Image();i.decoding
 const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1},nmark:{k:'st_m5_4',ic:'sti_m5_4',dur:6,noburn:1},vlock:{k:'st_m5_5',ic:'sti_m5_5',dur:4,noburn:1},cpaint:{k:'st_m5_6',ic:'sti_m5_6',dur:5,noburn:1},pshield:{k:'st_m5_7',ic:'sti_m5_7',dur:5,hero:1},shaunt:{k:'st_m5_8',ic:'sti_m5_8',dur:3,noburn:1},adaze:{k:'st_m5_9',ic:'sti_m5_9',dur:2,noburn:1}}; // adaze: look + icon of Anvil's stun // shaunt: look + icon of Shade's slow // pshield: look + icon of Doc Volta's shield on the mechanics // cpaint: look + icon of Chroma's 'weak' // vlock: LOCK-ON – every hit on it is critical // nmark: look + icon of Nova's MARKED // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
 const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3'],m5_4:['ult_m5_4','st_m5_4','sti_m5_4','hit_m5_4'],m5_5:['ult_m5_5','st_m5_5','sti_m5_5','hit_m5_5'],m5_6:['ult_m5_6','st_m5_6','sti_m5_6','hit_m5_6'],m5_7:['ult_m5_7','st_m5_7','sti_m5_7','hit_m5_7'],m5_8:['st_m5_8','sti_m5_8','hit_m5_8'],m5_9:['ult_m5_9','st_m5_9','sti_m5_9','hit_m5_9']};
 const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4},m5_4:{k:'hit_m5_4',n0:4,c:4},m5_5:{k:'hit_m5_5',n0:4,c:4},m5_6:{k:'hit_m5_6',n0:4,c:4},m5_7:{k:'hit_m5_7',n0:4,c:4},m5_8:{k:'hit_m5_8',n0:0,c:4},m5_9:{k:'hit_m5_9',n0:0,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
-function mstat(m,s,src,delay){B.fx.push({type:'mstat',s,t:-(delay||0),d:MST[s].dur+.6,tgt:m,x:m.x,dd:m.d,src});}
+function mstat(m,s,src,delay){if(!m||m.dead)return;const D=MST[s].dur; // v16-363: the effect counts right away, also in simulated / swept battles (was only when drawn)
+  if(!MST[s].hero&&!MST[s].noburn){burnOn(m,src);m.burn=Math.max(m.burn,D);}m[s]=Math.max(m[s]||0,D);
+  if(!B.sim)B.fx.push({type:'mstat',s,t:-(delay||0),d:D+.6,tgt:m,x:m.x,dd:m.d,src,on:1});}
 function atl8(k,m,delay,o){B.fx.push(Object.assign({type:'atl8',k,t:-(delay||0),d:.9,tgt:m,x:m.x,dd:m.d,f0:0,n:8,hm:1.9},o||{}));}
 const WIDE8={},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
@@ -2322,7 +2324,7 @@ const SKF={
    const R=120*S,inR=m=>c&&Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R;
    if(c&&!B.sim){let i=0;for(const m of alive(B.mons))if(inR(m))atl8('ult_m5_3',m,i++*.07,{d:1.0,hm:1.8});}
    castAct(u,.75,()=>{u.post=.6;shake(14);
-     if(c){for(const m of alive(B.mons))if(inR(m)){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);if(!B.sim&&!m.dead)mstat(m,'gstun',u,0);}}
+     if(c){for(const m of alive(B.mons))if(inR(m)){damage(u,m,1.8,{skill:1});m.stun=Math.max(m.stun,1.5);mstat(m,'gstun',u,0);}}
      if(!u.dead){u.taunt=6;u.shield=Math.max(u.shield,u.max*.6);}
      // v16-256: every hero with Goliath's shield carries a small copy of HIS shield picture (fxs frame 3) while the shield lasts
      for(const h of alive(B.heroes)){if(h!==u)h.shield=Math.max(h.shield,h.max*.25);} // v16-shbar: no small shield copy / glow on every hero – the shield bar shows it
@@ -2333,24 +2335,24 @@ const SKF={
    const R=130*S,inR=m=>c&&Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R;
    if(c&&!B.sim){let i=0;for(const m of alive(B.mons))if(inR(m))atl8('ult_m5_4',m,i++*.07,{d:1.0,hm:1.8});}
    castAct(u,.75,()=>{u.post=.6;shake(10);
-     if(c){for(const m of alive(B.mons))if(inR(m)){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(!B.sim&&!m.dead)mstat(m,'nmark',u,0);}}});},
+     if(c){for(const m of alive(B.mons))if(inR(m)){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);mstat(m,'nmark',u,0);}}});},
  m5_9(u){ // ANVIL's AIRBAG SLAM: he jumps and slams the shield in front of him (skill frame 5); the crash-test shockwave (fxs) = stun ALL 2s + 150%, taunt 4s + shield 50% HP
    // v16-362 (26 nov, Marius): old wide sheet + code ring removed – his AIRBAG SLAM picture on EVERY enemy, then CRASH DAZED (= the 2 s stun, his look + icon)
    if(!B.sim){let i=0;for(const m of alive(B.mons))atl8('ult_m5_9',m,.25+i++*.06,{d:1.0,hm:1.8});}
    castAct(u,.8,()=>{u.post=.6;shake(14);
-     for(const m of alive(B.mons)){damage(u,m,1.5,{skill:1});m.stun=Math.max(m.stun,2);if(!B.sim&&!m.dead)mstat(m,'adaze',u,0);}
+     for(const m of alive(B.mons)){damage(u,m,1.5,{skill:1});m.stun=Math.max(m.stun,2);mstat(m,'adaze',u,0);}
      if(!u.dead){u.taunt=4;u.shield=Math.max(u.shield,u.max*.5);}});},
  m5_8(u){ // Shade's EXHAUST PHANTOM: he vanishes (skill row = black smoke), appears behind the weakest enemy (fxs = him bursting out + red X), then comes back
    const ms=alive(B.mons);if(!ms.length)return;let tg=ms[0];for(const m of ms)if(m.hp<tg.hp)tg=m;const f8=FV8(u),D=1.05;
    const i24=fx24Img(u.h.id),F24=i24&&i24.complete&&i24.naturalWidth&&!LOWRES,DD=F24?1.6:1.0,IMP=F24?DD*16/24:.62; // v16-348: 24 frames, impact = frame 17 (the red X)
    if(F24)B.fx.push({type:'fx24',t:-D,d:DD,id:u.h.id,tg,x:tg.x+30*S,dd:tg.d});else if(f8)B.fx.push({type:'sheet8',t:-D,d:1.0,sp:u.spr,x:tg.x+30*S,dd:tg.d});
-   B.fx.push({type:'call',t:-(D+IMP),d:.05,fn:()=>{if(tg.dead)return;shake(14);B.flash=.2;damage(u,tg,3.8,{skill:1,crit:1});const hq=m=>{if(m.dead)return;m.slow=Math.max(m.slow,3);if(!B.sim)mstat(m,'shaunt',u,0);};hq(tg);for(const m of alive(B.mons))if(m!==tg&&Math.hypot(m.x-tg.x,(m.d-tg.d)*(FY1-FY0)*1.25)<80*S){damage(u,m,1.2,{skill:1});hq(m);}}}); // v16-361: PHANTOM HAUNT (slow 3 s, his smoke + icon)
+   B.fx.push({type:'call',t:-(D+IMP),d:.05,fn:()=>{if(tg.dead)return;shake(14);B.flash=.2;damage(u,tg,3.8,{skill:1,crit:1});const hq=m=>{if(m.dead)return;m.slow=Math.max(m.slow,3);mstat(m,'shaunt',u,0);};hq(tg);for(const m of alive(B.mons))if(m!==tg&&Math.hypot(m.x-tg.x,(m.d-tg.d)*(FY1-FY0)*1.25)<80*S){damage(u,m,1.2,{skill:1});hq(m);}}}); // v16-361: PHANTOM HAUNT (slow 3 s, his smoke + icon)
    for(const k of (F24?[0,.55,1.1,1.6]:[0,.55,1.1]))B.fx.push({type:'call',t:-(D+k),d:.05,fn:()=>{u.post=.6;}});castAct(u,D,()=>{});},
  m5_7(u){ // v16-328: Doc Volta's PIT STOP – the ambulance (wide sheet, drawn over the HEROES) drives through the team; impact = heal 25% + shield 15% + 20% ultimate energy for the others (v16-333: was 30, budget phones)
    // v16-360 (26 nov, Marius): old wide sheet over the team removed – his PIT STOP picture (healing pillar) on EVERY mechanic, then PIT CREW SHIELD (his bubble + icon while the shield is up)
    if(!B.sim){let i=0;for(const h of alive(B.heroes))atl8('ult_m5_7',h,i++*.06,{d:1.1,hm:1.6});}
    castAct(u,.8,()=>{u.post=.6;const k=1+(u.tl?TV(u):0);
-     for(const h of alive(B.heroes)){heal(h,h.max*.25*k);h.shield=Math.max(h.shield,h.max*.15);if(h!==u)h.en=Math.min(100,(h.en||0)+20);if(!B.sim)mstat(h,'pshield',u,0);}
+     for(const h of alive(B.heroes)){heal(h,h.max*.25*k);h.shield=Math.max(h.shield,h.max*.15);if(h!==u)h.en=Math.min(100,(h.en||0)+20);mstat(h,'pshield',u,0);}
      teamBuff({def:0,col:'#69f0ae',txt:'PIT STOP'});});},
  m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
@@ -2358,13 +2360,13 @@ const SKF={
    const R=135*S,inR=m=>c&&Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R;
    if(c&&!B.sim){let i=0;for(const m of alive(B.mons))if(inR(m))atl8('ult_m5_6',m,i++*.07,{d:1.1,hm:1.9});}
    castAct(u,.85,()=>{u.post=.6;shake(10);
-     if(c){const v=u.tl?TV(u):0;for(const m of alive(B.mons))if(inR(m)){damage(u,m,2.6,{skill:1});m.slow=Math.max(m.slow,4);m.weak=Math.max(m.weak,5);if(v)wetOn(m,v);if(!B.sim&&!m.dead)mstat(m,'cpaint',u,0);}}});},
+     if(c){const v=u.tl?TV(u):0;for(const m of alive(B.mons))if(inR(m)){damage(u,m,2.6,{skill:1});m.slow=Math.max(m.slow,4);m.weak=Math.max(m.weak,5);if(v)wetOn(m,v);mstat(m,'cpaint',u,0);}}});},
  m5_5(u){ // v16-141: Vega's OVERDRIVE RAILSHOT – the strongest enemy (most HP) is hit by the beam (fxs, frame 5 = full power = his shot, skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,L=alive(B.mons);let tg=null;for(const m of L)if(!tg||m.hp>tg.hp)tg=m;
    // v16-358 (26 nov, Marius): old wide sheet + code beam/circles removed – his OVERDRIVE RAILSHOT picture on the strongest enemy (big) and on every enemy in its lane, then LOCK-ON (all hits on it are critical 4 s)
    if(tg){tg.mark=Math.max(tg.mark,2);if(!B.sim){atl8('ult_m5_5',tg,.3,{d:1.0,hm:2.1});for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S)atl8('ult_m5_5',m,.4,{d:.9,hm:1.4});}}
    castAct(u,.75,()=>{u.post=.6;shake(12);if(!tg)return;
-     if(!tg.dead){damage(u,tg,5.5,{skill:1,crit:1});if(!B.sim&&!tg.dead)mstat(tg,'vlock',u,0);}
+     if(!tg.dead){damage(u,tg,5.5,{skill:1,crit:1});mstat(tg,'vlock',u,0);}
      for(const m of alive(B.mons))if(m!==tg&&Math.abs(m.d-tg.d)*(FY1-FY0)<34*S&&m.x>u.x-20*S)damage(u,m,1.6,{skill:1});});},
  m5_2(u){ // v16-128: Ignis' REBIRTH FLAME – the fire phoenix (fxs) dives on the biggest group; impact (fxs frame 4) = his burst (skill frame 4) = damage + heal + (once) revive all
    // v16-355 (26 nov, Marius): old wide sheet + code fire/rings removed – his REBIRTH FLAME picture (phoenix dives) on EVERY enemy, then PHOENIX AURA on every mechanic
@@ -2373,7 +2375,7 @@ const SKF={
      for(const m of alive(B.mons)){damage(u,m,2,{skill:1});burnOn(m,u);}
      const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);/* v16-314: only REBORN! – no extra effect on the revived hero */}}
      allyFx('m5_2',alive(B.heroes).filter(h=>!h.rvFx),1.5);for(const h of B.heroes)h.rvFx=0;
-     for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hotS=B.hsrc;h.hot=4;h.hotA=h.max*.15/4;if(!B.sim)mstat(h,'paura',u,0);}
+     for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hotS=B.hsrc;h.hot=4;h.hotA=h.max*.15/4;mstat(h,'paura',u,0);}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
  m5_1(u){const wdl=false; // v16-354 (26 nov, Marius): old wide sheet + fire trail removed – her OVERDRIVE picture lands on every enemy she blasts through, then ARMOR BREAK
    castAct(u,wdl?.75:.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
@@ -2439,7 +2441,7 @@ function unitUpdate(u,dt,foes,friends){
     if(a.k==='dash'){const v=1100*S*dt;
       if(!a.back){u.face=1;u.x+=v;u.st='dash';
         const F=a.fire,P=a.p||{},c1=F?'#ff6d00':a.col||'#40c4ff',c2=F?'#ff3d00':a.col||'#2979ff',c3=F?'#ffd180':a.col?hexA(a.col,.6):'#80d8ff';
-        for(const m of alive(B.mons))if(!a.hit.has(m)&&Math.abs(m.x-u.x)<26*S&&(a.all||Math.abs(m.d-u.d)<(a.band||.2))){a.hit.add(m);damage(u,m,a.mult||2.6,{crit:1,skill:1});if(F)burnOn(m,u);if(u.h&&u.h.id==='m5_1'&&!B.sim){atl8('ult_m5_1',m,0,{d:.9,hm:1.7});if(!m.dead)mstat(m,'abrk',u,.4);}if(P.mark)m.mark=Math.max(m.mark,P.mark);if(P.slow)m.slow=Math.max(m.slow,P.slow);
+        for(const m of alive(B.mons))if(!a.hit.has(m)&&Math.abs(m.x-u.x)<26*S&&(a.all||Math.abs(m.d-u.d)<(a.band||.2))){a.hit.add(m);damage(u,m,a.mult||2.6,{crit:1,skill:1});if(F)burnOn(m,u);if(u.h&&u.h.id==='m5_1'){if(!B.sim)atl8('ult_m5_1',m,0,{d:.9,hm:1.7});mstat(m,'abrk',u,.4);}if(P.mark)m.mark=Math.max(m.mark,P.mark);if(P.slow)m.slow=Math.max(m.slow,P.slow);
           if(P.splash){for(const o of alive(B.mons))if(o!==m&&Math.hypot(o.x-m.x,(o.d-m.d)*(FY1-FY0)*1.25)<60*S)damage(u,o,P.splash,{noCrit:1,skill:1});B.fx.push({type:'ring',x:m.x,y:fy(m.d),t:0,d:.4,r:60*S,col:c1,ground:1});if(FX2&&!FV8(u))fxBurst(m.x,fy(m.d)-20*S,c1,50*S);shake(4);}if(u.spr&&u.spr.dboom&&u.spr.bi&&!a.nb)B.fx.push({type:'sprBoom',x:m.x,y:fy(m.d),t:0,d:.6,r:60*S,im:u.spr.bi});sparks(m.x,headY(m)+20,10,c1);if(FX2&&!FV8(u)){fxs('slash_02',c1,m.x,headY(m)+24*dsc(m.d),{d:.25,s0:50*S,s1:90*S,rot:-Math.PI/2+rnd(-.4,.4),ease:1});fxBurst(m.x,headY(m)+24*dsc(m.d),c2,40*S);if(F)fxs('fire_01','#ff9100',m.x,headY(m)+24*dsc(m.d),{d:.4,s0:20*S,s1:80*S,rot:rnd(0,TAU),ease:1});}}
         if(FX2&&!sprOK(u.spr)){const ty=fy(u.d)-30*dsc(u.d);fxs('muzzle_02',c2,u.x-26*S,ty,{d:.22,s0:70*S,s1:40*S,rot:-Math.PI/2,a0:.9});fxs('trace_01',c3,u.x-60*S,ty+rnd(-14,14)*S,{d:.25,s0:120*S,s1:160*S,sx:.6,rot:Math.PI/2,a0:.7});}
         for(let k=0;k<(F?5:3);k++)part({x:u.x-rnd(0,F?40:24)*S,y:fy(u.d)-rnd(4,40)*S,vx:rnd(-60,-20),vy:rnd(-20,20),life:rnd(.25,.5),r:rnd(3,F?9:7)*S,col:F?(k%2?'rgba(255,109,0,.75)':'rgba(255,214,0,.8)'):(k%2?'rgba(41,121,255,.7)':'rgba(180,230,255,.8)'),type:'flame'});
@@ -2875,7 +2877,7 @@ function drawFx(t,ow){
       if(k<.85){g.translate(x,y);g.rotate(t*12);gearShape(f.r,'#ffd54a');g.rotate(-t*12);g.globalAlpha=.25;g.fillStyle='#ffab00';g.fillRect(-2,-80,4,70);}}
     else if(f.type==='sh8'){const h=f.u,d=f.sp,v=d&&d.fx8;if(!h||h.dead||!(h.shield>0)){f.t=f.d;}else if(v&&d.fi&&d.fi.naturalWidth){const R=v.rows[0],kk=SPK*dsc(h.d)*.36,a=Math.min(1,f.t*4);g.globalAlpha=a*(.75+.2*Math.sin(f.t*5));g.translate(h.x+20*S*dsc(h.d),fy(h.d)-6*S+Math.sin(f.t*3)*2*S);g.drawImage(d.fi,f.c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
     else if(f.type==='fx24'){if(f.tg&&!f.tg.dead){f.x=f.tg.x+30*S;f.dd=f.tg.d;}const v=FX24[f.id],im=fx24Img(f.id);if(v&&im&&im.complete&&im.naturalWidth){const c=Math.min(v.n-1,Math.floor(k*v.n)),R=v.rows[0],kk=SPK*dsc(f.dd)*1.25;g.globalAlpha=k>.94?(1-k)/.06:1;g.translate(f.x,fy(f.dd)+6*S);g.drawImage(im,c*v.cw,R[0],v.cw,R[1],-v.ax*kk,-R[3]*kk,v.uw*kk,R[2]*kk);}}
-    else if(f.type==='mstat'){const m=f.tgt,D=MST[f.s].dur;if(!f.on){f.on=1;if(m&&!m.dead){if(!MST[f.s].hero&&!MST[f.s].noburn){burnOn(m,f.src);m.burn=D;}m[f.s]=D;}}if(m&&!m.dead){f.x=m.x;f.dd=m.d;if(MST[f.s].hero)m[f.s]=Math.max(0,D-k*f.d);}else if(k*f.d<D)f.t=Math.max(f.t,D);
+    else if(f.type==='mstat'){const m=f.tgt,D=MST[f.s].dur;if(m&&!m.dead){f.x=m.x;f.dd=m.d;if(MST[f.s].hero)m[f.s]=Math.max(0,D-k*f.d);}else if(k*f.d<D)f.t=Math.max(f.t,D);
       const im=atl(MST[f.s].k);if(im.naturalWidth){const tt=k*f.d,c=tt<D?Math.floor(tt*10)%4:Math.min(7,4+Math.floor((tt-D)/.6*4)),cw=im.naturalWidth/4,ch=im.naturalHeight/2,uh=m&&!m.dead?Math.max(30*S,fy(m.d)-headY(m)):(f.uh||60*S);f.uh=uh;const hh=Math.max(80*S*dsc(f.dd),uh*(MST[f.s].k_h||1.4)),ww=hh*cw/ch; // v16-362: sized on the unit's real height (heroes + monsters)
       const HR=MST[f.s].hero;if(HR)g.globalAlpha=.6; // on mechanics: see-through so the hero stays visible
       g.drawImage(im,(c%4)*cw,Math.floor(c/4)*ch,cw,ch,f.x-ww/2,fy(f.dd)+hh*.1-hh,ww,hh);if(HR)g.globalAlpha=1;}}
