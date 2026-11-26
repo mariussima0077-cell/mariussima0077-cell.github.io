@@ -3208,7 +3208,8 @@ function rwSend(){const s=RWS();RT.g=s.g;RT.nOn=s.n;RT.st='leave';RT.v=20;s.n=0;
 function rwRefresh(){const s=RWS();if(s.rf>=rwRfMax())return false;s.rf++;s.g=rwRoll(s.g);if(RT.st==='dock')RT.g=s.g;save();return true;}
 const rSlot=(s)=>{const w=Math.floor(s/2),x0=RT.x-146-(w+1)*126;return {x:x0+(s%2?93:33),y:SOON.railY+5-rwWH()*.6};};
 const rwWH=()=>{const I=rwI('wag'+RT.g);return I.complete&&I.naturalWidth?124*I.naturalHeight/I.naturalWidth:30;};
-function rwCar(i){while(RT.cars.length<=i){const c=newCar(false);c.col=pick(VIVID);c.dirt=0;c.dmg=[];RT.cars.push(c);}return RT.cars[i];}
+// v16-371 fix (iPhone crash 'c.x' in drawCarAt): RT.cars[m.s]=… can leave holes (s.n restored from the save / offline cars) → fill any empty slot
+function rwCar(i){let c=RT.cars[i];if(!c){c=newCar(false);c.col=pick(VIVID);c.dirt=0;c.dmg=[];RT.cars[i]=c;}return c;}
 function updateRail(dt){
   if(!(G.lv.rail>0))return;const s=RWS(),cap=rCap(),stop=rStop(),now=Date.now(),gap=(now-(s.ft||now))/1000;s.ft=now;
   // v16-270 (Marius 23 nov: „la Rail Wars să vină mașinile pe tren și când suntem offline”): back from the background (phone locked, other app)
