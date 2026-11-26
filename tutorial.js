@@ -171,6 +171,8 @@ setInterval(()=>{if(!isOpen('hub')){hubDone=false;return;}if(running||hubDone||!
   const k=open.find(k=>!G.tutM.includes(k));if(!k)return;
   hubDone=true;MINI=k;L=[{el:()=>document.querySelector('#hub.open .hubM[data-hb="'+k+'"]'),t:MG[k],next:'GOT IT'}];
   running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},700);
+let pkT=0;document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('[data-pkgo]'))pkT=Date.now();},true);
+const PKG=k=>'<img src="img/ui12/pk_'+k+'.webp" style="height:1.3em;vertical-align:-.32em" alt="">';
 // ---------- v16-122 (Marius): mini-guides the FIRST time a page is opened (one bubble, once per player) ----------
 const PG={
   heroes:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b>HEROES</b>: your <b>BATTLE TEAM</b> (5 heroes) fights here. Tap a hero to <b>LEVEL UP</b> with ${'<b>Essence</b>'} – every 20 levels = <b>ASCENSION</b>. <b>AUTO BEST</b> picks your strongest team.`},
@@ -221,7 +223,16 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   // v16-212 (Marius 23 nov: Arena Shop + milestone rewards)
   ashop:{ok:()=>isOpen('onl')&&!!document.querySelector('#olArena.on #olArT'),t:`<b>ARENA MEDALS</b>: every Arena fight now gives medals (<b>+10</b> win, <b>+3</b> loss), plus the daily and season rewards. Spend them in the <b>ARENA SHOP</b> (tickets, Dungeon keys, Essence, Builder Kits, a <b>Legendary of your choice</b> every month, a frame and a title). In <b>REWARDS</b>, open a chest at <b>3, 7, 12, 20, 30, 45 and 60 wins</b> every season.`},
   // v16-214 (Marius 23 nov: shortcuts)
-  pkgo:{ok:()=>isOpen('sheet')&&vis(document.querySelector('#sheet .pkBar')),t:`<b>YOUR PARTS</b>: tap a part → the map flies to your <b>weakest building</b> that uses it and opens its upgrade. A green <b style="color:#43e97b">▲</b> = you have enough parts to upgrade one now.`},
+  // v16-370 (Marius 26 nov: "players don't get the YOUR PARTS shortcut") – guided in 3 steps (new key → everybody sees it once)
+  pkgo2:{ok:()=>isOpen('sheet')&&vis(document.querySelector('#sheet .pkBar')),L:()=>{let t0=0;const sp=()=>{const a=[...document.querySelectorAll('#sheet .pkBar span[data-pkgo]')];return a.find(s=>s.querySelector('.pkUp'))||a.find(s=>!s.classList.contains('on'))||a[0];};return [
+    {el:()=>document.querySelector('#sheet .pkBar'),t:`<b>YOUR PARTS</b> = what you use to <b>upgrade buildings</b>. Every building takes <b>one</b> kind:<br>${PKG('tank')} Engine · ${PKG('warrior')} Tuning · ${PKG('ranger')} Inspection · ${PKG('mage')} Paint + Electrical · ${PKG('support')} Service · ${PKG('bk')} <b>Builder Kit</b> = all the others (Parking, Office, Security, Car Wash…)`,next:'NEXT'},
+    {el:sp,tap:1,enter:()=>{t0=Date.now();},t:`<b>Tap a part</b> → the map flies to your <b>weakest building</b> that uses it and opens it. A green <b style="color:#43e97b">▲</b> = you can upgrade one <b>right now</b>. Try it!`,done:()=>pkT>t0||!isOpen('sheet')},
+    {el:()=>$('shBtn'),p:'thumb',t:`Here it is! <b>have / need</b> shows your parts. Enough → tap <b>UPGRADE</b>. Not enough → the note under it says <b>where to get them</b> (salvage gear, Idle Rewards, campaign, towers). Tap the part again to jump to the next building.`,next:'GOT IT'}];}},
+  // v16-370 (Marius 26 nov): how things UNLOCK – the first time a player meets a lock
+  lockbld:{ok:()=>isOpen('sheet')&&/Unlocks at Reputation/.test((document.querySelector('#shStats .lock')||{}).textContent||''),L:()=>[
+    {el:()=>$('repPill'),t:`<b>🔒 LOCKED BUILDING</b>: buildings open with <b>REPUTATION</b> (the <b>REP</b> bar at the top). Every car your garage repairs and sells fills it. Each new REP level opens <b>new buildings</b> and <b>new repairs</b> and gives a gift.`,next:'GOT IT'}]},
+  lockhub:{ok:()=>isOpen('hub')&&vis(document.querySelector('#hub.open .hubM.lk')),L:()=>[
+    {el:()=>document.querySelector('#hub.open .hubM.lk'),t:`<b>🔒 GREY = LOCKED</b>: every battle mode opens when you win the <b>campaign stage</b> written on it. Win more <b>CAMPAIGN</b> stages to open Arena, Towers, World Boss and Dungeons.`,next:'GOT IT'}]},
   gogo:{ok:()=>isOpen('gpx')&&vis(document.querySelector('#gpx [data-g=go]')),t:`<b>GO</b>: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have <b>GO</b> too.`},
   // v16-254 (Marius 23 nov: Thieves 2.0)
   thieves2:{ok:()=>isOpen('sheet')&&sel0()==='security'&&!!document.querySelector('#sheet .mwB'),t:`<b>THIEVES 2.0</b>: thieves come in groups – <b>★ PRO</b>, <b>👑 GANG BOSS</b> and sometimes a whole <b style="color:#ff6b6b">GANG RAID</b>. Guards get <b>BACKUP</b> and <b>K9 dogs</b>. Caught = Builder Kit, Crew Tickets, diamonds; escaped = part of your cash stolen. <b>MOST WANTED</b>: catch the 3 thieves on the board today for a bounty.`},
@@ -236,7 +247,7 @@ setInterval(()=>{if(running||!window.__TE||!G.h)return;if(!G.tut&&(isNew()||(G.t
   const seen=G.tutM||(G.tutM=[]);const k=Object.keys(PG).find(k=>!seen.includes('p_'+k)&&(()=>{try{return PG[k].ok();}catch(e){return false;}})());if(!k)return;
   if(k==='vip'&&!seen.includes('p_vip2'))seen.push('p_vip2');
   if(k==='events'&&!seen.includes('p_evhub'))seen.push('p_evhub');   // v16-274: new players already read the new EVENTS text   // v16-238: new players already read the new VIP text
-  MINI='p_'+k;L=[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];
+  MINI='p_'+k;L=PG[k].L?PG[k].L():[{t:PG[k].t,next:'GOT IT',top:k==='gear'?0:1}];
   running=true;window.__TUTON=true;document.body.appendChild(root);go(0);loop();},900);
 window.__TUT={start:()=>{MINI=null;L=S;start(true);},go:n=>go(n),end};
 })();
