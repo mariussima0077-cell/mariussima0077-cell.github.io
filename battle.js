@@ -636,7 +636,7 @@ const TAL={m5_0:{n:'OVERLOAD CROWN',v:[.5,.65,.8],d:v=>'Every 4th attack the lig
  m5_4:{n:'STAR MARK',v:[.15,.2,.25],d:v=>'The monster Nova hits takes +'+Math.round(v*100)+'% damage from the whole team for 4 s.'},
  m5_6:{n:'WET PAINT',v:[.2,.25,.3],d:v=>'Every monster Chroma hits is soaked in paint: −'+Math.round(v*100)+'% attack speed for 4 s.'},
  m5_8:{n:'EXECUTION',v:[.3,.45,.6],d:v=>'Shade deals +'+Math.round(v*100)+'% damage to enemies below 30% HP.'},
- m5_9:{n:'CRUMPLE ZONE',v:[.15,.2,.25],d:v=>'Anvil takes −'+Math.round(v*100)+'% damage while his shield is up. (proposal – test account)'},
+ m5_9:{n:'CRUMPLE ZONE',v:[.15,.2,.25],d:v=>'Anvil takes −'+Math.round(v*100)+'% damage while his shield is up.'},
  m5_7:{n:'FIRST AID',v:[.1,.15,.2],d:v=>'Doc Volta\'s heals are +'+Math.round(v*100)+'% stronger. Phase II: the healed hero also gets a 5% HP shield. Phase III: +5% ultimate energy too.'},
  m5_5:{n:'PIERCING RAIL',v:[.6,.75,.9],d:v=>'Every 3rd shot goes through every monster in the line ('+Math.round(v*100)+'% damage).'}};
 const TAL_LV=[320,360,400],talLvOf=lv=>lv>=TAL_LV[2]?3:lv>=TAL_LV[1]?2:lv>=TAL_LV[0]?1:0;
@@ -2165,7 +2165,7 @@ function imgFx(k,x,y,w,d,o){B.fx.push(Object.assign({type:'imgfx',k,x,y,w,t:0,d}
 function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 // v16-256 (Marius: "keep what I gave you"): when the hero's own effect sheet (fxs) is loaded, the extra code-drawn effects of his skill are skipped
 const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
-const WIDE8={m5_0:'img/fx/wide_m5_0.webp',m5_1:'img/fx/wide_m5_1.webp',m5_2:'img/fx/wide_m5_2.webp',m5_3:'img/fx/wide_m5_3.webp',m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp'},WIDEI={};
+const WIDE8={m5_0:'img/fx/wide_m5_0.webp',m5_1:'img/fx/wide_m5_1.webp',m5_2:'img/fx/wide_m5_2.webp',m5_3:'img/fx/wide_m5_3.webp',m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
 // v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
@@ -2173,7 +2173,7 @@ const ALLY8={m5_0:'img/fx/ally_m5_0.webp',m5_1:'img/fx/ally_m5_1.webp',m5_2:'img
 function allyFx(id,hs,d){return false; /* v16-314 (25 nov, Marius): no more Mythic effects on teammates (BUFF / HEAL / REVIVE) – too many effects on the map; the ultimates stay */const im=allyImg(id);if(!im||!im.naturalWidth)return false;let k=0;for(const h of (hs||alive(B.heroes)))B.fx.push({type:'ally8',t:-(k++)*.06,d:d||1.3,im,u:h});return true;}
 function WD(u){const i=u&&u.h&&wideImg(u.h.id);return !!(i&&i.naturalWidth);}
 // v16-321 (Marius: 'Nova – the arrows don't come from the top and it's too fast'): with his 23-24 frame sheets the picture's impact = the moment of the damage (end of the cast)
-const WTA={m5_7:1.2,m5_2:1.5,m5_3:1.2,m5_4:1.5,m5_5:1.2,m5_6:2.0};
+const WTA={m5_9:1.2,m5_7:1.2,m5_2:1.5,m5_3:1.2,m5_4:1.5,m5_5:1.2,m5_6:2.0};
 // v16-334 (Marius 25 nov: "skill-urile nu-mi plac așa mult" – no new sheets): ULT2 = the ultimate picture is a bit smaller (the fight stays visible),
 // the part after the impact is shorter (1.0 s, was 1.5) and the enemies REACT on the impact: pushed back + a short hit-stop + camera punch
 const ULT2=1;
@@ -2214,7 +2214,7 @@ function drawReady(g,u,t){const id=u.h&&u.h.id,im=id&&READY8[id]&&readyImg(id);i
     g.globalCompositeOperation='lighter';g.globalAlpha=al*glow*(.4+.2*Math.sin(t*30));g.drawImage(im,sx,sy+fh*cut,fw,fh*(1-cut),u.sx-w/2,u.sy-h*.76+h*cut,w,h*(1-cut));}
   g.restore();}function wideImg(id){if(!WIDE8[id])return null;let i=WIDEI[id];if(!i){i=WIDEI[id]=new Image();i.decoding='async';i.src=LOWRES?WIDE8[id].replace('.webp','_low.webp'):WIDE8[id];}return i;}
 // v16-306 (Marius, 25 nov): ultimates with 23-24 frames (his 3 ChatGPT sheets per hero) instead of 8 → N = frames in the picture (600x200 each), WIDEIP = the impact frame in the new sheets
-const WIDEIP={m5_7:12,m5_0:11,m5_1:11,m5_2:10,m5_3:8,m5_4:11,m5_5:11,m5_6:15};function wN(im){return Math.max(8,Math.round(im.naturalHeight*3/im.naturalWidth));}
+const WIDEIP={m5_9:8,m5_7:12,m5_0:11,m5_1:11,m5_2:10,m5_3:8,m5_4:11,m5_5:11,m5_6:15};function wN(im){return Math.max(8,Math.round(im.naturalHeight*3/im.naturalWidth));}
 function castAct(u,dur,fire){u.act={k:'cast',t:0,dur,fire};u.st='cast';if(u.hero&&!B.sim&&u.h&&u.h.gr===5)sfx('cast');}
 const SKF={
  m3_0(u,ms){const P=skp(u),f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Viktor's ENGINE DROP – he throws the engine from where he stands (no more leap); it falls on the biggest group (fxs frame 2 = lands = damage); same numbers as before
@@ -2302,7 +2302,7 @@ const SKF={
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
  m5_9(u){ // ANVIL's AIRBAG SLAM (test account): he jumps and slams the shield in front of him (skill frame 5); the crash-test shockwave (fxs) = stun ALL 2s + 150%, taunt 4s + shield 50% HP
-   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,wd=pushWide(u,.72,{dd:u.d});
+   const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],wd=c&&pushWide(u,1.2,{dd:c.d});
    if(f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:u.x+u.face*70*S,dd:u.d});
    castAct(u,wd?1.2:.7,()=>{u.post=.6;shake(14);B.flash=.22;
      for(const m of alive(B.mons)){damage(u,m,1.5,{skill:1});m.stun=Math.max(m.stun,2);}
