@@ -2031,7 +2031,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
   tgt.hp-=left;tgt.flash=1;tgt.hurt=1;if(src.hero&&!tgt.hero)src.bsD=(src.bsD||0)+a;if(tgt.hero)tgt.bsT=(tgt.bsT||0)+a; // v16-350 battle stats
   if(src.hero&&src.br==='warrior'&&!tgt.hero&&!src.dead&&src.hp<src.max){const lh=Math.min(src.max-src.hp,a*RB_LS[src.h.gr||0]/100);src.hp+=lh;src.bsH=(src.bsH||0)+lh;} // v16-349 warrior role: lifesteal
-  if(!B.sim&&src.hero&&!tgt.hero&&!o.skill&&!LOWRES&&B.t-(tgt.elT||-9)>.12){tgt.elT=B.t;const [ex,ey]=sxy(tgt);elHit(src,ex,ey-(tgt.H||40)*.5*dsc(tgt.d));} // v16-322
+  if(!B.sim&&src.hero&&!tgt.hero&&!o.skill&&!LOWRES&&!(src.h&&HITFX[src.h.id])&&B.t-(tgt.elT||-9)>.12){tgt.elT=B.t;const [ex,ey]=sxy(tgt);elHit(src,ex,ey-(tgt.H||40)*.5*dsc(tgt.d));} // v16-322
   if(!B.sim){if(!tgt.hero&&!LOWRES&&B.t-(tgt.dbT||-9)>.14){tgt.dbT=B.t;const [hx,hy]=sxy(tgt);hitBits(hx,hy-(tgt.H||40)*.45*dsc(tgt.d),crit?4:2);}sfx(tgt.hero?'thud':crit?'crit':'hit');} // v16-319
   if(tgt.wbB){B.wbD+=left;if((o.skill||crit)&&!(tgt.hurtS>-2))tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
   if(ULT2&&o.skill&&src.hero&&!tgt.hero&&!B.sim&&!tgt.wbB&&tgt.hp>0&&B.fx.some(f=>f.type==='wide8'&&f.u===src&&!f.heroes&&f.t>f.ta-.25&&f.t<f.ta+.6)&&0)B.fx.push({type:'kb',m:tgt,t:0,d:.26,v:(tgt.boss?70:330)*S}); // v16-334: pushed back by the ultimate
@@ -2076,6 +2076,7 @@ function elDraw(g,f,k){g.save();g.globalCompositeOperation='lighter';
 // Nova's normal shot = her real arrow (the spark-plug arrow of her ultimate) flying with a glowing trail
 function arrowDraw(p,x,y){const T=p.tr||(p.tr=[]),L=T[T.length-1];T.push([x,y]);if(T.length>6)T.shift();
   const an=L?Math.atan2(y-L[1],x-L[0]):(p.tx>x?0:Math.PI),im=dropImg('m5_4');
+  {const a=atl('hit_m5_4');if(a.naturalWidth){const c=Math.floor(B.real*14)%4,cw=a.naturalWidth/4,ch=a.naturalHeight/2,hh=46*S,ww=hh*cw/ch;g.save();g.translate(x,y);g.rotate(an);g.drawImage(a,c*cw,0,cw,ch,-ww*.8,-hh/2,ww,hh);g.restore();return;}} // v16-357 her spark-plug arrow (Marius' sheet)
   if(!im||!im.naturalWidth){g.save();g.strokeStyle='#9be7ff';g.lineWidth=3*S;g.beginPath();g.moveTo(x-Math.cos(an)*26*S,y-Math.sin(an)*26*S);g.lineTo(x,y);g.stroke();g.restore();return;}
   const ah=52*S,aw=ah*im.naturalWidth/im.naturalHeight,rot=an-Math.PI*.75;
   g.save();if(!LOWRES){g.globalCompositeOperation='lighter';for(let i=0;i<T.length-1;i++){const [px,py]=T[i];g.save();g.translate(px,py);g.rotate(rot);g.globalAlpha=.07+.07*i;g.drawImage(im,-aw*.3,-ah*.7,aw,ah);g.restore();}
@@ -2191,12 +2192,12 @@ function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
 // v16-354: Mythic effect pictures (Marius' own sheets, 4x2 atlases on transparent) – ult impact, status after the ult, status icon, basic hit
 const ATL={};function atl(k){let i=ATL[k];if(!i){i=ATL[k]=new Image();i.decoding='async';i.src='img/fx/'+k+(LOWRES&&k.indexOf('sti_')!==0?'_low':'')+'.webp';}return i;}
-const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1}}; // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
-const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3']};
-const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
+const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1},nmark:{k:'st_m5_4',ic:'sti_m5_4',dur:6,noburn:1}}; // nmark: look + icon of Nova's MARKED // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
+const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3'],m5_4:['ult_m5_4','st_m5_4','sti_m5_4','hit_m5_4']};
+const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4},m5_4:{k:'hit_m5_4',n0:4,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
 function mstat(m,s,src,delay){B.fx.push({type:'mstat',s,t:-(delay||0),d:MST[s].dur+.6,tgt:m,x:m.x,dd:m.d,src});}
 function atl8(k,m,delay,o){B.fx.push(Object.assign({type:'atl8',k,t:-(delay||0),d:.9,tgt:m,x:m.x,dd:m.d,f0:0,n:8,hm:1.9},o||{}));}
-const WIDE8={m5_4:'img/fx/wide_m5_4.webp',m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
+const WIDE8={m5_5:'img/fx/wide_m5_5.webp',m5_6:'img/fx/wide_m5_6.webp',m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
 // v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
@@ -2328,10 +2329,11 @@ const SKF={
      teamBuff({def:6,col:'#ffca28',txt:'IRON FORTRESS'});});},
  m5_4(u){ // v16-141: Nova's STARFIRE RAIN – the arrow rain (fxs) falls on the biggest group; impact = fxs frame 5 = end of her shot up (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
-   const wd=c&&pushWide(u,.9,{tg:c,dd:c.d,drop:'m5_4'});if(c&&f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:c.x,dd:c.d});
-   castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(10);B.flash=.18;
-     if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
-       if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
+   // v16-357 (26 nov, Marius): old wide sheet + sky arrows/bolts/rings from code removed – her STARFIRE RAIN picture on every enemy in the area, then her STARFIRE MARK (= MARKED +35%, 6 s)
+   const R=130*S,inR=m=>c&&Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R;
+   if(c&&!B.sim){let i=0;for(const m of alive(B.mons))if(inR(m))atl8('ult_m5_4',m,i++*.07,{d:1.0,hm:1.8});}
+   castAct(u,.75,()=>{u.post=.6;shake(10);
+     if(c){for(const m of alive(B.mons))if(inR(m)){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(!B.sim&&!m.dead)mstat(m,'nmark',u,0);}}});},
  m5_9(u){ // ANVIL's AIRBAG SLAM: he jumps and slams the shield in front of him (skill frame 5); the crash-test shockwave (fxs) = stun ALL 2s + 150%, taunt 4s + shield 50% HP
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),100*S)||alive(B.mons)[0],wd=c&&pushWide(u,1.2,{tg:c,dd:c.d});
    if(f8&&!wd)B.fx.push({type:'sheet8',t:-.22,d:.96,sp:u.spr,x:u.x+u.face*70*S,dd:u.d});
@@ -2415,7 +2417,7 @@ function unitUpdate(u,dt,foes,friends){
   u.flash=Math.max(0,u.flash-dt*6);u.hurt=Math.max(0,u.hurt-dt*4);if(u.rcl>0)u.rcl-=dt;if(u.land>0)u.land-=dt;if(u.post>0)u.post-=dt;if(u.enLock>0)u.enLock-=dt;
   if(u.dead){u.deadT+=dt;return;}
   u.stun=Math.max(0,u.stun-dt);u.slow=Math.max(0,u.slow-dt);u.mark=Math.max(0,u.mark-dt);
-  if(!u.hero){u.ice=Math.max(0,u.ice-dt);if(u.mcrown>0)u.mcrown-=dt;if(u.abrk>0)u.abrk-=dt;if(u.gstun>0)u.gstun-=dt;u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
+  if(!u.hero){u.ice=Math.max(0,u.ice-dt);if(u.mcrown>0)u.mcrown-=dt;if(u.abrk>0)u.abrk-=dt;if(u.gstun>0)u.gstun-=dt;if(u.nmark>0)u.nmark-=dt;u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
     if(u.burnT>=.5){u.burnT=0;if(u.burnSrc)damage(u.burnSrc,u,.22,{noCrit:1,skill:1});if(u.dead)return;}}}
   if(u.hero){u.buff=Math.max(0,u.buff-dt);u.aspd=Math.max(0,u.aspd-dt);u.defB=Math.max(0,u.defB-dt);u.critB=Math.max(0,u.critB-dt);u.taunt=Math.max(0,u.taunt-dt);if(u.nmk>0)u.nmk-=dt;if(u.shield>0)u.shield=Math.max(0,u.shield-u.max*.04*dt);
     if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;const hs=B.hsrc;B.hsrc=u.hotS;heal(u,u.hotA);B.hsrc=hs;}}
@@ -2916,8 +2918,8 @@ function drawNums(){g.textAlign='center';g.lineJoin='round';for(const n0 of B.nu
   g.font='900 '+Math.round((n.big?17:13)*s*S)+'px Game,system-ui';g.lineWidth=3.5;g.strokeStyle='rgba(0,0,0,.85)';g.strokeText(n.txt,n.x,y);g.fillStyle=n.col;g.fillText(n.txt,n.x,y);}g.globalAlpha=1;}
 // v16-14: little status icons above the HP bar (buffs on mechanics, debuffs on monsters) – they blink in the last second
 const STI_H=[['paura','paura','#ff9100'],['buff','atk','#ff7043'],['aspd','aspd','#ffca28'],['critB','crit','#ff4081'],['defB','helm','#42a5f5'],['hot','heart','#66bb6a'],['taunt','horns','#e53935']];
-const STI_M=[['mcrown','mcrown','#ffb300'],['abrk','abrk','#ff5252'],['gstun','gstun','#ffca28'],['ice','snow','#80d8ff'],['stun','star','#fdd835'],['burn','flame','#ff6d00'],['slow','clock','#ba68c8'],['mark','scan','#26c6da'],['weak','skull','#9e9e9e']];
-function statusIcons(u,x,y){const L=[];for(const [f,ic,col] of u.hero?STI_H:STI_M){const v=u[f]||0;if(v<=0)continue;if(f==='stun'&&(u.ice>0||u.gstun>0))continue;if(f==='burn'&&(u.mcrown>0||u.abrk>0))continue;
+const STI_M=[['mcrown','mcrown','#ffb300'],['abrk','abrk','#ff5252'],['gstun','gstun','#ffca28'],['nmark','nmark','#b388ff'],['ice','snow','#80d8ff'],['stun','star','#fdd835'],['burn','flame','#ff6d00'],['slow','clock','#ba68c8'],['mark','scan','#26c6da'],['weak','skull','#9e9e9e']];
+function statusIcons(u,x,y){const L=[];for(const [f,ic,col] of u.hero?STI_H:STI_M){const v=u[f]||0;if(v<=0)continue;if(f==='stun'&&(u.ice>0||u.gstun>0))continue;if(f==='burn'&&(u.mcrown>0||u.abrk>0))continue;if(f==='mark'&&u.nmark>0)continue;
     const left=f==='shield'?9:v;L.push([ic,col,left]);}
   if(!L.length)return;const sz=Math.round(13*S),gap=1.5*S,tw=L.length*sz+(L.length-1)*gap;let ix=x-tw/2;
   for(const [ic,col,left] of L){g.globalAlpha=left<1?.35+.65*Math.abs(Math.sin(B.real*10)):1;const mi=MST[ic]&&atl(MST[ic].ic);if(mi&&mi.naturalWidth)g.drawImage(mi,ix-sz*.15,y-sz*1.15,sz*1.3,sz*1.3);else g.drawImage(badgeCv(ic,col,32),ix,y-sz,sz,sz);ix+=sz+gap;}g.globalAlpha=1;}
