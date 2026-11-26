@@ -2192,12 +2192,12 @@ function burnOn(m,src){m.burn=4;m.burnSrc=src;}
 const FV8=u=>!!(u&&u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth);
 // v16-354: Mythic effect pictures (Marius' own sheets, 4x2 atlases on transparent) – ult impact, status after the ult, status icon, basic hit
 const ATL={};function atl(k){let i=ATL[k];if(!i){i=ATL[k]=new Image();i.decoding='async';i.src='img/fx/'+k+(LOWRES&&k.indexOf('sti_')!==0?'_low':'')+'.webp';}return i;}
-const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1},nmark:{k:'st_m5_4',ic:'sti_m5_4',dur:6,noburn:1},vlock:{k:'st_m5_5',ic:'sti_m5_5',dur:4,noburn:1},cpaint:{k:'st_m5_6',ic:'sti_m5_6',dur:5,noburn:1}}; // cpaint: look + icon of Chroma's 'weak' // vlock: LOCK-ON – every hit on it is critical // nmark: look + icon of Nova's MARKED // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
-const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3'],m5_4:['ult_m5_4','st_m5_4','sti_m5_4','hit_m5_4'],m5_5:['ult_m5_5','st_m5_5','sti_m5_5','hit_m5_5'],m5_6:['ult_m5_6','st_m5_6','sti_m5_6','hit_m5_6']};
-const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4},m5_4:{k:'hit_m5_4',n0:4,c:4},m5_5:{k:'hit_m5_5',n0:4,c:4},m5_6:{k:'hit_m5_6',n0:4,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
+const MST={mcrown:{k:'st_m5_0',ic:'sti_m5_0',dur:4},abrk:{k:'st_m5_1',ic:'sti_m5_1',dur:5},paura:{k:'st_m5_2',ic:'sti_m5_2',dur:6,hero:1},gstun:{k:'st_m5_3',ic:'sti_m5_3',dur:4,noburn:1},nmark:{k:'st_m5_4',ic:'sti_m5_4',dur:6,noburn:1},vlock:{k:'st_m5_5',ic:'sti_m5_5',dur:4,noburn:1},cpaint:{k:'st_m5_6',ic:'sti_m5_6',dur:5,noburn:1},pshield:{k:'st_m5_7',ic:'sti_m5_7',dur:5,hero:1}}; // pshield: look + icon of Doc Volta's shield on the mechanics // cpaint: look + icon of Chroma's 'weak' // vlock: LOCK-ON – every hit on it is critical // nmark: look + icon of Nova's MARKED // gstun: SHIELD STUN – the monster deals −20% damage // paura: PHOENIX AURA on mechanics (look + icon; the −20% is the REBIRTH FLAME team buff) // mcrown: burns +15% damage taken · abrk: ARMOR BREAK −30% DEF, burns
+const MYFX={m5_0:['ult_m5_0','st_m5_0','sti_m5_0'],m5_1:['ult_m5_1','st_m5_1','sti_m5_1','hit_m5_1'],m5_2:['ult_m5_2','st_m5_2','sti_m5_2','hit_m5_2'],m5_3:['ult_m5_3','st_m5_3','sti_m5_3','hit_m5_3'],m5_4:['ult_m5_4','st_m5_4','sti_m5_4','hit_m5_4'],m5_5:['ult_m5_5','st_m5_5','sti_m5_5','hit_m5_5'],m5_6:['ult_m5_6','st_m5_6','sti_m5_6','hit_m5_6'],m5_7:['ult_m5_7','st_m5_7','sti_m5_7','hit_m5_7']};
+const HITFX={m5_1:{k:'hit_m5_1',n0:0,c:4},m5_2:{k:'hit_m5_2',n0:4,c:4},m5_3:{k:'hit_m5_3',n0:0,c:4},m5_4:{k:'hit_m5_4',n0:4,c:4},m5_5:{k:'hit_m5_5',n0:4,c:4},m5_6:{k:'hit_m5_6',n0:4,c:4},m5_7:{k:'hit_m5_7',n0:4,c:4}}; // basic hit pictures: n0 = first frame of the normal hit, c = critical
 function mstat(m,s,src,delay){B.fx.push({type:'mstat',s,t:-(delay||0),d:MST[s].dur+.6,tgt:m,x:m.x,dd:m.d,src});}
 function atl8(k,m,delay,o){B.fx.push(Object.assign({type:'atl8',k,t:-(delay||0),d:.9,tgt:m,x:m.x,dd:m.d,f0:0,n:8,hm:1.9},o||{}));}
-const WIDE8={m5_7:'img/fx/wide_m5_7.webp',m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
+const WIDE8={m5_9:'img/fx/wide_m5_9.webp'},WIDEI={};
 // v16-wide: WD(u) = his wide sheet is loaded; pushWide = the wide effect, main impact (frame 5) exactly ta s after now, then 1.5 s to fade
 const DROP8={m5_4:'img/fx/drop_m5_4.webp',m5_2:'img/fx/drop_m5_2.webp'},DROPI={};function dropImg(id){if(!DROP8[id])return null;let i=DROPI[id];if(!i){i=DROPI[id]=new Image();i.decoding='async';i.src=DROP8[id];}return i;}
 // v16-297 (Marius): Mythic team effects drawn ON every ally (8 frames, 4x2 atlas of 192x256, ground ring 90/512 above the cell bottom), slightly staggered
@@ -2348,9 +2348,10 @@ const SKF={
    B.fx.push({type:'call',t:-(D+IMP),d:.05,fn:()=>{if(tg.dead)return;shake(14);B.flash=.2;damage(u,tg,3.8,{skill:1,crit:1});for(const m of alive(B.mons))if(m!==tg&&Math.hypot(m.x-tg.x,(m.d-tg.d)*(FY1-FY0)*1.25)<80*S)damage(u,m,1.2,{skill:1});if(!B.sim)sparks(tg.x,headY(tg)+20*dsc(tg.d),16,'#ff1744');}});
    for(const k of (F24?[0,.55,1.1,1.6]:[0,.55,1.1]))B.fx.push({type:'call',t:-(D+k),d:.05,fn:()=>{u.post=.6;}});castAct(u,D,()=>{});},
  m5_7(u){ // v16-328: Doc Volta's PIT STOP – the ambulance (wide sheet, drawn over the HEROES) drives through the team; impact = heal 25% + shield 15% + 20% ultimate energy for the others (v16-333: was 30, budget phones)
-   const wd=pushWide(u,1.2,{heroes:1});
-   castAct(u,wd?1.2:.7,()=>{u.post=.6;B.flash=.12;const k=1+(u.tl?TV(u):0);
-     for(const h of alive(B.heroes)){heal(h,h.max*.25*k);h.shield=Math.max(h.shield,h.max*.15);if(h!==u)h.en=Math.min(100,(h.en||0)+20);if(!B.sim)sparks(h.x,headY(h)+10*dsc(h.d),6,'#b9f6ca');}
+   // v16-360 (26 nov, Marius): old wide sheet over the team removed – his PIT STOP picture (healing pillar) on EVERY mechanic, then PIT CREW SHIELD (his bubble + icon while the shield is up)
+   if(!B.sim){let i=0;for(const h of alive(B.heroes))atl8('ult_m5_7',h,i++*.06,{d:1.1,hm:1.6});}
+   castAct(u,.8,()=>{u.post=.6;const k=1+(u.tl?TV(u):0);
+     for(const h of alive(B.heroes)){heal(h,h.max*.25*k);h.shield=Math.max(h.shield,h.max*.15);if(h!==u)h.en=Math.min(100,(h.en||0)+20);if(!B.sim)mstat(h,'pshield',u,0);}
      teamBuff({def:0,col:'#69f0ae',txt:'PIT STOP'});});},
  m5_6(u){ // v16-244: Chroma's RAINBOW TEMPEST – the paint tornado (fxs) falls on the biggest group; impact = fxs frame 5 = her rainbow burst (skill frame 5)
    const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth,c=cluster(alive(B.mons),110*S)||alive(B.mons)[0];
@@ -2917,7 +2918,7 @@ function drawNums(){g.textAlign='center';g.lineJoin='round';for(const n0 of B.nu
   if(n.dv!=null){const T=TE(),v=n.dv>=1e6?Math.floor(n.dv/1e6)+'M':n.dv>=1e5?Math.floor(n.dv/1e3)+'K':String(n.dv),hh=(n.crit?21:15)*s*S;if(T.numDraw&&T.numDraw(g,v,'dmg',n.x,y,hh,'center')){if(n.crit)T.numDraw(g,'C','dmg',n.x,y-hh*.95,hh*.8,'center');continue;}}
   g.font='900 '+Math.round((n.big?17:13)*s*S)+'px Game,system-ui';g.lineWidth=3.5;g.strokeStyle='rgba(0,0,0,.85)';g.strokeText(n.txt,n.x,y);g.fillStyle=n.col;g.fillText(n.txt,n.x,y);}g.globalAlpha=1;}
 // v16-14: little status icons above the HP bar (buffs on mechanics, debuffs on monsters) – they blink in the last second
-const STI_H=[['paura','paura','#ff9100'],['buff','atk','#ff7043'],['aspd','aspd','#ffca28'],['critB','crit','#ff4081'],['defB','helm','#42a5f5'],['hot','heart','#66bb6a'],['taunt','horns','#e53935']];
+const STI_H=[['paura','paura','#ff9100'],['pshield','pshield','#69f0ae'],['buff','atk','#ff7043'],['aspd','aspd','#ffca28'],['critB','crit','#ff4081'],['defB','helm','#42a5f5'],['hot','heart','#66bb6a'],['taunt','horns','#e53935']];
 const STI_M=[['mcrown','mcrown','#ffb300'],['abrk','abrk','#ff5252'],['gstun','gstun','#ffca28'],['nmark','nmark','#b388ff'],['vlock','vlock','#18ffff'],['cpaint','cpaint','#ff4fd8'],['ice','snow','#80d8ff'],['stun','star','#fdd835'],['burn','flame','#ff6d00'],['slow','clock','#ba68c8'],['mark','scan','#26c6da'],['weak','skull','#9e9e9e']];
 function statusIcons(u,x,y){const L=[];for(const [f,ic,col] of u.hero?STI_H:STI_M){const v=u[f]||0;if(v<=0)continue;if(f==='stun'&&(u.ice>0||u.gstun>0))continue;if(f==='burn'&&(u.mcrown>0||u.abrk>0))continue;if(f==='mark'&&u.nmark>0)continue;if(f==='weak'&&u.cpaint>0)continue;
     const left=f==='shield'?9:v;L.push([ic,col,left]);}
