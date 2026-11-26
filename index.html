@@ -3709,7 +3709,8 @@ const ROSTER={
   ['Diesel Dave:engine','Carlos Clutch:engine','Max Brake:service','Rafael Chrome:paint','Elena Spark:elec:f','Lena Wire:elec:f','Kenji Scan:inspect','Tess Turbo:tuning:f'],
   ['Viktor the Surgeon:engine','Big Mo:service','Gloria Gloss:paint:f','Professor Ohm:elec','Hawk-Eye Hugo:inspect','Aria Neon:tuning:f','Nitro Nina:tuning:f'],
   ['Grigore Iron Hands:engine','Mama Rosa:service:f','Duke Diamond:paint','Sofia Lightning:elec:f','Oracle Otto:inspect','Rex Redline:tuning'],
-  ['The Torque King:all','Lady Overdrive:all:f','Ignis, the Iron Phoenix:all','Goliath, the Iron Bulwark:all','Nova, the Starfire Huntress:all:f','Vega, the Railgun Ace:all','Chroma, the Paint Tempest:all:f','Doc Volta, the Pit Medic:all','Shade, the Ghost Rider:all'],   // v16-340: SHADE (m5_8) released for everyone
+  ['The Torque King:all','Lady Overdrive:all:f','Ignis, the Iron Phoenix:all','Goliath, the Iron Bulwark:all','Nova, the Starfire Huntress:all:f','Vega, the Railgun Ace:all','Chroma, the Paint Tempest:all:f','Doc Volta, the Pit Medic:all','Shade, the Ghost Rider:all'].concat(window.SEC&&SEC.TEST_ACC?['Anvil, the Crash Tester:all']:[]),   // ANVIL (m5_9) – only on the owner's test account (Training Room) until Marius says 'lansează Anvil'
+   // v16-340: SHADE (m5_8) released for everyone
 
   ['?','?']],
  g:[
@@ -3747,7 +3748,7 @@ const DUP_MONEY=[150,350,800,2000,5000,12000];
 const MYTH_AURA=.10;
 const spName=sp=>sp==='all'?'🌟 All workshops':(ST[sp]?ST[sp].icon+' '+ST[sp].name:'');
 // v16-247 (Marius 23 nov): MYTHIC heroes work only in the workshop of their class (same as battle.js MYTH_CLS)
-const MYTH_GAR={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec',m5_8:'tuning'};
+const MYTH_GAR={m5_0:'elec',m5_1:'tuning',m5_2:'service',m5_3:'engine',m5_4:'inspect',m5_5:'inspect',m5_6:'paint',m5_7:'elec',m5_8:'tuning',m5_9:'engine'};
 const gSp=h=>h&&h.sp==='all'?(MYTH_GAR[h.id]||'engine'):(h?h.sp:'');
 // v11: +1…+5 = +20% of base each, +6…+50 = +4% each (+50 = ×3.8)
 // v16-40: stars after +5 give less on low grades (an Uncommon +50 was stronger than a Legendary)
@@ -3856,7 +3857,7 @@ function addTickets(n,why){G.h.tk+=n;save();if(why)toast(''+TKI+' +'+n+' Recruit
 const PCACHE={};
 function hashS(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 // v16-5: Marius' own pictures for these heroes (cut from his sprite sheets)
-const HPIC={m5_8:1,m5_7:1,m5_6:1,m5_4:1,m5_5:1,m5_3:1,m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,m5_2:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1,g2_0:1,g2_1:1,g2_2:1,g2_3:1,g2_4:1,g3_0:1,g3_1:1,g3_2:1,g3_3:1,g3_4:1,g4_0:1,g4_1:1,g4_2:1,g4_3:1,g5_0:1,g5_1:1};
+const HPIC={m5_9:1,m5_8:1,m5_7:1,m5_6:1,m5_4:1,m5_5:1,m5_3:1,m0_0:1,m0_1:1,m0_2:1,m0_3:1,m0_4:1,m0_5:1,m0_6:1,m0_7:1,m0_8:1,m0_9:1,m1_0:1,m1_1:1,m1_2:1,m1_3:1,m1_4:1,m1_5:1,m1_6:1,m1_7:1,m1_8:1,m2_0:1,m2_1:1,m2_2:1,m2_3:1,m2_4:1,m2_5:1,m2_6:1,m2_7:1,m3_0:1,m3_1:1,m3_2:1,m3_3:1,m3_4:1,m3_5:1,m3_6:1,m4_0:1,m4_1:1,m4_2:1,m4_3:1,m4_4:1,m4_5:1,m5_0:1,m5_1:1,m5_2:1,d0_0:1,d0_1:1,d0_2:1,d0_3:1,d0_4:1,d0_5:1,d0_6:1,d1_0:1,d1_1:1,d1_2:1,d1_3:1,d1_4:1,d1_5:1,d2_0:1,d2_1:1,d2_2:1,d2_3:1,d2_4:1,d3_0:1,d3_1:1,d3_2:1,d3_3:1,d3_4:1,d4_0:1,d4_1:1,d4_2:1,d4_3:1,d5_0:1,d5_1:1,g0_0:1,g0_1:1,g0_2:1,g0_3:1,g0_4:1,g0_5:1,g0_6:1,g1_0:1,g1_1:1,g1_2:1,g1_3:1,g1_4:1,g1_5:1,g2_0:1,g2_1:1,g2_2:1,g2_3:1,g2_4:1,g3_0:1,g3_1:1,g3_2:1,g3_3:1,g3_4:1,g4_0:1,g4_1:1,g4_2:1,g4_3:1,g5_0:1,g5_1:1};
 function portrait(h,sil){const key=h.id+(sil?'s':'');if(HPIC[h.id])return 'img/hero/'+key+'.webp';if(PCACHE[key])return PCACHE[key];
   const S=128,cv2=document.createElement('canvas');cv2.width=cv2.height=S;const g=cv2.getContext('2d');
   let sd=hashS(h.id)||1;const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
@@ -4103,7 +4104,7 @@ $('pop').addEventListener('click',e=>{if(!e.target.closest('[data-p="payOK"]'))r
 // ---------- results ----------
 const resEl=$('res');
 // v16-94: full-screen splash art of a Mythic hero (tap to close). Shown when a hero with a splash is summoned + ART button on the HEROES page
-const SPLASH={m5_7:'img/hero/splash_m5_7.webp',m5_8:'img/hero/splash_m5_8.webp',m5_6:'img/hero/splash_m5_6.webp',m5_4:'img/hero/splash_m5_4.webp',m5_5:'img/hero/splash_m5_5.webp',m5_3:'img/hero/splash_m5_3.webp',m5_2:'img/hero/splash_m5_2.webp',m3_0:'img/hero/splash_m3_0.webp',m3_1:'img/hero/splash_m3_1.webp',m3_6:'img/hero/splash_m3_6.webp',m3_5:'img/hero/splash_m3_5.webp',m3_3:'img/hero/splash_m3_3.webp',m3_4:'img/hero/splash_m3_4.webp',m3_2:'img/hero/splash_m3_2.webp',m4_0:'img/hero/splash_m4_0.webp',m4_1:'img/hero/splash_m4_1.webp',m4_2:'img/hero/splash_m4_2.webp',m4_3:'img/hero/splash_m4_3.webp',m4_4:'img/hero/splash_m4_4.webp',m4_5:'img/hero/splash_m4_5.webp',m5_0:'img/hero/splash_m5_0.webp',m5_1:'img/hero/splash_m5_1.webp'};
+const SPLASH={m5_9:'img/hero/splash_m5_9.webp',m5_7:'img/hero/splash_m5_7.webp',m5_8:'img/hero/splash_m5_8.webp',m5_6:'img/hero/splash_m5_6.webp',m5_4:'img/hero/splash_m5_4.webp',m5_5:'img/hero/splash_m5_5.webp',m5_3:'img/hero/splash_m5_3.webp',m5_2:'img/hero/splash_m5_2.webp',m3_0:'img/hero/splash_m3_0.webp',m3_1:'img/hero/splash_m3_1.webp',m3_6:'img/hero/splash_m3_6.webp',m3_5:'img/hero/splash_m3_5.webp',m3_3:'img/hero/splash_m3_3.webp',m3_4:'img/hero/splash_m3_4.webp',m3_2:'img/hero/splash_m3_2.webp',m4_0:'img/hero/splash_m4_0.webp',m4_1:'img/hero/splash_m4_1.webp',m4_2:'img/hero/splash_m4_2.webp',m4_3:'img/hero/splash_m4_3.webp',m4_4:'img/hero/splash_m4_4.webp',m4_5:'img/hero/splash_m4_5.webp',m5_0:'img/hero/splash_m5_0.webp',m5_1:'img/hero/splash_m5_1.webp'};
 function showSplash(id,then){const H=HB[id],el=$('splash');if(!SPLASH[id]||!H||!el){if(then)then();return;}
   const src=(isAwk(H)&&own(id)&&mTier(own(id).s)>=5&&AWK_ART[id])||SPLASH[id]; // v16-161: Awakened V portrait when Marius sends it
   el.innerHTML='<div class="spW"><img src="'+src+'"><div class="spT">'+(GRADES[H.gr]?GRADES[H.gr].n.toUpperCase():'')+'</div><div class="spN">'+H.n+'<small>Tap to continue</small></div></div>';
