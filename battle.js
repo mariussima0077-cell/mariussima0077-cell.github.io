@@ -48,9 +48,9 @@ css.textContent=`
 #cpCard,#cpTeam,#cpRes{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;background:rgba(4,6,9,.78)}
 #cpCard.open,#cpTeam.open,#cpRes.open{display:flex}
 .bsBtn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 64px);right:10px;z-index:8;box-shadow:0 3px 10px rgba(0,0,0,.6);padding:7px 16px;border:2px solid #ffd54a;border-radius:10px;background:linear-gradient(#3a2a08,#1c1404);color:#ffd54a;font:900 13px system-ui;letter-spacing:1px}
-#bsOv{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72)}#bsOv.open{display:flex}
+#bsOv{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72)}#bsOv.open{display:flex}
 #bsOv .bsBox{width:min(94vw,440px);max-height:86vh;overflow:auto;background:linear-gradient(#1d2330,#0d1018);border:2px solid #ffd54a;border-radius:14px;padding:10px;color:#fff;font-family:system-ui}
-#bsOv .bsH{text-align:center;font-weight:900;font-size:18px;letter-spacing:2px;color:#ffd54a;margin-bottom:6px}
+#bsOv .bsS{margin:8px 2px 2px;font-weight:900;font-size:12px;letter-spacing:1.5px;color:#9fe8ff}#bsOv .bsH{text-align:center;font-weight:900;font-size:18px;letter-spacing:2px;color:#ffd54a;margin-bottom:6px}
 #bsOv .bsR{display:flex;gap:8px;align-items:flex-start;padding:6px;margin:5px 0;background:rgba(255,255,255,.05);border-radius:10px}#bsOv .bsR.ko{opacity:.7}
 #bsOv .bsR>img{width:46px;height:46px;border-radius:8px;border:2px solid;object-fit:cover;flex:none}
 #bsOv .bsI{flex:1;min-width:0}#bsOv .bsI>b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#bsOv .bsI em{color:#ffd54a;font-style:normal;font-size:11px;border:1px solid #ffd54a;border-radius:5px;padding:0 4px}#bsOv .bsI i{color:#ff5252;font-style:normal;font-size:11px}
@@ -3092,13 +3092,20 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden||!running)r
 // ---------------------------------------------------------------- results
 const ANX={id:0,n:0};
 // v16-350 (Marius 26 nov): BATTLE STATS after every battle – who did what (damage dealt, damage taken, heals, shields)
-function bStats(){const H=(B&&B.heroes||[]).filter(u=>u.hero);if(!H.length)return;const T=TE(),f=n=>T.nf(Math.round(n||0));
-  const k=[['bsD','DAMAGE','#ff9100'],['bsT','TAKEN','#ff5252'],['bsH','HEALED','#69f0ae'],['bsS','SHIELDS','#40c4ff']],mx={},tot=H.reduce((a,u)=>a+(u.bsD||0),0)||1;
-  k.forEach(([q])=>mx[q]=Math.max(1,...H.map(u=>u[q]||0)));const mvp=H.slice().sort((a,b)=>(b.bsD||0)-(a.bsD||0))[0];
-  const row=u=>`<div class="bsR${u.dead?' ko':''}"><img src="${portraitURL(u.h)}" style="border-color:${gcol(u.h)}"><div class="bsI"><b style="color:${gcol(u.h)}">${u.h.n}${u===mvp&&(u.bsD||0)>0?' <em>MVP</em>':''}${u.dead?' <i>K.O.</i>':''}</b><small>${u.br?BROLE[u.br].n:''} · ${Math.round((u.bsD||0)/tot*100)}% of team damage</small>`+
-    k.map(([q,n,c])=>`<div class="bsB"><span>${n}</span><div><i style="width:${Math.round((u[q]||0)/mx[q]*100)}%;background:${c}"></i></div><b>${f(u[q])}</b></div>`).join('')+`</div></div>`;
-  let o=document.getElementById('bsOv');if(!o){o=document.createElement('div');o.id='bsOv';document.getElementById('cpRes').appendChild(o);o.addEventListener('click',e=>{if(e.target===o||e.target.closest('.bsX'))o.classList.remove('open');});}
-  o.innerHTML=`<div class="bsBox"><div class="bsH">BATTLE STATS</div>${H.map(row).join('')}<button class="bsX">CLOSE</button></div>`;o.classList.add('open');}
+function bStats(L,labels){L=L||(B&&B.heroes||[]).filter(u=>u.hero);if(!L.length)return;const T=TE(),f=n=>T.nf(Math.round(n||0));
+  const k=[['bsD','DAMAGE','#ff9100'],['bsT','TAKEN','#ff5252'],['bsH','HEALED','#69f0ae'],['bsS','SHIELDS','#40c4ff']],mx={};
+  k.forEach(([q])=>mx[q]=Math.max(1,...L.map(u=>u[q]||0)));const k2=k.filter(([q])=>q!=='bsS'||L.some(u=>(u[q]||0)>0)); // no SHIELDS row when nobody gave shields (Arena log has none)
+  const sides=[...new Set(L.map(u=>u.side||0))];
+  const block=sd=>{const H=L.filter(u=>(u.side||0)===sd),tot=H.reduce((a,u)=>a+(u.bsD||0),0)||1,mvp=H.slice().sort((a,b)=>(b.bsD||0)-(a.bsD||0))[0];
+    return (labels?`<div class="bsS">${labels[sd]||''}</div>`:'')+H.map(u=>{const br=u.br||bRoleOf(u.h);return `<div class="bsR${u.dead?' ko':''}"><img src="${portraitURL(u.h)}" style="border-color:${gcol(u.h)}"><div class="bsI"><b style="color:${gcol(u.h)}">${u.h.n}${u===mvp&&(u.bsD||0)>0?' <em>MVP</em>':''}${u.dead?' <i>K.O.</i>':''}</b><small>${br?BROLE[br].n:''} · ${Math.round((u.bsD||0)/tot*100)}% of team damage</small>`+
+    k2.map(([q,n,c])=>`<div class="bsB"><span>${n}</span><div><i style="width:${Math.round((u[q]||0)/mx[q]*100)}%;background:${c}"></i></div><b>${f(u[q])}</b></div>`).join('')+`</div></div>`;}).join('');};
+  let o=document.getElementById('bsOv');if(!o){o=document.createElement('div');o.id='bsOv';document.body.appendChild(o);o.addEventListener('click',e=>{if(e.target===o||e.target.closest('.bsX'))o.classList.remove('open');});}
+  o.innerHTML=`<div class="bsBox"><div class="bsH">BATTLE STATS</div>${sides.map(block).join('')}<button class="bsX">CLOSE</button></div>`;o.classList.add('open');}
+// v16-351: ARENA / RAIL WARS (online.js) – stats from the server fight log: e={a:attacker,h:[[target,dmg(<0 = heal),col,ko]]}
+function bStatsLog(r){try{const HB=TE().HB||{},U=[...r.ta.map(u=>({...u,side:0})),...r.td.map(u=>({...u,side:1}))].map(u=>({h:HB[u.id]||{id:u.id,n:u.n||'?',gr:u.gr||0,sp:u.role},side:u.side,bsD:0,bsT:0,bsH:0,bsS:0,dead:false}));
+  r.log.forEach(e=>{const a=U[e.a];(e.h||[]).forEach(h=>{const t=U[h[0]];if(!t)return;if(h[1]<0){if(a)a.bsH+=-h[1];}else{t.bsT+=h[1];if(a&&a.side!==t.side)a.bsD+=h[1];}if(h[3])t.dead=true;});});
+  bStats(U,['YOUR TEAM','RIVAL']);}catch(e){console.warn(e);}}
+window.TE_BSTATS_LOG=bStatsLog;
 window.TE_BSTATS=bStats;
 function bsBtn(){const b=document.getElementById('cpRes');const o0=document.getElementById('bsBtn');if(o0)o0.remove();if(!b||!B||!B.heroes||!B.heroes.some(u=>(u.bsD||0)+(u.bsT||0)>0))return;const x=document.createElement('button');x.id='bsBtn';x.className='bsBtn';x.textContent='BATTLE STATS';x.onclick=e=>{e.stopPropagation();bStats();};b.appendChild(x);}
 function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)return twFinish(win,retreat);const T=TE(),G=T.G,si=B.si,S0=STAGES[si];
@@ -3863,7 +3870,7 @@ function anxTower(can,go){const G=TE().G;const show=()=>{const on=G.cp.autoNext!
   const start=()=>{clearInterval(ANX.id);ANX.n=0;if(!can||G.cp.autoNext===false||window.__TUTON)return show();ANX.n=3;show();
     ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}{const bo=document.getElementById('bsOv');if(bo&&bo.classList.contains('open'))return;} /* v16-350: AUTO NEXT waits while BATTLE STATS is open */ANX.n--;show();if(ANX.n<=0){clearInterval(ANX.id);$('cpRes').classList.remove('open');go();}},1000);};
   start();return ()=>{G.cp.autoNext=G.cp.autoNext===false;TE().save();start();};}
-function twFinish(win,retreat){if(B.tw&&B.tw.demo){const cb=B.tw.cb;close();try{cb&&cb(win);}catch(e){}return;}{const F0=B.tw||{};if(window.TEQ&&!retreat&&(win||F0.wb))TEQ(F0.wb?'wb':F0.dg?'dg':'tower',1);}   // v16-238: daily quests
+function twFinish(win,retreat){if(B.tw&&B.tw.demo){const cb=B.tw.cb,trn=B.tw.trn,L=B.heroes.filter(u=>u.hero);close();try{cb&&cb(win);}catch(e){}if(trn)setTimeout(()=>bStats(L),300); /* v16-351: Training Room → BATTLE STATS */return;}{const F0=B.tw||{};if(window.TEQ&&!retreat&&(win||F0.wb))TEQ(F0.wb?'wb':F0.dg?'dg':'tower',1);}   // v16-238: daily quests
   if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
   if(win&&f===t.b+1){const r=twRew(f);t.b=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;if(r.ct)G.h.ct+=r.ct;T.save();if(r.tk)T.addTickets(r.tk,'Tower floor '+f);
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
@@ -4649,7 +4656,7 @@ function trainRoom(){if(!(window.SEC&&SEC.TEST_ACC))return;const T=TE(),HB=T.HB;
   d.oninput=e=>{if(e.target.id==='trSi'){TRN.si=+e.target.value;const b=d.querySelector('.en b');if(b)b.textContent='stage '+sLabel(TRN.si);}};
   d.onchange=e=>{if(e.target.id==='trSi'){sv();const sc=d.querySelector('.gd').scrollTop;draw();d.querySelector('.gd').scrollTop=sc;}};}
 function trainFight(){const T=TE(),team=TRN.ids.map(heroOf).filter(Boolean),si=TRN.si,S0=STAGES[si];team.forEach(h=>{const dd=sprOf(h);if(dd)sprLoad(dd);});
-  const F={demo:1,cb:()=>trainRoom(),f:0,w:S0.w,mod:-1,eq:si,mul:stageMul(si)*stEase(si),st:{n:'TRAINING · '+sLabel(si),bio:S0.bio,w:S0.w,boss:S0.boss}};
+  const F={demo:1,trn:1,cb:()=>trainRoom(),f:0,w:S0.w,mod:-1,eq:si,mul:stageMul(si)*stEase(si),st:{n:'TRAINING · '+sLabel(si),bio:S0.bio,w:S0.w,boss:S0.boss}};
   root.classList.add('open');window.__BATTLE_ON=true;safeStart(si,team,F);}
 window.CAMPAIGN={demoFight,trainRoom,tutSetFor:id=>{const h=TE().HB[id];const k=h?clsOf(h):'';return SETS[k]?k:SETK[0];},todo:()=>{const o=hubTodo();return o.boss||o.dg||o.arena;},dgTodo:()=>!!hubTodo().dg,peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[clsOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,set);g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&heroWhy(h));}catch(e){return false;}},heroWhy:()=>{try{const a=[...new Set(curTeamList().map(heroWhy).filter(Boolean))];return a.length>1?'×'+a.length:a[0]||'';}catch(e){return '';}},hubWhy:()=>{const o=hubTodo();return o.dg?'':o.boss?'BOSS':o.arena?'FIGHT':'';},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),sumQ:n=>gsummon(n,0,1),sumQP:n=>gsummon(n,1,1),res:(r,n,s,hd)=>gsResults(r,n,s,hd),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[clsOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 // v16-280: VIP set box – 6 pieces of one class set, grade r, into the bag (not equipped)

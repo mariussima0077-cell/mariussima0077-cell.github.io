@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=350;window.TE_CV=CV;
+const CV=351;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -837,10 +837,10 @@ function finish(){if(F.done)return;F.done=true;const r=F.r;F.U.forEach(u=>{if(!u
   setTimeout(()=>{if(!F)return;const R=$('olRes'),t=r.tier;R.classList.toggle('lose',!r.win);
     R.innerHTML=`<div class="rr"></div>${t?`<div class="o-rb">${badge(t.lg,t.div||'★')}</div>`:''}<h2>${r.win?'VICTORY!':'DEFEAT'}</h2>${r.kind==='train'&&!F.replay?(r.rwH||''):F.replay?'<div class="pts" style="color:#9fe3ff;text-shadow:none;font-size:16px">REPLAY</div>':`<div class="pts" id="olPts">${r.da>0?'+':''}0 pts</div>`}
      ${t&&!F.replay?`<div class="lg"><div class="o-bar"><i style="width:${tierPct(t,r.pts-r.da)}%"></i></div><small>${t.name} · ${r.pts} pts</small></div>`:''}
-     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>${DMh} +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>${TKh} +${r.rw.tk} Recruit</div>`:''}${r.rw.am?`<div>${AMh} +${r.rw.am} Medals</div>`:''}</div>`:''}<button class="btn" id="olCont">CONTINUE</button>`;
+     ${r.rw&&!F.replay?`<div class="rw2">${r.rw.dm?`<div>${DMh} +${r.rw.dm}</div>`:''}${r.rw.tk?`<div>${TKh} +${r.rw.tk} Recruit</div>`:''}${r.rw.am?`<div>${AMh} +${r.rw.am} Medals</div>`:''}</div>`:''}${window.TE_BSTATS_LOG?'<button class="btn" id="olBst" style="margin-bottom:6px;background:linear-gradient(#3a2a08,#1c1404);color:#ffd54a;border:2px solid #ffd54a">BATTLE STATS</button>':''}<button class="btn" id="olCont">CONTINUE</button>`;
     R.classList.add('on');$('olFx').classList.add('end');if(!F.replay&&r.kind!=='train'){let n=0;const tgt=r.da,st=Math.sign(tgt)||1;const iv=setInterval(()=>{n+=st;const e=$('olPts');if(e)e.textContent=(tgt>0?'+':'')+n+' pts';if(n===tgt||!F)clearInterval(iv);},40);
       setTimeout(()=>{const b=R.querySelector('.lg .o-bar i');if(b)b.style.width=tierPct(t,r.pts)+'%';},500);}
-    $('olCont').onclick=()=>{const tro=F&&F.trOpen,oe=r.onEnd;$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(tro){root.classList.remove('open');}if(oe){try{oe();}catch(e){}return;}if(cur==='olArena'){arData=null;loadArena();}};},1100);}
+    {const bb=$('olBst');if(bb)bb.onclick=()=>window.TE_BSTATS_LOG(r);} /* v16-351 */$('olCont').onclick=()=>{const bo=document.getElementById('bsOv');if(bo)bo.classList.remove('open');const tro=F&&F.trOpen,oe=r.onEnd;$('olFx').classList.remove('on');cancelAnimationFrame(fRaf);F=null;window.__BATTLE_ON=false;if(tro){root.classList.remove('open');}if(oe){try{oe();}catch(e){}return;}if(cur==='olArena'){arData=null;loadArena();}};},1100);}
 let crowd=null;
 // v16-155: moving floodlight beams over the Arena picture (cheap: 4 gradients)
 function arenaLights(W,H,t){g.save();g.globalCompositeOperation='lighter';for(let k=0;k<4;k++){const sx=W*(k<2?.08+k*.12:.92-(k-2)*.12),a=(k<2?.35:-.35)+Math.sin(t*.7+k*1.7)*.22;g.save();g.translate(sx,H*.04);g.rotate(a);const lg=g.createLinearGradient(0,0,0,H*.6);lg.addColorStop(0,k%2?'#ff7af02a':'#7ad8ff2a');lg.addColorStop(1,'#0000');g.fillStyle=lg;g.beginPath();g.moveTo(-W*.012,0);g.lineTo(W*.012,0);g.lineTo(W*.11,H*.6);g.lineTo(-W*.11,H*.6);g.fill();g.restore();}g.restore();}

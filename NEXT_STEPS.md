@@ -264,7 +264,8 @@
 
 ## ✅ v16-350 (26 nov 2026) – BATTLE STATS după fiecare bătălie
 - Buton „BATTLE STATS” sus-dreapta pe ecranul de rezultat (campanie, Torque Tower, Class Towers, World Boss, Dungeons): pe fiecare erou DAMAGE / TAKEN / HEALED / SHIELDS, % din damage-ul echipei, MVP. AUTO NEXT așteaptă cât e deschis. Câmpuri `bsD/bsT/bsH/bsS` pe unități (atenție: `sT` era deja folosit!).
-- Arena / Rail Wars: încă fără stats (alt cod).
+- v16-351: și ARENA / RAIL WARS (buton BATTLE STATS pe rezultat, calculat din log-ul serverului, ambele echipe; fără rândul SHIELDS – log-ul nu are scuturi) + TRAINING ROOM (se deschide singur după luptă).
+- ⚠️ Lupta din Arena / Rail Wars e calculată pe server (`server/online.js`): statisticile noi pe roluri ajung (vin din profil), dar bonusurile de rol din bătălie (lifesteal, +20%…) NU sunt încă și pe server.
 - Lipsă: nimic.
 
 ## ✅ v16-349 (26 nov 2026) – ROLURI: fiecare rol bun la treaba lui (toți eroii)
