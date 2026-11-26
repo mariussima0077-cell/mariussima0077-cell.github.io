@@ -6,7 +6,7 @@ on:
       action:
         description: "announce = post in #announcements | setup / migrate / community = server admin (already done)"
         type: choice
-        options: [announce, setup, migrate, community, tweaks]
+        options: [announce, setup, migrate, community, tweaks, betatest]
         default: announce
       kind:
         description: "soon = upcoming update (what it will contain) | live = update is out now"
@@ -40,6 +40,9 @@ jobs:
       - name: Community + Onboarding
         if: ${{ inputs.action == 'community' }}
         run: node discord/community.mjs
+      - name: Beta-test channel
+        if: ${{ inputs.action == 'betatest' }}
+        run: node discord/betatest.mjs
       - name: Tweaks
         if: ${{ inputs.action == 'tweaks' }}
         run: node discord/tweaks.mjs
