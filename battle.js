@@ -2485,15 +2485,15 @@ function unitUpdate(u,dt,foes,friends){
   if(u.pounce&&dd<140*S&&dd>u.rng*1.5){u.pounce=0;u.act=null;B.fx.push({type:'dust',x:u.x,y:fy(u.d)});u.x=tg.x-u.face*(bw(u)+bw(tg));u.d=tg.d;damage(u,tg,1.5);shake(4);sparks(tg.x,headY(tg)+20,8);return;}
   // v16-255 (Marius: "after a boss pushes them, sometimes heroes stand and don't attack"): a hero who walks but can't get closer for 0.6 s
   // (pushed by the boss / blocked by the other heroes) attacks from where he is if the target is near enough, otherwise takes a new spot.
-  const stuck=u.hero&&(u.stk||0)>.6;if(stuck&&dd>range*1.9){u.sK=null;u.stk=0;}
-  if(dd<=range||(spot&&Math.abs(u.x-spot[0])<=18*S&&Math.abs(u.d-spot[1])*(FY1-FY0)<=18*S)||(stuck&&dd<=range*1.9)){if(u.hero)u.stk=0;if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
+  const stuck=(u.stk||0)>.6,SR=u.hero?1.9:1.4;if(stuck&&dd>range*SR){u.sK=null;u.stk=0;} // v16-365: monsters too (crowded monster attacks from where it is)
+  if(dd<=range||(spot&&Math.abs(u.x-spot[0])<=18*S&&Math.abs(u.d-spot[1])*(FY1-FY0)<=18*S)||(stuck&&dd<=range*SR)){u.stk=0;if(u.cd<=0){u.st='atk';u.ap=0;if(!u.hero)u.alt=(u.na=(u.na||0)+1)%3===0;}else if(u.st!=='atk')u.st='idle';return;}
   // move
   const sp=u.mv*(u.slow>0?.5:1)*(u.charge?2.2:1)*(spot&&dd<130*S?1.7:1)*dt;
   const tx=spot?spot[0]:tg.x-u.face*range*.85,dx=tx-u.x,ddp=((spot?spot[1]:tg.d)-u.d)*(FY1-FY0);const L=Math.hypot(dx,ddp)||1;
-  if(u.hero){const lp=u.lp;if(lp){const mv=Math.hypot(u.x-lp[0],(u.d-lp[1])*(FY1-FY0));u.stk=mv<sp*.35?(u.stk||0)+dt:Math.max(0,(u.stk||0)-dt*2);}u.lp=[u.x,u.d];}
+  {const lp=u.lp;if(lp){const mv=Math.hypot(u.x-lp[0],(u.d-lp[1])*(FY1-FY0));u.stk=mv<sp*.35?(u.stk||0)+dt:Math.max(0,(u.stk||0)-dt*2);}u.lp=[u.x,u.d];}
   u.x+=dx/L*Math.min(sp,L);u.d+=ddp/L*Math.min(sp,L)/(FY1-FY0)*(spot?1:.8);u.d=clamp(u.d,.02,.98);u.x=clamp(u.x,14*S,W-14*S);
   // v16-335 (Marius: "câteodată aleargă pe loc"): a hero who is blocked (pushed back / crowded, barely moves) stands in idle instead of running on the spot
-  if(u.hero&&(u.stk||0)>.15){u.st='idle';return;}
+  if((u.stk||0)>.15){u.st='idle';return;} // v16-365: blocked monsters don't run on the spot either
   u.st='walk';u.wph+=dt*(u.hero?11:9)*(u.charge?2:1);if(u.t==='tire')u.roll+=dt*(u.charge?14:7)*u.face;
 }
 // v16-46: melee mechanics no longer fight for the same spot. Each one takes his own place around the monster
@@ -2522,7 +2522,7 @@ function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
     else if(R==='service')shoot(u,tg,'bolt',1,u.spr&&u.spr.look?{look:u.spr.look}:null);
     else if(R==='paint'){const pc=['#e0457b','#29b6f6','#ffd21a','#76ff03'][u.hits++%4];shoot(u,tg,'paint',1,{col:pc});
       if(sprOK(u.spr)){const [px,py]=muzzle(u);B.fx.push({type:'beam',x0:px,y0:py,x1:x,y1:y,t:0,d:.2,col:u.spr.col||'#ff4fd8',w:5});}}
-    else{const m=R==='all'?1.15:1;damage(u,tg,m);if(R==='all')mythHit(u,tg,x,y);sparks(x,y,R==='engine'?10:6,R==='tuning'?'#40c4ff':'#ffe082');if(R==='engine'||R==='all'){shake(3);if(!tg.boss)tg.x+=6*S;}
+    else{const m=R==='all'?1.15:1;damage(u,tg,m);if(R==='all')mythHit(u,tg,x,y);sparks(x,y,R==='engine'?10:6,R==='tuning'?'#40c4ff':'#ffe082');if(R==='engine'||R==='all'){shake(3);} // v16-365: no more 6 px push on every hit (v16-341 rule)
       B.fx.push({type:'slash',x,y,t:0,d:.18,f:u.face,col:R==='tuning'?'#40c4ff':'#fff'});
       if(FX2&&!FV8(u)){const sc=R==='tuning'?'#40c4ff':R==='engine'?'#ff9100':'#ffe082';fxs('slash_02',sc,x-u.face*4*S,y,{d:.2,s0:40*S,s1:64*S,rot:(u.face>0?-Math.PI/2:Math.PI/2)+rnd(-.5,.5),ease:1});fxs('flare_01','#ffffff',x,y,{d:.15,s0:12*S,s1:44*S});}}
     return;}
@@ -2546,7 +2546,7 @@ function sep(list){for(let i=0;i<list.length;i++){const a=list[i];if(a.dead||a.a
 function bw(u){if(u.hero)return 26*dsc(u.d);if(u.boss&&!u.wbB)return bossHW(u)*bossK(u)*.5;const M=MON[u.t];return Math.min(70*S,(M?M.h*M.sc:40)*(u.boss?1:1.22)*.38*dsc(u.d));}
 function sepHM(){const F=FY1-FY0;for(const h of B.heroes){if(h.dead||h.act)continue;for(const m of B.mons){if(m.dead||m.act||m.wbB)continue;
   if(Math.abs(m.d-h.d)*F>40*S)continue;const dx=m.x-h.x,min=(bw(h)+bw(m))*.9,ax=Math.abs(dx);if(ax>=min)continue;
-  const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;h.x-=dir*o;}}} // v16-338 (Marius 26 nov: "să nu se mai împingă monștrii cu eroii"): the monster never moves, the hero stops in front of it
+  const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;if(m.st==='walk'&&!m.boss)m.x+=dir*o;else{h.x-=dir*o;const up=h.d<.06?1:h.d>.94?-1:h.d>=m.d?1:-1;h.d=clamp(h.d+up*Math.min(o*.35,4*S)/F,.02,.98);}}}} // v16-365: a WALKING monster is stopped at the hero (it walked through heroes / squeezed one inside it); a standing one still never moves // v16-338 (Marius 26 nov: "să nu se mai împingă monștrii cu eroii"): the monster never moves, the hero stops in front of it
 // v16-206 (tester Wazza4ever 23 nov: Class Tower, came back to the game after a while – the heroes ran on the spot towards 2 Mirror Moths and never hit them).
 // WATCHDOG: if no monster loses HP for 6 s in a fight, every unit is put back in a reachable place (bad numbers fixed, monsters inside the picture,
 // stuck skills / melee places cleared) and each hero is placed in reach of his target. Normal fights never trigger it.
