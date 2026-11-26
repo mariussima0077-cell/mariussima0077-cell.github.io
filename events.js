@@ -23,7 +23,7 @@ const EV={
    m:[[3,{dm:40}],[5,{ess:3}],[10,{tk:2}],[15,{dm:100}],[30,{ess:5,tk:1}],[45,{tk:3}],[60,{dm:200}],[100,{dm:100,ess:10}],[130,{tk:4}],[160,{dm:300,ess:5}],[250,{dm:400,ess:20}],[400,{dm:700,tk:8}]]},
  dia:{bn:'dia',n:'DIAMOND SPREE',ic:'💎',col:'#4dd0e1',d:'Spend diamonds anywhere (summons, name change …). Every diamond spent counts.',u:'diamonds',tkk:'tk',
    m:[[150,{dm:20}],[300,{tk:2}],[500,{dm:50}],[800,{gt:2}],[1200,{dm:100}],[1500,{tk:3,gt:2}],[3000,{ct:3}],[4000,{dm:250}],[5000,{tk:5,ct:3}],[8000,{dm:500,tk:3}],[12000,{tk:8,gt:5}],[20000,{dm:1200,tk:10}]]},
- key:{bn:'key',n:'KEY ROULETTE',ic:'🔑',col:'#4fc3f7',d:'Spin the roulette – it gives ONLY Dungeon keys. Won keys are BONUS keys: they stack, never expire and wait for you (daily keys are used first). Free spins come only from the event quests below (no buying).',u:'spins',tkk:'dm',
+ key:{bn:'key',n:'KEY ROULETTE',ic:'🔑',col:'#4fc3f7',d:'Spin the roulette – it gives ONLY Dungeon keys. Won keys are BONUS keys: they stack, never expire and wait for you (daily keys are used first). Free spins come only from the event quests below (no buying). RANKING = most keys WON (same score: who got there first).',u:'spins',tkk:'dm',
    m:[[2,{tk:1}],[3,{dm:50}],[5,{gt:1}],[6,{dm:100}],[8,{ct:1,tk:1}],[9,{tk:2,gt:1}],[11,{dm:150}],[12,{dm:250}],[14,{tk:2,ct:1}],[15,{tk:3,ct:2}]]},
  // v16-173 (Marius 22 nov): MORE milestones (12 per event, 10 for the wheels) and a bit richer (~+30%)
  // v16-161 (Marius 22 nov): DUNGEON RUSH – every Dungeon key used (win or SWEEP) counts
@@ -32,7 +32,7 @@ const EV={
  // v16-129 (Marius 21 nov): CASH ROULETTE – NO quests: spins are bought with garage CASH, every spin costs more, max CW_MAX spins per event. Wins garage upgrade parts + Dungeon keys.
  cash:{bn:'cash',n:'CASH ROULETTE',ic:'💰',col:'#ffb300',d:'Spend your garage CASH on spins – win garage upgrade PARTS and Dungeon keys. No quests: every spin costs more than the one before, max 25 spins per event.',u:'spins',tkk:'tk',
    m:[[2,{tk:1}],[3,{dm:50}],[5,{gt:1}],[6,{dm:100}],[8,{ct:2}],[10,{tk:2,gt:1}],[12,{dm:150}],[15,{dm:250}],[18,{tk:2,gt:2}],[20,{tk:3,ct:2}],[23,{dm:300}],[25,{dm:500,tk:5}]]},
- wheel:{bn:'wheel',n:'LUCKY WHEEL',ic:'🎡',col:'#ffd54a',d:'Spin the wheel – it gives ONLY diamonds. Free spins come from the event quests below (no buying).',u:'spins',tkk:'dm',
+ wheel:{bn:'wheel',n:'LUCKY WHEEL',ic:'🎡',col:'#ffd54a',d:'Spin the wheel – it gives ONLY diamonds. Free spins come from the event quests below (no buying). RANKING = most diamonds WON (same score: who got there first).',u:'spins',tkk:'dm',
    m:[[2,{tk:1}],[3,{dm:50}],[5,{gt:1}],[6,{dm:100}],[8,{ct:1,tk:1}],[9,{tk:2,gt:1}],[11,{dm:150}],[12,{dm:250}],[14,{tk:2,ct:1}],[15,{tk:3,ct:2}]]}};
 // ranking prizes (sent by Mail by the server when the event ends) – the same table is in server/online.js (EV_RW)
 const MED=n=>n<=1?1:n<=3?2:n<=10?3:n<=50?4:5,MDL=(n,t)=>'<i class="rkm" style="background-image:url(img/ui10/rk_'+MED(n)+'.webp)">'+(t||n)+'</i>'; // v16-120 UI11 rank medals
@@ -48,7 +48,8 @@ const DGN={vault:'Vault',mine:'Scrap Mine',forge:'Forge',lab:'Lab'};
 const CWH=[['rp',80,22],['bk',260,20],['rp',160,16],['key',1,14],['bk',520,12],['rp',320,9],['kall',1,5],['jack',600,2]],CW_MAX=25;
 const cwBase=()=>{const t=T();return Math.max(5000,Math.round((t.idleRate?t.idleRate():20000)*.5/100)*100);};   // first spin = 30 min of your idle money
 const cwPrice=w=>Math.round(((w.base||cwBase())*Math.pow(1.15,w.used||0))/100)*100;   // ×1.15 per spin → 25 spins ≈ 106 h of idle money
-const isW=k=>k==='wheel'||k==='key'||k==='cash',QL=k=>k==='key'?KQ:k==='cash'?[]:WQ,SL=k=>k==='key'?KWH:k==='cash'?CWH:WHEEL;
+const isW=k=>k==='wheel'||k==='key'||k==='cash',RW=k=>k==='wheel'||k==='key',rsc=st=>RW(st.k)?(st.w?st.w.won||0:0):isW(st.k)?(st.w?st.w.used:0):st.sc,   // v16-368 (Marius: "toți au aceleași rotiri → toți la egalitate"): Lucky Wheel / Key Roulette RANK = what you WON (diamonds / keys), milestones stay on spins
+QL=k=>k==='key'?KQ:k==='cash'?[]:WQ,SL=k=>k==='key'?KWH:k==='cash'?CWH:WHEEL;
 const WQ=[['login','Open the game today',1,1],['win','Win 5 battles in the campaign',5,1],['sum','Summon 10 times (heroes, crew or gear)',10,1],['idle','Collect Idle Rewards 2 times',2,1],['lvl','Level up heroes 10 times',10,1]];
 const cur=(tr,t)=>{const i=Math.floor(((t||Date.now())-E0)/DUR);return {i,k:TRK[tr][((i%TRK[tr].length)+TRK[tr].length)%TRK[tr].length],id:tr+i,end:E0+(i+1)*DUR,start:E0+i*DUR};};
 const day=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
@@ -67,7 +68,7 @@ function tick(){const G=T()&&T().G;if(!G)return;const d=G.dm||0;if(dmL!=null&&d<
 // ---------------- server: live ranking
 let sendT=0,rk={};
 function dirty(){dot();clearTimeout(sendT);sendT=setTimeout(send,15000);}
-async function send(){if(!window.ONLINE||!ONLINE.call)return;const s=S();for(const tr of ['A','B']){const st=s[tr],sc=isW(st.k)?(st.w?st.w.used:0):st.sc;if(sc>0&&sc!==st.sent){const r=await ONLINE.call('evsc',{eid:st.id,k:st.k,sc});if(r&&r.ok){st.sent=sc;rk[st.id]={rank:r.rank,t:Date.now()};}}}}
+async function send(){if(!window.ONLINE||!ONLINE.call)return;const s=S();for(const tr of ['A','B']){const st=s[tr],sc=rsc(st);if(sc>0&&sc!==st.sent){const r=await ONLINE.call('evsc',{eid:st.id,k:st.k,sc});if(r&&r.ok){st.sent=sc;rk[st.id]={rank:r.rank,t:Date.now()};}}}}
 async function rank(tr){const st=S()[tr];if(!window.ONLINE||!ONLINE.call)return null;await send();const r=await ONLINE.call('evrank',{eid:st.id,k:st.k});return r&&r.ok?r:null;}
 // ---------------- rewards
 // v16-125 (Marius: "nothing in the frames, only text"): rewards as big icons + gold number pictures, the event's own icon in the left box
@@ -218,7 +219,7 @@ function render(){if(!el||!el.classList.contains('open'))return;const s=S();
   if(view==='sched'){body.innerHTML=schedHtml();return;}
   if(view==='rank'){body.innerHTML='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'<br>TOP 100</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div id="evRkL"><div class="evP" style="text-align:center;margin:20px">Loading the ranking…</div></div>'+rkPrizes(st);return;}
   let h='<div class="evBan pic" style="--c:'+E.col+';--b:url(img/ui9/evb_'+E.bn+'.webp)"><h3>'+E.n+'</h3><div class="evT">⏳ ends in '+left(c.end-Date.now())+'</div></div><div class="evD">'+E.d+'</div>';
-  h+='<div class="evSc"><span>YOUR '+E.u.toUpperCase()+'</span> <b>'+NH(T().nf(sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+(EGO[st.k]?' <b class="evGo" data-e="go" data-k="'+EGO[st.k]+'">GO ›</b>':'')+'</div>';
+  h+='<div class="evSc"><span>'+(RW(st.k)?(st.k==='key'?'KEYS WON':'DIAMONDS WON'):'YOUR '+E.u.toUpperCase())+'</span> <b>'+NH(T().nf(RW(st.k)?rsc(st):sc),1.25)+'</b>'+(rk[st.id]&&rk[st.id].rank?' · RANK <b style="font-size:18px">#'+rk[st.id].rank+'</b>':'')+(EGO[st.k]?' <b class="evGo" data-e="go" data-k="'+EGO[st.k]+'">GO ›</b>':'')+'</div>';
   if(st.k==='cash'){const w=st.w,p=cwPrice(w),can=!spinning&&w.used<CW_MAX&&T().G.money>=p;h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">'+(w.used>=CW_MAX?'MAX SPINS':'SPIN · '+T().fmt(p))+'</button><div class="evP">Spins: <b>'+w.used+' / '+CW_MAX+'</b> · your cash: <b>'+T().fmt(T().G.money)+'</b> · next spin costs ×1.15</div><div class="evP">Prizes grow with your campaign stage. Parts upgrade your garages (LV 1-100).</div></div>';}
   else if(isW(st.k)){const w=st.w,can=w.sp>0&&!spinning,KR=st.k==='key';h+='<div class="evW"><canvas id="evWh"></canvas><button class="evSpin'+(can?'':' dis')+'" data-e="spin">SPIN · '+w.sp+' left'+(can?RD_:'')+'</button><div class="evP">Won in this event: '+(KR?'🔑':DM())+' <b>'+T().nf(w.won)+'</b>'+(KR?' keys':'')+'</div>'+(KR&&window.DGK?'<div class="evP">Your bonus keys: '+DGK.K.map(d=>'<img class="tki" src="img/dg/k_'+d+'.webp" alt=""> <b>'+DGK.bon(d)+'</b>').join(' &nbsp;')+(DGK.ok()?'':'<br>🔒 Dungeons open at stage 15 – your keys wait for you')+'</div>':'')+'</div>';
     h+='<div class="evS">TODAY\'S QUESTS · FREE SPINS</div>'+QL(st.k).map(x=>{const v=Math.min(x[2],w.q[x[0]]||0),ok=v>=x[2],got=w.got[x[0]];return '<div class="evM'+(got?' done':ok?' ok':'')+'"><div class="g">'+NH(v+'/'+x[2],1)+'</div><div class="r qt"><span class="qtx">'+x[1]+(!ok&&x[0]!=='login'?' <b class="evGo" data-e="go" data-k="'+x[0]+'">GO ›</b>':'')+'</span><div class="evPb"><i style="width:'+(v/x[2]*100)+'%"></i></div></div><button class="'+(ok&&!got?'':'dis')+'" data-e="wq" data-q="'+x[0]+'">'+(got?'✓':'+'+x[3]+(st.k==='key'?' 🔑':' 🎡'))+(ok&&!got?RD_:'')+'</button></div>';}).join('');}

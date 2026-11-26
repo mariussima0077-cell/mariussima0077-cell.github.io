@@ -28,7 +28,7 @@ const DAILY = [[30,1],[50,1],[80,2],[120,2],[160,3],[220,4]];          // arena 
 // v16-99: TIME EVENTS (3 days each, 2 tracks at the same time) – the same schedule is in events.js
 const EV_E0 = Date.UTC(2026, 10, 20), EV_DUR = 3 * DAY, EV_TRK = {A:['hero','gear','crew','dgr'], B:['ess','dia','wheel','key','cash']};   // v16-120 KEY ROULETTE · v16-129 CASH ROULETTE (added at the END → events 0-3 stay the same)
 const EV_RATE = {hero:1500, gear:1500, crew:1500, dia:400000, dgr:300};   // v16-330: max score per hour of event (summons / diamonds spent / dungeon floors)
-const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40, key:40, cash:25, dgr:3000};   // v16-161: cash was missing (score became NaN) + DUNGEON RUSH
+const EV_CAP = {hero:30000, gear:30000, crew:30000, ess:1e15, dia:5e6, wheel:40000, key:480, cash:25, dgr:3000};   // v16-161: cash was missing (score became NaN) + DUNGEON RUSH
 // v16-193 (Marius 23 nov): TORQUE GRAND PRIX once per server – starts 3 days after the server opens, 28 days. Same dates in cloud.js SERVERS[].open.
 // At the launch reset: set SRV_OPEN[1] = launch day. New server → add its opening date here (and in cloud.js).
 const SRV_OPEN = {1: Date.UTC(2026, 10, 19, 17, 0, 0)}, GP_DELAY = 3 * DAY, GP_LEN = 28 * DAY, GP_CAP = 1000000, GP_MAX = 90 * DAY, GP_TAIL = 7 * DAY, GP_FINAL = 21 * DAY, GP_FINPTS = 55000;
