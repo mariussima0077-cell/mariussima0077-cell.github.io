@@ -47,6 +47,16 @@ css.textContent=`
 @keyframes cpPulse{0%,100%{transform:scale(1);box-shadow:0 6px 0 #000a,0 0 10px #ff6d00}50%{transform:scale(1.08);box-shadow:0 6px 0 #000a,0 0 30px #ffab00}}
 #cpCard,#cpTeam,#cpRes{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;background:rgba(4,6,9,.78)}
 #cpCard.open,#cpTeam.open,#cpRes.open{display:flex}
+.bsBtn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 64px);right:10px;z-index:8;box-shadow:0 3px 10px rgba(0,0,0,.6);padding:7px 16px;border:2px solid #ffd54a;border-radius:10px;background:linear-gradient(#3a2a08,#1c1404);color:#ffd54a;font:900 13px system-ui;letter-spacing:1px}
+#bsOv{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72)}#bsOv.open{display:flex}
+#bsOv .bsBox{width:min(94vw,440px);max-height:86vh;overflow:auto;background:linear-gradient(#1d2330,#0d1018);border:2px solid #ffd54a;border-radius:14px;padding:10px;color:#fff;font-family:system-ui}
+#bsOv .bsH{text-align:center;font-weight:900;font-size:18px;letter-spacing:2px;color:#ffd54a;margin-bottom:6px}
+#bsOv .bsR{display:flex;gap:8px;align-items:flex-start;padding:6px;margin:5px 0;background:rgba(255,255,255,.05);border-radius:10px}#bsOv .bsR.ko{opacity:.7}
+#bsOv .bsR>img{width:46px;height:46px;border-radius:8px;border:2px solid;object-fit:cover;flex:none}
+#bsOv .bsI{flex:1;min-width:0}#bsOv .bsI>b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#bsOv .bsI em{color:#ffd54a;font-style:normal;font-size:11px;border:1px solid #ffd54a;border-radius:5px;padding:0 4px}#bsOv .bsI i{color:#ff5252;font-style:normal;font-size:11px}
+#bsOv .bsI small{display:block;color:#aab;font-size:10.5px;margin-bottom:2px}
+#bsOv .bsB{display:flex;align-items:center;gap:5px;font-size:10px;margin:2px 0}#bsOv .bsB span{width:52px;color:#ccd;font-weight:800}#bsOv .bsB>div{flex:1;height:7px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}#bsOv .bsB>div>i{display:block;height:100%;border-radius:4px}#bsOv .bsB b{width:58px;text-align:right}
+#bsOv .bsX{display:block;margin:8px auto 2px;padding:6px 18px;border:2px solid #889;border-radius:10px;background:#222833;color:#fff;font:900 12px system-ui}
 .cpBox{width:min(92vw,420px);max-height:90vh;overflow-y:auto;touch-action:pan-y;background:linear-gradient(#2b1a10,#140c08);border:2px solid #ffb300;border-radius:18px;padding:16px;box-shadow:0 0 40px #ff6d0055;box-sizing:border-box}
 .cpBox h2{margin:0 0 4px;font-size:22px;color:#ffcc80;text-align:center;text-shadow:0 2px 0 #000}
 .cpBox .sub{text-align:center;color:#c8a27c;font-size:12px;font-weight:800;letter-spacing:1px}
@@ -2018,8 +2028,8 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   const crit=o.crit||ss||(!o.noCrit&&Math.random()<Math.min(src.hero?CRIT_CAP:1,src.crit+(src.critB>0?.15:0)));if(crit)a*=src.cdm||CRIT_DM;
   a=Math.max(1,Math.round(a));let left=a;
   if(tgt.shield>0){const s=Math.min(tgt.shield,left);tgt.shield-=s;left-=s;}
-  tgt.hp-=left;tgt.flash=1;tgt.hurt=1;
-  if(src.hero&&src.br==='warrior'&&!tgt.hero&&!src.dead&&src.hp<src.max){const lh=a*RB_LS[src.h.gr||0]/100;src.hp=Math.min(src.max,src.hp+lh);} // v16-349 warrior role: lifesteal
+  tgt.hp-=left;tgt.flash=1;tgt.hurt=1;if(src.hero&&!tgt.hero)src.bsD=(src.bsD||0)+a;if(tgt.hero)tgt.bsT=(tgt.bsT||0)+a; // v16-350 battle stats
+  if(src.hero&&src.br==='warrior'&&!tgt.hero&&!src.dead&&src.hp<src.max){const lh=Math.min(src.max-src.hp,a*RB_LS[src.h.gr||0]/100);src.hp+=lh;src.bsH=(src.bsH||0)+lh;} // v16-349 warrior role: lifesteal
   if(!B.sim&&src.hero&&!tgt.hero&&!o.skill&&!LOWRES&&B.t-(tgt.elT||-9)>.12){tgt.elT=B.t;const [ex,ey]=sxy(tgt);elHit(src,ex,ey-(tgt.H||40)*.5*dsc(tgt.d));} // v16-322
   if(!B.sim){if(!tgt.hero&&!LOWRES&&B.t-(tgt.dbT||-9)>.14){tgt.dbT=B.t;const [hx,hy]=sxy(tgt);hitBits(hx,hy-(tgt.H||40)*.45*dsc(tgt.d),crit?4:2);}sfx(tgt.hero?'thud':crit?'crit':'hit');} // v16-319
   if(tgt.wbB){B.wbD+=left;if((o.skill||crit)&&!(tgt.hurtS>-2))tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
@@ -2032,9 +2042,9 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(tgt.hp<=0&&tgt.hero&&tgt.tl&&tgt.h.id==='m5_2'&&!tgt.phx){tgt.phx=1;tgt.hp=Math.round(tgt.max*TV(tgt));tgt.st='idle';talTxt(tgt,'REBIRTH FLAME!');if(!B.sim)B.fx.push({type:'ring',x:tgt.x,y:fy(tgt.d),t:0,d:.6,r:70*S,col:'#ff5252',ground:1});}
   else if(tgt.hp<=0){kill(tgt);const ad=pv(src,'tuning',0);if(ad&&!tgt.hero){src.aspdK=Math.max(src.aspd>0?(src.aspdK||0):0,ad/100);src.aspd=Math.max(src.aspd,4);pasTxt(src,0);}}
   else if(tgt.hero){const ls=pv(tgt,'engine',1);if(ls&&!tgt.ls&&tgt.hp<tgt.max*.35){tgt.ls=1;tgt.shield=Math.max(tgt.shield,tgt.max*ls/100);tgt.taunt=Math.max(tgt.taunt,3);pasTxt(tgt,1,'LAST STAND!');}
-    if(tgt.hp<tgt.max*.3)for(const h of B.heroes){const ek=pv(h,'service',1);if(ek&&!h.dead&&h.ekCd<=0){h.ekCd=15;heal(tgt,tgt.max*ek/100*(h.br==='support'?RB_SUP:1));pasTxt(h,1);if(!B.sim)B.fx.push({type:'plus',u:tgt,t:0,d:.7});break;}}}
+    if(tgt.hp<tgt.max*.3)for(const h of B.heroes){const ek=pv(h,'service',1);if(ek&&!h.dead&&h.ekCd<=0){h.ekCd=15;B.hsrc=h;heal(tgt,tgt.max*ek/100*(h.br==='support'?RB_SUP:1));B.hsrc=null;pasTxt(h,1);if(!B.sim)B.fx.push({type:'plus',u:tgt,t:0,d:.7});break;}}}
   return a;}
-function heal(u,amt){if(B.hk>1&&u.hero)amt*=B.hk;if(u.dead||(B.mod==='noheal'&&u.hero))return;const a=Math.round(Math.min(amt,u.max-u.hp));u.hp+=a;if(a>0)num(u.x,headY(u),'+'+a,'#69f0ae');}
+function heal(u,amt){if(B.hk>1&&u.hero)amt*=B.hk;if(u.dead||(B.mod==='noheal'&&u.hero))return;const a=Math.round(Math.min(amt,u.max-u.hp));u.hp+=a;if(a>0&&u.hero){const s=B.hsrc&&B.hsrc.hero?B.hsrc:null;if(s)s.bsH=(s.bsH||0)+a;}if(a>0)num(u.x,headY(u),'+'+a,'#69f0ae');}
 function kill(u){if(!u.hero&&!B.sim)try{chunks(u);}catch(e){}u.hp=0;u.dead=true;u.deadT=0;u.st='dead';u.act=null;u.sP=null;u.sT=null;
   const [x,y]=sxy(u);
   if(u.hero){B.deaths++;smoke(x,y-20,6);num(x,headY(u)-10,'K.O.','#ff5252',1);if(!B.sim)sfx('ko');}
@@ -2151,7 +2161,7 @@ function cast(u){if(!canCast(u))return;u.en=0;u.rageT=B.t;u.enLock=3;B.flash=.15
       for(let k=0;k<8;k++)B.fx.push({type:'gear',x:rnd(W*.3,W),tgt:null,y0:-40,t:-rnd(0,.8),d:.55,src:u,r:rnd(8,14)*S,dl:rnd(0,1)});
       for(const h of alive(B.heroes)){h.buff=6;B.fx.push({type:'plus',u:h,t:0,d:.7,col:'#ffab00',txt:'ATK+30%'});}}};u.st='cast';}
   else{u.act={k:'cast',t:0,dur:R==='service'||R==='inspect'?.5:.35,fire:()=>skillFire(u)};u.st='cast';}}
-function supSh(u,fn){if(u.br!=='support')return fn();const s0=B.heroes.map(h=>h.shield||0);try{return fn();}finally{B.heroes.forEach((h,i)=>{const d=(h.shield||0)-s0[i];if(d>0)h.shield+=d*(RB_SUP-1);});}} // v16-349 support role: +20% shields
+function supSh(u,fn){const s0=B.heroes.map(h=>h.shield||0),hs=B.hsrc;B.hsrc=u;try{return fn();}finally{B.hsrc=hs;let g=0;B.heroes.forEach((h,i)=>{let d=(h.shield||0)-s0[i];if(d>0){if(u.br==='support'){h.shield+=d*(RB_SUP-1);d*=RB_SUP;}g+=d;}});if(u.hero)u.bsS=(u.bsS||0)+g;}} // v16-349 support role: +20% shields · v16-350: battle stats (heals / shields given)
 function skillFire(u){B.hk=u.skK||1;try{return supSh(u,()=>skillFire0(u));}finally{B.hk=1;}}
 function skillFire0(u){const R=u.role,ms=alive(B.mons);if(!ms.length)return;
   const P=skp(u);
@@ -2160,7 +2170,7 @@ function skillFire0(u){const R=u.role,ms=alive(B.mons);if(!ms.length)return;
   if(P.wave||R==='inspect'){B.fx.push({type:'scan',x:u.x,t:0,d:.7,src:u,hit:new Set(),p:P});if(P.crit||P.atk)teamBuff({crit:P.crit,atk:P.atk,col:P.col,txt:P.crit?'CRIT UP':'ATK+30%'});return;}
   if(P.coil){B.fx.push({type:'coil',x:u.x+50*S,dd:u.d,t:0,d:4,tick:0,src:u});return;}
   if(R==='service'){const low=P.low&&alive(B.heroes).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];
-    for(const h of alive(B.heroes)){heal(h,h.max*(P.heal||.32));const hd=P.hotT||4;if(P.hot!==0){h.hot=hd;h.hotA=h.max*(P.hot||.12)/hd;}if(P.cleanse)h.stun=0;if(P.shield)h.shield=Math.max(h.shield,h.max*P.shield);if(h===low){heal(h,h.max*P.low);num(h.x,headY(h)-16,'PATCHED!','#b2ff59',1);}
+    for(const h of alive(B.heroes)){heal(h,h.max*(P.heal||.32));const hd=P.hotT||4;if(P.hot!==0){h.hotS=B.hsrc;h.hot=hd;h.hotA=h.max*(P.hot||.12)/hd;}if(P.cleanse)h.stun=0;if(P.shield)h.shield=Math.max(h.shield,h.max*P.shield);if(h===low){heal(h,h.max*P.low);num(h.x,headY(h)-16,'PATCHED!','#b2ff59',1);}
       if(!u.noFx)B.fx.push({type:'oil',u:h,t:0,d:.9});   // v16-125: Big Mo shows his own dome instead
       if(FX2&&!u.noFx){const hx=h.x,hy=fy(h.d),hh=dsc(h.d);fxs('magic_02','#69f0ae',hx,hy,{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxs('light_02','#69f0ae',hx,hy-36*hh,{d:.7,s0:30*S,s1:100*S,a0:.8,ease:1});fxs('trace_01','#b9f6ca',hx,hy-50*hh,{d:.6,s0:110*S,s1:150*S,sx:1.6,a0:.7});fxSpark(hx,hy-40*hh,'#69f0ae',5,22*S);}}
     if(P.atk||P.def)teamBuff({atk:P.atk,def:P.def,col:P.col,txt:P.atk?'ATK+30%':'DEF UP'});}
@@ -2228,7 +2238,7 @@ function drawReady(g,u,t){const id=u.h&&u.h.id,im=id&&READY8[id]&&readyImg(id);i
   g.restore();}function wideImg(id){if(!WIDE8[id])return null;let i=WIDEI[id];if(!i){i=WIDEI[id]=new Image();i.decoding='async';i.src=LOWRES?WIDE8[id].replace('.webp','_low.webp'):WIDE8[id];}return i;}
 // v16-306 (Marius, 25 nov): ultimates with 23-24 frames (his 3 ChatGPT sheets per hero) instead of 8 → N = frames in the picture (600x200 each), WIDEIP = the impact frame in the new sheets
 const WIDEIP={m5_9:8,m5_7:12,m5_0:11,m5_1:11,m5_2:10,m5_3:8,m5_4:11,m5_5:11,m5_6:15};function wN(im){return Math.max(8,Math.round(im.naturalHeight*3/im.naturalWidth));}
-function castAct(u,dur,fire){if(u.br==='support'){const f0=fire;fire=(...x)=>{const k=B.hk;B.hk=Math.max(k||1,RB_SUP);try{return supSh(u,()=>f0(...x));}finally{B.hk=k;}};} /* v16-349 support role: +20% heals & shields */u.act={k:'cast',t:0,dur,fire};u.st='cast';if(u.hero&&!B.sim&&u.h&&u.h.gr===5)sfx('cast');}
+function castAct(u,dur,fire){if(u.hero){const f0=fire,sp=u.br==='support';fire=(...x)=>{const k=B.hk;if(sp)B.hk=Math.max(k||1,RB_SUP);try{return supSh(u,()=>f0(...x));}finally{B.hk=k;}};} /* v16-349 support role: +20% heals & shields */u.act={k:'cast',t:0,dur,fire};u.st='cast';if(u.hero&&!B.sim&&u.h&&u.h.gr===5)sfx('cast');}
 const SKF={
  m3_0(u,ms){const P=skp(u),f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Viktor's ENGINE DROP – he throws the engine from where he stands (no more leap); it falls on the biggest group (fxs frame 2 = lands = damage); same numbers as before
    if(!f8||!(u.spr&&u.spr.v8)){const c=cluster(ms,(P.rad||95)*S)||ms[0];u.act={k:'leap',t:0,dur:.55,x0:u.x,d0:u.d,x1:c.x-24*S,d1:c.d,p:P};u.st='leap';return;}
@@ -2269,7 +2279,7 @@ const SKF={
    castAct(u,.8,()=>{const dead=!u.rev&&B.heroes.find(h=>h.dead&&h!==u);u.post=.6;
    if(dead){u.rev=1;dead.dead=false;dead.hp=Math.round(dead.max*.4);dead.deadT=0;dead.st='idle';dead.act=null;dead.stun=0;dead.lift=0;dead.en=0;
      num(dead.x,headY(dead)-16,'REVIVED!','#fff59d',1);if(!f8)imgFx('holy',dead.x,fy(dead.d)+6*S,120*S,1.3);}
-   for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(h!==dead&&!f8)imgFx('holy',h.x,fy(h.d)+6*S,90*S,1);
+   for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hotS=B.hsrc;h.hot=4;h.hotA=h.max*.15/4;if(h!==dead&&!f8)imgFx('holy',h.x,fy(h.d)+6*S,90*S,1);
      if(FX2&&!FV8(u)){fxs('magic_02','#fff176',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#fff176',5,22*S);}}
    teamBuff({def:6,col:'#fff176',txt:'DEF UP'});B.flash=.5;});},
  m4_2(u,ms){const c=cluster(ms,100*S)||ms[0];castAct(u,.6,()=>{const cx=c.x,cd=c.d,v=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth;u.post=.6;
@@ -2354,7 +2364,7 @@ const SKF={
      if(c&&!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:110*S,col:'#ff6d00',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#ff9100',110*S);}
      const dead=u.rev?[]:B.heroes.filter(h=>h.dead&&h!==u);if(dead.length){u.rev=1;for(const d of dead){d.dead=false;d.hp=Math.round(d.max*.4);d.deadT=0;d.st='idle';d.act=null;d.stun=0;d.lift=0;d.en=0;num(d.x,headY(d)-16,'REBORN!','#ffcc80',1);/* v16-314: only REBORN! – no extra effect on the revived hero */}}
      allyFx('m5_2',alive(B.heroes).filter(h=>!h.rvFx),1.5);for(const h of B.heroes)h.rvFx=0;
-     for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
+     for(const h of alive(B.heroes)){heal(h,h.max*.35);h.hotS=B.hsrc;h.hot=4;h.hotA=h.max*.15/4;if(FX2&&!FV8(u)){fxs('magic_02','#ffab40',h.x,fy(h.d),{ground:1,d:1,s0:20*S,s1:90*S,sy:.34,vr:2.5,ease:1});fxSpark(h.x,fy(h.d)-40*dsc(h.d),'#ffcc80',5,22*S);}}
      teamBuff({def:6,col:'#ff9100',txt:'REBIRTH FLAME'});});},
  m5_1(u){const ms0=alive(B.mons),c0=cluster(ms0,100*S)||ms0[0],wdl=c0&&pushWide(u,(WD(u)?.75:.45)+Math.max(0,(c0.x-u.x)/(1100*S)),{tg:c0,dd:c0.d});castAct(u,wdl?.75:.45,()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,all:1,mult:3};u.st='dash';
    if(u.spr&&u.spr.fx8&&!wdl){const c=cluster(alive(B.mons),100*S)||alive(B.mons)[0];if(c){const tt=Math.max(0,(c.x-u.x)/(1100*S));B.fx.push({type:'sheet8',t:-Math.max(0,tt-.46),d:.96,sp:u.spr,x:c.x,dd:c.d});}} // v16-95: fire trail → explosion (frame 5) when she passes the biggest group
@@ -2401,9 +2411,9 @@ function unitUpdate(u,dt,foes,friends){
   if(!u.hero){u.ice=Math.max(0,u.ice-dt);u.weak=Math.max(0,u.weak-dt);if(u.wpt>0)u.wpt-=dt;u.tw=Math.max(0,u.tw-dt);if(u.burn>0){u.burn-=dt;u.burnT+=dt;if(Math.random()<.35)part({x:u.x+rnd(-10,10)*S,y:headY(u)+rnd(14,40)*dsc(u.d),vx:rnd(-10,10),vy:rnd(-50,-20),life:.4,r:rnd(3,6)*S,col:Math.random()<.5?'rgba(255,145,0,.8)':'rgba(255,61,0,.7)',type:'flame'});
     if(u.burnT>=.5){u.burnT=0;if(u.burnSrc)damage(u.burnSrc,u,.22,{noCrit:1,skill:1});if(u.dead)return;}}}
   if(u.hero){u.buff=Math.max(0,u.buff-dt);u.aspd=Math.max(0,u.aspd-dt);u.defB=Math.max(0,u.defB-dt);u.critB=Math.max(0,u.critB-dt);u.taunt=Math.max(0,u.taunt-dt);if(u.nmk>0)u.nmk-=dt;if(u.shield>0)u.shield=Math.max(0,u.shield-u.max*.04*dt);
-    if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;heal(u,u.hotA);}}
+    if(u.hot>0){u.hot-=dt;u.hotT=(u.hotT||0)+dt;if(u.hotT>=1){u.hotT=0;const hs=B.hsrc;B.hsrc=u.hotS;heal(u,u.hotA);B.hsrc=hs;}}
     if(u.pn){u.ekCd=Math.max(0,u.ekCd-dt);
-      const fc=pv(u,'service',0);if(fc){u.fcT=Math.min(6,u.fcT+dt);if(u.fcT>=6){const w=alive(B.heroes).filter(h=>h.hp<h.max*.97).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];if(w){u.fcT=0;heal(w,w.max*fc/100*(u.br==='support'?RB_SUP:1));if(!B.sim)B.fx.push({type:'plus',u:w,t:0,d:.7});}}}
+      const fc=pv(u,'service',0);if(fc){u.fcT=Math.min(6,u.fcT+dt);if(u.fcT>=6){const w=alive(B.heroes).filter(h=>h.hp<h.max*.97).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];if(w){u.fcT=0;B.hsrc=u;heal(w,w.max*fc/100*(u.br==='support'?RB_SUP:1));B.hsrc=null;if(!B.sim)B.fx.push({type:'plus',u:w,t:0,d:.7});}}}
       const sw=pv(u,'all',1);if(sw&&u.hp<u.max*.5){u.swT+=dt;if(u.swT>=1){u.swT=0;heal(u,u.max*sw/100);}}}}
   if(u.stun>0){u.st='idle';u.act=u.act&&u.act.k==='return'?u.act:null;return;}
   // hero actions
@@ -3081,6 +3091,16 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden||!running)r
 
 // ---------------------------------------------------------------- results
 const ANX={id:0,n:0};
+// v16-350 (Marius 26 nov): BATTLE STATS after every battle – who did what (damage dealt, damage taken, heals, shields)
+function bStats(){const H=(B&&B.heroes||[]).filter(u=>u.hero);if(!H.length)return;const T=TE(),f=n=>T.nf(Math.round(n||0));
+  const k=[['bsD','DAMAGE','#ff9100'],['bsT','TAKEN','#ff5252'],['bsH','HEALED','#69f0ae'],['bsS','SHIELDS','#40c4ff']],mx={},tot=H.reduce((a,u)=>a+(u.bsD||0),0)||1;
+  k.forEach(([q])=>mx[q]=Math.max(1,...H.map(u=>u[q]||0)));const mvp=H.slice().sort((a,b)=>(b.bsD||0)-(a.bsD||0))[0];
+  const row=u=>`<div class="bsR${u.dead?' ko':''}"><img src="${portraitURL(u.h)}" style="border-color:${gcol(u.h)}"><div class="bsI"><b style="color:${gcol(u.h)}">${u.h.n}${u===mvp&&(u.bsD||0)>0?' <em>MVP</em>':''}${u.dead?' <i>K.O.</i>':''}</b><small>${u.br?BROLE[u.br].n:''} · ${Math.round((u.bsD||0)/tot*100)}% of team damage</small>`+
+    k.map(([q,n,c])=>`<div class="bsB"><span>${n}</span><div><i style="width:${Math.round((u[q]||0)/mx[q]*100)}%;background:${c}"></i></div><b>${f(u[q])}</b></div>`).join('')+`</div></div>`;
+  let o=document.getElementById('bsOv');if(!o){o=document.createElement('div');o.id='bsOv';document.getElementById('cpRes').appendChild(o);o.addEventListener('click',e=>{if(e.target===o||e.target.closest('.bsX'))o.classList.remove('open');});}
+  o.innerHTML=`<div class="bsBox"><div class="bsH">BATTLE STATS</div>${H.map(row).join('')}<button class="bsX">CLOSE</button></div>`;o.classList.add('open');}
+window.TE_BSTATS=bStats;
+function bsBtn(){const b=document.getElementById('cpRes');const o0=document.getElementById('bsBtn');if(o0)o0.remove();if(!b||!B||!B.heroes||!B.heroes.some(u=>(u.bsD||0)+(u.bsT||0)>0))return;const x=document.createElement('button');x.id='bsBtn';x.className='bsBtn';x.textContent='BATTLE STATS';x.onclick=e=>{e.stopPropagation();bStats();};b.appendChild(x);}
 function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)return twFinish(win,retreat);const T=TE(),G=T.G,si=B.si,S0=STAGES[si];
   const P=CPX();if(!B.sim&&si===P.best){if(win)delete P.stuck;else if(!P.stuck||P.stuck.si!==si)P.stuck={si,t:Date.now()};}
   let html='';const lab=sLabel(si);
@@ -3111,12 +3131,12 @@ function finish(win,retreat){running=false;cancelAnimationFrame(raf);if(B.tw)ret
       <button class="rsGo" data-a="retry">RETRY</button></div>
       <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="map">CAMPAIGN</button></div></div>`;}
   $('cpResBox').classList.add('rsSk');
-  $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;
+  $('cpResBox').innerHTML=html;$('cpRes').classList.add('open');bsBtn();$('cpResBox').scrollTop=0;
   // v16-25: AUTO NEXT – after a victory the next stage starts by itself after a 3 s countdown (same team). Stops on defeat, on any tap, or with the switch.
   clearInterval(ANX.id);const canAuto=win&&si<NST-1&&chOpen(STAGES[si+1].c);
   const anxShow=()=>{const on=G.cp.autoNext!==false,b=$('anxS'),c=$('anxC');if(!b)return;b.textContent=on?'ON':'OFF';b.parentNode.classList.toggle('on',on);c.textContent=on&&ANX.n>0?'next stage in '+ANX.n+'…':on?'':'tap to turn on';};
   const anxGo=()=>{clearInterval(ANX.id);ANX.n=0;if(!canAuto||G.cp.autoNext===false||window.__TUTON)return anxShow(); /* v16-72: no auto-next during the tutorial */ANX.n=3;anxShow();
-    ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}ANX.n--;anxShow();if(ANX.n<=0){clearInterval(ANX.id);
+    ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}{const bo=document.getElementById('bsOv');if(bo&&bo.classList.contains('open'))return;} /* v16-350: AUTO NEXT waits while BATTLE STATS is open */ANX.n--;anxShow();if(ANX.n<=0){clearInterval(ANX.id);
       $('cpRes').classList.remove('open');CPX().ch=STAGES[si+1].c;safeStart(si+1,teamHeroes());}},1000);};
   if(canAuto)anxGo();
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;
@@ -3841,7 +3861,7 @@ function twGo0(team){const t=twG();if(t.b>=TW_N)return;if(!team||!team.length)te
 const ANX_ROW='<div class="anx" data-a="atog"><span>⟳ AUTO NEXT</span><i id="anxC"></i><b id="anxS"></b></div>';
 function anxTower(can,go){const G=TE().G;const show=()=>{const on=G.cp.autoNext!==false,b=$('anxS'),c=$('anxC');if(!b)return;b.textContent=on?'ON':'OFF';b.parentNode.classList.toggle('on',on);c.textContent=on&&ANX.n>0?'next floor in '+ANX.n+'…':on?'':'tap to turn on';};
   const start=()=>{clearInterval(ANX.id);ANX.n=0;if(!can||G.cp.autoNext===false||window.__TUTON)return show();ANX.n=3;show();
-    ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}ANX.n--;show();if(ANX.n<=0){clearInterval(ANX.id);$('cpRes').classList.remove('open');go();}},1000);};
+    ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}{const bo=document.getElementById('bsOv');if(bo&&bo.classList.contains('open'))return;} /* v16-350: AUTO NEXT waits while BATTLE STATS is open */ANX.n--;show();if(ANX.n<=0){clearInterval(ANX.id);$('cpRes').classList.remove('open');go();}},1000);};
   start();return ()=>{G.cp.autoNext=G.cp.autoNext===false;TE().save();start();};}
 function twFinish(win,retreat){if(B.tw&&B.tw.demo){const cb=B.tw.cb;close();try{cb&&cb(win);}catch(e){}return;}{const F0=B.tw||{};if(window.TEQ&&!retreat&&(win||F0.wb))TEQ(F0.wb?'wb':F0.dg?'dg':'tower',1);}   // v16-238: daily quests
   if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
@@ -3857,7 +3877,7 @@ function twFinish(win,retreat){if(B.tw&&B.tw.demo){const cb=B.tw.cb;close();try{
       <div class="rsDB b2" data-a="team"><img src="img/ui2/i_star1.webp"><span><b>Better team & skills</b>${F.mod>=0?'this floor: '+TW_MOD[F.mod].n:'Essence → LEVEL UP · Ascension'}</span></div>
       <button class="rsGo" data-a="twretry">RETRY</button></div>
       <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="tw">TOWER</button></div></div>`;}
-  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;clearInterval(ANX.id);
+  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');bsBtn();$('cpResBox').scrollTop=0;clearInterval(ANX.id);
   const anxT=anxTower(win&&f===t.b&&f<TW_N,()=>twGo(true));
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;if(a==='atog'){anxT();return;}clearInterval(ANX.id);ANX.n=0;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
     if(a==='twnext'||a==='twretry')twGo(true);else if(a==='team'){showMap();TWS.ret=1;openGear();}else if(a==='gear'){showMap();TWS.ret=1;openGear();}
@@ -4070,7 +4090,7 @@ function ctFinish(win,retreat){const T=TE(),G=T.G,t=ctG(),F=B.tw,k=F.ct,f=F.f;le
       <div class="rsDB b2" data-a="gear"><img src="img/ui2/i_star1.webp"><span><b>Levels & stars</b>${F.mod>=0?'this floor: '+TW_MOD[F.mod].n:'duplicates +1 star'}</span></div>
       <button class="rsGo" data-a="ctnext">RETRY</button></div>
       <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="gear">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="ct">TOWER</button></div></div>`;}
-  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;clearInterval(ANX.id);
+  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');bsBtn();$('cpResBox').scrollTop=0;clearInterval(ANX.id);
   const anxT=anxTower(win&&f===t[k]&&f<CT_N&&ctOpenK(k),()=>ctGo(k,true));
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;if(a==='atog'){anxT();return;}clearInterval(ANX.id);ANX.n=0;$('cpRes').classList.remove('open');$('bt').classList.remove('open');
     if(a==='ctnext')ctGo(k,true);else if(a==='gear'){showMap();CTS.ret=1;openGear();}
@@ -4298,7 +4318,7 @@ function wbFinish(win,retreat){const T=TE(),w=wbG(),dmg=Math.round(B.wbD||0),bef
     ${nt?`<div class="wbRN">🎁 ${nt} new daily reward${nt>1?'s':''} – claim on the WORLD BOSS page</div>`:''}
     <div class="wbRL">${KEYI()} ${wbKeys()}/${wbKMax()} keys left today</div>
     <div class="cpRow"><button class="cpGo" data-a="wb">WORLD BOSS</button><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button></div></div>`;
-  $('cpResBox').classList.remove('rsSk');$('cpResBox').classList.add('wbSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;clearInterval(ANX.id);
+  $('cpResBox').classList.remove('rsSk');$('cpResBox').classList.add('wbSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');bsBtn();$('cpResBox').scrollTop=0;clearInterval(ANX.id);
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('cpResBox').classList.remove('wbSk');$('bt').classList.remove('open');
     showMap();if(a==='team'){WBS.ret=1;openGear();}else wbOpen();};}
 wbEl.addEventListener('click',e=>{const el=e.target.closest('[data-wb]');
@@ -4508,7 +4528,7 @@ function dgFinish(win,retreat){const T=TE(),g=dgG(),F=B.tw,k=F.dg,f=F.f,D=DG[k];
       <div class="rsDB b2" data-a="team"><img src="img/ui2/i_star1.webp"><span><b>Better team & skills</b>or try an easier floor</span></div>
       <button class="rsGo" data-a="dgagain">RETRY</button></div>
       <div class="rsM"><div class="cpRow"><button class="cpGo alt" data-a="team">${IMGI('img/ui2/i_star1.webp','1.3em','-.35em')} HEROES</button><button class="cpGo alt" data-a="dg">DUNGEON</button></div></div>`;}
-  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');$('cpResBox').scrollTop=0;clearInterval(ANX.id);
+  $('cpResBox').classList.add('rsSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');bsBtn();$('cpResBox').scrollTop=0;clearInterval(ANX.id);
   $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a;$('cpRes').classList.remove('open');$('bt').classList.remove('open');DGS.k=k;
     if(a==='dgnext'){DGS.sel=f+1;dgGo(true);}else if(a==='dgagain'){DGS.sel=f;dgGo(true);}
     else if(a==='team'||a==='gear'){showMap();DGS.ret=1;openGear();}
