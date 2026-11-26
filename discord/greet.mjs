@@ -51,6 +51,7 @@ for (const j of joins) {
         '🚀 **Where to go:**',
         `📢 News & updates → ${link('📢┃announcements', '#announcements')}`,
         `🧪 Play before release → ${link('🧪┃play-before-release', '#play-before-release')}`,
+        `💎 **100,000 free diamonds** (test gift) → ${link('💎┃free-diamonds', '#free-diamonds')}`,
         `🌍 Chat with everyone → ${link('🌍┃global-chat', '#global-chat')}`,
         `❓ Help → ${link('❓┃help', '#help')}  •  🐞 Bugs → ${link('🐞┃bug-reports', '#bug-reports')}  •  💡 Ideas → ${link('💡┃suggestions', '#suggestions')}`,
         '',

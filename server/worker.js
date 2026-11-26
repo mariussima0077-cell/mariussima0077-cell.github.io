@@ -694,11 +694,12 @@ async function giftPage(url, env) {
   const num = (x, m) => Math.max(0, Math.min(m, Math.floor(+url.searchParams.get(x) || 0)));
   const dm = num('dm', GIFT_MAX), G = {dm, tk:num('tk', GIFT_MAX), gt:num('gt', GIFT_MAX), ct:num('ct', GIFT_MAX), dk:num('dk', 1000)}, msg = (url.searchParams.get('msg') || '').trim().slice(0, 200), back = `<a href="/admin?key=${k}">← back</a>`;
   const gT = agTxt(G), gQ = `&dm=${G.dm}&tk=${G.tk}&gt=${G.gt}&ct=${G.ct}&dk=${G.dk}`; await agEnsure(db);
-  if (!q) return PAGE('Gift', back + '<div class=c>Write a player name or Player ID.</div>');
+  if (!q) return PAGE('Gift', back + '<div class=c>Write a player name, the in-game ID (number) or Player ID.</div>');
   if (!gT) return PAGE('Gift', back + '<div class=c>Write at least one amount (💎, tickets or keys).</div>');
   // who? exact Player ID · start of a Player ID (8+ characters) · exact name · part of a name
   let rs = [];
-  try { rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE pid=?').bind(q).all()).results;
+  try { if (/^\d{1,10}$/.test(q)) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE uid=?').bind(+q).all()).results;   // v16-370: the short in-game « ID 123 » from the profile (players post it on Discord #free-diamonds)
+    if (!rs.length) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE pid=?').bind(q).all()).results;
     if (!rs.length && q.length >= 8) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE pid LIKE ? LIMIT 5').bind(q + '%').all()).results;
     if (!rs.length) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE nlow=? LIMIT 5').bind(q.toLowerCase()).all()).results;
     if (!rs.length) rs = (await db.prepare('SELECT pid,name,best FROM prof WHERE nlow LIKE ? ORDER BY t DESC LIMIT 20').bind('%' + q.toLowerCase() + '%').all()).results; } catch (e) {}
