@@ -64,7 +64,7 @@ const AMILE = [[3,{dm:50}],[7,{tk:2}],[12,{am:100}],[20,{dm:150,gt:2}],[30,{keys
 const CUP_RW = {1:{dm:2000,tk:50,t:'Champion'}, 2:{dm:1200,tk:30,t:'Final'}, 4:{dm:800,tk:20,t:'Semi-final'}, 8:{dm:500,tk:15,t:'Quarter-final'}, 16:{dm:300,gt:10,t:'Round of 16'}, 32:{dm:150,gt:5,t:'Round of 32'}, 64:{dm:80,gt:3,t:'Round of 64'}};
 const BOTN = ['Rusty_Rick','GearGrinder','Lugnut_Lou','OilSlick','Sparky_88','TorqueTina','Wrenchy','PistonPete','Clutch_Kid','Turbo_Ted','NutBuster','RevLimit','BoltBaron','DieselDan','CamshaftCarl','Brake_Bea','Muffler_Max','HubcapHal','ChromeCleo','Axle_Ace'];
 const HERO_IDS = [['m0_0','m0_1','m0_2','m0_3','m0_4','m0_5','m0_6','m0_7','m0_8','m0_9'],['m1_0','m1_1','m1_2','m1_3','m1_4','m1_5','m1_6'],['m2_0','m2_1','m2_2','m2_3','m2_4','m2_5','m2_6'],
-  ['m3_0','m3_1','m3_2','m3_3','m3_4','m3_5','m3_6'],['m4_0','m4_1','m4_2','m4_3','m4_4','m4_5'],['m5_0','m5_1','m5_2','m5_3','m5_4','m5_5','m5_6','m5_7','m5_8']];
+  ['m3_0','m3_1','m3_2','m3_3','m3_4','m3_5','m3_6'],['m4_0','m4_1','m4_2','m4_3','m4_4','m4_5'],['m5_0','m5_1','m5_2','m5_3','m5_4','m5_5','m5_6','m5_7','m5_8','m5_9']];
 
 // ------------------------------------------------------------------ bad words (masked in chat, refused in names)
 // STEM = rude anywhere in a word ("fucking") · EXACT = only as a whole word (so "computer", "future", "habite", "populară" stay OK)
@@ -255,7 +255,7 @@ async function patList(env, srv) { const t0 = gpT0(srv); if (!t0 || Date.now() <
 async function sysMsg(env, srv, txt) { await env.DB.prepare('INSERT INTO chat(srv,ch,uid,t,txt,lang,sys) VALUES(?,?,0,?,?,?,1)').bind(srv, 'w', Date.now(), txt, 'en').run(); }
 // v16-224 (Marius 23 nov): BIG ANNOUNCEMENTS – the whole server learns when somebody gets a MYTHIC hero or an ASCENDED gear piece.
 // chat row with sys=2 (+ uid of the lucky player, k = JSON data for the golden banner). Every game shows the banner (op 'ann', also in sync).
-const MYTH = {m5_0:'The Torque King', m5_1:'Lady Overdrive', m5_2:'Ignis, the Iron Phoenix', m5_3:'Goliath, the Iron Bulwark', m5_4:'Nova, the Starfire Huntress', m5_5:'Vega, the Railgun Ace', m5_6:'Chroma, the Paint Tempest', m5_7:'Doc Volta, the Pit Medic', m5_8:'Shade, the Ghost Rider'};
+const MYTH = {m5_0:'The Torque King', m5_1:'Lady Overdrive', m5_2:'Ignis, the Iron Phoenix', m5_3:'Goliath, the Iron Bulwark', m5_4:'Nova, the Starfire Huntress', m5_5:'Vega, the Railgun Ace', m5_6:'Chroma, the Paint Tempest', m5_7:'Doc Volta, the Pit Medic', m5_8:'Shade, the Ghost Rider', m5_9:'Anvil, the Crash Tester'};
 const GSL = {tool:'Tool', helm:'Helmet', vest:'Work Vest', glove:'Gloves', boots:'Boots', chip:'ECU Chip'}, GSI = ['tool','helm','vest','glove','boots','chip'];
 const GSET = {engine:['Iron Piston',['Piston Hammer','Piston Helm','Piston Plate','Hydraulic Fists','Piston Boots','Engine Core']], tuning:['Nitro Rush',['Nitro Impact Gun','Nitro Racing Helmet','Nitro Racing Vest','Nitro Gloves','Nitro Jet Boots','Nitro Race ECU']],
   inspect:['Laser Scope',['Laser Scanner','Scope Helmet','Circuit Vest','Laser Gloves','Light-Strip Boots','Scan Crystal']], service:['Field Medic',['Healing Wrench','Medic Helmet','Medic Vest','Healing Gloves','Medic Boots','Heart Chip']],
