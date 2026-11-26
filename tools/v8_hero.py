@@ -53,7 +53,7 @@ HEROES = {
   'm5_1': ('lady', {'idle': 439, 'run': 381, 'attack': 385, 'skill': 372, 'hitko': 384, 'win': 430, 'fx': 372}),
 }
 HEROES['m5_7'] = ('volta', {'idle': 412, 'run': 390, 'attack': 437, 'skill': 405, 'hitko': 393, 'win': 434, 'fx': 330})   # v16-328 DOC VOLTA (new Mythic SUPPORT). REF = frame 1 hair-top → feet (drone excluded); attack = every 2nd frame of attack16a/b
-HEROES['m5_8'] = ('shade', {'idle': 349, 'run': 356, 'attack': 345, 'skill': 345, 'hitko': 385, 'win': 385, 'fx': 345})   # SHADE, THE GHOST RIDER (demo)
+HEROES['m5_8'] = ('shade', {'idle': 349, 'run': 356, 'attack': 345, 'skill': 345, 'hitko': 385, 'win': 385, 'fx': 345})   # SHADE, THE GHOST RIDER
 HID = sys.argv[1] if len(sys.argv) > 1 else 'm5_0'
 SRC = 'img/sheets/%s/%s_%%s.webp' % (HEROES[HID][0], HID)
 ROWS = ['idle', 'run', 'attack', 'skill', 'hitko', 'win']

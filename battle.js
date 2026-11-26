@@ -1245,7 +1245,7 @@ m5_1:{a:[193.3,246],m:[300,150],fire:1,v8:{cw:286,uw:381.3,ax:193.3,ck:4,dsh:[4,
 m5_3:{a:[170.7,246],m:[300,150],v8:{"cw":243,"uw":324.0,"ax":170.7,"rows":[[0,225,300.0,294.7],[225,226,301.3,296.0],[451,273,364.0,340.0],[724,265,353.3,320.0],[989,220,293.3,286.7],[1209,222,296.0,292.0]],ck:5,pk:[5,6,7]},fx8:{"cw":247,"uw":329.3,"ax":165.3,"rows":[[0,315,420.0,397.3]]}}, // v16-132: GOLIATH, THE IRON BULWARK (new Mythic TANK) – 8 frames (tools/v8_hero.py m5_3); ck = shield slam → hex dome (frame 5), pk = dome holds → idle; fxs = hex shield falls → impact (frame 4) → shatters
 m5_4:{a:[118.7,246],m:[190.7,122],col:'#9be7ff',v8:{"cw":188,"uw":250.7,"ax":118.7,"rows":[[0,191,254.7,250.7],[191,192,256.0,252.0],[383,189,252.0,248.0],[572,222,296.0,290.7],[794,195,260.0,254.7],[989,200,266.7,262.7]],"ck":5,"pk":[5,6,7]},fx8:{"cw":181,"uw":241.3,"ax":121.3,"rows":[[0,243,324.0,293.3]]}}, // v16-141: NOVA, THE STARFIRE HUNTRESS (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_4)
 m5_5:{a:[133.3,246],m:[251.3,128],col:'#18ffff',v8:{"cw":216,"uw":288.0,"ax":133.3,"rows":[[0,216,288.0,284.0],[216,209,278.7,272.0],[425,222,296.0,286.7],[647,206,274.7,269.3],[853,203,270.7,266.7],[1056,211,281.3,277.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":353,"uw":470.7,"ax":234.7,"rows":[[0,189,252.0,240.0]]}}, // v16-141: VEGA, THE RAILGUN ACE (Mythic RANGER) – 8 frames (tools/v8_hero.py m5_5)
-m5_8:{a:[160.0,246],m:[260,150],col:'#ff1744',v8:{"cw":232,"uw":309.3,"ax":160.0,"rows":[[0,200,266.7,262.7],[200,201,268.0,262.7],[401,192,256.0,250.7],[593,223,297.3,290.7],[816,202,269.3,264.0],[1018,208,277.3,270.7]],"pk":[7]},fx8:{"cw":232,"uw":309.3,"ax":154.7,"rows":[[0,222,296.0,274.7]]}}, // DEMO: SHADE, THE GHOST RIDER
+m5_8:{a:[160.0,246],m:[260,150],col:'#ff1744',v8:{"cw":232,"uw":309.3,"ax":160.0,"rows":[[0,200,266.7,262.7],[200,201,268.0,262.7],[401,192,256.0,250.7],[593,223,297.3,290.7],[816,202,269.3,264.0],[1018,208,277.3,270.7]],"pk":[7]},fx8:{"cw":232,"uw":309.3,"ax":154.7,"rows":[[0,222,296.0,274.7]]}}, // SHADE, THE GHOST RIDER (v16-340)
 m5_7:{a:[128.0,246],m:[206.7,146],col:'#69f0ae',v8:{"cw":181,"uw":241.3,"ax":128.0,"rows":[[0,197,262.7,258.7],[197,192,256.0,252.0],[389,191,254.7,250.7],[580,220,293.3,286.7],[800,191,254.7,245.3],[991,192,256.0,250.7]]},fx8:{"cw":203,"uw":270.7,"ax":134.7,"rows":[[0,267,356.0,344.0]]}}, // v16-328: DOC VOLTA, THE PIT MEDIC (Mythic SUPPORT, class Elec) – 8 frames (tools/v8_hero.py m5_7)
 m5_6:{a:[112.0,246],m:[188,80],col:'#ff4fd8',v8:{"cw":188,"uw":250.7,"ax":112.0,"rows":[[0,199,265.3,260.0],[199,207,276.0,270.7],[406,190,253.3,249.3],[596,220,293.3,288.0],[816,219,292.0,286.7],[1035,217,289.3,285.3]],"ck":5,"pk":[5,6,7]},fx8:{"cw":207,"uw":276.0,"ax":137.3,"rows":[[0,269,358.7,328.0]]}}, // v16-244: CHROMA, THE PAINT TEMPEST (Mythic MAGE, Paint) – 8 frames (tools/v8_hero.py m5_6); ck = spins the staff → rainbow burst (frame 5), pk = paint orbits → idle; fxs = paint tornado → splash (frame 5)
 m5_2:{a:[148.0,246],m:[300,150],fire:1,v8:{cw:237,uw:316.0,ax:148.0,rows:[[0,196,261.3,256.0],[196,191,254.7,250.7],[387,221,294.7,289.3],[608,238,317.3,304.0],[846,196,261.3,257.3],[1042,219,292.0,286.7]],ck:5,pk:[5,6,7]},fx8:{cw:233,uw:310.7,ax:154.7,rows:[[0,290,386.7,348.0]]}}, // v16-128: IGNIS, THE IRON PHOENIX (new Mythic) – 8 frames (tools/v8_hero.py m5_2); ck = plants the staff → wings open → rises → BURST (frame 4), pk = lands → idle; fxs = fire phoenix dives → impact (frame 4) → embers
@@ -1990,7 +1990,7 @@ function mbPay(){if(!B.mb)return;try{const T=TE(),G=T.G,e=Math.max(1,Math.round(
 // Heroes now block at most DEF_CAP of a hit, so POWER shows the real strength again.
 const DEF_CAP=.6;
 function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
-  if(tgt.hero&&!o.sure&&tgt.h&&tgt.h.id==='m5_8'&&!tgt.stun&&Math.random()<.3){pasTxt(tgt,1,'EVADE');tgt.sstep=1;return 0;} // DEMO Shade: 30% evade
+  if(tgt.hero&&!o.sure&&tgt.h&&tgt.h.id==='m5_8'&&!tgt.stun&&Math.random()<.3){pasTxt(tgt,1,'EVADE');tgt.sstep=1;return 0;} // Shade: 30% evade
   if(tgt.hero&&!o.sure){const dg=pv(tgt,'tuning',1);if(dg&&!tgt.stun&&Math.random()*100<dg){pasTxt(tgt,1,'DODGE');return 0;}}
   let a=src.atk*mult*(src.buff>0?1.3:1)*rnd(.9,1.1);if(src.hero&&src.skK>1&&(o.skill||mult>1.15))a*=src.skK; // v16-99: skill level (+6% skill damage per level)
   a*=tgt.hero?Math.max(1-DEF_CAP,100/(100+tgt.def*3)):100/(100+tgt.def*3);/* v16-235: hero armor max -60% (DEF_CAP) */if(tgt.mark>0)a*=1.35;if(tgt.nmk>0&&src.hero)a*=1+(tgt.nmv||0);
@@ -2298,7 +2298,7 @@ const SKF={
    castAct(u,wd?1.5:.7,()=>{u.post=.6;shake(10);B.flash=.18;
      if(c){const R=130*S;for(const m of alive(B.mons))if(Math.hypot(m.x-c.x,(m.d-c.d)*(FY1-FY0)*1.25)<R){damage(u,m,2.4,{skill:1});m.slow=Math.max(m.slow,3);m.mark=Math.max(m.mark,6);if(FX2&&!FV8(u))fxBolt(m.x,headY(m)-60*S,m.x,headY(m)+20*dsc(m.d),'#9be7ff',22);}
        if(!f8){B.fx.push({type:'ring',x:c.x,y:fy(c.d),t:0,d:.6,r:R,col:'#9be7ff',ground:1});if(FX2&&!FV8(u))fxShock(c.x,fy(c.d),'#80d8ff',R);}sparks(c.x,fy(c.d)-10*S,14,'#e1f5fe');}});},
- m5_8(u){ // DEMO Shade's EXHAUST PHANTOM: he vanishes (skill row = black smoke), appears behind the weakest enemy (fxs = him bursting out + red X), then comes back
+ m5_8(u){ // Shade's EXHAUST PHANTOM: he vanishes (skill row = black smoke), appears behind the weakest enemy (fxs = him bursting out + red X), then comes back
    const ms=alive(B.mons);if(!ms.length)return;let tg=ms[0];for(const m of ms)if(m.hp<tg.hp)tg=m;const f8=FV8(u),D=1.05;
    if(f8)B.fx.push({type:'sheet8',t:-D,d:1.0,sp:u.spr,x:tg.x+30*S,dd:tg.d});
    B.fx.push({type:'call',t:-(D+.62),d:.05,fn:()=>{if(tg.dead)return;shake(14);B.flash=.2;damage(u,tg,3.8,{skill:1,crit:1});for(const m of alive(B.mons))if(m!==tg&&Math.hypot(m.x-tg.x,(m.d-tg.d)*(FY1-FY0)*1.25)<80*S)damage(u,m,1.2,{skill:1});if(!B.sim)sparks(tg.x,headY(tg)+20*dsc(tg.d),16,'#ff1744');}});
@@ -2447,7 +2447,7 @@ function meleeSpot(u,tg,range){const F=FY1-FY0,st=66*S,KD=.72;
     for(const k of [0,1,-1,2,-2,3,-3]){const g=gap(k);if(g<0)continue;const sc=Math.min(g,56*S)/S-Math.abs(k-cur)*9-Math.abs(k)*4;if(sc>bs){bs=sc;best=k;}}u.sK=best;}
   const p=at(u.sK);p[1]=clamp(p[1],.02,.98);u.sP=p;return p;}
 function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
-  if(u.hero&&u.h&&u.h.id==='m5_8'){for(let k=0;k<3;k++)B.fx.push({type:'call',t:-k*.14,d:.05,fn:()=>{if(!tg.dead){damage(u,tg,.4);if(!B.sim)sparks(x,y,5,'#ff1744');}}});return;} // DEMO Shade: 3 quick hits × 40%
+  if(u.hero&&u.h&&u.h.id==='m5_8'){for(let k=0;k<3;k++)B.fx.push({type:'call',t:-k*.14,d:.05,fn:()=>{if(!tg.dead){damage(u,tg,.4);if(!B.sim)sparks(x,y,5,'#ff1744');}}});return;} // Shade: 3 quick hits × 40%
   if(u.hero&&u.tl)talHit(u,tg);
   if(u.hero){const R=u.role,MR=MYTH_RNG[u.h&&u.h.id];
     if(MR||R==='inspect'||R==='elec'||R==='service'||R==='paint')shotFx(u,MR?MR.col:(u.spr&&u.spr.col)||rageCol(u.h&&u.h.id)); // v16-322: recoil + muzzle flash
