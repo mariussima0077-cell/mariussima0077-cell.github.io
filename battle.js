@@ -563,7 +563,7 @@ const SKP={
  // Bruisers (jump + ground slam)
  m0_2:{sk:'WRENCH CRUSHER',skd:'Jumps and smashes the giant wrench down: 260% damage in a small area, stun 1.4s. Gains a 25% shield and taunts.',p:{mult:2.6,rad:80,stun:1.4,col:'#ffab00'}},
  m0_3:{sk:'OIL SLICK SMASH',skd:'Hammer jump into the biggest group: 200% damage, stun 1s and spilled oil slows them 50% for 4s. Shield + taunt.',p:{mult:2,stun:1,slow:4,col:'#a1887f'}},
- m1_0:{sk:'GEAR BREAKER',skd:'Leaps with her wrench and cracks the ground: 230% damage, stun 1.2s and knocks enemies far back. Shield + taunt.',p:{mult:2.3,push:60,col:'#b2ff59'}},
+ m1_0:{sk:'GEAR BREAKER',skd:'Leaps with her wrench and cracks the ground: 230% damage, stuns enemies 1.2s. Shield + taunt.',p:{mult:2.3,push:60,col:'#b2ff59'}},
  m1_1:{sk:'PISTON FURY',skd:'Dumbbell jump slam: 220% damage, stun 1.2s. Then he goes wild: +30% attack and +30% attack speed for 6s.',p:{mult:2.2,rage:6,col:'#76ff03'}},
  m2_0:{sk:'DIESEL CLOUD',skd:'Belly-flop into the enemies: 230% damage, stun 1.2s. Black diesel smoke weakens them: they deal −30% damage for 5s.',p:{mult:2.3,weak:5,col:'#90a4ae'}},
  m2_1:{sk:'CLUTCH SLAM',skd:'Smashes the clutch disc down: 240% damage and a long stun of 2s. Gains a big 40% shield and taunts.',p:{mult:2.4,stun:2,shield:.4,col:'#40c4ff'}},
@@ -583,10 +583,10 @@ const SKP={
  m3_1:{sk:'TOOLBOX FORTRESS',skd:'Slams down his toolbox: heals all mechanics 15% and gives everyone a shield of 30% HP.',p:{heal:.15,hot:0,shield:.3,col:'#b388ff'}},
  // Sprayers (bomb)
  m0_4:{sk:'COLOR SPLASH',skd:'Big paint bomb: 170% damage in a wide area, enemies slowed 50% for 5s, burning paint on the ground.',p:{mult:1.7,rad:115,slow:5,puddle:1}},
- m0_5:{sk:'DENT BLAST',skd:'Heavy paint bomb: 230% damage in a small area, knocks enemies back and stuns 0.8s.',p:{mult:2.3,rad:85,push:40,stun:.8}},
+ m0_5:{sk:'DENT BLAST',skd:'Heavy paint bomb: 230% damage in a small area and stuns 0.8s.',p:{mult:2.3,rad:85,push:40,stun:.8}},
  m1_4:{sk:'ACID BATH',skd:'Acid bomb: 150% damage, acid burns 4s and weakens enemies (−30% damage) for 4s.',p:{mult:1.5,burn:1,weak:4,pal:['#76ff03','#c6ff00','#b2ff59']}},
  m1_5:{sk:'TOXIC GLOSS',skd:'Purple toxic bomb: 170% damage, marks enemies (+35% damage taken) for 6s and slows them 3s.',p:{mult:1.7,mark:6,slow:3,pal:['#d05cff','#e040fb','#7c4dff']}},
- m2_3:{sk:'PRESSURE WASH',skd:'Water bomb: 190% damage, the blast pushes enemies back and stuns them 1.2s.',p:{mult:1.9,stun:1.2,push:50,pal:['#29b6f6','#80d8ff','#e1f5fe']}},
+ m2_3:{sk:'PRESSURE WASH',skd:'Water bomb: 190% damage, the blast stuns enemies 1.2s.',p:{mult:1.9,stun:1.2,push:50,pal:['#29b6f6','#80d8ff','#e1f5fe']}},
  m3_2:{sk:'GLOSS WAVE',skd:'A purple gloss wave sweeps the WHOLE field: 160% damage to every enemy, slowed 50% and marked (+35% damage) for 4s.',p:{wave:1,mult:1.6,slow:4,mark:4,col:'#e040fb'}},
  // Shockers (lightning)
  m0_6:{sk:'SPARK CHAIN',skd:'Lightning jumps 5 times: 200% damage, stun 1.2s.',p:{jumps:5,mult:2,stun:1.2}},
@@ -2008,7 +2008,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   if(!B.sim&&src.hero&&!tgt.hero&&!o.skill&&!LOWRES&&B.t-(tgt.elT||-9)>.12){tgt.elT=B.t;const [ex,ey]=sxy(tgt);elHit(src,ex,ey-(tgt.H||40)*.5*dsc(tgt.d));} // v16-322
   if(!B.sim){if(!tgt.hero&&!LOWRES&&B.t-(tgt.dbT||-9)>.14){tgt.dbT=B.t;const [hx,hy]=sxy(tgt);hitBits(hx,hy-(tgt.H||40)*.45*dsc(tgt.d),crit?4:2);}sfx(tgt.hero?'thud':crit?'crit':'hit');} // v16-319
   if(tgt.wbB){B.wbD+=left;if((o.skill||crit)&&!(tgt.hurtS>-2))tgt.hurtS=.45;if(tgt.hp<1)tgt.hp=tgt.max;} // v16-60: endless HP bars, only the damage counts
-  if(ULT2&&o.skill&&src.hero&&!tgt.hero&&!B.sim&&!tgt.wbB&&tgt.hp>0&&B.fx.some(f=>f.type==='wide8'&&f.u===src&&!f.heroes&&f.t>f.ta-.25&&f.t<f.ta+.6))B.fx.push({type:'kb',m:tgt,t:0,d:.26,v:(tgt.boss?70:330)*S}); // v16-334: pushed back by the ultimate
+  if(ULT2&&o.skill&&src.hero&&!tgt.hero&&!B.sim&&!tgt.wbB&&tgt.hp>0&&B.fx.some(f=>f.type==='wide8'&&f.u===src&&!f.heroes&&f.t>f.ta-.25&&f.t<f.ta+.6)&&0)B.fx.push({type:'kb',m:tgt,t:0,d:.26,v:(tgt.boss?70:330)*S}); // v16-334: pushed back by the ultimate
   const [x]=sxy(tgt);const y=headY(tgt);
   if(FX2&&!B.sim&&!tgt.hero&&(o.skill||crit)){B.hs=Math.max(B.hs,o.skill?.06:.035);fxs('star_04','#ffffff',x,y+22*dsc(tgt.d),{d:.22,s0:20*S,s1:70*S,rot:rnd(0,1),ease:1});}
   num(x,y,(crit?'💥':'')+a,tgt.hero?'#ff8a80':crit?'#ffd54a':'#ffffff',crit?1:0);if(!tgt.hero){const n=B.nums[B.nums.length-1];n.dv=a;n.crit=crit;}
@@ -2121,7 +2121,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
     if(FX2){const pc=['#e0457b','#29b6f6','#ffd21a','#76ff03','#d05cff'];for(let k=0;k<7;k++){const a=k/7*TAU;fxs('smoke_04',pc[k%5],x+Math.cos(a)*R*.35,y0-14+Math.sin(a)*R*.12,{add:0,d:rnd(.8,1.1),s0:30*S,s1:R*rnd(1.1,1.5),a0:.8,rot:rnd(0,TAU),vr:rnd(-1,1),vx:Math.cos(a)*40*S,vy:-20*S,drag:1.5,ease:1});}
       fxBurst(x,y0-14,'#ff4fd8',60*S);fxShock(x,y0,'#d05cff',R*.6);for(let k=0;k<5;k++)fxScorch(x+rnd(-R,R)*.6,y0+rnd(-8,8),pc[k],R*.35,4);}if(P.puddle!==undefined?P.puddle:!P.pal)B.fx.push({type:'puddle',x,y:y0,d0:p.d,t:0,d:4,r:R*.85,src:s,tick:0});shake(8);
     const cols=P.pal||['#e0457b','#29b6f6','#ffd21a','#76ff03','#d05cff'];for(let k=0;k<40;k++){const a=rnd(0,TAU),v=rnd(60,260);part({x,y:y0-10,vx:Math.cos(a)*v,vy:Math.sin(a)*v*.5-120,g:420,life:rnd(.5,.9),r:rnd(2,4),col:cols[k%5],type:'spark'});}
-    for(const m of alive(B.mons))if(Math.hypot(m.x-x,(m.d-p.d)*(FY1-FY0)*1.25)<R){damage(s,m,p.mult||1.8,{skill:1});m.slow=Math.max(m.slow,P.slow||(P.pal?0:4));if(P.stun)m.stun=Math.max(m.stun,P.stun);if(P.push&&!m.boss)m.x+=P.push*S*(m.x>=x?1:.4);if(P.mark)m.mark=Math.max(m.mark,P.mark);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,s);}}}
+    for(const m of alive(B.mons))if(Math.hypot(m.x-x,(m.d-p.d)*(FY1-FY0)*1.25)<R){damage(s,m,p.mult||1.8,{skill:1});m.slow=Math.max(m.slow,P.slow||(P.pal?0:4));if(P.stun)m.stun=Math.max(m.stun,P.stun);if(P.mark)m.mark=Math.max(m.mark,P.mark);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,s);}}}
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
@@ -2218,7 +2218,7 @@ const SKF={
    if(!f8||!(u.spr&&u.spr.v8)){const c=cluster(ms,(P.rad||95)*S)||ms[0];u.act={k:'leap',t:0,dur:.55,x0:u.x,d0:u.d,x1:c.x-24*S,d1:c.d,p:P};u.st='leap';return;}
    castAct(u,.6,()=>{u.post=.6;const ms2=alive(B.mons);if(!ms2.length)return;const c=cluster(ms2,(P.rad||95)*S)||ms2[0],cx=c.x,cd=c.d;B.fx.push({type:'sheet8',t:0,d:.96,sp:u.spr,x:cx,dd:cd});
      B.fx.push({type:'call',t:-.24,d:.05,fn:()=>{const R=(P.rad||95)*S,y=fy(cd),RC=P.col||'#d05cff';shake(14);
-       for(const m of alive(B.mons))if(Math.hypot(m.x-cx,(m.d-cd)*(FY1-FY0)*1.25)<R){damage(u,m,P.mult||2.2,{skill:1});m.stun=Math.max(m.stun,P.stun||1.2);if(!m.boss)m.x+=(P.push||26)*S;if(P.slow)m.slow=Math.max(m.slow,P.slow);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,u);}
+       for(const m of alive(B.mons))if(Math.hypot(m.x-cx,(m.d-cd)*(FY1-FY0)*1.25)<R){damage(u,m,P.mult||2.2,{skill:1});m.stun=Math.max(m.stun,P.stun||1.2);if(P.slow)m.slow=Math.max(m.slow,P.slow);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,u);}
        if(!u.dead){u.taunt=4;u.shield=Math.max(u.shield,u.max*(P.shield||.25));}}});});},
  m3_1(u){const f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Big Mo's TOOLBOX FORTRESS – his own healing dome (8 frames) under every mechanic, brightest (frame 4) when the toolbox hits the ground = heal + shield; same numbers as before
    if(!f8||!(u.spr&&u.spr.v8)){u.act={k:'cast',t:0,dur:.5,fire:()=>skillFire(u)};u.st='cast';return;}
@@ -2389,7 +2389,7 @@ function unitUpdate(u,dt,foes,friends){
       if(k>=1){u.lift=0;const P=a.p||{},R=(P.rad||95)*S,y=fy(u.d),RC=P.col||'#ffab00';B.fx.push({type:'ring',x:u.x+24*S,y,t:0,d:.5,r:R,col:RC,ground:1});B.fx.push({type:'ring',x:u.x+24*S,y,t:-.08,d:.5,r:R*.6,col:'#fff3c4',ground:1});
         smoke(u.x+20*S,y,12,'rgba(150,110,70,.55)',1.3);debris(u.x+20*S,y,10,['#6d4c41','#9e9e9e','#ffca28']);shake(14);
         if(FX2&&!FV8(u)){const lx=u.x+24*S;fxShock(lx,y,RC,R);if(P.weak||P.burn)fxSmoke(lx,y,P.col||'#616161',8,60*S);fxScorch(lx,y,'#2b1a10',R*.7,2.5);fxBurst(lx,y-18*S,'#ff6d00',60*S);fxs('dirt_02','#8d6e63',lx,y-14*S,{add:0,d:.55,s0:40*S,s1:180*S,a0:.95,rot:rnd(0,TAU),ease:1});fxSmoke(lx,y,'#a1887f',6,50*S);B.hs=.12;}
-        for(const m of alive(B.mons))if(Math.hypot(m.x-(u.x+24*S),(m.d-u.d)*(FY1-FY0)*1.25)<R){damage(u,m,P.mult||2.2,{skill:1});m.stun=Math.max(m.stun,P.stun||1.2);if(!m.boss)m.x+=(P.push||26)*S;if(P.slow)m.slow=Math.max(m.slow,P.slow);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,u);}
+        for(const m of alive(B.mons))if(Math.hypot(m.x-(u.x+24*S),(m.d-u.d)*(FY1-FY0)*1.25)<R){damage(u,m,P.mult||2.2,{skill:1});m.stun=Math.max(m.stun,P.stun||1.2);if(P.slow)m.slow=Math.max(m.slow,P.slow);if(P.weak)m.weak=Math.max(m.weak,P.weak);if(P.burn)burnOn(m,u);}
         if(P.rage){u.buff=Math.max(u.buff,P.rage);u.aspdK=Math.max(u.aspd>0?u.aspdK:0,.3);u.aspd=Math.max(u.aspd,P.rage);num(u.x,headY(u)-14,'RAGE!','#ff7043',1);}
         u.taunt=4;u.shield=Math.max(u.shield,u.max*(P.shield||.25));u.act=null;u.st='idle';u.cd=.3;u.land=u.spr&&u.spr.lt||.32;}
       return;}
@@ -2486,7 +2486,7 @@ function sep(list){for(let i=0;i<list.length;i++){const a=list[i];if(a.dead||a.a
 function bw(u){if(u.hero)return 26*dsc(u.d);if(u.boss&&!u.wbB)return bossHW(u)*bossK(u)*.5;const M=MON[u.t];return Math.min(70*S,(M?M.h*M.sc:40)*(u.boss?1:1.22)*.38*dsc(u.d));}
 function sepHM(){const F=FY1-FY0;for(const h of B.heroes){if(h.dead||h.act)continue;for(const m of B.mons){if(m.dead||m.act||m.wbB)continue;
   if(Math.abs(m.d-h.d)*F>40*S)continue;const dx=m.x-h.x,min=(bw(h)+bw(m))*.9,ax=Math.abs(dx);if(ax>=min)continue;
-  const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;if(m.boss)h.x-=dir*o;else{h.x-=dir*o*.5;m.x+=dir*o*.5;}}}}
+  const dir=dx>0||(dx===0&&h.face>0)?1:-1,o=min-ax;h.x-=dir*o;}}} // v16-338 (Marius 26 nov: "să nu se mai împingă monștrii cu eroii"): the monster never moves, the hero stops in front of it
 // v16-206 (tester Wazza4ever 23 nov: Class Tower, came back to the game after a while – the heroes ran on the spot towards 2 Mirror Moths and never hit them).
 // WATCHDOG: if no monster loses HP for 6 s in a fight, every unit is put back in a reachable place (bad numbers fixed, monsters inside the picture,
 // stuck skills / melee places cleared) and each hero is placed in reach of his target. Normal fights never trigger it.
@@ -2556,7 +2556,7 @@ function fxUpdate(f,dt){if(f.type==='chunks'){chunksStep(f,dt);return;}
   else if(f.type==='gear'&&!f.done&&f.t>=f.d*.85)fxUpdateGear(f);
   else if(f.type==='puddle'){f.tick+=dt;if(f.tick>.5){f.tick=0;for(const m of alive(B.mons))if(Math.hypot(m.x-f.x,(m.d-f.d0)*(FY1-FY0)*1.25)<f.r){damage(f.src,m,.22,{noCrit:1,skill:1});m.slow=Math.max(m.slow,.6);}}}
   else if(f.type==='quake'){const x=lerp(f.x0,W+90*S,Math.max(0,f.t/f.d));f.fx=x;if(Math.random()<.5)debris(x,fy(rnd(.1,.9)),2,['#6d4c41','#9e9e9e','#ffca28']);if(f.t<f.d*.8)B.shake=Math.max(B.shake,5);
-    for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);damage(f.src,m,2.3,{skill:1});m.stun=Math.max(m.stun,1.6);if(!m.boss)m.x+=22*S;sparks(m.x,headY(m)+20,10,'#ffd54a');if(FX2&&!FV8(f.src))fxBurst(m.x,fy(m.d)-20*S,'#ffab00',40*S);}}
+    for(const m of alive(B.mons))if(!f.hit.has(m)&&m.x<=x){f.hit.add(m);damage(f.src,m,2.3,{skill:1});m.stun=Math.max(m.stun,1.6);sparks(m.x,headY(m)+20,10,'#ffd54a');if(FX2&&!FV8(f.src))fxBurst(m.x,fy(m.d)-20*S,'#ffab00',40*S);}}
   else if(f.type==='strike'&&!f.done&&f.t>=0){f.done=true;const ms=alive(B.mons);if(ms.length){const m=ms[Math.floor(Math.random()*ms.length)],x=m.x,y=headY(m)+22*dsc(m.d);
     B.fx.push({type:'bolt',x0:x+rnd(-30,30)*S,y0:f.top,x1:x,y1:y,t:0,d:.28,col:'#ffe066'});damage(f.src,m,1.5,{skill:1});m.stun=Math.max(m.stun,1);sparks(x,y,10,'#fff176',220);shake(5);
     if(FX2&&!FV8(f.src)){fxBolt(x,f.top,x,y,'#ffd54a',60);fxs('spark_02','#fff59d',x,y,{d:.35,s0:40*S,s1:110*S,rot:rnd(0,TAU),ease:1});fxBurst(x,y,'#ffd54a',40*S);}}}
