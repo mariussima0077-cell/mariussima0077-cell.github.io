@@ -1211,12 +1211,13 @@ const BROLE={tank:{n:'TANK',c:'#6ec6ff'},warrior:{n:'WARRIOR',c:'#ff6e5a'},range
 const CLS2ROLE={engine:'tank',tuning:'warrior',inspect:'ranger',paint:'mage',elec:'mage',service:'support'},MYTH_ROLE={m5_0:'mage',m5_1:'warrior',m5_2:'support',m5_3:'tank',m5_4:'ranger',m5_5:'ranger',m5_6:'mage',m5_7:'support',m5_8:'warrior',m5_9:'tank'};
 // v16-141: the two Mythic RANGERS shoot from far away (Legend class is melee): range + a bit less HP / DEF
 // v16-349 (Marius 26 nov): every ROLE must be good at its job – Mythic stats by role (they all shared the 'Legend' template)
-const MYTH_RK={m5_3:{hp:1.35,def:1.4,atk:.8},m5_9:{hp:1.35,def:1.4,atk:.8},m5_1:{hp:1.05,def:1.05,atk:1.15},m5_8:{hp:.85,def:.85,atk:1.2},m5_0:{hp:.95},m5_2:{def:1.15,atk:.85}};
+const MYTH_RK={m5_3:{hp:1.35,def:1.4,atk:.8},m5_9:{hp:1.35,def:1.4,atk:.8},m5_1:{hp:1.05,def:1.05,atk:1.15},m5_8:{hp:.85,def:.85,atk:1.2},m5_2:{def:1.15,atk:.85}};
 // role bonuses in battle (all grades): warrior lifesteal · ranger +20% vs bosses · mage +20% skill damage · support +20% heals & shields
 const RB_LS=[6,7,8,9,10,12],RB_BOSS=.2,RB_MAGE=1.2,RB_SUP=1.2;
 function roleBonTxt(h){const k=bRoleOf(h);if(!k)return '';return {tank:'TANK · highest HP &amp; DEF – protects the team',warrior:'WARRIOR · heals '+RB_LS[h.gr||0]+'% of the damage he deals',ranger:'RANGER · +20% damage to bosses &amp; mini bosses',mage:'MAGE · +20% skill damage',support:'SUPPORT · +20% heals &amp; shields'}[k];}
-const MYTH_RNG={m5_7:{rng:210,hp:.85,def:.8,as:1,col:'#69f0ae',w:4},m5_6:{rng:200,hp:.82,def:.75,as:1,col:'#ff4fd8',w:4},m5_4:{rng:215,hp:.8,def:.75,as:1,col:'#9be7ff',w:3},m5_5:{rng:235,hp:.78,def:.7,as:1.12,col:'#18ffff',w:5}};
+const MYTH_RNG={m5_0:{rng:195,hp:.85,def:.8,as:1,col:'#ffd54a',w:4},m5_2:{rng:190,hp:.88,def:.8,as:1,col:'#ff7043',w:5},m5_7:{rng:210,hp:.85,def:.8,as:1,col:'#69f0ae',w:4},m5_6:{rng:200,hp:.82,def:.75,as:1,col:'#ff4fd8',w:4},m5_4:{rng:215,hp:.8,def:.75,as:1,col:'#9be7ff',w:3},m5_5:{rng:235,hp:.78,def:.7,as:1.12,col:'#18ffff',w:5}};
 function bRoleOf(h){if(!h||h.crew)return null;return MYTH_ROLE[h.id]||CLS2ROLE[roleOf(h)]||null;}
+const isRngH=h=>((MYTH_RNG[h.id]&&MYTH_RNG[h.id].rng)||ROLE[roleOf(h)].rng)>=80; // v16-384: Mythic ranged heroes show 'Ranged'
 const RLI=k=>'img/ui12/role_'+k+'.webp';
 const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
 function teamRoles(tl){const have=new Set(tl.filter(Boolean).map(bRoleOf).filter(Boolean));return {have,n:have.size,bon:TR_BON[have.size]||0};}
@@ -2522,7 +2523,7 @@ function doHit(u,tg){const [x]=sxy(tg),y=headY(tg)+16*dsc(tg.d);
     if(MR||R==='inspect'||R==='elec'||R==='service'||R==='paint')shotFx(u,MR?MR.col:(u.spr&&u.spr.col)||rageCol(u.h&&u.h.id)); // v16-322: recoil + muzzle flash
     if(MR&&u.h.id==='m5_4'&&!B.sim){shoot(u,tg,'arrow',1,{spd:950});return;}
     if(MR&&u.h.id==='m5_7'){voltaHeal(u,.04);} // v16-328 Doc Volta: every shot also heals the most hurt ally // v16-322: Nova's real arrow flies (damage when it lands)
-    if(MR){const [bx,sy]=muzzle(u,40,40);B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w});if(FX2&&!FV8(u))fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');mythHit(u,tg,x,y);return;} // v16-141: Nova arrow / Vega railgun shot
+    if(MR){const [bx,sy]=muzzle(u,40,40);if(u.h.id==='m5_0'){B.fx.push({type:'bolt',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.24,col:MR.col});if(FX2&&!FV8(u))fxBolt(bx,sy,x,y,MR.col,34);}else B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.2,col:MR.col,w:MR.w}); /* v16-384 (Marius 27 nov): Torque King (mage) + Ignis (support) attack from the back row – gold lightning / fire beam */if(FX2&&!FV8(u))fxs('circle_05',MR.col,x,y,{d:.22,s0:14*S,s1:46*S});damage(u,tg,1);sparks(x,y,6,'#e0f7fa');mythHit(u,tg,x,y);return;} // v16-141: Nova arrow / Vega railgun shot
     if(R==='inspect'){const [bx,sy]=muzzle(u,14,40),bc=sprOK(u.spr)?u.spr.col||'#ff5252':'#64ffda';B.fx.push({type:'beam',x0:bx,y0:sy,x1:x,y1:y,t:0,d:.26,col:bc,w:sprOK(u.spr)?4:3});if(FX2&&!FV8(u)){fxs('circle_05',bc,x,y,{d:.22,s0:14*S,s1:44*S});if(!sprOK(u.spr))fxs('circle_05',bc,bx,sy,{d:.15,s0:10*S,s1:26*S});}damage(u,tg,1);sparks(x,y,5,'#a7ffeb');const ws=pv(u,'inspect',0);if(ws&&++u.shots%ws===0&&!tg.dead){tg.mark=Math.max(tg.mark,3);pasTxt(u,0);}}
     else if(R==='elec'){const [ex,ey]=muzzle(u,20,44),ec=u.spr&&u.spr.col;B.fx.push({type:'bolt',x0:ex,y0:ey,x1:x,y1:y,t:0,d:.24,col:ec});if(FX2&&!FV8(u)){fxBolt(ex,ey,x,y,ec||'#40c4ff',34);fxs('circle_05','#80d8ff',x,y,{d:.2,s0:16*S,s1:40*S});}damage(u,tg,1);sparks(x,y,6,'#80d8ff');
       const sc=pv(u,'elec',1);if(sc&&!tg.dead&&Math.random()*100<sc){tg.stun=Math.max(tg.stun,.6);pasTxt(u,1);}
@@ -3371,13 +3372,13 @@ function popTeamCmp(k,newId){const T=TE(),si=tsi,ep=tEP();const Lb=tsel.map(hero
   if(oldH&&newH&&skOf(oldH).sk!==skOf(newH).sk){xp.push(`New skill: <b>${skOf(newH).sk}</b> – ${skOf(newH).skd}`);xc.push(`Loses skill: <b>${skOf(oldH).sk}</b>`);}
   if(newH)pasOf(newH).forEach(p=>{if(!oldH||!pasOf(oldH).some(q=>q.n===p.n&&q.d===p.d))xp.push(`Passive: <b>${p.ic} ${p.n}</b> – ${p.d}`);});
   if(oldH)pasOf(oldH).forEach(p=>{if(!newH||!pasOf(newH).some(q=>q.n===p.n))xc.push(`Loses passive: <b>${p.ic} ${p.n}</b>`);});
-  if(oldH&&newH&&(ROLE[ro].rng>=80)!==(ROLE[rn].rng>=80))(ROLE[rn].rng>=80?xp:xc).push(ROLE[rn].rng>=80?'Attacks from far away (safer)':'Fights up close (takes more hits)');
+  if(oldH&&newH&&isRngH(oldH)!==isRngH(newH))(isRngH(newH)?xp:xc).push(isRngH(newH)?'Attacks from far away (safer)':'Fights up close (takes more hits)');
   if(!newH)xc.push('Team has only '+La.length+' mechanics');
   if(oldH&&!oldH.crew&&heroGear(oldH.id).length)xc.push(`${oldH.n}'s gear stays with ${oldH.n}`);
   let x=`<div class="pT">Before / After</div><div class="pD">${newH?(oldH?'Replace in the battle team':'Add to the battle team'):'Remove from the battle team'} · ${TCX?TCX.t:'stage '+sLabel(si)}</div>
    <div class="cmp">${miniCard(oldH,'BEFORE')}<div class="cmA">➜</div>${miniCard(newH,'AFTER')}</div>`;
   x+=`<div class="ct tx"><div class="ch"><span></span><b>Before</b><b>After</b></div><div><span>Role</span><b>${oldH?IMGI(roleBadge(ro),'1.1em','-.22em')+' '+ROLE[ro].n:'—'}</b><b>${newH?IMGI(roleBadge(rn),'1.1em','-.22em')+' '+ROLE[rn].n:'—'}</b></div>
-   <div><span>Skill</span><b>${oldH?skOf(oldH).sk:'—'}</b><b>${newH?skOf(newH).sk:'—'}</b></div><div><span>Range</span><b>${oldH?(ROLE[ro].rng>=80?'Ranged':'Melee'):'—'}</b><b>${newH?(ROLE[rn].rng>=80?'Ranged':'Melee'):'—'}</b></div></div>`;
+   <div><span>Skill</span><b>${oldH?skOf(oldH).sk:'—'}</b><b>${newH?skOf(newH).sk:'—'}</b></div><div><span>Range</span><b>${oldH?(isRngH(oldH)?'Ranged':'Melee'):'—'}</b><b>${newH?(isRngH(newH)?'Ranged':'Melee'):'—'}</b></div></div>`;
   x+=cmpBlock(oldH&&unitStats(oldH),newH&&unitStats(newH),oldH?pow(oldH):0,newH?pow(newH):0,xp,xc);
   x+=`<div class="tpw">${IMGI(PWU,'1.2em','-.25em')} TEAM POWER <b>${tpb.toLocaleString()}</b> ${tag(tpb)} ➜ <b>${tpa.toLocaleString()}</b> ${tag(tpa)} <small>vs ${ep.toLocaleString()}</small></div>`;
   x+=`<button class="cpGo" data-p="tok" data-k="${k}" data-id="${newId||''}">✓ CONFIRM</button><button class="cpGo alt" data-p="x">CANCEL</button>`;
