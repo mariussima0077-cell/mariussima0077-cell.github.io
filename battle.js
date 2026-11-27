@@ -390,6 +390,11 @@ const css3=document.createElement('style');css3.textContent=`
 .scS i.ok{background:linear-gradient(#1f4a1f,#0e2410);box-shadow:inset 0 0 0 1.5px #66bb6a;opacity:1}.scS i.ok small{color:#b9f6ca}.scS i.nx{box-shadow:inset 0 0 0 1.5px #ffd54a;opacity:1}.scS i.nx small{color:#ffe9a8}
 .scN{margin-top:5px;font:700 10.5px Game,system-ui;color:#c9d6e6;text-align:center}.scN.ok{color:#9ff0a8}
 /* v16-375 CRYSTAL COLLECTION + TORQUE LINK */
+/* v16-376 (Marius: „refac taburile?”): the step tiles of STAR + CRYSTAL COLLECTION use the game's slot frames (img/ui5/slot0 locked · slot1 next · slot2 done = green copy of slot1), 9-slice */
+.scS i,.scS i.ok,.scS i.nx{background:none!important;box-shadow:none!important;border:0;border-image:url(img/ui5/slot0.webp) 46 fill/11px/1px stretch;padding:7px 4px 8px;opacity:1}
+.scS i.nx{border-image-source:url(img/ui5/slot1.webp);border-image-outset:4px}.scS i.ok{border-image-source:url(img/ui5/slot2.webp);border-image-outset:4px}
+.scS i b,.scS i small{text-shadow:0 1px 2px #000,0 0 3px #000}.scS i:not(.ok):not(.nx) b{color:#c9d2dd}.scS i:not(.ok):not(.nx) small{color:#8796a8}
+.scS{gap:6px}
 .cryS{grid-template-columns:repeat(5,minmax(0,1fr))}.cryR .scH b small{font:700 10px Game,system-ui}
 .cryBar{height:9px;margin:6px 2px 2px;border-radius:6px;background:#0b1424;box-shadow:inset 0 0 0 1px #34465f;overflow:hidden}.cryBar i{display:block;height:100%;background:linear-gradient(90deg,#1b8f2e,#6dff7a);border-radius:6px}
 .cryG{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;margin-top:5px}.cryG span{display:flex;flex-direction:column;align-items:center;padding:3px 1px;border-radius:8px;background:#0b1424;box-shadow:inset 0 0 0 1px #34465f;font:400 11px Lilita,Game,system-ui;letter-spacing:.2px}
