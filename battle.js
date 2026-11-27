@@ -3373,7 +3373,9 @@ let tsel=[],tsi=0,TCX=null; // v16-99: TCX = team screen opened from Tower / Cla
 const tPool=()=>TCX?TCX.pool():[...myMechs(),...[0,1,2,3,4].map(crewHero)],tEP=()=>TCX?TCX.ep():enemyPower(tsi),tBest=()=>TCX?TCX.best():bestTeam();
 function tSave(){const T=TE();if(TCX)TCX.set(tsel.slice());else T.G.cp.team=tsel.slice();T.save();}
 const isTank=r=>r==='engine'||r==='all';
-function curTeamList(){const T=TE(),G=T.G;let ids=(G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&G.h.own[id]);if(!ids.length)ids=bestTeam();return ids.slice(0,TMAX).map(heroOf);}
+function curTeamList(){const T=TE(),G=T.G;let ids=(G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&G.h.own[id]);
+  // v16-378 (Marius 27 nov: „obligă jucătorii să mai adauge unul”): old 5-hero teams get their 6th hero by themselves (the strongest one not in the team), once
+  if(ids.length&&ids.length<TMAX&&!G.cp.t6){G.cp.t6=1;const add=myMechs().filter(h=>!ids.includes(h.id)).slice(0,TMAX-ids.length).map(h=>h.id);if(add.length){ids=ids.concat(add);G.cp.team=ids.slice();try{T.save();setTimeout(()=>T.toast('🦸 BATTLE TEAM: 6 places now – your 6th hero joined the team!',3500),2500);}catch(e){}}}if(!ids.length)ids=bestTeam();return ids.slice(0,TMAX).map(heroOf);}
 function teamDiff(Lb,La){const cb=Lb.map(h=>roleOf(h)),ca=La.map(h=>roleOf(h)),pros=[],cons=[];
   const med=l=>l.filter(r=>r==='service').length,tank=l=>l.filter(isTank).length,rng=l=>l.filter(r=>ROLE[r].rng>=80).length;
   if(med(cb)&&!med(ca))cons.push('No Medic left – nobody heals the team');if(!med(cb)&&med(ca))pros.push('Team gets a Medic – heals everybody');

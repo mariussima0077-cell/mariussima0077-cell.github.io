@@ -14,7 +14,7 @@ const TIERS = [[0,0,'III'],[1050,0,'II'],[1100,0,'I'],[1150,1,'III'],[1250,1,'II
   [1720,3,'III'],[1820,3,'II'],[1920,3,'I'],[2020,4,'III'],[2140,4,'II'],[2260,4,'I'],[2400,5,'']];
 export const tierOf = p => { let t = TIERS[0]; for (const x of TIERS) if (p >= x[0]) t = x; const i = TIERS.indexOf(t), nx = TIERS[i + 1];
   return {lg:t[1], div:t[2], name:LEAGUES[t[1]] + (t[2] ? ' ' + t[2] : ''), from:t[0], next:nx ? nx[0] : null}; };
-const MIN_CV = 88;   // v16-88: minimum game version allowed online (see CV in online.js)
+const MIN_CV = 378;   // v16-378 (Marius 27 nov): everyone must take the 6-hero BATTLE TEAM (Arena 6 vs 6)
 // v16-85: VIP level is computed HERE from the VIP points the anti-cheat bot already has (players.vip),
 // never taken from the client (old app versions sent POINTS as the level → 'VIP 15' at stage 1-13).
 const VIP_PTS = [0, 100, 1300, 2850, 4900, 7500, 10600, 14200, 18300, 22900, 28000];   // v16-122: VIP 1-10 (same as index.html)
