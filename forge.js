@@ -69,7 +69,7 @@ const css=document.createElement('style');css.textContent=`
 #fgP{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(2,3,6,.82);font-family:Game,system-ui,sans-serif;color:#fff}
 #fgP.open{display:flex}
 #fgPB{position:relative;width:min(92vw,380px);max-height:92vh;overflow:auto;border-radius:16px;border:2px solid var(--gc);background:linear-gradient(#1d2129,#0e1116);box-shadow:0 0 24px #000,0 0 14px var(--gc);padding:14px 14px 12px}
-.fgX{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:50%;border:2px solid #ffd54a;background:#2a1d0a;color:#ffd54a;font:900 16px Game,system-ui}
+.fgX{position:absolute;right:6px;top:6px;width:44px;height:30px;border:0;background:url(img/ui8/ic_close.webp) center/contain no-repeat;font-size:0}
 .fgTop{display:flex;gap:12px;align-items:center;padding-right:34px}
 .fgSl{position:relative;width:92px;height:92px;flex:none;background:url(img/forge/slot.webp) center/100% 100% no-repeat;filter:drop-shadow(0 0 8px var(--gc))}
 .fgSl img{position:absolute;left:16%;top:18%;width:68%;height:68%;object-fit:contain}
@@ -79,8 +79,8 @@ const css=document.createElement('style');css.textContent=`
 .fgNx{margin-top:10px;border-radius:12px;border:1px solid #2a2f36;background:#161a20;padding:10px}.fgNx.bt{border-color:var(--nc);background:#24171a}
 .fgNh{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:14px}.fgNh span{color:var(--nc)}.fgNh b{font-size:20px}
 .fgNd{font-size:11.5px;color:#c9d1d9;margin:5px 0;line-height:1.35}.fgCo{font-size:12px;color:#ffd9a0;margin-bottom:8px}
-.fgGo{width:100%;height:48px;border-radius:12px;border:2px solid #ffd54a;background:linear-gradient(#ffb74d,#ef6c00);color:#2a1000;font:900 16px Game,system-ui;box-shadow:0 3px 0 #6d3a00}
-.fgGo.bt{background:linear-gradient(#fff,var(--nc));}.fgGo.off{background:#2a2f36;color:#77808a;border-color:#3a414a;box-shadow:none}
+.fgGo{width:100%;height:48px;--bh:48px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;box-shadow:none;border-radius:0;color:#3a2300;font:900 italic 16px Game,system-ui}
+.fgGo.bt{border-image-source:url(img/ui8/btn_red_s.webp);color:#fff;text-shadow:0 2px 0 #0008}.fgGo.off{border-image-source:url(img/ui8/btn_grey_s.webp);color:#e8edf2;text-shadow:0 1px 0 #0008}
 .fgMsg{min-height:18px;text-align:center;font-weight:900;font-size:13px;margin-top:6px}
 .fgRes{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;font-size:12px;margin-top:8px;color:#ffe0b2}
 #fg{position:fixed;inset:0;z-index:30;display:none;justify-content:center;background:#07090d;font-family:Game,system-ui,sans-serif;color:#fff}
@@ -89,25 +89,25 @@ const css=document.createElement('style');css.textContent=`
 #fgW::before{content:'';position:absolute;inset:0;background:linear-gradient(#0008,#000b 45%,#000d);pointer-events:none}
 .fgHd{position:relative;padding:calc(env(safe-area-inset-top) + 8px) 8px 4px;display:flex;align-items:center;gap:6px}
 .fgHd img{flex:1;min-width:0;height:auto;max-height:62px;object-fit:contain}
-.fgBk{width:42px;height:42px;flex:none;border-radius:12px;border:2px solid #ffd54a;background:#2a1d0a;color:#ffd54a;font:900 18px Game,system-ui}
+.fgBk{width:56px;height:38px;flex:none;border:0;background:url(img/ui8/ic_back.webp) center/contain no-repeat;font-size:0}
 .fgRb{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:3px 9px;padding:4px 8px;font-size:12px;font-weight:900;background:#0009;border-top:1px solid #ffd54a33;border-bottom:1px solid #ffd54a33}
 .fgTb{position:relative;display:flex;gap:6px;padding:8px 10px}
-.fgTb button{flex:1;height:42px;border-radius:10px;border:1px solid #3a414a;background:#20252bdd;color:#c9d1d9;font:900 13px Game,system-ui;position:relative}
-.fgTb button.on{background:linear-gradient(#ffb74d,#ef6c00);color:#1a1208;border-color:#ffd54a}
+.fgTb button{flex:1;height:40px;--bh:40px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_grey_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;box-shadow:none;border-radius:0;color:#e8edf2;font:900 italic 13px Game,system-ui;text-shadow:0 1px 0 #0008;position:relative}
+.fgTb button.on{border-image-source:url(img/ui8/btn_gold_s.webp);color:#3a2300;text-shadow:none}
 .fgTb i{position:absolute;right:4px;top:4px;width:9px;height:9px;border-radius:50%;background:#ff2b2b;border:1.5px solid #fff}
 .fgBd{position:relative;flex:1;overflow:auto;padding:4px 10px calc(env(safe-area-inset-bottom) + 18px)}
 .fgGr{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.fgC{position:relative;border-radius:10px;background:#11151bcc;border:2px solid var(--gc);padding:4px 2px 3px;text-align:center;font-size:9px;font-weight:900;color:#fff}
-.fgC img{width:100%;aspect-ratio:1;object-fit:contain;display:block}.fgC.lk{opacity:.4;filter:grayscale(1)}
-.fgC small{display:block;color:var(--gc);font-size:9px}.fgC i{position:absolute;right:2px;top:2px;width:10px;height:10px;border-radius:50%;background:#ff2b2b;border:1.5px solid #fff}
+.fgC{position:relative;text-align:center;font-size:9px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
+.fgC .fr{position:relative;width:100%;aspect-ratio:220/221;background:var(--fr) center/100% 100% no-repeat}.fgC .fr img{position:absolute;left:14%;top:14%;width:72%;height:72%;object-fit:contain}.fgC.lk{opacity:.4;filter:grayscale(1)}
+.fgC small{display:block;color:var(--gc);font-size:9px}.fgC i{position:absolute;right:0;top:0;width:10px;height:10px;border-radius:50%;background:#ff2b2b;border:1.5px solid #fff}
 .fgBx{margin-top:10px;border-radius:12px;background:#11151bdd;border:1px solid #ffd54a44;padding:9px 10px}
 .fgBx h4{margin:0 0 4px;font-size:13px;color:#ffb347;letter-spacing:.5px}.fgBx p{margin:0 0 6px;font-size:11px;color:#9aa4ae;line-height:1.35}
 .fgRow{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;color:#6c757d}.fgRow.on{color:#ffd54a}
 .fgTr{border-radius:12px;background:#11151bdd;border:1px solid #3a414a;padding:9px 10px;margin-top:8px}
 .fgTr .h{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:14px}.fgTr .h span{font-size:12px;color:#ffb347}
 .fgTr .m{font-size:11px;color:#9aa4ae;margin:4px 0}.fgTr .b{height:7px;border-radius:4px;background:#2a2f36;overflow:hidden}.fgTr .b i{display:block;height:100%;background:#5ec2ff}
-.fgTr .a{display:flex;gap:6px;margin-top:8px}.fgTr .a button{flex:1;height:44px;border-radius:10px;border:0;background:linear-gradient(#80d8ff,#0288d1);color:#06121c;font:900 12px Game,system-ui}
-.fgTr .a button.off{background:#2a2f36;color:#77808a}
+.fgTr .a{display:flex;gap:6px;margin-top:8px}.fgTr .a button{flex:1;height:44px;--bh:44px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_blue_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;box-shadow:none;border-radius:0;color:#fff;font:900 italic 12px Game,system-ui;text-shadow:0 1px 0 #0008}
+.fgTr .a button.off{border-image-source:url(img/ui8/btn_grey_s.webp);color:#cfd8dc}
 .fgBs{position:relative;margin-top:4px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 70%,#5a2a12,#140b07 75%);border:1px solid #6b3a1c;height:230px;display:flex;align-items:flex-end;justify-content:center}
 .fgBs img{height:96%;object-fit:contain}.fgBs b{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:22px;color:#ff9d3a;text-shadow:0 2px 4px #000}
 `;document.head.appendChild(css);
@@ -141,7 +141,7 @@ function tryUp(id){if(!id||!can(id))return;const f=S(),c=cost(id),ch=chance(id),
   f.mc-=c.mc;
   if(win){f.lv[id]=c.L+1;f.pt[id]=0;if(c.bp)f.bp[c.bp]--;MOK=1;MSG=c.b?'🔥 <span>BREAKTHROUGH!</span> <span style="text-transform:uppercase">'+GN[c.t]+'</span>':'✔ Lv '+(c.L+1);sfx(c.b?'levelup':'upgrade');}
   else{MOK=0;if(c.b){f.pt[id]=(f.pt[id]||0)+PITY[c.t];MSG='✖ <span>Failed</span> · <span>+'+PITY[c.t]+'% chance next time</span>';}else MSG='✖ Failed – try again';sfx('deny');}
-  MCK='';T().save();renderTool();}
+  MCK='';T().save();renderTool();refresh();} // refresh(): the hero page behind the popup shows the new power at once (Marius)
 
 // ---------------------------------------------------------------- THE FORGE page
 let TAB='tools';
@@ -167,7 +167,7 @@ function renderPage(){const f=S(),W=$('fgW'),n=now();
   h+='<div class="fgRb">'+MCI()+' '+f.mc.toLocaleString()+[1,2,3,4,5,6].map(i=>'<span>'+BPI(i)+' '+f.bp[i]+'</span>').join('')+'</div>';
   h+='<div class="fgTb">'+[['tools','TOOLS',td],['junk','JUNKYARD',jd],['boss','SCRAP GOLEM',bd]].map(([k,t,d])=>'<button data-p="tab" data-t="'+k+'" class="'+(TAB===k?'on':'')+'">'+t+(d?'<i></i>':'')+'</button>').join('')+'</div><div class="fgBd">';
   if(TAB==='tools'){
-    h+='<div class="fgGr">'+MY.map(id=>{const L=lv(id),g=gOf(L),H=T().HB[id];return '<div class="fgC'+(own(id)?'':' lk')+'" data-p="tool" data-h="'+id+'" style="--gc:'+GC[g]+'"><img src="img/forge/tool_'+id+'.webp" alt="">'+(H?String(H.n).split(',')[0]:id)+'<small>Lv '+L+'</small>'+(can(id)?'<i></i>':'')+'</div>';}).join('')+'</div>';
+    h+='<div class="fgGr">'+MY.map(id=>{const L=lv(id),g=gOf(L),H=T().HB[id];return '<div class="fgC'+(own(id)?'':' lk')+'" data-p="tool" data-h="'+id+'" style="--gc:'+GC[g]+';--fr:url(img/fr'+g+'.webp)"><div class="fr"><img src="img/forge/tool_'+id+'.webp" alt=""></div>'+(H?String(H.n).split(',')[0]:id)+'<small>Lv '+L+'</small>'+(can(id)?'<i></i>':'')+'</div>';}).join('')+'</div>';
     const N=collN();
     h+='<div class="fgBx"><h4>TOOL COLLECTION</h4><p>2 tools of different heroes at the same grade → a bonus for ALL your heroes.</p>'+CB.map(([g,nm,st,v])=>'<div class="fgRow'+(N[g]>=2?' on':'')+'"><span style="color:'+(N[g]>=2?GC[g]:'')+'">2 × '+nm+' ('+Math.min(2,N[g])+'/2)</span><b>+'+v+'% '+(st==='all'?'ATK, HP, DEF &amp; skill':st==='sd'?'skill damage':st.toUpperCase())+'</b></div>').join('')+'</div>';
     h+='<div class="fgBx"><h4>HOW IT WORKS</h4><p>Every Mythic hero has a SIGNATURE TOOL (also on the hero page, under the hero). Lv 0 → 70 · every 10 levels a BREAKTHROUGH to the next grade: Common → Uncommon → Rare → Epic → Legendary → Mythic → Transcendent. Levels use Molten Core; a breakthrough also needs a Blueprint of the next colour. Chances get lower at every grade – every failed breakthrough adds chance.</p></div>';}

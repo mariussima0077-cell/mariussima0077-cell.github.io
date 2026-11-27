@@ -4385,7 +4385,7 @@ async function wbRank(){const w=wbG(),esc=s=>String(s).replace(/[&<>"]/g,c=>'&#'
   x+='<div class="wS">WEEKLY REWARDS · BY MAIL ON MONDAY</div>'+WB_RANK.map((q,i)=>wRowB(5-i,'<b>'+(q[0]===q[1]?'#'+q[0]:'#'+q[0]+' – '+q[1])+'</b>',null,wbRwHtml(q[2]))).join('');
   popW('DAMAGE RANKING',x);}
 // v16-388 THE FORGE · SCRAP GOLEM: same fight as the World Boss (60 s, endless HP bars, only the damage counts) – tries, rewards and the result live in forge.js
-function fgFight(L){const eq=wbEq();return {wb:1,fg:1,f:0,eq,mod:-1,mul:stageMul0(eq)*.6,L,weak:'elec',boss:true,mini:false,w:[['golem']],st:{n:'SCRAP GOLEM',bio:18,w:[['golem']],boss:true,mini:false}};}
+function fgFight(L){const eq=wbEq();return {wb:1,fg:1,f:0,eq,mod:-1,mul:stageMul0(eq)*.6,L,weak:null,boss:true,mini:false,w:[['golem']],st:{n:'SCRAP GOLEM',bio:18,w:[['golem']],boss:true,mini:false}};}
 function fgGo(L){let team=teamHeroes();if(!team||!team.length)team=bestTeam().map(heroOf);rootOn();['cpGear','cpPop','hub','wb','tw','ct'].forEach(id=>{const e=$(id);if(e)e.classList.remove('open');});
   try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad('golem2');safeStart(wbEq(),team,fgFight(L));return !!(B&&B.wbB&&running);}
 function fgFinish(win,retreat){const dmg=Math.round(B.wbD||0),r=window.TFORGE?TFORGE.bossDone(dmg):{html:''};
