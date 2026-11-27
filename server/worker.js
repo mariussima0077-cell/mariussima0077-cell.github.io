@@ -308,8 +308,16 @@ async function scan(env) {
     // two phones looked like "+480 VIP in 24 h" while the game really gave 165. Now the LEDGER (what the game really gave, today +
     // yesterday) must ALSO be too high – a phone switch alone is never a flag.
     const lg2 = (await db.prepare('SELECT SUM(m) m, SUM(vip) v FROM ledg WHERE pid=? AND day>=?').bind(p.pid, parisDay(now - day)).first()) || {};
-    const capM = capPerSec(p.lv) * dt / 4 + 5e7;
-    if (r.m1 - r.m0 > capM && (lg2.m || 0) > capM) why.push('24h money too high');
+    // 27 nov (Adi, false alarm): the old cap (income × time / 4) forgot what the game really pays on top of the buildings:
+    // extra levels 11-100 (+2 % each, not in 'lv'), Classic Collection bonus, the idle chest + 3 Quick Idle and money from Mail.
+    // A short play window (few snapshots) made the cap tiny → one idle claim = flag. Now: ×3 for the bonuses, 2 full idle
+    // chests, Mail money ×3, and the LEDGER (today + yesterday) is compared with a cap for its own window (up to 48 h).
+    const ps24 = capPerSec(p.lv);
+    let mailM = 0; try { const pr = await db.prepare('SELECT uid FROM prof WHERE pid=?').bind(p.pid).first();
+      if (pr) for (const m of (await db.prepare('SELECT rw FROM inbox WHERE uid=? AND got=1 AND t>?').bind(pr.uid, now - 2 * day).all()).results) { const w = JSON.parse(m.rw || '{}'); mailM += +(w.m || 0) + +(w.money || 0); } } catch (e) {}
+    const extra = 2 * 22 * 3600 * ps24 / 20 + 3 * mailM + 5e7;
+    const capM = 3 * ps24 * dt / 4 + extra, capL = 3 * ps24 * 2 * 86400 / 4 + extra;
+    if (r.m1 - r.m0 > capM && (lg2.m || 0) > capL) why.push('24h money too high');
     const nb24 = ((await db.prepare("SELECT COUNT(*) n FROM purchases WHERE pid=? AND state='ok' AND t>?").bind(p.pid, now - day).first()) || {n:0}).n;   // v16-122
     const capV = 400 + nb24 * 2100;
     if (r.v1 - r.v0 > capV && (lg2.v || 0) > capV && !isGift(p.pid)) why.push('24h VIP points too high');

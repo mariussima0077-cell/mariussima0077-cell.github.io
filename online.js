@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=394;window.TE_CV=CV;
+const CV=395;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -293,7 +293,7 @@ const css=`
 #onl .tlist div.o-lock .tt{filter:grayscale(1) brightness(.6)}
 #onl .modal{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:#000b}
 #onl .modal .box .mX{position:sticky;top:0;float:right;z-index:6;width:36px;height:36px;margin:-6px -6px 4px 8px;border:2px solid #ffd54a;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff7a6a,#c62828 60%,#6d0f0f);color:#fff;font:900 17px/1 Game,system-ui;padding:0}
-#onl .modal .box{width:88%;max-height:84%;overflow:auto;border-radius:18px;padding:16px;background:linear-gradient(#2a2010,#120e08);box-shadow:0 0 0 2px #ffd54a,0 0 30px #ffb30066;text-align:center;animation:olPop .3s cubic-bezier(.2,1.5,.4,1)}
+#onl .modal .box{width:88%;max-height:84%;overflow:auto;will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:16px;background:linear-gradient(#2a2010,#120e08);box-shadow:0 0 0 2px #ffd54a,0 0 30px #ffb30066;text-align:center;animation:olPop .3s cubic-bezier(.2,1.5,.4,1)}
 #onl .modal h4{margin:0 0 10px;font:900 17px Game,system-ui;color:#ffe27a}
 #onl .modal input{width:100%;background:#0b0f15;box-shadow:0 0 0 1.5px #e0aa25;border:0;border-radius:12px;padding:12px;font:800 16px Game,system-ui;color:#fff;outline:none;user-select:text;-webkit-user-select:text}
 #onl .modal p{font:700 11.5px/1.5 Game,system-ui;color:#c9b88a;margin:10px 0;text-align:left}
@@ -729,20 +729,25 @@ function nameModal(){const free=!(ME&&ME.chg>0);
      if(r.ok){if(!free){G.dm-=300;T().save();}toast('✅ Name saved: '+n,2500);return true;}
      return false;});
   setTimeout(()=>{const i=$('olNm');if(i)i.focus();},200);}
+// v16-394 (Marius 27 nov, video): the profile vanished for 1 frame when the hero pictures finished loading (Android WebView repaint)
+// → the window stays invisible until its pictures are decoded (max 0.7 s), then pops in already complete
+function imgReady(d){const bx=d.querySelector('.box');if(!bx)return;d.style.visibility='hidden';bx.style.animation='none';
+  const im=[...d.querySelectorAll('img')].map(i=>i.decode?i.decode().catch(()=>{}):0);
+  Promise.race([Promise.all(im),new Promise(r=>setTimeout(r,700))]).then(()=>{d.style.visibility='';bx.style.animation='';});}
 async function viewProfile(uid){const r=await call('view',{uid});if(!r.ok){toast('⚠️ Could not load the profile');return;}const p=r.p;
-  modal(`<div class="av" style="width:110px;height:118px;margin:0 auto">${avf(p.icon,p.frame)}</div><h4 style="margin:4px 0">${flag(p.cc)} ${onD(p)}${nmc(p)}</h4><div>${tt(p.title)}</div>
-   <div class="stats" style="margin-top:10px;text-align:left"><div>Campaign<b>⚔️ ${stLab(p.best)}</b></div><div>Team power<b>${PWh} ${fmtN(p.pow)}</b></div><div>Arena<b>${p.arena?p.arena.tier.name:'—'}</b></div><div>VIP · Cup wins<b>${p.vip} · 🏆 ${p.cupw}</b></div></div>
+  const d=modal(`<div class="av" style="width:110px;height:118px;margin:0 auto">${avf(p.icon,p.frame)}</div><h4 style="margin:4px 0">${flag(p.cc)} ${onD(p)}${nmc(p)}</h4><div>${tt(p.title)}</div>
+   <div class="stats" style="margin-top:10px;text-align:left"><div>Campaign<b>⚔️ ${stLab(p.best)}</b></div><div>Team power<b>${PWh} ${fmtN(p.pow)}</b></div><div>Arena<b>${p.arena?p.arena.tier.name:'—'}</b></div><div>VIP · Cup wins<b>${p.vip<0?'🙈':p.vip} · 🏆 ${p.cupw}</b></div></div>
    <h3>BATTLE TEAM</h3><div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">${(p.team||[]).map((h,i)=>`<div data-m="h${i}" class="pkTap">${fcard(h.id,h.s,52)}</div>`).join('')||'<small style="color:#8fa0b4">No battle team yet</small>'}</div>${(p.team||[]).length?'<small class="pkHint">Tap a hero to see the gear</small>':''}
-   <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,b=>{if(b[0]==='h'){const h=(p.team||[])[+b.slice(1)];if(h)peekHero(h,p);return false;}return true;});}
+   <div class="ok"><button class="btn" data-m="ok">CLOSE</button></div>`,b=>{if(b[0]==='h'){const h=(p.team||[])[+b.slice(1)];if(h)peekHero(h,p);return false;}return true;});imgReady(d);}
 // v16-176 (Marius): tap a hero on another player's profile → level, power, stats, skill and gear
 function peekHero(h,p){const c=C(),g=Math.max(0,Math.min(5,gradeOf(h.id))),nm=hName(h.id)||h.n||'Hero',sk=c&&c.peekSkill?c.peekSkill(h.id):null,old=!(h.eq&&h.eq.length)&&!h.lv;/* v16-180: the server always sends eq:[] and lv:0 → an empty list = team saved by an old version */
   const st=[['❤️ HP',fmtN(h.hp||0)],['⚔️ ATK',fmtN(h.atk||0)],['🛡️ DEF',fmtN(h.def||0)],['🎯 CRIT',h.crit!=null?Math.round(h.crit*1000)/10+'%':'—'],['⏱️ SPEED',h.as?Math.round(100/h.as)/100+'/s':'—']];
-  modal(`<div class="pkH"><div class="pkC">${fcard(h.id,h.s,96)}</div><div class="pkT"><b style="color:${GRC[g]}">${esc(nm)}</b><small>${GRN[g]}${c&&c.roleOfId&&c.roleOfId(h.id)?' · '+esc(c.roleOfId(h.id)):''}</small>
+  const pm=modal(`<div class="pkH"><div class="pkC">${fcard(h.id,h.s,96)}</div><div class="pkT"><b style="color:${GRC[g]}">${esc(nm)}</b><small>${GRN[g]}${c&&c.roleOfId&&c.roleOfId(h.id)?' · '+esc(c.roleOfId(h.id)):''}</small>
      <div class="pkL">${[h.lv?'Lv '+h.lv:'',h.s?'+'+h.s:''].filter(Boolean).join(' · ')}</div><div class="pkP">${PWh} ${fmtN(h.pw||0)}</div><small style="color:#8fa0b4">${esc(p.name)}'s hero</small></div></div>
    <div class="stats pkSt">${st.map(x=>`<div>${x[0]}<b>${x[1]}</b></div>`).join('')}</div>
    ${sk&&sk.n?`<div class="pkSk"><b>✨ ${esc(sk.n)}</b><small>${esc(sk.d)}</small></div>`:''}
    <h3>GEAR</h3>${old?'<small style="color:#8fa0b4;display:block;text-align:center">This player must open the game with the new version to show the gear.</small>':(c&&c.peekGear?c.peekGear(h.eq):'')}
-   <div class="ok"><button class="btn" data-m="ok">BACK</button></div>`,()=>true).classList.add('pkM');}
+   <div class="ok"><button class="btn" data-m="ok">BACK</button></div>`,()=>true);pm.classList.add('pkM');imgReady(pm);}
 
 // ------------------------------------------------------------------ INBOX (Arena / Cup rewards)
 async function openInbox(){const r=await call('inbox',{});if(!r.ok){toast('📶 No connection');return;}
