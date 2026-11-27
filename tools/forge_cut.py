@@ -85,11 +85,11 @@ ban.crop((cols[0], rows[0], cols[-1] + 1, rows[-1] + 1)).resize((1100, 143), Ima
 Image.open(U + 'forge_bg.webp').convert('RGB').save(OUT + 'forge_bg.webp', quality=82)
 print(sorted(os.listdir(OUT)))
 # v16-390: 9-slice panel + Junkyard card (green cut away, cropped tight) and the Golem stage
-for nm in ['panel', 'card']:
+for nm in ['panel', 'card', 'popup']:
     im = key(U + nm + '_src.webp')
     im = im.crop(im.getbbox())
     w, h = im.size
-    k = 2 / 3 if nm == 'panel' else 1 / 2
+    k = {'panel': 2 / 3, 'card': 1 / 2, 'popup': 1 / 2}[nm]
     im = im.resize((round(w * k), round(h * k)), Image.LANCZOS)
     im.save(OUT + nm + '.webp', quality=90)
     print(nm, im.size)

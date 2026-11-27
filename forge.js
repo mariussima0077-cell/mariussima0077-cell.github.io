@@ -68,8 +68,8 @@ const css=document.createElement('style');css.textContent=`
 #gMain .gTool:active{transform:scale(.92)}
 #fgP{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(2,3,6,.82);font-family:Game,system-ui,sans-serif;color:#fff}
 #fgP.open{display:flex}
-#fgPB{position:relative;width:min(92vw,380px);max-height:92vh;overflow:auto;border-radius:16px;border:2px solid var(--gc);background:linear-gradient(#1d2129,#0e1116);box-shadow:0 0 24px #000,0 0 14px var(--gc);padding:14px 14px 12px}
-.fgX{position:absolute;right:6px;top:6px;width:44px;height:30px;border:0;background:url(img/ui8/ic_close.webp) center/contain no-repeat;font-size:0}
+#fgPB{position:relative;width:min(94vw,360px);max-height:92vh;overflow:auto;background:none;padding:58px 22px 24px;filter:drop-shadow(0 0 14px var(--gc))}#fgPB::before{content:'';position:absolute;inset:0;border-style:solid;border-color:transparent;border-width:80px 48px 48px;border-image:url(img/forge/popup.webp) 118 70 70 fill/80px 48px 48px stretch;pointer-events:none;z-index:0}#fgPB>*{position:relative;z-index:1}#fgPB>.fgX{position:absolute;z-index:2} /* v16-391 Marius' popup frame */
+.fgX{position:absolute;right:14px;top:14px;width:44px;height:30px;border:0;background:url(img/ui8/ic_close.webp) center/contain no-repeat;font-size:0}
 .fgTop{display:flex;gap:12px;align-items:center;padding-right:34px}
 .fgSl{position:relative;width:92px;height:92px;flex:none;background:url(img/forge/slot.webp) center/100% 100% no-repeat;filter:drop-shadow(0 0 8px var(--gc))}
 .fgSl img{position:absolute;left:16%;top:18%;width:68%;height:68%;object-fit:contain}
@@ -82,7 +82,7 @@ const css=document.createElement('style');css.textContent=`
 .fgGo{width:100%;height:48px;--bh:48px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;box-shadow:none;border-radius:0;color:#3a2300;font:900 italic 16px Game,system-ui}
 .fgGo.bt{border-image-source:url(img/ui8/btn_red_s.webp);color:#fff;text-shadow:0 2px 0 #0008}.fgGo.off{border-image-source:url(img/ui8/btn_grey_s.webp);color:#e8edf2;text-shadow:0 1px 0 #0008}
 .fgMsg{min-height:18px;text-align:center;font-weight:900;font-size:13px;margin-top:6px}
-.fgRes{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;font-size:12px;margin-top:8px;color:#ffe0b2}
+.fgRes{display:flex;flex-wrap:wrap;gap:3px 5px;justify-content:center;font-size:11px;margin-top:8px;color:#ffe0b2}
 #fg{position:fixed;inset:0;z-index:30;display:none;justify-content:center;background:#07090d;font-family:Game,system-ui,sans-serif;color:#fff}
 #fg.open{display:flex}
 #fgW{position:relative;width:min(100vw,480px);height:100%;background:url(img/forge/forge_bg.webp) center top/cover no-repeat;display:flex;flex-direction:column;overflow:hidden}
