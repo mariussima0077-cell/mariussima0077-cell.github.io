@@ -75,7 +75,8 @@ export async function runHealth(env, why) {
   const dep = env.CFV && env.CFV.id ? String(env.CFV.id) : '', oDep = await getM(db, 'dep'), oGv = await getM(db, 'gv'), what = [];
   if (dep && dep !== oDep) { if (oDep !== null) what.push('server' + (env.CFV.tag ? ' ' + env.CFV.tag : '')); await setM(db, 'dep', dep); await setM(db, 'depT', now); }
   if (gv && gv !== oGv) { if (oGv !== null) what.push('game ' + gv); await setM(db, 'gv', gv); }
-  if (what.length) await alert(db, bad.length ? 'red' : 'info', `📦 Update detected (${what.join(' + ')}) → ` + (bad.length ? `🔴 ${bad.length} problem(s): ${bad.map(b => HNAME[b.k] || b.k).join(', ')}` : `✅ all ${res.length} checks OK`));
+  // v16-377 (Marius 27 nov 2026: „nu cred că am nevoie pe discord dasta”) → no more „✅ all checks OK” messages; Discord only when something is wrong
+  if (what.length && bad.length) await alert(db, 'red', `📦 Update detected (${what.join(' + ')}) → 🔴 ${bad.length} problem(s): ${bad.map(b => HNAME[b.k] || b.k).join(', ')}`);
   await setM(db, 'run', now); await setM(db, 'why', why || 'cron');
   await db.prepare('DELETE FROM alerts WHERE t<?').bind(now - 30 * 864e5).run();
   await db.prepare('DELETE FROM serr WHERE t<?').bind(now - 30 * 864e5).run();
