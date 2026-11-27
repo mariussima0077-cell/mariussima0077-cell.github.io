@@ -4288,7 +4288,10 @@ for(const [k,sp] of [['scrap','scrapzilla2'],['crushk','crusher2'],['infp','infe
 // v16-388 THE FORGE boss SCRAP GOLEM (Marius' 4 sheets, tools/golem_cut.py): World Boss engine, own tries + rewards (forge.js)
 MON.golem={n:'SCRAP GOLEM',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[40,120],dr:'spr_golem2',dr0:'titan',sp:'golem2',sc:1,noLz:1,desc:'Forge boss'};
 MSPR.golem2={w:196,h:238,ax:97.0,ay:228.0,ih:203.0,wb:{v2:1,ni:6,pr:3,fxP:1,fx:{w:1024,h:171,ya:0.9}}};MDRAW.spr_golem2=(g,u,t)=>drawSprMon(g,u,t,'golem2');
-MON.scrap.lz=[138,150];MON.infp.lz=[60,0]; // v16-134: SCRAPZILLA mouth in the new skill frames · INFERNO lava starts at its feet
+MON.scrap.lz=[138,150];MON.infp.lz=[60,0];
+// v16-393 (Marius 27 nov: „toți boșii ăia mari își pierd claritatea… fă-i puțin mai mici”): the big sprite bosses were drawn bigger than their pictures
+// (blurry). World Bosses + Scrap Golem and the chapter bosses: body −22% (laser / beam starting points move with them).
+{const BOSS_SHRINK=.78;['scrap','crushk','infp','tows','golem','titan','wyrm','plow','tanker','omega','dozer','hydra','kraken','mixer'].forEach(k=>{const M=MON[k];if(!M||M.__sh)return;M.__sh=1;M.h=Math.round(M.h*BOSS_SHRINK);if(M.lz)M.lz=M.lz.map(v=>Math.round(v*BOSS_SHRINK));});} // v16-134: SCRAPZILLA mouth in the new skill frames · INFERNO lava starts at its feet
 const WBFX={};function wbFxIm(id){if(!WBFX[id]){WBFX[id]=new Image();WBFX[id].decoding='async';WBFX[id].src='img/wb/fx_'+id.replace(/2$/,'')+'.webp';}return WBFX[id];}
 const WBS={ret:0,sending:0,rank:null,raf:0};
 const wbEl=document.createElement('div');wbEl.id='wb';wbEl.innerHTML='<div id="wbBox"></div>';root.appendChild(wbEl);
