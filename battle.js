@@ -2081,7 +2081,7 @@ function damage(src,tgt,mult,o){o=o||{};if(!tgt||tgt.dead)return 0;
   else if(tgt.hero){const ls=pv(tgt,'engine',1);if(ls&&!tgt.ls&&tgt.hp<tgt.max*.35){tgt.ls=1;tgt.shield=Math.max(tgt.shield,tgt.max*ls/100);tgt.taunt=Math.max(tgt.taunt,3);pasTxt(tgt,1,'LAST STAND!');}
     if(tgt.hp<tgt.max*.3)for(const h of B.heroes){const ek=pv(h,'service',1);if(ek&&!h.dead&&h.ekCd<=0){h.ekCd=15;B.hsrc=h;heal(tgt,tgt.max*ek/100*(h.br==='support'?RB_SUP:1));B.hsrc=null;pasTxt(h,1);if(!B.sim)B.fx.push({type:'plus',u:tgt,t:0,d:.7});break;}}}
   return a;}
-function heal(u,amt){if(B.hk>1&&u.hero)amt*=B.hk;if(u.dead||(B.mod==='noheal'&&u.hero))return;const a=Math.round(Math.min(amt,u.max-u.hp));u.hp+=a;if(a>0&&u.hero){const s=B.hsrc&&B.hsrc.hero?B.hsrc:null;if(s)s.bsH=(s.bsH||0)+a;}if(a>0)num(u.x,headY(u),'+'+a,'#69f0ae');}
+function heal(u,amt){if(B.hk>1&&u.hero)amt*=B.hk;if(u.dead||(B.mod==='noheal'&&u.hero))return;const a=Math.round(Math.min(amt,u.max-u.hp));u.hp+=a;if(a>0&&u.hero){const s=B.hsrc&&B.hsrc.hero?B.hsrc:null;if(s)s.bsH=(s.bsH||0)+a;}if(a>0){num(u.x,headY(u),'+'+a,'#69f0ae');if(!B.sim&&u.hero)sfx('heal');}}
 function kill(u){if(!u.hero&&!B.sim)try{chunks(u);}catch(e){}u.hp=0;u.dead=true;u.deadT=0;u.st='dead';u.act=null;u.sP=null;u.sT=null;
   const [x,y]=sxy(u);
   if(u.hero){B.deaths++;smoke(x,y-20,6);num(x,headY(u)-10,'K.O.','#ff5252',1);if(!B.sim)sfx('ko');}
@@ -2132,27 +2132,8 @@ function chunksStep(f,dt){for(const p of f.P){p.vy+=950*S*dt;p.x+=p.vx*dt;p.y+=p
 function chunksDraw(g,f){const k=f.t/f.d,A=k>.7?(1-k)/.3:1;
   for(const p of f.P){g.save();g.globalAlpha=A;g.translate(p.x,p.y);g.rotate(p.rot);g.scale(-f.k,f.k);g.drawImage(f.im,p.sx,p.sy,p.w,p.h,-p.w/2,-p.h/2,p.w,p.h);g.restore();}g.globalAlpha=1;}
 // sounds made in code (Web Audio, no files): metal hits, crits, shots, explosions, breaking monsters, victory. PROFILE → SOUND can switch them off.
-const SND={on:true,ctx:null,last:{},nb:null};try{SND.on=localStorage.getItem('te_snd')!=='0';}catch(e){}
-window.TE_SND={get on(){return SND.on;},set(v){SND.on=!!v;try{localStorage.setItem('te_snd',v?'1':'0');}catch(e){}}};
-function sctx(){if(!SND.on||window.__SIM)return null;try{if(!SND.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;SND.ctx=new C();SND.m=SND.ctx.createGain();SND.m.gain.value=.45;SND.m.connect(SND.ctx.destination);
-      const n=SND.ctx.sampleRate*.6,b=SND.ctx.createBuffer(1,n,SND.ctx.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;SND.nb=b;
-      const un=()=>{try{SND.ctx.resume();}catch(e){}};document.addEventListener('pointerdown',un,{passive:true});}
-    if(SND.ctx.state==='suspended')SND.ctx.resume().catch(()=>{});return SND.ctx.state==='running'?SND.ctx:null;}catch(e){return null;}}
-function tone(C,t0,f,dur,vol,type,f1){const o=C.createOscillator(),gn=C.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t0+dur);
-  gn.gain.setValueAtTime(vol,t0);gn.gain.exponentialRampToValueAtTime(.001,t0+dur);o.connect(gn);gn.connect(SND.m);o.start(t0);o.stop(t0+dur+.02);}
-function noise(C,t0,dur,vol,fq,q){const s=C.createBufferSource(),fl=C.createBiquadFilter(),gn=C.createGain();s.buffer=SND.nb;fl.type='bandpass';fl.frequency.value=fq;fl.Q.value=q||1;
-  gn.gain.setValueAtTime(vol,t0);gn.gain.exponentialRampToValueAtTime(.001,t0+dur);s.connect(fl);fl.connect(gn);gn.connect(SND.m);s.start(t0,Math.random()*.3);s.stop(t0+dur+.02);}
-const SFXGAP={hit:.06,crit:.08,shot:.07,thud:.12,break:.09,boom:.25,cast:.3,ko:.3,win:1};
-function sfx(kind){const now=performance.now()/1000;if(now-(SND.last[kind]||0)<(SFXGAP[kind]||.05))return;const C=sctx();if(!C)return;SND.last[kind]=now;const t0=C.currentTime+.005,p=rnd(.92,1.08);
-  try{if(kind==='hit'){const f=480*p;for(const [m,v] of [[1,.22],[2.76,.1],[5.4,.05]])tone(C,t0,f*m,.22/m+.05,v,'triangle');noise(C,t0,.05,.25,2500,1.2);}
-  else if(kind==='crit'){const f=520*p;for(const [m,v] of [[1,.26],[2.76,.12]])tone(C,t0,f*m,.3,v,'triangle');tone(C,t0+.01,2100*p,.25,.08);noise(C,t0,.07,.3,3000,1);}
-  else if(kind==='shot'){tone(C,t0,330*p,.18,.12,'triangle',180*p);noise(C,t0,.12,.12,1800,.8);}
-  else if(kind==='thud'){tone(C,t0,140*p,.16,.22,'sine',70);noise(C,t0,.08,.15,600,1);}
-  else if(kind==='break'){noise(C,t0,.45,.35,500,.7);for(let i=0;i<3;i++)tone(C,t0+i*.06,rnd(300,900),.25,.08,'triangle');}
-  else if(kind==='boom'){noise(C,t0,1.1,.5,180,.6);tone(C,t0,75,.9,.35,'sine',35);}
-  else if(kind==='cast'){tone(C,t0,220*p,.55,.12,'sawtooth',880*p);noise(C,t0,.5,.08,1200,.5);}
-  else if(kind==='ko'){tone(C,t0,180,.5,.2,'sine',60);}
-  else if(kind==='win'){[523,659,784,1046].forEach((f,i)=>tone(C,t0+i*.11,f,.6,.12,'triangle'));}}catch(e){}}
+// v16-380: the sound engine moved to settings.js (TE_SFX) – one engine for the whole game, one SOUND EFFECTS switch in ⚙ SETTINGS
+function sfx(kind){if(window.TE_SFX&&!window.__SIM)window.TE_SFX(kind);}
 // projectiles
 function shoot(src,tgt,type,mult,o){if(src.hero&&!B.sim)sfx('shot');const [x,y]=sxy(src);const mz=src.hero&&sprOK(src.spr)?muzzle(src):null;B.proj.push(Object.assign({src,tgt,type,mult,x:mz?mz[0]:src.x+src.face*14*S,d:src.d,h:mz?fy(src.d)-mz[1]:(src.fly?44:34)*dsc(src.d),t:0,spd:type==='wrench'?420:type==='bomb'?300:360,rot:0},o||{}));}
 function projUpdate(p,dt){
@@ -2188,7 +2169,7 @@ function projHit(p){const s=p.src,[x,y0]=[p.x,fy(p.d)],y=y0-p.h;
 
 // ---------------------------------------------------------------- hero skills
 function canCast(u){return B.phase==='fight'&&!u.dead&&u.en>=100&&u.stun<=0&&!u.act&&alive(B.mons).length>0;}
-function cast(u){if(!canCast(u))return;u.en=0;u.rageT=B.t;u.enLock=3;B.flash=.15;if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
+function cast(u){if(!canCast(u))return;u.en=0;u.rageT=B.t;u.enLock=3;B.flash=.15;if(!B.sim)sfx(u.h&&u.h.gr===5?'ult':'sk_'+(u.br||'warrior'));if(FX2&&!sprOK(u.spr))fxAura(u); // v16-40: heroes with Marius' pictures show only the effect drawn in their own skill animation
   if(!(B.banner&&B.banner.img))B.banner={u,t:0,name:skOf(u.h).sk}; // v16-237: the MINI BOSS picture banner is not cut by a skill banner
   const R=u.role,ms=alive(B.mons);
   if(LEGFX[u.h.id]&&!B.sim)LEGFX[u.h.id](u,ms);
@@ -2292,7 +2273,7 @@ function drawReady(g,u,t){const id=u.h&&u.h.id,im=id&&READY8[id]&&readyImg(id);i
   g.restore();}function wideImg(id){if(!WIDE8[id])return null;let i=WIDEI[id];if(!i){i=WIDEI[id]=new Image();i.decoding='async';i.src=LOWRES?WIDE8[id].replace('.webp','_low.webp'):WIDE8[id];}return i;}
 // v16-306 (Marius, 25 nov): ultimates with 23-24 frames (his 3 ChatGPT sheets per hero) instead of 8 → N = frames in the picture (600x200 each), WIDEIP = the impact frame in the new sheets
 const WIDEIP={m5_9:8,m5_7:12,m5_0:11,m5_1:11,m5_2:10,m5_3:8,m5_4:11,m5_5:11,m5_6:15};function wN(im){return Math.max(8,Math.round(im.naturalHeight*3/im.naturalWidth));}
-function castAct(u,dur,fire){if(u.hero){const f0=fire,sp=u.br==='support';fire=(...x)=>{const k=B.hk;if(sp)B.hk=Math.max(k||1,RB_SUP);try{return supSh(u,()=>f0(...x));}finally{B.hk=k;}};} /* v16-349 support role: +20% heals & shields */u.act={k:'cast',t:0,dur,fire};u.st='cast';if(u.hero&&!B.sim&&u.h&&u.h.gr===5)sfx('cast');}
+function castAct(u,dur,fire){if(u.hero){const f0=fire,sp=u.br==='support';fire=(...x)=>{const k=B.hk;if(sp)B.hk=Math.max(k||1,RB_SUP);try{return supSh(u,()=>f0(...x));}finally{B.hk=k;}};} /* v16-349 support role: +20% heals & shields */u.act={k:'cast',t:0,dur,fire};u.st='cast';if(!u.hero&&!B.sim)sfx('cast');}
 const SKF={
  m3_0(u,ms){const P=skp(u),f8=u.spr&&u.spr.fx8&&u.spr.fi&&u.spr.fi.naturalWidth; // v16-125: Viktor's ENGINE DROP – he throws the engine from where he stands (no more leap); it falls on the biggest group (fxs frame 2 = lands = damage); same numbers as before
    if(!f8||!(u.spr&&u.spr.v8)){const c=cluster(ms,(P.rad||95)*S)||ms[0];u.act={k:'leap',t:0,dur:.55,x0:u.x,d0:u.d,x1:c.x-24*S,d1:c.d,p:P};u.st='leap';return;}
@@ -2605,7 +2586,7 @@ function step(dt){B.t+=dt;B.phT+=dt;
     B.mons=B.mons.filter(m=>!(m.dead&&m.deadT>1.2));
     if(B.wbB){B.wbT-=dt;if(B.wbT<=0){B.wbT=0;B.phase='win';B.phT=0;B.wbUp=1;for(const h of B.heroes)if(!h.dead)h.st='win';}}
     if(B.phase==='win'){}
-    else if(!alive(B.heroes).length){B.phase='lose';B.phT=0;}
+    else if(!alive(B.heroes).length){B.phase='lose';B.phT=0;if(!B.sim)sfx('lose');}
     else if(!alive(B.mons).length&&!B.proj.length){if(B.wave<B.stage.w.length-1){B.phase='march';B.phT=0;B.wave++;B.bossBar=null;
         for(const h of alive(B.heroes)){heal(h,h.max*.15);h.act=null;h.lift=0;h.sP=null;h.sT=null;}formation();}
       else{B.phase='win';B.phT=0;for(const h of B.heroes)if(!h.dead)h.st='win';if(!B.sim)sfx('win');}}}

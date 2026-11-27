@@ -30,3 +30,6 @@ schimbă `const V` în sw.js + `CV` în online.js, `python3 tools/sw_hash.py`, `
 - Sursa: `lang/src/img_spec.py` (casete + texte) → `python3 tools/img_l10n.py` (refăcute toate) sau `ONLY=team python3 tools/img_l10n.py fr` (una singură). Lista ajunge în `lang/imgs.js`.
 - `lang/i18n.js` schimbă căile `img/...` → `img/l/<limbă>/...` (HTML, <img>, stiluri, canvas). Engleza nu încarcă nimic în plus.
 - Rămân în engleză intenționat (nume de moduri / marcă): CAMPAIGN/ARENA/TORQUE TOWER/CLASS TOWERS/TORQUE CUP/WORLD BOSS/DUNGEONS pe cardurile din BATTLE, RAIL WARS, GRAND PRIX, WANTED, numele pachetelor din Shop, firmele clădirilor.
+
+## v16-380 (27 nov)
+- Texte noi (Thieves 3.0, ⚙ SETTINGS, sunet): adăugate în `lang/src/add.tsv` (EN/FR/ES/PT) și `lang/src/extra_kj.tsv` (EN/KO/JA). Regula lui Marius: **tot ce e nou se traduce în toate limbile** – scrie textele fără `<b>` în mijlocul propoziției (fiecare bucată dintre taguri e o cheie separată), apoi `python3 tools/lang_build.py` și verifică `window.__MISS` în joc.

@@ -238,8 +238,14 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   lockhub:{ok:()=>isOpen('hub')&&vis(document.querySelector('#hub.open .hubM.lk')),L:()=>[
     {el:()=>document.querySelector('#hub.open .hubM.lk'),t:`<b>🔒 GREY = LOCKED</b>: every battle mode opens when you win the <b>campaign stage</b> written on it. Win more <b>CAMPAIGN</b> stages to open Arena, Towers, World Boss and Dungeons.`,next:'GOT IT'}]},
   gogo:{ok:()=>isOpen('gpx')&&vis(document.querySelector('#gpx [data-g=go]')),t:`<b>GO</b>: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have <b>GO</b> too.`},
+  // v16-380 (Marius 27 nov: Thieves 3.0 + ⚙ SETTINGS with music / sound effects)
+  thieves3:{ok:()=>isOpen('sheet')&&sel0()==='security'&&vis(document.querySelector('#sheet .htB')),L:()=>[
+    {el:()=>document.querySelector('#sheet .htB'),t:`<b>THIEVES 3.0</b><br>A thief now needs time to break into a car – watch the bar over his head. TAP a thief to scare him: he stops for a moment and is easier to catch.`,next:'NEXT'},
+    {el:()=>document.querySelector('#sheet .htB'),t:`<b>🔥 HEAT</b><br>Every raid you win raises the HEAT: more Builder Kit and bigger gangs. From Security 5 a MEGA RAID with up to 20 thieves comes once a day.`,next:'NEXT'},
+    {el:()=>document.querySelector('#sheet .albG')||document.querySelector('#sheet .htB'),t:`<b>📒 THIEF ALBUM</b><br>Catch the same thief 5, 25 and 100 times for badges with diamonds and Crew Tickets. Your guards also catch thieves while you are away.`,next:'GOT IT'}]},
+  settings:{ok:()=>isOpen('stg'),t:`<b>⚙ SETTINGS</b><br>Switch the music and the sound effects on or off, choose if the camera follows thieves, and set graphics and language here.`},
   // v16-254 (Marius 23 nov: Thieves 2.0)
-  thieves2:{ok:()=>isOpen('sheet')&&sel0()==='security'&&!!document.querySelector('#sheet .mwB'),t:`<b>THIEVES 2.0</b>: thieves come in groups – <b>★ PRO</b>, <b>👑 GANG BOSS</b> and sometimes a whole <b style="color:#ff6b6b">GANG RAID</b>. Guards get <b>BACKUP</b> and <b>K9 dogs</b>. Caught = Builder Kit, Crew Tickets, diamonds; escaped = part of your cash stolen. <b>MOST WANTED</b>: catch the 3 thieves on the board today for a bounty.`},
+  // thieves2 (Thieves 2.0) was replaced by thieves3 in v16-380
   // v16-275 (Marius 24 nov): Rail Wars was the only page without a guide
   railw:{ok:()=>isOpen('st'),t:`<b>RAIL WARS</b>: new cars from the <b>Car Factory</b> get fuel, a wash and go up on the train. When it is full, <b>SEND</b> it (3 trains a day) for <b>Street Tokens</b>. A higher train grade (Car Wash · Gas Station · Factory levels, or <b>REFRESH</b>) = more tokens. Attack other players' trains (5 a day) and spend your tokens in the <b>STREET SHOP</b>.`},
   // v16-294 (Marius 24 nov): CRIT CHANCE (max 60%) and CRIT DAMAGE are separate · AWAKENING ×1.5 per tier
