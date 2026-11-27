@@ -572,7 +572,7 @@ const HSK={
  m4_1:{sk:'MIRACLE SHIFT',skd:'Holy light heals all mechanics for 35% HP (+15% over 4s) and REVIVES one K.O. mechanic with 40% HP (once per battle). Team: −20% damage taken for 6s.'},
  m4_2:{sk:'DIAMOND VORTEX',skd:'A paint-and-diamond tornado on the biggest group: 210% damage, then crystal freeze – frozen 2.2s and they take +35% damage for 4s.'},
  m4_3:{sk:'THUNDERSTORM',skd:'Storm cloud over the enemies: 8 lightning strikes of 150% damage, each stuns 1s. Team: +25% attack speed for 6s.'},
- m4_4:{sk:'TIME WARP',skd:'The All-Seeing Eye bends time: all enemies slowed 50% and marked (+35% damage) for 6s. Team: +40% attack speed for 6s.'},
+ m4_4:{sk:'TIME WARP',skd:'The All-Seeing Eye bends time: all enemies take 180% damage, are slowed 50% and marked (+35% damage) for 6s. Team: +40% attack speed for 6s.'},
  m4_5:{sk:'INFERNO DASH',skd:'Rocket-kick dash through every enemy in its lane: 280% damage, always critical, and they burn for 4s.'},
  m5_0:{sk:'GEAR APOCALYPSE',skd:'Flaming gears crash on every enemy: 320% damage + a giant gear on the biggest group (150%). Then MOLTEN CROWN: every hit enemy burns for 4s and takes +15% damage. Team: +30% attack and −20% damage taken for 8s.'},
  m5_1:{sk:'OVERDRIVE',skd:'Full throttle: blasts through ALL enemies – 300% damage, always critical, then ARMOR BREAK: they burn and lose 30% DEF for 5s. Team: +30% attack speed and +15% crit for 6s.'},
@@ -590,10 +590,10 @@ const SKP={
  m0_2:{sk:'WRENCH CRUSHER',skd:'Jumps and smashes the giant wrench down: 260% damage in a small area, stun 1.4s. Gains a 25% shield and taunts.',p:{mult:2.6,rad:80,stun:1.4,col:'#ffab00'}},
  m0_3:{sk:'OIL SLICK SMASH',skd:'Hammer jump into the biggest group: 200% damage, stun 1s and spilled oil slows them 50% for 4s. Shield + taunt.',p:{mult:2,stun:1,slow:4,col:'#a1887f'}},
  m1_0:{sk:'GEAR BREAKER',skd:'Leaps with her wrench and cracks the ground: 230% damage, stuns enemies 1.2s. Shield + taunt.',p:{mult:2.3,push:60,col:'#b2ff59'}},
- m1_1:{sk:'PISTON FURY',skd:'Dumbbell jump slam: 220% damage, stun 1.2s. Then he goes wild: +30% attack and +30% attack speed for 6s.',p:{mult:2.2,rage:6,col:'#76ff03'}},
- m2_0:{sk:'DIESEL CLOUD',skd:'Belly-flop into the enemies: 230% damage, stun 1.2s. Black diesel smoke weakens them: they deal −30% damage for 5s.',p:{mult:2.3,weak:5,col:'#90a4ae'}},
+ m1_1:{sk:'PISTON FURY',skd:'Dumbbell jump slam: 220% damage, stun 1.2s. Then he goes wild: +30% attack and +30% attack speed for 6s. Shield + taunt.',p:{mult:2.2,rage:6,col:'#76ff03'}},
+ m2_0:{sk:'DIESEL CLOUD',skd:'Belly-flop into the enemies: 230% damage, stun 1.2s. Black diesel smoke weakens them: they deal −30% damage for 5s. Shield + taunt.',p:{mult:2.3,weak:5,col:'#90a4ae'}},
  m2_1:{sk:'CLUTCH SLAM',skd:'Smashes the clutch disc down: 240% damage and a long stun of 2s. Gains a big 40% shield and taunts.',p:{mult:2.4,stun:2,shield:.4,col:'#40c4ff'}},
- m3_0:{sk:'ENGINE DROP',skd:'Lifts a whole engine block and drops it: 280% damage in a big area, toxic fumes burn 4s and weaken enemies (−30% damage).',p:{mult:2.8,rad:110,burn:1,weak:4,col:'#d05cff'}},
+ m3_0:{sk:'ENGINE DROP',skd:'Lifts a whole engine block and drops it: 280% damage in a big area, toxic fumes burn 4s and weaken enemies (−30% damage). Shield + taunt.',p:{mult:2.8,rad:110,burn:1,weak:4,col:'#d05cff'}},
  // Racers (dash)
  m0_9:{sk:'REV & RETURN',skd:'Dashes through his lane (220%, always critical) and hits everyone AGAIN on the way back (90%).',p:{mult:2.2,back:.9,col:'#40c4ff'}},
  m1_8:{sk:'GRINDER RUSH',skd:'Dashes with the angle grinder: 240% damage, always critical. Sparks mark enemies: +35% damage taken for 5s.',p:{mult:2.4,mark:5,col:'#ffd54a'}},
@@ -615,11 +615,11 @@ const SKP={
  m2_3:{sk:'PRESSURE WASH',skd:'Water bomb: 190% damage, the blast stuns enemies 1.2s.',p:{mult:1.9,stun:1.2,push:50,pal:['#29b6f6','#80d8ff','#e1f5fe']}},
  m3_2:{sk:'GLOSS WAVE',skd:'A purple gloss wave sweeps the WHOLE field: 160% damage to every enemy, slowed 50% and marked (+35% damage) for 4s.',p:{wave:1,mult:1.6,slow:4,mark:4,col:'#e040fb'}},
  // v16-364: new LEGENDARY heroes (class skills, Marius: small skill, no wow)
- m4_6:{sk:'WELD WALL',skd:'Rivet jumps and welds his shield into the ground: 220% damage, stun 1s. He gains a 40% HP shield and taunts the enemies.',p:{mult:2.2,stun:1,shield:.4,col:'#ff9100'}},
- m4_7:{sk:'BLAZE CUT',skd:'Kael dashes through his lane with the burning wrench-blade: 260% damage, always critical, and every hit explodes on the enemies around (60%).',p:{mult:2.6,splash:.6,col:'#ff6d00'}},
- m4_8:{sk:'NAIL STORM',skd:'Spark locks onto the strongest enemy and fires a storm of glowing nails: 450% damage, always critical, marked for 6s. Long range.',p:{snipe:1,col:'#18ffff'}},
- m4_9:{sk:'NITRO BURST',skd:'Mira throws a nitro flask on the biggest group: 220% damage in a wide area and blue fire burns them for 4s. Long range.',p:{mult:2.2,rad:110,burn:1,pal:['#2979ff','#80d8ff','#b388ff']}},
- m4_10:{sk:'GREEN FLAG',skd:'Lena waves the green flag: heals all mechanics 25% (+10% over 4s) and the team gets +30% attack for 5s.',p:{heal:.25,hot:.1,atk:5,col:'#69f0ae'}},
+ m4_6:{sk:'WELD WALL',skd:'Rivet jumps and welds his shield into the ground: 260% damage, stun 1.6s. He gains a 45% HP shield and taunts the enemies.',p:{mult:2.6,stun:1.6,shield:.45,col:'#ff9100'}},
+ m4_7:{sk:'BLAZE CUT',skd:'Kael dashes through his lane with the burning wrench-blade: 290% damage, always critical, and every hit explodes on the enemies around (70%).',p:{mult:2.9,splash:.7,col:'#ff6d00'}},
+ m4_8:{sk:'NAIL STORM',skd:'Spark locks onto the strongest enemy and fires a storm of glowing nails: 500% damage, always critical, marked for 6s. Long range.',p:{snipe:1,mult:5,col:'#18ffff'}},
+ m4_9:{sk:'NITRO BURST',skd:'Mira throws a nitro flask on the biggest group: 250% damage in a wide area and blue fire burns them for 4s. Long range.',p:{mult:2.5,rad:110,burn:1,pal:['#2979ff','#80d8ff','#b388ff']}},
+ m4_10:{sk:'GREEN FLAG',skd:'Lena waves the green flag: heals all mechanics 30% (+10% over 4s) and the team gets +30% attack for 5s.',p:{heal:.3,hot:.1,atk:5,col:'#69f0ae'}},
  // Shockers (lightning)
  m0_6:{sk:'SPARK CHAIN',skd:'Lightning jumps 5 times: 200% damage, stun 1.2s.',p:{jumps:5,mult:2,stun:1.2}},
  m1_6:{sk:'GREEN SURGE',skd:'A long green chain that jumps 9 times: 140% damage, stun 0.8s.',p:{jumps:9,mult:1.4,stun:.8}},
@@ -627,10 +627,10 @@ const SKP={
  m2_5:{sk:'LIVE WIRE',skd:'Heavy current that jumps 4 times without getting weaker: 270% damage, stun 1.5s.',p:{jumps:4,mult:2.7,stun:1.5,decay:1}},
  m3_3:{sk:'TESLA COIL',skd:'Places his Tesla coil: for 4s it zaps a random enemy every 0.4s (80% damage, stun 0.5s).',p:{coil:1}},
  // Scanners (scan / beam)
- m0_7:{sk:'ENGINE CHECK',skd:'A strong scan wave: 140% damage to every enemy and marks them (+35% damage taken) for 7s.',p:{mult:1.4,mark:7,col:'#64ffda'}},
- m0_8:{sk:'WEAK SPOT DATA',skd:'Scan wave: 110% damage, marks enemies 6s and the team gets +15% critical chance for 5s.',p:{mult:1.1,mark:6,crit:5,col:'#40c4ff'}},
- m1_7:{sk:'SCAN PULSE',skd:'Cold scan pulse: 120% damage, marks enemies 6s and slows them 50% for 3s.',p:{mult:1.2,mark:6,slow:3,col:'#80d8ff'}},
- m2_6:{sk:'TARGET LOCK',skd:'Red targeting scan: 120% damage, marks enemies 7s and the team gets +30% attack for 5s.',p:{mult:1.2,mark:7,atk:5,col:'#ff5252'}},
+ m0_7:{sk:'ENGINE CHECK',skd:'A strong scan wave: 180% damage to every enemy and marks them (+35% damage taken) for 7s.',p:{mult:1.8,mark:7,col:'#64ffda'}},
+ m0_8:{sk:'WEAK SPOT DATA',skd:'Scan wave: 150% damage, marks enemies 6s and the team gets +15% critical chance for 5s.',p:{mult:1.5,mark:6,crit:5,col:'#40c4ff'}},
+ m1_7:{sk:'SCAN PULSE',skd:'Cold scan pulse: 160% damage, marks enemies 6s and slows them 50% for 3s.',p:{mult:1.6,mark:6,slow:3,col:'#80d8ff'}},
+ m2_6:{sk:'TARGET LOCK',skd:'Red targeting scan: 160% damage, marks enemies 7s and the team gets +30% attack for 5s.',p:{mult:1.6,mark:7,atk:5,col:'#ff5252'}},
  m3_4:{sk:'HEADSHOT',skd:'Locks onto the strongest enemy and fires a huge sniper beam: 450% damage, always critical, marked 6s.',p:{snipe:1,col:'#e040fb'}}};
 for(const k in SKP)HSK[k]={sk:SKP[k].sk,skd:SKP[k].skd};
 const skp=u=>u&&u.h&&SKP[u.h.id]?SKP[u.h.id].p:{};
@@ -2186,7 +2186,7 @@ function skillFire(u){B.hk=u.skK||1;try{return supSh(u,()=>skillFire0(u));}final
 function skillFire0(u){const R=u.role,ms=alive(B.mons);if(!ms.length)return;
   const P=skp(u);
   if(P.snipe){const t=ms.slice().sort((a,b)=>b.hp-a.hp)[0],[bx,by]=muzzle(u,20,44),x=t.x,y=headY(t)+22*dsc(t.d);B.fx.push({type:'beam',x0:bx,y0:by,x1:x,y1:y,t:0,d:.5,col:P.col,w:14});
-    damage(u,t,4.5,{crit:1,skill:1});t.mark=Math.max(t.mark,6);shake(10);B.fx.push({type:'ring',x,y,t:0,d:.4,r:50*S,col:P.col});if(FX2){fxBurst(x,y,P.col,70*S);fxs('flare_01','#ffffff',x,y,{d:.3,s0:20*S,s1:110*S});}return;}
+    damage(u,t,P.mult||4.5,{crit:1,skill:1});t.mark=Math.max(t.mark,6);shake(10);B.fx.push({type:'ring',x,y,t:0,d:.4,r:50*S,col:P.col});if(FX2){fxBurst(x,y,P.col,70*S);fxs('flare_01','#ffffff',x,y,{d:.3,s0:20*S,s1:110*S});}return;}
   if(P.wave||R==='inspect'){B.fx.push({type:'scan',x:u.x,t:0,d:.7,src:u,hit:new Set(),p:P});if(P.crit||P.atk)teamBuff({crit:P.crit,atk:P.atk,col:P.col,txt:P.crit?'CRIT UP':'ATK+30%'});return;}
   if(P.coil){B.fx.push({type:'coil',x:u.x+50*S,dd:u.d,t:0,d:4,tick:0,src:u});return;}
   if(R==='service'){const low=P.low&&alive(B.heroes).sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];
@@ -2295,7 +2295,7 @@ const SKF={
    const f=ok?{type:'sheet8',t:-.12,d:.96,sp:u.spr,x:t.x,dd:t.d}:null;if(f)B.fx.push(f);
    castAct(u,.75,()=>B.fx.push({type:'call',t:-.15,d:.05,fn:()=>{if(u.dead)return;u.post=.6;if(t.dead)t=pick();if(!t)return;if(f){f.x=t.x;f.dd=t.d;}
      const k=dsc(u.d),bx=u.x+u.face*113*SPK*k,by=fy(u.d)-(u.lift||0)-125*SPK*k,x=t.x,y=headY(t)+22*dsc(t.d),C=P.col||'#e040fb';
-     B.fx.push({type:'beam',x0:bx,y0:by,x1:x,y1:y,t:0,d:ok?.3:.5,col:C,w:ok?7:14});damage(u,t,4.5,{crit:1,skill:1});t.mark=Math.max(t.mark,6);shake(10);
+     B.fx.push({type:'beam',x0:bx,y0:by,x1:x,y1:y,t:0,d:ok?.3:.5,col:C,w:ok?7:14});damage(u,t,P.mult||4.5,{crit:1,skill:1});t.mark=Math.max(t.mark,6);shake(10);
      if(!ok)B.fx.push({type:'ring',x,y,t:0,d:.4,r:50*S,col:C,ground:0});if(FX2&&!FV8(u)){fxBurst(x,y,C,60*S);if(!ok)fxs('flare_01','#ffffff',x,y,{d:.3,s0:20*S,s1:110*S});}}}));},
  m3_5(u){const P=skp(u),go=()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,mult:P.mult,band:P.band,col:P.col,p:P};u.st='dash';
    // v16-113: Aria's NEON SPIN – her own neon tornado (8 frames, frame 5 = burst) on the biggest group in her wide lane, timed with her arrival; same numbers as before
@@ -2329,7 +2329,7 @@ const SKF={
    teamBuff({aspd:6,aspdK:.25,col:'#ffd54a',txt:'SPEED UP'});});},
  m4_4(u,ms){castAct(u,1,()=>{B.flash=.2;u.post=.6;
    if(u.spr&&u.spr.fx8){const c=cluster(ms,100*S)||ms[0];B.fx.push({type:'sheet8',t:0,d:1.1,sp:u.spr,x:c.x,dd:c.d});} // v16-106: Otto's All-Seeing Eye clock (8 frames) over the biggest group
-   for(const m of alive(B.mons)){m.slow=Math.max(m.slow,6);m.mark=Math.max(m.mark,6);m.tw=6;imgFx('hglass',m.x,headY(m)-8*S,30*S,1.4,{float:1,u:m});damage(u,m,.6,{skill:1,noCrit:1});}
+   for(const m of alive(B.mons)){m.slow=Math.max(m.slow,6);m.mark=Math.max(m.mark,6);m.tw=6;imgFx('hglass',m.x,headY(m)-8*S,30*S,1.4,{float:1,u:m});damage(u,m,1.8,{skill:1,noCrit:1});}
    teamBuff({aspd:6,aspdK:.4,col:'#80d8ff',txt:'SPEED UP'});});},
  m4_5(u){const go=()=>{u.act={k:'dash',t:0,x0:u.x,d0:u.d,hit:new Set(),back:false,fire:1,mult:2.8};u.st='dash';
    // v16-106: Rex's fire trail → explosion (frame 5) on the first enemy in his lane, timed with his arrival
