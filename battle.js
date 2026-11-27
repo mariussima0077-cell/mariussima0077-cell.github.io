@@ -336,12 +336,12 @@ const css3=document.createElement('style');css3.textContent=`
 #cpCardBox .ppR3{position:absolute!important;left:66.93%;top:52.79%;width:13.47%;height:8.79%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%}
 #cpCardBox .ppR span{line-height:1}#cpCardBox .ppR span img{max-height:7cqw}#cpCardBox .ppR b{font:900 3cqw Game,system-ui;color:#fff;text-shadow:0 1px 0 #000,0 0 4px #000;white-space:nowrap}
 #cpCardBox .ppG{position:absolute!important;left:50%;transform:translateX(-50%);top:61.2%;width:auto;max-width:76%;height:2.6%;box-sizing:border-box;padding:0 2.2cqw;border-radius:2cqw;background:#0a0f1ae8;box-shadow:0 0 0 1px #e0a82e66;display:flex;justify-content:center;align-items:center;gap:1.4cqw;flex-wrap:nowrap;white-space:nowrap;font:900 2.1cqw Game,system-ui;text-shadow:0 1px 0 #000;z-index:2}
-#cpCardBox .ppS0{position:absolute!important;left:12.40%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS1{position:absolute!important;left:25.46%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS2{position:absolute!important;left:38.51%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS3{position:absolute!important;left:51.57%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS4{position:absolute!important;left:64.63%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS5{position:absolute!important;left:77.68%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS0{position:absolute!important;left:12.60%;top:71.22%;width:9.86%;height:6.51%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS1{position:absolute!important;left:25.59%;top:71.22%;width:9.86%;height:6.51%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS2{position:absolute!important;left:38.67%;top:71.22%;width:9.77%;height:6.51%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS3{position:absolute!important;left:51.66%;top:71.22%;width:9.77%;height:6.51%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS4{position:absolute!important;left:64.55%;top:71.22%;width:9.86%;height:6.51%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS5{position:absolute!important;left:77.44%;top:71.22%;width:10.06%;height:6.51%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 #cpCardBox .ppS img{width:88%;height:88%;object-fit:cover;border-radius:1.4cqw;background:#000}#cpCardBox .ppS i{font:900 7cqw Game,system-ui;color:#ffd54a55;font-style:normal}
 #cpCardBox .ppEd{position:absolute!important;left:33%;top:65.4%;width:34%;height:4.1%;border:0;border-radius:2cqw;background:linear-gradient(#64b5f6,#1565c0);box-shadow:0 0 0 .4cqw #0a2a52,0 .6cqw 0 #0a2a52;color:#fff;font:900 2.9cqw Game,system-ui;letter-spacing:.3px;text-shadow:0 1px 0 #000}
 #cpCardBox .ppB{position:absolute!important;left:4.46%;top:83.61%;width:21.78%;height:11.15%;background:none;border:0;border-radius:3cqw}
@@ -3002,9 +3002,9 @@ function drawHUD(t){HIT=[];const top=10,bh=38;
     g.fillStyle='rgba(255,255,255,.25)';g.fillRect(x,y+1,bw*Math.max(0,b.hp/b.max),3);
     g.font='900 '+Math.round(11*S)+'px Game,system-ui';g.fillStyle='#fff';g.textAlign='center';g.fillText('💀 '+b.name+(b.enr?' · ENRAGED':''),W/2,y+26);}
   // hero cards
-  const n=B.heroes.length,pad=8,cw=(W-pad*(n+1))/n,ch=H-PANEL-14,y0=PANEL+4;
+  const n=B.heroes.length,pad=n>=6?-5:8,ed=n>=6?0:pad,cw=(W-ed*2-pad*(n-1))/n,ch=H-PANEL-14,y0=PANEL+4; // v16-379 (Marius: „lipite una de alta, destul de mari”): 6 cards touch each other
   const pg=g.createLinearGradient(0,PANEL-10,0,H);pg.addColorStop(0,'rgba(10,6,4,0)');pg.addColorStop(.18,'rgba(10,6,4,.88)');pg.addColorStop(1,'rgba(6,3,2,.97)');g.fillStyle=pg;g.fillRect(0,PANEL-10,W,H-PANEL+10);
-  B.heroes.forEach((u,i)=>{const x=pad+i*(cw+pad),y=y0,ready=canCast(u);
+  B.heroes.forEach((u,i)=>{const x=ed+i*(cw+pad),y=y0,ready=canCast(u);
     g.save();if(u.dead)g.globalAlpha=.45;
     if(!drawFCard(u,x,y,cw,ch,ready,t)){ // frame picture not loaded yet → old plain card
       g.fillStyle=u.look.gc;rr(g,x,y,cw,ch,10);g.fill();
@@ -3547,13 +3547,13 @@ function renderBag(h){const T=TE(),g=GR();
   const inv=g.inv.filter(it=>gfil==='all'||it.s===gfil).sort((a,b)=>b.r-a.r||b.lv-a.lv||a.s.localeCompare(b.s));
   $m('gInv').innerHTML=inv.length?'<div class="gGrid">'+inv.map(it=>{const o=ownerOf(it);const oh=o&&T.HB[o];return '<div class="gSlot">'+itemCard(it,o?`<img class="own" src="${portraitURL(oh)}" style="border-color:${gcol(oh)}">`:'',h&&o===h.id?'mine':o?'used':'',it.set&&h&&setKeys(h).includes(it.set)?'On':'')+'</div>';}).join('')+'</div>':'<div class="gEmpty">No gear here yet. Win battles to find gear!</div>';}
 // v16-47: the 5 battle-team heroes stand on the pedestals of Marius' HEROES page (animated idle pose)
-const PEDX=[.092,.255,.418,.582,.745,.908]; // v16-377: 6 pedestals (img/ui2/heroes_h.webp redrawn with 6)
+const PEDX=[.1,.262,.423,.582,.742,.903]; // v16-379: Marius' new picture with 6 pedestals (img/ui2/heroes_h.webp)
 function renderPeds(tl){const T=TE();let x='';for(let k=0;k<TMAX;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${PEDX[k]*100}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${String(h.n).split(',')[0]}</span><i>${h.crew?'CREW':SL(h)}</i>`+RDT(heroWhy(h)):'<b>+</b>'}</div>`;}
   $m('gPeds').innerHTML=x;pedList=tl;}
 let pedList=[],pedRaf=0,gpg='',pedT0=0;
 function pedLoop(t){pedRaf=0;const cg=$('cpGear');if(!cg.classList.contains('open'))return;pedRaf=requestAnimationFrame(pedLoop);if(t-pedT0<50)return;pedT0=t;const s=t/1000;
   if(gpg===''){const cv=$('gPedCv'),r=cv.getBoundingClientRect();if(!r.width)return;const dpr=Math.min(2,devicePixelRatio||1),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
-    const X=cv.getContext('2d');X.clearRect(0,0,W,H);pedList.forEach((h,k)=>{if(h&&hasSpr(h.id))pose(X,h.id,'idle',s+k*.37,0,W*PEDX[k],H*.9,H*.42,1);});}
+    const X=cv.getContext('2d');X.clearRect(0,0,W,H);pedList.forEach((h,k)=>{if(h&&hasSpr(h.id))pose(X,h.id,'idle',s+k*.37,0,W*PEDX[k],H*.875,H*.42,1);});}
   else if(gpg==='hero'){const h=gHero(),cv=$('gHeroCv'),r=cv.getBoundingClientRect();if(!h||!r.width)return;const dpr=Math.min(2,devicePixelRatio||1),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
     const X=cv.getContext('2d');X.clearRect(0,0,W,H);X.imageSmoothingQuality='high';if(!hdPose(X,h.id,s,W*.5,H*.93,H*.62)&&hasSpr(h.id))pose(X,h.id,'idle',s,0,W*.5,H*.93,H*.62,1);}}
 // v16-252 (Marius: "the hero in the middle is not HD"): HERO page = HD idle (tools/v8_hero.py with HD=1 → img/hero/hd_<id>.webp, idle row at 2.4×).
