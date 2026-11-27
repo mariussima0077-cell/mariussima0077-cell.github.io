@@ -211,7 +211,7 @@ async function report(b, env) {
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(b.pid, now, 'dual', 'same account on 2 phones at the same time (info only)').run(); }
   const bmaxOld = old ? Math.max(old.bmax || 0, old.best || 0) : 0, bmax = Math.max(bmaxOld, s.best | 0);
   // 2) impossible numbers
-  if (s.mythic > 10 ||  /* v16-161: 6 Mythic heroes + 2 Mythic drivers + 2 Mythic guards (was 6 → a full collection could be flagged) */ s.heroes > 120 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 3000 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
+  if (s.mythic > 40 ||  /* v16-161: was 10. 27 nov (Adi banned in a loop after 10,000 gift tickets): today 10 Mythic heroes + 2 drivers + 2 guards = 14 → a full collection was 'impossible'. Now 40 / 300 = room for future heroes */ s.heroes > 300 || s.stars > s.heroes * 50 || s.lv > 140 || s.best > 3000 || s.money < 0) { pts += 100; kinds.add('proof'); why.push('impossible_values'); }
   // 3) compared with the last report
   if (old) {
     const dt = Math.max(1, (now - old.last) / 1000);
@@ -276,7 +276,9 @@ async function report(b, env) {
   }
   const score = Math.min(999, (old ? old.score : 0) + pts);
   // v16-157: ban only with a PROOF or 2 different kinds of signs; otherwise hidden (shadow) from score SHADOW_AT
-  const banned = old && old.banned ? 1 : (score >= BAN_AT && canBan(kinds) ? 1 : 0);
+  // 27 nov (Marius): after ✅ unban in /admin the bot may NOT ban again automatically for 48 h (only hide in shadow) – unban means unban
+  const adminUnban = old && !old.banned && !!(await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='unban' AND detail='by admin' AND t>?").bind(b.pid, now - 2 * 864e5).first());
+  const banned = old && old.banned ? 1 : (score >= BAN_AT && canBan(kinds) && !adminUnban ? 1 : 0);
   const shadow = old && old.shadow === 2 ? 2 : (!banned && score >= SHADOW_AT ? 1 : old && old.shadow === 1 && score >= 30 ? 1 : 0);
   if (shadow === 1 && !(old && old.shadow)) why.push('→ hidden (shadow)');
   const flags = [...new Set([...(old && old.flags ? old.flags.split(',') : []), ...(b.flags || [])])].filter(Boolean).join(',');
@@ -315,7 +317,8 @@ async function scan(env) {
     if (why.length && await db.prepare("SELECT 1 FROM events WHERE pid=? AND t>? AND detail LIKE 'bot:%'").bind(p.pid, now - day).first()) continue;
     if (why.length) {
       const k = kindsOf(p.sig); k.add('econ');
-      const score = p.score + 50, ban = score >= BAN_AT && canBan(k) ? 1 : 0, sh = p.shadow === 2 ? 2 : (!ban && score >= SHADOW_AT ? 1 : p.shadow || 0);   // v16-157
+      const au = !!(await db.prepare("SELECT 1 FROM events WHERE pid=? AND kind='unban' AND detail='by admin' AND t>?").bind(p.pid, now - 2 * day).first());   // 27 nov: 48 h after an admin unban → no auto ban
+      const score = p.score + 50, ban = score >= BAN_AT && canBan(k) && !au ? 1 : 0, sh = p.shadow === 2 ? 2 : (!ban && score >= SHADOW_AT ? 1 : p.shadow || 0);   // v16-157
       await db.prepare('UPDATE players SET score=?, banned=?, reason=?, sig=?, shadow=? WHERE pid=?').bind(score, ban, why.join(' · '), [...k].join(','), sh, p.pid).run();
       await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(p.pid, now, ban ? 'ban' : 'flag', 'bot: ' + why.join(' · ')).run();
     }
@@ -870,7 +873,7 @@ async function admin(url, env) {
       else return new Response('This player has no online profile yet (he never opened the online pages) – the answer cannot reach his Mail. Try again later.', {status:200}); }
     return Response.redirect(url.origin + '/admin?key=' + k + '#sup', 302); }
   const act = url.searchParams.get('unban');
-  if (act) { await db.prepare('UPDATE players SET banned=0, score=0, shadow=0, sig=NULL, reason=? WHERE pid=?').bind('unbanned by admin', act).run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
+  if (act) { await db.prepare('UPDATE players SET banned=0, score=0, shadow=0, sig=NULL, reason=? WHERE pid=?').bind('unbanned by admin', act).run(); await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(act, Date.now(), 'unban', 'by admin').run(); return Response.redirect(url.origin + '/admin?key=' + k, 302); }
   // v16-157: hide (shadow) / show again by hand · player card
   const shw = url.searchParams.get('shadow'), ush = url.searchParams.get('unshadow');
   if (shw) { await db.prepare('UPDATE players SET shadow=2 WHERE pid=?').bind(shw).run(); await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind(shw, Date.now(), 'flag', 'hidden (shadow) by admin').run(); return Response.redirect(url.origin + '/admin?key=' + k + '&p=' + encodeURIComponent(shw), 302); }
