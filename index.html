@@ -614,8 +614,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #fuelChip.on{display:flex}#fuelChip b{font-size:15px}#fuelChip i{font-style:normal;color:#3a2200;background:linear-gradient(#ffe27a,#ffb300);border-radius:8px;padding:1px 6px}
 #fuelChip.tank{animation:fcP 1s ease-in-out infinite}@keyframes fcP{50%{transform:scale(1.06);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #ffd54a,0 0 14px #ffb300}}
 #fuelChip.boost i{background:linear-gradient(#80d8ff,#2979ff);color:#fff}
-.megaB{position:fixed;left:50%;top:22%;transform:translate(-50%,-50%);z-index:9000;pointer-events:none;text-align:center;padding:10px 26px 12px;border-radius:16px;background:linear-gradient(180deg,#c62828,#5a0a0a);border:3px solid #ffd54a;box-shadow:0 0 0 3px #3a0000,0 10px 30px #000c,0 0 44px #ff1744aa;animation:gRaid 3.3s ease-out forwards}
-.megaB b{display:block;font:900 34px Game,system-ui;color:#ffd54a;text-shadow:0 3px 0 #000;white-space:nowrap}.megaB span{display:block;font:900 15px Game,system-ui;color:#fff;letter-spacing:2px;text-shadow:0 2px 0 #000;white-space:nowrap}
+.megaB{position:fixed;left:50%;top:22%;width:min(94vw,430px);transform:translate(-50%,-50%);z-index:9000;pointer-events:none;text-align:center;filter:drop-shadow(0 6px 14px #000a);animation:gRaid 3.3s ease-out forwards}
+.megaB img{display:block;width:100%}.megaB span{display:inline-block;margin-top:-6px;padding:3px 16px;border-radius:12px;background:linear-gradient(180deg,#c62828,#5a0a0a);border:2px solid #ffd54a;font:900 15px Game,system-ui;color:#fff;letter-spacing:2px;text-shadow:0 2px 0 #000;white-space:nowrap}
 .raidC p.ht{color:#ffb74d}
 .htB{display:flex;gap:10px;align-items:center;background:linear-gradient(180deg,#3a1f12,#1f120b);border:1.5px solid #ff8f00;border-radius:12px;padding:8px 10px;margin:4px 0}
 .htL{flex:none;width:52px;text-align:center}.htL b{display:block;font:900 30px Game,system-ui;color:#ffb300;text-shadow:0 0 10px #ff6d00,0 2px 0 #000;line-height:1}.htL small{font:800 10px Body,system-ui;color:#c9a27a}
@@ -1979,7 +1979,7 @@ function startRaid(force){const tg=theftTargets().length;if(!tg)return false;
   return true;}
 function raidBanner(kind,n){if(!mapSeen())return;
   if(kind==='gang'){const b=document.createElement('img');b.src='img/thief/gang_raid.webp';b.className='gRaidB';document.body.appendChild(b);setTimeout(()=>b.remove(),2900);return;}
-  const b=document.createElement('div');b.className='megaB';b.innerHTML='<b>MEGA RAID!</b><span>'+n+' THIEVES</span>';document.body.appendChild(b);setTimeout(()=>b.remove(),3300);}
+  const b=document.createElement('div');b.className='megaB';b.innerHTML='<img src="img/thief/mega_raid.webp" alt="MEGA RAID!"><span>'+n+' THIEVES</span>';document.body.appendChild(b);setTimeout(()=>b.remove(),3300);}   // v16-382: Marius' banner
 function secAlarm(T,why){if(!RAID||RAID.alarm)return;RAID.alarm=1;RAID.at=RAID.t;const c=T.car;
   float(c.x,c.y-34,RAID.n>1?'🚨 '+RAID.n+' THIEVES!':'🚨 THIEF!','#ff5252');if(why)float(T.p.x,T.p.y-46,why,'#ffd54a');rsfx('alarm');
   let w=0;guards.forEach(g=>{if(!g.p.vis||g.mode==='run'||g.mode==='fight')return;g.tg=T;
