@@ -24,3 +24,9 @@ Marius: „fă jocul în câteva limbi (5-6 max), prescurtări unde nu încape, 
 
 ## Ca să-l pui pe live (doar când spune Marius)
 schimbă `const V` în sw.js + `CV` în online.js, `python3 tools/sw_hash.py`, `bash tools/check_undef.sh`, `python3 tools/budget_phone.py`, apoi push pe `main`.
+
+## Poze traduse (v16-374)
+- 26 de poze cu text englezesc (titluri SHOP/BAG/CREW, HERO/GEAR/CREW SUMMON, CAMPAIGN, BATTLE, DAILY QUESTS, TEAM & COLLECTION, HERO COLLECTION, FUSION, raritățile din summon, WORLD BOSS, GEAR FORGE, DUNGEON PASS, check-in 5000…) au copii traduse în `img/l/<limbă>/` (aceeași cale).
+- Sursa: `lang/src/img_spec.py` (casete + texte) → `python3 tools/img_l10n.py` (refăcute toate) sau `ONLY=team python3 tools/img_l10n.py fr` (una singură). Lista ajunge în `lang/imgs.js`.
+- `lang/i18n.js` schimbă căile `img/...` → `img/l/<limbă>/...` (HTML, <img>, stiluri, canvas). Engleza nu încarcă nimic în plus.
+- Rămân în engleză intenționat (nume de moduri / marcă): CAMPAIGN/ARENA/TORQUE TOWER/CLASS TOWERS/TORQUE CUP/WORLD BOSS/DUNGEONS pe cardurile din BATTLE, RAIL WARS, GRAND PRIX, WANTED, numele pachetelor din Shop, firmele clădirilor.

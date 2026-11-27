@@ -27,6 +27,29 @@ function langBtn(){var ld=document.getElementById('loader');if(!ld||document.get
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',langBtn);else langBtn();
 if(L==='en')return;
 try{document.documentElement.lang=L;}catch(e){}
+// translated pictures (tools/img_l10n.py → img/l/<lang>/…, list in lang/imgs.js): every 'img/<path>' in the list is swapped
+// in HTML strings, <img src>, inline styles and <style> sheets – English players never load these.
+(function(){
+  var RX=null;function rx(){if(RX)return RX;var l=window.TE_IMGL;if(!l||!l.length)return null;
+    RX=new RegExp('(^|[^/\\w]|\\./)img/('+l.map(function(p){return p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');return RX;}
+  function rw(s){var r=rx();if(!r||typeof s!=='string'||s.indexOf('img/')<0)return s;r.lastIndex=0;return s.replace(r,'$1img/l/'+L+'/$2');}
+  window.TE_IMGRW=rw;
+  function hook(P,k){var d=Object.getOwnPropertyDescriptor(P,k);if(!d||!d.set)return;Object.defineProperty(P,k,{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){d.set.call(this,rw(v));}});}
+  try{hook(Element.prototype,'innerHTML');if(window.ShadowRoot)hook(ShadowRoot.prototype,'innerHTML');hook(Element.prototype,'outerHTML');hook(HTMLImageElement.prototype,'src');
+    hook(CSSStyleDeclaration.prototype,'cssText');['background','backgroundImage','borderImage','borderImageSource'].forEach(function(k){hook(CSSStyleDeclaration.prototype,k);});
+    var ia=Element.prototype.insertAdjacentHTML;Element.prototype.insertAdjacentHTML=function(w,h){return ia.call(this,w,rw(h));};
+    var sa=Element.prototype.setAttribute;Element.prototype.setAttribute=function(n,v){return sa.call(this,n,(n==='src'||n==='style')?rw(v):v);};
+    var sp=CSSStyleDeclaration.prototype.setProperty;CSSStyleDeclaration.prototype.setProperty=function(n,v,p){return sp.call(this,n,rw(v),p);};
+    var tc=Object.getOwnPropertyDescriptor(Node.prototype,'textContent');Object.defineProperty(Node.prototype,'textContent',{configurable:true,get:tc.get,set:function(v){tc.set.call(this,(this.nodeName==='STYLE')?rw(v):v);}});
+  }catch(e){}
+  function fix(n,deep){if(n.nodeType!==1)return;
+    if(n.nodeName==='STYLE'){var s=n.textContent,r=rw(s);if(r!==s)n.textContent=r;return;}
+    if(n.nodeName==='IMG'){var a=n.getAttribute('src');if(a){var b=rw(a);if(b!==a)n.setAttribute('src',b);}}
+    var st=n.getAttribute&&n.getAttribute('style');if(st&&st.indexOf('img/')>=0){var b2=rw(st);if(b2!==st)n.setAttribute('style',b2);}
+    if(deep&&n.querySelectorAll){var q=n.querySelectorAll('style,img,[style*="img/"]');for(var i=0;i<q.length;i++)fix(q[i]);}}
+  function go(){fix(document.documentElement,1);new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var a=ms[i].addedNodes;for(var j=0;j<a.length;j++)fix(a[j]);}}).observe(document.documentElement,{childList:true,subtree:true});}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){fix(document.documentElement,1);});go();}else go();
+})();
 window.TE_LANG_LOAD=function(D){
   var NUM=/\d[\d.,]*/g,CACHE=new Map(),MISS=window.__MISS=new Set();
   function look(c){var r=D[c];if(r!=null)return r;var n=c.match(NUM);if(n){var t=c.replace(NUM,'#');r=D[t];if(r!=null){var i=0;return r.replace(/#/g,function(){var v=n[i++];return v==null?'':v;});}}return null;}
@@ -68,5 +91,6 @@ window.TE_LANG_LOAD=function(D){
   function start(){watch(document.body);}
   if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
 };
+document.write('<script src="lang/imgs.js?v=1"><\/script>');
 document.write('<script src="lang/'+L+'.js?v=1"><\/script>');
 })();

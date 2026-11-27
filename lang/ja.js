@@ -946,6 +946,7 @@ TE_LANG_LOAD({
 "Fights up close (takes more hits)": "近接戦闘（被弾が多い）",
 "Final boss": "最終ボス",
 "Finish": "達成",
+"Finish # Service jobs": "サービス作業を#件完了",
 "Finish the tutorial for a big gift:": "チュートリアル完了で大きなギフト：",
 "Finished cars wait here until the Sales Office sells them online.": "完成車は販売所がネット販売するまでここで待機。",
 "Fire chief": "消防指揮車",

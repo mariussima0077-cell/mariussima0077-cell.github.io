@@ -943,6 +943,7 @@ TE_LANG_LOAD({
 "Fights up close (takes more hits)": "Combat au corps à corps (prend plus de coups)",
 "Final boss": "Boss final",
 "Finish": "Termine",
+"Finish # Service jobs": "Termine # services",
 "Finish the tutorial for a big gift:": "Termine le tutoriel pour un gros cadeau :",
 "Finished cars wait here until the Sales Office sells them online.": "Les voitures finies attendent ici que le Bureau des ventes les vende en ligne.",
 "Fire chief": "Chef des pompiers",
