@@ -72,8 +72,8 @@ css.textContent=`
 .anx{display:flex;align-items:center;gap:8px;margin:12px 0 -4px;padding:8px 12px;border-radius:12px;border:1.5px solid #ffb30055;background:#1e140d;font-weight:900;font-size:13px;color:#ffd9b0;letter-spacing:.5px}
 .anx i{flex:1;text-align:right;font-style:normal;font-size:12px;color:#ffe082}.anx b{min-width:42px;text-align:center;padding:4px 0;border-radius:9px;background:#3a2c22;color:#a1887f;font-size:12px}
 .anx.on{border-color:#66bb6a;box-shadow:0 0 12px #66bb6a44}.anx.on b{background:linear-gradient(#81c784,#388e3c);color:#fff}
-.slots{display:flex;gap:6px;justify-content:center}
-.slot{width:62px;height:84px;border-radius:12px;border:2px dashed #ffb30088;background:#0007;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#ffb30099;font-size:26px;font-weight:900}
+.slots{display:flex;gap:5px;justify-content:center}
+.slot{width:62px;flex:0 1 62px;min-width:0;height:84px;border-radius:12px;border:2px dashed #ffb30088;background:#0007;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#ffb30099;font-size:26px;font-weight:900}
 .slot img,.pick img{width:100%;height:62px;object-fit:cover;display:block}
 .slot .n,.pick .n{position:absolute;bottom:0;left:0;right:0;font-size:8.5px;font-weight:900;text-align:center;background:#000c;padding:2px 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
 .slot .r,.pick .r{position:absolute;top:2px;left:3px;font-size:9px;font-weight:900;text-shadow:0 1px 0 #000}
@@ -336,11 +336,12 @@ const css3=document.createElement('style');css3.textContent=`
 #cpCardBox .ppR3{position:absolute!important;left:66.93%;top:52.79%;width:13.47%;height:8.79%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%}
 #cpCardBox .ppR span{line-height:1}#cpCardBox .ppR span img{max-height:7cqw}#cpCardBox .ppR b{font:900 3cqw Game,system-ui;color:#fff;text-shadow:0 1px 0 #000,0 0 4px #000;white-space:nowrap}
 #cpCardBox .ppG{position:absolute!important;left:50%;transform:translateX(-50%);top:61.2%;width:auto;max-width:76%;height:2.6%;box-sizing:border-box;padding:0 2.2cqw;border-radius:2cqw;background:#0a0f1ae8;box-shadow:0 0 0 1px #e0a82e66;display:flex;justify-content:center;align-items:center;gap:1.4cqw;flex-wrap:nowrap;white-space:nowrap;font:900 2.1cqw Game,system-ui;text-shadow:0 1px 0 #000;z-index:2}
-#cpCardBox .ppS0{position:absolute!important;left:13.07%;top:70.23%;width:12.48%;height:8.2%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS1{position:absolute!important;left:28.61%;top:70.23%;width:12.48%;height:8.2%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS2{position:absolute!important;left:43.96%;top:70.23%;width:12.48%;height:8.2%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS3{position:absolute!important;left:59.31%;top:70.23%;width:12.48%;height:8.2%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#cpCardBox .ppS4{position:absolute!important;left:74.65%;top:70.23%;width:12.48%;height:8.2%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS0{position:absolute!important;left:12.40%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS1{position:absolute!important;left:25.46%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS2{position:absolute!important;left:38.51%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS3{position:absolute!important;left:51.57%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS4{position:absolute!important;left:64.63%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#cpCardBox .ppS5{position:absolute!important;left:77.68%;top:70.98%;width:10.14%;height:6.62%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 #cpCardBox .ppS img{width:88%;height:88%;object-fit:cover;border-radius:1.4cqw;background:#000}#cpCardBox .ppS i{font:900 7cqw Game,system-ui;color:#ffd54a55;font-style:normal}
 #cpCardBox .ppEd{position:absolute!important;left:33%;top:65.4%;width:34%;height:4.1%;border:0;border-radius:2cqw;background:linear-gradient(#64b5f6,#1565c0);box-shadow:0 0 0 .4cqw #0a2a52,0 .6cqw 0 #0a2a52;color:#fff;font:900 2.9cqw Game,system-ui;letter-spacing:.3px;text-shadow:0 1px 0 #000}
 #cpCardBox .ppB{position:absolute!important;left:4.46%;top:83.61%;width:21.78%;height:11.15%;background:none;border:0;border-radius:3cqw}
@@ -914,7 +915,8 @@ const TRK=i=>1+.07*Math.min(1,Math.max(0,i-15)/45); // v16-136: TEAM ROLES – a
 // with Legendary +10, Mythic AWAKENING, Mythic +15%, Ascended +20% and the stronger collections (measured with tools/endgame.py: Epic teams +4%, Legendary +6…+10 / Mythic copies ≈ ×2)
 const PKP=[[0,1.04],[100,1.06],[300,1.3],[600,1.7],[900,2]],PK=i=>{if(i<=0)return PKP[0][1];for(let k=1;k<PKP.length;k++){const [a,va]=PKP[k-1],[b,vb]=PKP[k];if(i<=b)return va+(vb-va)*(i-a)/(b-a);}return PKP[PKP.length-1][1];};
 const MON_SETX=1.3; // v16-246 (Marius): every piece is a set piece now → all monsters +30% (campaign, towers, Class Towers, Dungeons, World Boss)
-const stageMul0=i=>MON_SETX*stageMulB(i)*GK(i)*TRK(i)*PK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
+const T6K=i=>i<30?1:i>=90?1.2:1+.2*(i-30)/60; // v16-377 (Marius 27 nov): 6th hero in the team (+~20% power) → monsters +20%, ramped in stages 30-90 (the start stays as it was)
+const stageMul0=i=>T6K(i)*MON_SETX*stageMulB(i)*GK(i)*TRK(i)*PK(i)*(TE().expMul?TE().expMul(i):1); // v16-99: monsters follow the hero level the game expects at this stage
 const stageMulB=i=>{if(i<20)return Math.pow(1.1,i);for(let k=1;k<SMK.length;k++){const [a,va]=SMK[k-1],[b,vb]=SMK[k];if(i<=b)return va*Math.pow(vb/va,(i-a)/(b-a));}return SMK[SMK.length-1][1];};
 // v16-73: battles gave ~20× more money than the garage at the start (all buildings LV4 in 20 min) → CP_MON
 const CP_MON=.25; // v16-99: .35→.25 – gear does not cost money any more (Gear Parts), money is only for the garage
@@ -1232,7 +1234,8 @@ function pow(h,ov){return powS(unitStats(h,ov),ROLE[roleOf(h)]);}
 function crewHero(k){return {id:'crew'+k,crew:true,n:CREW_NAMES[k],gr:0,cat:'m',sp:'crew',f:false};}
 function teamHeroes(){const T=TE(),ids=(T.G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&T.G.h.own[id]);
   return ids.slice(0,5).map(id=>id.startsWith('crew')?crewHero(+id.slice(4)):T.HB[id]);}
-function bestTeam(){return myMechs().slice(0,5).map(h=>h.id);} // v16-122 (Marius): no more old 'Rookie Crew' helpers – only your real heroes
+const TMAX=6; // v16-377 (Marius 27 nov): BATTLE TEAM = 6 heroes (3 front + 3 back)
+function bestTeam(){return myMechs().slice(0,TMAX).map(h=>h.id);} // v16-122 (Marius): no more old 'Rookie Crew' helpers – only your real heroes
 function teamPower(list){const L=list.filter(Boolean),k=1+teamRoles(L.filter(h=>!h.crew)).bon;return Math.round(L.reduce((a,h)=>a+pow(h)*(h.crew?1:k),0));} // v16-136: + TEAM ROLES bonus
 // v15: early bosses are easier (no long wall at the start of the game)
 const BEASE=c=>[.42,.55,.68,.8,.8][c]??.72; // v16-40: 2-month test – chapter bosses were walls of 7-13 days (5-20 .9→.8, chapter 6+ 1→.72)
@@ -1933,9 +1936,9 @@ function mkMon(t,i,k){const M=MON[t];if(M.sp)msprLoad(M.sp);if(HM&&!B.tw){fxImg(
     b:M.b,at:M.at||'',sp1:M.b==='pound'?4:M.b==='crusher'?3:M.b==='titan'?4:0,sp2:M.b==='crusher'?8:M.b==='titan'?9:0,sp3:M.b==='titan'?14:0,pounce:M.pounce?1:0,charge:M.charge?1:0,enr:false};}
 
 const FORM=[[.36,.22],[.33,.62],[.22,.42],[.14,.14],[.13,.8],[.25,.92],[.05,.48]]; // v16-292: slots 6-7 only for the tutorial opening fight (7 Mythics)
-const FORM6=[[.37,.18],[.39,.5],[.37,.82],[.18,.16],[.21,.5],[.18,.84]]; // v16-372 (Marius 26 nov): TEST 6 heroes = 3 front + 3 back (Training Room only)
+const FORM6=[[.37,.18],[.39,.5],[.37,.82],[.18,.16],[.21,.5],[.18,.84]]; // v16-377 (Marius 27 nov): 6 heroes = 3 front + 3 back (was a Training Room test in v16-372)
 function formation(){const hs=B.heroes;const melee=hs.filter(u=>u.rng<80*S),rng=hs.filter(u=>u.rng>=80*S);
-  const F=hs.length===6&&B.tw&&B.tw.trn?FORM6:FORM;const order=[...melee,...rng];order.forEach((u,i)=>{u.fx=W*F[i][0];u.fd=F[i][1];});}
+  const F=hs.length===6?FORM6:FORM;const order=[...melee,...rng];order.forEach((u,i)=>{u.fx=W*F[i][0];u.fd=F[i][1];});}
 
 // v16-10: a tester's battle never started (FIGHT → back to the stages). If starting fails, retry without the new effects;
 // if it still fails, show the error so he can send a screenshot.
@@ -3319,7 +3322,7 @@ function openCard(i){cbgPre(i);const T=TE(),G=T.G,PX=CPX(),s=STAGES[i],C=CHAP[s.
    ${(()=>{const st=PX.stuck;if(i!==PX.best||!st||st.si!==i)return '';const gk=Math.min(GRIT_N,Math.floor((Date.now()-st.t)/216e5)),nx=gk<GRIT_N?Math.ceil((216e5-(Date.now()-st.t)%216e5)/36e5):0;return `<div class="grit">🔥 NEVER GIVE UP: <b>+${Math.round(gritK(gk)*100)}%</b> HP &amp; attack${gk<GRIT_N?` · next +${gritStep(gk)*100}% in ~${nx}h`:' (max)'}</div>`;})()}
    <div class="ppRT">${first?'FIRST CLEAR':'REPLAY'}</div>${rws.slice(0,4).map((r,k)=>`<div class="ppR ppR${k}"><span>${r[0]}</span><b>${T.numH?T.numH(r[1],'gold',1.1):r[1]}</b></div>`).join('')}
    <div class="ppG">${(()=>{const d=gdrop(s.oc).slice(),a=s.oc>=ASC_CH?Math.round(d[5]*.15*Math.min(1,(s.oc-ASC_CH+1)/21)*10)/10:0;d[5]=Math.round((d[5]-a)*10)/10;d.push(a);return ['COM','UNC','RAR','EPI','LEG','MYT','ASC'].map((n,k)=>d[k]?`<span style="color:${GG(k).c}">${n} ${d[k]}%</span>`:'').filter(Boolean).join(' ');})()}</div>
-   ${[0,1,2,3,4].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="team">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
+   ${[0,1,2,3,4,5].map(k=>{const h=tm[k];return `<div class="ppS ppS${k}" data-a="team">${h?`<img src="${portraitURL(h)}" style="box-shadow:0 0 0 2px ${gcol(h)}">`:'<i>+</i>'}</div>`;}).join('')}
    <button class="ppB" data-a="close" aria-label="Back"></button><button class="ppF" data-a="fight">FIGHT!</button>${!first&&!HM?`<button class="ppSw${cpSwOK()?'':' off'}" data-a="sweep">⚡ SWEEP<small>${cpSwOK()?swLeft()+' / '+SW_MAX+' today':'VIP 4'}</small></button>`:''}`;
   const mc=$('cpMons');const nMon=s.w.flat().length,info=()=>{const d=document.createElement('div');d.className='mon monInfo';d.innerHTML='<b>×'+nMon+'</b><div>'+s.w.length+' WAVES</div>';return d;};
   const tl=types.slice(0,3);if(tl.length<3)setTimeout(()=>{if(tl.length===2)mc.insertBefore(info(),mc.children[1]);else if(tl.length===1){mc.insertBefore(info(),mc.firstChild);}},0);
@@ -3370,7 +3373,7 @@ let tsel=[],tsi=0,TCX=null; // v16-99: TCX = team screen opened from Tower / Cla
 const tPool=()=>TCX?TCX.pool():[...myMechs(),...[0,1,2,3,4].map(crewHero)],tEP=()=>TCX?TCX.ep():enemyPower(tsi),tBest=()=>TCX?TCX.best():bestTeam();
 function tSave(){const T=TE();if(TCX)TCX.set(tsel.slice());else T.G.cp.team=tsel.slice();T.save();}
 const isTank=r=>r==='engine'||r==='all';
-function curTeamList(){const T=TE(),G=T.G;let ids=(G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&G.h.own[id]);if(!ids.length)ids=bestTeam();return ids.slice(0,5).map(heroOf);}
+function curTeamList(){const T=TE(),G=T.G;let ids=(G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&G.h.own[id]);if(!ids.length)ids=bestTeam();return ids.slice(0,TMAX).map(heroOf);}
 function teamDiff(Lb,La){const cb=Lb.map(h=>roleOf(h)),ca=La.map(h=>roleOf(h)),pros=[],cons=[];
   const med=l=>l.filter(r=>r==='service').length,tank=l=>l.filter(isTank).length,rng=l=>l.filter(r=>ROLE[r].rng>=80).length;
   if(med(cb)&&!med(ca))cons.push('No Medic left – nobody heals the team');if(!med(cb)&&med(ca))pros.push('Team gets a Medic – heals everybody');
@@ -3419,9 +3422,9 @@ function popAutoBest(){const T=TE(),nb=tBest(),Lb=tsel.map(heroOf),La=nb.map(her
 function openTeam(si,cx){const T=TE(),G=T.G;tsi=si;TCX=cx||null;cleanGear();tsel=TCX?TCX.get():curTeamList().map(h=>h.id);
   const render=()=>{const pool=tPool();const list=tsel.map(heroOf);
     const card=(h,cls,extra,k)=>`<div class="${cls}" style="border-color:${gcol(h)}" ${k!=null?'data-slot="'+k+'"':'data-id="'+h.id+'"'}><img src="${portraitURL(h)}"><span class="r" style="color:${gcol(h)}">${h.crew?'CREW':SL(h)+' <small style="color:#e2c6ff">Lv'+TE().lvOf(h.id)+'</small>'}</span><img class="rl" src="${roleBadge(clsOf(h))}">${extra||''}<span class="n">${h.n}</span></div>`;
-    let sl='';for(let k=0;k<5;k++){const h=list[k];sl+=h?card(h,'slot f','',k):'<div class="slot">+</div>';}
+    let sl='';for(let k=0;k<TMAX;k++){const h=list[k];sl+=h?card(h,'slot f','',k):'<div class="slot">+</div>';}
     const ep=tEP(),tp=teamPower(list),col=tp>=ep*1.15?'#66bb6a':tp>=ep*.85?'#ffb300':'#ff5252';
-    $('cpTeamBox').innerHTML=`<button class="stX" data-a="back" aria-label="close">✕</button><h2>${TCX&&TCX.done?'EDIT BATTLE TEAM':'CHOOSE YOUR TEAM'}</h2><div class="sub">${TCX?TCX.t:'STAGE '+sLabel(si)} · max 5 · ${TCX&&TCX.done?'tap a mechanic below to add him · tap a team slot to change him':'tap a hero in the team to change him'}</div><div class="cpSec">TEAM</div><div class="slots">${sl}</div>
+    $('cpTeamBox').innerHTML=`<button class="stX" data-a="back" aria-label="close">✕</button><h2>${TCX&&TCX.done?'EDIT BATTLE TEAM':'CHOOSE YOUR TEAM'}</h2><div class="sub">${TCX?TCX.t:'STAGE '+sLabel(si)} · max '+TMAX+' · ${TCX&&TCX.done?'tap a mechanic below to add him · tap a team slot to change him':'tap a hero in the team to change him'}</div><div class="cpSec">TEAM</div><div class="slots">${sl}</div>
      <div id="cpPow">${IMGI(glyphURL('swords','#ffd54a'),'1em','-.12em')} ${tp.toLocaleString()} <span style="color:#9a8">vs</span> <span style="color:#ff8a80">${ep.toLocaleString()}</span> <span style="color:${col}">${tp>=ep*1.15?'· EASY':tp>=ep*.85?'· EVEN':'· HARD'}</span>${mbWarn(ep,tp,1)}</div>
      <div class="cpSec" style="display:flex;justify-content:space-between;align-items:center;gap:6px">YOUR MECHANICS <span style="display:flex;gap:6px">${TCX?'':`<button class="cpB sm" data-a="gear">`}${TCX?'':`${IMGI(glyphURL('bag','#ffd54a'))} GEAR</button>`}<button class="cpB sm" data-a="best">${IMGI(glyphURL('bolt','#ffd54a'))} AUTO BEST</button></span></div>
      <div class="pool">${pool.map(h=>card(h,'pick'+(tsel.includes(h.id)?' on':''))).join('')}</div>
@@ -3434,7 +3437,7 @@ function openTeam(si,cx){const T=TE(),G=T.G;tsi=si;TCX=cx||null;cleanGear();tsel
     if(a==='gear'){openGear(tsel.find(i=>!i.startsWith('crew')));return;}
     if(a==='go'){if(!tsel.length){T.toast('Pick at least 1 hero',2000);return;}tSave();$('cpTeam').classList.remove('open');if(TCX){const c=TCX;TCX=null;c.go(tsel.map(heroOf));return;}safeStart(si,teamHeroes());return;}
     if(sk!=null){popReplace(+sk);return;}
-    if(id){const k=tsel.indexOf(id);if(k>=0)popReplace(k);else if(tsel.length<5){tsel.push(id);tSave();render();}else popWhoLeaves(id);}};}
+    if(id){const k=tsel.indexOf(id);if(k>=0)popReplace(k);else if(tsel.length<TMAX){tsel.push(id);tSave();render();}else popWhoLeaves(id);}};}
 
 // v16-101 (Marius: "team modification must be easier"): EDIT TEAM from the HEROES page = the team screen (tap to add,
 // tap a slot to change – still with before / after), opened above the HEROES page, DONE goes back to it.
@@ -3542,12 +3545,13 @@ function renderBag(h){const T=TE(),g=GR();
   const inv=g.inv.filter(it=>gfil==='all'||it.s===gfil).sort((a,b)=>b.r-a.r||b.lv-a.lv||a.s.localeCompare(b.s));
   $m('gInv').innerHTML=inv.length?'<div class="gGrid">'+inv.map(it=>{const o=ownerOf(it);const oh=o&&T.HB[o];return '<div class="gSlot">'+itemCard(it,o?`<img class="own" src="${portraitURL(oh)}" style="border-color:${gcol(oh)}">`:'',h&&o===h.id?'mine':o?'used':'',it.set&&h&&setKeys(h).includes(it.set)?'On':'')+'</div>';}).join('')+'</div>':'<div class="gEmpty">No gear here yet. Win battles to find gear!</div>';}
 // v16-47: the 5 battle-team heroes stand on the pedestals of Marius' HEROES page (animated idle pose)
-function renderPeds(tl){const T=TE();let x='';for(let k=0;k<5;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${[12.4,31.2,50,68.8,87.5][k]}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${String(h.n).split(',')[0]}</span><i>${h.crew?'CREW':SL(h)}</i>`+RDT(heroWhy(h)):'<b>+</b>'}</div>`;}
+const PEDX=[.092,.255,.418,.582,.745,.908]; // v16-377: 6 pedestals (img/ui2/heroes_h.webp redrawn with 6)
+function renderPeds(tl){const T=TE();let x='';for(let k=0;k<TMAX;k++){const h=tl[k];x+=`<div class="gPed${h&&h.id===gsel&&gpg==='hero'?' on':''}" data-ts="${k}" style="left:${PEDX[k]*100}%">${h?(hasSpr(h.id)?'':`<img class="pp" src="${portraitURL(h)}" style="border-color:${gcol(h)}">`)+`<span style="color:${gcol(h)}">${String(h.n).split(',')[0]}</span><i>${h.crew?'CREW':SL(h)}</i>`+RDT(heroWhy(h)):'<b>+</b>'}</div>`;}
   $m('gPeds').innerHTML=x;pedList=tl;}
 let pedList=[],pedRaf=0,gpg='',pedT0=0;
 function pedLoop(t){pedRaf=0;const cg=$('cpGear');if(!cg.classList.contains('open'))return;pedRaf=requestAnimationFrame(pedLoop);if(t-pedT0<50)return;pedT0=t;const s=t/1000;
   if(gpg===''){const cv=$('gPedCv'),r=cv.getBoundingClientRect();if(!r.width)return;const dpr=Math.min(2,devicePixelRatio||1),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
-    const X=cv.getContext('2d');X.clearRect(0,0,W,H);pedList.forEach((h,k)=>{if(h&&hasSpr(h.id))pose(X,h.id,'idle',s+k*.37,0,W*[.124,.312,.5,.688,.875][k],H*.905,H*.46,1);});}
+    const X=cv.getContext('2d');X.clearRect(0,0,W,H);pedList.forEach((h,k)=>{if(h&&hasSpr(h.id))pose(X,h.id,'idle',s+k*.37,0,W*PEDX[k],H*.9,H*.42,1);});}
   else if(gpg==='hero'){const h=gHero(),cv=$('gHeroCv'),r=cv.getBoundingClientRect();if(!h||!r.width)return;const dpr=Math.min(2,devicePixelRatio||1),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
     const X=cv.getContext('2d');X.clearRect(0,0,W,H);X.imageSmoothingQuality='high';if(!hdPose(X,h.id,s,W*.5,H*.93,H*.62)&&hasSpr(h.id))pose(X,h.id,'idle',s,0,W*.5,H*.93,H*.62,1);}}
 // v16-252 (Marius: "the hero in the middle is not HD"): HERO page = HD idle (tools/v8_hero.py with HD=1 → img/hero/hd_<id>.webp, idle row at 2.4×).
@@ -3728,7 +3732,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.g==='lvl'){const h=gHero();if(h)popLvl(h);return;}
   if(el.dataset.g==='tedit'){heroTeamEdit();return;}
   if(el.dataset.g==='fuse'){const h=gHero();if(h&&h.gr===4&&T.openFuse){const tm=document.getElementById('team');if(tm)tm.style.zIndex=30;T.openFuse(gsel);}else T.toast('⭐ Stars go up when you summon '+(h?h.n:'this hero')+' again (max +50). Legendary +'+5+' heroes can be fused into Mythic.',3800);return;}
-  if(el.dataset.g==='tin'){const h=gHero();if(!h)return;if(tsel.length<5)popTeamCmp(tsel.length,h.id);else popWhoLeaves(h.id);return;}
+  if(el.dataset.g==='tin'){const h=gHero();if(!h)return;if(tsel.length<TMAX)popTeamCmp(tsel.length,h.id);else popWhoLeaves(h.id);return;}
   if(el.dataset.g==='tout'){const h=gHero();if(!h)return;const k=tsel.indexOf(h.id);if(k<0)return;if(tsel.length<=1){T.toast('The team needs at least 1 hero',1800);return;}popTeamCmp(k,'');return;}
   if(el.dataset.sort){gsort=el.dataset.sort;renderGear();return;}
   if(el.dataset.ts!=null){const k=+el.dataset.ts,id=tsel[k];if(id&&!id.startsWith('crew')){gsel=id;renderGear();gPage('hero');return;}if(id){popReplace(k);return;}T.toast('Tap a hero below, then ➕ ADD TO TEAM',2200);return;}
@@ -4094,7 +4098,7 @@ function ctRew(k,f0){const F=ctFloor(k,f0),f=Math.min(f0,500),r={money:Math.roun
   if(ctSetF(f))r.set={s:GSLOT[ctSlot(f)%6].k,r:CT_GR(f)};if(f%10===0){r.dm=Math.round((50+f/10)/5)*5;r.gtk=1+Math.floor(f/200);}if(f%50===0)r.dm+=200+Math.round(f/2);const T=TE(),x=f>100&&f%5===0&&!ctSetF(f)?2:1;r.ess=Math.round(.5*x*T.ESS_Ui(F.eq));r.gp=Math.round(.6*x*T.GP_Ui(F.eq));r.pk={[CLS2ROLE[k]]:Math.round((100+20*f)*(f%10===0||x>1?2:1))};return r;} // v16-129: Class Tower → the parts of its class · v16-161: Essence / Gear Parts by the floor's stage; floors 101+ every 5th floor without a set piece give ×2
 function ctPower(k,f){const F=ctFloor(k,f);let p=0;F.w.forEach(w=>w.forEach(t=>{const M=MON[t];p+=(M.hp*.25+M.atk*6+M.def*4)*F.mul;}));return Math.round(p/F.w.length*1.05*(F.mod>=0?1.12:1));}
 const ctPool=k=>myMechs().filter(h=>clsOf(h)===k); // v16-246: Mythic heroes go into the tower of their class
-function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,5);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)
+function ctTeam(k){const P=ctPool(k),tm=curTeamList().map(h=>h.id),a=P.filter(h=>tm.includes(h.id));return [...a,...P.filter(h=>!tm.includes(h.id)).sort((x,y)=>pow(y)-pow(x))].slice(0,TMAX);} // v16-110: automatic (BATTLE TEAM heroes of this class first, then the strongest)
 const GRC=['#b0bec5','#66bb6a','#42a5f5','#ab47bc','#ffb300','#ff3d3d','#2ef3ff'];
 function ctSetHtml(s){return '<img src="img/ui4/st_'+s.k+'_'+s.s+'.webp" alt="" style="border-radius:4px;background:'+GRC[s.r]+'55;box-shadow:0 0 0 2px '+GRC[s.r]+'">';}
 function ctRewHtml(k,r,big){const T=TE(),a=EGI(r);if(r.set)a.push(ctSetHtml({k,s:r.set.s,r:r.set.r}));if(r.dm)a.push(T.DMI+' '+r.dm);if(r.gtk)a.push(GTKI+' '+r.gtk);if(big)a.push('<img src="img/ui2/i_coins.webp" alt=""> '+T.fmt(r.money));return '<span class="twRw">'+a.join(' &nbsp;')+'</span>';}
@@ -4681,7 +4685,7 @@ function testFill(){const T=TE(),G=T.G;let ch=!G.tacc;const up=(o,k,v)=>{if(!((o
     if(cur&&cur.r>=6){cur.sr=GSTARMAX6;cur.lv=GMAXR[6];ch=true;return;}
     const it=newItem(sl.k,6,clsOf(h));it.lv=GMAXR[6];it.sr=GSTARMAX6;g.inv.push(it);byId[it.id]=it;equip(h.id,it);ch=true;});});
   if(!g.tst5){g.tst5=1;GSLOT.forEach(sl=>{for(let k=0;k<2;k++){const it=newItem(sl.k,5);it.lv=GMAXR[5];g.inv.push(it);}});ch=true;}
-  if(!G.cp.team||!G.cp.team.length){G.cp.team=myMechs().slice(0,5).map(h=>h.id);ch=true;}
+  if(!G.cp.team||!G.cp.team.length){G.cp.team=myMechs().slice(0,TMAX).map(h=>h.id);ch=true;}
   T.save();return ch;}
 if(window.SEC&&SEC.TEST_ACC){try{if(testFill()){let k='te_tfr',n=0;try{n=+sessionStorage.getItem(k)||0;sessionStorage.setItem(k,n+1);}catch(e){}if(n<2)setTimeout(()=>location.reload(),300);}}catch(e){console.error('testFill',e);}}
 // v16-121 (Marius): Ascended gear also from Idle Rewards – from chapter 30, 0.1% per hour in the chest (seeded: no reroll)
@@ -4699,7 +4703,7 @@ function demoFight(cb){const T=TE(),HB=T.HB;const team=Object.keys(HB).map(k=>HB
   B.spd=1.5;B.auto=true;let dps=0,hp=0;B.heroes.forEach(u=>{u.max*=40;u.hp=u.max;hp+=u.max;dps+=u.atk/(u.as||1);});
   B.mons.forEach((m,i)=>{m.max=m.hp=Math.max(3000,dps*12);m.atk=hp/B.heroes.length*.01;m.d=i?.74:.26;m.x=W*(i?.84:.72);});B.bossBar=B.mons[0];}
 
-// v16-336 (Marius 26 nov): TRAINING ROOM – ONLY on the owner's full test account (SEC.TEST_ACC). Pick any 5 heroes (6 = TEST 3+3 formation, v16-372) + any campaign stage
+// v16-336 (Marius 26 nov): TRAINING ROOM – ONLY on the owner's full test account (SEC.TEST_ACC). Pick any 6 heroes (3+3 formation) + any campaign stage
 // as the enemy, fight with no rewards / no progress (tw.demo), then come back here. Used to test new heroes (Shade) before players get them.
 let TRN=null;
 function trainRoom(){if(!(window.SEC&&SEC.TEST_ACC))return;const T=TE(),HB=T.HB;
@@ -4717,7 +4721,7 @@ function trainRoom(){if(!(window.SEC&&SEC.TEST_ACC))return;const T=TE(),HB=T.HB;
     '<div class="bt"><button data-a="x">✖ CLOSE</button><button data-a="go" class="go">⚔ FIGHT</button></div>';};
   draw();d.style.display='flex';
   d.onclick=e=>{const t=e.target.closest('[data-h],[data-r],[data-f],[data-s],[data-a]');if(!t)return;
-    if(t.dataset.h){const id=t.dataset.h,i=TRN.ids.indexOf(id);if(i>=0)TRN.ids.splice(i,1);else if(TRN.ids.length<6)TRN.ids.push(id);else T.toast('Max 6 heroes (TEST) – tap one to remove it',1800);}
+    if(t.dataset.h){const id=t.dataset.h,i=TRN.ids.indexOf(id);if(i>=0)TRN.ids.splice(i,1);else if(TRN.ids.length<TMAX)TRN.ids.push(id);else T.toast('Max '+TMAX+' heroes – tap one to remove it',1800);}
     else if(t.dataset.r){TRN.ids.splice(+t.dataset.r,1);}
     else if(t.dataset.f){TRN.f=t.dataset.f;}
     else if(t.dataset.s){TRN.si=+t.dataset.s;}

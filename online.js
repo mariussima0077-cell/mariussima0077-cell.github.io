@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=376;window.TE_CV=CV;
+const CV=377;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -583,7 +583,7 @@ async function loadArena(){const B=$('olArB');if(LS('te_aleg')==='1'){LS('te_ale
   arData=r;arenaTk=r.tk;dots();const t=r.tier;
   B.innerHTML=`<div class="ahero ah3"><div class="badge">${badge(t.lg,t.div||'★')}</div><div class="t"><b>${t.name}</b><small>🏅 ${r.pts} points · rank #${r.rank} · ${r.w}W / ${r.l}L</small><div class="o-bar"><i style="width:0"></i></div><small>${t.next?`${t.next-r.pts} pts to the next division`:'Top league!'} · season ${r.season} ends in <span id="olSeason">${dur(r.end-Date.now())}</span></small></div></div>
    <div class="tk"><span>⚔️ Arena fights <b id="olTk">${r.tk}</b> / ${r.tkMax} <span id="olTkN"></span></span><span>🎁 daily reward 22:00</span></div>
-   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,5).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ${PWh} ${fmtN(o.pow)}</small></div><button class="fight f3 ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}"><small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
+   <div id="olOpps">${r.opp.map((o,i)=>`<div class="opp" style="animation-delay:${.1+i*.08}s" ${o.uid?`data-uid="${o.uid}"`:''}><div class="bd">${badge(o.tier.lg)}</div><div class="tm">${o.team.slice(0,6).map(h=>ring(h.id)).join('')}</div><div class="o-nm"><b>${flag(o.cc)} ${esc(o.name)} ${o.bot?'<span class="ai">AI</span>':''}</b><small>🏅 ${o.pts} · ${PWh} ${fmtN(o.pow)}</small></div><button class="fight f3 ${r.tk>0?'':'off'}" data-fight="${esc(o.key)}"><small>+${win(r.pts,o.pts)} pts</small></button></div>`).join('')}</div>
    <div class="btns"><div class="shine" data-a="def">🛡️ MY TEAM</div><div class="shine" data-a="ref">🔄 NEW RIVALS</div></div>
    <div class="leag">${LG.map((l,i)=>`<div class="${i===t.lg?'on':''}">${badge(i)}${l[0]}</div>`).join('')}</div>
    <div class="o-note">Fights are automatic: your <b>battle team</b> (with gear) against the other player's team – he does not need to be online. Win = up to +${win(r.pts,r.pts+400)} points. When others attack you, you lose a few points only if they win.<br>Rivals marked <span class="ai">AI</span> are training rivals while the server is still filling up.</div>
@@ -802,9 +802,9 @@ const fc=$('olFc'),g=fc.getContext('2d');let F=null,fRaf=0;
 const IMG={};const im=s=>{if(!IMG[s]){IMG[s]=new Image();IMG[s].src=s;}return IMG[s];};
 const FXN=['slash_02','flare_01','spark_05','star_07','magic_02','circle_05','fire_01','twirl_02','light_02'];const FX=n=>im('img/fx/'+n+'.webp');
 const SKFX={engine:'circle_05',tuning:'fire_01',inspect:'light_02',service:'magic_02',paint:'twirl_02',elec:'spark_05',all:'star_07',crew:'flare_01'};
-const LAY=[[.39,.64],[.27,.56],[.28,.75],[.16,.62],[.17,.81]];
+const LAY=[[.39,.64],[.27,.56],[.28,.75],[.16,.62],[.17,.81]],LAY6=[[.39,.56],[.41,.68],[.39,.8],[.2,.56],[.22,.68],[.2,.8]]; // v16-377: 6 heroes = 3 front + 3 back
 function playFight(r,replay){
-  const mk=(u,side,i)=>({...u,hp0:u.hp,side,slot:i,hp:100,mhp:100,dead:false,ps:'idle',pt:0,hx:0,fl:0,ko:0});
+  const mk=(u,side,i)=>({...u,hp0:u.hp,side,slot:i,six:(side?r.td:r.ta).length>=6,hp:100,mhp:100,dead:false,ps:'idle',pt:0,hx:0,fl:0,ko:0});
   const ta=r.ta.map((u,i)=>mk(u,0,i)),td=r.td.map((u,i)=>mk(u,1,i)),U=[...ta,...td];
   // real HP in % from the log (the server sent damage numbers; we scale with each unit's total damage taken + what is left)
   const taken=U.map(()=>0),healed=U.map(()=>0);r.log.forEach(e=>e.h.forEach(h=>{if(h[1]>0)taken[h[0]]+=h[1];else healed[h[0]]-=h[1];}));
@@ -823,7 +823,7 @@ function playFight(r,replay){
   const loop=now=>{if(!F)return;const dt=Math.min(.05,(now-last)/1000);last=now;(F.v2?a2Step:stepF)(dt);fRaf=requestAnimationFrame(loop);};fRaf=requestAnimationFrame(loop);}
 $('olSpd').onclick=()=>{if(!F)return;F.spd=F.spd===1?2:F.spd===2?3:1;LS('te_aspd',String(F.spd));$('olSpd').textContent='×'+F.spd+' ⏩';};
 $('olSkip').onclick=()=>{if(!F||F.done)return;while(F.i<F.r.log.length)(F.v2?a2Ev:applyEv)(F.r.log[F.i++],true);if(F.v2){F.q.forEach(q=>q.fn());F.q=[];}F.t=F.r.dur;finish();};
-function upos(u,W,H){const l=LAY[u.slot]||LAY[0];return {x:(u.side?1-l[0]:l[0])*W+u.hx*(u.side?-1:1),y:l[1]*H};}
+function upos(u,W,H){const l=(u.six?LAY6:LAY)[u.slot]||LAY[0];return {x:(u.side?1-l[0]:l[0])*W+u.hx*(u.side?-1:1),y:l[1]*H};}
 function applyEv(e,instant){const U=F.U,a=U[e.a];if(!a)return;
   if(!instant){a.ps=e.k==='sk'?'skill':'atk';a.pt=0;if(e.k==='m')a.lunge=1;if(e.k==='sk'){F.sk={u:a,t:0,r:e.r};if(e.r!=='service')F.white=.35;}}
   const W=fc.width,H=fc.height;

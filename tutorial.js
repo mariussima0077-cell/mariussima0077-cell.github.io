@@ -175,7 +175,7 @@ let pkT=0;document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e
 const PKG=k=>'<img src="img/ui12/pk_'+k+'.webp" style="height:1.3em;vertical-align:-.32em" alt="">';
 // ---------- v16-122 (Marius): mini-guides the FIRST time a page is opened (one bubble, once per player) ----------
 const PG={
-  heroes:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b>HEROES</b>: your <b>BATTLE TEAM</b> (5 heroes) fights here. Tap a hero to <b>LEVEL UP</b> with ${'<b>Essence</b>'} – every 20 levels = <b>ASCENSION</b>. <b>AUTO BEST</b> picks your strongest team.`},
+  heroes:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop'),t:`<b>HEROES</b>: your <b>BATTLE TEAM</b> (6 heroes) fights here. Tap a hero to <b>LEVEL UP</b> with ${'<b>Essence</b>'} – every 20 levels = <b>ASCENSION</b>. <b>AUTO BEST</b> picks your strongest team.`},
   gear:{ok:()=>isOpen('cpPop')&&!!document.querySelector('#cpPopBox .iUp'),t:`<b>GEAR</b> makes heroes stronger in battle. <b>UPGRADE</b> with <b>Gear Parts</b> (salvage, campaign, Dungeons, Idle). Two identical pieces = <b>★ STAR UP</b>. A full class set gives extra bonuses.`},
   crew:{ok:()=>isOpen('ros'),t:`<b>MY CREW</b> = everybody who <b>works in your garage</b>: mechanics (heroes), guards and drivers. Each workshop takes only <b>its own class</b>. Better crew = faster work and more money. <b>AUTO BEST</b> fills every place.`},
   summon:{ok:()=>isOpen('sm')&&!isOpen('res'),t:`<b>SUMMON</b>: <b>HERO</b> = mechanics who work AND fight · <b>CREW</b> = drivers and guards for the garage · <b>GEAR</b> = equipment. <b>×10</b> gives 11. A <b>Legendary</b> is guaranteed every 100 summons.`},

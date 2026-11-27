@@ -166,7 +166,7 @@ function cleanEq(e) { if (!Array.isArray(e)) return []; const seen = new Set();
   return e.slice(0, 6).map(i => i && ({s:EQ_SL.includes(i.s) ? i.s : '', r:num(i.r, 0, 6) | 0, lv:num(i.lv, 1, 60) | 0, sr:num(i.sr, 0, 20) | 0, set:String(i.set || '').replace(/[^a-z0-9_]/g, '').slice(0, 12)})).filter(i => i && i.s && !seen.has(i.s) && seen.add(i.s)); }
 function cleanTeam(t) {
   if (!Array.isArray(t)) return [];
-  return t.slice(0, 5).map(u => ({id:String(u.id || '').replace(/[^a-z0-9_]/g, '').slice(0, 12), n:clean(u.n).slice(0, 24), gr:num(u.gr, 0, 5) | 0, s:num(u.s, 0, 50) | 0,
+  return t.slice(0, 6).map(u => ({id:String(u.id || '').replace(/[^a-z0-9_]/g, '').slice(0, 12), n:clean(u.n).slice(0, 24), gr:num(u.gr, 0, 5) | 0, s:num(u.s, 0, 50) | 0,
     role:ROLES.includes(u.role) ? u.role : 'crew', hp:num(u.hp, 1, 5e8), atk:num(u.atk, 1, 5e7), def:num(u.def, 0, 5e4), as:num(u.as, .25, 3), crit:num(u.crit, 0, .75), cdm:num(u.cdm || 1.8, 1.8, 4.8),
     rng:num(u.rng, 20, 300), eg:1, sd:num(u.sd || 1, 1, 3),   // v16-299: no Skill charge any more → SKILL DAMAGE (sd)
      pw:Math.round(num(u.pw, 0, 2e9)), lv:num(u.lv, 0, 300) | 0, a:num(u.a, 0, 20) | 0, eq:cleanEq(u.eq)})).filter(u => u.id);
@@ -671,9 +671,9 @@ const BOT_RO = [ // [hero name, class] per grade 0-3 (same order as ROSTER in in
  [['Diesel Dave','engine'],['Carlos Clutch','engine'],['Max Brake','service'],['Rafael Chrome','paint'],['Elena Spark','elec'],['Lena Wire','elec'],['Kenji Scan','inspect'],['Tess Turbo','tuning']],
  [['Viktor the Surgeon','engine'],['Big Mo','service'],['Gloria Gloss','paint'],['Professor Ohm','elec'],['Hawk-Eye Hugo','inspect'],['Aria Neon','tuning'],['Nitro Nina','tuning']]];
 const bRnd = (a, b) => a + Math.random() * (b - a), bPick = a => a[Math.floor(Math.random() * a.length)];
-function fillTeam(stage, seed) {   // 5 heroes whose team power ≈ the enemy power of that stage (a bit under)
+function fillTeam(stage, seed) {   // 6 heroes (v16-377) whose team power ≈ the enemy power of that stage (a bit under)
   const P = Math.max(1200, ...EP_N.slice(0, Math.max(1, Math.min(EP_N.length, stage + 1)))) * .9, mx = stage < 25 ? 1 : stage < 60 ? 2 : 3, t = [];
-  for (let k = 0; k < 5; k++) { const gr = Math.max(0, Math.min(mx, ((seed >> (k * 2)) & 3) % (mx + 1))), L = BOT_RO[gr], i = (seed + k * 7) % L.length, [n, role] = L[i], sh = P / 5;
+  for (let k = 0; k < 6; k++) { const gr = Math.max(0, Math.min(mx, ((seed >> (k * 2)) & 3) % (mx + 1))), L = BOT_RO[gr], i = (seed + k * 7) % L.length, [n, role] = L[i], sh = P / 6;
     t.push({id:'m' + gr + '_' + i, n, gr, s:Math.min(10, (seed >> k) % 4 + (stage / 30 | 0)), role, hp:Math.round(sh * .5 / .25), atk:Math.round(sh * .5 / 6), def:Math.round(8 + stage * .3), as:1, crit:.1, rng:role === 'inspect' ? 160 : 45, eg:1}); }
   return t;
 }
