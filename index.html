@@ -3782,7 +3782,35 @@ function sStars(t,cls){let x='';for(let i=0;i<t;i++)x+='<img class="awS'+(cls?' 
 function sLbl(h,s,long){if(!isAwk(h))return '+'+(s||0);const t=mTier(s);return t?(long?'AWAKENED ':'AWK ')+ROM[t]:'+0';}
 const ESI='<img class="tki" src="img/ui9/essence.webp" alt="Essence">',GPI='<img class="tki" src="img/ui9/gparts.webp" alt="Gear Parts">';
 const lvO=id=>G.h.own[id]||{lv:1,a:0,s:0};
-const lvOf=id=>lvO(id).lv||1, ascOf=id=>lvO(id).a||0;
+// v16-375 (Marius 27 nov): TORQUE LINK – the 5 strongest battle heroes (CORE 5, by their own level) are levelled normally;
+// EVERY other battle hero (no limit, no cooldown) uses the level + ascension of the weakest Core hero (max Lv 300 / Asc 14).
+// A linked hero that had levels gets 100% of its Essence back (auto rebirth, gear stays). Mythic Lv 300-400 stays personal.
+// When all 5 Core heroes are Lv 300 + Asc 14 the Link is MAXED: every hero is set to Lv 300 / Asc 14 for good (o.lg = gift → rebirth gives no Essence for it)
+let LNK=null,LNKt=0,LNKn=-1;
+const LNK_ON=()=>!!G&&!!G.h&&!!G.h.own;
+const lkHeroes=()=>HEROES.filter(h=>h.cat==='m'&&!h.soon&&G.h.own[h.id]);
+function linkInfo(){const now=Date.now();if(LNK&&now-LNKt<800)return LNK;const L=lkHeroes();LNKt=now;LNKn=L.length;
+  if(L.length<=5){LNK={core:new Set(L.map(h=>h.id)),ids:L.map(h=>h.id),lv:0,a:0,max:false,on:false};return LNK;}
+  const k=h=>{const o=G.h.own[h.id];return lvMul(Math.min(o.lv||1,LV_MAX),Math.min(o.a||0,ASC_MAX));};
+  const S=L.slice().sort((a,b)=>k(b)-k(a)||(b.gr-a.gr)||(a.id<b.id?-1:1)),C=S.slice(0,5),w=G.h.own[C[4].id];
+  const lv=Math.min(w.lv||1,LV_MAX);
+  LNK={core:new Set(C.map(h=>h.id)),ids:C.map(h=>h.id),lv,a:Math.min(w.a||0,ASC_MAX),max:lv>=LV_MAX&&(w.a||0)>=ASC_MAX,on:true};return LNK;}
+const linkDirty=()=>{LNKt=0;};
+const isLinked=id=>{const h=HB[id];if(!h||h.cat!=='m'||!G.h.own[id])return false;const k=linkInfo();return k.on&&!k.core.has(id);};
+const lkPair=id=>{const o=lvO(id);if(!isLinked(id))return [o.lv||1,o.a||0];const k=LNK;return lvMul(o.lv||1,o.a||0)>=lvMul(k.lv,k.a)?[o.lv||1,o.a||0]:[k.lv,k.a];};
+const lvOf=id=>lkPair(id)[0], ascOf=id=>lkPair(id)[1];
+// keeps the save clean: linked heroes with own levels → Essence back; Link maxed → everybody Lv 300 / Asc 14
+function linkSync(){if(!LNK_ON())return;linkDirty();const k=linkInfo();if(!k.on)return;let e=0,n=0,ch=0;
+  for(const h of lkHeroes()){if(k.core.has(h.id))continue;const o=G.h.own[h.id];
+    if(!o.lg&&((o.lv||1)>1||(o.a||0)>0)&&(o.lv||1)<=LV_MAX){const v=rebirthVal(h.id);o.lv=1;o.a=0;if(v){e+=v;n++;}ch=1;}
+    if(k.max&&!o.lg&&(o.lv||1)<LV_MAX){o.lv=LV_MAX;o.a=ASC_MAX;o.lg=1;ch=1;}}
+  if(e){G.ess=(G.ess||0)+e;G.essR=(G.essR||0)+e;setTimeout(()=>toast('🔗 TORQUE LINK · '+n+' hero'+(n>1?'es':'')+' now follow your CORE 5 · '+ESI+' +'+nfmt(e)+' Essence back',3800),1200);}
+  if(ch){linkDirty();save();}}
+// ⇄ a linked hero takes the place of the weakest Core hero (they swap their own levels – free, any time)
+function linkSwap(id){const k=linkInfo();if(!k.on||k.core.has(id)||!G.h.own[id])return false;const wid=k.ids[4],a=G.h.own[id],b=G.h.own[wid];
+  const t={lv:a.lv,a:a.a,lg:a.lg};a.lv=b.lv;a.a=b.a;if(b.lg)a.lg=1;else delete a.lg;b.lv=t.lv;b.a=t.a;if(t.lg)b.lg=1;else delete b.lg;linkDirty();
+  // the hero must really be in the Core after the swap (same level as the weakest → tie order by grade/id): if not, it is already equal = nothing to do
+  const k2=linkInfo();if(!k2.core.has(id)){b.lv=a.lv;b.a=a.a;a.lv=t.lv;a.a=t.a;linkDirty();return false;}save();return wid;}
 // v16-207 (Marius 23 nov): MYTHIC CORE – rare currency from duplicates of maxed heroes (every grade, tiny chance for low grades) →
 // Mythic battle heroes go from Lv 300 to Lv 400 (levels + 5 Core Ascensions paid in Mythic Core) · CORE SHOP: Red Mythic Box (a Mythic of your choice)
 const MC_LV=400,MC_CH=[.0002,.0003,.0005,.002,.01,1],MC_N=[1,1,1,1,1,50],MC_ASC=[20,30,40,50,60],MC_BOX=200;
@@ -3814,11 +3842,11 @@ const MCI='<img class="mcI" src="img/ui9/mcore.webp" alt="">'; // v16-208: Mythi
 // v16-133 (Marius): REBIRTH – a hero goes back to Lv 1 / no Ascension, 100% of the Essence comes back (free). The refunded Essence is
 // remembered in G.essR: spending it again does NOT count for the Essence event (no ranking farming with reset + re-level).
 const essEvt=sp=>{const r=Math.min(sp,G.essR||0);G.essR=(G.essR||0)-r;return sp-r;};
-function rebirthVal(id){const o=G.h.own[id];if(!o)return 0;let e=0;for(let L=1;L<Math.min(o.lv||1,LV_MAX);L++)e+=lvCost(L);for(let k=0;k<Math.min(o.a||0,ASC_MAX);k++)e+=ascCost(k);return e;}
+function rebirthVal(id){const o=G.h.own[id];if(!o||o.lg)return 0;let e=0;for(let L=1;L<Math.min(o.lv||1,LV_MAX);L++)e+=lvCost(L);for(let k=0;k<Math.min(o.a||0,ASC_MAX);k++)e+=ascCost(k);return e;}
 function rebirthMC(id){const o=G.h.own[id];if(!o)return 0;let c=0;for(let L=LV_MAX;L<(o.lv||1);L++)c+=lvCost(L);for(let k=ASC_MAX;k<(o.a||0);k++)c+=ascCost(k);return c;}
-function rebirth(id){const o=G.h.own[id];if(!o)return 0;const e=rebirthVal(id),c=rebirthMC(id);o.lv=1;o.a=0;if(e){G.ess=(G.ess||0)+e;G.essR=(G.essR||0)+e;}if(c)G.mc=(G.mc||0)+c;save();return e;}
-function lvUp(id,n){const o=G.h.own[id];if(!o)return 0;if(!o.lv)o.lv=1;let k=0,sp=0;while(k<n&&o.lv<lvCap(id)){const c=lvCost(o.lv),M=lvMC(o.lv);if(lvHave(o.lv)<c)break;if(M)G.mc-=c;else{G.ess-=c;sp+=c;}o.lv++;k++;}if(k){save();if(window.EVT){const ev=essEvt(sp);if(ev)EVT.add('ess',ev);EVT.q('lvl',k);}}return k;}
-function ascend(id){const o=G.h.own[id];if(!o||(o.lv||1)<lvCap(id)||lvCap(id)>=hMax(id))return false;const a0=o.a||0,c=ascCost(a0);if(ascHave(a0)<c)return false;if(ascMC(a0)){G.mc-=c;o.a=a0+1;save();return true;}G.ess-=c;o.a=a0+1;save();if(window.EVT){const ev=essEvt(c);if(ev)EVT.add('ess',ev);EVT.q('lvl',1);}return true;}
+function rebirth(id){const o=G.h.own[id];if(!o)return 0;const e=rebirthVal(id),c=rebirthMC(id);o.lv=1;o.a=0;delete o.lg;linkDirty();if(e){G.ess=(G.ess||0)+e;G.essR=(G.essR||0)+e;}if(c)G.mc=(G.mc||0)+c;save();return e;}
+function lvUp(id,n){const o=G.h.own[id];if(!o||isLinked(id)&&!o.lg)return 0;if(!o.lv)o.lv=1;let k=0,sp=0;while(k<n&&o.lv<lvCap(id)){const c=lvCost(o.lv),M=lvMC(o.lv);if(lvHave(o.lv)<c)break;if(M)G.mc-=c;else{G.ess-=c;sp+=c;}o.lv++;k++;}if(k){linkDirty();save();if(window.EVT){const ev=essEvt(sp);if(ev)EVT.add('ess',ev);EVT.q('lvl',k);}}return k;}
+function ascend(id){const o=G.h.own[id];if(!o||isLinked(id)&&!o.lg||(o.lv||1)<lvCap(id)||lvCap(id)>=hMax(id))return false;const a0=o.a||0,c=ascCost(a0);if(ascHave(a0)<c)return false;if(ascMC(a0)){G.mc-=c;o.a=a0+1;linkDirty();save();return true;}G.ess-=c;o.a=a0+1;linkDirty();save();if(window.EVT){const ev=essEvt(c);if(ev)EVT.add('ess',ev);EVT.q('lvl',1);}return true;}
 const HCAP={crit:.6,shield:.8,tip:.8};
 const hv=(h,k,s)=>Math.min(HCAP[k]||9,(HS[h.cat][k][h.gr]||0)*starK(s)*(h.cat==='m'?1+.001*(lvOf(h.id)-1):1)); // v16-99: hero level also helps a little in the garage (+0.1% per level)
 const own=id=>G.h.own[id];
@@ -3839,7 +3867,7 @@ const discCount=cat=>HEROES.filter(h=>inCat(h,cat)&&!h.soon&&G.h.disc[h.id]).len
 const setDone=(cat,gr)=>heroesOf(cat,gr).every(h=>G.h.disc[h.id]);
 // cached bonuses
 const SB={m:{},g:{},d:{}};
-function heroRefresh(){HVER++;lastPanelKey='';
+function heroRefresh(){HVER++;lastPanelKey='';try{linkSync();}catch(e){}
   CATK.forEach(cat=>{SB[cat]={};SETB[cat].forEach(([k,v],gr)=>{if(setDone(cat,gr))SB[cat][k]=(SB[cat][k]||0)+v;});});
   for(const id in drivers)drivers[id].forEach(d=>d.p.spd=1+drvBonus(id,d.k).spd);}
 function mechBonus(st,j){const o={spd:SB.m.spd||0,inc:SB.m.inc||0,crit:0};
@@ -4535,6 +4563,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:162,d:'Nov 27, 2026',ic:'🔗',t:'TORQUE LINK & CRYSTAL COLLECTION',l:['<b>🔗 TORQUE LINK</b>: your <b>CORE 5</b> = your 5 strongest heroes. Level them up as usual – <b>every other hero</b> gets the level and ascension of the weakest Core hero, for free. No limit, no cooldown, no more Rebirth to try heroes.','Heroes you had levelled outside the Core 5 gave <b>100% of their Essence back</b>. Want another hero in the Core? Open his LEVEL UP → <b>⇄ PUT IN CORE 5</b> (free swap).','When all Core 5 reach <b>Lv 300 / ASC 14</b> the Link is maxed: every hero stays Lv 300 for good (Mythic Lv 300-400 stays personal).','<b>💎 CRYSTAL COLLECTION</b> (HEROES → HERO COLLECTION): every <b>new hero</b> and every <b>+</b> gives <b>Torque Crystals</b> – higher grade = more. 20 steps = up to <b>+15% HP / ATK / DEF</b>, <b>+10% CRIT DMG</b>, <b>+3% CRIT</b> for every battle hero. Your old heroes already count!']},
  {id:161,d:'Nov 27, 2026',ic:'🌍',t:'The game now speaks 6 languages',l:['Torque Empire is now in <b>English, Français, Español, Português, 한국어 and 日本語</b> – it picks your phone language by itself.','Change it any time: <b>Profile → LANGUAGE</b> (or the 🌍 button on the loading screen). Hero and monster names stay in English.']},
  {id:160,d:'Nov 26, 2026',ic:'🐉',t:'World Boss: bigger damage milestones',l:['The daily <b>World Boss</b> damage milestones now need more damage: your 3 daily fights reach 10 rewards, the last 2 rewards need extra fights (VIP / pass keys).']},
  {id:159,d:'Nov 26, 2026',ic:'🎡',t:'Fairer wheel rankings',l:['<b>LUCKY WHEEL</b> and <b>KEY ROULETTE</b> rankings now count what you <b>WIN</b> (diamonds / keys), not the number of spins – everyone gets the same spins, so no more ties for everybody.','Same score? The one who got there first is ahead. Milestone rewards still count your spins.']},
@@ -4837,7 +4866,8 @@ try{migr99();migr247();heroRefresh();}catch(e){console.error(e);}
 function migr161(){if(G.m161)return;G.m161=1;let dm=0;for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o||h.cat!=='m')continue;const mx=hMaxS(h),k=h.gr===5?1000:h.gr===4?150:0;if(k&&o.s>mx){dm+=(o.s-mx)*k;o.s=mx;}}
   if(dm){G.dm=(G.dm||0)+dm;setTimeout(()=>toast('💎 +'+dm.toLocaleString()+' · extra hero stars → diamonds (new AWAKENING / Legendary +10)',4200),4000);}save();}
 try{migr161();}catch(e){console.error(e);}
-window.__TE={SECT:{openSec:()=>openPanel("security"),startRaid,cars:()=>cars,mkTest:()=>{[...yardSpots.slice(0,6),...expSpots.slice(0,4)].forEach(s=>{if(s.car)return;const c=newCar();c.slot=s;s.car=c;c.x=s.x;c.y=s.y;c.a=s.a;c.state=s.kind==="exp"?"forsale":"yard";c.value=500;cars.push(c);});},get RAID(){return RAID;},THF,XG,guards,police,VAN_T,setCam:(x,y,z)=>{Z=z;camX=x-VW/2/Z;camY=y-(VH-TOP)/2/Z;},set raidNext(v){raidNext=v;}},MC_LV,MC_CH,MC_N,MC_ASC,MC_BOX,isMM,hMax,lvMC,ascMC,lvHave,ascHave,rebirthMC,MCI,hMaxS,sLbl,mTier,isAwk,ROM,sStars,awkNeed,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,rebirth,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleCalc,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3)),spdX:()=>(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3))?3:(S2()&&SHOP2.spd()>=2?2:0)};
+window.__TE={SECT:{openSec:()=>openPanel("security"),startRaid,cars:()=>cars,mkTest:()=>{[...yardSpots.slice(0,6),...expSpots.slice(0,4)].forEach(s=>{if(s.car)return;const c=newCar();c.slot=s;s.car=c;c.x=s.x;c.y=s.y;c.a=s.a;c.state=s.kind==="exp"?"forsale":"yard";c.value=500;cars.push(c);});},get RAID(){return RAID;},THF,XG,guards,police,VAN_T,setCam:(x,y,z)=>{Z=z;camX=x-VW/2/Z;camY=y-(VH-TOP)/2/Z;},set raidNext(v){raidNext=v;}},MC_LV,MC_CH,MC_N,MC_ASC,MC_BOX,isMM,hMax,lvMC,ascMC,lvHave,ascHave,rebirthMC,MCI,hMaxS,sLbl,mTier,isAwk,ROM,sStars,awkNeed,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,rebirth,linkInfo,isLinked,linkSwap,linkSync,linkDirty,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleCalc,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3)),spdX:()=>(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3))?3:(S2()&&SHOP2.spd()>=2?2:0)};
+setTimeout(()=>{try{linkSync();}catch(e){}},4000); // v16-375 TORQUE LINK: clean the save once after start
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};
 $('cpBtn').onclick=()=>{closePanel();if(window.CAMPAIGN)(window.CAMPAIGN.hub||window.CAMPAIGN.open)();};

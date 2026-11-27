@@ -231,6 +231,10 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   // v16-370 (Marius 26 nov): how things UNLOCK – the first time a player meets a lock
   lockbld:{ok:()=>isOpen('sheet')&&/Unlocks at Reputation/.test((document.querySelector('#shStats .lock')||{}).textContent||''),L:()=>[
     {el:()=>$('repPill'),t:`<b>🔒 LOCKED BUILDING</b>: buildings open with <b>REPUTATION</b> (the <b>REP</b> bar at the top). Every car your garage repairs and sells fills it. Each new REP level opens <b>new buildings</b> and <b>new repairs</b> and gives a gift.`,next:'GOT IT'}]},
+  // v16-375 (Marius 27 nov): TORQUE LINK + CRYSTAL COLLECTION
+  tlink:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&vis(document.querySelector('#gLink .lkBox')),L:()=>[
+    {el:()=>document.querySelector('#gLink .lkBox'),t:`<b>🔗 TORQUE LINK</b>: level up only your <b>CORE 5</b> (your 5 strongest heroes). <b>Every other hero</b> gets the level of the weakest one – free, no limit, no Rebirth. Heroes you had levelled gave their <b>Essence back</b>.`,next:'GOT IT'}]},
+  crycoll:{ok:()=>vis(document.querySelector('#gcW #gcCry')),t:`<b style="color:#2e9d3a">💎 CRYSTAL COLLECTION</b>: every <b>new hero</b> and every <b>+</b> gives <b>Torque Crystals</b> (Mythic the most). Crystals are never spent – they open <b>20 steps</b> of HP, ATK, DEF and CRIT bonuses for <b>every battle hero</b>.`},
   lockhub:{ok:()=>isOpen('hub')&&vis(document.querySelector('#hub.open .hubM.lk')),L:()=>[
     {el:()=>document.querySelector('#hub.open .hubM.lk'),t:`<b>🔒 GREY = LOCKED</b>: every battle mode opens when you win the <b>campaign stage</b> written on it. Win more <b>CAMPAIGN</b> stages to open Arena, Towers, World Boss and Dungeons.`,next:'GOT IT'}]},
   gogo:{ok:()=>isOpen('gpx')&&vis(document.querySelector('#gpx [data-g=go]')),t:`<b>GO</b>: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have <b>GO</b> too.`},
