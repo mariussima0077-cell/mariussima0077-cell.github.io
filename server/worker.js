@@ -100,7 +100,13 @@ async function ensureG(env) {
     db.prepare('CREATE INDEX IF NOT EXISTS rcpt_pid ON rcpt(pid, t)'),
     db.prepare('CREATE TABLE IF NOT EXISTS agift(id INTEGER PRIMARY KEY AUTOINCREMENT, pid TEXT, dm INTEGER, msg TEXT, t INTEGER, sent INTEGER DEFAULT 0, ts INTEGER, mid INTEGER, nonce TEXT UNIQUE)'),   // v16-233b: 💎 sent from /admin
     db.prepare('CREATE INDEX IF NOT EXISTS agift_pid ON agift(pid, sent)'),
+    // 27 nov: Cloudflare D1 alert (83% of 5M rows_read/day) – events/snaps/chat/purchases had no index for these WHERE → full table scans
+    db.prepare('CREATE INDEX IF NOT EXISTS events_pid ON events(pid, kind, t)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS events_kind ON events(kind, t)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS snaps_t ON snaps(t)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS purchases_pid ON purchases(pid, t)'),
   ]);
+  try { await db.prepare('CREATE INDEX IF NOT EXISTS chat_t ON chat(t)').run(); } catch (e) {}   // chat is created in online.js – may not exist yet on a fresh DB
   gReady = true;
 }
 export {ensureG};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
