@@ -106,7 +106,6 @@ async function ensureG(env) {
     db.prepare('CREATE INDEX IF NOT EXISTS snaps_t ON snaps(t)'),
     db.prepare('CREATE INDEX IF NOT EXISTS purchases_pid ON purchases(pid, t)'),
   ]);
-  try { await db.prepare('CREATE INDEX IF NOT EXISTS chat_t ON chat(t)').run(); } catch (e) {}   // chat is created in online.js – may not exist yet on a fresh DB
   gReady = true;
 }
 export {ensureG};   // v16-104: memory editor (GameGuardian…) · pack used without a purchase confirmed by Google (Lucky Patcher…)
@@ -296,7 +295,9 @@ async function report(b, env) {
 async function scan(env) {
   const db = env.DB, now = Date.now(), day = 864e5;
   // a) 24-hour check: total money earned over a day must be possible with the player's buildings
-  const rows = (await db.prepare('SELECT pid,lv,score,banned,sig,shadow FROM players WHERE last>? AND banned=0').bind(now - day).all()).results;
+  // 27 nov (D1 rows_read alert): the 24h money/VIP check reads ~288 snaps per active player – once an HOUR is enough (was every 10 min = 6× the reads)
+  const hourly = new Date(now).getUTCMinutes() < 10;
+  const rows = hourly ? (await db.prepare('SELECT pid,lv,score,banned,sig,shadow FROM players WHERE last>? AND banned=0').bind(now - day).all()).results : [];
   for (const p of rows) {
     const r = await db.prepare('SELECT MIN(t) t0, MAX(t) t1, MIN(money) m0, MAX(money) m1, MIN(vip) v0, MAX(vip) v1 FROM snaps WHERE pid=? AND t>?').bind(p.pid, now - day).first();
     if (!r || !r.t0) continue;
@@ -381,7 +382,7 @@ async function scan(env) {
   // c) clean up
   await db.prepare('DELETE FROM snaps WHERE t<?').bind(now - 7 * day).run();   // v16-157: 7 days (player card chart in /admin)
   await db.prepare('DELETE FROM players WHERE last<? AND banned=0').bind(now - 180 * day).run();
-  await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'scan', 'checked ' + rows.length + ' active players').run();
+  if (hourly) await db.prepare('INSERT INTO events(pid,t,kind,detail) VALUES(?,?,?,?)').bind('-', now, 'scan', 'checked ' + rows.length + ' active players').run();
   await db.prepare("DELETE FROM events WHERE kind='scan' AND t<?").bind(now - day).run();
   // d) cloud saves not used for 2 years are deleted (as written in the privacy policy)
   await ensureCloud(env); await db.prepare('DELETE FROM accounts WHERE t<?').bind(now - 730 * day).run();

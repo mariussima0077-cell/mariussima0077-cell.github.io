@@ -113,6 +113,9 @@ async function ensure(env) {
     db.prepare('CREATE INDEX IF NOT EXISTS prof_pow ON prof(srv, pow)'),
     db.prepare(`CREATE TABLE IF NOT EXISTS chat(id INTEGER PRIMARY KEY AUTOINCREMENT, srv INTEGER, ch TEXT, uid INTEGER, t INTEGER, txt TEXT, lang TEXT, tr TEXT DEFAULT '{}', hid INTEGER DEFAULT 0, rep INTEGER DEFAULT 0, sys INTEGER DEFAULT 0)`),
     db.prepare('CREATE INDEX IF NOT EXISTS chat_srv ON chat(srv, ch, id)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS chat_ann ON chat(srv, sys, id)'),   // 27 nov: annList (every 90 s per player) read the whole chat of the server
+    db.prepare('CREATE INDEX IF NOT EXISTS chat_uid ON chat(uid, t)'),         // 27 nov: brag limit (sys=2 AND uid=?)
+    db.prepare('CREATE INDEX IF NOT EXISTS chat_t ON chat(t)'),
     db.prepare('CREATE TABLE IF NOT EXISTS creps(mid INTEGER, uid INTEGER, t INTEGER, PRIMARY KEY(mid, uid))'),
     db.prepare(`CREATE TABLE IF NOT EXISTS arena(uid INTEGER PRIMARY KEY, srv INTEGER, season INTEGER, pts INTEGER, w INTEGER DEFAULT 0, l INTEGER DEFAULT 0, tk INTEGER, tkt INTEGER, opp TEXT, peak INTEGER, t INTEGER, rday TEXT DEFAULT '')`),
     db.prepare('CREATE INDEX IF NOT EXISTS arena_pts ON arena(srv, season, pts)'),
@@ -618,6 +621,7 @@ async function rewardsTick(env) {
         await mail(env, r.uid, '⭐', EV_NAME[k] + ' – final ranking', `Your rank: #${n} (score ${Math.round(r.sc).toLocaleString('en-US')}).`, rw); }
       await db.prepare('DELETE FROM evt WHERE eid=?').bind(tr + (+li - 4)).run(); }
     if (li === null || +li !== ci) await kvSet(env, key, ci); }
+  if (new Date(now).getUTCMinutes() >= 10) return;   // 27 nov (D1 alert): the title + the cleanup below read whole tables → once an HOUR (was every 10 min)
   // TORQUE KING title: #1 of the campaign ranking on each server
   for (const r of (await db.prepare('SELECT srv, uid FROM prof p WHERE substr(p.pid,1,4)<>\'tst_\' AND best=(SELECT MAX(best) FROM prof q WHERE q.srv=p.srv AND substr(q.pid,1,4)<>\'tst_\') GROUP BY srv').all()).results) await addUnl(env, r.uid, 'king');
   await db.prepare('DELETE FROM chat WHERE t<?').bind(now - 7 * DAY).run();
@@ -628,7 +632,8 @@ async function rewardsTick(env) {
 }
 export async function onlineCron(env) { await ensure(env);
   try { await botTick(env); } catch (e) { console.log('botTick', e && e.message); }   // v16-222: bots FIRST (before, an error/CPU limit in rewards/cup stopped them)
-  try { await env.DB.prepare(`UPDATE prof SET vip=(SELECT ${VIP_SQL} FROM players pl WHERE pl.pid=prof.pid) WHERE pid IN (SELECT pid FROM players)`).run(); } catch (e) {}   // v16-85: fix every profile
+  // 27 nov (D1 alert): once an hour (was every 10 min) and only the profiles whose VIP really changed are written
+  if (new Date(Date.now()).getUTCMinutes() < 10) try { await env.DB.prepare(`UPDATE prof SET vip=(SELECT ${VIP_SQL} FROM players pl WHERE pl.pid=prof.pid) WHERE pid IN (SELECT pid FROM players) AND vip IS NOT (SELECT ${VIP_SQL} FROM players pl WHERE pl.pid=prof.pid)`).run(); } catch (e) {}   // v16-85: fix every profile
   await rewardsTick(env); await cupTick(env); }
 
 // ------------------------------------------------------------------ v16-167: FILLER BOTS (Marius 22 nov: "a few bots, one by one, so players have someone to play with")
@@ -654,6 +659,7 @@ async function botTrain(db, b, pl, stage, now) {
   await db.prepare('UPDATE rwday SET s=s+1 WHERE uid=?').bind(b.uid).run();
   await db.prepare('INSERT INTO rwtrain(uid,srv,g,tok,cars,t0,t1) VALUES(?,?,?,?,?,?,?)').bind(b.uid, 1, g, tok, cars, now, now + RW_TRIP).run();
 }
+const rkCache = new Map();   // 27 nov: ranking cache (srv|by → {t, rows, tot})
 let botSeen = 0;   // v16-222: the ranking also makes the bots (once per 10 min per server copy), so they appear without waiting for the cron
 const BOT_NAMES = ['LugNutLarry','ClutchNorris','WD40Wendy','BrakeDancer','MufflerMike','TireKicker','DuctTapeDave','PistonPanda','CaptainCarb','NoBrakesNed',
   'HubcapHarry','RevvyMcRev','TurboTurtle','SpannerSusan','GreasyGrandpa','OilSpillBill','SirHonksALot','BumperBetty','WobblyWheel','ChickenTikkaV8'];
@@ -817,9 +823,15 @@ export async function online(op, b, env) {
   if (op === 'rank') {
     if (now - botSeen > 6e5) { botSeen = now; try { await botTick(env); } catch (e) { console.log('botTick', e && e.message); } }
     const by = ['best','pow','lv'].includes(b.by) ? b.by : 'best';
+    // 27 nov (D1 alert): the page asks every 10 s per player → the top 100 + total are kept 60 s per server copy; my rank from the list when I'm in it
+    const ck = p.srv + '|' + by, hit = rkCache.get(ck);
+    if (hit && now - hit.t < 60e3) { const i = hit.rows.findIndex(r => r.uid === p.uid);
+      const my = i >= 0 ? i + 1 : (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
+      return {ok:true, by, list:hit.rows.map(r => pub(r)), me:pub(p), myRank:my, total:hit.tot, time:now}; }
     const rows = (await db.prepare(`SELECT p.* FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? ORDER BY p.${by} DESC, p.pow DESC LIMIT 100`).bind(p.srv, now - 30 * DAY).all()).results;
     const my = (await db.prepare(`SELECT COUNT(*) n FROM prof p LEFT JOIN players pl ON pl.pid=p.pid WHERE p.srv=? AND COALESCE(pl.banned,0)=0 AND COALESCE(pl.shadow,0)=0 AND substr(p.pid,1,4)<>'tst_' AND p.t>? AND (p.${by}>? OR (p.${by}=? AND p.pow>?))`).bind(p.srv, now - 30 * DAY, p[by], p[by], p.pow).first()).n + 1;
     const tot = (await db.prepare('SELECT COUNT(*) n FROM prof WHERE srv=? AND t>?').bind(p.srv, now - 30 * DAY).first()).n;
+    rkCache.set(ck, {t:now, rows, tot});
     return {ok:true, by, list:rows.map(r => pub(r)), me:pub(p), myRank:my, total:tot, time:now};
   }
   if (op === 'chat') {
