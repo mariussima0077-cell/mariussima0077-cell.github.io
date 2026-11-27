@@ -1,0 +1,235 @@
+# / # VIP points	VIP 포인트 # / #	VIPポイント # / #
+# / # collected	# / # 수령	# / # 受取
+# / day	# / 일	# / 日
+# every #h	#시간마다 #	#時間ごとに#
+#/# stages · #/# ⭐	#/# 스테이지 · #/# ⭐	#/# ステージ · #/# ⭐
++#% ATK & HP	공격·HP +#%	攻撃・HP +#%
+ACTIVE: ATK +#%	활성: 공격 +#%	有効：攻撃+#%
+ACTIVE: Attack +#% · HP +#% · Defense +#% · Crit chance +#%	활성: 공격 +#% · HP +#% · 방어 +#% · 치명 +#%	有効：攻撃+#% · HP+#% · 防御+#% · 会心+#%
+ACTIVE: DEF +#%	활성: 방어 +#%	有効：防御+#%
+ACTIVE: HP +#%	활성: HP +#%	有効：HP+#%
+ACTIVE: CRIT +#%	활성: 치명 +#%	有効：会心+#%
+ATK +#%	공격 +#%	攻撃+#%
+DEF +#%	방어 +#%	防御+#%
+HP +#%	HP +#%	HP+#%
+CRIT +#%	치명 +#%	会心+#%
+HP · ATK · DEF +#%	HP · 공격 · 방어 +#%	HP · 攻撃 · 防御 +#%
+AVAILABLE HEROES	보유 영웅	所持ヒーロー
+AWK V	각성 V	覚醒V
+AWK I	각성 I	覚醒I
+AWK II	각성 II	覚醒II
+AWK III	각성 III	覚醒III
+AWK IV	각성 IV	覚醒IV
+AWAKENED V	각성 V	覚醒V
+Arrival valet #	발레 #	バレー#
+Bay #	작업대 #	作業台#
+CORE →	코어 →	コア →
+CRUSHER KING · KEYS #/#	CRUSHER KING · 열쇠 #/#	CRUSHER KING · 鍵 #/#
+DAY #	#일차	#日目
+DAY # OF # · LOG IN EVERY DAY	#/#일차 · 매일 접속	#/#日目 · 毎日ログイン
+Earn $# from sales	판매로 $# 벌기	販売で$#稼ぐ
+Every purchase gives VIP points (# € = # points) – every pack, pass and fund. Daily Quests give # point each. Every VIP level opens a big chest (diamonds, tickets, a full gear set of your choice…), +# h Idle and +#% on all Idle Rewards. VIP Passes make all benefits stronger: Silver ×# · Gold ×# · Platinum ×# – together ×#	모든 구매에 VIP 포인트(# € = # 포인트) – 팩, 패스, 펀드 모두. 일일 퀘스트는 각 #포인트. VIP 레벨마다 큰 상자(다이아, 티켓, 원하는 장비 세트…), 방치 +#시간, 방치 보상 +#%. VIP 패스로 혜택 강화: 실버 ×# · 골드 ×# · 플래티넘 ×# – 합계 ×#	購入ごとにVIPポイント（# € = #pt）– パック、パス、ファンド全て。デイリーは各#pt。VIPレベルごとに大きな宝箱（ダイヤ、チケット、好きな装備セット…）、放置+#時間、放置報酬+#%。VIPパスで強化：シルバー×# · ゴールド×# · プラチナ×# – 合計×#
+FIELDS →	필드 →	フィールド →
+FLOOR # / #	층 # / #	階 # / #
+Forever · all #	영구 · 모두 #	永久 · 全#
+HALLS →	홀 →	ホール →
+HEROES FOR BATTLES	전투용 영웅	バトル用ヒーロー
+Inspect # cars	차 #대 검사	車を#台検査
+Inspection driver #	검사 운전사 #	検査ドライバー#
+Inspection · Bay #	검사 · 작업대 #	検査 · 作業台#
+KEYS #/#	열쇠 #/#	鍵 #/#
+Load # cars on the transporter	트럭에 차 #대 적재	トラックに車#台積む
+Loading... #%	로딩 중... #%	読み込み中... #%
+MAX – # XP	최대 – # XP	最大 – # XP
+Mechanics check every car. The inspection decides which workshops the car visits and which parts must be ordered.	정비공이 모든 차를 검사해요. 검사 결과로 갈 정비소와 주문할 부품이 정해져요.	メカニックが全ての車を点検。検査で行き先の工房と発注部品が決まる。
+Puts every driver where he helps most. Nothing changes until you confirm.	운전사를 가장 도움되는 곳에 배치. 확인 전엔 바뀌지 않아요.	ドライバーを最適な場所に配置。確定まで変わりません。
+RIVERS →	강 →	川 →
+ROAD +×#	로드 +×#	ロード+×#
+ROOKIE	신입	ルーキー
+Recruit + Crew + Gear tickets every day	매일 모집 + 크루 + 장비 티켓	毎日リクルート＋クルー＋装備チケット
+Rep #	명성 #	評判#
+SPIN · # left	회전 · #회 남음	スピン · 残り#
+SPINS:	회전:	スピン：
+STAGE #-#	스테이지 #-#	ステージ #-#
+SUMMON ×#	소환 ×#	召喚×#
+SUMMONS:	소환:	召喚：
+Sales Office driver #	판매소 운전사 #	販売所ドライバー#
+Scanner heroes in battle	전투 중 스캐너 영웅	バトルのスキャナー
+Service driver #	정비 운전사 #	整備ドライバー#
+TEAM ROLES #/# ·	팀 역할 #/# ·	チームロール #/# ·
+TEAM #/#	팀 #/#	チーム #/#
+TODAY +#	오늘 +#	今日+#
+TODAY: BRUISER · RACER	오늘: 파이터 · 레이서	今日：ブルーザー · レーサー
+YOUR SUMMONS	내 소환	召喚結果
+diamonds	다이아	ダイヤ
+empty	비어 있음	空き
+in #d #h	#일 #시간 후	#日#時間後
+missing: TANK, RANGER · # roles +#% · # +#% · # +#%	부족: 탱커, 원거리 · 역할 # +#% · # +#% · # +#%	不足：タンク、レンジャー · ロール# +#% · # +#% · # +#%
+missing: TANK · # roles +#% · # +#% · # +#%	부족: 탱커 · 역할 # +#% · # +#% · # +#%	不足：タンク · ロール# +#% · # +#% · # +#%
+missions	미션	ミッション
+or	또는	または
+stage #-#	스테이지 #-#	ステージ#-#
+vs stage #-# · #	vs 스테이지 #-# · #	vs ステージ#-# · #
+×# each	각 ×#	各×#
+– Electronics · Wagon, SUV, Pickup, Van · suspension, rust, respray	– 전장 · 왜건, SUV, 픽업, 밴 · 서스펜션, 녹, 재도장	– 電装 · ワゴン、SUV、ピックアップ、バン · サス、サビ、全塗装
+– Engine Shop · Parts Office & Helipad · Sports cars · clutch, timing belt, ECU	– 엔진 공장 · 부품실 & 헬리패드 · 스포츠카 · 클러치, 타이밍 벨트, ECU	– エンジン工房 · 部品室＆ヘリポート · スポーツカー · クラッチ、タイミングベルト、ECU
+– Inspection, Service, Body & Paint — small jobs only	– 검사, 정비, 판금·도장 — 작은 작업만	– 検査、整備、板金塗装 — 小さな作業のみ
+– Supercars · engine & gearbox swaps · widebody · sport kits	– 슈퍼카 · 엔진·변속기 교체 · 와이드바디 · 스포츠 키트	– スーパーカー · エンジン・ミッション載せ替え · ワイドボディ · スポーツキット
+– Tuning · Muscle cars · turbo, street kits, ECU stage #	– 튜닝 · 머슬카 · 터보, 스트리트 키트, ECU 스테이지 #	– チューニング · マッスルカー · ターボ、ストリートキット、ECUステージ#
+– V# swaps · full Race builds	– V# 스왑 · 풀 레이스 빌드	– V#スワップ · フルレース仕様
+– Car sale price +#% · Idle income +#%	– 차 판매가 +#% · 방치 수익 +#%	– 販売価格+#% · 放置収入+#%
+⏳ #d #h left	⏳ #일 #시간 남음	⏳ 残り#日#時間
+⏳ ends in #d #h	⏳ #일 #시간 후 종료	⏳ #日#時間後に終了
+◆ COMMON	◆ 일반	◆ コモン
+◆ RARE	◆ 희귀	◆ レア
+◆ UNCOMMON	◆ 고급	◆ アンコモン
+★ LV #	★ Lv #	★ Lv #
+★LV.#	★Lv.#	★Lv.#
+LV #	Lv #	Lv #
+LVL #	Lv #	Lv #
+Lv #	Lv #	Lv #
+Level # / #	레벨 # / #	レベル # / #
+⚙️ ENGINE SHOP  ·  ★ LV #	⚙️ 엔진 공장  ·  ★ Lv #	⚙️ エンジン工房  ·  ★ Lv #
+⚡ ELECTRONICS  ·  ★ LV #	⚡ 전장  ·  ★ Lv #	⚡ 電装  ·  ★ Lv #
+⚡ Work speed here: +#%	⚡ 여기 작업 속도: +#%	⚡ ここの作業速度：+#%
+⭐ Reputation #	⭐ 명성 #	⭐ 評判#
+⭐ Your Rep bonus now: car sale price +#% · idle income +#%	⭐ 현재 명성 보너스: 차 판매가 +#% · 방치 수익 +#%	⭐ 現在の評判ボーナス：販売価格+#% · 放置収入+#%
+🌐 AUTO: ON	🌐 자동: 켜짐	🌐 自動：ON
+🌟 All workshops ✓ · Lv #	🌟 모든 정비소 ✓ · Lv #	🌟 全工房 ✓ · Lv #
+🎁 QUICK IDLE #h · # left	🎁 빠른 방치 #시간 · ×#	🎁 クイック放置#時間 · ×#
+🎖️ Tier #/#	🎖️ 단계 #/#	🎖️ 段階 #/#
+🎨 BODY & PAINT  ·  ★ LV #	🎨 판금·도장  ·  ★ Lv #	🎨 板金塗装  ·  ★ Lv #
+🎨 Body & Paint	🎨 판금·도장	🎨 板金塗装
+🏁 TUNING  ·  ★ LV #	🏁 튜닝  ·  ★ Lv #	🏁 チューニング  ·  ★ Lv #
+💵 Money	💵 돈	💵 お金
+💼 SALES OFFICE  ·  ★ LV #	💼 판매소  ·  ★ Lv #	💼 販売所  ·  ★ Lv #
+🔍 INSPECTION  ·  ★ LV #	🔍 검사  ·  ★ Lv #	🔍 検査  ·  ★ Lv #
+🔍 Inspection ✓ · Lv #	🔍 검사 ✓ · Lv #	🔍 検査 ✓ · Lv #
+🔒 Opens after the Starter Pack	🔒 스타터 팩 이후 오픈	🔒 スターターパックの後に解放
+🔒 Opens after the Rookie Pack	🔒 루키 팩 이후 오픈	🔒 ルーキーパックの後に解放
+🔒 Opens after the Pro Pack	🔒 프로 팩 이후 오픈	🔒 プロパックの後に解放
+🔒 Opens after the Elite Pack	🔒 엘리트 팩 이후 오픈	🔒 エリートパックの後に解放
+🔒 Opens after the Master Pack	🔒 마스터 팩 이후 오픈	🔒 マスターパックの後に解放
+🔒 Opens after the Legend Pack	🔒 레전드 팩 이후 오픈	🔒 レジェンドパックの後に解放
+🔧 SERVICE  ·  ★ LV #	🔧 정비  ·  ★ Lv #	🔧 整備  ·  ★ Lv #
+🔧 Service ✓ · Lv #	🔧 정비 ✓ · Lv #	🔧 整備 ✓ · Lv #
+# / # · next: car on the way · #:#	# / # · 다음: 차 이동 중 · #:#	# / # · 次：車が移動中 · #:#
+# upgrades: street kits, lowering, ECU tunes, neon, chrome rims, tint, LED lights, sport exhaust, wraps, carbon hoods, flame decals, roof scoops, air suspension, drift kits, nitro and full race builds.	업그레이드 #종: 스트리트 키트, 로워링, ECU 튜닝, 네온, 크롬 휠, 틴팅, LED, 스포츠 배기, 랩핑, 카본 후드, 불꽃 데칼, 루프 스쿱, 에어 서스, 드리프트 키트, 니트로, 풀 레이스 빌드.	#種のカスタム：ストリートキット、ローダウン、ECUチューン、ネオン、クロームホイール、スモーク、LED、スポーツマフラー、ラッピング、カーボンボンネット、ファイヤーパターン、ルーフスクープ、エアサス、ドリフトキット、ニトロ、フルレース仕様。
+Arrival Parking	도착 주차장	到着駐車場
+Body & Paint driver #	판금·도장 운전사 #	板金塗装ドライバー#
+Bruiser heroes in battle	전투 중 파이터 영웅	バトルのブルーザー
+Bulbs, sensors, wiring looms and ECU repairs.	전구, 센서, 배선, ECU 수리.	電球、センサー、配線、ECU修理。
+Choose a driver. Best for this place first. Tap to compare before / after.	운전사 선택. 이 자리에 최적인 순. 탭해서 전/후 비교.	ドライバーを選択。この枠に最適な順。タップで前/後比較。
+Choose a guard. Best for this place first. Tap to compare before / after.	경비원 선택. 이 자리에 최적인 순. 탭해서 전/후 비교.	警備員を選択。この枠に最適な順。タップで前/後比較。
+Best for this place first. Tap to compare before / after.	이 자리에 최적인 순. 탭해서 전/후 비교.	この枠に最適な順。タップで前/後比較。
+Electronics driver #	전장 운전사 #	電装ドライバー#
+Engine Shop driver #	엔진 공장 운전사 #	エンジン工房ドライバー#
+Medic heroes in battle	전투 중 메딕 영웅	バトルのメディック
+Oil, brakes, tires and batteries. Later: suspension and clutches.	오일, 브레이크, 타이어, 배터리. 이후: 서스펜션과 클러치.	オイル、ブレーキ、タイヤ、バッテリー。後に：サスとクラッチ。
+Polish, dents, rust and full resprays. Later: bumpers and widebody kits.	광택, 덴트, 녹, 전체 도장. 이후: 범퍼와 와이드바디 키트.	磨き、へこみ、サビ、全塗装。後に：バンパーとワイドボディ。
+Racer heroes in battle	전투 중 레이서 영웅	バトルのレーサー
+Shocker heroes in battle	전투 중 쇼커 영웅	バトルのショッカー
+Sprayer heroes in battle	전투 중 페인터 영웅	バトルのペインター
+Timing belt 📦	타이밍 벨트 📦	タイミングベルト 📦
+Timing belts, turbos, gearbox and full engine swaps. Long jobs that pay a lot. Every job needs parts.	타이밍 벨트, 터보, 변속기, 엔진 교체. 오래 걸리지만 보수가 커요. 모든 작업에 부품 필요.	タイミングベルト、ターボ、ミッション、エンジン載せ替え。長いが高収入。全作業に部品が必要。
+Tuning driver #	튜닝 운전사 #	チューニングドライバー#
+VIP # GIFTS	VIP # 선물	VIP # ギフト
+VIP #:	VIP #:	VIP #：
+Garage parts	정비소 부품	工房パーツ
+No connection – try again later	연결 없음 – 나중에 다시	接続なし – 後で再試行
+REFRESH #/#	새로고침 #/#	更新 #/#
+Driving speed here: +#%	여기 운전 속도: +#%	ここの運転速度：+#%
+# (# patrols)	# (순찰 #)	#（巡回#）
+# (security car)	# (보안 차량)	#（警備車両）
+Desk guard	데스크 경비원	デスク警備員
+Mythic #%	신화 #%	神話#%
+Patrol guard	순찰 경비원	巡回警備員
+Collection Garage	컬렉션 차고	コレクションガレージ
+MOST WANTED – TODAY	현상 수배 – 오늘	指名手配 – 今日
+Coming soon – nothing to do here yet.	곧 공개 – 아직 할 일이 없어요.	近日公開 – まだ何もありません。
+Thief catch here: +#%	여기 도둑 체포: +#%	ここの泥棒捕獲：+#%
+LANGUAGE	언어	言語
+Welcome back! While you were away your garage kept working.	돌아오신 걸 환영해요! 부재 중에도 정비소는 계속 일했어요.	おかえり！留守中も工房は働き続けていたよ。
+# / # today	오늘 # / #	今日 # / #
+# each	각 #	各#
+🎁 Epic SET (# pieces, your choice)	🎁 에픽 세트 (#개, 선택)	🎁 エピックセット（#個、選択）
+🎁 Legendary SET (# pieces, your choice)	🎁 전설 세트 (#개, 선택)	🎁 伝説セット（#個、選択）
+🎁 Mythic SET (# pieces, your choice)	🎁 신화 세트 (#개, 선택)	🎁 神話セット（#個、選択）
+# empty places filled	빈 자리 # 채움	空き枠#を埋めた
+🎁 # Quick Idle	🎁 빠른 방치 #	🎁 クイック放置#
+(not working · #)	(근무 안 함 · #)	（勤務外 · #）
++#K · # left today	+#K · 오늘 # 남음	+#K · 本日残り#
+/ # TICKETS	/ # 티켓	/ #チケット
+ASC # · SKILL #	승급 # · 스킬 #	昇格# · スキル#
+CHAPTER # OF #	챕터 # / #	第#章 / #
+MAX	최대	最大
+More driving speed in total	총 운전 속도 증가	合計運転速度アップ
+NEW: Idle Essence, Idle Gear Parts, Idle garage parts, Idle Rewards money	NEW: 방치 에센스, 방치 장비 부품, 방치 정비소 부품, 방치 보상 현금	NEW：放置エッセンス、放置装備パーツ、放置工房パーツ、放置報酬のお金
+NEW: Thief catch chance	NEW: 도둑 체포 확률	NEW：泥棒の捕獲率
+NEW: Upgrade discount (parts)	NEW: 강화 할인(부품)	NEW：強化割引（パーツ）
+Repair # city fleet vehicles	시 차량 #대 수리	市の車両を#台修理
+Role Parts (Tank · Warrior · Ranger · Mage · Support) – you have #M · #M · #M · #M · #M	역할 부품 (탱커 · 전사 · 원거리 · 마법사 · 서포터) – 보유 #M · #M · #M · #M · #M	ロールパーツ（タンク · 戦士 · レンジャー · 魔法使い · サポート）– 所持 #M · #M · #M · #M · #M
+YOUR BENEFITS · VIP #	내 혜택 · VIP #	特典 · VIP #
+all	모두	全て
+and	그리고	と
+close	닫기	閉じる
+earn	획득	獲得
+every	매	毎
+for	(용)	用
+garage	정비소	工房
+none	없음	なし
+role	역할	ロール
+with	(으)로	で
+🎁 bonus +# Recruit & +# Crew tickets	🎁 보너스 모집 +# · 크루 +# 티켓	🎁 ボーナス リクルート+#・クルー+#チケット
+🎁 Quick Idle (# h): +$#M	🎁 빠른 방치 (#시간): +$#M	🎁 クイック放置（#時間）：+$#M
+🛵 Driving speed (all places together)	🛵 운전 속도 (모든 자리 합계)	🛵 運転速度（全枠の合計）
+NO TIME LIMIT	제한 없음	期限なし
+ONE TIME ONLY	1회 한정	1回限り
+· until # finish ·	· #명 완주까지 ·	· #人完走まで ·
+# FREE SUMMONS	무료 소환 #회	無料召喚#回
+📅 EVENT CALENDAR	📅 달력	📅 カレンダー
+EVENT CALENDAR	달력	カレンダー
+HERO COLLECTION	영웅 도감	ヒーロー図鑑
+HERO SUMMON	영웅소환	ヒーロー召喚
+Patron Badge	후원자 배지	パトロンバッジ
+Grand Prix Road	GP 로드	GPロード
+NEW: CRIT DAMAGE	NEW: 치명 피해	NEW：会心ダメ
+@Mon	월	月
+@Tue	화	火
+@Wed	수	水
+@Thu	목	木
+@Fri	금	金
+@Sat	토	土
+@Sun	일	日
+@Jan	1월	1月
+@Feb	2월	2月
+@Mar	3월	3月
+@Apr	4월	4月
+@May	5월	5月
+@Jun	6월	6月
+@Jul	7월	7月
+@Aug	8월	8月
+@Sep	9월	9月
+@Oct	10월	10月
+@Nov	11월	11月
+@Dec	12월	12月
+@cjk	일	日
+GEAR SUMMON	장비소환	装備召喚
+From: Torque Studios	보낸 이: Torque Studios	差出人：Torque Studios
+BATTLE	전투	バトル
+HEROES	영웅	ヒーロー
+SUMMON	소환	召喚
+CREW	크루	クルー
+IDLE	방치	放置
+QUESTS	퀘스트	クエスト
+ARENA	아레나	アリーナ
+RANK	랭킹	ランク
+CHAT	채팅	チャット
+CHECK-IN	출석	ログイン
+NEWS	소식	ニュース
+MAIL	우편	メール
+EVENTS	이벤트	イベント
+IDLE REWARDS	방치 보상	放置報酬
+Recruit Tickets	모집 티켓	リクルートチケット
+CLAIM	받기	受け取る
+Money	돈	お金

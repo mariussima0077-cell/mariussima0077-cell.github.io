@@ -1,0 +1,152 @@
+2	SAC	BOLSA	BOLSA
+3	COLLECTION DE HÉROS	COLECCIÓN DE HÉROES	COLEÇÃO DE HERÓIS
+4	TOUS LES HÉROS	TODOS LOS HÉROES	TODOS OS HERÓIS
+5	RECYCLER	RECICLAR	RECICLAR
+6	HÉROS	HÉROES	HERÓIS
+7	Cogneur	Pegador	Brutamontes
+9	Bondit dans le plus gros groupe : #% de dégâts, étourdit #s, provoque les ennemis et gagne un bouclier.	Salta al grupo más grande: #% de daño, aturde #s, provoca a los enemigos y gana un escudo.	Salta no maior grupo: #% de dano, atordoa #s, provoca os inimigos e ganha um escudo.
+10	Pilote	Piloto	Piloto
+12	Fonce à travers chaque ennemi de sa ligne avec un feu bleu : #% de dégâts, toujours critique.	Cruza a todos los enemigos de su línea con fuego azul: #% de daño, siempre crítico.	Atravessa todos os inimigos da sua linha com fogo azul: #% de dano, sempre crítico.
+13	Scanner	Escáner	Scanner
+15	Une onde de scan marque tous les ennemis : #% de dégâts et ils subissent +#% de dégâts pendant #s.	Una onda de escaneo marca a todos los enemigos: #% de daño y reciben +#% de daño durante #s.	Uma onda de scan marca todos os inimigos: #% de dano e eles recebem +#% de dano por #s.
+16	Médecin	Médico	Médico
+18	Soigne tous les mécaniciens de #% de leurs PV + #% de plus en #s. Chaque #e coup soigne l'allié le plus faible.	Cura a todos los mecánicos un #% de sus PV + #% más en #s. Cada #.º golpe cura al aliado más débil.	Cura todos os mecânicos em #% do PV + #% a mais em #s. A cada #º golpe cura o aliado mais fraco.
+19	Peintre	Pintor	Pintor
+21	Bombe de peinture sur le plus gros groupe : #% de dégâts, #% de ralentissement et peinture brûlante pendant #s.	Bomba de pintura al grupo más grande: #% de daño, #% de ralentización y pintura ardiente durante #s.	Bomba de tinta no maior grupo: #% de dano, #% de lentidão e tinta ardente por #s.
+22	Électrochoc	Electro	Elétrico
+24	La foudre en chaîne saute # fois : #% de dégâts et étourdit #s.	El rayo en cadena salta # veces: #% de daño y aturde #s.	Raio em cadeia salta # vezes: #% de dano e atordoa #s.
+25	Légende	Leyenda	Lenda
+27	Des engrenages géants pleuvent sur chaque ennemi : #% de dégâts. Tous les mécaniciens +#% d'attaque pendant #s.	Engranajes gigantes llueven sobre cada enemigo: #% de daño. Todos los mecánicos +#% de ataque durante #s.	Engrenagens gigantes chovem em cada inimigo: #% de dano. Todos os mecânicos +#% de ataque por #s.
+28	Équipage	Cuadrilla	Tripulação
+30	Lance une clé qui tourne : #% de dégâts.	Lanza una llave giratoria: #% de daño.	Arremessa uma chave giratória: #% de dano.
+32	Frappe le sol : un mur de rochers roule à travers TOUS les ennemis – #% de dégâts et étourdit #s. Gagne un bouclier de #% et provoque les ennemis.	Golpea el suelo: un muro de rocas arrasa a TODOS los enemigos – #% de daño y aturde #s. Gana un escudo de #% y provoca a los enemigos.	Golpeia o chão: um muro de pedras rola sobre TODOS os inimigos – #% de dano e atordoa #s. Ganha um escudo de #% e provoca os inimigos.
+34	Une lumière sacrée soigne tous les mécaniciens de #% PV (+#% en #s) et RÉANIME un mécanicien K.O. avec #% PV (une fois par combat). Équipe : −#% de dégâts subis pendant #s.	Una luz sagrada cura a todos los mecánicos #% PV (+#% en #s) y REVIVE a un mecánico K.O. con #% PV (una vez por combate). Equipo: −#% de daño recibido durante #s.	Uma luz sagrada cura todos os mecânicos em #% PV (+#% em #s) e REVIVE um mecânico nocauteado com #% PV (uma vez por batalha). Equipe: −#% de dano recebido por #s.
+36	Une tornade de peinture et de diamants sur le plus gros groupe : #% de dégâts, puis gel de cristal – gelés #s et ils subissent +#% de dégâts pendant #s.	Un tornado de pintura y diamantes al grupo más grande: #% de daño, luego congelación de cristal – congelados #s y reciben +#% de daño durante #s.	Um tornado de tinta e diamantes no maior grupo: #% de dano, depois congelamento de cristal – congelados #s e recebem +#% de dano por #s.
+38	Nuage d'orage sur les ennemis : # éclairs de #% de dégâts, chacun étourdit #s. Équipe : +#% de vitesse d'attaque pendant #s.	Nube de tormenta sobre los enemigos: # rayos de #% de daño, cada uno aturde #s. Equipo: +#% de velocidad de ataque durante #s.	Nuvem de tempestade sobre os inimigos: # raios de #% de dano, cada um atordoa #s. Equipe: +#% de velocidade de ataque por #s.
+40	L'Œil qui voit tout plie le temps : tous les ennemis ralentis de #% et marqués (+#% de dégâts) pendant #s. Équipe : +#% de vitesse d'attaque pendant #s.	El Ojo que todo lo ve dobla el tiempo: todos los enemigos ralentizados #% y marcados (+#% de daño) durante #s. Equipo: +#% de velocidad de ataque durante #s.	O Olho que tudo vê dobra o tempo: todos os inimigos lentos em #% e marcados (+#% de dano) por #s. Equipe: +#% de velocidade de ataque por #s.
+42	Charge propulsée à travers chaque ennemi de sa ligne : #% de dégâts, toujours critique, et ils brûlent pendant #s.	Carga con cohete a través de cada enemigo de su línea: #% de daño, siempre crítico, y arden durante #s.	Investida a jato por cada inimigo da sua linha: #% de dano, sempre crítico, e eles queimam por #s.
+44	Des engrenages enflammés s'écrasent sur chaque ennemi : #% de dégâts + un engrenage géant sur le plus gros groupe (#%). Puis MOLTEN CROWN : chaque ennemi touché brûle #s et subit +#% de dégâts. Équipe : +#% d'attaque et −#% de dégâts subis pendant #s.	Engranajes en llamas caen sobre cada enemigo: #% de daño + un engranaje gigante al grupo más grande (#%). Luego MOLTEN CROWN: cada enemigo golpeado arde #s y recibe +#% de daño. Equipo: +#% de ataque y −#% de daño recibido durante #s.	Engrenagens em chamas caem sobre cada inimigo: #% de dano + uma engrenagem gigante no maior grupo (#%). Depois MOLTEN CROWN: cada inimigo atingido queima por #s e recebe +#% de dano. Equipe: +#% de ataque e −#% de dano recebido por #s.
+46	Plein gaz : traverse TOUS les ennemis – #% de dégâts, toujours critique, puis ARMOR BREAK : ils brûlent et perdent #% de DÉF pendant #s. Équipe : +#% de vitesse d'attaque et +#% de critique pendant #s.	A toda máquina: arrasa a TODOS los enemigos – #% de daño, siempre crítico, luego ARMOR BREAK: arden y pierden #% de DEF durante #s. Equipo: +#% de velocidad de ataque y +#% de crítico durante #s.	Acelerador no fundo: atravessa TODOS os inimigos – #% de dano, sempre crítico, depois ARMOR BREAK: eles queimam e perdem #% de DEF por #s. Equipe: +#% de velocidade de ataque e +#% de crítico por #s.
+48	Un phénix de feu géant plonge sur les ennemis : #% de dégâts à TOUS, ils brûlent #s. Soigne tous les mécaniciens de #% + #% en #s, équipe −#% de dégâts subis pendant #s. Une fois par combat, il ramène TOUS les mécaniciens tombés avec #% PV.	Un fénix de fuego gigante se lanza sobre los enemigos: #% de daño a TODOS, arden #s. Cura a todos los mecánicos #% + #% en #s, equipo −#% de daño recibido durante #s. Una vez por combate revive a TODOS los mecánicos caídos con #% PV.	Uma fênix de fogo gigante mergulha nos inimigos: #% de dano a TODOS, eles queimam por #s. Cura todos os mecânicos em #% + #% em #s, equipe −#% de dano recebido por #s. Uma vez por batalha traz de volta TODOS os mecânicos caídos com #% PV.
+50	Un bouclier d'énergie géant s'écrase sur le plus gros groupe : #% de dégâts, étourdit #s et SHIELD STUN : ils infligent −#% de dégâts pendant #s. Goliath provoque TOUS les ennemis #s avec un bouclier de #% PV ; chaque mécanicien reçoit un bouclier de #% PV et −#% de dégâts subis pendant #s.	Un escudo de energía gigante cae sobre el grupo más grande: #% de daño, aturde #s y SHIELD STUN: infligen −#% de daño durante #s. Goliath provoca a TODOS los enemigos #s con un escudo de #% PV; cada mecánico recibe un escudo de #% PV y −#% de daño recibido durante #s.	Um escudo de energia gigante cai sobre o maior grupo: #% de dano, atordoa #s e SHIELD STUN: eles causam −#% de dano por #s. Goliath provoca TODOS os inimigos por #s com um escudo de #% PV; cada mecânico ganha um escudo de #% PV e −#% de dano recebido por #s.
+52	Une pluie de flèches-bougies électriques tombe sur le plus gros groupe : #% de dégâts, ralentit de #% pendant #s et ils sont MARQUÉS (+#% de dégâts subis) pendant #s. Longue portée.	Una lluvia de flechas-bujía eléctricas cae sobre el grupo más grande: #% de daño, ralentiza #% durante #s y quedan MARCADOS (+#% de daño recibido) durante #s. Largo alcance.	Uma chuva de flechas-vela elétricas cai sobre o maior grupo: #% de dano, lentidão de #% por #s e eles ficam MARCADOS (+#% de dano recebido) por #s. Longo alcance.
+54	Une tornade de peinture arc-en-ciel magique tombe sur le plus gros groupe : #% de dégâts, ralentit de #% pendant #s et les ennemis peints infligent −#% de dégâts pendant #s. Longue portée.	Un tornado de pintura arcoíris mágica cae sobre el grupo más grande: #% de daño, ralentiza #% durante #s y los enemigos pintados infligen −#% de daño durante #s. Largo alcance.	Um tornado de tinta arco-íris mágica cai sobre o maior grupo: #% de dano, lentidão de #% por #s e os inimigos pintados causam −#% de dano por #s. Longo alcance.
+56	Shade disparaît dans une fumée noire, apparaît derrière l'ennemi le plus faible et frappe d'un X rouge : #% de dégâts, toujours critique (#% autour), puis PHANTOM HAUNT : ils sont ralentis #s. Kit : chaque attaque = # coups rapides, #% d'esquive, après une esquive son prochain coup est un critique assuré (SHADOW STEP).	Shade desaparece en humo negro, aparece detrás del enemigo más débil y golpea con una X roja: #% de daño, siempre crítico (#% alrededor), luego PHANTOM HAUNT: quedan ralentizados #s. Kit: cada ataque = # golpes rápidos, #% de evasión, tras evadir su siguiente golpe es crítico seguro (SHADOW STEP).	Shade some em fumaça preta, aparece atrás do inimigo mais fraco e ataca com um X vermelho: #% de dano, sempre crítico (#% ao redor), depois PHANTOM HAUNT: eles ficam lentos por #s. Kit: cada ataque = # golpes rápidos, #% de esquiva, após uma esquiva o próximo golpe é crítico garantido (SHADOW STEP).
+58	Anvil saute et plante son bouclier-portière dans le sol : l'airbag explose et une onde de crash-test frappe TOUS les ennemis – #% de dégâts et étourdit #s (CRASH DAZED). Il provoque TOUS les ennemis #s avec un bouclier de #% PV.	Anvil salta y clava su escudo-puerta en el suelo: el airbag estalla y una onda de crash-test golpea a TODOS los enemigos – #% de daño y aturde #s (CRASH DAZED). Provoca a TODOS los enemigos #s con un escudo de #% PV.	Anvil salta e crava seu escudo-porta no chão: o airbag explode e uma onda de crash-test atinge TODOS os inimigos – #% de dano e atordoa #s (CRASH DAZED). Ele provoca TODOS os inimigos por #s com um escudo de #% PV.
+60	Une ambulance de course traverse l'équipe : soigne chaque héros de #% PV, donne un bouclier de #% PV et +#% d'énergie d'ultime aux autres. Soigneur à longue portée.	Una ambulancia de carreras cruza el equipo: cura a cada héroe #% PV, da un escudo de #% PV y +#% de energía de definitiva a los demás. Sanador de largo alcance.	Uma ambulância de corrida atravessa a equipe: cura cada herói em #% PV, dá um escudo de #% PV e +#% de energia de ultimate aos outros. Curandeiro de longo alcance.
+62	Le drone faucon marque l'ennemi le plus fort, puis un rayon railgun géant : #% de dégâts sur lui (toujours critique) et #% sur chaque ennemi de sa ligne. Puis LOCK-ON : chaque coup sur lui est critique pendant #s. Longue portée.	El dron halcón marca al enemigo más fuerte y luego un rayo railgun gigante: #% de daño a él (siempre crítico) y #% a cada enemigo de su línea. Luego LOCK-ON: cada golpe sobre él es crítico durante #s. Largo alcance.	O drone falcão marca o inimigo mais forte, depois um raio railgun gigante: #% de dano nele (sempre crítico) e #% em cada inimigo da sua linha. Depois LOCK-ON: cada golpe nele é crítico por #s. Longo alcance.
+64	Saute et abat sa clé géante : #% de dégâts dans une petite zone, étourdit #s. Gagne un bouclier de #% et provoque.	Salta y golpea con la llave gigante: #% de daño en un área pequeña, aturde #s. Gana un escudo de #% y provoca.	Salta e bate a chave gigante: #% de dano numa área pequena, atordoa #s. Ganha um escudo de #% e provoca.
+66	Saut au marteau dans le plus gros groupe : #% de dégâts, étourdit #s et l'huile renversée les ralentit de #% pendant #s. Bouclier + provocation.	Salto con martillo al grupo más grande: #% de daño, aturde #s y el aceite derramado los ralentiza #% durante #s. Escudo + provocación.	Salto com martelo no maior grupo: #% de dano, atordoa #s e o óleo derramado os deixa #% mais lentos por #s. Escudo + provocação.
+68	Bondit avec sa clé et fend le sol : #% de dégâts, étourdit les ennemis #s. Bouclier + provocation.	Salta con su llave y agrieta el suelo: #% de daño, aturde a los enemigos #s. Escudo + provocación.	Salta com sua chave e racha o chão: #% de dano, atordoa os inimigos por #s. Escudo + provocação.
+70	Saut écrasant avec haltère : #% de dégâts, étourdit #s. Puis il se déchaîne : +#% d'attaque et +#% de vitesse d'attaque pendant #s.	Salto aplastante con pesa: #% de daño, aturde #s. Luego se desata: +#% de ataque y +#% de velocidad de ataque durante #s.	Salto esmagador com haltere: #% de dano, atordoa #s. Depois enlouquece: +#% de ataque e +#% de velocidade de ataque por #s.
+72	Plat du ventre sur les ennemis : #% de dégâts, étourdit #s. Une fumée de diesel noire les affaiblit : ils infligent −#% de dégâts pendant #s.	Panzazo sobre los enemigos: #% de daño, aturde #s. El humo negro de diésel los debilita: infligen −#% de daño durante #s.	Barrigada nos inimigos: #% de dano, atordoa #s. A fumaça preta de diesel os enfraquece: eles causam −#% de dano por #s.
+74	Abat le disque d'embrayage : #% de dégâts et long étourdissement de #s. Gagne un gros bouclier de #% et provoque.	Golpea con el disco de embrague: #% de daño y un aturdimiento largo de #s. Gana un gran escudo de #% y provoca.	Bate o disco de embreagem: #% de dano e um atordoamento longo de #s. Ganha um grande escudo de #% e provoca.
+76	Soulève un bloc moteur entier et le lâche : #% de dégâts dans une grande zone, des fumées toxiques brûlent #s et affaiblissent les ennemis (−#% de dégâts).	Levanta un bloque de motor entero y lo suelta: #% de daño en un área grande, humos tóxicos queman #s y debilitan a los enemigos (−#% de daño).	Levanta um bloco de motor inteiro e o solta: #% de dano numa área grande, fumaça tóxica queima por #s e enfraquece os inimigos (−#% de dano).
+78	Fonce dans sa ligne (#%, toujours critique) et frappe tout le monde ENCORE au retour (#%).	Cruza su línea (#%, siempre crítico) y golpea a todos OTRA VEZ al volver (#%).	Atravessa sua linha (#%, sempre crítico) e atinge todos DE NOVO na volta (#%).
+80	Fonce avec la meuleuse : #% de dégâts, toujours critique. Les étincelles marquent les ennemis : +#% de dégâts subis pendant #s.	Carga con la amoladora: #% de daño, siempre crítico. Las chispas marcan a los enemigos: +#% de daño recibido durante #s.	Investe com a esmerilhadeira: #% de dano, sempre crítico. As faíscas marcam os inimigos: +#% de dano recebido por #s.
+82	Charge turbo dans sa ligne : #%, toujours critique. Toute l'équipe gagne +#% de vitesse d'attaque pendant #s.	Carga turbo por su línea: #%, siempre crítico. Todo el equipo gana +#% de velocidad de ataque durante #s.	Investida turbo na sua linha: #%, sempre crítico. A equipe toda ganha +#% de velocidade de ataque por #s.
+84	Charge néon tournoyante sur un LARGE couloir : #%, toujours critique, ennemis ralentis de #% pendant #s.	Carga de neón giratoria en un camino ANCHO: #%, siempre crítico, enemigos ralentizados #% durante #s.	Investida neon giratória num caminho LARGO: #%, sempre crítico, inimigos lentos em #% por #s.
+86	Chevauche une fusée nitro dans sa ligne : #%, toujours critique, et chaque coup explose sur les ennemis autour (#%).	Monta un cohete nitro por su línea: #%, siempre crítico, y cada golpe explota sobre los enemigos cercanos (#%).	Monta um foguete nitro na sua linha: #%, sempre crítico, e cada golpe explode nos inimigos ao redor (#%).
+88	Soigne tous les mécaniciens de #% (+#% en #s) et retire l'étourdissement de tous.	Cura a todos los mecánicos #% (+#% en #s) y quita el aturdimiento a todos.	Cura todos os mecânicos em #% (+#% em #s) e remove o atordoamento de todos.
+90	Soigne tous les mécaniciens de #% (+#% en #s). Huile fraîche : équipe +#% d'attaque pendant #s.	Cura a todos los mecánicos #% (+#% en #s). Aceite nuevo: equipo +#% de ataque durante #s.	Cura todos os mecânicos em #% (+#% em #s). Óleo novo: equipe +#% de ataque por #s.
+92	Soigne tous les mécaniciens de #% maintenant et un gros #% de plus en #s.	Cura a todos los mecánicos #% ahora y un gran #% más en #s.	Cura todos os mecânicos em #% agora e um grande #% a mais em #s.
+94	Soigne tous les mécaniciens de #% (+#% en #s) et le plus faible reçoit +#% en plus.	Cura a todos los mecánicos #% (+#% en #s) y el más débil recibe +#% extra.	Cura todos os mecânicos em #% (+#% em #s) e o mais fraco ganha +#% extra.
+96	Soigne tous les mécaniciens de #% (+#% en #s). L'équipe subit −#% de dégâts pendant #s.	Cura a todos los mecánicos #% (+#% en #s). El equipo recibe −#% de daño durante #s.	Cura todos os mecânicos em #% (+#% em #s). A equipe recebe −#% de dano por #s.
+98	Pose sa caisse à outils : soigne tous les mécaniciens de #% et donne à chacun un bouclier de #% PV.	Planta su caja de herramientas: cura a todos los mecánicos #% y da a cada uno un escudo de #% PV.	Bate sua caixa de ferramentas: cura todos os mecânicos em #% e dá a todos um escudo de #% PV.
+100	Grosse bombe de peinture : #% de dégâts dans une large zone, ennemis ralentis de #% pendant #s, peinture brûlante au sol.	Gran bomba de pintura: #% de daño en un área amplia, enemigos ralentizados #% durante #s, pintura ardiente en el suelo.	Grande bomba de tinta: #% de dano numa área ampla, inimigos lentos em #% por #s, tinta ardente no chão.
+102	Lourde bombe de peinture : #% de dégâts dans une petite zone et étourdit #s.	Bomba de pintura pesada: #% de daño en un área pequeña y aturde #s.	Bomba de tinta pesada: #% de dano numa área pequena e atordoa #s.
+104	Bombe d'acide : #% de dégâts, l'acide brûle #s et affaiblit les ennemis (−#% de dégâts) pendant #s.	Bomba de ácido: #% de daño, el ácido quema #s y debilita a los enemigos (−#% de daño) durante #s.	Bomba de ácido: #% de dano, o ácido queima por #s e enfraquece os inimigos (−#% de dano) por #s.
+106	Bombe toxique violette : #% de dégâts, marque les ennemis (+#% de dégâts subis) pendant #s et les ralentit #s.	Bomba tóxica morada: #% de daño, marca a los enemigos (+#% de daño recibido) durante #s y los ralentiza #s.	Bomba tóxica roxa: #% de dano, marca os inimigos (+#% de dano recebido) por #s e os deixa lentos por #s.
+108	Bombe à eau : #% de dégâts, l'explosion étourdit les ennemis #s.	Bomba de agua: #% de daño, la explosión aturde a los enemigos #s.	Bomba de água: #% de dano, a explosão atordoa os inimigos por #s.
+110	Une vague de vernis violette balaie TOUT le terrain : #% de dégâts à chaque ennemi, ralentis de #% et marqués (+#% de dégâts) pendant #s.	Una ola de barniz morado barre TODO el campo: #% de daño a cada enemigo, ralentizados #% y marcados (+#% de daño) durante #s.	Uma onda de verniz roxa varre TODO o campo: #% de dano em cada inimigo, lentos em #% e marcados (+#% de dano) por #s.
+112	Rivet saute et soude son bouclier dans le sol : #% de dégâts, étourdit #s. Il gagne un bouclier de #% PV et provoque les ennemis.	Rivet salta y suelda su escudo al suelo: #% de daño, aturde #s. Gana un escudo de #% PV y provoca a los enemigos.	Rivet salta e solda seu escudo no chão: #% de dano, atordoa #s. Ganha um escudo de #% PV e provoca os inimigos.
+114	Kael fonce dans sa ligne avec sa lame-clé enflammée : #% de dégâts, toujours critique, et chaque coup explose sur les ennemis autour (#%).	Kael cruza su línea con su llave-espada en llamas: #% de daño, siempre crítico, y cada golpe explota sobre los enemigos cercanos (#%).	Kael atravessa sua linha com a chave-lâmina em chamas: #% de dano, sempre crítico, e cada golpe explode nos inimigos ao redor (#%).
+116	Spark vise l'ennemi le plus fort et tire une tempête de clous brillants : #% de dégâts, toujours critique, marqué #s. Longue portée.	Spark fija al enemigo más fuerte y dispara una tormenta de clavos brillantes: #% de daño, siempre crítico, marcado #s. Largo alcance.	Spark mira no inimigo mais forte e dispara uma tempestade de pregos brilhantes: #% de dano, sempre crítico, marcado por #s. Longo alcance.
+118	Mira lance une fiole de nitro sur le plus gros groupe : #% de dégâts dans une large zone et un feu bleu les brûle #s. Longue portée.	Mira lanza un frasco de nitro al grupo más grande: #% de daño en un área amplia y fuego azul los quema #s. Largo alcance.	Mira joga um frasco de nitro no maior grupo: #% de dano numa área ampla e fogo azul os queima por #s. Longo alcance.
+120	Lena agite le drapeau vert : soigne tous les mécaniciens de #% (+#% en #s) et l'équipe gagne +#% d'attaque pendant #s.	Lena agita la bandera verde: cura a todos los mecánicos #% (+#% en #s) y el equipo gana +#% de ataque durante #s.	Lena agita a bandeira verde: cura todos os mecânicos em #% (+#% em #s) e a equipe ganha +#% de ataque por #s.
+122	La foudre saute # fois : #% de dégâts, étourdit #s.	El rayo salta # veces: #% de daño, aturde #s.	O raio salta # vezes: #% de dano, atordoa #s.
+124	Une longue chaîne verte qui saute # fois : #% de dégâts, étourdit #s.	Una larga cadena verde que salta # veces: #% de daño, aturde #s.	Uma longa corrente verde que salta # vezes: #% de dano, atordoa #s.
+126	Électrifie le sol sous TOUS les ennemis : #% de dégâts et étourdit tout le monde #s.	Electrifica el suelo bajo TODOS los enemigos: #% de daño y aturde a todos #s.	Eletrifica o chão sob TODOS os inimigos: #% de dano e atordoa todos por #s.
+128	Courant puissant qui saute # fois sans faiblir : #% de dégâts, étourdit #s.	Corriente fuerte que salta # veces sin debilitarse: #% de daño, aturde #s.	Corrente forte que salta # vezes sem enfraquecer: #% de dano, atordoa #s.
+130	Pose sa bobine Tesla : pendant #s elle électrocute un ennemi au hasard toutes les #s (#% de dégâts, étourdit #s).	Coloca su bobina Tesla: durante #s electrocuta a un enemigo al azar cada #s (#% de daño, aturde #s).	Coloca sua bobina Tesla: por #s ela eletrocuta um inimigo aleatório a cada #s (#% de dano, atordoa #s).
+132	Une puissante onde de scan : #% de dégâts à chaque ennemi et les marque (+#% de dégâts subis) pendant #s.	Una fuerte onda de escaneo: #% de daño a cada enemigo y los marca (+#% de daño recibido) durante #s.	Uma forte onda de scan: #% de dano em cada inimigo e os marca (+#% de dano recebido) por #s.
+134	Onde de scan : #% de dégâts, marque les ennemis #s et l'équipe gagne +#% de chance de critique pendant #s.	Onda de escaneo: #% de daño, marca a los enemigos #s y el equipo gana +#% de probabilidad de crítico durante #s.	Onda de scan: #% de dano, marca os inimigos por #s e a equipe ganha +#% de chance de crítico por #s.
+136	Impulsion de scan froide : #% de dégâts, marque les ennemis #s et les ralentit de #% pendant #s.	Pulso de escaneo frío: #% de daño, marca a los enemigos #s y los ralentiza #% durante #s.	Pulso de scan frio: #% de dano, marca os inimigos por #s e os deixa #% mais lentos por #s.
+138	Scan de visée rouge : #% de dégâts, marque les ennemis #s et l'équipe gagne +#% d'attaque pendant #s.	Escaneo de mira rojo: #% de daño, marca a los enemigos #s y el equipo gana +#% de ataque durante #s.	Scan de mira vermelho: #% de dano, marca os inimigos por #s e a equipe ganha +#% de ataque por #s.
+140	Vise l'ennemi le plus fort et tire un énorme rayon de sniper : #% de dégâts, toujours critique, marqué #s.	Fija al enemigo más fuerte y dispara un enorme rayo de francotirador: #% de daño, siempre crítico, marcado #s.	Mira no inimigo mais forte e dispara um enorme raio de sniper: #% de dano, sempre crítico, marcado por #s.
+142	Subit −	Recibe −	Recebe −
+143	% de dégâts à chaque coup.	% de daño de cada golpe.	% de dano de cada golpe.
+145	Une fois par combat, sous #% PV : gagne un bouclier de	Una vez por combate, bajo #% PV: gana un escudo de	Uma vez por batalha, abaixo de #% PV: ganha um escudo de
+146	% PV et provoque les ennemis #s.	% PV y provoca a los enemigos #s.	% PV e provoca os inimigos por #s.
+148	Chaque ennemi qu'il met K.O. : +	Cada enemigo que noquea: +	Cada inimigo que ele nocauteia: +
+149	% de vitesse d'attaque pendant #s.	% de velocidad de ataque durante #s.	% de velocidade de ataque por #s.
+151	% de chance d'esquiver un coup ennemi.	% de probabilidad de esquivar un golpe enemigo.	% de chance de esquivar um golpe inimigo.
+153	Toutes les #s, soigne le mécanicien le plus faible de	Cada #s cura al mecánico más débil un	A cada #s cura o mecânico mais fraco em
+154	% de ses PV.	% de sus PV.	% do PV dele.
+156	Quand un mécanicien passe sous #% PV : soin instantané de	Cuando un mecánico baja de #% PV: curación instantánea de	Quando um mecânico cai abaixo de #% PV: cura instantânea de
+157	% PV (recharge #s).	% PV (recarga #s).	% PV (recarga de #s).
+159	Chaque tir ralentit l'ennemi de #% pendant	Cada disparo ralentiza al enemigo #% durante	Cada tiro deixa o inimigo #% mais lento por
+161	% de dégâts aux ennemis ralentis.	% de daño a enemigos ralentizados.	% de dano a inimigos lentos.
+163	% de chance qu'un tir rebondisse sur un 2e ennemi (#% de dégâts).	% de probabilidad de que un disparo salte a un 2.º enemigo (#% de daño).	% de chance de um tiro pular para um 2º inimigo (#% de dano).
+165	% de chance qu'un tir étourdisse l'ennemi #s.	% de probabilidad de que un disparo aturda al enemigo #s.	% de chance de um tiro atordoar o inimigo por #s.
+167	Chaque	Cada	A cada
+168	tir marque la cible #s (+#% de dégâts subis).	disparo marca al objetivo #s (+#% de daño recibido).	tiro marca o alvo por #s (+#% de dano recebido).
+170	% de dégâts aux ennemis marqués.	% de daño a enemigos marcados.	% de dano a inimigos marcados.
+172	Tous les mécaniciens infligent +	Todos los mecánicos infligen +	Todos os mecânicos causam +
+173	% de dégâts tant que ce héros est debout.	% de daño mientras este héroe siga en pie.	% de dano enquanto este herói estiver de pé.
+175	Sous #% PV : régénère	Bajo #% PV: regenera	Abaixo de #% PV: regenera
+176	% PV chaque seconde.	% PV cada segundo.	% PV por segundo.
+178	Toutes les # attaques, la foudre saute sur # monstres de plus (	Cada # ataques el rayo salta a # monstruos más (	A cada # ataques o raio salta para mais # monstros (
+179	% de dégâts).	% de daño).	% de dano).
+181	# premières s de chaque vague : +	Primeros # s de cada oleada: +	Primeiros # s de cada onda: +
+182	% de vitesse d'attaque.	% de velocidad de ataque.	% de velocidade de ataque.
+183	Une fois par combat, quand Ignis tombe, il renaît avec	Una vez por combate, cuando Ignis cae renace con	Uma vez por batalha, quando Ignis cai ele renasce com
+184	% PV.	% PV.	% PV.
+186	Au début de chaque vague, toute l'équipe reçoit un bouclier de	Al inicio de cada oleada todo el equipo recibe un escudo de	No início de cada onda a equipe toda ganha um escudo de
+187	% des PV de Goliath.	% de los PV de Goliath.	% do PV de Goliath.
+189	Le monstre touché par Nova subit +	El monstruo que golpea Nova recibe +	O monstro atingido por Nova recebe +
+190	% de dégâts de toute l'équipe pendant # s.	% de daño de todo el equipo durante # s.	% de dano de toda a equipe por # s.
+192	Chaque monstre touché par Chroma est trempé de peinture : −	Cada monstruo que golpea Chroma queda empapado de pintura: −	Cada monstro atingido por Chroma fica encharcado de tinta: −
+193	% de vitesse d'attaque pendant # s.	% de velocidad de ataque durante # s.	% de velocidade de ataque por # s.
+195	Shade inflige +	Shade inflige +	Shade causa +
+196	% de dégâts aux ennemis sous #% PV.	% de daño a enemigos bajo #% PV.	% de dano a inimigos abaixo de #% PV.
+198	Anvil subit −	Anvil recibe −	Anvil recebe −
+199	% de dégâts tant que son bouclier tient.	% de daño mientras su escudo aguante.	% de dano enquanto seu escudo durar.
+201	Les soins de Doc Volta sont +	Las curas de Doc Volta son +	As curas de Doc Volta são +
+202	% plus forts. Phase II : le héros soigné reçoit aussi un bouclier de #% PV. Phase III : +#% d'énergie d'ultime en plus.	% más fuertes. Fase II: el héroe curado también recibe un escudo de #% PV. Fase III: +#% de energía de definitiva también.	% mais fortes. Fase II: o herói curado também ganha um escudo de #% PV. Fase III: +#% de energia de ultimate também.
+204	Chaque #e tir traverse tous les monstres de la ligne (	Cada #.º disparo atraviesa a todos los monstruos de la línea (	A cada #º tiro atravessa todos os monstros da linha (
+205	SURCHARGE !	¡SOBRECARGA!	SOBRECARGA!
+207	MOUILLÉ	MOJADO	MOLHADO
+214	Bougie rapide	Bujía rápida	Vela rápida
+216	Arrive en roulant fort	Llega rodando fuerte	Chega rolando forte
+218	Crache des gaz	Escupe gases	Cospe fumaça
+220	Œil laser	Ojo láser	Olho laser
+222	Bondit	Salta encima	Dá o bote
+224	Frappe le sol	Golpe al suelo	Soco no chão
+226	Coups électriques	Puñetazos eléctricos	Socos elétricos
+228	Lance des bombes d'acide	Lanza bombas de ácido	Lança bombas de ácido
+230	Double coup de lame	Doble tajo	Golpe duplo de lâmina
+232	Scie tournante	Sierra giratoria	Serra giratória
+234	Onde sonore qui ralentit	Onda sonora que ralentiza	Onda sonora que deixa lento
+236	Molosse qui charge	Sabueso que embiste	Cão que investe
+238	Énorme et lourd	Enorme y pesado	Enorme e pesado
+240	Crache du feu	Escupe fuego	Cospe fogo
+242	Tire des bougies	Dispara bujías	Dispara velas
+244	Roule comme un disque de frein	Rueda como un disco de freno	Rola como um disco de freio
+246	Gonfle et éclate	Se infla y estalla	Infla e estoura
+248	Te saute dessus	Salta sobre ti	Pula em você
+250	Carapace dure, pinces	Caparazón duro, pinzas	Casco duro, pinças
+252	Coup de dard	Golpe de aguijón	Ferroada
+254	Lance des bombes d'huile	Lanza bombas de aceite	Lança bombas de óleo
+256	Reflet aveuglant	Reflejo cegador	Reflexo ofuscante
+258	Crache des boules de suie	Escupe bolas de hollín	Cospe bolas de fuligem
+260	Coup de piston	Embestida de pistón	Golpe de pistão
+262	Bondit et mord	Salta y muerde	Salta e morde
+264	Fouet d'huile	Látigo de aceite	Chicote de óleo
+266	Coup de langue-durite	Latigazo de lengua-manguera	Chicotada de língua-mangueira
+268	Boule d'engrenages	Bola de engranajes	Bola de engrenagens
+270	Charge au pare-chocs	Embestida de parachoques	Investida de para-choque
+272	Boss de chapitre	Jefe de capítulo	Chefe de capítulo
+277	Mini-boss	Minijefe	Minichefe
+287	Boss final	Jefe final	Chefe final
+302	Mini-boss · piqué au dard	Minijefe · picada de aguijón	Minichefe · mergulho de ferrão

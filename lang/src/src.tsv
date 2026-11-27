@@ -1,0 +1,4066 @@
+1	use strict
+2	BAG
+3	HERO COLLECTION
+4	ALL HEROES
+5	SALVAGE
+6	HEROES
+7	Bruiser
+8	PISTON SLAM
+9	Leaps into the biggest group: #% damage, stun #s, taunts enemies and gains a shield.
+10	Racer
+11	NITRO DASH
+12	Dashes through every enemy in its lane with blue fire: #% damage, always critical.
+13	Scanner
+14	FULL DIAGNOSTIC
+15	A scan wave marks all enemies: #% damage and they take +#% damage for #s.
+16	Medic
+17	OIL CHANGE
+18	Heals all mechanics for #% of their HP + #% more over #s. Every #rd hit heals the weakest ally.
+19	Sprayer
+20	COLOR STORM
+21	Paint bomb on the biggest group: #% damage, #% slow and burning paint for #s.
+22	Shocker
+23	OVERVOLT
+24	Chain lightning jumps # times: #% damage and stun #s.
+25	Legend
+26	TORQUE STORM
+27	Giant gears rain on every enemy: #% damage. All mechanics +#% attack for #s.
+28	Crew
+29	WRENCH THROW
+30	Throws a spinning wrench: #% damage.
+31	IRON QUAKE
+32	Smashes the ground: a wall of rocks rolls through ALL enemies – #% damage and stun #s. Gains a #% shield and taunts enemies.
+33	MIRACLE SHIFT
+34	Holy light heals all mechanics for #% HP (+#% over #s) and REVIVES one K.O. mechanic with #% HP (once per battle). Team: −#% damage taken for #s.
+35	DIAMOND VORTEX
+36	A paint-and-diamond tornado on the biggest group: #% damage, then crystal freeze – frozen #s and they take +#% damage for #s.
+37	THUNDERSTORM
+38	Storm cloud over the enemies: # lightning strikes of #% damage, each stuns #s. Team: +#% attack speed for #s.
+39	TIME WARP
+40	The All-Seeing Eye bends time: all enemies slowed #% and marked (+#% damage) for #s. Team: +#% attack speed for #s.
+41	INFERNO DASH
+42	Rocket-kick dash through every enemy in its lane: #% damage, always critical, and they burn for #s.
+43	GEAR APOCALYPSE
+44	Flaming gears crash on every enemy: #% damage + a giant gear on the biggest group (#%). Then MOLTEN CROWN: every hit enemy burns for #s and takes +#% damage. Team: +#% attack and −#% damage taken for #s.
+45	OVERDRIVE
+46	Full throttle: blasts through ALL enemies – #% damage, always critical, then ARMOR BREAK: they burn and lose #% DEF for #s. Team: +#% attack speed and +#% crit for #s.
+47	REBIRTH FLAME
+48	A giant fire phoenix dives on the enemies: #% damage to ALL, they burn for #s. Heals all mechanics #% + #% over #s, team −#% damage taken for #s. Once per battle it brings back ALL fallen mechanics with #% HP.
+49	IRON FORTRESS
+50	A giant energy shield crashes on the biggest group: #% damage, stun #s and SHIELD STUN: they deal −#% damage for #s. Goliath taunts ALL enemies for #s with a shield of #% HP; every mechanic gets a shield of #% HP and −#% damage taken for #s.
+51	STARFIRE RAIN
+52	A rain of electric spark-plug arrows falls on the biggest group: #% damage, slow #% for #s and they are MARKED (+#% damage taken) for #s. Long range.
+53	RAINBOW TEMPEST
+54	A tornado of magic rainbow paint falls on the biggest group: #% damage, slow #% for #s and the painted enemies deal −#% damage for #s. Long range.
+55	EXHAUST PHANTOM
+56	Shade vanishes in black exhaust smoke, appears behind the weakest enemy and strikes with a red X: #% damage, always critical (#% around), then PHANTOM HAUNT: they are slowed for #s. Kit: every attack = # quick hits, #% evade, after an evade his next hit is a sure critical (SHADOW STEP).
+57	AIRBAG SLAM
+58	Anvil jumps and slams his car-door shield into the ground: the airbag bursts and a crash-test shockwave hits ALL enemies – #% damage and stun #s (CRASH DAZED). He taunts ALL enemies for #s with a shield of #% HP.
+59	PIT STOP
+60	A racing ambulance drives through the team: heals every hero #% HP, gives a shield of #% HP and +#% ultimate energy to the others. Long range healer.
+61	OVERDRIVE RAILSHOT
+62	The hawk drone marks the strongest enemy, then a giant railgun beam: #% damage to it (always critical) and #% to every enemy in its lane. Then LOCK-ON: every hit on it is critical for #s. Long range.
+63	WRENCH CRUSHER
+64	Jumps and smashes the giant wrench down: #% damage in a small area, stun #s. Gains a #% shield and taunts.
+65	OIL SLICK SMASH
+66	Hammer jump into the biggest group: #% damage, stun #s and spilled oil slows them #% for #s. Shield + taunt.
+67	GEAR BREAKER
+68	Leaps with her wrench and cracks the ground: #% damage, stuns enemies #s. Shield + taunt.
+69	PISTON FURY
+70	Dumbbell jump slam: #% damage, stun #s. Then he goes wild: +#% attack and +#% attack speed for #s.
+71	DIESEL CLOUD
+72	Belly-flop into the enemies: #% damage, stun #s. Black diesel smoke weakens them: they deal −#% damage for #s.
+73	CLUTCH SLAM
+74	Smashes the clutch disc down: #% damage and a long stun of #s. Gains a big #% shield and taunts.
+75	ENGINE DROP
+76	Lifts a whole engine block and drops it: #% damage in a big area, toxic fumes burn #s and weaken enemies (−#% damage).
+77	REV & RETURN
+78	Dashes through his lane (#%, always critical) and hits everyone AGAIN on the way back (#%).
+79	GRINDER RUSH
+80	Dashes with the angle grinder: #% damage, always critical. Sparks mark enemies: +#% damage taken for #s.
+81	TURBO BOOST
+82	Turbo dash through her lane: #%, always critical. The whole team gets +#% attack speed for #s.
+83	NEON SPIN
+84	Spinning neon dash that hits a WIDE path: #%, always critical, enemies slowed #% for #s.
+85	NITRO ROCKET
+86	Rides a nitro rocket through her lane: #%, always critical, and every hit explodes on the enemies around (#%).
+87	FIRST AID KIT
+88	Heals all mechanics #% (+#% over #s) and removes stun from everyone.
+89	FRESH OIL
+90	Heals all mechanics #% (+#% over #s). Fresh oil: team +#% attack for #s.
+91	SLOW-DRIP OIL
+92	Heals all mechanics #% now and a big #% more over #s.
+93	LIFT & PATCH
+94	Heals all mechanics #% (+#% over #s) and the weakest one gets +#% extra.
+95	BRAKE PADS
+96	Heals all mechanics #% (+#% over #s). Team takes −#% damage for #s.
+97	TOOLBOX FORTRESS
+98	Slams down his toolbox: heals all mechanics #% and gives everyone a shield of #% HP.
+99	COLOR SPLASH
+100	Big paint bomb: #% damage in a wide area, enemies slowed #% for #s, burning paint on the ground.
+101	DENT BLAST
+102	Heavy paint bomb: #% damage in a small area and stuns #s.
+103	ACID BATH
+104	Acid bomb: #% damage, acid burns #s and weakens enemies (−#% damage) for #s.
+105	TOXIC GLOSS
+106	Purple toxic bomb: #% damage, marks enemies (+#% damage taken) for #s and slows them #s.
+107	PRESSURE WASH
+108	Water bomb: #% damage, the blast stuns enemies #s.
+109	GLOSS WAVE
+110	A purple gloss wave sweeps the WHOLE field: #% damage to every enemy, slowed #% and marked (+#% damage) for #s.
+111	WELD WALL
+112	Rivet jumps and welds his shield into the ground: #% damage, stun #s. He gains a #% HP shield and taunts the enemies.
+113	BLAZE CUT
+114	Kael dashes through his lane with the burning wrench-blade: #% damage, always critical, and every hit explodes on the enemies around (#%).
+115	NAIL STORM
+116	Spark locks onto the strongest enemy and fires a storm of glowing nails: #% damage, always critical, marked for #s. Long range.
+117	NITRO BURST
+118	Mira throws a nitro flask on the biggest group: #% damage in a wide area and blue fire burns them for #s. Long range.
+119	GREEN FLAG
+120	Lena waves the green flag: heals all mechanics #% (+#% over #s) and the team gets +#% attack for #s.
+121	SPARK CHAIN
+122	Lightning jumps # times: #% damage, stun #s.
+123	GREEN SURGE
+124	A long green chain that jumps # times: #% damage, stun #s.
+125	STATIC FIELD
+126	Electrifies the ground under ALL enemies: #% damage and stun #s to everyone.
+127	LIVE WIRE
+128	Heavy current that jumps # times without getting weaker: #% damage, stun #s.
+129	TESLA COIL
+130	Places his Tesla coil: for #s it zaps a random enemy every #s (#% damage, stun #s).
+131	ENGINE CHECK
+132	A strong scan wave: #% damage to every enemy and marks them (+#% damage taken) for #s.
+133	WEAK SPOT DATA
+134	Scan wave: #% damage, marks enemies #s and the team gets +#% critical chance for #s.
+135	SCAN PULSE
+136	Cold scan pulse: #% damage, marks enemies #s and slows them #% for #s.
+137	TARGET LOCK
+138	Red targeting scan: #% damage, marks enemies #s and the team gets +#% attack for #s.
+139	HEADSHOT
+140	Locks onto the strongest enemy and fires a huge sniper beam: #% damage, always critical, marked #s.
+141	IRON SKIN
+142	Takes −
+143	% damage from every hit.
+144	LAST STAND
+145	Once per battle, under #% HP: gains a shield of
+146	% HP and taunts enemies for #s.
+147	ADRENALINE
+148	Every enemy he knocks out: +
+149	% attack speed for #s.
+150	QUICK STEP
+151	% chance to dodge an enemy hit.
+152	FIELD CARE
+153	Every #s heals the weakest mechanic for
+154	% of his HP.
+155	EMERGENCY KIT
+156	When a mechanic drops under #% HP: instant heal of
+157	% HP (#s cooldown).
+158	STICKY PAINT
+159	Every shot slows the enemy #% for
+160	THINNER
+161	% damage to slowed enemies.
+162	STATIC
+163	% chance that a shot jumps to a second enemy (#% damage).
+164	SHORT CIRCUIT
+165	% chance that a shot stuns the enemy #s.
+166	WEAK SPOT
+167	Every
+168	shot marks the target for #s (+#% damage taken).
+169	PRECISION
+170	% damage to marked enemies.
+171	LEADER
+172	All mechanics deal +
+173	% damage while this hero stands.
+174	SECOND WIND
+175	Under #% HP: regenerates
+176	% HP every second.
+177	OVERLOAD CROWN
+178	Every #th attack the lightning jumps to # more monsters (
+179	% damage).
+180	REDLINE RUSH
+181	First # s of every wave: +
+182	% attack speed.
+183	Once per battle, when Ignis falls he is reborn with
+184	% HP.
+185	IRON WALL
+186	At the start of every wave the whole team gets a shield of
+187	% of Goliath's HP.
+188	STAR MARK
+189	The monster Nova hits takes +
+190	% damage from the whole team for # s.
+191	WET PAINT
+192	Every monster Chroma hits is soaked in paint: −
+193	% attack speed for # s.
+194	EXECUTION
+195	Shade deals +
+196	% damage to enemies below #% HP.
+197	CRUMPLE ZONE
+198	Anvil takes −
+199	% damage while his shield is up.
+200	FIRST AID
+201	Doc Volta's heals are +
+202	% stronger. Phase II: the healed hero also gets a #% HP shield. Phase III: +#% ultimate energy too.
+203	PIERCING RAIL
+204	Every #rd shot goes through every monster in the line (
+205	OVERLOAD!
+206	PIERCE ×
+207	WET
+208	Rookie Rob
+209	Rookie Dan
+210	Rookie Max
+211	Rookie Ivo
+212	Rookie Sam
+213	Spark Imp
+214	Fast spark plug
+215	Tire Roller
+216	Rolls in hard
+217	Muffler Serpent
+218	Spits exhaust
+219	Headlight Drone
+220	Laser eye
+221	Piston Spider
+222	Pounces
+223	Radiator Brute
+224	Ground pound
+225	Battery Golem
+226	Shocking punches
+227	Fuel Can Bomber
+228	Lobs acid bombs
+229	Wiper Mantis
+230	Double blade slash
+231	Hubcap Saw
+232	Spinning saw
+233	Horn Howler
+234	Sound blast slows
+235	Turbo Hound
+236	Charging hound
+237	Gearbox Golem
+238	Huge and heavy
+239	Exhaust Bat
+240	Spits fire
+241	Spark Wraith
+242	Shoots spark plugs
+243	Brake Beast
+244	Rolls in like a brake disc
+245	Airbag Blob
+246	Inflates and bursts
+247	Spring Hopper
+248	Jumps on you
+249	Caliper Crab
+250	Hard shell, pinching claws
+251	Jack Scorpion
+252	Stinger strike
+253	Filter Goblin
+254	Throws oil bombs
+255	Mirror Moth
+256	Mirror glare
+257	Muffler Slug
+258	Spits soot balls
+259	Piston Beetle
+260	Piston ram
+261	Wrench Raptor
+262	Leaps and bites
+263	Oil Slime
+264	Oil whip
+265	Radiator Toad
+266	Hose tongue lash
+267	Gear Hedgehog
+268	Spinning gear ball
+269	Bumper Rhino
+270	Bumper charge
+271	DOZER BEHEMOTH
+272	Chapter boss
+273	COMPACTOR KRAKEN
+274	FIRE ENGINE HYDRA
+275	MIXER COLOSSUS
+276	CRUSHER
+277	Mini-boss
+278	SLUDGE CRUSHER
+279	FROST CRUSHER
+280	NEON CRUSHER
+281	MAGMA CRUSHER
+282	JUNK TITAN
+283	ACID TANKER
+284	FROST PLOW
+285	TURBO WYRM
+286	OMEGA ENGINE
+287	Final boss
+288	Bolt Crawler
+289	Tire Rat
+290	Piston Imp
+291	Exhaust Snake
+292	Scrap Hound
+293	Crankshaft Brute
+294	TURBO WASP
+295	TOXIC WASP
+296	FROST WASP
+297	NEON WASP
+298	MAGMA WASP
+299	JUNKYARD TITAN
+300	NITRO DRAGON
+301	TOW KING
+302	Mini-boss · stinger dive
+303	Scrapyard Wastes
+304	Rusty Junkyard
+305	Smog Valley
+306	Burning Stacks
+307	Titan's Foundry
+308	Rust Gate
+309	Tire Hills
+310	Crushed Row
+311	Bolt Alley
+312	Wreck Ridge
+313	Hubcap Hollow
+314	Scrap Ramp
+315	Chassis Lane
+316	Muffler Marsh
+317	Oil Lake
+318	Fume Gate
+319	Exhaust Flats
+320	Soot Corner
+321	Crusher Pit
+322	Magnet Yard
+323	Cinder Walk
+324	Furnace Road
+325	Ember Heap
+326	Spark Alley
+327	Ash Pile
+328	Coal Chute
+329	Slag River
+330	Gear Graveyard
+331	Molten Gate
+332	Foundry Steps
+333	Rivet Bridge
+334	Smelter Row
+335	Toxic Refinery
+336	Acid Swamp
+337	Pipe Maze
+338	Tank Farm
+339	Refinery Core
+340	Green Gate
+341	Acid Puddles
+342	Rot Marsh
+343	Bubble Bog
+344	Sludge Pond
+345	Fizz Creek
+346	Drum Dump
+347	Mold Meadow
+348	Valve Street
+349	Leaky Joints
+350	Steam Vents
+351	Gauge Room
+352	Drain Tunnel
+353	Sludge Pit
+354	Barrel Hill
+355	Fuel Depot
+356	Pump Station
+357	Chem Lab
+358	Silo Row
+359	Hazmat Yard
+360	Tar Pits
+361	Toxic Tower
+362	Flare Stack
+363	Reactor Walk
+364	Core Gate
+365	Vapor Deck
+366	Catalyst Hall
+367	Acid Throne
+368	Frozen Pass
+369	Snow Road
+370	Ice Bridges
+371	Frost Peaks
+372	Glacier Depot
+373	Snow Gate
+374	Slush Lane
+375	Chain Road
+376	Frozen Jam
+377	Wiper Woods
+378	Sleet Hill
+379	Icicle Arch
+380	Snowdrift Bend
+381	Ice Bridge
+382	Black Ice
+383	Salt Barns
+384	Avalanche Turn
+385	Frozen Lake
+386	Hail Ridge
+387	Frost Pit
+388	Blizzard Pass
+389	Crystal Cave
+390	Pine Hairpin
+391	Summit Garage
+392	Polar Station
+393	Frostbite Gap
+394	Cold Forge
+395	Plow Yard
+396	Ice Wall
+397	Frozen Gate
+398	Tundra Run
+399	Rime Hall
+400	Plow King Hall
+401	Neon Highway
+402	City Lights
+403	Tunnel Run
+404	Skyline Ramp
+405	Turbo Arena
+406	Neon Gate
+407	Taxi Rank
+408	Billboard Row
+409	Night Market
+410	Drift Corner
+411	Arcade Alley
+412	Chrome Mile
+413	Hologram Plaza
+414	Echo Tube
+415	Toll Booth
+416	Speed Trap
+417	Subway Loop
+418	Strobe Gate
+419	Neon Pit
+420	Overpass
+421	Rooftop Lot
+422	Laser Bridge
+423	Street Race
+424	Glow Garage
+425	Pulse Avenue
+426	Sky Bridge
+427	Nitro Lane
+428	Boost Ring
+429	Wyrm Gate
+430	Afterburn Strip
+431	Redline Ring
+432	Turbo Wyrm Nest
+433	Volcano Forge
+434	Ash Fields
+435	Lava Rivers
+436	Forge Halls
+437	Omega Core
+438	Ash Gate
+439	Smoke Fields
+440	Ember Road
+441	Cinder Dunes
+442	Lava Bridge
+443	Pumice Flats
+444	Sulfur Vents
+445	Scorch Trail
+446	Lava River
+447	Obsidian Ford
+448	Magma Falls
+449	Fire Hollow
+450	Basalt Steps
+451	Ember Cave
+452	Magma Pit
+453	Anvil Row
+454	Piston Hall
+455	Crank Forge
+456	Cast Yard
+457	Hammer Works
+458	Ingot Vault
+459	Bellows Bridge
+460	Blast Furnace
+461	Molten Heart
+462	Last Gate
+463	Inferno Gate
+464	Core Reactor
+465	Omega Engine
+466	Dusk
+467	Storm
+468	Crimson
+469	Midnight
+470	Venom
+471	Frostbite
+472	Golden
+473	Void
+474	Omega
+475	Nemesis
+476	Eclipse
+477	Chaos
+478	Titan
+479	Phantom
+480	Inferno
+481	Celestial
+482	Doom
+483	Rustfall Canyon
+484	Storm Junkyard
+485	Crimson Scrapheap
+486	Midnight Wreckyard
+487	Venom Dump
+488	Frostbite Salvage
+489	Golden Junkpile
+490	Void Graveyard
+491	Omega Scrap Throne
+492	Nemesis Scrap Abyss
+493	Apex Scrap Peaks
+494	Eclipse Junkyard
+495	Chaos Scrapstorm
+496	Legend Scrap Throne
+497	Titan Scrap Fortress
+498	Phantom Scrapyard
+499	Inferno Scrap Pits
+500	Celestial Scrapfield
+501	Doom Scrap Throne
+502	Dusk Oil Fields
+503	Storm Refinery
+504	Blood Oil Swamp
+505	Midnight Chem Works
+506	Venom Lagoon
+507	Frozen Pipeline
+508	Golden Oil Rigs
+509	Void Reactor
+510	Omega Refinery
+511	Nemesis Chem Abyss
+512	Apex Acid Towers
+513	Eclipse Refinery
+514	Chaos Chem Storm
+515	Legend Oil Kingdom
+516	Titan Refinery
+517	Phantom Chem Works
+518	Inferno Oil Lakes
+519	Celestial Refinery
+520	Doom Chem Kingdom
+521	Dusk Glacier
+522	Blizzard Peaks
+523	Crimson Tundra
+524	Midnight Icefields
+525	Venom Snowfields
+526	Frostbite Summit
+527	Golden Ice Caves
+528	Void Iceberg
+529	Omega Ice Fortress
+530	Nemesis Ice Abyss
+531	Apex Glacier
+532	Eclipse Frost Hollow
+533	Chaos Blizzard
+534	Legend Ice Throne
+535	Titan Glacier
+536	Phantom Ice Caves
+537	Inferno Frost Rift
+538	Celestial Ice Peaks
+539	Doom Ice Throne
+540	Sunset Boulevard
+541	Storm Speedway
+542	Crimson Strip
+543	Midnight Expressway
+544	Venom City
+545	Frostbite Freeway
+546	Golden Grand Prix
+547	Void Overpass
+548	Omega Raceway
+549	Nemesis Night Circuit
+550	Apex Speedway
+551	Eclipse Boulevard
+552	Chaos Raceway
+553	Legend Grand Prix
+554	Titan Speedway
+555	Phantom Highway
+556	Inferno Raceway
+557	Celestial Circuit
+558	Doom Grand Prix
+559	Dusk Caldera
+560	Thunder Volcano
+561	Crimson Magma Pits
+562	Midnight Forge
+563	Venom Crater
+564	Frostfire Mountain
+565	Golden Foundry
+566	Void Core
+567	Omega Inferno
+568	Nemesis Core
+569	Apex Caldera
+570	Eclipse Forge
+571	Chaos Inferno
+572	Legend Core
+573	Titan Forge
+574	Phantom Caldera
+575	Inferno Core
+576	Celestial Forge
+577	Doom Core
+578	ULTIMA ENGINE
+579	ENGINE
+580	Ultima
+581	Tool
+582	Helmet
+583	Work Vest
+584	Gloves
+585	Boots
+586	ECU Chip
+587	Attack
+588	HP
+589	Defense
+590	Crit chance
+591	Crit damage
+592	Attack speed
+593	Skill damage
+594	Rusty Wrench
+595	Steel Wrench
+596	Torque Wrench
+597	Impact Gun
+598	Golden Ratchet
+599	Titan Breaker
+600	Celestial Driver
+601	Cloth Cap
+602	Hard Hat
+603	Welding Mask
+604	Carbon Helmet
+605	Golden Helmet
+606	Crown of Gears
+607	Halo of Torque
+608	Old Overalls
+609	Kevlar Apron
+610	Armored Vest
+611	Golden Plate
+612	Mythic Exo-Suit
+613	Starforged Exo-Suit
+614	Cotton Gloves
+615	Leather Gloves
+616	Grip Gloves
+617	Shock Gloves
+618	Golden Gauntlets
+619	Titan Fists
+620	Nova Gauntlets
+621	Old Sneakers
+622	Work Boots
+623	Steel Toes
+624	Racing Boots
+625	Golden Boots
+626	Nitro Boots
+627	Warp Boots
+628	Basic Fuse
+629	Tuned ECU
+630	Stage # ECU
+631	Golden ECU
+632	Quantum ECU
+633	Singularity ECU
+634	Ascended
+635	LVL
+636	LVL —
+637	Main stat ×
+638	Extra stats +
+639	Iron Piston
+640	Piston Hammer
+641	Piston Helm
+642	Piston Plate
+643	Hydraulic Fists
+644	Piston Boots
+645	Engine Core
+646	Nitro Rush
+647	Nitro Impact Gun
+648	Nitro Racing Helmet
+649	Nitro Racing Vest
+650	Nitro Gloves
+651	Nitro Jet Boots
+652	Nitro Race ECU
+653	Laser Scope
+654	Laser Scanner
+655	Scope Helmet
+656	Circuit Vest
+657	Laser Gloves
+658	Light-Strip Boots
+659	Scan Crystal
+660	Field Medic
+661	Healing Wrench
+662	Medic Helmet
+663	Medic Vest
+664	Healing Gloves
+665	Medic Boots
+666	Heart Chip
+667	Color Storm
+668	Rainbow Spray Gun
+669	Painter Mask
+670	Splash Vest
+671	Dripping Gloves
+672	Splash Boots
+673	Palette Chip
+674	Thunder Coil
+675	Tesla Wrench
+676	Coil Helmet
+677	Battery Vest
+678	Arc Gloves
+679	Spark Boots
+680	Thunder Cell
+681	Every set piece has # random
+682	SET STAT
+683	: Common +#% · Uncommon +#% · Rare +#% · Epic +#% · Legendary +#% · Mythic +#% · Ascended +#%. All set pieces the
+684	same grade
+685	(Ascended counts as Mythic).
+686	◀ THIS PIECE
+687	(not yet)
+688	All set pieces the same grade
+689	ECU
+690	STAGE #
+691	On
+692	%;top:
+693	%;width:
+694	%;height:
+695	AWAKENED
+696	NOT AWAKENED
+697	copies → AWK
+698	MAX
+699	TANK
+700	WARRIOR
+701	RANGER
+702	MAGE
+703	SUPPORT
+704	TANK · highest HP & DEF – protects the team
+705	WARRIOR · heals
+706	% of the damage he deals
+707	RANGER · +#% damage to bosses & mini bosses
+708	MAGE · +#% skill damage
+709	SUPPORT · +#% heals & shields
+710	;height:
+711	-.#em
+712	;vertical-align:
+713	hue-rotate(
+714	deg) saturate(
+715	) brightness(
+716	⚠️ Battle started in safe mode
+717	Battle could not start
+718	Please send a screenshot of this to the developer:
+719	CLOSE
+720	🦸 You have no heroes yet – summon your first heroes!
+721	MINI BOSS + ENRAGE
+722	MINI BOSS
+723	– monsters ×
+724	your power
+725	⚠ MINI BOSS + ENRAGE!
+726	⚠ WARNING! MINI BOSS
+727	👹 MINI BOSS defeated! +
+728	Essence
+729	EVADE
+730	DODGE
+731	SHADOW STEP
+732	REBIRTH FLAME!
+733	LAST STAND!
+734	SPEED UP
+735	ATK+#%
+736	CRIT UP
+737	PATCHED!
+738	DEF UP
+739	REVIVED!
+740	ATK+#% DEF UP
+741	REBORN!
+742	OVERDRIVE!
+743	SUMMON!
+744	RAGE!
+745	ENRAGED!
+746	px Game,system-ui
+747	WORLD BOSS
+748	DUNGEON
+749	TOWER
+750	AUTO
+751	· ENRAGED
+752	CREW
+753	TAP!
+754	DOUBLE KO!
+755	TRIPLE KO!
+756	QUAD KO!
+757	MEGA KO ×
+758	# italic
+759	WAVE
+760	FIGHT!
+761	⚠ BOSS ⚠
+762	VICTORY!
+763	DEFEAT
+764	BOSS
+765	BATTLE SPEED ×#
+766	×# is free for everyone.
+767	×# is a pack – yours forever, every chapter.
+768	· UNLOCK ×#
+769	NO THANKS
+770	TEST MODE (owner): tapping the price unlocks without payment
+771	PAUSED
+772	▶ RESUME
+773	🏳 RETREAT
+774	⏩ Battle Speed ×#: Silver or Gold Pass · ×#: Platinum or Diamond Pass (Shop → VIP PASS)
+775	⏩ Battle Speed ×# unlocked forever!
+776	⚡ Skill charging – tap the card when it shows TAP!
+777	🔧 Your mechanics attack on their own · tap a card when it shows TAP! to use its skill
+778	DAMAGE
+779	TAKEN
+780	HEALED
+781	SHIELDS
+782	MVP
+783	% of team damage
+784	%;background:
+785	BATTLE STATS
+786	YOUR TEAM
+787	RIVAL
+788	Campaign
+789	FIRST CLEAR REWARDS
+790	REPLAY REWARD
+791	⭐⭐⭐ = no mechanic knocked out
+792	Perfect! No mechanic was knocked out.
+793	CHAPTER
+794	CLEARED!
+795	Chapter
+796	is now open
+797	AUTO SALVAGE
+798	Bag full (
+799	– salvaged for
+800	⚠ BAG
+801	– nothing is lost, but GEAR SUMMON is locked until you salvage
+802	GEAR FOUND
+803	⟳ AUTO NEXT
+804	NEXT ▶
+805	GEAR SUMMON
+806	EQUIP GEAR
+807	VICTORY
+808	STAGE
+809	CAMPAIGN
+810	RETREAT
+811	HOW TO GET STRONGER – tap one
+812	Equip & upgrade gear
+813	works only in battles
+814	Summon more mechanics
+815	higher color = much stronger · duplicates +# star
+816	Level up your heroes
+817	Essence → LEVEL UP · Ascension every # levels
+818	RETRY
+819	ON
+820	OFF
+821	next stage in
+822	tap to turn on
+823	HARD
+824	OF
+825	HARD ·
+826	stages ·
+827	🔒 Clear stage
+828	🔒 HARD MODE opens after NORMAL chapter # (stage #-
+829	HARD MODE
+830	The same chapters with
+831	much stronger monsters
+832	– and
+833	(money, tickets, diamonds).
+834	HARD chapter N opens when you clear NORMAL chapter N.
+835	.webp" alt=""
+836	ALL CHAPTERS
+837	acts × # worlds ·
+838	chapters ·
+839	· ORIGINS
+840	ACT
+841	🔒 clear NORMAL chapter
+842	🔒 beat
+843	🔒 Clear NORMAL chapter
+844	🔒 Beat
+845	(stage
+846	-#) to open Chapter
+847	height:#em
+848	· HARD ×
+849	REWARDS
+850	· next +
+851	% in ~
+852	(max)
+853	🔥 NEVER GIVE UP:
+854	HP & attack
+855	FIRST CLEAR
+856	REPLAY
+857	COM
+858	UNC
+859	RAR
+860	EPI
+861	LEG
+862	MYT
+863	ASC
+864	CH
+865	WAVES
+866	ENEMY
+867	Back
+868	mon monInfo
+869	👑 SWEEP opens at VIP #
+870	⚡ SWEEP:
+871	used today – back tomorrow
+872	⚡ SWEEP
+873	cpBox winSk
+874	Stat
+875	Before
+876	After
+877	Change
+878	Power
+879	✅ ADVANTAGES
+880	❌ DISADVANTAGES
+881	No Medic left – nobody heals the team
+882	Team gets a Medic – heals everybody
+883	No tank (Bruiser / Legend) – monsters hit your weak mechanics
+884	Team gets a tank in front
+885	Many ranged mechanics, few in front
+886	Already in the team
+887	EASY
+888	EVEN
+889	New skill:
+890	Loses skill:
+891	Passive:
+892	Loses passive:
+893	Attacks from far away (safer)
+894	Fights up close (takes more hits)
+895	Team has only
+896	's gear stays with
+897	Replace in the battle team
+898	Add to the battle team
+899	Remove from the battle team
+900	BEFORE
+901	AFTER
+902	Before / After
+903	Ranged
+904	Melee
+905	Role
+906	Skill
+907	Range
+908	TEAM POWER
+909	CANCEL
+910	✖ Remove from the team
+911	Tap a mechanic to see the advantages and disadvantages before you change.
+912	comes in
+913	if replaced
+914	Team is full
+915	Who should
+916	replace? Tap to see before / after.
+917	⚡ This is already your best team
+918	Team power +
+919	Team power −
+920	Auto best – before / after
+921	The strongest mechanics by power.
+922	LEAVE THE TEAM
+923	JOIN THE TEAM
+924	✓ CONFIRM
+925	Lv
+926	slot f
+927	EDIT BATTLE TEAM
+928	CHOOSE YOUR TEAM
+929	tap a mechanic below to add him · tap a team slot to change him
+930	tap a hero in the team to change him
+931	· EASY
+932	· EVEN
+933	· HARD
+934	GEAR
+935	BACK
+936	✓ DONE
+937	· max # ·
+938	TEAM
+939	YOUR MECHANICS
+940	AUTO BEST
+941	Pick at least # hero
+942	BATTLE TEAM · campaign + Arena
+943	✓ Battle team saved
+944	OPEN A BOX (
+945	CORE SHOP
+946	Mythic Core:
+947	RED MYTHIC BOX
+948	Open it and choose
+949	any Mythic hero
+950	– a new hero or +# copy for AWAKENING. It stays in your bag until you open it and can never be salvaged.
+951	BUY ·
+952	Mythic Core
+953	comes from
+954	duplicates of heroes already at their max
+955	: Common
+956	% · Uncommon
+957	% · Rare
+958	% · Epic
+959	% · Legendary
+960	% (# Core) · Mythic: always
+961	. Use it for
+962	Lv #-#
+963	of Mythic heroes and here.
+964	NEW
+965	RED MYTHIC BOX · CHOOSE
+966	Tap a Mythic hero twice. Boxes:
+967	· max
+968	Essence:
+969	Ascension
+970	· Skill Lv
+971	% skill damage & heal)
+972	MAX +
+973	POWER
+974	CORE
+975	ASCENSION
+976	– Lv
+977	is the limit for now.
+978	• all stats
+979	(power
+980	• skill Lv
+981	(+#% skill damage & heal)
+982	• max level
+983	ASCEND ·
+984	MAX LEVEL
+985	· all ascensions done
+986	II
+987	III
+988	· Lv
+989	TALENT ·
+990	MYTHIC HEROES → Lv #
+991	: after Lv # levels and #
+992	Core Ascensions
+993	(+#% all stats a level, +#% and +# skill level each Core Ascension). Mythic Core comes from duplicates of heroes at their max (rare – a Mythic duplicate gives
+994	comes from Idle Rewards, campaign stages, Torque Tower, Class Towers, all Dungeons, the Essence event and duplicates of maxed heroes. Levels work in every battle and a little in the garage (+#% per level).
+995	LV UP
+996	this.onerror=function(){this.remove()};this.src='
+997	this.remove()
+998	SKILLS
+999	ULTIMATE
+1000	PASSIVE
+1001	Epic +
+1002	EPIC+
+1003	TALENT
+1004	Mythic only
+1005	MYTHIC
+1006	RESOURCES
+1007	⚔️ BATTLE TEAM
+1008	for ALL battles
+1009	team power
+1010	vs stage
+1011	% ATK & HP
+1012	no bonus
+1013	missing:
+1014	· # roles +#% · # +#% · # +#%
+1015	all # roles – max bonus!
+1016	TEAM ROLES
+1017	GRADE
+1018	FUSE ✓
+1019	No heroes yet – summon your first heroes!
+1020	HERO SUMMON
+1021	You have no mechanic heroes yet.
+1022	Summon your first heroes – they fight and wear gear.
+1023	Off
+1024	ART
+1025	· SKILL
+1026	✖ LEAVE TEAM
+1027	➕ ADD TO TEAM
+1028	NEW GEAR
+1029	LEVEL UP · Lv
+1030	AUTO EQUIP
+1031	UNEQUIP ALL
+1032	🔒 NOT IN YOUR COLLECTION · stats at Lv # no gear
+1033	GET IT FROM HERO SUMMON
+1034	PREVIEW
+1035	ALL
+1036	ALL GEAR
+1037	No gear here yet. Win battles to find gear!
+1038	left:
+1039	ATK
+1040	DEF
+1041	CRIT
+1042	CRIT DMG
+1043	SPEED
+1044	SKILL DMG
+1045	ACTIVE:
+1046	COMPLETE A COLOR = BONUS FOR ALL HEROES
+1047	✓ ACTIVE · ALL HEROES
+1048	LOCKED · MYTHIC = SUMMON
+1049	LOCKED · ALL HEROES
+1050	★ STAR COLLECTION
+1051	When
+1052	your heroes of a color reach a step,
+1053	every battle hero
+1054	gets the bonus. Missing heroes count as not reached.
+1055	no step yet
+1056	AWK
+1057	Awakened
+1058	Next: all
+1059	heroes at
+1060	still below
+1061	✓ COMPLETE
+1062	YOUR HEROES · tap a color above to jump to it
+1063	" id="gcr
+1064	The bonus works in the campaign and in the Arena. Summon new heroes to fill the collection.
+1065	+ garage parts +
+1066	Nothing to salvage
+1067	SALVAGE ALL
+1068	show kept items (
+1069	Gear that a hero wears is never salvaged.
+1070	Tap the grades
+1071	to choose what goes in (saved) · tap an item to keep it
+1072	AUTO SALVAGE ·
+1073	new gear of the chosen grades (campaign + Gear Summon) is salvaged at once · set pieces never
+1074	free · in the bag
+1075	EQUIP
+1076	SET ·
+1077	★ STARS ONLY
+1078	UPGRADE
+1079	equip first
+1080	Your Gear Parts
+1081	YOU HAVE
+1082	slot +
+1083	🔧 The
+1084	belongs to the hero's
+1085	SLOT
+1086	, not to the piece
+1087	. Swap the piece – the + stays on the slot.
+1088	the hero
+1089	= level of
+1090	· every LVL
+1091	, every # LVL
+1092	BOOST +#%
+1093	IF YOU UNEQUIP IT FROM
+1094	slot becomes empty
+1095	(goes back to the bag)
+1096	Taken from
+1097	(his power −
+1098	BEFORE / AFTER ON
+1099	HEROES ONLY
+1100	SET STAT of this piece:
+1101	Set pieces on
+1102	free piece from the bag · it is gone after
+1103	in the bag (not worn).
+1104	% each star
+1105	· NEW STAR COLOR + NEW STAT
+1106	STARS
+1107	STAR UP
+1108	· MAX
+1109	BONUS!
+1110	(need
+1111	more)
+1112	Cost:
+1113	NEXT
+1114	ENHANCE BONUSES · +
+1115	Mythic
+1116	↩ BACK
+1117	GEAR GUIDE
+1118	HOW GEAR GETS STRONGER THAN MYTHIC
+1119	# GRADES
+1120	Common ➜ Mythic come from
+1121	Gear Summon
+1122	, the Campaign and Dungeons.
+1123	is the new grade above Mythic.
+1124	ENHANCE +# – +
+1125	STARS ONLY ON ASCENDED
+1126	Common ➜ Mythic
+1127	: ENHANCE with Gear Parts up to
+1128	– the
+1129	+ stays on the hero's SLOT
+1130	when you swap the piece. Every
+1131	unlocks a bonus: +# … +# = extra stats
+1132	each,
+1133	= main stat ×
+1134	= main stat ×# in total.
+1135	has no levels – a new Ascended (★#) is already
+1136	stronger than a Mythic +#
+1137	. Only Ascended get
+1138	stars ★# – ★#
+1139	(another Ascended piece of the same slot = +# star).
+1140	A Mythic can NOT become Ascended
+1141	– Ascended only drops (see #).
+1142	DROP
+1143	ONLY
+1144	pieces cannot be made – they only
+1145	Campaign battles
+1146	from stage
+1147	(more and more up to stage
+1148	Idle Rewards
+1149	(small chance for every hour in the chest)
+1150	Class Towers
+1151	floors # · # · # · # · # · # (a full Ascended set of the class)
+1152	Ascended pieces go up to
+1153	(new star color + new stat every #).
+1154	Open an Ascended piece ➜
+1155	at the bottom of its window.
+1156	SALVAGE never takes Ascended pieces.
+1157	GOT IT
+1158	BONUS UNLOCKED!
+1159	ENHANCE SUCCESS!
+1160	Power +
+1161	already wears the best gear
+1162	Auto equip – before / after
+1163	Best gear for
+1164	: the
+1165	set first (highest grade first), then the strongest free pieces.
+1166	will be TAKEN from other heroes (not their class set). They get the best free piece from the bag instead.
+1167	Nothing equipped
+1168	Remove all gear?
+1169	– before / after
+1170	All gear goes back to the bag
+1171	AUTO SALVAGE ON ·
+1172	AUTO SALVAGE OFF
+1173	🔒 You don't own this hero yet – get it from HERO SUMMON
+1174	Salvage
+1175	You get
+1176	. Salvaged gear is gone forever.
+1177	✓ SALVAGE
+1178	⭐ Stars go up when you summon
+1179	this hero
+1180	again (max +#). Legendary +
+1181	heroes can be fused into Mythic.
+1182	The team needs at least # hero
+1183	Tap a hero below, then ➕ ADD TO TEAM
+1184	Choose a
+1185	– you will see before / after
+1186	🔒 Locked – clear the chapter before it
+1187	Not enough Mythic Core (
+1188	TAP AGAIN
+1189	🎁 RED MYTHIC BOX +#
+1190	is already at the max
+1191	Tap
+1192	again to open the box
+1193	JOINS YOUR TEAM!
+1194	+# copy
+1195	Not enough Mythic Core · duplicates of maxed heroes
+1196	Not enough Essence · Dungeons, campaign, Idle Rewards, events
+1197	· Power +
+1198	⚡ GEAR BOOST · LVL
+1199	· ATK / HP / DEF gear +
+1200	Not enough Mythic Core for the Core Ascension
+1201	Not enough Essence for the Ascension
+1202	✦ ASCENSION
+1203	· max Lv
+1204	· skill Lv
+1205	and the Mythic Core:
+1206	gear piece
+1207	s go
+1208	back to the BAG (Ascended stars stay on the pieces)
+1209	no gear equipped
+1210	• slot upgrades back to +# · you get back
+1211	of the Gear Parts:
+1212	goes back to
+1213	Lv #
+1214	no Ascension
+1215	(skill Lv #).
+1216	• you get back
+1217	of the Essence:
+1218	• stars
+1219	stay (summons can't be undone)
+1220	• free · use the Essence on any hero
+1221	reborn ·
+1222	gear → BAG
+1223	equipped on
+1224	Equip it first – the upgrade (+) belongs to the hero's SLOT
+1225	Not enough Gear Parts (
+1226	) · salvage gear, Dungeons, campaign, Idle Rewards
+1227	is used
+1228	★ STAR UP!
+1229	✦ ASCENDED!
+1230	is now Ascended
+1231	to salvage
+1232	TAP AGAIN TO SALVAGE (+
+1233	parts)
+1234	🔨 Salvaged for
+1235	🔨 Garage parts + Essence:
+1236	Common
+1237	Uncommon
+1238	Rare
+1239	Epic
+1240	Legendary
+1241	Gear Ticket
+1242	Gear Tickets
+1243	SUMMON
+1244	;top:
+1245	;width:
+1246	font-size:
+1247	color:
+1248	HERO
+1249	· MYTHIC
+1250	EQUIP YOUR HEROES
+1251	MYTHIC GEAR!
+1252	LEGENDARY GEAR!
+1253	GEAR SUMMONED
+1254	· +# BONUS
+1255	auto salvaged
+1256	bag full – sold
+1257	+ garage parts + Essence
+1258	AGAIN ×
+1259	SUMMON RATES
+1260	GEAR · FOR BATTLES ONLY
+1261	Every summon gives # random gear piece (Tool, Helmet, Work Vest, Gloves, Boots or ECU Chip).
+1262	Summon x#
+1263	pieces.
+1264	Every piece is a SET piece
+1265	– the # class sets have the same chance (
+1266	% each):
+1267	Guaranteed: a
+1268	summons and a
+1269	summons (now
+1270	Enhance
+1271	: Common → Mythic go to
+1272	with Gear Parts, a bonus every +# ★
+1273	Stars
+1274	only on Ascended.
+1275	(above Mythic): #% in the summon, or it drops in campaign battles and Idle Rewards from stage
+1276	. Ascended pieces go up to
+1277	: every # stars a new star color (gold → red → purple → rainbow) + a new bonus stat.
+1278	No tickets?
+1279	= # summon – you are always asked first.
+1280	WHERE TO GET
+1281	GEAR TICKETS
+1282	First clear of every campaign stage:
+1283	· mini-boss (X-#):
+1284	· boss (X-#):
+1285	· Daily Check-in:
+1286	every day
+1287	Start: # tickets.
+1288	📜 SUMMON HISTORY
+1289	SUMMON HISTORY
+1290	Last
+1291	gear summons
+1292	Nothing yet.
+1293	RAGE
+1294	Enemies deal
+1295	damage.
+1296	IRON PLATING
+1297	Enemies have
+1298	defense and
+1299	HP.
+1300	Enemies move
+1301	faster and attack
+1302	faster.
+1303	HOT FLOOR
+1304	Your heroes lose
+1305	of their max HP every second.
+1306	NO REPAIRS
+1307	Your heroes
+1308	cannot be healed
+1309	(skills, potions and between waves).
+1310	SHARP EDGES
+1311	Enemies get
+1312	critical chance.
+1313	FLOOR
+1314	TORQUE TOWER
+1315	MINI-BOSS
+1316	CLEARED
+1317	" src="img/ui#/tw_m
+1318	TOWER CLEARED!
+1319	CHALLENGE · FLOOR
+1320	🔒 TORQUE TOWER opens after campaign stage #-#
+1321	FIXED REWARDS · FIRST CLEAR OF EACH FLOOR
+1322	Every floor:
+1323	+ coins
+1324	Every #th floor: +
+1325	Every #th floor (boss):
+1326	Nothing is random. Each floor gives its reward only once.
+1327	NEXT BIG FLOORS
+1328	MODIFIERS
+1329	MODIFIER
+1330	FIRST CLEAR REWARD
+1331	Enemy power
+1332	next floor in
+1333	Tower floor
+1334	THE TOWER IS CLEARED!
+1335	IS OPEN
+1336	NEXT FLOOR ▶
+1337	TORQUE TOWER · FLOOR
+1338	Record: floor
+1339	this floor:
+1340	Essence → LEVEL UP · Ascension
+1341	Better team & skills
+1342	Tower
+1343	background:
+1344	background:url(img/ui#/hub_mid.webp) # #/
+1345	.webp)
+1346	;background:
+1347	PvP · ONLINE
+1348	🔒 STAGE
+1349	TODAY:
+1350	EVERY WEEKEND
+1351	· KEYS
+1352	KEYS
+1353	🔒 New battle modes are coming soon!
+1354	🔒 TORQUE TOWER opens after campaign stage
+1355	🔒 CLASS TOWERS open after campaign stage
+1356	🔒 WORLD BOSS opens after campaign stage
+1357	🔒 DUNGEONS open after campaign stage
+1358	ARENA
+1359	TORQUE CUP
+1360	opens after campaign stage
+1361	SUN
+1362	MON
+1363	TUE
+1364	WED
+1365	THU
+1366	FRI
+1367	SAT
+1368	SUNDAY
+1369	MONDAY
+1370	TUESDAY
+1371	WEDNESDAY
+1372	THURSDAY
+1373	FRIDAY
+1374	SATURDAY
+1375	#;box-shadow:# # # #px
+1376	· SUN
+1377	CLASS TOWERS
+1378	TODAY ·
+1379	ALL TOWERS ARE OPEN
+1380	OPEN · SUNDAY ALL
+1381	filter:grayscale(#) brightness(.#)
+1382	RECORD
+1383	NO
+1384	HEROES YET – summon some!
+1385	HEROES (MYTHIC TOO) · BEST # FIGHT
+1386	CLOSED TODAY
+1387	CHALLENGE ·
+1388	OPEN:
+1389	HOW IT WORKS
+1390	# towers, one per class ·
+1391	each.
+1392	Only heroes of that class +
+1393	heroes fight (your best #).
+1394	Each tower is open on # days a week ·
+1395	SUNDAY all towers are open
+1396	SCHEDULE
+1397	FIXED REWARDS · FIRST CLEAR
+1398	Floors #-# every #th floor:
+1399	# SET PIECE
+1400	of that class (Rare → Epic → Legendary → Mythic)
+1401	Floors #-#: a
+1402	MYTHIC SET PIECE
+1403	every #th floor
+1404	Floors # · # · # · # · # · #: the # pieces of an
+1405	ASCENDED SET
+1406	of that class
+1407	every #th floor · very hard, the last floors are for the future
+1408	The higher the floor, the bigger every reward.
+1409	TOWER · NEXT SET PIECES
+1410	The bonus works only on
+1411	heroes.
+1412	🔒 This tower is closed today · open:
+1413	You have no
+1414	heroes yet – summon some!
+1415	BAG FULL →
+1416	SET
+1417	New set piece:
+1418	TOWER · FLOOR
+1419	duplicates +# star
+1420	set pieces of this class help a lot
+1421	Summon more
+1422	only this class (+ Legend) fights here
+1423	Levels & stars
+1424	🎒 BAG FULL
+1425	Your gear bag is at
+1426	Battles never lose gear: the bag can go over the limit. But
+1427	is locked until the bag is under
+1428	again.
+1429	Tip: turn on
+1430	on the Salvage page – low grades become parts automatically.
+1431	♻ SALVAGE NOW
+1432	SCRAPZILLA
+1433	A gigantic dinosaur made of crushed cars: claw swipes, ground slams and a wide fire breath. It ENRAGES in the last # seconds.
+1434	CRUSHER KING
+1435	A giant golem built from a car-crusher press: huge hydraulic punches and frequent ground slams that hit everyone close to it. No ranged attack. It ENRAGES in the last # seconds.
+1436	INFERNO PISTON
+1437	A fire demon made from a giant V# engine: fan-belt whip lashes, ground slams and a cone of fire from its cylinder chest. It ENRAGES in the last # seconds.
+1438	TOW SERPENT
+1439	A giant serpent made of heavy chains and crane hooks with a tow-truck head: fast lunges along the ground that hit everyone in front of it, many times. No ranged attack. It ENRAGES in the last # seconds.
+1440	World boss
+1441	WEAK TO
+1442	TODAY'S DAMAGE
+1443	HP BARS · BEST HIT
+1444	BOSS KEYS · new in
+1445	DAILY REWARDS
+1446	BAR
+1447	CLAIM
+1448	SWEEP
+1449	· best hit this week
+1450	attack once this week first
+1451	DAMAGE RANKING
+1452	ATTACK
+1453	NO KEYS
+1454	THIS WEEK
+1455	· THIS WEEK'S BOSS
+1456	heroes deal
+1457	damage to it.
+1458	# BOSS KEYS
+1459	a day – one key = one attack of
+1460	# seconds
+1461	with your battle team.
+1462	The boss cannot be killed: every bar you empty fills again. Only your
+1463	counts.
+1464	One HP bar =
+1465	today (it grows with your heroes).
+1466	Daily rewards are
+1467	– nothing is random.
+1468	: uses one key, no fight – deals your
+1469	best hit of this week
+1470	WEEKLY DAMAGE RANKING · REWARDS BY MAIL
+1471	The week ends on Monday #:# UTC (#:# Paris). A new boss comes every week.
+1472	· claimed!
+1473	🔑 No BOSS KEYS left today · new keys at midnight
+1474	⚔ Attack the boss once this week – SWEEP then repeats your best hit
+1475	⚡ SWEEP ·
+1476	damage (
+1477	bars)
+1478	new reward
+1479	Loading…
+1480	📶 The ranking needs an internet connection (and the game online at least once).
+1481	Your damage this week:
+1482	– it is sent as soon as you are online.
+1483	THIS WEEK · ENDS IN
+1484	YOU
+1485	Nobody has attacked yet this week – be the first!
+1486	WEEKLY REWARDS · BY MAIL ON MONDAY
+1487	TIME UP!
+1488	TEAM DEFEATED
+1489	NEW BEST TODAY!
+1490	new daily reward
+1491	– claim on the WORLD BOSS page
+1492	HP BARS
+1493	TODAY
+1494	· THIS WEEK
+1495	keys left today
+1496	✅ Already claimed today
+1497	Deal
+1498	damage today (
+1499	to go)
+1500	WEAK:
+1501	CASH VAULT
+1502	CASH
+1503	Lots of cash – for buildings, gear upgrades and classic cars.
+1504	SCRAP MINE
+1505	One gear piece every win. The slot changes in a fixed order (Tool → Helmet → … ). Deeper floors = higher grade.
+1506	GEAR FORGE
+1507	SET PIECES
+1508	One SET piece every win. Class and slot change in a fixed order. Deeper floors = higher grade.
+1509	NITRO LAB
+1510	NITRO BOOST
+1511	NITRO BOOST: +HP & +attack for
+1512	hours in Campaign, Torque Tower and Class Towers (not Arena, Cup, World Boss).
+1513	· FLOOR
+1514	BAG FULL
+1515	· bag full →
+1516	· NITRO +
+1517	% for
+1518	🔑 No keys left for
+1519	· new keys at midnight
+1520	· DUNGEON PASS: +
+1521	keys a day
+1522	NITRO +
+1523	DUNGEONS
+1524	DUNGEON PASS
+1525	ACTIVE
+1526	days left ·
+1527	keys a day + SWEEP
+1528	Free:
+1529	a day per dungeon · used only when you win
+1530	;--cs:
+1531	New keys in
+1532	· rewards are fixed
+1533	KEYS · new in
+1534	BONUS
+1535	BEST
+1536	NITRO BOOST: off
+1537	NEXT:
+1538	· SWEEP: DUNGEON PASS or VIP #
+1539	# dungeons ·
+1540	each · a boss every #th floor.
+1541	free keys
+1542	a day in EVERY dungeon. A key is used
+1543	only when you win
+1544	Keys you do not use
+1545	– they stack up day after day (also the keys from packs and the Key Roulette).
+1546	Win a floor to open the next one. You can replay any floor you reached.
+1547	Floors
+1548	are much harder – and pay much more:
+1549	gear from floor # NITRO up to +#%, more Essence and Gear Parts,
+1550	cash, Essence and Gear Parts on boss floors # # … #
+1551	: very hard, the last floors are for the future · rewards like floor #
+1552	gear every #th floor.
+1553	Rewards are
+1554	– nothing is random. Dungeons never give diamonds or tickets.
+1555	Floor
+1556	DUNGEON PASS ·
+1557	DAYS
+1558	keys a day in every dungeon (
+1559	instead of
+1560	SWEEP: finish a floor you already cleared in one tap.
+1561	No automatic renewal.
+1562	Fixed rewards only · no diamonds, no tickets.
+1563	· no automatic renewal
+1564	a day in every dungeon
+1565	· cleared floors in one tap
+1566	ACTIVE ·
+1567	DAYS LEFT
+1568	· BUY
+1569	🔑 DUNGEON PASS active for
+1570	days! +
+1571	Win floor # first – SWEEP repeats floors you already cleared
+1572	⏩ SWEEP
+1573	ALL FLOORS CLEARED!
+1574	KEYS LEFT TODAY:
+1575	AGAIN
+1576	Best: floor
+1577	NO KEY USED – tap one to get stronger
+1578	Scrap Mine + Gear Forge give gear
+1579	or try an easier floor
+1580	🔒 Win floor
+1581	THE CITY IS UNDER ATTACK!
+1582	END
+1583	🎯 TRAINING ROOM
+1584	test account only · no rewards · no progress
+1585	border:#px solid
+1586	;background-image:url(
+1587	LEGENDARY
+1588	ENEMY:
+1589	· BOSS
+1590	✖ CLOSE
+1591	⚔ FIGHT
+1592	Max # heroes – tap one to remove it
+1593	TRAINING ·
+1594	FIGHT
+1595	Engine
+1596	Tuning
+1597	Inspection
+1598	Service
+1599	Body & Paint
+1600	Electronics
+1601	.cpPop.open,#cpPop,.pop.open
+1602	[class*=pop],[id*=op]
+1603	TEST
+1604	(prefers-reduced-motion: reduce)
+1605	input,textarea,select,canvas,[data-nofx]
+1606	button,[onclick],a[href],[role="button"],.btn,.buy,.pB,label[for]
+1607	brightness(#)
+1608	px,
+1609	px)
+1610	px) scale(.#)
+1611	Pebble Bug
+1612	Rusty Rambler
+1613	Sunset Roadster
+1614	Woody Wagon
+1615	Starline Cruiser
+1616	Midnight Coupe
+1617	Thunderbolt GT
+1618	Silver Arrow
+1619	Royal Phantom
+1620	Gullwing Grand
+1621	Golden Dynasty
+1622	Eternal Torque
+1623	Copper Clipper
+1624	Mint Marauder
+1625	Azure Ace
+1626	Desert Dart
+1627	Ivory Imperial
+1628	Crimson Comet
+1629	Night Falcon
+1630	Bronze Baron
+1631	Jade Jubilee
+1632	Plum Prestige
+1633	Solar Sovereign
+1634	Frost Phantom
+1635	Ruby Regent
+1636	Obsidian Oracle
+1637	Platinum Pharaoh
+1638	Emerald Empress
+1639	Inferno Imperator
+1640	Starlight Sultan
+1641	Diamond Duchess
+1642	Titan Tycoon
+1643	Aurora Archon
+1644	Crown of Torque
+1645	Celestial Kaiser
+1646	The Last Legend
+1647	CLASSIC COLLECTION
+1648	MY GARAGE
+1649	DEALER
+1650	COMMON
+1651	UNCOMMON
+1652	RARE
+1653	EPIC
+1654	ASCENDED
+1655	# every
+1656	tab:
+1657	Open your Collection Garage
+1658	Buy classic cars from the dealer and park them in your private showroom. Every parked car brings
+1659	while you are away (collect them with
+1660	IDLE
+1661	OPEN ·
+1662	🔒 REP
+1663	YOUR COLLECTION ·
+1664	CARS
+1665	⚔️ All heroes in battle:
+1666	Buy a car to get diamonds, Essence, Gear Parts and tickets
+1667	Idle money +
+1668	% (#% per car) · your # most expensive cars are shown in the garage on the map
+1669	BUY MORE CARS
+1670	Every car can be owned
+1671	and counts forever – no parking limit. Rewards are fixed – nothing random.
+1672	✓ OWNED
+1673	WHILE YOU OWN IT
+1674	+#% idle money · counts forever
+1675	SELL ·
+1676	· 🔒 REP
+1677	🔒 The Collection Garage opens at REP
+1678	Not enough money
+1679	🏆 Collection Garage OPEN! Buy your first classic car at the dealer.
+1680	🅿️ Spot
+1681	car:
+1682	buy:
+1683	needs REP
+1684	joins your collection! All heroes +
+1685	sell:
+1686	TAP AGAIN TO SELL
+1687	💰 Sold for
+1688	#-ogooa#hblh#d#s#ieervv#rp#bqh#k#apps.googleusercontent.com
+1689	S# · Nitro Bay
+1690	POST
+1691	application/json
+1692	#-digit
+1693	Your game was saved on another phone after this one.
+1694	cars sold
+1695	🏗️ buildings LV
+1696	⚔️ stage
+1697	;color:
+1698	KEEP THIS
+1699	USE CLOUD
+1700	☁️ Which game do you keep?
+1701	There is already a game saved in your Google account.
+1702	The other one will be replaced.
+1703	📱 This phone
+1704	☁️ Google cloud
+1705	⚠️ Could not download the cloud save. Try again later.
+1706	☁️ This phone's game is now saved in your Google account
+1707	⚠️ No internet – try again.
+1708	⚠️ Google sign-in failed. Try again.
+1709	✓ Signed in with Google
+1710	Continue with Google
+1711	Optional · keeps your game safe on a new phone
+1712	📲 TRANSFER FROM OLD VERSION
+1713	✓ Google account · ☁️ Cloud save ON
+1714	Last saved:
+1715	SERVER
+1716	● ONLINE
+1717	🌍 Choose a server
+1718	;border:#px solid
+1719	YOUR GAME
+1720	🔒 COMING SOON
+1721	Each server is a separate game. New servers open as more players join.
+1722	Google sign-in
+1723	– waiting for the Client ID (see PLAY_RULES.md). Players don't see this box yet.
+1724	📲 Old version
+1725	Played before in the old (Chrome) version on this phone? Bring your progress here.
+1726	TRANSFER MY PROGRESS
+1727	☁️ Cloud save
+1728	Sign in with Google to keep your progress safe and play on another phone. We only keep your game – not your e-mail or name.
+1729	☁️ Cloud save: ON
+1730	✓ Google
+1731	· saves by itself every few minutes
+1732	DELETE
+1733	DELETE removes your cloud save and Google link from our server. The game on this phone stays.
+1734	☁️ Saved
+1735	Signed out. Your game stays on this phone.
+1736	🗑️ Cloud save and Google link deleted
+1737	⚠️ Could not delete – check internet.
+1738	Your Google account has a newer game from another phone.
+1739	HERO SUMMON FESTIVAL
+1740	Summon Mechanics (Recruit tickets or diamonds). Every summon counts.
+1741	GEAR SUMMON FORGE
+1742	Summon gear (Gear tickets or diamonds). Every piece counts.
+1743	CREW SUMMON RALLY
+1744	Summon Drivers + Guards (Crew tickets or diamonds). Every summon counts.
+1745	ESSENCE RUSH
+1746	Spend Essence on hero LEVEL UP and ASCENSION. Every Essence spent counts.
+1747	DIAMOND SPREE
+1748	Spend diamonds anywhere (summons, name change …). Every diamond spent counts.
+1749	KEY ROULETTE
+1750	Spin the roulette – it gives ONLY Dungeon keys. Won keys are BONUS keys: they stack, never expire and wait for you (daily keys are used first). Free spins come only from the event quests below (no buying). RANKING = most keys WON (same score: who got there first).
+1751	DUNGEON RUSH
+1752	Use Dungeon keys (a victory or a SWEEP). Every key used counts – your stacked bonus keys too!
+1753	keys used
+1754	CASH ROULETTE
+1755	Spend your garage CASH on spins – win garage upgrade PARTS and Dungeon keys. No quests: every spin costs more than the one before, max # spins per event.
+1756	LUCKY WHEEL
+1757	Spin the wheel – it gives ONLY diamonds. Free spins come from the event quests below (no buying). RANKING = most diamonds WON (same score: who got there first).
+1758	Open the game today
+1759	Win # battles in the campaign
+1760	Use # Dungeon keys
+1761	Summon # times (heroes, crew or gear)
+1762	Collect Idle Rewards # times
+1763	Vault
+1764	Scrap Mine
+1765	Forge
+1766	Lab
+1767	Level up heroes # times
+1768	💰 Max
+1769	spins in this event
+1770	Not enough cash (
+1771	🔑 KEY ROULETTE:
+1772	in EVERY dungeon
+1773	! (bonus keys, they stack)
+1774	🎡 LUCKY WHEEL:
+1775	🔑 +# key in EVERY dungeon
+1776	JACKPOT!
+1777	of every part +
+1778	💰 CASH ROULETTE:
+1779	JACKPOT
+1780	EVENTS
+1781	free spin
+1782	;--b:url(img/ui#/evb_
+1783	⏳ ends in
+1784	Loading the ranking…
+1785	KEYS WON
+1786	DIAMONDS WON
+1787	YOUR
+1788	· RANK
+1789	MAX SPINS
+1790	SPIN ·
+1791	Spins:
+1792	· your cash:
+1793	· next spin costs ×#
+1794	Prizes grow with your campaign stage. Parts upgrade your garages (LV #-#).
+1795	Won in this event:
+1796	Your bonus keys:
+1797	🔒 Dungeons open at stage # – your keys wait for you
+1798	TODAY'S QUESTS · FREE SPINS
+1799	MILESTONE REWARDS
+1800	TOP # RANKING
+1801	· starts in
+1802	↩ ALL EVENTS
+1803	RANKING PRIZES
+1804	sent by Mail when the event ends
+1805	The ranking needs internet. Your score is saved and sent later.
+1806	Mechanic
+1807	Nobody yet – be the first!
+1808	en-GB
+1809	EVENT CALENDAR
+1810	# events at the same time · each one lasts # days · your phone time
+1811	NOW ·
+1812	LIVE NOW
+1813	GRAND PRIX
+1814	🏁 LIVE NOW
+1815	🏁 FINISHED
+1816	ONE TIME ONLY
+1817	claim your rewards
+1818	📅 EVENT CALENDAR
+1819	coming next · each event lasts # days · your phone time
+1820	DOMContentLoaded
+1821	SILVER
+1822	GOLD
+1823	PLATINUM
+1824	👑 Grand Prix
+1825	unlocked on this server!
+1826	Sell # cars
+1827	Win # campaign battles
+1828	Summon # times (any)
+1829	Summon # times
+1830	# NEW campaign stages + # NEW Tower floors
+1831	Summon # times during the event
+1832	Clear # NEW campaign stages
+1833	Climb # NEW floors in the Class Towers
+1834	Upgrade buildings +# levels in total
+1835	Collect # NEW heroes
+1836	Use # Dungeon keys during the event
+1837	WEEK # · Clear campaign stage #
+1838	WEEK # · Own a LEGENDARY hero at +#
+1839	WEEK # · Reach Torque Tower floor #
+1840	WEEK # · Own # ASCENDED gear piece
+1841	🏆 CHAMPION · Own a MYTHIC hero AWAKENED I
+1842	Hero Ticket
+1843	Crew Ticket
+1844	Dungeon Key
+1845	Essence ×#
+1846	Builder Kit ×#
+1847	Days #-# · Hero, Crew & Gear summons
+1848	Days #-# · Level up & Ascend your heroes
+1849	Days #-# · Dungeons – your bonus keys stack
+1850	Days #-# · Trains, Rail Wars & the final sprint
+1851	GP Tokens
+1852	🏁 Tier # – END OF THE ROAD:
+1853	🎖️ Tier
+1854	DIAMOND PASS
+1855	DIAMOND PASS+
+1856	Not enough diamonds (
+1857	needed)
+1858	unlocked! Claim the blue lane on the Road.
+1859	OWNED ✓
+1860	💎 DIAMOND PASS
+1861	A blue reward lane on the Road, paid with
+1862	(no real money).
+1863	Tier # gives ALL your diamonds back
+1864	💎, then every tier gives a bonus (tickets, keys, Essence, kits).
+1865	total, tiers #-
+1866	You own the DIAMOND PASS → PASS+ costs only the difference and your claimed tiers give the rest.
+1867	€ Packs: Silver ×# · Gold ×# · Platinum ×# each on its own lane
+1868	with diamonds
+1869	+ Ascended gear, Mythic copy, Patron badge, +GP Tokens.
+1870	🏆 Choose your Mythic (FREE lane) first
+1871	Diamond Pass tiers:
+1872	+ ✦ ASCENDED gear
+1873	+ # copy of
+1874	your Mythic
+1875	🔒 Buy the Grand Prix
+1876	pack to open this lane
+1877	pass rewards:
+1878	Patron
+1879	unlocked! Open the ROAD to claim your PREMIUM rewards.
+1880	Tokens
+1881	Patron Badge
+1882	Mythic copy
+1883	ROAD +×
+1884	GRAND PRIX PACKS
+1885	👑 Every pack opens
+1886	its own lane
+1887	on the Road: Silver ×# · Gold ×# · Platinum ×# Buy several packs → several lanes, all tiers you already reached are ready to claim.
+1888	ENDED
+1889	SOON
+1890	🏆 CHOOSE # MYTHIC
+1891	+ FREE bonus:
+1892	joined your team! +
+1893	Weekly limit reached
+1894	Not enough GP Tokens
+1895	🎁 Pit-Stop Chest:
+1896	🏁 FIRST OVER THE LINE: you are #
+1897	! Your prize is in the Mail.
+1898	🌍 Server Goal gift:
+1899	Play the game – it counts by itself
+1900	Finish
+1901	GRAND PRIX FINISHERS
+1902	event missions
+1903	(the last one: a
+1904	MYTHIC AWAKENED I
+1905	). The first
+1906	# players
+1907	of your server win – checked by Torque Guard:
+1908	GP CHAMPION
+1909	– Golden Statue, Trophy ## Royal Entrance, Diamond Rain, Legend Car +
+1910	# + # Hero, # Gear Tickets, # keys +
+1911	gold name
+1912	GP PODIUM
+1913	# / # + Tickets +
+1914	silver name
+1915	GP FINISHER
+1916	# + Tickets +
+1917	purple name
+1918	When the #th player finishes, the event closes
+1919	# days later
+1920	– everybody can still claim the Road.
+1921	Your missions:
+1922	You finished #
+1923	You finished – the # places were already taken.
+1924	Your finish is being checked.
+1925	— free place —
+1926	· opens in
+1927	LOCKED
+1928	DONE
+1929	💎 Diamond Pass:
+1930	diamonds back!
+1931	TORQUE GRAND PRIX
+1932	⏳ Starts in
+1933	FINISHED
+1934	NO TIME LIMIT
+1935	· until # finish ·
+1936	⏱ Closes in
+1937	TOP # FULL
+1938	EVENT
+1939	MISSIONS
+1940	ROAD
+1941	SHOP
+1942	LEGENDS
+1943	PATRONS
+1944	THE # RACE WEEKS
+1945	LIVE
+1946	OVERTIME
+1947	– all missions are open. Daily & weekly missions keep coming until the Top # is full.
+1948	YOUR RACE
+1949	Free weekly Pit-Stop Chest
+1950	FREE
+1951	Grand Prix Road – Tier
+1952	pts · # = MYTHIC · # = END
+1953	OPEN
+1954	Missions – daily, weekly & event
+1955	GO
+1956	Grand Prix Shop
+1957	Tickets · Keys · Essence · Kits
+1958	DAILY
+1959	WEEKLY
+1960	Daily missions reset at midnight.
+1961	Weekly missions reset every # days of the event.
+1962	The first # missions count what you do
+1963	during the event
+1964	. The
+1965	CHAMPION
+1966	missions open week by week (week # # #). Finish
+1967	of them to race for the Top # – no time limit.
+1968	GRAND PRIX ROAD ·
+1969	POINTS
+1970	TIER
+1971	tiers · every
+1972	points = # tier · tiers #-# give
+1973	· tier # =
+1974	. Points = all GP Tokens you earned (spending in the Shop does not lower them).
+1975	Blue lane ×# on every tier.
+1976	Blue lane ×# ·
+1977	upgrade to PASS+ ×#
+1978	Buy it with
+1979	: PASS ×# (
+1980	) or PASS+ ×# (
+1981	CLAIM ALL
+1982	PASS+
+1983	SEE
+1984	PLAT
+1985	Every pass has
+1986	for everyone ·
+1987	×# (€ packs – tap a 🔒 lane to see them) ·
+1988	(tier # = diamonds back).
+1989	👑 CLAIM ALL PASSES
+1990	🏆 TIER
+1991	– CHOOSE # MYTHIC
+1992	FREE lane – reachable by playing every day.
+1993	CHOOSE
+1994	LOCKED · TIER
+1995	Pass lanes at tier
+1996	+ ✦ Ascended gear ·
+1997	+ ✦ Ascended gear + # copy of your Mythic
+1998	(Ascended gear: # piece, from the first lane you claim)
+1999	GRAND PRIX LEGENDS
+2000	Go online to see the ranking.
+2001	You
+2002	Your Name
+2003	👑 CHAMPION · ## OVER THE LINE
+2004	Golden Statue
+2005	Your favourite hero as a gold statue in the Arena & Battle Hub –
+2006	, seen by every player.
+2007	Trophy ##
+2008	“The only Grand Prix Champion”
+2009	Royal Entrance
+2010	the whole server sees you log in
+2011	▶ preview
+2012	Diamond Rain
+2013	#× a day you rain gifts in chat
+2014	PRESTIGE REWARDS
+2015	Grand Prix Frame
+2016	animated · TOP #-#
+2017	Legend Car
+2018	“# of #” · your name · TOP #-#
+2019	Name Colour
+2020	gold ## · silver ##-# · purple ##-#
+2021	GP Titles
+2022	CHAMPION · PODIUM · FINISHER
+2023	yours ✓
+2024	with any Grand Prix Pack
+2025	Never again
+2026	one-time event
+2027	Prizes go to the
+2028	first # players
+2029	who finish ALL event missions. Nothing here gives battle power.
+2030	🌍 SERVER GOAL
+2031	pts ·
+2032	Every player’s Road points on your server add up. Each step unlocks a gift for
+2033	ALL players
+2034	👑 PATRONS
+2035	Every player who buys a
+2036	Grand Prix Pack
+2037	becomes a
+2038	– the whole server is told in the chat and
+2039	gets a gift: Silver
+2040	· Gold
+2041	· Platinum
+2042	Max
+2043	per day from Patron gifts.
+2044	No Patron yet on this server – be the first!
+2045	SEE THE PACKS
+2046	GRAND PRIX SHOP
+2047	this week
+2048	Spend the
+2049	GP Tokens you get from missions. Limits reset every week.
+2050	Champion
+2051	entered the server!
+2052	Grand Prix Champion
+2053	💎 Diamond Rain!
+2054	💎 (preview)
+2055	ONE-TIME
+2056	event with
+2057	: it stays open until # players finish ALL the event missions (+# days), then it never comes back.
+2058	📋 Do
+2059	(daily, weekly, event) → earn
+2060	🎖️ Your tokens move you up the
+2061	Grand Prix Road
+2062	# tiers
+2063	). Tier # =
+2064	a MYTHIC hero of your choice
+2065	– free! Tier # = the big final prize.
+2066	🔓 New
+2067	CHAMPION missions
+2068	open every week (week # # #). The last one: a
+2069	: the first # who finish ALL event missions win titles, name colours and big prizes – ## is the
+2070	: buy it with diamonds → a bonus lane on every tier of the Road.
+2071	🛒 Spend tokens in the
+2072	GP Shop
+2073	· 🎁 a free
+2074	Pit-Stop Chest
+2075	every week.
+2076	: the live ranking of your server · 🌍
+2077	SERVER GOAL
+2078	: gifts for everybody.
+2079	LET’S RACE!
+2080	LIVE ·
+2081	NO LIMIT
+2082	online now
+2083	📶 No internet · your progress is saved on this phone
+2084	🔧 Server maintenance · keep playing, your progress is safe
+2085	🔒 Online modes work only in the official Torque Empire app from Google Play on a real (not rooted) phone.
+2086	UPDATE REQUIRED
+2087	A new version of Torque Empire is out.
+2088	Update to play online (Arena, Ranking, Chat, Cup).
+2089	Your progress is saved.
+2090	UPDATE NOW
+2091	UPDATING…
+2092	Grand Prix: ## to finish all missions
+2093	Grand Prix: ##-# to finish all missions
+2094	Grand Prix: Top # to finish all missions
+2095	VIP LEGEND
+2096	Reach VIP #
+2097	VIP STAR
+2098	FOUNDER
+2099	Founder Pass (Shop)
+2100	RAIL BARON
+2101	Rail Pass active (Shop)
+2102	TORQUE KING
+2103	Be ## of the campaign on your server
+2104	CUP CHAMPION
+2105	Win a Weekend Cup
+2106	ARENA LEGEND
+2107	Reach LEGEND in the Arena
+2108	ARENA GLADIATOR
+2109	Reach GOLD in the Arena
+2110	ARENA WARLORD
+2111	Arena Shop (# medals)
+2112	BOSS SLAYER
+2113	Reach campaign stage #-#
+2114	GEAR GURU
+2115	Own a Legendary gear item
+2116	SPEED DEMON
+2117	Reach Reputation #
+2118	GARAGE TALKER
+2119	Write # chat messages
+2120	WRENCH MASTER
+2121	ROOKIE
+2122	Start the game
+2123	SKY BREAKER
+2124	Reach floor # in Torque Tower
+2125	Awaken a Mythic hero
+2126	BOSS HUNTER
+2127	Claim the last World Boss reward of a day
+2128	DUNGEON MASTER
+2129	Reach floor # in all # Dungeons
+2130	TRAIN TYCOON
+2131	Send # trains in Rail Wars
+2132	RAIL RAIDER
+2133	Win # train attacks in Rail Wars
+2134	HARDCORE
+2135	Reach HARD MODE stage #-#
+2136	COLLECTOR
+2137	Own # classic cars in the Collection Garage
+2138	LUCKY STAR
+2139	Own a Mythic hero
+2140	TOWER CLIMBER
+2141	GARAGE TYCOON
+2142	Get a building to level #
+2143	DAILY GRINDER
+2144	Check in # days
+2145	Free
+2146	Reputation #
+2147	Arena GOLD or Arena Shop
+2148	VIP # or Arena DIAMOND
+2149	Arena LEGEND or a Cup win
+2150	Founder
+2151	Rail Baron
+2152	Tower Climber
+2153	Boss Hunter
+2154	Dungeon Master
+2155	Collector
+2156	Own all # classic cars
+2157	BRONZE
+2158	DIAMOND
+2159	LEGEND
+2160	%;background-image:url(
+2161	BATTLE RANKING
+2162	LIVE · YOUR SERVER
+2163	WORLD CHAT
+2164	AUTO-TRANSLATE
+2165	PVP · WEEKLY SEASON
+2166	WEEKEND TOURNAMENT
+2167	MY PROFILE
+2168	NAME · ICON · FRAME · TITLE
+2169	GARAGE
+2170	WORLD
+2171	SEND
+2172	Write a message…
+2173	TOP
+2174	HISTORY
+2175	RANKING
+2176	CUP
+2177	SKIP ⏭
+2178	.webp" alt="VIP
+2179	GIFT
+2180	📶 Online features need an internet connection
+2181	.fight,.play,.menu
+2182	📶 Could not reach the server.
+2183	Check your internet and try again.
+2184	Top # of your server · tap a player to see his profile
+2185	animation-delay:
+2186	English
+2187	Română
+2188	Français
+2189	Español
+2190	Português
+2191	Deutsch
+2192	Italiano
+2193	Polski
+2194	Türkçe
+2195	Nederlands
+2196	Indonesia
+2197	Tiếng Việt
+2198	Magyar
+2199	Čeština
+2200	Svenska
+2201	AUTO: ON
+2202	AUTO: OFF
+2203	💬 Chat rules
+2204	Be nice – this chat is for everyone #+.
+2205	❌ No insults, hate, bullying or adult content
+2206	❌ No spam, links or ads
+2207	❌ No personal info (phone, address, e-mail…)
+2208	❌ No selling or trading accounts
+2209	Bad words are hidden automatically. Long-press a message to
+2210	Mute
+2211	Report
+2212	a player. Players who break the rules are muted or banned.
+2213	Messages are translated automatically by our server (Cloudflare) and are deleted after # days.
+2214	NOT NOW
+2215	I AGREE
+2216	📶 Could not reach the chat.
+2217	No messages yet.
+2218	Say hi to your server! 👋
+2219	🌐 translated from
+2220	show original
+2221	show translation
+2222	Unmute
+2223	👤 View profile
+2224	📋 Copy
+2225	🚩 Report
+2226	📋 Copied
+2227	🔇 Player muted – you will not see his messages
+2228	🔈 Player unmuted
+2229	🚩 Report this message?
+2230	Our team will check it. After # reports the message is hidden automatically.
+2231	REPORT
+2232	🚩 Thank you – the message was reported
+2233	⚠️ Could not report
+2234	b[data-ch]
+2235	✏️ Choose your player name first (Profile)
+2236	⏳ Slow down – wait a few seconds
+2237	🔇 You are muted until
+2238	🚫 Your account is blocked
+2239	🧪 Test account – chat is read-only
+2240	📶 No connection
+2241	⚠️ Message not sent
+2242	Enter
+2243	🚫 Your account is blocked.
+2244	📶 Could not reach the Arena.
+2245	pts to the next division
+2246	Top league!
+2247	AI
+2248	points · rank #
+2249	· season
+2250	ends in
+2251	⚔️ Arena fights
+2252	🎁 daily reward #:#
+2253	🛡️ MY TEAM
+2254	🔄 NEW RIVALS
+2255	Fights are automatic: your
+2256	battle team
+2257	(with gear) against the other player's team – he does not need to be online. Win = up to +
+2258	points. When others attack you, you lose a few points only if they win.
+2259	Rivals marked
+2260	are training rivals while the server is still filling up.
+2261	DAILY REWARD (#:#)
+2262	Cash Vault
+2263	Gear Forge
+2264	Essence Lab
+2265	Recruit Ticket
+2266	Builder Kit
+2267	Legendary Hero (choose)
+2268	Gladiator Frame
+2269	Title ARENA WARLORD
+2270	Dungeon
+2271	Key
+2272	CHOOSE # LEGENDARY
+2273	Tap a hero. It joins your team (or adds a copy).
+2274	joined your team!
+2275	Arena Medals
+2276	Season
+2277	wins · resets in
+2278	OWNED
+2279	# / month
+2280	next month
+2281	ARENA SHOP
+2282	Earn
+2283	medals:
+2284	per win ·
+2285	per loss · daily reward by league (
+2286	# → #) · season end (
+2287	# → #). Weekly limits reset with the season (Monday).
+2288	WINS
+2289	Win Arena fights to open the chests. Wins and chests reset every season (Monday).
+2290	✓ You already own it
+2291	Not enough Arena Medals (
+2292	Buy
+2293	YES, BUY
+2294	Not enough Arena Medals
+2295	Limit reached
+2296	You already own it
+2297	⚠️ Could not buy
+2298	Win more Arena fights first
+2299	Already claimed
+2300	⚠️ Could not claim
+2301	· +# in
+2302	📶 Could not load.
+2303	Nobody in the Arena yet – be the first!
+2304	WIN
+2305	LOSS
+2306	⚔️ you attacked
+2307	🛡️ attacked you:
+2308	No fights yet.
+2309	⚔️ No Arena fights left – +# every # hours
+2310	⚠️ This fight is too old
+2311	🛡️ My Arena team
+2312	Your Arena team is your
+2313	from the Campaign (with its gear). It attacks and it also defends you when others attack.
+2314	⚔️ HEROES PAGE
+2315	⚔️ No Arena fights left
+2316	🔄 Rivals changed – try again
+2317	⚔️ You need a battle team first
+2318	🚫 Account blocked
+2319	⚠️ Could not start the fight
+2320	📶 Could not reach the Cup.
+2321	🏆 Champion
+2322	🥈 Final
+2323	🥉 Semi-final
+2324	Quarter-final
+2325	Round of #
+2326	Gear
+2327	FINAL
+2328	SEMI-FINAL
+2329	QUARTER-FINAL
+2330	ROUND OF
+2331	FINAL #
+2332	WEEKEND CUP #
+2333	The best # players of the Arena qualify on Friday #:# · knock-out · # round every # h · your battle team fights for you
+2334	until the qualification
+2335	LAST CUP CHAMPION
+2336	Weekend Cup #
+2337	Climb the Arena this week to qualify. Rewards are diamonds & tickets earned by playing.
+2338	🏆 Champion:
+2339	· you are not in this Cup
+2340	· you are out – well played!
+2341	· you are still in! 💪
+2342	players ·
+2343	until the
+2344	🙈 VIP HIDDEN
+2345	👁 VIP VISIBLE
+2346	Others do not see your VIP level
+2347	Tap to hide your VIP level from others
+2348	· ID
+2349	GARAGE · CUP
+2350	✏️ CHOOSE YOUR PLAYER NAME (FREE)
+2351	Summon heroes to use them as your icon.
+2352	✅ in use
+2353	tap to use
+2354	STANDARD
+2355	LOW
+2356	⚙️ AUTO · recommended
+2357	The game checked your phone →
+2358	for you
+2359	✨ HD · MAX QUALITY
+2360	Sharpest picture on good phones · uses more battery and memory
+2361	🖼️ STANDARD
+2362	Sharp picture, normal battery use
+2363	🍃 LOW · SMOOTH
+2364	For older phones – lighter picture, no lag, less battery
+2365	🔊 BATTLE SOUNDS ON
+2366	Hits, explosions, victory
+2367	🔇 BATTLE SOUNDS OFF
+2368	Silent battles
+2369	ICON · YOUR HEROES
+2370	FRAME
+2371	TITLE
+2372	💬 DISCORD REWARD
+2373	Join our Discord:
+2374	# 💎 + # Recruit + # Gear + # Crew tickets
+2375	· gift codes & news about the next updates
+2376	🎁 GIFT CODE
+2377	Type a code from our Discord – the reward comes in your MAIL
+2378	HELP & SUPPORT
+2379	🆘 WRITE TO US
+2380	A bug, a purchase, your account or an idea – we answer in your MAIL
+2381	GRAPHICS
+2382	SOUND
+2383	Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.
+2384	Player ID
+2385	muted players (
+2386	✏️ #–# letters, numbers, _ . -
+2387	🚫 This name is not allowed
+2388	❌ This name is already used on your server
+2389	🔒 Not unlocked yet
+2390	⚠️ Could not save
+2391	🔈 All players unmuted
+2392	🔊 Battle sounds ON
+2393	🔇 Battle sounds OFF
+2394	⚙️ AUTO graphics
+2395	✨ HD graphics ON
+2396	🖼️ STANDARD graphics
+2397	🍃 LOW graphics
+2398	– restarting…
+2399	Locked
+2400	CHOOSE YOUR NAME
+2401	CHANGE NAME
+2402	This change is FREE
+2403	This change costs
+2404	(you have
+2405	#–# letters / numbers ( _ . - allowed) · no bad words · one name per server
+2406	Your player name
+2407	SAVE
+2408	You need # Diamonds
+2409	✅ Name saved:
+2410	⚠️ Could not load the profile
+2411	No battle team yet
+2412	Tap a hero to see the gear
+2413	Team power
+2414	Arena
+2415	VIP · Cup wins
+2416	BATTLE TEAM
+2417	Hero
+2418	❤️ HP
+2419	⚔️ ATK
+2420	🛡️ DEF
+2421	🎯 CRIT
+2422	⏱️ SPEED
+2423	This player must open the game with the new version to show the gear.
+2424	's hero
+2425	Recruit
+2426	Dungeon keys
+2427	Nothing new.
+2428	🎁 Rewards
+2429	Claimed
+2430	🐞 Bug
+2431	💳 Purchase
+2432	👤 Account / save
+2433	🚩 A player
+2434	💡 Idea
+2435	❓ Other
+2436	🆘 HELP & SUPPORT
+2437	What is it about?
+2438	We add your player ID, game version and phone model by ourselves. The answer comes in your
+2439	MAIL
+2440	Tell us what happened (what you did, what you saw)…
+2441	✏️ Write a few words first
+2442	✅ Sent! We will answer in your MAIL
+2443	⏳ You already sent # messages today – we will answer soon
+2444	📶 No connection – try again
+2445	⬆️ Update the game first
+2446	⚠️ Could not send – try again
+2447	📶 Needs an internet connection
+2448	Follow us on Discord for
+2449	GIFT CODES
+2450	, events and news about the
+2451	next updates
+2452	Join the Torque Empire Discord server.
+2453	Come back and tap
+2454	GET REWARD
+2455	– log in with Discord, we check that you joined.
+2456	The reward arrives in your
+2457	. One time per account.
+2458	# · JOIN DISCORD
+2459	# · GET REWARD
+2460	&response_type=token&scope=guilds.members.read&redirect_uri=
+2461	&state=
+2462	🎁 After the Discord login, come back and open your MAIL
+2463	✅ Reward already claimed – thank you!
+2464	Stay on Discord for gift codes and update news.
+2465	Type a code from our
+2466	Discord
+2467	(#announcements).
+2468	💬 DISCORD
+2469	REDEEM
+2470	CODE
+2471	✏️ Type the code first
+2472	Reward
+2473	→ check your MAIL!
+2474	❌ This code does not exist
+2475	⌛ This code has expired
+2476	✅ You already used this code
+2477	😢 This code was used by too many players
+2478	⏳ Too many wrong codes today – try tomorrow
+2479	📶 Go online once first (choose your player name)
+2480	⚠️ Could not check the code – try again
+2481	📶 HELP needs an internet connection
+2482	Rival
+2483	VS
+2484	# pts
+2485	Medals
+2486	CONTINUE
+2487	TORQUE ARENA
+2488	SKILL!
+2489	SKILL
+2490	RANK
+2491	MYTHIC HEROES
+2492	MYTHIC HERO
+2493	ASCENDED GEAR
+2494	A player
+2495	PLAYER
+2496	EM
+2497	STRONG
+2498	SUP
+2499	SUB
+2500	VIDEO
+2501	TEXTAREA
+2502	STARTER PACK
+2503	BEST START
+2504	ROOKIE PACK
+2505	PRO PACK
+2506	ELITE PACK
+2507	MASTER PACK
+2508	LEGEND PACK
+2509	TITAN PACK
+2510	ui#/v_dm
+2511	ui#/sp_dm
+2512	ui#/sp_chest
+2513	SILVER PASS
+2514	GOLD PASS
+2515	PLATINUM PASS
+2516	CAMPAIGN FUND · NORMAL
+2517	CAMPAIGN FUND · HARD
+2518	keys for every dungeon
+2519	of each role part +
+2520	Restored
+2521	Diamonds ×
+2522	(first time)
+2523	(second time)
+2524	Diamonds
+2525	unlocked! Claim your rewards.
+2526	· daily gift
+2527	🚆 RAIL PASS: +
+2528	Street Tokens
+2529	🚆 RAIL PASS · daily gift: +
+2530	is already yours.
+2531	You need
+2532	diamonds (
+2533	) – you get them all back right away!
+2534	is yours forever!
+2535	The Rail Pass is already active.
+2536	This VIP Pass is already active.
+2537	ui#/v_crown
+2538	PACKS
+2539	DIAMONDS
+2540	ui#/sp_vip
+2541	VIP PASS
+2542	ui#/v_gift
+2543	FUNDS
+2544	SPECIAL OFFERS · ONE TIME ONLY
+2545	shop/pk_
+2546	🔒 Opens after the
+2547	Summon tickets +
+2548	keys for EACH of the # dungeons (keys never expire).
+2549	The last offer – buy it once.
+2550	Buy it once – then the next pack opens.
+2551	hero lg
+2552	hero ep
+2553	ui#/v_coins
+2554	VALUE
+2555	✓ You bought all special offers – thank you!
+2556	YOUR FOREVER PACKS
+2557	shop/founder
+2558	Founder Pass
+2559	Forever: Battle Speed ×# + the FOUNDER frame & title on your profile (ranking, chat, Arena).
+2560	ui#/sp_truck
+2561	VIP Truck · Rich Clients
+2562	Forever: rich clients, priority in every garage, pay ×#
+2563	ui#/sp_crew
+2564	VIP Crew Boost
+2565	Forever: every mechanic +#% speed & money.
+2566	ui#/sp_speed
+2567	Battle Speed ×#
+2568	Forever.
+2569	Included in the Gold & Platinum Pass.
+2570	🧪 TEST MODE (owner): tapping a price gives it without payment.
+2571	↩ Back to my normal account
+2572	🧪 Open the FULL TEST ACCOUNT (hidden from rankings)
+2573	📱 Packs are available in the Torque Empire app on Google Play.
+2574	Payments by Google Play. Bought on another phone? Purchases come back by themselves with the same Google account.
+2575	#st time:
+2576	#nd time:
+2577	= # summon (you are always asked first). Rate Info and the Legendary pity (every # summons) stay the same.
+2578	Yours forever
+2579	Forever · all
+2580	come back right away
+2581	CONFIRM?
+2582	Active –
+2583	days left
+2584	ACTIVE ✓
+2585	Recruit + Crew + Gear tickets
+2586	shop/vp_sil
+2587	FOREVER · paid with diamonds – you get them all back
+2588	ui#/v_idle
+2589	Battle Speed
+2590	shop/vp_gold
+2591	ui#/i_key
+2592	Dungeon keys every day
+2593	+# each
+2594	Your monthly Gold Pass counts until it ends (
+2595	days).
+2596	POPULAR
+2597	shop/vp_plat
+2598	Monthly subscription
+2599	Right away
+2600	+ # of each ticket
+2601	Diamonds every day
+2602	World Boss key every day
+2603	VIP benefits
+2604	ui#/v_garage
+2605	Idle Rewards collected by themselves
+2606	In # days: #
+2607	+ # tickets
+2608	shop/vp_dia
+2609	Monthly subscription · the richest
+2610	shop/vp_rail
+2611	RAIL PASS
+2612	Monthly subscription · for train bosses – works with every VIP Pass
+2613	Street Tokens right away
+2614	Street Tokens every day
+2615	Trains a day
+2616	Train fills in
+2617	# min
+2618	Street Tokens per train
+2619	Refreshes per train
+2620	Rail Wars attacks a day
+2621	Your train is robbed: you lose
+2622	only half
+2623	Golden locomotive + RAIL BARON title
+2624	In # days: ≈#
+2625	as gifts + #% more from every train
+2626	DUNGEON PASS · # DAYS
+2627	Dungeon Pass · # days
+2628	+# keys a day in every dungeon + SWEEP.
+2629	days left.
+2630	All VIP Passes stack: every pass gives its own daily gift and its own keys, the Idle hours add up, and the fastest Battle Speed counts. The daily gifts arrive the first time you open the game each day.
+2631	CAMPAIGN FUNDS · BUY ONCE
+2632	NORMAL
+2633	HARD ×#
+2634	×# VALUE
+2635	CAMPAIGN FUND
+2636	Rewards at every #rd chapter of HARD MODE – bigger rewards.
+2637	Rewards at every #rd chapter of the NORMAL campaign.
+2638	Already passed? Claim at once.
+2639	Tap a glowing reward!
+2640	Total:
+2641	· progress:
+2642	Player ID:
+2643	↩ Back to my account
+2644	Privacy policy
+2645	Replay tutorial
+2646	Test key
+2647	✖ Wrong key
+2648	Battle → Dungeons → DUNGEON PASS
+2649	🏅 Founder Pass: Battle Speed ×# + FOUNDER frame & title!
+2650	👑 VIP Crew Boost active – every mechanic +#%!
+2651	🚚 VIP Truck unlocked! The first rich clients are on their way.
+2652	PASS
+2653	" alt=""
+2654	# Recruit Tickets
+2655	# Gear Tickets
+2656	# Crew Tickets
+2657	#h Idle Essence
+2658	🚆 Your
+2659	train arrived: +
+2660	(robbed: −
+2661	🔒 This train grade is locked (
+2662	refreshes used)
+2663	img.tr
+2664	⬆ UPGRADE!
+2665	✨ Upgraded to
+2666	🔄 Still
+2667	refresh left
+2668	--gc
+2669	🚆 The train is not full yet (
+2670	cars)
+2671	🚆 No trains left today (
+2672	a day)
+2673	📶 Rail Wars needs internet
+2674	⚠️ Could not send the train
+2675	train sent! Back in # min – keep it safe!
+2676	⚔️ No attacks left today (
+2677	🚆 That train is gone – pick another
+2678	⚠️ Could not attack
+2679	The train got away
+2680	a day for
+2681	· come back tomorrow
+2682	Not enough Street Tokens (
+2683	An item: USE it later = # hours of idle Essence for your stage at that moment (now
+2684	· in YOUR ITEMS – use it when you want
+2685	Essence (#h idle)
+2686	YOUR ITEMS
+2687	#h Idle Essence ×
+2688	USE
+2689	YOUR PURCHASES
+2690	USED #h Idle Essence
+2691	(left
+2692	STREET TOKENS
+2693	for the Street Shop
+2694	RAIL PASS ACTIVE
+2695	# trains · # attacks · # refreshes · # min fill · ×# tokens · robbed = lose half
+2696	+# TRAIN · +# ATTACKS · ×# TOKENS
+2697	RAIL PASS · €# / month ›
+2698	🚆 Build the RAIL TERMINAL (next to the Car Factory) to join RAIL WARS.
+2699	YOUR TRAIN
+2700	Cars
+2701	· FULL
+2702	· next:
+2703	Brings when full
+2704	Sends today
+2705	🔒 LOCKED
+2706	🔄 REFRESH
+2707	Grade chances (Car Wash + Gas Station + Car Factory levels):
+2708	📶 Loading…
+2709	⬆️ Update the game to play Rail Wars
+2710	📶 No connection – try again later
+2711	ON THE WAY
+2712	arrives in
+2713	arrived!
+2714	· robbed
+2715	· not robbed
+2716	ATTACK A TRAIN
+2717	Win the fight = steal
+2718	% of what is on the train. Attacks today:
+2719	· each train can be robbed
+2720	steal ~
+2721	No trains on the way right now – try again in a few minutes.
+2722	🔄 NEW TRAINS
+2723	ATTACKS ON YOUR TRAINS
+2724	train –
+2725	your team won
+2726	STREET SHOP
+2727	🚆 RAIL WARS
+2728	OPEN ›
+2729	CHIEF MECHANIC
+2730	your Legendary
+2731	Welcome to
+2732	, boss! I'm Mama Rosa, your chief mechanic. Let me show you around – it only takes a minute.
+2733	Finish the tutorial for a big gift:
+2734	LET'S GO
+2735	Monsters made of car parts are attacking the city! Look what
+2736	heroes can do…
+2737	WATCH!
+2738	WOW! Want heroes like that? Let's get
+2739	first team. Open
+2740	– it's free!
+2741	to recruit # heroes – one
+2742	is guaranteed!
+2743	(replay: tap NEXT)
+2744	joined you! Heroes
+2745	fight in battles
+2746	work in your garage
+2747	. Close these pages to continue.
+2748	Now it's your turn to fight! Tap
+2749	BATTLE
+2750	Open the
+2751	Tap your stage.
+2752	Your best heroes are already in the team. Press
+2753	Battles give money, tickets, diamonds and gear.
+2754	So close! Gear will make your heroes stronger.
+2755	, then
+2756	to go back.
+2757	Let's make
+2758	even stronger with
+2759	. Open
+2760	– a full
+2761	EPIC SET
+2762	is waiting!
+2763	The
+2764	is already on
+2765	– # pieces = a big set bonus! Better gear = more power in every battle.
+2766	This is your
+2767	. Customer cars arrive at the
+2768	ARRIVAL PARKING
+2769	. Valet drivers take them to the workshops by themselves.
+2770	INSPECTION
+2771	checks every car and decides what must be repaired and which workshop it visits.
+2772	When a car is fixed, the
+2773	SALES OFFICE
+2774	sells it and you get the money. It all runs by itself – even while you are away!
+2775	Upgrades make your garage faster and richer.
+2776	Tap the SERVICE workshop.
+2777	: more mechanics, faster work and bigger pay. Buildings are upgraded with
+2778	PARTS
+2779	(not money) – you get them from battles, salvage and Idle Rewards.
+2780	DAILY QUESTS
+2781	: finish them every day for diamonds and tickets.
+2782	IDLE REWARDS
+2783	: your garage keeps earning while you are offline. Collect it here!
+2784	That's it, boss! Here is your welcome gift. Now build your
+2785	START
+2786	SKIP TUTORIAL
+2787	🎁 Welcome gift:
+2788	diamonds +
+2789	Recruit,
+2790	Crew and
+2791	Preview: the gift is not given (test only)
+2792	SKIP = NO GIFT · TAP AGAIN
+2793	: your battle team fights other players' teams. # fights a day – climb from BRONZE to LEGEND!
+2794	: every weekend the best Arena players fight in a tournament for big prizes.
+2795	is open! Climb floor by floor – every floor is harder and gives better rewards.
+2796	are open: a tower for every hero class. Build strong teams for each one!
+2797	is open! # keys a day: hit the boss as hard as you can and climb the damage ranking.
+2798	are open! # free keys a day in each dungeon – unused keys stack up. Money, gear and NITRO BOOST.
+2799	"]:not(.lk)
+2800	: your
+2801	(# heroes) fights here. Tap a hero to
+2802	LEVEL UP
+2803	– every # levels =
+2804	picks your strongest team.
+2805	makes heroes stronger in battle.
+2806	Gear Parts
+2807	(salvage, campaign, Dungeons, Idle). Two identical pieces =
+2808	★ STAR UP
+2809	. A full class set gives extra bonuses.
+2810	MY CREW
+2811	= everybody who
+2812	works in your garage
+2813	: mechanics (heroes), guards and drivers. Each workshop takes only
+2814	its own class
+2815	. Better crew = faster work and more money.
+2816	fills every place.
+2817	= mechanics who work AND fight ·
+2818	= drivers and guards for the garage ·
+2819	= equipment.
+2820	gives # A
+2821	is guaranteed every # summons.
+2822	is free for everybody:
+2823	Daily Quests
+2824	give VIP points. Every VIP level gives a bigger
+2825	DAILY GIFT
+2826	(tickets, diamonds, Essence, Builder Kit, Dungeon keys) and stronger Idle bonuses. VIP Passes make the bonuses even bigger.
+2827	NEW VIP GIFTS
+2828	: tap
+2829	every day – each VIP level adds more: Crew & Gear tickets, more diamonds,
+2830	. VIP # / # = extra
+2831	World Boss keys
+2832	. Idle now gives more
+2833	Essence, Gear Parts and garage parts
+2834	with VIP.
+2835	now also have
+2836	battle quests
+2837	: campaign, towers, Dungeons, Arena, World Boss. Tap a picture (
+2838	GO ›
+2839	) to go straight there. Every quest gives
+2840	VIP points
+2841	: every event running now has its own banner –
+2842	tap it
+2843	to open its page. Just play (summon, spend Essence…) to collect points →
+2844	milestone rewards
+2845	prizes. The
+2846	below shows what comes next.
+2847	DAILY CHECK-IN
+2848	: come back every day for free tickets. Missing a day
+2849	never resets
+2850	your progress – you simply continue.
+2851	: every hero has a role –
+2852	. # different roles in your team =
+2853	, all # =
+2854	attack & HP. ♻
+2855	REBIRTH
+2856	gives back #% of a hero's Essence.
+2857	BUILDINGS
+2858	upgrade with
+2859	, not money: battle garages use the parts of their
+2860	(Engine = Tank, Tuning = Warrior…), all other buildings use the
+2861	. Up to
+2862	LV #
+2863	– a battle garage also makes its hero class stronger. Car money goes to the
+2864	Classic Collection
+2865	: free keys every day in each dungeon – a key is used only when you
+2866	. Keys you do not use
+2867	stack up
+2868	day after day (also keys from packs and the Key Roulette). Rewards are fixed: cash, gear, set pieces, NITRO BOOST.
+2869	PITY
+2870	Hero summons. Tap the red
+2871	bar =
+2872	WISH
+2873	: you choose which Mythic the pity gives.
+2874	AWAKENING
+2875	: Mythic copies wake the hero up –
+2876	Awakened I → V
+2877	(# copies). Every tier =
+2878	×# power
+2879	(Awakened V = ×#) and skill levels.
+2880	heroes go to
+2881	– every + is +#%.
+2882	: when
+2883	your heroes of a color reach a step (+# +# … Legendary +#…+# Mythic Awakened I…V),
+2884	gets the bonus.
+2885	: every event that is running now has its own banner –
+2886	to open its page. The
+2887	below shows what comes next and when.
+2888	(under the event banners): see the next events with their exact dates. New event:
+2889	– every Dungeon key you use counts.
+2890	TOWERS
+2891	now have
+2892	# floors
+2893	. The higher the floor, the bigger every reward. Class Towers: a
+2894	Mythic set piece
+2895	every # floors after # and a full
+2896	at floors #-#
+2897	🎒 GEAR BAG
+2898	: battles never lose gear – the bag can go
+2899	over its limit
+2900	. When the counter is
+2901	, only
+2902	is locked until you
+2903	. Turn on
+2904	to keep the bag clean.
+2905	NEW: SLOT UPGRADES
+2906	now belongs to the hero's
+2907	, not to the piece. Put a better piece in – it gets the slot's
+2908	at once, nothing is lost! The badge in the corner shows the slot level (new colour every
+2909	). Old upgrades of pieces in the bag were refunded in Gear Parts.
+2910	NEW: ALL GEAR IS SET GEAR
+2911	: every piece belongs to one of the
+2912	# class sets
+2913	and has its own random
+2914	(higher grade = bigger %). All set pieces of the
+2915	! Mythic heroes now belong to a class too.
+2916	#gHero.open .gi.sOn,#gHero.open .gi.sOff
+2917	SET GEAR
+2918	: the big icon on a piece shows its
+2919	. On the right class it
+2920	with a green
+2921	and the set bonus works. A red
+2922	means wrong class – no set bonus.
+2923	MYTHIC SETS
+2924	: a Mythic hero gets the bonus of the
+2925	Torque King
+2926	of the set of its
+2927	(Goliath → Iron Piston, Ignis → Field Medic …) – the one with more pieces counts.
+2928	❮ ❯ NEXT HERO
+2929	: tap the arrows or
+2930	swipe left / right
+2931	on the hero to go to the next one – no need to go back. In your team you go through the
+2932	# team heroes
+2933	! After floor # the monsters get much stronger – and the rewards much bigger:
+2934	gear and set pieces from floor
+2935	, NITRO up to
+2936	, more Essence and Gear Parts, more cash, and
+2937	on every boss floor (# # … #).
+2938	: every chapter now has
+2939	# stages
+2940	(was #) – mini-boss at stage
+2941	, chapter boss at
+2942	, with bigger rewards.
+2943	in total (NORMAL and HARD). Your progress and stars are kept – only the stage numbers changed.
+2944	⚡ AUTO SUMMON
+2945	: summons ×# again and again with your tickets – and
+2946	too if you choose a limit (NO / #K / #K / ALL). Choose when it stops – first
+2947	, first
+2948	or all tickets. Tap
+2949	■ STOP
+2950	any time.
+2951	⚠ MINI BOSS
+2952	: every battle compares your
+2953	with the monsters'. If the monsters are more than
+2954	stronger, a
+2955	joins the last wave. Over
+2956	they also go
+2957	ENRAGE
+2958	. If your team is stronger, nothing happens. In the campaign it starts at
+2959	chapter #
+2960	(stage #-#); the team screen warns you before the fight. Beat a mini boss = bonus
+2961	. Campaign, Torque Tower and Class Towers.
+2962	GEAR ENHANCE
+2963	: Common → Mythic gear now goes up to
+2964	(no more stars). Every
+2965	unlocks a bonus: extra stats up to +# then
+2966	double the main stat. Your old stars became + levels – nothing was lost.
+2967	: no levels, already stronger than a Mythic +# and only Ascended get
+2968	stars ★#-★#
+2969	MYTHIC CORE
+2970	: duplicates of heroes already at their max can give a rare
+2971	(a Mythic duplicate always gives #). With it your
+2972	Mythic heroes go from Lv # to Lv #
+2973	(# Core Ascensions, +# skill level each). In the
+2974	– a Mythic hero of your choice for Awakening.
+2975	MYTHIC TALENTS
+2976	: every Mythic hero has his own talent. It wakes up in
+2977	# phases
+2978	on the way to Lv #:
+2979	I at Lv #
+2980	II at Lv #
+2981	III at Lv #
+2982	– each phase makes it stronger. It works by itself in every battle.
+2983	ARENA MEDALS
+2984	: every Arena fight now gives medals (
+2985	win,
+2986	loss), plus the daily and season rewards. Spend them in the
+2987	(tickets, Dungeon keys, Essence, Builder Kits, a
+2988	Legendary of your choice
+2989	every month, a frame and a title). In
+2990	, open a chest at
+2991	# # # # # # and # wins
+2992	every season.
+2993	#sheet .pkBar span[data-pkgo]
+2994	YOUR PARTS
+2995	= what you use to
+2996	upgrade buildings
+2997	. Every building takes
+2998	kind:
+2999	Engine ·
+3000	Tuning ·
+3001	Inspection ·
+3002	Paint + Electrical ·
+3003	Service ·
+3004	= all the others (Parking, Office, Security, Car Wash…)
+3005	Tap a part
+3006	→ the map flies to your
+3007	weakest building
+3008	that uses it and opens it. A green
+3009	= you can upgrade one
+3010	right now
+3011	. Try it!
+3012	Here it is!
+3013	have / need
+3014	shows your parts. Enough → tap
+3015	. Not enough → the note under it says
+3016	where to get them
+3017	(salvage gear, Idle Rewards, campaign, towers). Tap the part again to jump to the next building.
+3018	🔒 LOCKED BUILDING
+3019	: buildings open with
+3020	REPUTATION
+3021	(the
+3022	REP
+3023	bar at the top). Every car your garage repairs and sells fills it. Each new REP level opens
+3024	new buildings
+3025	new repairs
+3026	and gives a gift.
+3027	🔒 GREY = LOCKED
+3028	: every battle mode opens when you win the
+3029	campaign stage
+3030	written on it. Win more
+3031	stages to open Arena, Towers, World Boss and Dungeons.
+3032	: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have
+3033	too.
+3034	THIEVES #
+3035	: thieves come in groups –
+3036	★ PRO
+3037	👑 GANG BOSS
+3038	and sometimes a whole
+3039	GANG RAID
+3040	. Guards get
+3041	BACKUP
+3042	K# dogs
+3043	. Caught = Builder Kit, Crew Tickets, diamonds; escaped = part of your cash stolen.
+3044	MOST WANTED
+3045	: catch the # thieves on the board today for a bounty.
+3046	RAIL WARS
+3047	: new cars from the
+3048	Car Factory
+3049	get fuel, a wash and go up on the train. When it is full,
+3050	it (# trains a day) for
+3051	. A higher train grade (Car Wash · Gas Station · Factory levels, or
+3052	REFRESH
+3053	) = more tokens. Attack other players' trains (# a day) and spend your tokens in the
+3054	NEW: CRIT DAMAGE
+3055	= how often a hero hits critical (max
+3056	= how hard that hit is (base
+3057	now give Crit damage – your gloves changed by themselves.
+3058	: every tier =
+3059	#olPrB [data-dc]
+3060	DISCORD REWARD
+3061	: join our Discord server and get
+3062	in your MAIL (one time). On Discord we post
+3063	– type them in
+3064	– and news about the next updates.
+3065	: buy classic cars with your
+3066	garage cash
+3067	. Every car gives tickets over time and makes
+3068	all heroes stronger
+3069	– forever.
+3070	Played Torque Empire before?
+3071	The game got a new app. If you played the old version on this phone, bring your progress here – garage, heroes, VIP and packs.
+3072	⚠️ This replaces the game you have in this app now.
+3073	📲 TRANSFER MY PROGRESS
+3074	NEW GAME
+3075	You can also do it later from the start screen.
+3076	ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz#
+3077	Browser
+3078	⚠️ Can't open Chrome
+3079	Please update the app and try again.
+3080	Signing in with Google…
+3081	Choose your Google account in Chrome.
+3082	Then tap
+3083	RETURN TO GAME
+3084	(or the ✕ at the top).
+3085	OPEN CHROME AGAIN
+3086	Waiting for your old game…
+3087	Chrome opens and sends your progress here.
+3088	⌛ Time is up
+3089	Nothing arrived. Try again.
+3090	TRY AGAIN
+3091	No old game found
+3092	Chrome on this phone has no Torque Empire progress. If you signed in with Google in the old version, sign in here too – your cloud save comes back.
+3093	START A NEW GAME
+3094	Progress transferred!
+3095	Welcome back, boss. Restarting…
+3096	App
+3097	tE-v#-#c#f#
+3098	android-app://
+3099	#c#a#b#ff#b#c#bffdf#b#a#a#eb#
+3100	SHA-#
+3101	Account reset
+3102	Your game was reset by the Torque Empire team. A new game starts now – good luck!
+3103	Account blocked
+3104	Our anti-cheat system found changes that are not possible in the game (edited save, money hack or speed hack).
+3105	If you think this is a mistake, write to support with this ID.
+3106	🧪 TEST MODE (browser): unlocked for free. In the Google Play app this is a real payment.
+3107	📱 Packs can be bought only in the Torque Empire app on Google Play.
+3108	📲 Please update Torque Empire from Google Play to buy packs.
+3109	⚠️ Google Play payments are not available on this device.
+3110	Total
+3111	EUR
+3112	🛒 Opening Google Play…
+3113	⚠️ Payment could not be verified. You were not charged twice – try again later.
+3114	AbortError
+3115	📲 Payments work only in the new Torque Empire app from Google Play (this is the old Chrome version). Install the update from the Play Store.
+3116	⚠️ Google Play payments are not available right now (
+3117	⚠️ No answer from Google Play. Try again.
+3118	✓ You already own this – restoring it…
+3119	product not found in Google Play
+3120	another payment is still open
+3121	no answer from Google Play
+3122	no offer for this pass
+3123	⚠️ Payment failed (
+3124	). You were not charged.
+3125	⏳ Payment pending – the pack arrives as soon as Google confirms it.
+3126	⚠️ Payment could not be verified yet – it will be added automatically when you restart the game.
+3127	✓ Purchases restored
+3128	no plugin (old app)
+3129	(promise)
+3130	Mechanics check every car. The inspection decides which workshops the car visits and which parts must be ordered.
+3131	Oil, brakes, tires and batteries. Later: suspension and clutches.
+3132	Polish, dents, rust and full resprays. Later: bumpers and widebody kits.
+3133	Bulbs, sensors, wiring looms and ECU repairs.
+3134	Engine Shop
+3135	Timing belts, turbos, gearbox and full engine swaps. Long jobs that pay a lot. Every job needs parts.
+3136	# upgrades: street kits, lowering, ECU tunes, neon, chrome rims, tint, LED lights, sport exhaust, wraps, carbon hoods, flame decals, roof scoops, air suspension, drift kits, nitro and full race builds.
+3137	Arrival Parking
+3138	Security
+3139	Car Wash
+3140	Gas Station
+3141	Rail Terminal
+3142	Kick scooter
+3143	E-scooter
+3144	Moped
+3145	Sport scooter
+3146	Sport scooter+
+3147	Racing moped
+3148	Racing moped+
+3149	Turbo scooter
+3150	Turbo scooter+
+3151	Electric superbike
+3152	Inspection, Service, Body & Paint — small jobs only
+3153	Electronics · Wagon, SUV, Pickup, Van · suspension, rust, respray
+3154	Engine Shop · Parts Office & Helipad · Sports cars · clutch, timing belt, ECU
+3155	Tuning · Muscle cars · turbo, street kits, ECU stage #
+3156	Supercars · engine & gearbox swaps · widebody · sport kits
+3157	V# swaps · full Race builds
+3158	Car sale price +
+3159	% · Idle income +
+3160	· 🎁 bonus +# Recruit & +# Crew tickets
+3161	Oil change
+3162	Brake pads
+3163	New battery
+3164	New tires
+3165	Suspension
+3166	Clutch
+3167	Polish & wax
+3168	Dent repair
+3169	Rust repair
+3170	Full respray
+3171	New bumper
+3172	Widebody kit
+3173	Bulbs & fuses
+3174	Sensor fault
+3175	Wiring loom
+3176	ECU repair
+3177	Timing belt
+3178	New turbo
+3179	Gearbox swap
+3180	Engine swap
+3181	V# swap
+3182	Street kit
+3183	Lowering + rims
+3184	ECU stage #
+3185	Sport kit
+3186	Neon & livery
+3187	Race build
+3188	Chrome rims
+3189	Window tint
+3190	LED lights
+3191	Sport exhaust
+3192	Two-tone wrap
+3193	Carbon hood
+3194	Flame decals
+3195	Roof scoop
+3196	Air suspension
+3197	Drift kit
+3198	Nitro kit
+3199	Hatchback
+3200	Sedan
+3201	Wagon
+3202	SUV
+3203	Pickup
+3204	Van
+3205	Sports car
+3206	Muscle car
+3207	Supercar
+3208	Coupe
+3209	Convertible
+3210	Minivan
+3211	Limousine
+3212	Hot hatch
+3213	Taxi
+3214	Police car
+3215	Police SUV
+3216	Ambulance
+3217	Fire chief
+3218	VIP Royal Hypercar
+3219	Work pickup
+3220	Idle Essence
+3221	Idle Gear Parts
+3222	Thief catch chance
+3223	Upgrade discount (parts)
+3224	Idle garage parts
+3225	Idle Rewards money
+3226	👑 VIP
+3227	SET (# pieces, your choice)
+3228	Legendary hero
+3229	🔴 Mythic hero of your choice
+3230	Your VIP benefits went up!
+3231	+ 🔴 RED MYTHIC BOX – open it in HEROES → choose any Mythic hero
+3232	SET – you choose the set
+3233	🎁 CHOOSE YOUR SET
+3234	Daily VIP gift now:
+3235	No set box waiting
+3236	Tap a set twice. All # pieces (
+3237	) go to your gear bag.
+3238	Set boxes waiting:
+3239	outline:#px solid #ffd#a
+3240	TAP AGAIN ✓
+3241	set – # pieces in your gear bag!
+3242	(# every dungeon)
+3243	daily gift:
+3244	👑 VIP weekly chest:
+3245	· 🗝 +# in every dungeon
+3246	Sell
+3247	from sales
+3248	Inspect
+3249	Service jobs
+3250	Body & Paint jobs
+3251	Electronics jobs
+3252	Engine Shop jobs
+3253	Tuning jobs
+3254	Upgrade buildings
+3255	Upgrade a building
+3256	Catch a thief
+3257	Repair
+3258	city fleet vehicles
+3259	Load
+3260	cars on the transporter
+3261	Win
+3262	campaign battles
+3263	Clear
+3264	tower floors (any tower)
+3265	Dungeon runs
+3266	Fight
+3267	Arena battles
+3268	Attack the World Boss
+3269	📋 Daily quest done:
+3270	— claim +
+3271	VIP points!
+3272	Qa
+3273	en-US
+3274	em;height:
+3275	em;margin-right:-
+3276	em;background-size:
+3277	em auto;background-position:-
+3278	em #;background-image:url(img/num/
+3279	.webp);vertical-align:
+3280	💵 TIP +
+3281	JOB
+3282	FOUND
+3283	PART
+3284	ORDERED
+3285	🎯 DOUBLE PAY!
+3286	SOLD ONLINE
+3287	👑 THANK YOU!
+3288	🚨 BACK ON DUTY
+3289	🔑 NEW OWNER
+3290	👑 SEE YOU SOON!
+3291	⭐ REPUTATION
+3292	📦 PARTS DELIVERED
+3293	Security car
+3294	K# van
+3295	THIEF
+3296	PRO
+3297	GANG BOSS
+3298	Violet Vex
+3299	Sticky Sam
+3300	Gold Chain Gus
+3301	The Fox
+3302	Hoodie Hank
+3303	Granny Grab
+3304	Big Tony
+3305	Crowbar Carl
+3306	Shadow Kid
+3307	Lockpick Leo
+3308	👑 GANG BOSS!
+3309	🚐 REINFORCEMENTS!
+3310	THIEVES!
+3311	🚨 THIEF!
+3312	⛓ CAUGHT! +
+3313	📋 MOST WANTED:
+3314	🚓 BACKUP!
+3315	🐕 K# UNIT!
+3316	RAID OVER
+3317	RAID STOPPED!
+3318	thieves caught
+3319	· GANG RAID
+3320	· GANG BOSS
+3321	Crew Tickets
+3322	Recruit Tickets
+3323	📋 Most Wanted caught:
+3324	· ALL # – DAILY BONUS!
+3325	💸 Stolen: −
+3326	📋 MOST WANTED – TODAY
+3327	CAUGHT
+3328	Catch all # today →
+3329	DAILY BONUS
+3330	💥 BROKE FREE!
+3331	🚔 POLICE CHASE!
+3332	TAXI
+3333	🚚 The VIP Truck is here with
+3334	rich clients! They get priority.
+3335	👑 RICH CLIENT
+3336	👑 VIP TRUCK · UNLOADING
+3337	SCOOTERS ONLY
+3338	DRIVERS LANE
+3339	🔒 EXPANSION · LV
+3340	VALET
+3341	EXPORT PARKING · FOR SALE
+3342	LV.
+3343	LV
+3344	BUILD ·
+3345	KITS
+3346	🔒 LV
+3347	💼 SALES OFFICE ·
+3348	PICKUP
+3349	PRIVATE · HELIPAD
+3350	PARTS OFFICE
+3351	URGENT ·
+3352	⛓ CAUGHT
+3353	🦹 THIEF
+3354	EMPIRE
+3355	LOADING
+3356	TE
+3357	COMING SOON
+3358	🏁 RACE TRACK
+3359	RACE TRACK
+3360	🏆 TAP TO OPEN
+3361	🔒 REP #
+3362	CLASSIC CAR SHOWROOM
+3363	SECURITY
+3364	🏆 CLASSIC COLLECTION · PREMIUM
+3365	🫧 CAR WASH · ⛽ DIESEL −#% ←
+3366	⬇ WASH & FUEL
+3367	EXIT
+3368	🫧 CAR WASH
+3369	⛽ GAS STATION
+3370	🏭 CAR FACTORY
+3371	🫧 WASH BUSY
+3372	⛽ PUMPS FULL
+3373	YOUR PARTS · tap = weakest building
+3374	: every building that uses them is at MAX (or still locked)
+3375	🏗️ Every building is at MAX level
+3376	📅 Done – you opened the game today. Just CLAIM it!
+3377	⭐ Extra income (LV #+)
+3378	heroes in battle
+3379	💰 Income
+3380	💰 Income now
+3381	(live)
+3382	measuring…
+3383	no direct money
+3384	more cars for every garage
+3385	new jobs
+3386	🏭 NEW CAR
+3387	🫧 WASH
+3388	⛽ DIESEL −#%
+3389	NEXT CAR
+3390	🚆 RAIL TERMINAL
+3391	car on the way ·
+3392	🚆 EXPORT CAR
+3393	TRAIN ·
+3394	READY TO SEND!
+3395	cars · next
+3396	👑 RICH CLIENT · PRIORITY
+3397	🚨 CITY FLEET
+3398	INSPECTING
+3399	⏳ WAITING PARTS
+3400	SELLING...
+3401	FOR SALE
+3402	SOLD
+3403	Bays & mechanics
+3404	Drivers
+3405	Driver scooter
+3406	Work speed
+3407	Job pay bonus
+3408	Customer cars arrive from the highway and wait here. Valet drivers take them to Inspection and ride back on their scooters.
+3409	Parking spots
+3410	Valet drivers
+3411	New car every
+3412	Sales Office
+3413	Agents sell finished cars online. Office drivers take sold cars from Export Parking to the Transport Yard.
+3414	Sales agents
+3415	Sale bonus
+3416	Time per sale
+3417	Car Transporter
+3418	Loads sold cars from the Transport Yard and delivers them to the buyers.
+3419	Cars per trip
+3420	Back in
+3421	Parts Office & Helipad
+3422	Inspection orders the parts a car needs. The helicopter flies them in urgently, and your parts driver takes the work pickup and trailer down the private road to collect them.
+3423	Pickup speed
+3424	Crates per trip
+3425	Helicopter speed
+3426	Export Parking
+3427	Finished cars wait here until the Sales Office sells them online.
+3428	Spots
+3429	Transport Yard
+3430	Sold cars wait behind the barriers until the transporter loads them. A guard watches the CCTV from the security office.
+3431	Guards
+3432	🛡️ Security
+3433	Thieves come for the cars in the Transport Yard and Export Parking – alone, in pairs, with a PRO, a GANG BOSS with his van… and sometimes the whole GANG. Your guards patrol and fight them; BACKUP guards and the K# dog unit come to help. Caught thieves give Builder Kit, Crew Tickets and diamonds. A thief who escapes steals part of your cash – a higher Security level steals less.
+3434	(# patrols)
+3435	Catch chance
+3436	Guard run speed
+3437	Backup guards
+3438	(security car)
+3439	K# dog unit
+3440	Boss + Gang raids
+3441	Gang raids
+3442	Less cash stolen
+3443	Extra CCTV cameras
+3444	🏆 Collection Garage
+3445	COMING SOON. A premium showroom for classic and vintage cars. Because these cars are priceless it has its own fence, CCTV cameras, a guard house, a barrier and a laser gate.
+3446	🫧 Car Wash
+3447	Drivers come from the street for a wash and pay you. Your sold cars also get a free shine before delivery, so they sell for more. LV #-# make the car wash bigger, LV #-# bring more money.
+3448	Customer every
+3449	Pay per wash
+3450	Shine bonus on sold cars
+3451	⛽ Gas Station
+3452	Drivers stop at your pumps to fill up and pay you. Your car transporter fills up for free, so it comes back faster. LV #-# add pumps (# # # #), LV #-# bring more money.
+3453	Fuel pumps
+3454	Car every
+3455	Pay per fill
+3456	Transporter back faster
+3457	🚆 Rail Terminal
+3458	RAIL WARS: every hour the Car Factory sends EXPORT cars – they fuel at the Gas Station, get washed at the Car Wash and go up on your train. A full train is sent from the RAIL WARS page (RAIL WARS button on the right side of the screen): max # a day, # min on the way, other players may attack it. Its GRADE (Common → Mythic) depends on your Car Wash, Gas Station and Car Factory levels; you can refresh it # times. A higher grade brings more Street Tokens for the Street Shop. LV #-# = more cars per train (# # # #).
+3459	Cars per train
+3460	Full train in
+3461	≈ # min
+3462	Best grade chance
+3463	🏭 Car Factory
+3464	Robots build brand-new cars. Every new car leaves through the right gate and is sold straight to a dealer. LV #-# make the factory bigger with more robots, LV #-# build faster and sell for more.
+3465	Price per new car
+3466	Robot arms
+3467	🏁 Race Track
+3468	COMING SOON. Here you will test the cars built by your garage, enter races and win competitions. Unlocks in a later chapter.
+3469	Tank Parts
+3470	Warrior Parts
+3471	Ranger Parts
+3472	Mage Parts
+3473	Support Parts
+3474	sk-
+3475	Forever: a golden car carrier arrives at random times and unloads #-# luxury cars of rich clients (supercars, limousines, the Royal Hypercar). They get PRIORITY in every garage and pay ×#
+3476	VIP Pass · # days
+3477	All your VIP level benefits are ×
+3478	stronger for # days. VIP points still come from Daily Quests – for everyone.
+3479	Battles can run at ×# speed. ×# is free for everyone. Yours forever – every chapter, every stage.
+3480	Forever: EVERY mechanic in every workshop works #% faster and earns #% more money. Works together with your heroes.
+3481	👑 VIP Pass active for # days! All VIP benefits ×
+3482	✨ HD graphics are ON · tap again for STANDARD (less battery)
+3483	✨ HD graphics: the sharpest picture, uses more battery · tap again to turn ON
+3484	⚙️ STANDARD graphics – restarting…
+3485	✨ HD ON – restarting…
+3486	✓ done
+3487	📦 ordered
+3488	🚁 flying in
+3489	🛬 on helipad
+3490	🛻 on the way
+3491	✓ parts in stock
+3492	needs parts
+3493	Driving
+3494	Waiting for a driver
+3495	Waiting for a free workshop
+3496	Waiting for inspection
+3497	In the workshop
+3498	Waiting for parts
+3499	For sale
+3500	Sold – going to the yard
+3501	Waiting for the transporter
+3502	Loading
+3503	👑 Rich client from the VIP Truck – priority in every garage, every job pays ×#
+3504	The inspection found these jobs:
+3505	Not inspected yet. The mechanics will find out what this car needs.
+3506	Value so far
+3507	Car type bonus
+3508	🛒 Shop
+3509	Packs stay forever – every chapter, every stage
+3510	background-image:url(
+3511	background-image:url(img/
+3512	.webp);background-position:
+3513	;background-size:
+3514	🧪 TEST MODE (owner): tapping the price unlocks the pack without payment.
+3515	· PASS ×
+3516	MAX LEVEL –
+3517	Every purchase gives VIP points (# € =
+3518	points) – every pack, pass and fund. Daily Quests give # point each. Every VIP level opens a big chest (diamonds, tickets, a full gear set of your choice…), +# h Idle and +#% on all Idle Rewards.
+3519	VIP Passes make all benefits stronger: Silver ×# · Gold ×# · Platinum ×# – together ×#
+3520	With the VIP Pass all benefits are ×
+3521	VIP Pass
+3522	VIP Pass ·
+3523	· forever
+3524	Silver & Gold: forever (your diamonds come back) · Platinum & Diamond: monthly – all stack.
+3525	All VIP benefits ×
+3526	stronger than without the pass.
+3527	GIFTS
+3528	Every day:
+3529	Every Monday:
+3530	each + 🗝 # in every dungeon
+3531	Reach VIP # with Daily Quests to unlock daily gifts.
+3532	✓ TODAY
+3533	✓ WEEK
+3534	🎁 SET BOX waiting:
+3535	🎁 Quick Idle (# h at once)
+3536	⚡ SWEEP (campaign + Dungeons)
+3537	🎒 Gear bag
+3538	⚔️ Arena fights a day
+3539	🗝 Dungeon keys a day
+3540	World Boss keys a day
+3541	YOUR BENEFITS · VIP
+3542	👑 = with VIP Pass
+3543	🔒 VIP
+3544	ALL VIP LEVELS
+3545	(with VIP Pass)
+3546	Daily gift:
+3547	Quick Idle
+3548	🎒 +# bag
+3549	⚔️ +# Arena
+3550	🗝 +# Dungeon key a day
+3551	Level chest:
+3552	+# World Boss key
+3553	pts (≈
+3554	NEW:
+3555	🧪 TEST MODE (owner): tapping the price activates the VIP Pass without payment.
+3556	📋 DAILY QUESTS
+3557	💰 Income per hour
+3558	measuring… play #-# minutes
+3559	What every building earned in your last # minutes of play, per hour. Tap a building on the map to see how much its next upgrade adds.
+3560	No money yet in this session – your garages are still working on the first cars.
+3561	😴 While you are away (Idle)
+3562	Battles, quests and events give extra money that is not counted here.
+3563	⭐ Reputation
+3564	XP
+3565	MAX –
+3566	Every sold car gives reputation. Bigger jobs give more. Rep #-# bring new workshops, harder repairs and better cars; Rep #-# raise your car prices and idle income. Every level up: Recruit +# & Crew +# tickets.
+3567	⭐ Your Rep bonus now: car sale price +
+3568	% · idle income +
+3569	Rep
+3570	on gd
+3571	Level
+3572	Not built
+3573	JOBS
+3574	needs Parts Office
+3575	👮 Thieves caught
+3576	🚨 Cars stolen
+3577	👑 VIP upgrade discount
+3578	included.
+3579	🚧 Coming soon – nothing to do here yet.
+3580	🔒 Unlocks at Reputation
+3581	. Sell more cars to grow your reputation.
+3582	come from:
+3583	Idle Rewards, campaign stages,
+3584	Torque Tower
+3585	, the Cash Roulette event and packs.
+3586	salvaging gear, Idle Rewards, campaign stages,
+3587	LEVEL
+3588	NOT BUILT
+3589	🔒 REPUTATION
+3590	NEEDED
+3591	BUILD
+3592	Not enough
+3593	BUILT!
+3594	;background:url(
+3595	line-height:
+3596	ui#/
+3597	VIP PTS
+3598	;box-shadow:# #
+3599	TODAY +
+3600	✅ Claimed
+3601	VIP points ·
+3602	🎁 Gift opened:
+3603	🎁 Claim
+3604	daily quests to open this gift
+3605	Mechanics
+3606	MECHANIC
+3607	Recruit skilled Mechanics for your Garage!
+3608	Guard
+3609	GUARD
+3610	Hire tough Guards to stop the car thieves!
+3611	Driver
+3612	DRIVER
+3613	Recruit fast Drivers to move your cars!
+3614	Crew member
+3615	Drivers and Guards in one summon!
+3616	Diamonds ·
+3617	Mia Brush:paint:f
+3618	Kim Tablet:inspect:f
+3619	Gina Gear:engine:f
+3620	Vic Spray:paint:f
+3621	Ivy Volt:elec:f
+3622	Nora Check:inspect:f
+3623	Elena Spark:elec:f
+3624	Lena Wire:elec:f
+3625	Tess Turbo:tuning:f
+3626	Viktor the Surgeon:engine
+3627	Gloria Gloss:paint:f
+3628	Hawk-Eye Hugo:inspect
+3629	Aria Neon:tuning:f
+3630	Nitro Nina:tuning:f
+3631	Grigore Iron Hands:engine
+3632	Mama Rosa:service:f
+3633	Sofia Lightning:elec:f
+3634	Rivet, the Shield Welder:engine
+3635	Kael, the Wrench Blade:tuning
+3636	Spark, the Nail Gunner:inspect:f
+3637	Mira, the Nitro Alchemist:paint:f
+3638	Lena, the Flag Marshal:service:f
+3639	The Torque King:all
+3640	Lady Overdrive:all:f
+3641	Ignis, the Iron Phoenix:all
+3642	Goliath, the Iron Bulwark:all
+3643	Nova, the Starfire Huntress:all:f
+3644	Vega, the Railgun Ace:all
+3645	Chroma, the Paint Tempest:all:f
+3646	Doc Volta, the Pit Medic:all
+3647	Shade, the Ghost Rider:all
+3648	Anvil, the Crash Tester:all
+3649	Barry Badge
+3650	Gus Gate
+3651	Walt Watch
+3652	Fred Flash
+3653	Ned Night
+3654	Carl Cam
+3655	Boris Bolt
+3656	Lou Lock
+3657	Otis Patrol
+3658	Sid Siren
+3659	Sgt. Stone
+3660	Jake Jumper
+3661	Duke Dash
+3662	Eagle Eddie
+3663	Tank Tyson
+3664	Zippy Zack
+3665	Lenny Lane
+3666	Kurt Kick
+3667	Milo Mirror
+3668	Turbo Ted
+3669	Ray Roundabout
+3670	Vince Valet
+3671	Coming soon
+3672	💰 Job income
+3673	⚡ Work speed
+3674	🏃 Guard run speed
+3675	🛵 Driver speed
+3676	🛡️ Thief catch chance
+3677	💰 Thief reward
+3678	💵 Tip chance
+3679	🌟 All workshops
+3680	IV
+3681	Essence ·
+3682	Gear Parts ·
+3683	· Bay
+3684	🖥️ Desk guard
+3685	🚶 Patrol guard
+3686	🅿️ Arrival valet
+3687	💼 Sales Office driver
+3688	work speed
+3689	job income
+3690	% chance to double the job pay
+3691	🔥 Aura: +
+3692	% work speed for the whole workshop
+3693	thief catch chance
+3694	run speed
+3695	thief reward
+3696	% money lost if a car is stolen
+3697	driving & walking speed
+3698	% chance of a tip on every drive
+3699	image/png
+3700	te-rs|
+3701	te-rs#|
+3702	border-color:
+3703	CREW SUMMON
+3704	DRIVERS + GUARDS
+3705	AVAILABLE
+3706	· WISH
+3707	LEGENDARY PITY
+3708	COLLECTION
+3709	· BAG FULL – SALVAGE
+3710	· EQUIP YOUR HEROES
+3711	🔴 Red heroes are COMING SOON
+3712	Tickets
+3713	Summon ×
+3714	. You have
+3715	The missing
+3716	– you have
+3717	Diamonds come from campaign stages (bosses give the most), Daily Quest gifts, new Reputation and VIP levels.
+3718	Use Diamonds?
+3719	You have
+3720	– Summon ×
+3721	Do you agree to pay the missing
+3722	with Diamonds?
+3723	✓ YES, SUMMON ×
+3724	NO, CANCEL
+3725	STOP AUTO
+3726	AUTO SUMMON
+3727	⚡ AUTO SUMMON: no
+3728	Tickets and not enough
+3729	🎒 Gear bag full – SALVAGE first
+3730	Summons
+3731	again and again (×# at the end) with your tickets:
+3732	Use diamonds too?
+3733	(# = # summon · you have
+3734	– tickets are used first
+3735	Tickets only
+3736	It stops when it runs out
+3737	or the bag is full
+3738	, when you tap
+3739	STOP
+3740	, or when you get:
+3741	STOP AT LEGENDARY
+3742	first Legendary or better
+3743	STOP AT MYTHIC
+3744	first Mythic
+3745	USE EVERYTHING
+3746	up to
+3747	summoned ·
+3748	Best:
+3749	· stops at
+3750	the end
+3751	No tickets / diamond limit reached
+3752	No tickets left
+3753	Gear bag full – SALVAGE
+3754	Stopped
+3755	found!
+3756	Stopped by you
+3757	⚡ AUTO SUMMON:
+3758	diamonds used
+3759	Best results below
+3760	Tap to continue
+3761	;--gd:
+3762	SUMMON ×
+3763	NEW!
+3764	COPY
+3765	Summon ×# ·
+3766	Tap outside to close ·
+3767	tickets left
+3768	open best
+3769	🔥 MYTHIC
+3770	💛 LEGENDARY
+3771	★ Your
+3772	are already in the best places
+3773	Puts every
+3774	where he helps most. Nothing changes until you confirm.
+3775	(all places together)
+3776	More
+3777	in total
+3778	empty place
+3779	Back to the bench:
+3780	work outside their speciality (½ bonus)
+3781	✓ Best
+3782	SWAP
+3783	🅿️ Arrival Parking
+3784	💼 Sales Office
+3785	WORKING NOW
+3786	No places yet – build and upgrade buildings to unlock places.
+3787	EMPTY
+3788	tap to add
+3789	ON THE BENCH
+3790	(not working ·
+3791	yet.
+3792	GO TO SUMMON
+3793	Everybody is working. 👍
+3794	▲ BETTER
+3795	no better place
+3796	ℹ️ This page is only for the
+3797	(repairs, security, driving). The
+3798	is chosen in ⚔️ Battle. Before any change you see
+3799	Money
+3800	Your garage (sold cars) · Idle Rewards
+3801	Classic Collection cars · Cash Roulette event spins
+3802	Campaign bosses · Daily Quests · Check-in · Events · Arena · Shop
+3803	# = # summon (you are always asked first) · Silver VIP Pass · name change
+3804	Check-in · Daily Quests · campaign · Idle Rewards · new Reputation / VIP levels
+3805	HERO Summon (mechanics who work AND fight)
+3806	Check-in · Daily Quest gifts · thieves caught · campaign bosses · Idle Rewards
+3807	CREW Summon (drivers and guards for the garage)
+3808	Check-in · campaign · Idle Rewards · events
+3809	GEAR Summon (equipment for battles)
+3810	Idle Rewards · campaign · Torque Tower · Class Towers · Dungeons · events · duplicates of maxed heroes
+3811	Hero LEVEL UP and ASCENSION (HEROES page)
+3812	SALVAGE old gear · campaign · Idle Rewards · towers · Dungeons
+3813	Gear UPGRADE (tap a piece of gear)
+3814	Role Parts (Tank · Warrior · Ranger · Mage · Support) – you have
+3815	SALVAGE gear (set gear = its class) · campaign stages · Idle Rewards · Class Towers (Bruiser Tower → Tank…) · Cash Roulette · packs
+3816	Upgrade the battle garages (LV #-#): Engine = Tank · Tuning = Warrior · Inspection = Ranger · Paint + Electronics = Mage · Service = Support. Every level makes that class stronger in battle.
+3817	Builder Kit – you have
+3818	Idle Rewards · campaign stages · Torque Tower · Cash Roulette · packs
+3819	Upgrade every other building (parking, office, security, transport, car wash, gas station, factory, Parts Office) – LV #-#
+3820	Keys
+3821	World Boss: # a day · Dungeons: # free a day each · Key Roulette · Dungeon Pass
+3822	One key = one World Boss attack / one Dungeon win
+3823	Daily Quests (free for everybody)
+3824	VIP levels: bigger bonuses for your garage, Idle time and more
+3825	GET
+3826	TICKETS
+3827	summon Mechanics. You have
+3828	summon Drivers and Guards (mixed). You have
+3829	Both are earned only by playing.
+3830	Diamonds = # summon
+3831	(always asked first).
+3832	WHERE TO GET TICKETS
+3833	📅 Daily Check-in:
+3834	Daily Quest: +# each · gifts +# / +# / +# / +#
+3835	Daily Quest gifts: +# / +# / +# / +#
+3836	Thief caught: +#
+3837	+# every new Reputation level
+3838	+# every new VIP level
+3839	+# / # h in Idle Rewards (+ more from Classic cars)
+3840	Campaign: +# · mini-boss +# · boss +#
+3841	+# for every campaign boss
+3842	· DRIVERS + GUARDS
+3843	coming soon
+3844	is guaranteed every
+3845	summons (now:
+3846	❤️ Your
+3847	FIRST Mythic
+3848	is guaranteed after
+3849	Hero summons, then a
+3850	(now:
+3851	) – it is the Mythic you chose with
+3852	(no wish = a random Mythic). A Mythic from luck also starts the count again.
+3853	(# = ×#). You are always asked first.
+3854	🔟 Summon ×# gives
+3855	🎖️ Crew summon: first the grade is rolled (rates above), then one hero of that grade – every Driver and every Guard of that grade has the same chance.
+3856	📈 A hero you already own gets
+3857	(up to
+3858	copy goes into
+3859	AWAKENING I → V
+3860	, # copies).
+3861	Already at the max →
+3862	Common–Rare:
+3863	Epic:
+3864	Legendary:
+3865	Mythic:
+3866	Heroes level up (Lv # →
+3867	) with
+3868	, not with duplicates.
+3869	MYTHIC WISH
+3870	Your first Mythic comes after
+3871	Hero summons, then every
+3872	MYTHIC PITY
+3873	gives you a Mythic. Choose
+3874	which one
+3875	– collect copies of your favourite for
+3876	Now:
+3877	· you can change your wish any time.
+3878	WISH ❤
+3879	✕ NO WISH (random Mythic)
+3880	--ac
+3881	POWER UP
+3882	POWER UP · +# SKILL LEVEL
+3883	FULLY AWAKENED · NEW PORTRAIT
+3884	open t
+3885	No summons yet.
+3886	--hg
+3887	not owned
+3888	STATS
+3889	at +
+3890	: duplicate copies wake the hero up –
+3891	(copies # · # · # · # · # = #). Every tier:
+3892	(Awakened V = ×#) · +# skill level from II · a new portrait at V.
+3893	Next tier:
+3894	copies.
+3895	Mythic Pity: you choose the Mythic (WISH on the Summon page).
+3896	Every duplicate summon gives
+3897	(max +
+3898	). Every +# the stars change color (gold → red → purple → rainbow): +#% to everything and +# skill level.
+3899	(max
+3900	). each + =
+3901	of base (a Legendary +# ≈ #× an Epic +#). A Legendary +# is always stronger than an Epic +#
+3902	Each + adds
+3903	of base (+# = ×#). A hero of a
+3904	higher grade at +# is always stronger
+3905	than this grade at +#
+3906	Each + adds stats: +#…+# = +#% of base each, +#…+# = +#% each.
+3907	Levels: HEROES page → LEVEL UP with
+3908	Essence.
+3909	IN BATTLE ·
+3910	(skill) –
+3911	(passive, automatic) –
+3912	🏁 Works only in
+3913	(every workshop has its own class).
+3914	Guards work in the Security office: the desk guard and (Security LV #+) the patrol guard.
+3915	Drivers work for Arrival Parking (valets), every workshop and the Sales Office.
+3916	WORKS AT
+3917	— not assigned —
+3918	MOVE TO ANOTHER PLACE
+3919	ASSIGN
+3920	You had this hero. Summon him again to get him back.
+3921	🎯 Double pay chance
+3922	🔥 Aura (whole workshop)
+3923	🛡️ Thief catch
+3924	🏃 Run speed
+3925	🔒 Less money lost
+3926	🛵 Driving speed
+3927	vs now:
+3928	here:
+3929	★ Already working here
+3930	Bonus in this place
+3931	– specialist for
+3932	. In this workshop only
+3933	of the bonus.
+3934	(that place becomes empty).
+3935	goes back to the bench.
+3936	Where should
+3937	work?
+3938	Tap a place to see the difference before you move him.
+3939	★ here
+3940	No free places yet. Build or upgrade buildings to unlock more.
+3941	Best for this place first. Tap to compare before / after.
+3942	— Remove
+3943	✓ · Lv
+3944	★ works here
+3945	No
+3946	mechanics for this workshop yet · every workshop takes only its own class (Legend = all).
+3947	. Best for this place first. Tap to compare before / after.
+3948	· ½ bonus here
+3949	❤️ WISH:
+3950	WISH cleared – the Mythic pity gives a random Mythic
+3951	now works at
+3952	Removed
+3953	Use # different
+3954	Legendary +
+3955	# random Mythic
+3956	. The # are used up with their stars (they stay in your album). Already own the Mythic? He gets +# ★.
+3957	FUSE (
+3958	YOUR LEGENDARY +
+3959	None yet · summon Legendary
+3960	and get each one to +
+3961	🧪 Fusion is closed · Mythic heroes come from Summon (
+3962	%) · level up your heroes here
+3963	❓ New heroes are COMING SOON
+3964	🧪 Pick # different Legendary +
+3965	from the list below
+3966	🧪 FUSION · MYTHIC
+3967	🎁 No Quick Idle left today – more with a higher VIP level
+3968	👑 Quick Idle opens at VIP # (Daily Quests give VIP points)
+3969	🎁 Quick Idle (# h): +
+3970	left today
+3971	FULL
+3972	Classic cars
+3973	(tickets above include them)
+3974	· 🔧 Garage parts
+3975	🎁 QUICK IDLE #h ·
+3976	Money per hour grows with your
+3977	Reputation
+3978	, your
+3979	building levels
+3980	and your
+3981	👑 VIP level
+3982	· VIP
+3983	(Pass ×
+3984	🧰 The chest is still empty – come back later
+3985	✦ ASCENDED
+3986	🧰 IDLE REWARDS
+3987	👥 TEAM
+3988	CHANGE
+3989	+ ADD
+3990	wrong class · no bonus
+3991	💵 tips
+3992	NEWS
+3993	🔓 NEW:
+3994	unlocked!
+3995	Mythic heroes
+3996	✦ Ascended gear set ×
+3997	Nov # #
+3998	Mythic squad from Torque Studios
+3999	All # Mythic heroes join your team at level # each with a full Ascended gear set for their battle role. Level them up with Essence!
+4000	#f#fb
+4001	A gift from Torque Studios
+4002	Thank you for playing Torque Empire, Yakhouba! Here are # Diamonds for your hero summons. Good luck!
+4003	Thank you for testing Torque Empire, Alex! Here are # Diamonds for your hero summons. Good luck!
+4004	Thank you for testing Torque Empire and for all your reports, Wazza! Here are # Diamonds for your hero summons. Good luck!
+4005	#d#eb#a#
+4006	Thank you for playing Torque Empire! Here are # Diamonds for your hero summons. Good luck!
+4007	Sorry for the lost cars!
+4008	A bug made your Collection Garage cars disappear after restarting the game. It is fixed now – your cars stay from now on. As a thank-you for reporting it, here is a special gift from Torque Studios.
+4009	Diamonds are here!
+4010	Diamonds are new in Torque Empire! Use them to summon when you run out of tickets (# Diamonds = # summon – we always ask before using them). Here are some to start with.
+4011	Thank you, tester!
+4012	Thank you for helping us test Torque Empire before the launch. Here is a small gift for your garage. Have fun – and keep the reports coming!
+4013	New: Daily Check-in
+4014	Tap the calendar at the top right every day. Seven days of rewards, with a big chest on day # A missed day does not reset your progress.
+4015	Need help?
+4016	Found a bug, a problem with a purchase or have an idea? Tap
+4017	below (or tap
+4018	your avatar
+4019	top left →
+4020	) – we read every message and answer in your MAIL.
+4021	# FREE SUMMONS
+4022	ALL # TICKETS COLLECTED!
+4023	DAY
+4024	· LOG IN EVERY DAY
+4025	RECRUIT
+4026	TICKET
+4027	" id="ciGo"
+4028	ALL COLLECTED
+4029	COME BACK TOMORROW
+4030	Every day: # Recruit + # Crew + # Gear tickets. Fixed rewards – nothing random. Missing a day never resets your progress: you simply continue the next day.
+4031	📅 Day
+4032	LATEST UPDATES
+4033	MESSAGES FROM TORQUE STUDIOS
+4034	From: Torque Studios ·
+4035	✓ Gift claimed
+4036	🎁 Gift:
+4037	🎁 CLAIM GIFT
+4038	added!
+4039	Torque Studios ·
+4040	TAP TO PLAY
+4041	Loading...
+4042	· extra hero stars → diamonds (new AWAKENING / Legendary +#)
+4043	🧪 Fusion is closed · Mythic heroes now come from Summon
+4044	NEW VERSION
+4045	Downloading the update…
+4046	Your progress is safe
+4047	Update installed – starting…
+4048	🔄 New update ready
+4049	Tap OK to restart and get it. Your progress is saved.
+4050	LATER
+4051	?tacc=#
+4052	🧪 TEST ACCOUNT · hidden from rankings
+4053	🎯 TRAINING
+4054	Torque Empire
+4055	REP #
+4056	CHECK-IN
+4057	WHO WORKS IN THE GARAGE · not the battle team
+4058	My profile
+4059	Change name
+4060	HD graphics
+4061	Battle
+4062	Heroes
+4063	Summon
+4064	Idle
+4065	Quests
+4066	Rail Wars

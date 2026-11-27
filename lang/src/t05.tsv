@@ -1,0 +1,335 @@
+1501	COFFRE-FORT	BÓVEDA	COFRE
+1502	ARGENT	DINERO	DINHEIRO
+1503	Beaucoup d'argent – pour les bâtiments, l'équipement et les voitures de collection.	Mucho dinero – para edificios, mejoras de equipamiento y coches clásicos.	Muito dinheiro – para prédios, melhorias de equipamento e carros clássicos.
+1504	MINE DE FERRAILLE	MINA DE CHATARRA	MINA DE SUCATA
+1505	Une pièce d'équipement à chaque victoire. L'emplacement change dans un ordre fixe (Outil → Casque → … ). Plus profond = grade plus haut.	Una pieza de equipamiento por victoria. La ranura cambia en orden fijo (Herramienta → Casco → … ). Más profundo = grado más alto.	Uma peça de equipamento por vitória. O espaço muda numa ordem fixa (Ferramenta → Capacete → … ). Mais fundo = grau mais alto.
+1506	FORGE D'ÉQUIPEMENT	FORJA DE EQUIPAMIENTO	FORJA DE EQUIPAMENTO
+1507	PIÈCES DE SET	PIEZAS DE SET	PEÇAS DE CONJUNTO
+1508	Une pièce de SET à chaque victoire. Classe et emplacement changent dans un ordre fixe. Plus profond = grade plus haut.	Una pieza de SET por victoria. Clase y ranura cambian en orden fijo. Más profundo = grado más alto.	Uma peça de CONJUNTO por vitória. Classe e espaço mudam numa ordem fixa. Mais fundo = grau mais alto.
+1509	LABO NITRO	LAB NITRO	LAB NITRO
+1510	BOOST NITRO	BOOST NITRO	BOOST NITRO
+1511	BOOST NITRO : +PV & +attaque pendant	BOOST NITRO: +PV y +ataque durante	BOOST NITRO: +PV e +ataque por
+1512	heures en Campagne, Torque Tower et Tours de Classe (pas en Arène, Coupe, Boss mondial).	horas en Campaña, Torque Tower y Torres de Clase (no Arena, Copa, Jefe mundial).	horas na Campanha, Torque Tower e Torres de Classe (não na Arena, Copa, Chefe mundial).
+1513	· ÉTAGE	· PISO	· ANDAR
+1514	SAC PLEIN	BOLSA LLENA	BOLSA CHEIA
+1515	· sac plein →	· bolsa llena →	· bolsa cheia →
+1517	% pendant	% durante	% por
+1518	🔑 Plus de clés pour	🔑 No quedan llaves para	🔑 Sem chaves para
+1519	· nouvelles clés à minuit	· llaves nuevas a medianoche	· chaves novas à meia-noite
+1520	· PASS DONJON : +	· PASE MAZMORRA: +	· PASSE MASMORRA: +
+1521	clés par jour	llaves al día	chaves por dia
+1523	DONJONS	MAZMORRAS	MASMORRAS
+1524	PASS DONJON	PASE MAZMORRA	PASSE MASMORRA
+1525	ACTIF	ACTIVO	ATIVO
+1526	jours restants ·	días restantes ·	dias restantes ·
+1527	clés par jour + BALAYAGE	llaves al día + BARRIDO	chaves por dia + VARREDURA
+1528	Gratuit :	Gratis:	Grátis:
+1529	par jour et par donjon · utilisée seulement si tu gagnes	al día por mazmorra · solo se usa si ganas	por dia por masmorra · usada só quando você vence
+1531	Nouvelles clés dans	Llaves nuevas en	Chaves novas em
+1532	· récompenses fixes	· recompensas fijas	· recompensas fixas
+1533	CLÉS · nouvelles dans	LLAVES · nuevas en	CHAVES · novas em
+1534	BONUS	BONUS	BÔNUS
+1535	MEILLEUR	MEJOR	MELHOR
+1536	BOOST NITRO : off	BOOST NITRO: no	BOOST NITRO: desligado
+1537	SUIVANT :	SIGUIENTE:	PRÓXIMO:
+1538	· BALAYAGE : PASS DONJON ou VIP #	· BARRIDO: PASE MAZMORRA o VIP #	· VARREDURA: PASSE MASMORRA ou VIP #
+1539	# donjons ·	# mazmorras ·	# masmorras ·
+1540	chacun · un boss tous les # étages.	cada una · un jefe cada # pisos.	cada · um chefe a cada # andares.
+1541	clés gratuites	llaves gratis	chaves grátis
+1542	par jour dans CHAQUE donjon. Une clé est utilisée	al día en CADA mazmorra. Una llave se usa	por dia em CADA masmorra. Uma chave é usada
+1543	seulement si tu gagnes	solo si ganas	só quando você vence
+1544	Les clés non utilisées	Las llaves que no uses	As chaves que você não usar
+1545	– elles s'accumulent jour après jour (aussi les clés des packs et de la Roulette à clés).	– se acumulan día tras día (también las de packs y la Ruleta de llaves).	– se acumulam dia após dia (também as dos pacotes e da Roleta de chaves).
+1546	Gagne un étage pour ouvrir le suivant. Tu peux rejouer tout étage atteint.	Gana un piso para abrir el siguiente. Puedes repetir cualquier piso alcanzado.	Vença um andar para abrir o próximo. Você pode repetir qualquer andar alcançado.
+1547	Étages	Pisos	Andares
+1548	sont bien plus durs – et paient bien plus :	son mucho más difíciles – y pagan mucho más:	são muito mais difíceis – e pagam muito mais:
+1549	équipement dès l'étage # NITRO jusqu'à +#%, plus d'Essence et de Pièces d'équipement,	equipamiento desde el piso # NITRO hasta +#%, más Esencia y Piezas de equipamiento,	equipamento a partir do andar # NITRO até +#%, mais Essência e Peças de equipamento,
+1550	argent, Essence et Pièces d'équipement aux étages de boss # # … #	dinero, Esencia y Piezas de equipamiento en pisos de jefe # # … #	dinheiro, Essência e Peças de equipamento nos andares de chefe # # … #
+1551	: très dur, les derniers étages sont pour le futur · récompenses comme l'étage #	: muy difícil, los últimos pisos son para el futuro · recompensas como el piso #	: muito difícil, os últimos andares são para o futuro · recompensas como o andar #
+1552	équipement tous les # étages.	equipamiento cada # pisos.	equipamento a cada # andares.
+1553	Les récompenses sont	Las recompensas son	As recompensas são
+1554	– rien d'aléatoire. Les donjons ne donnent jamais de diamants ni de tickets.	– nada aleatorio. Las mazmorras nunca dan diamantes ni tickets.	– nada aleatório. As masmorras nunca dão diamantes nem tickets.
+1555	Étage	Piso	Andar
+1556	PASS DONJON ·	PASE MAZMORRA ·	PASSE MASMORRA ·
+1557	JOURS	DÍAS	DIAS
+1558	clés par jour dans chaque donjon (	llaves al día en cada mazmorra (	chaves por dia em cada masmorra (
+1559	au lieu de	en vez de	em vez de
+1560	BALAYAGE : termine un étage déjà gagné en une touche.	BARRIDO: completa un piso ya superado con un toque.	VARREDURA: conclua um andar já vencido com um toque.
+1561	Pas de renouvellement automatique.	Sin renovación automática.	Sem renovação automática.
+1562	Récompenses fixes seulement · pas de diamants, pas de tickets.	Solo recompensas fijas · sin diamantes, sin tickets.	Só recompensas fixas · sem diamantes, sem tickets.
+1563	· pas de renouvellement automatique	· sin renovación automática	· sem renovação automática
+1564	par jour dans chaque donjon	al día en cada mazmorra	por dia em cada masmorra
+1565	· étages gagnés en une touche	· pisos superados con un toque	· andares vencidos com um toque
+1566	ACTIF ·	ACTIVO ·	ATIVO ·
+1567	JOURS RESTANTS	DÍAS RESTANTES	DIAS RESTANTES
+1568	· ACHETER	· COMPRAR	· COMPRAR
+1569	🔑 PASS DONJON actif pour	🔑 PASE MAZMORRA activo por	🔑 PASSE MASMORRA ativo por
+1570	jours ! +	¡días! +	dias! +
+1571	Gagne d'abord l'étage # – le BALAYAGE répète les étages déjà gagnés	Gana primero el piso # – el BARRIDO repite pisos ya superados	Vença primeiro o andar # – a VARREDURA repete andares já vencidos
+1572	⏩ BALAYAGE	⏩ BARRIDO	⏩ VARREDURA
+1573	TOUS LES ÉTAGES TERMINÉS !	¡TODOS LOS PISOS SUPERADOS!	TODOS OS ANDARES CONCLUÍDOS!
+1574	CLÉS RESTANTES AUJOURD'HUI :	LLAVES RESTANTES HOY:	CHAVES RESTANTES HOJE:
+1575	ENCORE	OTRA VEZ	DE NOVO
+1576	Meilleur : étage	Mejor: piso	Melhor: andar
+1577	AUCUNE CLÉ UTILISÉE – touche un choix pour devenir plus fort	NO SE USÓ LLAVE – toca una opción para hacerte más fuerte	NENHUMA CHAVE USADA – toque numa opção para ficar mais forte
+1578	La Mine de ferraille + la Forge donnent de l'équipement	Mina de chatarra + Forja dan equipamiento	Mina de sucata + Forja dão equipamento
+1579	ou essaie un étage plus facile	o prueba un piso más fácil	ou tente um andar mais fácil
+1580	🔒 Gagne l'étage	🔒 Gana el piso	🔒 Vença o andar
+1581	LA VILLE EST ATTAQUÉE !	¡LA CIUDAD ESTÁ BAJO ATAQUE!	A CIDADE ESTÁ SOB ATAQUE!
+1582	FIN	FIN	FIM
+1583	🎯 SALLE D'ENTRAÎNEMENT	🎯 SALA DE ENTRENAMIENTO	🎯 SALA DE TREINO
+1584	compte de test uniquement · sans récompenses · sans progression	solo cuenta de prueba · sin recompensas · sin progreso	só conta de teste · sem recompensas · sem progresso
+1587	LÉGENDAIRE	LEGENDARIO	LENDÁRIO
+1588	ENNEMI :	ENEMIGO:	INIMIGO:
+1589	· BOSS	· JEFE	· CHEFE
+1590	✖ FERMER	✖ CERRAR	✖ FECHAR
+1591	⚔ COMBATTRE	⚔ LUCHAR	⚔ LUTAR
+1592	Max # héros – touche-en un pour le retirer	Máx # héroes – toca uno para quitarlo	Máx # heróis – toque num para removê-lo
+1593	ENTRAÎNEMENT ·	ENTRENAMIENTO ·	TREINO ·
+1594	COMBATTRE	LUCHAR	LUTAR
+1595	Moteur	Motor	Motor
+1596	Tuning	Tuning	Tuning
+1597	Inspection	Inspección	Inspeção
+1598	Entretien	Servicio	Revisão
+1599	Carrosserie & Peinture	Chapa y Pintura	Funilaria e Pintura
+1600	Électronique	Electrónica	Elétrica
+1647	COLLECTION CLASSIQUE	COLECCIÓN CLÁSICA	COLEÇÃO CLÁSSICA
+1648	MON GARAGE	MI GARAJE	MINHA GARAGEM
+1649	CONCESSIONNAIRE	CONCESIONARIO	REVENDA
+1650	COMMUN	COMÚN	COMUM
+1651	PEU COMMUN	POCO COMÚN	INCOMUM
+1652	RARE	RARO	RARO
+1653	ÉPIQUE	ÉPICO	ÉPICO
+1654	TRANSCENDÉ	ASCENDIDO	ASCENDIDO
+1655	# toutes les	# cada	# a cada
+1657	Ouvre ton Garage de Collection	Abre tu Garaje de Colección	Abra sua Garagem de Coleção
+1658	Achète des voitures classiques chez le concessionnaire et gare-les dans ton salon privé. Chaque voiture garée rapporte	Compra coches clásicos al concesionario y apárcalos en tu salón privado. Cada coche aparcado da	Compre carros clássicos na revenda e estacione no seu salão privado. Cada carro estacionado rende
+1659	pendant ton absence (récupère-les avec	mientras no estás (recógelos con	enquanto você está fora (colete com
+1660	IDLE	IDLE	IDLE
+1661	OUVRIR ·	ABRIR ·	ABRIR ·
+1662	🔒 RÉP	🔒 REP	🔒 REP
+1663	TA COLLECTION ·	TU COLECCIÓN ·	SUA COLEÇÃO ·
+1664	VOITURES	COCHES	CARROS
+1665	⚔️ Tous les héros en combat :	⚔️ Todos los héroes en combate:	⚔️ Todos os heróis em batalha:
+1666	Achète une voiture pour avoir diamants, Essence, Pièces d'équipement et tickets	Compra un coche para conseguir diamantes, Esencia, Piezas y tickets	Compre um carro para ganhar diamantes, Essência, Peças e tickets
+1667	Argent idle +	Dinero idle +	Dinheiro idle +
+1668	% (#% par voiture) · tes # voitures les plus chères sont visibles au garage sur la carte	% (#% por coche) · tus # coches más caros se ven en el garaje del mapa	% (#% por carro) · seus # carros mais caros aparecem na garagem do mapa
+1669	ACHÈTE PLUS DE VOITURES	COMPRA MÁS COCHES	COMPRE MAIS CARROS
+1670	Chaque voiture peut être possédée	Cada coche se puede tener	Cada carro pode ser comprado
+1671	et compte pour toujours – pas de limite de places. Récompenses fixes – rien d'aléatoire.	y cuenta para siempre – sin límite de plazas. Recompensas fijas – nada aleatorio.	e conta para sempre – sem limite de vagas. Recompensas fixas – nada aleatório.
+1672	✓ POSSÉDÉE	✓ TUYO	✓ SEU
+1673	TANT QUE TU LA POSSÈDES	MIENTRAS LO TENGAS	ENQUANTO FOR SEU
+1674	+#% d'argent idle · compte pour toujours	+#% dinero idle · cuenta para siempre	+#% dinheiro idle · conta para sempre
+1675	VENDRE ·	VENDER ·	VENDER ·
+1676	· 🔒 RÉP	· 🔒 REP	· 🔒 REP
+1677	🔒 Le Garage de Collection s'ouvre à RÉP	🔒 El Garaje de Colección se abre en REP	🔒 A Garagem de Coleção abre no REP
+1678	Pas assez d'argent	No hay suficiente dinero	Dinheiro insuficiente
+1679	🏆 Garage de Collection OUVERT ! Achète ta première voiture classique chez le concessionnaire.	🏆 ¡Garaje de Colección ABIERTO! Compra tu primer coche clásico en el concesionario.	🏆 Garagem de Coleção ABERTA! Compre seu primeiro carro clássico na revenda.
+1680	🅿️ Place	🅿️ Plaza	🅿️ Vaga
+1681	voiture :	coche:	carro:
+1682	achat :	compra:	compra:
+1683	il faut RÉP	requiere REP	requer REP
+1684	rejoint ta collection ! Tous les héros +	¡se une a tu colección! Todos los héroes +	entra na sua coleção! Todos os heróis +
+1685	vente :	venta:	venda:
+1686	TOUCHE ENCORE POUR VENDRE	TOCA OTRA VEZ PARA VENDER	TOQUE DE NOVO PARA VENDER
+1687	💰 Vendue pour	💰 Vendido por	💰 Vendido por
+1693	Ta partie a été sauvegardée sur un autre téléphone après celui-ci.	Tu partida se guardó en otro teléfono después de este.	Seu jogo foi salvo em outro celular depois deste.
+1694	voitures vendues	coches vendidos	carros vendidos
+1695	🏗️ bâtiments NIV	🏗️ edificios NV	🏗️ prédios NV
+1696	⚔️ étape	⚔️ fase	⚔️ fase
+1698	GARDER CELLE-CI	QUEDARME ESTA	FICAR COM ESTE
+1699	UTILISER LE CLOUD	USAR LA NUBE	USAR A NUVEM
+1700	☁️ Quelle partie gardes-tu ?	☁️ ¿Qué partida te quedas?	☁️ Qual jogo você quer manter?
+1701	Une partie est déjà sauvegardée dans ton compte Google.	Ya hay una partida guardada en tu cuenta de Google.	Já existe um jogo salvo na sua conta Google.
+1702	L'autre sera remplacée.	La otra se reemplazará.	O outro será substituído.
+1703	📱 Ce téléphone	📱 Este teléfono	📱 Este celular
+1704	☁️ Cloud Google	☁️ Nube de Google	☁️ Nuvem Google
+1705	⚠️ Impossible de télécharger la sauvegarde cloud. Réessaie plus tard.	⚠️ No se pudo descargar la partida de la nube. Inténtalo más tarde.	⚠️ Não foi possível baixar o save da nuvem. Tente mais tarde.
+1706	☁️ La partie de ce téléphone est maintenant sauvegardée dans ton compte Google	☁️ La partida de este teléfono ya está guardada en tu cuenta de Google	☁️ O jogo deste celular agora está salvo na sua conta Google
+1707	⚠️ Pas d'internet – réessaie.	⚠️ Sin internet – inténtalo de nuevo.	⚠️ Sem internet – tente de novo.
+1708	⚠️ Échec de la connexion Google. Réessaie.	⚠️ Falló el inicio de sesión con Google. Inténtalo de nuevo.	⚠️ Falha no login do Google. Tente de novo.
+1709	✓ Connecté avec Google	✓ Sesión iniciada con Google	✓ Conectado com Google
+1710	Continuer avec Google	Continuar con Google	Continuar com Google
+1711	Facultatif · garde ta partie en sécurité sur un nouveau téléphone	Opcional · protege tu partida en un teléfono nuevo	Opcional · mantém seu jogo seguro num celular novo
+1712	📲 TRANSFERT DEPUIS L'ANCIENNE VERSION	📲 TRANSFERIR DESDE LA VERSIÓN ANTIGUA	📲 TRANSFERIR DA VERSÃO ANTIGA
+1713	✓ Compte Google · ☁️ Sauvegarde cloud ACTIVE	✓ Cuenta de Google · ☁️ Guardado en la nube ACTIVO	✓ Conta Google · ☁️ Save na nuvem LIGADO
+1714	Dernière sauvegarde :	Último guardado:	Último save:
+1715	SERVEUR	SERVIDOR	SERVIDOR
+1716	● EN LIGNE	● EN LÍNEA	● ONLINE
+1717	🌍 Choisis un serveur	🌍 Elige un servidor	🌍 Escolha um servidor
+1719	TA PARTIE	TU PARTIDA	SEU JOGO
+1720	🔒 BIENTÔT	🔒 PRÓXIMAMENTE	🔒 EM BREVE
+1721	Chaque serveur est une partie séparée. De nouveaux serveurs ouvrent quand plus de joueurs arrivent.	Cada servidor es una partida aparte. Se abren servidores nuevos cuando llegan más jugadores.	Cada servidor é um jogo separado. Novos servidores abrem quando mais jogadores entram.
+1722	Connexion Google	Inicio de sesión con Google	Login do Google
+1724	📲 Ancienne version	📲 Versión antigua	📲 Versão antiga
+1725	Tu as joué avant dans l'ancienne version (Chrome) sur ce téléphone ? Récupère ta progression ici.	¿Jugaste antes en la versión antigua (Chrome) en este teléfono? Trae tu progreso aquí.	Jogou antes na versão antiga (Chrome) neste celular? Traga seu progresso para cá.
+1726	TRANSFÉRER MA PROGRESSION	TRANSFERIR MI PROGRESO	TRANSFERIR MEU PROGRESSO
+1727	☁️ Sauvegarde cloud	☁️ Guardado en la nube	☁️ Save na nuvem
+1728	Connecte-toi avec Google pour garder ta progression en sécurité et jouer sur un autre téléphone. On garde seulement ta partie – pas ton e-mail ni ton nom.	Inicia sesión con Google para proteger tu progreso y jugar en otro teléfono. Solo guardamos tu partida – no tu e-mail ni tu nombre.	Entre com o Google para manter seu progresso seguro e jogar em outro celular. Só guardamos seu jogo – não seu e-mail nem seu nome.
+1729	☁️ Sauvegarde cloud : ACTIVE	☁️ Guardado en la nube: ACTIVO	☁️ Save na nuvem: LIGADO
+1731	· sauvegarde toute seule toutes les quelques minutes	· se guarda solo cada pocos minutos	· salva sozinho a cada poucos minutos
+1732	SUPPRIMER	BORRAR	EXCLUIR
+1733	SUPPRIMER efface ta sauvegarde cloud et le lien Google de notre serveur. La partie sur ce téléphone reste.	BORRAR elimina tu guardado en la nube y el vínculo de Google de nuestro servidor. La partida de este teléfono se queda.	EXCLUIR apaga seu save na nuvem e o vínculo Google do nosso servidor. O jogo neste celular continua.
+1734	☁️ Sauvegardé	☁️ Guardado	☁️ Salvo
+1735	Déconnecté. Ta partie reste sur ce téléphone.	Sesión cerrada. Tu partida se queda en este teléfono.	Desconectado. Seu jogo continua neste celular.
+1736	🗑️ Sauvegarde cloud et lien Google supprimés	🗑️ Guardado en la nube y vínculo de Google borrados	🗑️ Save na nuvem e vínculo Google excluídos
+1737	⚠️ Suppression impossible – vérifie internet.	⚠️ No se pudo borrar – revisa internet.	⚠️ Não foi possível excluir – verifique a internet.
+1738	Ton compte Google a une partie plus récente d'un autre téléphone.	Tu cuenta de Google tiene una partida más reciente de otro teléfono.	Sua conta Google tem um jogo mais recente de outro celular.
+1739	FESTIVAL D'INVOCATION	FESTIVAL DE INVOCACIÓN	FESTIVAL DE INVOCAÇÃO
+1740	Invoque des Mécaniciens (tickets Recrue ou diamants). Chaque invocation compte.	Invoca Mecánicos (tickets de Recluta o diamantes). Cada invocación cuenta.	Invoque Mecânicos (tickets de Recruta ou diamantes). Cada invocação conta.
+1741	FORGE D'INVOCATION	FORJA DE INVOCACIÓN	FORJA DE INVOCAÇÃO
+1742	Invoque de l'équipement (tickets d'Équipement ou diamants). Chaque pièce compte.	Invoca equipamiento (tickets de Equipamiento o diamantes). Cada pieza cuenta.	Invoque equipamento (tickets de Equipamento ou diamantes). Cada peça conta.
+1743	RALLYE D'ÉQUIPAGE	RALLY DE CUADRILLA	RALI DA TRIPULAÇÃO
+1744	Invoque Chauffeurs + Gardes (tickets d'Équipage ou diamants). Chaque invocation compte.	Invoca Conductores + Guardias (tickets de Cuadrilla o diamantes). Cada invocación cuenta.	Invoque Motoristas + Guardas (tickets de Tripulação ou diamantes). Cada invocação conta.
+1745	RUÉE D'ESSENCE	FIEBRE DE ESENCIA	CORRIDA DE ESSÊNCIA
+1746	Dépense l'Essence en NIVEAU et ASCENSION des héros. Chaque Essence dépensée compte.	Gasta Esencia en SUBIR NIVEL y ASCENSIÓN de héroes. Cada Esencia gastada cuenta.	Gaste Essência em SUBIR NÍVEL e ASCENSÃO dos heróis. Cada Essência gasta conta.
+1747	FRÉNÉSIE DE DIAMANTS	DERROCHE DE DIAMANTES	FARRA DE DIAMANTES
+1748	Dépense des diamants partout (invocations, changement de nom …). Chaque diamant dépensé compte.	Gasta diamantes donde sea (invocaciones, cambio de nombre …). Cada diamante gastado cuenta.	Gaste diamantes em qualquer lugar (invocações, troca de nome …). Cada diamante gasto conta.
+1749	ROULETTE À CLÉS	RULETA DE LLAVES	ROLETA DE CHAVES
+1750	Tourne la roulette – elle donne UNIQUEMENT des clés de Donjon. Les clés gagnées sont des clés BONUS : elles s'accumulent, n'expirent jamais et t'attendent (les clés du jour sont utilisées d'abord). Les tours gratuits viennent seulement des quêtes ci-dessous (pas d'achat). CLASSEMENT = le plus de clés GAGNÉES (égalité : le premier arrivé).	Gira la ruleta – SOLO da llaves de Mazmorra. Las llaves ganadas son BONUS: se acumulan, nunca caducan y te esperan (las diarias se usan primero). Los giros gratis solo vienen de las misiones de abajo (sin compras). CLASIFICACIÓN = más llaves GANADAS (empate: quien llegó primero).	Gire a roleta – ela dá SÓ chaves de Masmorra. Chaves ganhas são BÔNUS: acumulam, nunca expiram e esperam por você (as diárias são usadas primeiro). Giros grátis vêm só das missões abaixo (sem compras). RANKING = mais chaves GANHAS (empate: quem chegou primeiro).
+1751	RUÉE DES DONJONS	FIEBRE DE MAZMORRAS	CORRIDA DAS MASMORRAS
+1752	Utilise des clés de Donjon (victoire ou BALAYAGE). Chaque clé utilisée compte – tes clés bonus aussi !	Usa llaves de Mazmorra (victoria o BARRIDO). Cada llave usada cuenta – ¡también tus llaves bonus!	Use chaves de Masmorra (vitória ou VARREDURA). Cada chave usada conta – suas chaves bônus também!
+1753	clés utilisées	llaves usadas	chaves usadas
+1754	ROULETTE CASH	RULETA DE DINERO	ROLETA DE DINHEIRO
+1755	Dépense l'ARGENT de ton garage en tours – gagne des PIÈCES d'amélioration de garage et des clés de Donjon. Pas de quêtes : chaque tour coûte plus que le précédent, max # tours par événement.	Gasta el DINERO de tu taller en giros – gana PIEZAS de mejora del taller y llaves de Mazmorra. Sin misiones: cada giro cuesta más que el anterior, máx # giros por evento.	Gaste o DINHEIRO da oficina em giros – ganhe PEÇAS de melhoria da oficina e chaves de Masmorra. Sem missões: cada giro custa mais que o anterior, máx # giros por evento.
+1756	ROUE DE LA CHANCE	RUEDA DE LA SUERTE	RODA DA SORTE
+1757	Tourne la roue – elle donne UNIQUEMENT des diamants. Les tours gratuits viennent des quêtes ci-dessous (pas d'achat). CLASSEMENT = le plus de diamants GAGNÉS (égalité : le premier arrivé).	Gira la rueda – SOLO da diamantes. Los giros gratis vienen de las misiones de abajo (sin compras). CLASIFICACIÓN = más diamantes GANADOS (empate: quien llegó primero).	Gire a roda – ela dá SÓ diamantes. Giros grátis vêm das missões abaixo (sem compras). RANKING = mais diamantes GANHOS (empate: quem chegou primeiro).
+1758	Ouvre le jeu aujourd'hui	Abre el juego hoy	Abra o jogo hoje
+1759	Gagne # combats en campagne	Gana # combates en la campaña	Vença # batalhas na campanha
+1760	Utilise # clés de Donjon	Usa # llaves de Mazmorra	Use # chaves de Masmorra
+1761	Invoque # fois (héros, équipage ou équipement)	Invoca # veces (héroes, cuadrilla o equipamiento)	Invoque # vezes (heróis, tripulação ou equipamento)
+1762	Récupère les Gains Idle # fois	Recoge las Recompensas Idle # veces	Colete as Recompensas Idle # vezes
+1763	Coffre	Bóveda	Cofre
+1764	Mine de ferraille	Mina de chatarra	Mina de sucata
+1765	Forge	Forja	Forja
+1766	Labo	Lab	Lab
+1767	Monte le niveau des héros # fois	Sube de nivel a héroes # veces	Suba o nível dos heróis # vezes
+1768	💰 Max	💰 Máx	💰 Máx
+1769	tours dans cet événement	giros en este evento	giros neste evento
+1770	Pas assez d'argent (	No hay suficiente dinero (	Dinheiro insuficiente (
+1771	🔑 ROULETTE À CLÉS :	🔑 RULETA DE LLAVES:	🔑 ROLETA DE CHAVES:
+1772	dans CHAQUE donjon	en CADA mazmorra	em CADA masmorra
+1773	! (clés bonus, elles s'accumulent)	! (llaves bonus, se acumulan)	! (chaves bônus, acumulam)
+1774	🎡 ROUE DE LA CHANCE :	🎡 RUEDA DE LA SUERTE:	🎡 RODA DA SORTE:
+1775	🔑 +# clé dans CHAQUE donjon	🔑 +# llave en CADA mazmorra	🔑 +# chave em CADA masmorra
+1776	JACKPOT !	¡PREMIO GORDO!	JACKPOT!
+1777	de chaque pièce +	de cada pieza +	de cada peça +
+1778	💰 ROULETTE CASH :	💰 RULETA DE DINERO:	💰 ROLETA DE DINHEIRO:
+1779	JACKPOT	PREMIO GORDO	JACKPOT
+1780	ÉVÉNEMENTS	EVENTOS	EVENTOS
+1781	tour gratuit	giro gratis	giro grátis
+1783	⏳ fin dans	⏳ termina en	⏳ termina em
+1784	Chargement du classement…	Cargando clasificación…	Carregando ranking…
+1785	CLÉS GAGNÉES	LLAVES GANADAS	CHAVES GANHAS
+1786	DIAMANTS GAGNÉS	DIAMANTES GANADOS	DIAMANTES GANHOS
+1787	TON	TU	SEU
+1788	· RANG	· PUESTO	· POSIÇÃO
+1789	TOURS MAX	GIROS MÁX	GIROS MÁX
+1790	TOURNER ·	GIRAR ·	GIRAR ·
+1791	Tours :	Giros:	Giros:
+1792	· ton argent :	· tu dinero:	· seu dinheiro:
+1793	· prochain tour coûte ×#	· el próximo giro cuesta ×#	· próximo giro custa ×#
+1794	Les prix grandissent avec ton étape de campagne. Les pièces améliorent tes garages (NIV #-#).	Los premios crecen con tu fase de campaña. Las piezas mejoran tus talleres (NV #-#).	Os prêmios crescem com sua fase na campanha. As peças melhoram suas oficinas (NV #-#).
+1795	Gagné dans cet événement :	Ganado en este evento:	Ganho neste evento:
+1796	Tes clés bonus :	Tus llaves bonus:	Suas chaves bônus:
+1797	🔒 Les Donjons s'ouvrent à l'étape # – tes clés t'attendent	🔒 Las Mazmorras se abren en la fase # – tus llaves te esperan	🔒 As Masmorras abrem na fase # – suas chaves esperam por você
+1798	QUÊTES DU JOUR · TOURS GRATUITS	MISIONES DE HOY · GIROS GRATIS	MISSÕES DE HOJE · GIROS GRÁTIS
+1799	RÉCOMPENSES DE PALIERS	RECOMPENSAS POR HITOS	RECOMPENSAS DE MARCOS
+1800	CLASSEMENT TOP #	CLASIFICACIÓN TOP #	RANKING TOP #
+1801	· commence dans	· empieza en	· começa em
+1802	↩ TOUS LES ÉVÉNEMENTS	↩ TODOS LOS EVENTOS	↩ TODOS OS EVENTOS
+1803	PRIX DU CLASSEMENT	PREMIOS DE CLASIFICACIÓN	PRÊMIOS DO RANKING
+1804	envoyés par Courrier à la fin de l'événement	enviados por Correo al terminar el evento	enviados por Correio no fim do evento
+1805	Le classement a besoin d'internet. Ton score est enregistré et envoyé plus tard.	La clasificación necesita internet. Tu puntuación se guarda y se envía luego.	O ranking precisa de internet. Sua pontuação é salva e enviada depois.
+1806	Mécanicien	Mecánico	Mecânico
+1807	Personne encore – sois le premier !	Nadie aún – ¡sé el primero!	Ninguém ainda – seja o primeiro!
+1809	CALENDRIER DES ÉVÉNEMENTS	CALENDARIO DE EVENTOS	CALENDÁRIO DE EVENTOS
+1810	# événements en même temps · chacun dure # jours · heure de ton téléphone	# eventos a la vez · cada uno dura # días · hora de tu teléfono	# eventos ao mesmo tempo · cada um dura # dias · horário do seu celular
+1811	MAINTENANT ·	AHORA ·	AGORA ·
+1812	EN COURS	EN CURSO	AO VIVO
+1813	GRAND PRIX	GRAN PREMIO	GRANDE PRÊMIO
+1814	🏁 EN COURS	🏁 EN CURSO	🏁 AO VIVO
+1815	🏁 TERMINÉ	🏁 TERMINADO	🏁 ENCERRADO
+1816	UNE SEULE FOIS	SOLO UNA VEZ	SÓ UMA VEZ
+1817	récupère tes récompenses	reclama tus recompensas	colete suas recompensas
+1818	📅 CALENDRIER DES ÉVÉNEMENTS	📅 CALENDARIO DE EVENTOS	📅 CALENDÁRIO DE EVENTOS
+1819	à venir · chaque événement dure # jours · heure de ton téléphone	próximos · cada evento dura # días · hora de tu teléfono	próximos · cada evento dura # dias · horário do seu celular
+1821	ARGENT	PLATA	PRATA
+1822	OR	ORO	OURO
+1823	PLATINE	PLATINO	PLATINA
+1824	👑 Grand Prix	👑 Gran Premio	👑 Grande Prêmio
+1825	débloqué sur ce serveur !	¡desbloqueado en este servidor!	desbloqueado neste servidor!
+1826	Vends # voitures	Vende # coches	Venda # carros
+1827	Gagne # combats de campagne	Gana # combates de campaña	Vença # batalhas da campanha
+1828	Invoque # fois (tout)	Invoca # veces (cualquiera)	Invoque # vezes (qualquer)
+1829	Invoque # fois	Invoca # veces	Invoque # vezes
+1830	# NOUVELLES étapes de campagne + # NOUVEAUX étages de Tour	# fases de campaña NUEVAS + # pisos de Torre NUEVOS	# fases NOVAS da campanha + # andares NOVOS da Torre
+1831	Invoque # fois pendant l'événement	Invoca # veces durante el evento	Invoque # vezes durante o evento
+1832	Termine # NOUVELLES étapes de campagne	Supera # fases de campaña NUEVAS	Conclua # fases NOVAS da campanha
+1833	Monte # NOUVEAUX étages dans les Tours de Classe	Sube # pisos NUEVOS en las Torres de Clase	Suba # andares NOVOS nas Torres de Classe
+1834	Améliore les bâtiments de +# niveaux au total	Mejora edificios +# niveles en total	Melhore prédios +# níveis no total
+1835	Obtiens # NOUVEAUX héros	Consigue # héroes NUEVOS	Consiga # heróis NOVOS
+1836	Utilise # clés de Donjon pendant l'événement	Usa # llaves de Mazmorra durante el evento	Use # chaves de Masmorra durante o evento
+1837	SEMAINE # · Termine l'étape de campagne #	SEMANA # · Supera la fase de campaña #	SEMANA # · Conclua a fase da campanha #
+1838	SEMAINE # · Possède un héros LÉGENDAIRE à +#	SEMANA # · Ten un héroe LEGENDARIO a +#	SEMANA # · Tenha um herói LENDÁRIO em +#
+1839	SEMAINE # · Atteins l'étage # de la Torque Tower	SEMANA # · Llega al piso # de la Torque Tower	SEMANA # · Chegue ao andar # da Torque Tower
+1840	SEMAINE # · Possède # pièce d'équipement TRANSCENDÉE	SEMANA # · Ten # pieza de equipamiento ASCENDIDA	SEMANA # · Tenha # peça de equipamento ASCENDIDA
+1841	🏆 CHAMPION · Possède un héros MYTHIQUE ÉVEILLÉ I	🏆 CAMPEÓN · Ten un héroe MÍTICO DESPERTADO I	🏆 CAMPEÃO · Tenha um herói MÍTICO DESPERTO I
+1842	Ticket de Héros	Ticket de Héroe	Ticket de Herói
+1843	Ticket d'Équipage	Ticket de Cuadrilla	Ticket de Tripulação
+1844	Clé de Donjon	Llave de Mazmorra	Chave de Masmorra
+1845	Essence ×#	Esencia ×#	Essência ×#
+1847	Jours #-# · Invocations de Héros, Équipage & Équipement	Días #-# · Invocaciones de Héroes, Cuadrilla y Equipamiento	Dias #-# · Invocações de Heróis, Tripulação e Equipamento
+1848	Jours #-# · Monte le niveau & l'Ascension de tes héros	Días #-# · Sube de nivel y asciende a tus héroes	Dias #-# · Suba o nível e ascenda seus heróis
+1849	Jours #-# · Donjons – tes clés bonus s'accumulent	Días #-# · Mazmorras – tus llaves bonus se acumulan	Dias #-# · Masmorras – suas chaves bônus acumulam
+1850	Jours #-# · Trains, Rail Wars & le sprint final	Días #-# · Trenes, Rail Wars y el sprint final	Dias #-# · Trens, Rail Wars e o sprint final
+1851	Jetons GP	Fichas GP	Fichas GP
+1852	🏁 Palier # – FIN DE LA ROUTE :	🏁 Nivel # – FIN DEL CAMINO:	🏁 Nível # – FIM DA ESTRADA:
+1853	🎖️ Palier	🎖️ Nivel	🎖️ Nível
+1854	PASS DIAMANT	PASE DIAMANTE	PASSE DIAMANTE
+1855	PASS DIAMANT+	PASE DIAMANTE+	PASSE DIAMANTE+
+1856	Pas assez de diamants (	No hay suficientes diamantes (	Diamantes insuficientes (
+1857	requis)	necesarios)	necessários)
+1858	débloqué ! Récupère la ligne bleue sur la Route.	¡desbloqueado! Reclama la línea azul en el Camino.	desbloqueado! Colete a linha azul na Estrada.
+1859	POSSÉDÉ ✓	TUYO ✓	SEU ✓
+1860	💎 PASS DIAMANT	💎 PASE DIAMANTE	💎 PASSE DIAMANTE
+1861	Une ligne de récompenses bleue sur la Route, payée avec	Una línea azul de recompensas en el Camino, pagada con	Uma linha azul de recompensas na Estrada, paga com
+1862	(pas d'argent réel).	(sin dinero real).	(sem dinheiro real).
+1863	Le palier # te rend TOUS tes diamants	El nivel # te devuelve TODOS tus diamantes	O nível # devolve TODOS os seus diamantes
+1864	💎, puis chaque palier donne un bonus (tickets, clés, Essence, kits).	💎, luego cada nivel da un bonus (tickets, llaves, Esencia, kits).	💎, depois cada nível dá um bônus (tickets, chaves, Essência, kits).
+1865	au total, paliers #-	en total, niveles #-	no total, níveis #-
+1866	Tu as le PASS DIAMANT → le PASS+ coûte seulement la différence et tes paliers récupérés donnent le reste.	Tienes el PASE DIAMANTE → el PASE+ cuesta solo la diferencia y tus niveles reclamados dan el resto.	Você tem o PASSE DIAMANTE → o PASSE+ custa só a diferença e seus níveis coletados dão o resto.
+1867	€ Packs : Argent ×# · Or ×# · Platine ×# chacun sur sa ligne	€ Packs: Plata ×# · Oro ×# · Platino ×# cada uno en su línea	€ Pacotes: Prata ×# · Ouro ×# · Platina ×# cada um na sua linha
+1868	avec des diamants	con diamantes	com diamantes
+1869	+ équipement Transcendé, copie Mythique, badge de Mécène, +Jetons GP.	+ equipamiento Ascendido, copia Mítica, insignia de Mecenas, +Fichas GP.	+ equipamento Ascendido, cópia Mítica, insígnia de Patrono, +Fichas GP.
+1870	🏆 Choisis d'abord ton Mythique (ligne GRATUITE)	🏆 Elige primero tu Mítico (línea GRATIS)	🏆 Escolha primeiro seu Mítico (linha GRÁTIS)
+1871	Paliers du Pass Diamant :	Niveles del Pase Diamante:	Níveis do Passe Diamante:
+1872	+ ✦ équipement TRANSCENDÉ	+ ✦ equipamiento ASCENDIDO	+ ✦ equipamento ASCENDIDO
+1873	+ # copie de	+ # copia de	+ # cópia de
+1874	ton Mythique	tu Mítico	seu Mítico
+1875	🔒 Achète le pack Grand Prix	🔒 Compra el pack Gran Premio	🔒 Compre o pacote Grande Prêmio
+1876	pour ouvrir cette ligne	para abrir esta línea	para abrir esta linha
+1877	récompenses du pass :	recompensas del pase:	recompensas do passe:
+1878	Mécène	Mecenas	Patrono
+1879	débloqué ! Ouvre la ROUTE pour récupérer tes récompenses PREMIUM.	¡desbloqueado! Abre el CAMINO para reclamar tus recompensas PREMIUM.	desbloqueado! Abra a ESTRADA para coletar suas recompensas PREMIUM.
+1880	Jetons	Fichas	Fichas
+1881	Badge de Mécène	Insignia de Mecenas	Insígnia de Patrono
+1882	Copie Mythique	Copia Mítica	Cópia Mítica
+1883	ROUTE +×	CAMINO +×	ESTRADA +×
+1884	PACKS GRAND PRIX	PACKS GRAN PREMIO	PACOTES GRANDE PRÊMIO
+1885	👑 Chaque pack ouvre	👑 Cada pack abre	👑 Cada pacote abre
+1886	sa propre ligne	su propia línea	sua própria linha
+1887	sur la Route : Argent ×# · Or ×# · Platine ×# Achète plusieurs packs → plusieurs lignes, tous les paliers déjà atteints sont prêts à récupérer.	en el Camino: Plata ×# · Oro ×# · Platino ×# Compra varios packs → varias líneas, todos los niveles ya alcanzados están listos.	na Estrada: Prata ×# · Ouro ×# · Platina ×# Compre vários pacotes → várias linhas, todos os níveis já alcançados ficam prontos para coletar.
+1888	TERMINÉ	TERMINADO	ENCERRADO
+1889	BIENTÔT	PRONTO	EM BREVE
+1890	🏆 CHOISIS # MYTHIQUE	🏆 ELIGE # MÍTICO	🏆 ESCOLHA # MÍTICO
+1891	+ bonus GRATUIT :	+ bonus GRATIS:	+ bônus GRÁTIS:
+1892	a rejoint ton équipe ! +	¡se unió a tu equipo! +	entrou na sua equipe! +
+1893	Limite hebdo atteinte	Límite semanal alcanzado	Limite semanal atingido
+1894	Pas assez de Jetons GP	No hay suficientes Fichas GP	Fichas GP insuficientes
+1895	🎁 Coffre Pit-Stop :	🎁 Cofre Pit-Stop:	🎁 Baú Pit-Stop:
+1896	🏁 PREMIER SUR LA LIGNE : tu es #	🏁 PRIMERO EN LA META: eres el #	🏁 PRIMEIRO NA LINHA: você é o #
+1897	! Ton prix est dans le Courrier.	! Tu premio está en el Correo.	! Seu prêmio está no Correio.
+1898	🌍 Cadeau d'Objectif du Serveur :	🌍 Regalo del Objetivo del Servidor:	🌍 Presente da Meta do Servidor:
+1899	Joue au jeu – ça compte tout seul	Juega – cuenta solo	Jogue – conta sozinho
+1900	Termine	Completa	Conclua

@@ -1,0 +1,408 @@
+3101	Compte réinitialisé	Cuenta reiniciada	Conta reiniciada
+3102	Ta partie a été réinitialisée par l'équipe Torque Empire. Une nouvelle partie commence – bonne chance !	El equipo de Torque Empire reinició tu partida. Empieza una nueva – ¡buena suerte!	Seu jogo foi reiniciado pela equipe Torque Empire. Um jogo novo começa agora – boa sorte!
+3103	Compte bloqué	Cuenta bloqueada	Conta bloqueada
+3104	Notre anti-triche a trouvé des changements impossibles dans le jeu (sauvegarde modifiée, hack d'argent ou de vitesse).	Nuestro antitrampas encontró cambios imposibles en el juego (partida editada, hack de dinero o de velocidad).	Nosso antitrapaça encontrou mudanças impossíveis no jogo (save editado, hack de dinheiro ou de velocidade).
+3105	Si tu penses que c'est une erreur, écris au support avec cet ID.	Si crees que es un error, escribe a soporte con este ID.	Se acha que é um erro, escreva ao suporte com este ID.
+3106	🧪 MODE TEST (navigateur) : débloqué gratuitement. Dans l'app Google Play, c'est un vrai paiement.	🧪 MODO PRUEBA (navegador): desbloqueado gratis. En la app de Google Play es un pago real.	🧪 MODO TESTE (navegador): liberado de graça. No app do Google Play é um pagamento real.
+3107	📱 Les packs s'achètent seulement dans l'app Torque Empire sur Google Play.	📱 Los packs solo se compran en la app Torque Empire de Google Play.	📱 Os pacotes só podem ser comprados no app Torque Empire do Google Play.
+3108	📲 Mets à jour Torque Empire depuis Google Play pour acheter des packs.	📲 Actualiza Torque Empire en Google Play para comprar packs.	📲 Atualize o Torque Empire pelo Google Play para comprar pacotes.
+3109	⚠️ Les paiements Google Play ne sont pas disponibles sur cet appareil.	⚠️ Los pagos de Google Play no están disponibles en este dispositivo.	⚠️ Pagamentos do Google Play não estão disponíveis neste aparelho.
+3110	Total	Total	Total
+3112	🛒 Ouverture de Google Play…	🛒 Abriendo Google Play…	🛒 Abrindo o Google Play…
+3113	⚠️ Paiement non vérifié. Tu n'as pas été débité deux fois – réessaie plus tard.	⚠️ No se pudo verificar el pago. No se te cobró dos veces – inténtalo más tarde.	⚠️ Pagamento não verificado. Você não foi cobrado duas vezes – tente mais tarde.
+3115	📲 Les paiements marchent seulement dans la nouvelle app Torque Empire de Google Play (ceci est l'ancienne version Chrome). Installe la mise à jour depuis le Play Store.	📲 Los pagos solo funcionan en la nueva app Torque Empire de Google Play (esta es la versión antigua de Chrome). Instala la actualización desde Play Store.	📲 Os pagamentos só funcionam no novo app Torque Empire do Google Play (esta é a versão antiga do Chrome). Instale a atualização pela Play Store.
+3116	⚠️ Paiements Google Play indisponibles pour l'instant (	⚠️ Pagos de Google Play no disponibles ahora (	⚠️ Pagamentos do Google Play indisponíveis agora (
+3117	⚠️ Pas de réponse de Google Play. Réessaie.	⚠️ Sin respuesta de Google Play. Inténtalo de nuevo.	⚠️ Sem resposta do Google Play. Tente de novo.
+3118	✓ Tu l'as déjà – restauration…	✓ Ya lo tienes – restaurando…	✓ Você já tem – restaurando…
+3119	produit introuvable dans Google Play	producto no encontrado en Google Play	produto não encontrado no Google Play
+3120	un autre paiement est encore ouvert	otro pago sigue abierto	outro pagamento ainda está aberto
+3121	pas de réponse de Google Play	sin respuesta de Google Play	sem resposta do Google Play
+3122	pas d'offre pour ce pass	no hay oferta para este pase	sem oferta para este passe
+3123	⚠️ Échec du paiement (	⚠️ Pago fallido (	⚠️ Pagamento falhou (
+3124	). Tu n'as pas été débité.	). No se te cobró.	). Você não foi cobrado.
+3125	⏳ Paiement en attente – le pack arrive dès que Google le confirme.	⏳ Pago pendiente – el pack llega en cuanto Google lo confirme.	⏳ Pagamento pendente – o pacote chega assim que o Google confirmar.
+3126	⚠️ Paiement pas encore vérifié – il sera ajouté automatiquement au redémarrage du jeu.	⚠️ Pago aún sin verificar – se añadirá solo al reiniciar el juego.	⚠️ Pagamento ainda não verificado – será adicionado sozinho quando você reiniciar o jogo.
+3127	✓ Achats restaurés	✓ Compras restauradas	✓ Compras restauradas
+3134	Atelier moteur	Taller de motores	Oficina de motores
+3138	Sécurité	Seguridad	Segurança
+3139	Lavage auto	Autolavado	Lava-rápido
+3140	Station-service	Gasolinera	Posto de gasolina
+3141	Terminal ferroviaire	Terminal de tren	Terminal ferroviário
+3142	Trottinette	Patinete	Patinete
+3143	Trottinette électrique	Patinete eléctrico	Patinete elétrico
+3144	Mobylette	Ciclomotor	Mobilete
+3145	Scooter sport	Scooter deportivo	Scooter esportivo
+3146	Scooter sport+	Scooter deportivo+	Scooter esportivo+
+3147	Mobylette de course	Ciclomotor de carreras	Mobilete de corrida
+3148	Mobylette de course+	Ciclomotor de carreras+	Mobilete de corrida+
+3149	Scooter turbo	Scooter turbo	Scooter turbo
+3150	Scooter turbo+	Scooter turbo+	Scooter turbo+
+3151	Superbike électrique	Superbike eléctrica	Superbike elétrica
+3152	Inspection, Entretien, Carrosserie & Peinture — petits travaux seulement	Inspección, Servicio, Chapa y Pintura — solo trabajos pequeños	Inspeção, Revisão, Funilaria e Pintura — só serviços pequenos
+3153	Électronique · Break, SUV, Pick-up, Van · suspension, rouille, peinture	Electrónica · Familiar, SUV, Pickup, Furgoneta · suspensión, óxido, pintura	Elétrica · Perua, SUV, Picape, Van · suspensão, ferrugem, pintura
+3154	Atelier moteur · Bureau des pièces & Héliport · Sportives · embrayage, courroie de distribution, ECU	Taller de motores · Oficina de piezas y Helipuerto · Deportivos · embrague, correa de distribución, ECU	Oficina de motores · Escritório de peças e Heliponto · Esportivos · embreagem, correia dentada, ECU
+3155	Tuning · Muscle cars · turbo, kits street, ECU stage #	Tuning · Muscle cars · turbo, kits street, ECU stage #	Tuning · Muscle cars · turbo, kits street, ECU stage #
+3156	Supercars · changements moteur & boîte · kit large · kits sport	Superdeportivos · cambios de motor y caja · kit ancho · kits sport	Supercarros · troca de motor e câmbio · kit widebody · kits esportivos
+3157	swaps V# · préparations course complètes	swaps V# · preparaciones de carreras completas	swaps V# · preparações de corrida completas
+3158	Prix de vente +	Precio de venta +	Preço de venda +
+3159	% · Revenu idle +	% · Ingreso idle +	% · Renda idle +
+3160	· 🎁 bonus +# tickets Recrue & +# Équipage	· 🎁 bonus +# tickets Recluta y +# Cuadrilla	· 🎁 bônus +# tickets Recruta e +# Tripulação
+3161	Vidange	Cambio de aceite	Troca de óleo
+3162	Plaquettes de frein	Pastillas de freno	Pastilhas de freio
+3163	Batterie neuve	Batería nueva	Bateria nova
+3164	Pneus neufs	Neumáticos nuevos	Pneus novos
+3165	Suspension	Suspensión	Suspensão
+3166	Embrayage	Embrague	Embreagem
+3167	Lustrage & cire	Pulido y cera	Polimento e cera
+3168	Débosselage	Reparar abolladura	Desamassar
+3169	Réparation rouille	Reparar óxido	Reparo de ferrugem
+3170	Peinture complète	Pintura completa	Pintura completa
+3171	Pare-chocs neuf	Parachoques nuevo	Para-choque novo
+3172	Kit large	Kit ancho	Kit widebody
+3173	Ampoules & fusibles	Bombillas y fusibles	Lâmpadas e fusíveis
+3174	Capteur en panne	Sensor averiado	Sensor com defeito
+3175	Faisceau électrique	Cableado	Chicote elétrico
+3176	Réparation ECU	Reparación ECU	Reparo de ECU
+3177	Courroie de distribution	Correa de distribución	Correia dentada
+3178	Turbo neuf	Turbo nuevo	Turbo novo
+3179	Changement de boîte	Cambio de caja	Troca de câmbio
+3180	Changement de moteur	Cambio de motor	Troca de motor
+3181	Swap V#	Swap V#	Swap V#
+3182	Kit street	Kit street	Kit street
+3183	Rabaissement + jantes	Rebaje + llantas	Rebaixamento + rodas
+3184	ECU stage #	ECU stage #	ECU stage #
+3185	Kit sport	Kit deportivo	Kit esportivo
+3186	Néons & déco	Neón y vinilos	Neon e adesivos
+3187	Préparation course	Preparación de carreras	Preparação de corrida
+3188	Jantes chromées	Llantas cromadas	Rodas cromadas
+3189	Vitres teintées	Lunas tintadas	Vidros escurecidos
+3190	Feux LED	Luces LED	Luzes LED
+3191	Échappement sport	Escape deportivo	Escapamento esportivo
+3192	Covering bicolore	Vinilo bicolor	Envelopamento bicolor
+3193	Capot carbone	Capó de carbono	Capô de carbono
+3194	Flammes	Llamas	Chamas
+3195	Prise d'air de toit	Toma de aire en techo	Entrada de ar no teto
+3196	Suspension pneumatique	Suspensión neumática	Suspensão a ar
+3197	Kit drift	Kit drift	Kit drift
+3198	Kit nitro	Kit nitro	Kit nitro
+3199	Citadine	Compacto	Hatch
+3200	Berline	Sedán	Sedã
+3201	Break	Familiar	Perua
+3203	Pick-up	Pickup	Picape
+3204	Fourgon	Furgoneta	Van
+3205	Sportive	Deportivo	Esportivo
+3206	Muscle car	Muscle car	Muscle car
+3207	Supercar	Superdeportivo	Supercarro
+3208	Coupé	Cupé	Cupê
+3209	Cabriolet	Descapotable	Conversível
+3210	Monospace	Monovolumen	Minivan
+3211	Limousine	Limusina	Limusine
+3212	GTI	Compacto deportivo	Hot hatch
+3213	Taxi	Taxi	Táxi
+3214	Voiture de police	Coche de policía	Viatura de polícia
+3215	SUV de police	SUV de policía	SUV de polícia
+3216	Ambulance	Ambulancia	Ambulância
+3217	Chef des pompiers	Jefe de bomberos	Chefe dos bombeiros
+3219	Pick-up de service	Pickup de trabajo	Picape de serviço
+3220	Essence Idle	Esencia Idle	Essência Idle
+3221	Pièces d'équipement Idle	Piezas de equipamiento Idle	Peças de equipamento Idle
+3222	Chance d'attraper un voleur	Probabilidad de atrapar ladrón	Chance de pegar ladrão
+3223	Réduction d'amélioration (pièces)	Descuento en mejoras (piezas)	Desconto em melhorias (peças)
+3224	Pièces de garage Idle	Piezas de taller Idle	Peças de oficina Idle
+3225	Argent des Gains Idle	Dinero de Recompensas Idle	Dinheiro das Recompensas Idle
+3227	SET (# pièces, au choix)	SET (# piezas, a elegir)	CONJUNTO (# peças, à escolha)
+3228	Héros Légendaire	Héroe Legendario	Herói Lendário
+3229	🔴 Héros Mythique au choix	🔴 Héroe Mítico a elegir	🔴 Herói Mítico à escolha
+3230	Tes avantages VIP ont augmenté !	¡Tus ventajas VIP aumentaron!	Suas vantagens VIP aumentaram!
+3231	+ 🔴 BOÎTE MYTHIQUE ROUGE – ouvre-la dans HÉROS → choisis n'importe quel héros Mythique	+ 🔴 CAJA MÍTICA ROJA – ábrela en HÉROES → elige cualquier héroe Mítico	+ 🔴 CAIXA MÍTICA VERMELHA – abra em HERÓIS → escolha qualquer herói Mítico
+3232	SET – tu choisis le set	SET – tú eliges el set	CONJUNTO – você escolhe
+3233	🎁 CHOISIS TON SET	🎁 ELIGE TU SET	🎁 ESCOLHA SEU CONJUNTO
+3234	Cadeau VIP du jour maintenant :	Regalo VIP diario ahora:	Presente VIP diário agora:
+3235	Aucune boîte de set en attente	No hay cajas de set esperando	Nenhuma caixa de conjunto esperando
+3236	Touche deux fois un set. Les # pièces (	Toca dos veces un set. Las # piezas (	Toque duas vezes num conjunto. As # peças (
+3237	) vont dans ton sac d'équipement.	) van a tu bolsa de equipamiento.	) vão para sua bolsa de equipamento.
+3238	Boîtes de set en attente :	Cajas de set esperando:	Caixas de conjunto esperando:
+3240	TOUCHE ENCORE ✓	TOCA OTRA VEZ ✓	TOQUE DE NOVO ✓
+3241	– # pièces dans ton sac d'équipement !	– ¡# piezas en tu bolsa de equipamiento!	– # peças na sua bolsa de equipamento!
+3242	(# par donjon)	(# por mazmorra)	(# por masmorra)
+3243	cadeau du jour :	regalo diario:	presente diário:
+3244	👑 Coffre VIP hebdo :	👑 Cofre VIP semanal:	👑 Baú VIP semanal:
+3245	· 🗝 +# dans chaque donjon	· 🗝 +# en cada mazmorra	· 🗝 +# em cada masmorra
+3246	Vends	Vende	Venda
+3247	de ventes	en ventas	em vendas
+3248	Inspecte	Inspecciona	Inspecione
+3249	Travaux d'entretien	Trabajos de servicio	Serviços de revisão
+3250	Travaux de carrosserie	Trabajos de chapa y pintura	Serviços de funilaria
+3251	Travaux d'électronique	Trabajos de electrónica	Serviços de elétrica
+3252	Travaux moteur	Trabajos de motor	Serviços de motor
+3253	Travaux de tuning	Trabajos de tuning	Serviços de tuning
+3254	Améliore des bâtiments	Mejora edificios	Melhore prédios
+3255	Améliore un bâtiment	Mejora un edificio	Melhore um prédio
+3256	Attrape un voleur	Atrapa a un ladrón	Pegue um ladrão
+3257	Répare	Repara	Conserte
+3258	véhicules de la flotte de la ville	vehículos de la flota de la ciudad	veículos da frota da cidade
+3259	Charge	Carga	Carregue
+3260	voitures sur le camion	coches en el camión	carros no caminhão
+3261	Gagne	Gana	Vença
+3262	combats de campagne	combates de campaña	batalhas da campanha
+3263	Termine	Supera	Conclua
+3264	étages de tour (n'importe laquelle)	pisos de torre (cualquiera)	andares de torre (qualquer uma)
+3265	Courses en donjon	Partidas en mazmorra	Corridas em masmorra
+3266	Fais	Haz	Faça
+3267	combats d'Arène	combates de Arena	lutas da Arena
+3268	Attaque le Boss mondial	Ataca al Jefe mundial	Ataque o Chefe mundial
+3269	📋 Quête du jour faite :	📋 Misión diaria hecha:	📋 Missão diária feita:
+3270	— récupère +	— reclama +	— colete +
+3271	points VIP !	¡puntos VIP!	pontos VIP!
+3280	💵 POURBOIRE +	💵 PROPINA +	💵 GORJETA +
+3281	TRAVAIL	TRABAJO	SERVIÇO
+3282	TROUVÉ	ENCONTRADO	ENCONTRADO
+3283	PIÈCE	PIEZA	PEÇA
+3284	COMMANDÉE	PEDIDA	PEDIDA
+3285	🎯 DOUBLE PAIE !	🎯 ¡PAGA DOBLE!	🎯 PAGAMENTO DOBRADO!
+3286	VENDUE EN LIGNE	VENDIDO ONLINE	VENDIDO ONLINE
+3287	👑 MERCI !	👑 ¡GRACIAS!	👑 OBRIGADO!
+3288	🚨 DE RETOUR EN SERVICE	🚨 DE VUELTA AL SERVICIO	🚨 DE VOLTA AO SERVIÇO
+3289	🔑 NOUVEAU PROPRIÉTAIRE	🔑 NUEVO DUEÑO	🔑 NOVO DONO
+3290	👑 À BIENTÔT !	👑 ¡HASTA PRONTO!	👑 ATÉ LOGO!
+3291	⭐ RÉPUTATION	⭐ REPUTACIÓN	⭐ REPUTAÇÃO
+3292	📦 PIÈCES LIVRÉES	📦 PIEZAS ENTREGADAS	📦 PEÇAS ENTREGUES
+3293	Voiture de sécurité	Coche de seguridad	Carro de segurança
+3294	Fourgon K#	Furgoneta K#	Van K#
+3295	VOLEUR	LADRÓN	LADRÃO
+3296	PRO	PRO	PRO
+3297	BOSS DE GANG	JEFE DE BANDA	CHEFÃO DA GANGUE
+3308	👑 BOSS DE GANG !	👑 ¡JEFE DE BANDA!	👑 CHEFÃO DA GANGUE!
+3309	🚐 RENFORTS !	🚐 ¡REFUERZOS!	🚐 REFORÇOS!
+3310	VOLEURS !	¡LADRONES!	LADRÕES!
+3311	🚨 VOLEUR !	🚨 ¡LADRÓN!	🚨 LADRÃO!
+3312	⛓ ATTRAPÉ ! +	⛓ ¡ATRAPADO! +	⛓ PEGO! +
+3313	📋 LES PLUS RECHERCHÉS :	📋 MÁS BUSCADOS:	📋 MAIS PROCURADOS:
+3314	🚓 RENFORT !	🚓 ¡REFUERZO!	🚓 REFORÇO!
+3315	🐕 UNITÉ K# !	🐕 ¡UNIDAD K#!	🐕 UNIDADE K#!
+3316	RAID TERMINÉ	REDADA TERMINADA	INVASÃO ENCERRADA
+3317	RAID STOPPÉ !	¡REDADA DETENIDA!	INVASÃO IMPEDIDA!
+3318	voleurs attrapés	ladrones atrapados	ladrões pegos
+3319	· RAID DE GANG	· REDADA DE BANDA	· INVASÃO DA GANGUE
+3320	· BOSS DE GANG	· JEFE DE BANDA	· CHEFÃO DA GANGUE
+3321	Tickets d'Équipage	Tickets de Cuadrilla	Tickets de Tripulação
+3322	Tickets de Recrue	Tickets de Recluta	Tickets de Recruta
+3323	📋 Plus recherchés attrapés :	📋 Más buscados atrapados:	📋 Mais procurados pegos:
+3324	· LES # – BONUS DU JOUR !	· LOS # – ¡BONUS DIARIO!	· TODOS OS # – BÔNUS DIÁRIO!
+3325	💸 Volé : −	💸 Robado: −	💸 Roubado: −
+3326	📋 LES PLUS RECHERCHÉS – AUJOURD'HUI	📋 MÁS BUSCADOS – HOY	📋 MAIS PROCURADOS – HOJE
+3327	ATTRAPÉ	ATRAPADO	PEGO
+3328	Attrape les # aujourd'hui →	Atrapa a los # hoy →	Pegue os # hoje →
+3329	BONUS DU JOUR	BONUS DIARIO	BÔNUS DIÁRIO
+3330	💥 ÉCHAPPÉ !	💥 ¡SE ESCAPÓ!	💥 ESCAPOU!
+3331	🚔 COURSE-POURSUITE !	🚔 ¡PERSECUCIÓN!	🚔 PERSEGUIÇÃO!
+3332	TAXI	TAXI	TÁXI
+3333	🚚 Le Camion VIP est là avec	🚚 El Camión VIP llegó con	🚚 O Caminhão VIP chegou com
+3334	clients riches ! Ils sont prioritaires.	¡clientes ricos! Tienen prioridad.	clientes ricos! Eles têm prioridade.
+3335	👑 CLIENT RICHE	👑 CLIENTE RICO	👑 CLIENTE RICO
+3336	👑 CAMION VIP · DÉCHARGEMENT	👑 CAMIÓN VIP · DESCARGANDO	👑 CAMINHÃO VIP · DESCARREGANDO
+3337	SCOOTERS SEULEMENT	SOLO SCOOTERS	SÓ SCOOTERS
+3338	VOIE DES CHAUFFEURS	CARRIL DE CONDUCTORES	FAIXA DOS MOTORISTAS
+3339	🔒 EXTENSION · NIV	🔒 AMPLIACIÓN · NV	🔒 EXPANSÃO · NV
+3340	VOITURIER	APARCACOCHES	MANOBRISTA
+3341	PARKING D'EXPORT · À VENDRE	PARKING DE EXPORTACIÓN · EN VENTA	ESTACIONAMENTO DE EXPORTAÇÃO · À VENDA
+3342	NIV.	NV.	NV.
+3343	NIV	NV	NV
+3344	CONSTRUIRE ·	CONSTRUIR ·	CONSTRUIR ·
+3345	KITS	KITS	KITS
+3346	🔒 NIV	🔒 NV	🔒 NV
+3347	💼 BUREAU DES VENTES ·	💼 OFICINA DE VENTAS ·	💼 ESCRITÓRIO DE VENDAS ·
+3348	PICK-UP	PICKUP	PICAPE
+3349	PRIVÉ · HÉLIPORT	PRIVADO · HELIPUERTO	PRIVADO · HELIPONTO
+3350	BUREAU DES PIÈCES	OFICINA DE PIEZAS	ESCRITÓRIO DE PEÇAS
+3351	URGENT ·	URGENTE ·	URGENTE ·
+3352	⛓ ATTRAPÉ	⛓ ATRAPADO	⛓ PEGO
+3353	🦹 VOLEUR	🦹 LADRÓN	🦹 LADRÃO
+3355	CHARGEMENT	CARGANDO	CARREGANDO
+3357	BIENTÔT	PRÓXIMAMENTE	EM BREVE
+3358	🏁 CIRCUIT	🏁 CIRCUITO	🏁 AUTÓDROMO
+3359	CIRCUIT	CIRCUITO	AUTÓDROMO
+3360	🏆 TOUCHE POUR OUVRIR	🏆 TOCA PARA ABRIR	🏆 TOQUE PARA ABRIR
+3361	🔒 RÉP #	🔒 REP #	🔒 REP #
+3362	SALON DES VOITURES DE COLLECTION	SALÓN DE COCHES CLÁSICOS	SALÃO DE CARROS CLÁSSICOS
+3363	SÉCURITÉ	SEGURIDAD	SEGURANÇA
+3364	🏆 COLLECTION CLASSIQUE · PREMIUM	🏆 COLECCIÓN CLÁSICA · PREMIUM	🏆 COLEÇÃO CLÁSSICA · PREMIUM
+3365	🫧 LAVAGE · ⛽ DIESEL −#% ←	🫧 AUTOLAVADO · ⛽ DIÉSEL −#% ←	🫧 LAVA-RÁPIDO · ⛽ DIESEL −#% ←
+3366	⬇ LAVAGE & PLEIN	⬇ LAVADO Y REPOSTAJE	⬇ LAVAGEM E ABASTECIMENTO
+3367	SORTIE	SALIDA	SAÍDA
+3368	🫧 LAVAGE AUTO	🫧 AUTOLAVADO	🫧 LAVA-RÁPIDO
+3369	⛽ STATION-SERVICE	⛽ GASOLINERA	⛽ POSTO DE GASOLINA
+3370	🏭 USINE AUTO	🏭 FÁBRICA DE COCHES	🏭 FÁBRICA DE CARROS
+3371	🫧 LAVAGE OCCUPÉ	🫧 AUTOLAVADO OCUPADO	🫧 LAVA-RÁPIDO OCUPADO
+3372	⛽ POMPES PLEINES	⛽ SURTIDORES LLENOS	⛽ BOMBAS CHEIAS
+3373	TES PIÈCES · touche = bâtiment le plus faible	TUS PIEZAS · toca = edificio más débil	SUAS PEÇAS · toque = prédio mais fraco
+3374	: tous les bâtiments qui les utilisent sont au MAX (ou encore bloqués)	: todos los edificios que las usan están al MÁX (o bloqueados)	: todos os prédios que usam estão no MÁX (ou bloqueados)
+3375	🏗️ Tous les bâtiments sont au niveau MAX	🏗️ Todos los edificios están al nivel MÁX	🏗️ Todos os prédios estão no nível MÁX
+3376	📅 Fait – tu as ouvert le jeu aujourd'hui. Récupère-le !	📅 Hecho – abriste el juego hoy. ¡Solo reclámalo!	📅 Feito – você abriu o jogo hoje. É só coletar!
+3377	⭐ Revenu en plus (NIV #+)	⭐ Ingreso extra (NV #+)	⭐ Renda extra (NV #+)
+3378	héros en combat	héroes en combate	heróis em batalha
+3379	💰 Revenus	💰 Ingresos	💰 Renda
+3380	💰 Revenus maintenant	💰 Ingresos ahora	💰 Renda agora
+3381	(direct)	(en vivo)	(ao vivo)
+3382	mesure…	midiendo…	medindo…
+3383	pas d'argent direct	sin dinero directo	sem dinheiro direto
+3384	plus de voitures pour chaque garage	más coches para cada taller	mais carros para cada oficina
+3385	nouveaux travaux	nuevos trabajos	novos serviços
+3386	🏭 VOITURE NEUVE	🏭 COCHE NUEVO	🏭 CARRO NOVO
+3387	🫧 LAVAGE	🫧 LAVADO	🫧 LAVAGEM
+3388	⛽ DIESEL −#%	⛽ DIÉSEL −#%	⛽ DIESEL −#%
+3389	VOITURE SUIVANTE	SIGUIENTE COCHE	PRÓXIMO CARRO
+3390	🚆 TERMINAL FERROVIAIRE	🚆 TERMINAL DE TREN	🚆 TERMINAL FERROVIÁRIO
+3391	voiture en route ·	coche en camino ·	carro a caminho ·
+3392	🚆 VOITURE D'EXPORT	🚆 COCHE DE EXPORTACIÓN	🚆 CARRO DE EXPORTAÇÃO
+3393	TRAIN ·	TREN ·	TREM ·
+3394	PRÊT À PARTIR !	¡LISTO PARA ENVIAR!	PRONTO PARA ENVIAR!
+3395	voitures · suivante	coches · siguiente	carros · próximo
+3396	👑 CLIENT RICHE · PRIORITÉ	👑 CLIENTE RICO · PRIORIDAD	👑 CLIENTE RICO · PRIORIDADE
+3397	🚨 FLOTTE DE LA VILLE	🚨 FLOTA DE LA CIUDAD	🚨 FROTA DA CIDADE
+3398	INSPECTION	INSPECCIONANDO	INSPECIONANDO
+3399	⏳ ATTENTE PIÈCES	⏳ ESPERANDO PIEZAS	⏳ ESPERANDO PEÇAS
+3400	VENTE...	VENDIENDO...	VENDENDO...
+3401	À VENDRE	EN VENTA	À VENDA
+3402	VENDUE	VENDIDO	VENDIDO
+3403	Baies & mécaniciens	Bahías y mecánicos	Boxes e mecânicos
+3404	Chauffeurs	Conductores	Motoristas
+3405	Scooter de chauffeur	Scooter de conductor	Scooter do motorista
+3406	Vitesse de travail	Velocidad de trabajo	Velocidade de trabalho
+3407	Bonus de paie	Bonus de paga	Bônus de pagamento
+3408	Les voitures des clients arrivent de l'autoroute et attendent ici. Les voituriers les emmènent à l'Inspection et reviennent en scooter.	Los coches de los clientes llegan de la autopista y esperan aquí. Los aparcacoches los llevan a Inspección y vuelven en scooter.	Os carros dos clientes chegam da rodovia e esperam aqui. Os manobristas levam para a Inspeção e voltam de scooter.
+3409	Places de parking	Plazas de parking	Vagas
+3410	Voituriers	Aparcacoches	Manobristas
+3411	Nouvelle voiture toutes les	Coche nuevo cada	Carro novo a cada
+3412	Bureau des ventes	Oficina de ventas	Escritório de vendas
+3413	Les agents vendent les voitures finies en ligne. Les chauffeurs du bureau emmènent les voitures vendues du Parking d'export à la Cour de transport.	Los agentes venden los coches terminados online. Los conductores de la oficina llevan los vendidos del Parking de exportación al Patio de transporte.	Os agentes vendem os carros prontos online. Os motoristas do escritório levam os vendidos do Estacionamento de exportação ao Pátio de transporte.
+3414	Agents commerciaux	Agentes de ventas	Agentes de vendas
+3415	Bonus de vente	Bonus de venta	Bônus de venda
+3416	Temps par vente	Tiempo por venta	Tempo por venda
+3417	Camion porte-voitures	Camión portacoches	Caminhão cegonha
+3418	Charge les voitures vendues à la Cour de transport et les livre aux acheteurs.	Carga los coches vendidos en el Patio de transporte y los entrega a los compradores.	Carrega os carros vendidos no Pátio de transporte e entrega aos compradores.
+3419	Voitures par trajet	Coches por viaje	Carros por viagem
+3420	Retour dans	Vuelve en	Volta em
+3421	Bureau des pièces & Héliport	Oficina de piezas y Helipuerto	Escritório de peças e Heliponto
+3422	L'inspection commande les pièces dont la voiture a besoin. L'hélicoptère les apporte en urgence, et ton chauffeur de pièces prend le pick-up et la remorque par la route privée pour les récupérer.	La inspección pide las piezas que necesita el coche. El helicóptero las trae urgente y tu conductor de piezas va con la pickup y el remolque por la carretera privada a recogerlas.	A inspeção pede as peças que o carro precisa. O helicóptero traz com urgência, e seu motorista de peças pega a picape e o reboque pela estrada privada para buscá-las.
+3423	Vitesse du pick-up	Velocidad de la pickup	Velocidade da picape
+3424	Caisses par trajet	Cajas por viaje	Caixas por viagem
+3425	Vitesse de l'hélicoptère	Velocidad del helicóptero	Velocidade do helicóptero
+3426	Parking d'export	Parking de exportación	Estacionamento de exportação
+3427	Les voitures finies attendent ici que le Bureau des ventes les vende en ligne.	Los coches terminados esperan aquí a que la Oficina de ventas los venda online.	Os carros prontos esperam aqui até o Escritório de vendas vendê-los online.
+3428	Places	Plazas	Vagas
+3429	Cour de transport	Patio de transporte	Pátio de transporte
+3430	Les voitures vendues attendent derrière les barrières que le camion les charge. Un garde surveille les caméras depuis le bureau de sécurité.	Los coches vendidos esperan tras las barreras a que los cargue el camión. Un guardia vigila las cámaras desde la oficina de seguridad.	Os carros vendidos esperam atrás das cancelas até o caminhão carregá-los. Um guarda vigia as câmeras do escritório de segurança.
+3431	Gardes	Guardias	Guardas
+3432	🛡️ Sécurité	🛡️ Seguridad	🛡️ Segurança
+3433	Les voleurs viennent pour les voitures de la Cour de transport et du Parking d'export – seuls, à deux, avec un PRO, un BOSS DE GANG avec sa camionnette… et parfois tout le GANG. Tes gardes patrouillent et les combattent ; les gardes en RENFORT et la brigade canine K# viennent aider. Les voleurs attrapés donnent du Builder Kit, des tickets d'Équipage et des diamants. Un voleur qui s'échappe vole une partie de ton argent – un niveau de Sécurité plus haut en vole moins.	Los ladrones vienen a por los coches del Patio de transporte y del Parking de exportación – solos, en pareja, con un PRO, un JEFE DE BANDA con su furgoneta… y a veces toda la BANDA. Tus guardias patrullan y luchan; los guardias de REFUERZO y la unidad canina K# vienen a ayudar. Los ladrones atrapados dan Kit de Constructor, tickets de Cuadrilla y diamantes. Un ladrón que escapa roba parte de tu dinero – más nivel de Seguridad = roba menos.	Os ladrões vêm atrás dos carros do Pátio de transporte e do Estacionamento de exportação – sozinhos, em dupla, com um PRO, um CHEFÃO DA GANGUE com sua van… e às vezes a GANGUE toda. Seus guardas patrulham e lutam; os guardas de REFORÇO e a unidade canina K# vêm ajudar. Ladrões pegos dão Kit de Construtor, tickets de Tripulação e diamantes. Um ladrão que foge rouba parte do seu dinheiro – nível de Segurança maior = rouba menos.
+3434	(# patrouilles)	(# patrullas)	(# patrulhas)
+3435	Chance de capture	Prob. de captura	Chance de captura
+3436	Vitesse de course des gardes	Velocidad de los guardias	Velocidade dos guardas
+3437	Gardes en renfort	Guardias de refuerzo	Guardas de reforço
+3438	(voiture de sécurité)	(coche de seguridad)	(carro de segurança)
+3439	Brigade canine K#	Unidad canina K#	Unidade canina K#
+3440	Raids Boss + Gang	Redadas de Jefe + Banda	Invasões de Chefão + Gangue
+3441	Raids de gang	Redadas de banda	Invasões de gangue
+3442	Moins d'argent volé	Menos dinero robado	Menos dinheiro roubado
+3443	Caméras en plus	Cámaras extra	Câmeras extras
+3444	🏆 Garage de Collection	🏆 Garaje de Colección	🏆 Garagem de Coleção
+3445	BIENTÔT. Un salon premium pour voitures classiques et anciennes. Ces voitures n'ont pas de prix, alors il a sa propre clôture, des caméras, une guérite, une barrière et un portail laser.	PRÓXIMAMENTE. Un salón premium para coches clásicos y antiguos. Estos coches no tienen precio, así que tiene su propia valla, cámaras, garita, barrera y puerta láser.	EM BREVE. Um salão premium para carros clássicos e antigos. Esses carros não têm preço, então ele tem cerca própria, câmeras, guarita, cancela e portão a laser.
+3446	🫧 Lavage auto	🫧 Autolavado	🫧 Lava-rápido
+3447	Des conducteurs viennent de la rue pour un lavage et te paient. Tes voitures vendues sont aussi lustrées gratuitement avant la livraison, donc elles se vendent plus cher. NIV #-# agrandissent le lavage, NIV #-# rapportent plus d'argent.	Vienen conductores de la calle a lavar el coche y te pagan. Tus coches vendidos también se pulen gratis antes de la entrega, así que se venden más caros. NV #-# amplían el autolavado, NV #-# dan más dinero.	Motoristas vêm da rua para lavar e pagam você. Seus carros vendidos também ganham brilho grátis antes da entrega, então vendem mais caro. NV #-# aumentam o lava-rápido, NV #-# dão mais dinheiro.
+3448	Client toutes les	Cliente cada	Cliente a cada
+3449	Paiement par lavage	Pago por lavado	Pagamento por lavagem
+3450	Bonus lustrage sur les voitures vendues	Bonus de brillo en coches vendidos	Bônus de brilho nos carros vendidos
+3451	⛽ Station-service	⛽ Gasolinera	⛽ Posto de gasolina
+3452	Des conducteurs s'arrêtent à tes pompes pour faire le plein et te paient. Ton camion porte-voitures fait le plein gratuitement, donc il revient plus vite. NIV #-# ajoutent des pompes (# # # #), NIV #-# rapportent plus d'argent.	Los conductores paran en tus surtidores a repostar y te pagan. Tu camión portacoches reposta gratis, así que vuelve antes. NV #-# añaden surtidores (# # # #), NV #-# dan más dinero.	Motoristas param nas suas bombas para abastecer e pagam você. Seu caminhão cegonha abastece de graça, então volta mais rápido. NV #-# adicionam bombas (# # # #), NV #-# dão mais dinheiro.
+3453	Pompes à carburant	Surtidores	Bombas de combustível
+3454	Voiture toutes les	Coche cada	Carro a cada
+3455	Paiement par plein	Pago por repostaje	Pagamento por abastecimento
+3456	Camion de retour plus vite	Camión vuelve antes	Caminhão volta mais rápido
+3457	🚆 Terminal ferroviaire	🚆 Terminal de tren	🚆 Terminal ferroviário
+3458	RAIL WARS : chaque heure, l'Usine envoie des voitures d'EXPORT – elles font le plein à la Station-service, passent au Lavage et montent dans ton train. Un train plein s'envoie depuis la page RAIL WARS (bouton RAIL WARS à droite de l'écran) : max # par jour, # min de trajet, les autres joueurs peuvent l'attaquer. Son GRADE (Commun → Mythique) dépend des niveaux du Lavage, de la Station-service et de l'Usine ; tu peux l'actualiser # fois. Un grade plus élevé rapporte plus de Jetons de la Rue pour la Boutique de la Rue. NIV #-# = plus de voitures par train (# # # #).	RAIL WARS: cada hora la Fábrica envía coches de EXPORTACIÓN – repostan en la Gasolinera, se lavan en el Autolavado y suben a tu tren. Un tren lleno se envía desde la página RAIL WARS (botón RAIL WARS a la derecha): máx # al día, # min de viaje, otros jugadores pueden atacarlo. Su GRADO (Común → Mítico) depende de los niveles de Autolavado, Gasolinera y Fábrica; puedes actualizarlo # veces. Un grado más alto da más Fichas de la Calle para la Tienda de la Calle. NV #-# = más coches por tren (# # # #).	RAIL WARS: a cada hora a Fábrica envia carros de EXPORTAÇÃO – abastecem no Posto, são lavados no Lava-rápido e sobem no seu trem. Um trem cheio é enviado pela página RAIL WARS (botão RAIL WARS à direita): máx # por dia, # min de viagem, outros jogadores podem atacar. O GRAU (Comum → Mítico) depende dos níveis do Lava-rápido, Posto e Fábrica; você pode atualizar # vezes. Grau maior = mais Fichas da Rua para a Loja da Rua. NV #-# = mais carros por trem (# # # #).
+3459	Voitures par train	Coches por tren	Carros por trem
+3460	Train plein dans	Tren lleno en	Trem cheio em
+3461	≈ # min	≈ # min	≈ # min
+3462	Chance du meilleur grade	Prob. del mejor grado	Chance do melhor grau
+3463	🏭 Usine auto	🏭 Fábrica de coches	🏭 Fábrica de carros
+3464	Des robots construisent des voitures neuves. Chaque voiture sort par la porte de droite et est vendue direct à un concessionnaire. NIV #-# agrandissent l'usine avec plus de robots, NIV #-# construisent plus vite et vendent plus cher.	Robots construyen coches nuevos. Cada coche sale por la puerta derecha y se vende directo a un concesionario. NV #-# amplían la fábrica con más robots, NV #-# fabrican más rápido y venden más caro.	Robôs constroem carros novos. Cada carro sai pelo portão da direita e é vendido direto a uma revenda. NV #-# aumentam a fábrica com mais robôs, NV #-# fabricam mais rápido e vendem mais caro.
+3465	Prix par voiture neuve	Precio por coche nuevo	Preço por carro novo
+3466	Bras robotisés	Brazos robóticos	Braços robóticos
+3467	🏁 Circuit	🏁 Circuito	🏁 Autódromo
+3468	BIENTÔT. Ici tu testeras les voitures de ton garage, feras des courses et gagneras des compétitions. S'ouvre dans un prochain chapitre.	PRÓXIMAMENTE. Aquí probarás los coches de tu taller, correrás carreras y ganarás competiciones. Se abre en un capítulo futuro.	EM BREVE. Aqui você vai testar os carros da sua oficina, correr e vencer competições. Abre num capítulo futuro.
+3469	Pièces Tank	Piezas de Tanque	Peças de Tanque
+3470	Pièces Guerrier	Piezas de Guerrero	Peças de Guerreiro
+3471	Pièces Tireur	Piezas de Tirador	Peças de Atirador
+3472	Pièces Mage	Piezas de Mago	Peças de Mago
+3473	Pièces Soutien	Piezas de Apoyo	Peças de Suporte
+3475	À vie : un porte-voitures doré arrive au hasard et décharge #-# voitures de luxe de clients riches (supercars, limousines, la Royal Hypercar). Elles ont la PRIORITÉ dans chaque garage et paient ×#	Para siempre: un portacoches dorado llega al azar y descarga #-# coches de lujo de clientes ricos (superdeportivos, limusinas, el Royal Hypercar). Tienen PRIORIDAD en cada taller y pagan ×#	Para sempre: uma cegonha dourada chega em horários aleatórios e descarrega #-# carros de luxo de clientes ricos (supercarros, limusines, o Royal Hypercar). Eles têm PRIORIDADE em toda oficina e pagam ×#
+3476	VIP Pass · # jours	VIP Pass · # días	VIP Pass · # dias
+3477	Tous tes avantages VIP sont ×	Todas tus ventajas VIP son ×	Todas as suas vantagens VIP ficam ×
+3478	plus forts pendant # jours. Les points VIP viennent toujours des Quêtes du jour – pour tous.	más fuertes durante # días. Los puntos VIP siguen llegando de las Misiones diarias – para todos.	mais fortes por # dias. Os pontos VIP continuam vindo das Missões diárias – para todos.
+3479	Les combats peuvent tourner en vitesse ×#. ×# est gratuit pour tous. À toi pour toujours – chaque chapitre, chaque étape.	Los combates pueden ir a velocidad ×#. ×# es gratis para todos. Tuyo para siempre – cada capítulo, cada fase.	As batalhas podem rodar em velocidade ×#. ×# é grátis para todos. Seu para sempre – todo capítulo, toda fase.
+3480	À vie : CHAQUE mécanicien de chaque atelier travaille #% plus vite et gagne #% de plus. Marche avec tes héros.	Para siempre: CADA mecánico de cada taller trabaja #% más rápido y gana #% más dinero. Funciona junto a tus héroes.	Para sempre: CADA mecânico de cada oficina trabalha #% mais rápido e ganha #% mais. Funciona junto com seus heróis.
+3481	👑 VIP Pass actif pour # jours ! Tous les avantages VIP ×	👑 ¡VIP Pass activo por # días! Todas las ventajas VIP ×	👑 VIP Pass ativo por # dias! Todas as vantagens VIP ×
+3482	✨ Graphismes HD ACTIVÉS · touche encore pour STANDARD (moins de batterie)	✨ Gráficos HD SÍ · toca otra vez para ESTÁNDAR (menos batería)	✨ Gráficos HD LIGADOS · toque de novo para PADRÃO (menos bateria)
+3483	✨ Graphismes HD : l'image la plus nette, utilise plus de batterie · touche encore pour ACTIVER	✨ Gráficos HD: la imagen más nítida, usa más batería · toca otra vez para ACTIVAR	✨ Gráficos HD: imagem mais nítida, usa mais bateria · toque de novo para LIGAR
+3484	⚙️ Graphismes STANDARD – redémarrage…	⚙️ Gráficos ESTÁNDAR – reiniciando…	⚙️ Gráficos PADRÃO – reiniciando…
+3485	✨ HD ACTIVÉ – redémarrage…	✨ HD SÍ – reiniciando…	✨ HD LIGADO – reiniciando…
+3486	✓ fait	✓ hecho	✓ feito
+3487	📦 commandé	📦 pedido	📦 pedido
+3488	🚁 en vol	🚁 en vuelo	🚁 em voo
+3489	🛬 sur l'héliport	🛬 en el helipuerto	🛬 no heliponto
+3490	🛻 en route	🛻 en camino	🛻 a caminho
+3491	✓ pièces en stock	✓ piezas en stock	✓ peças em estoque
+3492	il faut des pièces	necesita piezas	precisa de peças
+3493	Conduite	Conduciendo	Dirigindo
+3494	Attend un chauffeur	Esperando conductor	Esperando motorista
+3495	Attend un atelier libre	Esperando taller libre	Esperando oficina livre
+3496	Attend l'inspection	Esperando inspección	Esperando inspeção
+3497	À l'atelier	En el taller	Na oficina
+3498	Attend des pièces	Esperando piezas	Esperando peças
+3499	À vendre	En venta	À venda
+3500	Vendue – part à la cour	Vendido – va al patio	Vendido – indo para o pátio
+3501	Attend le camion	Esperando el camión	Esperando o caminhão
+3502	Chargement	Cargando	Carregando
+3503	👑 Client riche du Camion VIP – priorité dans chaque garage, chaque travail paie ×#	👑 Cliente rico del Camión VIP – prioridad en cada taller, cada trabajo paga ×#	👑 Cliente rico do Caminhão VIP – prioridade em toda oficina, cada serviço paga ×#
+3504	L'inspection a trouvé ces travaux :	La inspección encontró estos trabajos:	A inspeção encontrou estes serviços:
+3505	Pas encore inspectée. Les mécaniciens vont trouver ce dont elle a besoin.	Aún sin inspeccionar. Los mecánicos averiguarán qué necesita.	Ainda não inspecionado. Os mecânicos vão descobrir o que ele precisa.
+3506	Valeur actuelle	Valor hasta ahora	Valor até agora
+3507	Bonus type de voiture	Bonus por tipo de coche	Bônus por tipo de carro
+3508	🛒 Boutique	🛒 Tienda	🛒 Loja
+3509	Les packs restent pour toujours – chaque chapitre, chaque étape	Los packs son para siempre – cada capítulo, cada fase	Os pacotes ficam para sempre – todo capítulo, toda fase
+3514	🧪 MODE TEST (propriétaire) : toucher le prix débloque le pack sans paiement.	🧪 MODO PRUEBA (dueño): tocar el precio desbloquea el pack sin pagar.	🧪 MODO TESTE (dono): tocar no preço libera o pacote sem pagar.
+3515	· PASS ×	· PASE ×	· PASSE ×
+3516	NIVEAU MAX –	NIVEL MÁX –	NÍVEL MÁX –
+3517	Chaque achat donne des points VIP (# € =	Cada compra da puntos VIP (# € =	Cada compra dá pontos VIP (# € =
+3518	points) – chaque pack, pass et fonds. Les Quêtes du jour donnent # point chacune. Chaque niveau VIP ouvre un gros coffre (diamants, tickets, un set d'équipement complet au choix…), +# h d'Idle et +#% sur tous les Gains Idle.	puntos) – cada pack, pase y fondo. Las Misiones diarias dan # punto cada una. Cada nivel VIP abre un gran cofre (diamantes, tickets, un set de equipamiento completo a elegir…), +# h de Idle y +#% en todas las Recompensas Idle.	pontos) – cada pacote, passe e fundo. As Missões diárias dão # ponto cada. Cada nível VIP abre um grande baú (diamantes, tickets, um conjunto completo à escolha…), +# h de Idle e +#% em todas as Recompensas Idle.
+3519	Les VIP Pass renforcent tous les avantages : Argent ×# · Or ×# · Platine ×# – ensemble ×#	Los VIP Pass refuerzan todas las ventajas: Plata ×# · Oro ×# · Platino ×# – juntos ×#	Os VIP Pass reforçam todas as vantagens: Prata ×# · Ouro ×# · Platina ×# – juntos ×#
+3520	Avec le VIP Pass, tous les avantages sont ×	Con el VIP Pass todas las ventajas son ×	Com o VIP Pass todas as vantagens ficam ×
+3522	VIP Pass ·	VIP Pass ·	VIP Pass ·
+3523	· à vie	· para siempre	· para sempre
+3524	Argent & Or : à vie (tes diamants reviennent) · Platine & Diamant : mensuels – tous se cumulent.	Plata y Oro: para siempre (tus diamantes vuelven) · Platino y Diamante: mensuales – todos se acumulan.	Prata e Ouro: para sempre (seus diamantes voltam) · Platina e Diamante: mensais – todos se acumulam.
+3525	Tous les avantages VIP ×	Todas las ventajas VIP ×	Todas as vantagens VIP ×
+3526	plus forts que sans le pass.	más fuertes que sin el pase.	mais fortes que sem o passe.
+3527	CADEAUX	REGALOS	PRESENTES
+3528	Chaque jour :	Cada día:	Todo dia:
+3529	Chaque lundi :	Cada lunes:	Toda segunda:
+3530	chacun + 🗝 # dans chaque donjon	cada uno + 🗝 # en cada mazmorra	cada + 🗝 # em cada masmorra
+3531	Atteins VIP # avec les Quêtes du jour pour débloquer les cadeaux quotidiens.	Llega a VIP # con las Misiones diarias para desbloquear regalos diarios.	Chegue ao VIP # com as Missões diárias para liberar presentes diários.
+3532	✓ AUJOURD'HUI	✓ HOY	✓ HOJE
+3533	✓ SEMAINE	✓ SEMANA	✓ SEMANA
+3534	🎁 BOÎTE DE SET en attente :	🎁 CAJA DE SET esperando:	🎁 CAIXA DE CONJUNTO esperando:
+3535	🎁 Idle rapide (# h d'un coup)	🎁 Idle rápido (# h de golpe)	🎁 Idle rápido (# h de uma vez)
+3536	⚡ BALAYAGE (campagne + Donjons)	⚡ BARRIDO (campaña + Mazmorras)	⚡ VARREDURA (campanha + Masmorras)
+3537	🎒 Sac d'équipement	🎒 Bolsa de equipamiento	🎒 Bolsa de equipamento
+3538	⚔️ Combats d'Arène par jour	⚔️ Combates de Arena al día	⚔️ Lutas da Arena por dia
+3539	🗝 Clés de donjon par jour	🗝 Llaves de mazmorra al día	🗝 Chaves de masmorra por dia
+3540	Clés de Boss mondial par jour	Llaves de Jefe mundial al día	Chaves de Chefe mundial por dia
+3541	TES AVANTAGES · VIP	TUS VENTAJAS · VIP	SUAS VANTAGENS · VIP
+3542	👑 = avec VIP Pass	👑 = con VIP Pass	👑 = com VIP Pass
+3544	TOUS LES NIVEAUX VIP	TODOS LOS NIVELES VIP	TODOS OS NÍVEIS VIP
+3545	(avec VIP Pass)	(con VIP Pass)	(com VIP Pass)
+3546	Cadeau du jour :	Regalo diario:	Presente diário:
+3547	Idle rapide	Idle rápido	Idle rápido
+3548	🎒 +# sac	🎒 +# bolsa	🎒 +# bolsa
+3549	⚔️ +# Arène	⚔️ +# Arena	⚔️ +# Arena
+3550	🗝 +# clé de Donjon par jour	🗝 +# llave de Mazmorra al día	🗝 +# chave de Masmorra por dia

@@ -8,7 +8,7 @@ const PWh=window.PWI||'⚡';
 const DMh='<img class="tki" src="img/ui/diamond.svg" alt="">',TKh='<img class="tki" src="img/ticket.webp" alt="">',GTh='<img class="tki" src="img/gticket.webp" alt="">',CTh='<img class="tki" src="img/cticket.webp" alt="">';
 const API=()=>window.SEC&&SEC.api(), PID=()=>window.SEC&&SEC.PID;
 const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}};
-const LANG=(navigator.language||'en');
+const LANG=(window.TE_LANGSEL||navigator.language||'en');
 const esc=s=>String(s??'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
 const onD=p=>p&&p.on?'<i class="ond" title="online now"></i>':'';   // v16-189: green dot = online now (active in the last 10 min)
 const flag=cc=>cc&&/^[A-Z]{2}$/.test(cc)?String.fromCodePoint(...[...cc].map(c=>127397+c.charCodeAt(0))):'';
@@ -18,7 +18,7 @@ const HI=id=>'img/hero/'+(/^m\d_\d+$/.test(id||'')?id:'m0_0')+'.webp';
 const gradeOf=id=>{const m=/^[mdg](\d)_/.exec(id||'');return m?+m[1]:0;};
 const dur=ms=>{ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);return h>=24?Math.floor(h/24)+'d '+h%24+'h':h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s).padStart(2,'0')+'s';};
 // v16-88: CV = this game version (number). The server refuses older versions (MIN_CV in server/online.js) → window 'UPDATE REQUIRED'.
-const CV=372;window.TE_CV=CV;
+const CV=373;window.TE_CV=CV;
 // v16-261 (Marius, 23 nov 2026: „server de rezervă în caz de orice”): if the online server cannot be reached 3 times in a row,
 // a small pill at the top says so (no internet / server maintenance) – the game keeps working offline, the progress stays on the phone and syncs later.
 let NETF=0;function netPill(on){let d=document.getElementById('netPill');
@@ -543,7 +543,7 @@ function msgHtml(m){const tm=new Date(m.t).toLocaleTimeString([],{hour:'2-digit'
   const txt=autoTr&&m.tr?m.tr:m.txt;const trl=autoTr&&m.tr?`<div class="tr">🌐 translated from ${LNAME[m.lang]||m.lang} · <u data-orig="${m.id}">show original</u></div>`:'';
   if(m.me)return `<div class="m me" data-mid="${m.id}">${fav(m.icon,m.frame)}<div class="bub"><div class="h" style="justify-content:flex-end"><span class="tm">${tm}</span>${tt(m.title)} You</div><p>${esc(m.txt)}</p></div></div>`;
   return `<div class="m" data-mid="${m.id}" data-u="${m.uid}">${fav(m.icon,m.frame)}<div class="bub"><div class="h">${flag(m.cc)} ${nmc(m)} ${vipB(m.vip)} ${tt(m.title)}<span class="tm">${tm}</span></div><p>${esc(txt)}</p>${trl}</div></div>`;}
-$('olMsgs').addEventListener('click',e=>{const o=e.target.closest('[data-orig]');if(o){const m=chList.find(x=>x.id===+o.dataset.orig);if(m){const p=o.closest('.bub').querySelector('p');const sh=o.textContent==='show original';p.textContent=sh?m.txt:m.tr;o.textContent=sh?'show translation':'show original';}return;}
+$('olMsgs').addEventListener('click',e=>{const o=e.target.closest('[data-orig]');if(o){const m=chList.find(x=>x.id===+o.dataset.orig);if(m){const p=o.closest('.bub').querySelector('p');const sh=o.dataset.o!=='1';o.dataset.o=sh?'1':'';p.textContent=sh?m.txt:m.tr;o.textContent=sh?'show translation':'show original';}return;}
   const mm=e.target.closest('.m[data-u]');if(mm&&!e.target.closest('.menu'))openMenu(mm);});
 let lpT=0;$('olMsgs').addEventListener('touchstart',e=>{const mm=e.target.closest('.m[data-u]');if(!mm)return;clearTimeout(lpT);lpT=setTimeout(()=>openMenu(mm),450);},{passive:true});
 $('olMsgs').addEventListener('touchend',()=>clearTimeout(lpT),{passive:true});$('olMsgs').addEventListener('touchmove',()=>clearTimeout(lpT),{passive:true});
@@ -702,6 +702,7 @@ function renderProf(){const B=$('olPrB');if(!ME){B.innerHTML='<div class="empty"
    <h3>REWARDS</h3><div class="tlist"><div data-dc="1" style="border-color:#5865F2">💬 DISCORD REWARD<span>Join our Discord: <b style="color:#ffd54a">500 💎 + 10 Recruit + 10 Gear + 10 Crew tickets</b> · gift codes &amp; news about the next updates</span><b>›</b></div><div data-gc="1">🎁 GIFT CODE<span>Type a code from our Discord – the reward comes in your MAIL</span><b>›</b></div></div>
    <h3>HELP & SUPPORT</h3><div class="tlist"><div data-help="1">🆘 WRITE TO US<span>A bug, a purchase, your account or an idea – we answer in your MAIL</span><b>›</b></div></div>
    <h3>GRAPHICS</h3><div class="tlist" id="olGfx">${(()=>{const G=window.GFX||{man:'auto',eff:'std'},TN={hd:'HD',std:'STANDARD',low:'LOW'};return [['auto','⚙️ AUTO · recommended','The game checked your phone → <b>'+TN[G.man==='auto'?G.eff:(G.tier==='lo'?'low':'std')]+'</b> for you'],['hd','✨ HD · MAX QUALITY','Sharpest picture on good phones · uses more battery and memory'],['std','🖼️ STANDARD','Sharp picture, normal battery use'],['low','🍃 LOW · SMOOTH','For older phones – lighter picture, no lag, less battery']].map(g=>`<div class="${G.man===g[0]?'sel':''}" data-gfx="${g[0]}">${g[1]}<span>${g[2]}</span><b>${G.man===g[0]?'✅':''}</b></div>`).join('');})()}</div>
+   <h3>LANGUAGE</h3><div class="tlist" id="olLng">${Object.entries(window.TE_LANGS||{en:'English'}).map(([c,n])=>`<div class="${(window.TE_LANG||'en')===c?'sel':''}" data-lng="${c}" data-notr="1">${n}<span>${c==='en'?'English':''}</span><b>${(window.TE_LANG||'en')===c?'✅':''}</b></div>`).join('')}</div>
    <h3>SOUND</h3><div class="tlist" id="olSnd">${(()=>{const on=!window.TE_SND||window.TE_SND.on;return [[1,'🔊 BATTLE SOUNDS ON','Hits, explosions, victory'],[0,'🔇 BATTLE SOUNDS OFF','Silent battles']].map(o=>`<div class="${(o[0]===1)===on?'sel':''}" data-snd="${o[0]}">${o[1]}<span>${o[2]}</span><b>${(o[0]===1)===on?'✅':''}</b></div>`).join('');})()}</div>
    <div class="o-note">Your name, icon, frame and title are shown to other players in the ranking, chat and Arena.<br>Player ID ${ME.uid} · <u data-a="mutes">muted players (${mutes.size})</u></div>`;}
 async function setProf(set,paid){const r=await call('prof',{set,paid});
@@ -713,6 +714,7 @@ $('olPrB').addEventListener('click',async e=>{
   const a=e.target.closest('[data-a]');if(a&&a.dataset.a==='name'){nameModal();return;}
   if(a&&a.dataset.a==='mutes'){mutes.clear();LS('te_mutes','[]');toast('🔈 All players unmuted');renderProf();return;}
   if(e.target.closest('[data-help]')){helpForm();return;}
+  const lg=e.target.closest('[data-lng]');if(lg){if(lg.dataset.lng!==(window.TE_LANG||'en')&&window.TE_SETLANG)TE_SETLANG(lg.dataset.lng);return;}
   const sd=e.target.closest('[data-snd]');if(sd){if(window.TE_SND)window.TE_SND.set(sd.dataset.snd==='1');toast(sd.dataset.snd==='1'?'🔊 Battle sounds ON':'🔇 Battle sounds OFF',1500);renderProf();return;}
   if(e.target.closest('[data-dc]')){dcForm();return;}
   if(e.target.closest('[data-gc]')){gcForm();return;}
@@ -1016,7 +1018,7 @@ function addButtons(){
   const s2=$('side2');if(s2&&!$('rkBtn')){
     s2.insertAdjacentHTML('afterbegin',`<button id="rkBtn"><svg viewBox="0 0 64 64"><use href="#olTrophy"/></svg><small>RANK</small></button><button id="chBtn"><svg viewBox="0 0 64 64"><use href="#olChat"/></svg><small>CHAT</small><i id="chDot"></i></button>`);
     $('rkBtn').onclick=()=>openHub('olRank');$('chBtn').onclick=()=>openHub('olChat');}
-  const sd=$('side');if(sd&&!$('arBtn')){const b=document.createElement('button');b.id='arBtn';b.innerHTML='<img src="img/ui/ic_arena.webp" alt="Arena"><i id="arDot"></i>';
+  const sd=$('side');if(sd&&!$('arBtn')){const b=document.createElement('button');b.id='arBtn';b.innerHTML='<img src="img/nt/ui/ic_arena.webp" alt="Arena"><i id="arDot"></i>';
     const cp=$('cpBtn');if(cp&&cp.nextSibling)sd.insertBefore(b,cp.nextSibling);else sd.appendChild(b);b.onclick=()=>openHub('olArena');}
   dots();}
 // ------------------------------------------------------------------ v16-223 BIG ANNOUNCEMENTS (Marius 23 nov): MYTHIC hero / ASCENDED gear → the whole server sees it

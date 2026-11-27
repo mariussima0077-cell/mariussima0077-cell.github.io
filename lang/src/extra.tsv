@@ -1,0 +1,133 @@
+# / # VIP points	# / # puntos VIP	# / # pontos VIP
+# / # collected	# / # recogidos	# / # coletados
+# / day	# / día	# / dia
+# every #h	# cada #h	# a cada #h
+#/# stages · #/# ⭐	#/# fases · #/# ⭐	#/# fases · #/# ⭐
++#% ATK & HP	+#% ATQ y PV	+#% ATQ e PV
+ACTIVE: ATK +#%	ACTIVO: ATQ +#%	ATIVO: ATQ +#%
+ACTIVE: Attack +#% · HP +#% · Defense +#% · Crit chance +#%	ACTIVO: Ataque +#% · PV +#% · Defensa +#% · Prob. crítico +#%	ATIVO: Ataque +#% · PV +#% · Defesa +#% · Chance de crítico +#%
+ACTIVE: DEF +#%	ACTIVO: DEF +#%	ATIVO: DEF +#%
+ACTIVE: HP +#%	ACTIVO: PV +#%	ATIVO: PV +#%
+ATK +#%	ATQ +#%	ATQ +#%
+AVAILABLE HEROES	HÉROES DISPONIBLES	HERÓIS DISPONÍVEIS
+AWK V	DESP V	DESP V
+Arrival valet #	Aparcacoches #	Manobrista #
+Bay #	Bahía #	Box #
+CORE →	NÚCLEO →	NÚCLEO →
+CRUSHER KING · KEYS #/#	CRUSHER KING · LLAVES #/#	CRUSHER KING · CHAVES #/#
+DAY #	DÍA #	DIA #
+DAY # OF # · LOG IN EVERY DAY	DÍA # DE # · ENTRA CADA DÍA	DIA # DE # · ENTRE TODO DIA
+DEF +#%	DEF +#%	DEF +#%
+Earn $# from sales	Gana #$ en ventas	Ganhe #$ em vendas
+Every purchase gives VIP points (# € = # points) – every pack, pass and fund. Daily Quests give # point each. Every VIP level opens a big chest (diamonds, tickets, a full gear set of your choice…), +# h Idle and +#% on all Idle Rewards. VIP Passes make all benefits stronger: Silver ×# · Gold ×# · Platinum ×# – together ×#	Cada compra da puntos VIP (# € = # puntos) – cada pack, pase y fondo. Las Misiones diarias dan # punto cada una. Cada nivel VIP abre un gran cofre (diamantes, tickets, un set completo a elegir…), +# h de Idle y +#% en todas las Recompensas Idle. Los VIP Pass refuerzan todo: Plata ×# · Oro ×# · Platino ×# – juntos ×#	Cada compra dá pontos VIP (# € = # pontos) – cada pacote, passe e fundo. As Missões diárias dão # ponto cada. Cada nível VIP abre um grande baú (diamantes, tickets, um conjunto completo à escolha…), +# h de Idle e +#% em todas as Recompensas Idle. Os VIP Pass reforçam tudo: Prata ×# · Ouro ×# · Platina ×# – juntos ×#
+FIELDS →	CAMPOS →	CAMPOS →
+FLOOR # / #	PISO # / #	ANDAR # / #
+Forever · all #	Para siempre · los #	Para sempre · todos os #
+From: Torque Studios · Nov # #	De: Torque Studios · # nov. #	De: Torque Studios · # nov. #
+HALLS →	SALAS →	SALÕES →
+HEROES FOR BATTLES	HÉROES PARA COMBATES	HERÓIS PARA BATALHAS
+HP +#%	PV +#%	PV +#%
+HP · ATK · DEF +#%	PV · ATQ · DEF +#%	PV · ATQ · DEF +#%
+Inspect # cars	Inspecciona # coches	Inspecione # carros
+Inspection driver #	Conductor de inspección #	Motorista da inspeção #
+Inspection · Bay #	Inspección · Bahía #	Inspeção · Box #
+KEYS #/#	LLAVES #/#	CHAVES #/#
+Load # cars on the transporter	Carga # coches en el camión	Carregue # carros no caminhão
+Loading... #%	Cargando... #%	Carregando... #%
+MAX – # XP	MÁX – # XP	MÁX – # XP
+Mechanics check every car. The inspection decides which workshops the car visits and which parts must be ordered.	Los mecánicos revisan cada coche. La inspección decide a qué talleres va y qué piezas hay que pedir.	Os mecânicos verificam cada carro. A inspeção decide quais oficinas ele visita e quais peças pedir.
+Puts every driver where he helps most. Nothing changes until you confirm.	Coloca a cada conductor donde más ayuda. Nada cambia hasta que confirmes.	Coloca cada motorista onde ele mais ajuda. Nada muda até você confirmar.
+RIVERS →	RÍOS →	RIOS →
+ROAD +×#	CAMINO +×#	ESTRADA +×#
+ROOKIE	NOVATO	NOVATO
+Recruit + Crew + Gear tickets every day	Tickets Recluta + Cuadrilla + Equipamiento cada día	Tickets Recruta + Tripulação + Equipamento todo dia
+Rep #	Rep #	Rep #
+SPIN · # left	GIRAR · quedan #	GIRAR · restam #
+SPINS:	GIROS:	GIROS:
+STAGE #-#	FASE #-#	FASE #-#
+SUMMON ×#	INVOCAR ×#	INVOCAR ×#
+SUMMONS:	INVOCACIONES:	INVOCAÇÕES:
+Sales Office driver #	Conductor de ventas #	Motorista de vendas #
+Scanner heroes in battle	Héroes Escáner en combate	Heróis Scanner em batalha
+Service driver #	Conductor de servicio #	Motorista da revisão #
+Sun # Nov, #:# → Wed # Dec, #:#	Dom # nov., #:# → Mié # dic., #:#	Dom # nov., #:# → Qua # dez., #:#
+TEAM ROLES #/# ·	ROLES DEL EQUIPO #/# ·	FUNÇÕES DA EQUIPE #/# ·
+TODAY +#	HOY +#	HOJE +#
+TODAY: BRUISER · RACER	HOY: PEGADOR · PILOTO	HOJE: BRUTAMONTES · PILOTO
+Torque Studios · Nov # #	Torque Studios · # nov. #	Torque Studios · # nov. #
+YOUR SUMMONS	TUS INVOCACIONES	SUAS INVOCAÇÕES
+diamonds	diamantes	diamantes
+empty	vacío	vazio
+in #d #h	en #d #h	em #d #h
+missing: TANK, RANGER · # roles +#% · # +#% · # +#%	falta: TANQUE, TIRADOR · # roles +#% · # +#% · # +#%	falta: TANQUE, ATIRADOR · # funções +#% · # +#% · # +#%
+missions	misiones	missões
+or	o	ou
+stage #-#	fase #-#	fase #-#
+vs stage #-# · #	vs fase #-# · #	vs fase #-# · #
+×# each	×# cada uno	×# cada
+– Electronics · Wagon, SUV, Pickup, Van · suspension, rust, respray	– Electrónica · Familiar, SUV, Pickup, Furgoneta · suspensión, óxido, pintura	– Elétrica · Perua, SUV, Picape, Van · suspensão, ferrugem, pintura
+– Engine Shop · Parts Office & Helipad · Sports cars · clutch, timing belt, ECU	– Taller de motores · Oficina de piezas y Helipuerto · Deportivos · embrague, correa, ECU	– Oficina de motores · Escritório de peças e Heliponto · Esportivos · embreagem, correia, ECU
+– Inspection, Service, Body & Paint — small jobs only	– Inspección, Servicio, Chapa y Pintura — solo trabajos pequeños	– Inspeção, Revisão, Funilaria e Pintura — só serviços pequenos
+– Supercars · engine & gearbox swaps · widebody · sport kits	– Superdeportivos · cambios de motor y caja · kit ancho · kits sport	– Supercarros · troca de motor e câmbio · widebody · kits esportivos
+– Tuning · Muscle cars · turbo, street kits, ECU stage #	– Tuning · Muscle cars · turbo, kits street, ECU stage #	– Tuning · Muscle cars · turbo, kits street, ECU stage #
+– V# swaps · full Race builds	– swaps V# · preparaciones de carreras	– swaps V# · preparações de corrida
+⏳ #d #h left	⏳ quedan #d #h	⏳ restam #d #h
+⏳ ends in #d #h	⏳ termina en #d #h	⏳ termina em #d #h
+◆ COMMON	◆ COMÚN	◆ COMUM
+◆ RARE	◆ RARO	◆ RARO
+◆ UNCOMMON	◆ POCO COMÚN	◆ INCOMUM
+★ LV #	★ NV #	★ NV #
+★LV.#	★NV.#	★NV.#
+⚙️ ENGINE SHOP  ·  ★ LV #	⚙️ TALLER DE MOTORES  ·  ★ NV #	⚙️ OFICINA DE MOTORES  ·  ★ NV #
+⚡ ELECTRONICS  ·  ★ LV #	⚡ ELECTRÓNICA  ·  ★ NV #	⚡ ELÉTRICA  ·  ★ NV #
+⚡ Work speed here: +#%	⚡ Velocidad de trabajo aquí: +#%	⚡ Velocidade de trabalho aqui: +#%
+⭐ Reputation #	⭐ Reputación #	⭐ Reputação #
+⭐ Your Rep bonus now: car sale price +#% · idle income +#%	⭐ Tu bonus de Rep: precio de venta +#% · ingreso idle +#%	⭐ Seu bônus de Rep: preço de venda +#% · renda idle +#%
+🌐 AUTO: ON	🌐 AUTO: SÍ	🌐 AUTO: LIGADO
+🌟 All workshops ✓ · Lv #	🌟 Todos los talleres ✓ · Nv #	🌟 Todas as oficinas ✓ · Nv #
+🎁 QUICK IDLE #h · # left	🎁 IDLE RÁPIDO #h · quedan #	🎁 IDLE RÁPIDO #h · restam #
+🎖️ Tier #/#	🎖️ Nivel #/#	🎖️ Nível #/#
+🎨 BODY & PAINT  ·  ★ LV #	🎨 CHAPA Y PINTURA  ·  ★ NV #	🎨 FUNILARIA E PINTURA  ·  ★ NV #
+🎨 Body & Paint	🎨 Chapa y Pintura	🎨 Funilaria e Pintura
+🏁 TUNING  ·  ★ LV #	🏁 TUNING  ·  ★ NV #	🏁 TUNING  ·  ★ NV #
+💵 Money	💵 Dinero	💵 Dinheiro
+💼 SALES OFFICE  ·  ★ LV #	💼 OFICINA DE VENTAS  ·  ★ NV #	💼 ESCRITÓRIO DE VENDAS  ·  ★ NV #
+🔍 INSPECTION  ·  ★ LV #	🔍 INSPECCIÓN  ·  ★ NV #	🔍 INSPEÇÃO  ·  ★ NV #
+🔍 Inspection ✓ · Lv #	🔍 Inspección ✓ · Nv #	🔍 Inspeção ✓ · Nv #
+🔒 Opens after the Starter Pack	🔒 Se abre tras el Starter Pack	🔒 Abre depois do Starter Pack
+🔧 SERVICE  ·  ★ LV #	🔧 SERVICIO  ·  ★ NV #	🔧 REVISÃO  ·  ★ NV #
+🔧 Service ✓ · Lv #	🔧 Servicio ✓ · Nv #	🔧 Revisão ✓ · Nv #
+# / # · next: car on the way · #:#	# / # · siguiente: coche en camino · #:#	# / # · próximo: carro a caminho · #:#
+# upgrades: street kits, lowering, ECU tunes, neon, chrome rims, tint, LED lights, sport exhaust, wraps, carbon hoods, flame decals, roof scoops, air suspension, drift kits, nitro and full race builds.	# mejoras: kits street, rebajes, reprogramación ECU, neón, llantas cromadas, lunas tintadas, LED, escape deportivo, vinilos, capós de carbono, llamas, tomas de aire, suspensión neumática, kits drift, nitro y preparaciones de carreras.	# melhorias: kits street, rebaixamento, remap de ECU, neon, rodas cromadas, vidros escuros, LED, escapamento esportivo, envelopamento, capôs de carbono, chamas, entradas de ar, suspensão a ar, kits drift, nitro e preparações de corrida.
+Arrival Parking	Parking de llegada	Estacionamento de chegada
+Body & Paint driver #	Conductor de chapa y pintura #	Motorista da funilaria #
+Bruiser heroes in battle	Héroes Pegador en combate	Heróis Brutamontes em batalha
+Bulbs, sensors, wiring looms and ECU repairs.	Bombillas, sensores, cableado y reparaciones de ECU.	Lâmpadas, sensores, chicotes e reparos de ECU.
+Choose a driver. Best for this place first. Tap to compare before / after.	Elige un conductor. El mejor para este puesto primero. Toca para comparar antes / después.	Escolha um motorista. O melhor para este lugar primeiro. Toque para comparar antes / depois.
+Electronics driver #	Conductor de electrónica #	Motorista da elétrica #
+Engine Shop driver #	Conductor de motores #	Motorista de motores #
+Medic heroes in battle	Héroes Médico en combate	Heróis Médico em batalha
+Oil, brakes, tires and batteries. Later: suspension and clutches.	Aceite, frenos, neumáticos y baterías. Más tarde: suspensiones y embragues.	Óleo, freios, pneus e baterias. Depois: suspensões e embreagens.
+Polish, dents, rust and full resprays. Later: bumpers and widebody kits.	Pulido, abolladuras, óxido y pintura completa. Más tarde: parachoques y kits anchos.	Polimento, amassados, ferrugem e pintura completa. Depois: para-choques e kits widebody.
+Racer heroes in battle	Héroes Piloto en combate	Heróis Piloto em batalha
+Shocker heroes in battle	Héroes Electro en combate	Heróis Elétrico em batalha
+Sprayer heroes in battle	Héroes Pintor en combate	Heróis Pintor em batalha
+Timing belt 📦	Correa de distribución 📦	Correia dentada 📦
+Timing belts, turbos, gearbox and full engine swaps. Long jobs that pay a lot. Every job needs parts.	Correas, turbos, cajas de cambio y cambios de motor. Trabajos largos que pagan mucho. Cada trabajo necesita piezas.	Correias, turbos, câmbios e trocas de motor. Serviços longos que pagam bem. Cada serviço precisa de peças.
+Tuning driver #	Conductor de tuning #	Motorista de tuning #
+VIP # GIFTS	REGALOS VIP #	PRESENTES VIP #
+VIP #:	VIP #:	VIP #:
+Garage parts	Piezas de taller	Peças de oficina
+No connection – try again later	Sin conexión – inténtalo más tarde	Sem conexão – tente mais tarde
+REFRESH #/#	ACTUALIZAR #/#	ATUALIZAR #/#
+Driving speed here: +#%	Velocidad de conducción aquí: +#%	Velocidade de direção aqui: +#%
+# (# patrols)	# (# patrullas)	# (# patrulhas)
+# (security car)	# (coche de seguridad)	# (carro de segurança)
+Choose a guard. Best for this place first. Tap to compare before / after.	Elige un guardia. El mejor para este puesto primero. Toca para comparar antes / después.	Escolha um guarda. O melhor para este lugar primeiro. Toque para comparar antes / depois.
+Desk guard	Guardia de oficina	Guarda de mesa
+Mythic #%	Mítico #%	Mítico #%
+Patrol guard	Guardia de patrulla	Guarda de patrulha
+Collection Garage	Garaje de Colección	Garagem de Coleção
+MOST WANTED – TODAY	MÁS BUSCADOS – HOY	MAIS PROCURADOS – HOJE
+Coming soon – nothing to do here yet.	Próximamente – aún no hay nada aquí.	Em breve – nada para fazer aqui ainda.
+Thief catch here: +#%	Captura de ladrones aquí: +#%	Captura de ladrões aqui: +#%

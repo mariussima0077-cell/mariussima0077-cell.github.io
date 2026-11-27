@@ -1,0 +1,384 @@
+1101	Pièces de set sur	Piezas de set en	Peças de conjunto em
+1102	pièce libre du sac · elle disparaît après	pieza libre de la bolsa · desaparece después	peça livre da bolsa · ela some depois
+1103	dans le sac (non portée).	en la bolsa (sin usar).	na bolsa (não usada).
+1104	% par étoile	% por estrella	% por estrela
+1105	· NOUVELLE COULEUR D'ÉTOILE + NOUVELLE STAT	· NUEVO COLOR DE ESTRELLA + NUEVA ESTADÍSTICA	· NOVA COR DE ESTRELA + NOVO ATRIBUTO
+1106	ÉTOILES	ESTRELLAS	ESTRELAS
+1107	ÉTOILE +	ESTRELLA +	ESTRELA +
+1108	· MAX	· MÁX	· MÁX
+1109	BONUS !	¡BONUS!	BÔNUS!
+1110	(il faut	(faltan	(faltam
+1111	de plus)	más)	mais)
+1112	Coût :	Coste:	Custo:
+1113	SUIVANT	SIGUIENTE	PRÓXIMO
+1114	BONUS D'AMÉLIORATION · +	BONUS DE MEJORA · +	BÔNUS DE MELHORIA · +
+1115	Mythique	Mítico	Mítico
+1116	↩ RETOUR	↩ VOLVER	↩ VOLTAR
+1117	GUIDE DE L'ÉQUIPEMENT	GUÍA DEL EQUIPAMIENTO	GUIA DE EQUIPAMENTO
+1118	COMMENT L'ÉQUIPEMENT DÉPASSE LE MYTHIQUE	CÓMO EL EQUIPAMIENTO SUPERA AL MÍTICO	COMO O EQUIPAMENTO SUPERA O MÍTICO
+1119	# GRADES	# GRADOS	# GRAUS
+1120	Commun ➜ Mythique viennent de l'	Común ➜ Mítico vienen de la	Comum ➜ Mítico vêm da
+1121	Invocation d'équipement	Invocación de equipamiento	Invocação de equipamento
+1122	, de la Campagne et des Donjons.	, la Campaña y las Mazmorras.	, da Campanha e das Masmorras.
+1123	est le nouveau grade au-dessus de Mythique.	es el nuevo grado por encima de Mítico.	é o novo grau acima de Mítico.
+1124	AMÉLIORATION +# – +	MEJORA +# – +	MELHORIA +# – +
+1125	ÉTOILES SEULEMENT SUR TRANSCENDÉ	ESTRELLAS SOLO EN ASCENDIDO	ESTRELAS SÓ NO ASCENDIDO
+1126	Commun ➜ Mythique	Común ➜ Mítico	Comum ➜ Mítico
+1127	: AMÉLIORE avec des Pièces d'équipement jusqu'à	: MEJORA con Piezas de equipamiento hasta	: MELHORE com Peças de equipamento até
+1128	– le	– el	– o
+1129	+ reste sur l'EMPLACEMENT du héros	+ se queda en la RANURA del héroe	+ fica no ESPAÇO do herói
+1130	quand tu changes la pièce. Chaque	cuando cambias la pieza. Cada	quando você troca a peça. Cada
+1131	débloque un bonus : +# … +# = stats bonus	desbloquea un bonus: +# … +# = estadísticas extra	desbloqueia um bônus: +# … +# = atributos extras
+1132	chacune,	cada una,	cada,
+1133	= stat principale ×	= estadística principal ×	= atributo principal ×
+1134	= stat principale ×# au total.	= estadística principal ×# en total.	= atributo principal ×# no total.
+1135	n'a pas de niveaux – un nouveau Transcendé (★#) est déjà	no tiene niveles – un Ascendido nuevo (★#) ya es	não tem níveis – um Ascendido novo (★#) já é
+1136	plus fort qu'un Mythique +#	más fuerte que un Mítico +#	mais forte que um Mítico +#
+1137	. Seuls les Transcendés ont des	. Solo los Ascendidos tienen	. Só os Ascendidos têm
+1138	étoiles ★# – ★#	estrellas ★# – ★#	estrelas ★# – ★#
+1139	(une autre pièce Transcendée du même emplacement = +# étoile).	(otra pieza Ascendida de la misma ranura = +# estrella).	(outra peça Ascendida do mesmo espaço = +# estrela).
+1140	Un Mythique ne peut PAS devenir Transcendé	Un Mítico NO puede volverse Ascendido	Um Mítico NÃO pode virar Ascendido
+1141	– le Transcendé ne fait que tomber (voir #).	– el Ascendido solo se consigue como botín (ver #).	– Ascendido só vem como drop (veja #).
+1142	BUTIN	BOTÍN	DROP
+1143	SEULEMENT	SOLO	SÓ
+1144	ces pièces ne se fabriquent pas – elles ne font que	estas piezas no se fabrican – solo	essas peças não são fabricadas – elas só
+1145	Combats de campagne	Combates de campaña	Batalhas da campanha
+1146	dès l'étape	desde la fase	a partir da fase
+1147	(de plus en plus jusqu'à l'étape	(cada vez más hasta la fase	(cada vez mais até a fase
+1148	Gains Idle	Recompensas Idle	Recompensas Idle
+1149	(petite chance chaque heure dans le coffre)	(pequeña probabilidad cada hora en el cofre)	(pequena chance a cada hora no baú)
+1150	Tours de Classe	Torres de Clase	Torres de Classe
+1151	étages # · # · # · # · # · # (un set Transcendé complet de la classe)	pisos # · # · # · # · # · # (un set Ascendido completo de la clase)	andares # · # · # · # · # · # (um conjunto Ascendido completo da classe)
+1152	Les pièces Transcendées montent jusqu'à	Las piezas Ascendidas suben hasta	As peças Ascendidas vão até
+1153	(nouvelle couleur d'étoile + nouvelle stat tous les #).	(nuevo color de estrella + nueva estadística cada #).	(nova cor de estrela + novo atributo a cada #).
+1154	Ouvre une pièce Transcendée ➜	Abre una pieza Ascendida ➜	Abra uma peça Ascendida ➜
+1155	en bas de sa fenêtre.	abajo en su ventana.	embaixo na janela dela.
+1156	Le RECYCLAGE ne prend jamais les pièces Transcendées.	El RECICLAJE nunca toma piezas Ascendidas.	A RECICLAGEM nunca pega peças Ascendidas.
+1157	COMPRIS	ENTENDIDO	ENTENDI
+1158	BONUS DÉBLOQUÉ !	¡BONUS DESBLOQUEADO!	BÔNUS DESBLOQUEADO!
+1159	AMÉLIORATION RÉUSSIE !	¡MEJORA CON ÉXITO!	MELHORIA CONCLUÍDA!
+1160	Puissance +	Poder +	Poder +
+1161	porte déjà le meilleur équipement	ya lleva el mejor equipamiento	já usa o melhor equipamento
+1162	Équipement auto – avant / après	Equipar auto – antes / después	Equipar auto – antes / depois
+1163	Meilleur équipement pour	Mejor equipamiento para	Melhor equipamento para
+1164	: le set	: primero el set	: primeiro o conjunto
+1165	d'abord (grade le plus haut d'abord), puis les pièces libres les plus fortes.	(grado más alto primero), luego las piezas libres más fuertes.	(grau mais alto primeiro), depois as peças livres mais fortes.
+1166	sera PRIS à d'autres héros (pas leur set de classe). Ils reçoivent à la place la meilleure pièce libre du sac.	se QUITARÁ a otros héroes (no su set de clase). Ellos reciben la mejor pieza libre de la bolsa.	será TIRADO de outros heróis (não o conjunto da classe deles). Eles recebem a melhor peça livre da bolsa.
+1167	Rien d'équipé	Nada equipado	Nada equipado
+1168	Retirer tout l'équipement ?	¿Quitar todo el equipamiento?	Remover todo o equipamento?
+1169	– avant / après	– antes / después	– antes / depois
+1170	Tout l'équipement retourne dans le sac	Todo el equipamiento vuelve a la bolsa	Todo o equipamento volta para a bolsa
+1171	RECYCLAGE AUTO ACTIVÉ ·	RECICLAJE AUTO SÍ ·	RECICLAGEM AUTO LIGADA ·
+1172	RECYCLAGE AUTO DÉSACTIVÉ	RECICLAJE AUTO NO	RECICLAGEM AUTO DESLIGADA
+1173	🔒 Tu n'as pas encore ce héros – obtiens-le par INVOCATION DE HÉROS	🔒 Aún no tienes este héroe – consíguelo en INVOCACIÓN DE HÉROES	🔒 Você ainda não tem este herói – obtenha na INVOCAÇÃO DE HERÓIS
+1174	Recycler	Reciclar	Reciclar
+1175	Tu reçois	Recibes	Você recebe
+1176	. L'équipement recyclé disparaît pour toujours.	. El equipamiento reciclado desaparece para siempre.	. Equipamento reciclado some para sempre.
+1177	✓ RECYCLER	✓ RECICLAR	✓ RECICLAR
+1178	⭐ Les étoiles montent quand tu invoques	⭐ Las estrellas suben al invocar	⭐ As estrelas sobem quando você invoca
+1179	ce héros	a este héroe	este herói
+1180	à nouveau (max +#). Légendaire +	otra vez (máx +#). Legendario +	de novo (máx +#). Lendário +
+1181	les héros peuvent fusionner en Mythique.	los héroes pueden fusionarse en Mítico.	os heróis podem ser fundidos em Mítico.
+1182	L'équipe a besoin d'au moins # héros	El equipo necesita al menos # héroe	A equipe precisa de pelo menos # herói
+1183	Touche un héros ci-dessous, puis ➕ AJOUTER À L'ÉQUIPE	Toca un héroe abajo y luego ➕ AÑADIR AL EQUIPO	Toque num herói abaixo e depois em ➕ ADICIONAR À EQUIPE
+1184	Choisis un	Elige un	Escolha um
+1185	– tu verras avant / après	– verás antes / después	– você verá antes / depois
+1186	🔒 Bloqué – termine d'abord le chapitre précédent	🔒 Bloqueado – supera el capítulo anterior	🔒 Bloqueado – conclua o capítulo anterior
+1187	Pas assez de Noyau Mythique (	No hay suficiente Núcleo Mítico (	Núcleo Mítico insuficiente (
+1188	TOUCHE ENCORE	TOCA OTRA VEZ	TOQUE DE NOVO
+1189	🎁 BOÎTE MYTHIQUE ROUGE +#	🎁 CAJA MÍTICA ROJA +#	🎁 CAIXA MÍTICA VERMELHA +#
+1190	est déjà au max	ya está al máximo	já está no máximo
+1191	Touche	Toca	Toque
+1192	encore pour ouvrir la boîte	otra vez para abrir la caja	de novo para abrir a caixa
+1193	REJOINT TON ÉQUIPE !	¡SE UNE A TU EQUIPO!	ENTRA NA SUA EQUIPE!
+1194	+# copie	+# copia	+# cópia
+1195	Pas assez de Noyau Mythique · doublons de héros au max	No hay suficiente Núcleo Mítico · duplicados de héroes al máximo	Núcleo Mítico insuficiente · duplicatas de heróis no máximo
+1196	Pas assez d'Essence · Donjons, campagne, Gains Idle, événements	No hay suficiente Esencia · Mazmorras, campaña, Recompensas Idle, eventos	Essência insuficiente · Masmorras, campanha, Recompensas Idle, eventos
+1197	· Puissance +	· Poder +	· Poder +
+1198	⚡ BOOST D'ÉQUIPEMENT · NIV	⚡ BOOST DE EQUIPAMIENTO · NV	⚡ BOOST DE EQUIPAMENTO · NV
+1199	· équipement ATQ / PV / DÉF +	· equipamiento ATQ / PV / DEF +	· equipamento ATQ / PV / DEF +
+1200	Pas assez de Noyau Mythique pour l'Ascension de Noyau	No hay suficiente Núcleo Mítico para la Ascensión de Núcleo	Núcleo Mítico insuficiente para a Ascensão de Núcleo
+1201	Pas assez d'Essence pour l'Ascension	No hay suficiente Esencia para la Ascensión	Essência insuficiente para a Ascensão
+1202	✦ ASCENSION	✦ ASCENSIÓN	✦ ASCENSÃO
+1203	· Niv max	· Nv máx	· Nv máx
+1204	· Niv compétence	· Nv habilidad	· Nv habilidade
+1205	et le Noyau Mythique :	y el Núcleo Mítico:	e o Núcleo Mítico:
+1206	pièce d'équipement	pieza de equipamiento	peça de equipamento
+1207	s retournent	s vuelven	s voltam
+1208	dans le SAC (les étoiles Transcendées restent sur les pièces)	a la BOLSA (las estrellas Ascendidas se quedan en las piezas)	para a BOLSA (as estrelas Ascendidas ficam nas peças)
+1209	aucun équipement	sin equipamiento	sem equipamento
+1210	• améliorations d'emplacement à +# · tu récupères	• mejoras de ranura a +# · recuperas	• melhorias de espaço voltam a +# · você recupera
+1211	des Pièces d'équipement :	de las Piezas de equipamiento:	das Peças de equipamento:
+1212	revient au	vuelve al	volta ao
+1213	Niv #	Nv #	Nv #
+1214	sans Ascension	sin Ascensión	sem Ascensão
+1215	(Niv compétence #).	(Nv habilidad #).	(Nv habilidade #).
+1216	• tu récupères	• recuperas	• você recupera
+1217	de l'Essence :	de la Esencia:	da Essência:
+1218	• les étoiles	• las estrellas	• as estrelas
+1219	restent (les invocations ne s'annulent pas)	se quedan (las invocaciones no se deshacen)	ficam (invocações não podem ser desfeitas)
+1220	• gratuit · utilise l'Essence sur n'importe quel héros	• gratis · usa la Esencia en cualquier héroe	• grátis · use a Essência em qualquer herói
+1221	renaît ·	renace ·	renasce ·
+1222	équipement → SAC	equipamiento → BOLSA	equipamento → BOLSA
+1223	équipé sur	equipado en	equipado em
+1224	Équipe-la d'abord – l'amélioration (+) appartient à l'EMPLACEMENT du héros	Equípala primero – la mejora (+) pertenece a la RANURA del héroe	Equipe primeiro – a melhoria (+) pertence ao ESPAÇO do herói
+1225	Pas assez de Pièces d'équipement (	No hay suficientes Piezas de equipamiento (	Peças de equipamento insuficientes (
+1226	) · recycle de l'équipement, Donjons, campagne, Gains Idle	) · recicla equipamiento, Mazmorras, campaña, Recompensas Idle	) · recicle equipamento, Masmorras, campanha, Recompensas Idle
+1227	est utilisé	se usa	é usado
+1228	★ ÉTOILE + !	★ ¡ESTRELLA +!	★ ESTRELA +!
+1229	✦ TRANSCENDÉ !	✦ ¡ASCENDIDO!	✦ ASCENDIDO!
+1230	est maintenant Transcendé	ahora es Ascendido	agora é Ascendido
+1231	à recycler	para reciclar	para reciclar
+1232	TOUCHE ENCORE POUR RECYCLER (+	TOCA OTRA VEZ PARA RECICLAR (+	TOQUE DE NOVO PARA RECICLAR (+
+1233	pièces)	piezas)	peças)
+1234	🔨 Recyclé pour	🔨 Reciclado por	🔨 Reciclado por
+1235	🔨 Pièces de garage + Essence :	🔨 Piezas de taller + Esencia:	🔨 Peças de oficina + Essência:
+1236	Commun	Común	Comum
+1237	Peu commun	Poco común	Incomum
+1238	Rare	Raro	Raro
+1239	Épique	Épico	Épico
+1240	Légendaire	Legendario	Lendário
+1241	Ticket d'Équipement	Ticket de Equipamiento	Ticket de Equipamento
+1242	Tickets d'Équipement	Tickets de Equipamiento	Tickets de Equipamento
+1243	INVOQUER	INVOCAR	INVOCAR
+1248	HÉROS	HÉROE	HERÓI
+1249	· MYTHIQUE	· MÍTICO	· MÍTICO
+1250	ÉQUIPE TES HÉROS	EQUIPA A TUS HÉROES	EQUIPE SEUS HERÓIS
+1251	ÉQUIPEMENT MYTHIQUE !	¡EQUIPAMIENTO MÍTICO!	EQUIPAMENTO MÍTICO!
+1252	ÉQUIPEMENT LÉGENDAIRE !	¡EQUIPAMIENTO LEGENDARIO!	EQUIPAMENTO LENDÁRIO!
+1253	ÉQUIPEMENT INVOQUÉ	EQUIPAMIENTO INVOCADO	EQUIPAMENTO INVOCADO
+1254	· +# BONUS	· +# BONUS	· +# BÔNUS
+1255	recyclé auto	reciclado auto	reciclado auto
+1256	sac plein – vendu	bolsa llena – vendido	bolsa cheia – vendido
+1257	+ pièces de garage + Essence	+ piezas de taller + Esencia	+ peças de oficina + Essência
+1258	ENCORE ×	OTRA VEZ ×	DE NOVO ×
+1259	TAUX D'INVOCATION	PROBABILIDADES	CHANCES DE INVOCAÇÃO
+1260	ÉQUIPEMENT · POUR LES COMBATS	EQUIPAMIENTO · SOLO COMBATES	EQUIPAMENTO · SÓ BATALHAS
+1261	Chaque invocation donne # pièce d'équipement au hasard (Outil, Casque, Gilet, Gants, Bottes ou Puce ECU).	Cada invocación da # pieza de equipamiento al azar (Herramienta, Casco, Chaleco, Guantes, Botas o Chip ECU).	Cada invocação dá # peça de equipamento aleatória (Ferramenta, Capacete, Colete, Luvas, Botas ou Chip ECU).
+1262	Invoquer x#	Invocar x#	Invocar x#
+1263	pièces.	piezas.	peças.
+1264	Chaque pièce est une pièce de SET	Cada pieza es una pieza de SET	Cada peça é uma peça de CONJUNTO
+1265	– les # sets de classe ont la même chance (	– los # sets de clase tienen la misma probabilidad (	– os # conjuntos de classe têm a mesma chance (
+1266	% chacun) :	% cada uno):	% cada):
+1267	Garanti : un	Garantizado: un	Garantido: um
+1268	invocations et un	invocaciones y un	invocações e um
+1269	invocations (maintenant	invocaciones (ahora	invocações (agora
+1270	Amélioration	Mejora	Melhoria
+1271	: Commun → Mythique montent à	: Común → Mítico suben a	: Comum → Mítico vão até
+1272	avec des Pièces d'équipement, un bonus tous les +# ★	con Piezas de equipamiento, un bonus cada +# ★	com Peças de equipamento, um bônus a cada +# ★
+1273	Étoiles	Estrellas	Estrelas
+1274	seulement sur Transcendé.	solo en Ascendido.	só no Ascendido.
+1275	(au-dessus de Mythique) : #% dans l'invocation, ou il tombe en combats de campagne et Gains Idle dès l'étape	(por encima de Mítico): #% en la invocación, o cae en combates de campaña y Recompensas Idle desde la fase	(acima de Mítico): #% na invocação, ou cai nas batalhas da campanha e Recompensas Idle a partir da fase
+1276	. Les pièces Transcendées montent jusqu'à	. Las piezas Ascendidas suben hasta	. As peças Ascendidas vão até
+1277	: toutes les # étoiles une nouvelle couleur (or → rouge → violet → arc-en-ciel) + une nouvelle stat bonus.	: cada # estrellas un nuevo color (oro → rojo → morado → arcoíris) + una nueva estadística extra.	: a cada # estrelas uma nova cor (ouro → vermelho → roxo → arco-íris) + um novo atributo extra.
+1278	Pas de tickets ?	¿Sin tickets?	Sem tickets?
+1279	= # invocation – on te demande toujours avant.	= # invocación – siempre se te pregunta antes.	= # invocação – sempre perguntamos antes.
+1280	OÙ EN TROUVER	DÓNDE CONSEGUIR	ONDE CONSEGUIR
+1281	TICKETS D'ÉQUIPEMENT	TICKETS DE EQUIPAMIENTO	TICKETS DE EQUIPAMENTO
+1282	1re victoire de chaque étape de campagne :	1.ª victoria de cada fase de campaña:	1ª vitória de cada fase da campanha:
+1283	· mini-boss (X-#) :	· minijefe (X-#):	· minichefe (X-#):
+1284	· boss (X-#) :	· jefe (X-#):	· chefe (X-#):
+1285	· Connexion quotidienne :	· Check-in diario:	· Check-in diário:
+1286	chaque jour	cada día	todo dia
+1287	Départ : # tickets.	Inicio: # tickets.	Início: # tickets.
+1288	📜 HISTORIQUE DES INVOCATIONS	📜 HISTORIAL DE INVOCACIONES	📜 HISTÓRICO DE INVOCAÇÕES
+1289	HISTORIQUE DES INVOCATIONS	HISTORIAL DE INVOCACIONES	HISTÓRICO DE INVOCAÇÕES
+1290	Dernières	Últimas	Últimas
+1291	invocations d'équipement	invocaciones de equipamiento	invocações de equipamento
+1292	Rien pour l'instant.	Nada aún.	Nada ainda.
+1293	RAGE	FURIA	FÚRIA
+1294	Les ennemis infligent	Los enemigos infligen	Os inimigos causam
+1295	de dégâts.	de daño.	de dano.
+1296	BLINDAGE	BLINDAJE	BLINDAGEM
+1297	Les ennemis ont	Los enemigos tienen	Os inimigos têm
+1298	de défense et	de defensa y	de defesa e
+1299	de PV.	de PV.	de PV.
+1300	Les ennemis bougent	Los enemigos se mueven	Os inimigos se movem
+1301	plus vite et attaquent	más rápido y atacan	mais rápido e atacam
+1302	plus vite.	más rápido.	mais rápido.
+1303	SOL BRÛLANT	SUELO ARDIENTE	CHÃO QUENTE
+1304	Tes héros perdent	Tus héroes pierden	Seus heróis perdem
+1305	de leurs PV max chaque seconde.	de sus PV máx cada segundo.	do PV máx a cada segundo.
+1306	PAS DE RÉPARATION	SIN REPARACIONES	SEM REPAROS
+1307	Tes héros	Tus héroes	Seus heróis
+1308	ne peuvent pas être soignés	no pueden curarse	não podem ser curados
+1309	(compétences, potions et entre les vagues).	(habilidades, pociones y entre oleadas).	(habilidades, poções e entre ondas).
+1310	BORDS TRANCHANTS	FILOS CORTANTES	LÂMINAS AFIADAS
+1311	Les ennemis gagnent	Los enemigos ganan	Os inimigos ganham
+1312	de chance de critique.	de probabilidad de crítico.	de chance de crítico.
+1313	ÉTAGE	PISO	ANDAR
+1315	MINI-BOSS	MINIJEFE	MINICHEFE
+1316	TERMINÉ	SUPERADO	CONCLUÍDO
+1318	TOUR TERMINÉE !	¡TORRE SUPERADA!	TORRE CONCLUÍDA!
+1319	DÉFI · ÉTAGE	DESAFÍO · PISO	DESAFIO · ANDAR
+1320	🔒 La TORQUE TOWER s'ouvre après l'étape de campagne #-#	🔒 La TORQUE TOWER se abre tras la fase de campaña #-#	🔒 A TORQUE TOWER abre após a fase da campanha #-#
+1321	RÉCOMPENSES FIXES · 1RE VICTOIRE DE CHAQUE ÉTAGE	RECOMPENSAS FIJAS · 1.ª VICTORIA DE CADA PISO	RECOMPENSAS FIXAS · 1ª VITÓRIA DE CADA ANDAR
+1322	Chaque étage :	Cada piso:	Cada andar:
+1323	+ pièces	+ monedas	+ moedas
+1324	Tous les # étages : +	Cada # pisos: +	A cada # andares: +
+1325	Tous les # étages (boss) :	Cada # pisos (jefe):	A cada # andares (chefe):
+1326	Rien n'est aléatoire. Chaque étage donne sa récompense une seule fois.	Nada es aleatorio. Cada piso da su recompensa una sola vez.	Nada é aleatório. Cada andar dá sua recompensa só uma vez.
+1327	PROCHAINS GRANDS ÉTAGES	PRÓXIMOS GRANDES PISOS	PRÓXIMOS GRANDES ANDARES
+1328	MODIFICATEURS	MODIFICADORES	MODIFICADORES
+1329	MODIFICATEUR	MODIFICADOR	MODIFICADOR
+1330	RÉCOMPENSE DE 1RE VICTOIRE	RECOMPENSA DE 1.ª VICTORIA	RECOMPENSA DA 1ª VITÓRIA
+1331	Puissance ennemie	Poder enemigo	Poder inimigo
+1332	étage suivant dans	siguiente piso en	próximo andar em
+1333	Étage de la tour	Piso de la torre	Andar da torre
+1334	LA TOUR EST TERMINÉE !	¡LA TORRE ESTÁ SUPERADA!	A TORRE ESTÁ CONCLUÍDA!
+1335	EST OUVERT	ESTÁ ABIERTO	ESTÁ ABERTO
+1336	ÉTAGE SUIVANT ▶	SIGUIENTE PISO ▶	PRÓXIMO ANDAR ▶
+1337	TORQUE TOWER · ÉTAGE	TORQUE TOWER · PISO	TORQUE TOWER · ANDAR
+1338	Record : étage	Récord: piso	Recorde: andar
+1339	cet étage :	este piso:	este andar:
+1340	Essence → NIVEAU + · Ascension	Esencia → SUBIR NIVEL · Ascensión	Essência → SUBIR NÍVEL · Ascensão
+1341	Meilleure équipe & compétences	Mejor equipo y habilidades	Equipe e habilidades melhores
+1342	Tour	Torre	Torre
+1347	JcJ · EN LIGNE	JcJ · EN LÍNEA	JxJ · ONLINE
+1348	🔒 ÉTAPE	🔒 FASE	🔒 FASE
+1349	AUJOURD'HUI :	HOY:	HOJE:
+1350	CHAQUE WEEK-END	CADA FIN DE SEMANA	TODO FIM DE SEMANA
+1351	· CLÉS	· LLAVES	· CHAVES
+1352	CLÉS	LLAVES	CHAVES
+1353	🔒 De nouveaux modes de combat arrivent bientôt !	🔒 ¡Pronto llegan nuevos modos de combate!	🔒 Novos modos de batalha em breve!
+1354	🔒 La TORQUE TOWER s'ouvre après l'étape de campagne	🔒 La TORQUE TOWER se abre tras la fase de campaña	🔒 A TORQUE TOWER abre após a fase da campanha
+1355	🔒 Les TOURS DE CLASSE s'ouvrent après l'étape de campagne	🔒 Las TORRES DE CLASE se abren tras la fase de campaña	🔒 As TORRES DE CLASSE abrem após a fase da campanha
+1356	🔒 Le BOSS MONDIAL s'ouvre après l'étape de campagne	🔒 El JEFE MUNDIAL se abre tras la fase de campaña	🔒 O CHEFE MUNDIAL abre após a fase da campanha
+1357	🔒 Les DONJONS s'ouvrent après l'étape de campagne	🔒 Las MAZMORRAS se abren tras la fase de campaña	🔒 As MASMORRAS abrem após a fase da campanha
+1358	ARÈNE	ARENA	ARENA
+1359	COUPE TORQUE	COPA TORQUE	COPA TORQUE
+1360	s'ouvre après l'étape de campagne	se abre tras la fase de campaña	abre após a fase da campanha
+1361	DIM	DOM	DOM
+1362	LUN	LUN	SEG
+1363	MAR	MAR	TER
+1364	MER	MIÉ	QUA
+1365	JEU	JUE	QUI
+1366	VEN	VIE	SEX
+1367	SAM	SÁB	SÁB
+1368	DIMANCHE	DOMINGO	DOMINGO
+1369	LUNDI	LUNES	SEGUNDA
+1370	MARDI	MARTES	TERÇA
+1371	MERCREDI	MIÉRCOLES	QUARTA
+1372	JEUDI	JUEVES	QUINTA
+1373	VENDREDI	VIERNES	SEXTA
+1374	SAMEDI	SÁBADO	SÁBADO
+1376	· DIM	· DOM	· DOM
+1377	TOURS DE CLASSE	TORRES DE CLASE	TORRES DE CLASSE
+1378	AUJOURD'HUI ·	HOY ·	HOJE ·
+1379	TOUTES LES TOURS SONT OUVERTES	TODAS LAS TORRES ESTÁN ABIERTAS	TODAS AS TORRES ESTÃO ABERTAS
+1380	OUVERT · DIMANCHE TOUTES	ABIERTA · DOMINGO TODAS	ABERTA · DOMINGO TODAS
+1382	RECORD	RÉCORD	RECORDE
+1383	NON	NO	NÃO
+1384	HÉROS POUR L'INSTANT – invoques-en !	HÉROES AÚN – ¡invoca algunos!	HERÓIS AINDA – invoque alguns!
+1385	HÉROS (MYTHIQUES AUSSI) · LES # MEILLEURS COMBATTENT	HÉROES (MÍTICOS TAMBIÉN) · LUCHAN LOS # MEJORES	HERÓIS (MÍTICOS TAMBÉM) · OS # MELHORES LUTAM
+1386	FERMÉE AUJOURD'HUI	CERRADA HOY	FECHADA HOJE
+1387	DÉFI ·	DESAFÍO ·	DESAFIO ·
+1388	OUVERTE :	ABIERTA:	ABERTA:
+1389	COMMENT ÇA MARCHE	CÓMO FUNCIONA	COMO FUNCIONA
+1390	# tours, une par classe ·	# torres, una por clase ·	# torres, uma por classe ·
+1391	chacune.	cada una.	cada.
+1392	Seuls les héros de cette classe +	Solo los héroes de esa clase +	Só heróis dessa classe +
+1393	combattent (tes # meilleurs).	luchan (tus # mejores).	lutam (seus # melhores).
+1394	Chaque tour est ouverte # jours par semaine ·	Cada torre abre # días por semana ·	Cada torre abre # dias por semana ·
+1395	le DIMANCHE toutes les tours sont ouvertes	el DOMINGO todas las torres abren	no DOMINGO todas as torres abrem
+1396	PROGRAMME	HORARIO	CALENDÁRIO
+1397	RÉCOMPENSES FIXES · 1RE VICTOIRE	RECOMPENSAS FIJAS · 1.ª VICTORIA	RECOMPENSAS FIXAS · 1ª VITÓRIA
+1398	Étages #-# tous les # étages :	Pisos #-# cada # pisos:	Andares #-# a cada # andares:
+1399	# PIÈCE DE SET	# PIEZA DE SET	# PEÇA DE CONJUNTO
+1400	de cette classe (Rare → Épique → Légendaire → Mythique)	de esa clase (Raro → Épico → Legendario → Mítico)	dessa classe (Raro → Épico → Lendário → Mítico)
+1401	Étages #-# : une	Pisos #-#: una	Andares #-#: uma
+1402	PIÈCE DE SET MYTHIQUE	PIEZA DE SET MÍTICA	PEÇA DE CONJUNTO MÍTICA
+1403	tous les # étages	cada # pisos	a cada # andares
+1404	Étages # · # · # · # · # · # : les # pièces d'un	Pisos # · # · # · # · # · #: las # piezas de un	Andares # · # · # · # · # · #: as # peças de um
+1405	SET TRANSCENDÉ	SET ASCENDIDO	CONJUNTO ASCENDIDO
+1406	de cette classe	de esa clase	dessa classe
+1407	tous les # étages · très dur, les derniers étages sont pour le futur	cada # pisos · muy difícil, los últimos pisos son para el futuro	a cada # andares · muito difícil, os últimos andares são para o futuro
+1408	Plus l'étage est haut, plus chaque récompense est grosse.	Cuanto más alto el piso, mayor cada recompensa.	Quanto mais alto o andar, maior cada recompensa.
+1409	TOUR · PROCHAINES PIÈCES DE SET	TORRE · PRÓXIMAS PIEZAS DE SET	TORRE · PRÓXIMAS PEÇAS DE CONJUNTO
+1410	Le bonus marche seulement sur les héros	El bonus solo funciona en héroes	O bônus só vale para heróis
+1411	héros.	héroes.	heróis.
+1412	🔒 Cette tour est fermée aujourd'hui · ouverte :	🔒 Esta torre está cerrada hoy · abre:	🔒 Esta torre está fechada hoje · abre:
+1413	Tu n'as pas encore de	Aún no tienes	Você ainda não tem
+1414	héros – invoques-en !	héroes – ¡invoca algunos!	heróis – invoque alguns!
+1415	SAC PLEIN →	BOLSA LLENA →	BOLSA CHEIA →
+1416	SET	SET	CONJUNTO
+1417	Nouvelle pièce de set :	Nueva pieza de set:	Nova peça de conjunto:
+1418	TOUR · ÉTAGE	TORRE · PISO	TORRE · ANDAR
+1419	doublons +# étoile	duplicados +# estrella	duplicatas +# estrela
+1420	les pièces de set de cette classe aident beaucoup	las piezas de set de esta clase ayudan mucho	as peças de conjunto desta classe ajudam muito
+1421	Invoque plus de	Invoca más	Invoque mais
+1422	seule cette classe (+ Légende) combat ici	solo esta clase (+ Leyenda) lucha aquí	só esta classe (+ Lenda) luta aqui
+1423	Niveaux & étoiles	Niveles y estrellas	Níveis e estrelas
+1424	🎒 SAC PLEIN	🎒 BOLSA LLENA	🎒 BOLSA CHEIA
+1425	Ton sac d'équipement est à	Tu bolsa de equipamiento está en	Sua bolsa de equipamento está em
+1426	Les combats ne perdent jamais d'équipement : le sac peut dépasser la limite. Mais	Los combates nunca pierden equipamiento: la bolsa puede pasar el límite. Pero	As batalhas nunca perdem equipamento: a bolsa pode passar do limite. Mas
+1427	est bloqué tant que le sac n'est pas sous	se bloquea hasta que la bolsa baje de	fica bloqueado até a bolsa ficar abaixo de
+1428	à nouveau.	otra vez.	de novo.
+1429	Astuce : active	Consejo: activa	Dica: ligue
+1430	sur la page Recycler – les petits grades deviennent des pièces automatiquement.	en la página Reciclar – los grados bajos se vuelven piezas solos.	na página Reciclar – graus baixos viram peças sozinhos.
+1431	♻ RECYCLER MAINTENANT	♻ RECICLAR AHORA	♻ RECICLAR AGORA
+1433	Un dinosaure gigantesque fait de voitures écrasées : coups de griffes, frappes au sol et large souffle de feu. Il devient ENRAGÉ les # dernières secondes.	Un dinosaurio gigantesco hecho de coches aplastados: zarpazos, golpes al suelo y un amplio aliento de fuego. Se ENFURECE en los últimos # segundos.	Um dinossauro gigantesco feito de carros esmagados: garradas, golpes no chão e um amplo sopro de fogo. Fica ENFURECIDO nos últimos # segundos.
+1435	Un golem géant tiré d'une presse à voitures : énormes coups hydrauliques et frappes au sol fréquentes sur tous ceux qui sont proches. Pas d'attaque à distance. Il devient ENRAGÉ les # dernières secondes.	Un gólem gigante hecho de una prensa de coches: enormes puñetazos hidráulicos y golpes al suelo frecuentes contra todos los cercanos. Sin ataque a distancia. Se ENFURECE en los últimos # segundos.	Um golem gigante feito de uma prensa de carros: socos hidráulicos enormes e golpes no chão frequentes em todos por perto. Sem ataque à distância. Fica ENFURECIDO nos últimos # segundos.
+1437	Un démon de feu tiré d'un moteur V# géant : coups de fouet de courroie, frappes au sol et cône de feu sortant de ses cylindres. Il devient ENRAGÉ les # dernières secondes.	Un demonio de fuego hecho de un motor V# gigante: latigazos de correa, golpes al suelo y un cono de fuego desde sus cilindros. Se ENFURECE en los últimos # segundos.	Um demônio de fogo feito de um motor V# gigante: chicotadas de correia, golpes no chão e um cone de fogo dos cilindros. Fica ENFURECIDO nos últimos # segundos.
+1439	Un serpent géant fait de lourdes chaînes et de crochets de grue avec une tête de dépanneuse : charges rapides au sol qui frappent tous ceux devant lui, plusieurs fois. Pas d'attaque à distance. Il devient ENRAGÉ les # dernières secondes.	Una serpiente gigante de cadenas pesadas y ganchos de grúa con cabeza de grúa: embestidas rápidas por el suelo que golpean a todos delante, muchas veces. Sin ataque a distancia. Se ENFURECE en los últimos # segundos.	Uma serpente gigante de correntes pesadas e ganchos de guindaste com cabeça de guincho: investidas rápidas pelo chão que atingem todos à frente, muitas vezes. Sem ataque à distância. Fica ENFURECIDA nos últimos # segundos.
+1440	Boss mondial	Jefe mundial	Chefe mundial
+1441	FAIBLE CONTRE	DÉBIL CONTRA	FRACO CONTRA
+1442	DÉGÂTS DU JOUR	DAÑO DE HOY	DANO DE HOJE
+1443	BARRES DE PV · MEILLEUR COUP	BARRAS DE PV · MEJOR GOLPE	BARRAS DE PV · MELHOR GOLPE
+1444	CLÉS DE BOSS · nouvelles dans	LLAVES DE JEFE · nuevas en	CHAVES DE CHEFE · novas em
+1445	RÉCOMPENSES DU JOUR	RECOMPENSAS DIARIAS	RECOMPENSAS DIÁRIAS
+1446	BARRE	BARRA	BARRA
+1447	RÉCUPÉRER	RECLAMAR	COLETAR
+1448	BALAYAGE	BARRIDO	VARREDURA
+1449	· meilleur coup de la semaine	· mejor golpe de la semana	· melhor golpe da semana
+1450	attaque d'abord une fois cette semaine	ataca una vez esta semana primero	ataque uma vez nesta semana primeiro
+1451	CLASSEMENT DES DÉGÂTS	CLASIFICACIÓN DE DAÑO	RANKING DE DANO
+1452	ATTAQUER	ATACAR	ATACAR
+1453	PAS DE CLÉS	SIN LLAVES	SEM CHAVES
+1454	CETTE SEMAINE	ESTA SEMANA	ESTA SEMANA
+1455	· BOSS DE LA SEMAINE	· JEFE DE LA SEMANA	· CHEFE DA SEMANA
+1456	les héros infligent	los héroes infligen	os heróis causam
+1457	de dégâts contre lui.	de daño contra él.	de dano contra ele.
+1458	# CLÉS DE BOSS	# LLAVES DE JEFE	# CHAVES DE CHEFE
+1459	par jour – une clé = une attaque de	al día – una llave = un ataque de	por dia – uma chave = um ataque de
+1460	# secondes	# segundos	# segundos
+1461	avec ton équipe de combat.	con tu equipo de combate.	com sua equipe de batalha.
+1462	Le boss ne peut pas être tué : chaque barre vidée se remplit. Seuls tes	El jefe no se puede matar: cada barra vaciada se rellena. Solo cuenta tu	O chefe não pode ser morto: cada barra esvaziada se enche de novo. Só conta o seu
+1463	comptent.	.	.
+1464	Une barre de PV =	Una barra de PV =	Uma barra de PV =
+1465	aujourd'hui (elle grandit avec tes héros).	hoy (crece con tus héroes).	hoje (cresce com seus heróis).
+1466	Les récompenses du jour sont	Las recompensas diarias son	As recompensas diárias são
+1467	– rien d'aléatoire.	– nada aleatorio.	– nada aleatório.
+1468	: utilise une clé, sans combat – inflige ton	: usa una llave, sin combate – inflige tu	: usa uma chave, sem batalha – causa seu
+1469	meilleur coup de la semaine	mejor golpe de la semana	melhor golpe da semana
+1470	CLASSEMENT HEBDO DES DÉGÂTS · RÉCOMPENSES PAR COURRIER	CLASIFICACIÓN SEMANAL DE DAÑO · RECOMPENSAS POR CORREO	RANKING SEMANAL DE DANO · RECOMPENSAS POR CORREIO
+1471	La semaine finit le lundi à #:# UTC (#:# Paris). Un nouveau boss chaque semaine.	La semana termina el lunes a las #:# UTC (#:# París). Un jefe nuevo cada semana.	A semana termina segunda às #:# UTC (#:# Paris). Um chefe novo toda semana.
+1472	· récupéré !	· ¡reclamado!	· coletado!
+1473	🔑 Plus de CLÉS DE BOSS aujourd'hui · nouvelles clés à minuit	🔑 No quedan LLAVES DE JEFE hoy · llaves nuevas a medianoche	🔑 Sem CHAVES DE CHEFE hoje · chaves novas à meia-noite
+1474	⚔ Attaque le boss une fois cette semaine – le BALAYAGE répète ensuite ton meilleur coup	⚔ Ataca al jefe una vez esta semana – luego el BARRIDO repite tu mejor golpe	⚔ Ataque o chefe uma vez nesta semana – depois a VARREDURA repete seu melhor golpe
+1475	⚡ BALAYAGE ·	⚡ BARRIDO ·	⚡ VARREDURA ·
+1476	de dégâts (	de daño (	de dano (
+1477	barres)	barras)	barras)
+1478	nouvelle récompense	nueva recompensa	nova recompensa
+1479	Chargement…	Cargando…	Carregando…
+1480	📶 Le classement a besoin d'internet (et du jeu en ligne au moins une fois).	📶 La clasificación necesita internet (y el juego en línea al menos una vez).	📶 O ranking precisa de internet (e do jogo online pelo menos uma vez).
+1481	Tes dégâts cette semaine :	Tu daño esta semana:	Seu dano nesta semana:
+1482	– ils sont envoyés dès que tu es en ligne.	– se envía en cuanto estés en línea.	– é enviado assim que você estiver online.
+1483	CETTE SEMAINE · FIN DANS	ESTA SEMANA · TERMINA EN	ESTA SEMANA · TERMINA EM
+1484	TOI	TÚ	VOCÊ
+1485	Personne n'a encore attaqué cette semaine – sois le premier !	Nadie ha atacado aún esta semana – ¡sé el primero!	Ninguém atacou ainda nesta semana – seja o primeiro!
+1486	RÉCOMPENSES HEBDO · PAR COURRIER LE LUNDI	RECOMPENSAS SEMANALES · POR CORREO EL LUNES	RECOMPENSAS SEMANAIS · POR CORREIO NA SEGUNDA
+1487	TEMPS ÉCOULÉ !	¡SE ACABÓ EL TIEMPO!	TEMPO ESGOTADO!
+1488	ÉQUIPE VAINCUE	EQUIPO DERROTADO	EQUIPE DERROTADA
+1489	NOUVEAU RECORD DU JOUR !	¡NUEVO RÉCORD DE HOY!	NOVO RECORDE DO DIA!
+1490	nouvelle récompense du jour	nueva recompensa diaria	nova recompensa diária
+1491	– récupère-la sur la page BOSS MONDIAL	– reclámala en la página JEFE MUNDIAL	– colete na página CHEFE MUNDIAL
+1492	BARRES DE PV	BARRAS DE PV	BARRAS DE PV
+1493	AUJOURD'HUI	HOY	HOJE
+1494	· CETTE SEMAINE	· ESTA SEMANA	· ESTA SEMANA
+1495	clés restantes aujourd'hui	llaves restantes hoy	chaves restantes hoje
+1496	✅ Déjà récupéré aujourd'hui	✅ Ya reclamado hoy	✅ Já coletado hoje
+1497	Inflige	Inflige	Cause
+1498	de dégâts aujourd'hui (	de daño hoy (	de dano hoje (
+1499	restants)	restantes)	restantes)
+1500	FAIBLE :	DÉBIL:	FRACO:

@@ -8,6 +8,8 @@
 <meta name="theme-color" content="#0b1019">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<script src="lang/i18n.js"></script>
+<script src="lang/labels.js"></script>
 <script>// v16-260 AUTO GRAPHICS (Marius, 23 nov 2026): at the first start the game checks the phone once (memory, CPU cores, a short speed test).
 // Good phones get HD by themselves, normal phones STANDARD, weak phones LOW (lighter picture, no lag). PROFILE → GRAPHICS: AUTO / HD / STANDARD / LOW.
 // If AUTO chose too high and the battles are slow, it goes one step down by itself (saved for the next start).
@@ -422,7 +424,8 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 #team.open{display:flex}
 #tmBox,#idlBox{position:relative;--u:.4px;background:url(img/team.webp) center/100% 100% no-repeat}
 #tmBox{background:#0b1220}#tmBox.tall{border-radius:0}
-#idlBox{background-image:url(img/idle.webp)}
+#idlBox{background-image:url(img/nt/idle.webp)}
+#idlBox .idT{display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;overflow:hidden;pointer-events:none}
 #tmBox>*,#idlBox>*{position:absolute;box-sizing:border-box}
 #idl{position:fixed;inset:0;z-index:12;background:rgba(5,8,12,.8);display:none;align-items:center;justify-content:center}
 #idl.open{display:flex}
@@ -677,8 +680,8 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 #side2{gap:4px!important}
 #side2 button{width:52px!important;height:58px!important;background:none center/contain no-repeat!important;box-shadow:none!important;border-radius:0!important;filter:drop-shadow(0 3px 4px #0009)}
 #side2 button>svg,#side2 button>small{display:none!important}
-#side2 #rkBtn{background-image:url(img/ui3/s_rank.webp)!important}#side2 #chBtn{background-image:url(img/ui3/s_chat.webp)!important}#side2 #ciBtn{background-image:url(img/ui3/s_ci.webp)!important}#side2 #nwBtn{background-image:url(img/ui3/s_news.webp)!important}#side2 #mlBtn{background-image:url(img/ui3/s_mail.webp)!important}
-#side2 #rwSBtn{background-image:url(img/rw/rw_btn.webp)!important;background-size:118% auto!important} /* v16-254: Rail Wars emblem in the side column */#side2 #evBtn{background-image:url(img/ui3/s_event.webp)!important}
+#side2 #rkBtn{background-image:url(img/nt/ui3/s_rank.webp)!important}#side2 #chBtn{background-image:url(img/nt/ui3/s_chat.webp)!important}#side2 #ciBtn{background-image:url(img/nt/ui3/s_ci.webp)!important}#side2 #nwBtn{background-image:url(img/nt/ui3/s_news.webp)!important}#side2 #mlBtn{background-image:url(img/nt/ui3/s_mail.webp)!important}
+#side2 #rwSBtn{background-image:url(img/rw/rw_btn.webp)!important;background-size:118% auto!important} /* v16-254: Rail Wars emblem in the side column */#side2 #evBtn{background-image:url(img/nt/ui3/s_event.webp)!important}
 #side2 i{right:-2px!important;top:-2px!important}
 .itBt button small img.tki{display:inline;height:1.25em;vertical-align:-.3em;margin:0 .1em}
 .idEG{display:flex;align-items:center;justify-content:center;gap:4px;font:800 calc(var(--u,1px)*22) Game,system-ui;color:#e8dcff;text-shadow:0 2px 3px #000;white-space:nowrap}.idEG b{color:#d6b4ff}.idEG .tki{height:1.3em;vertical-align:-.3em}
@@ -1068,7 +1071,7 @@ body #side2{top:max(60px,calc(var(--hbw)/5.05 + 16px))}
 </div></div>
 <div id="toast"></div>
 <div id="zoom"><button id="hdBtn" aria-label="HD graphics">HD</button><button id="zin">+</button><button id="zout">−</button></div>
-<div id="side"><button id="cpBtn"><img src="img/ui/ic_battle.webp" alt="Battle"><i id="cpDot"></i></button><button id="heBtn"><img src="img/ui3/n_heroes.webp" alt="Heroes"><i id="heDot"></i></button><button id="smBtn"><img src="img/ui3/n_summon.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/ui3/n_crew.webp" alt="Crew"><i id="rosDot"></i></button><button id="idBtn"><img src="img/ui3/n_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/ui3/n_quests.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small><i id="vipDot"></i></button></div>
+<div id="side"><button id="cpBtn"><img src="img/nt/ui/ic_battle.webp" alt="Battle"><i id="cpDot"></i></button><button id="heBtn"><img src="img/nt/ui3/n_heroes.webp" alt="Heroes"><i id="heDot"></i></button><button id="smBtn"><img src="img/nt/ui3/n_summon.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/nt/ui3/n_crew.webp" alt="Crew"><i id="rosDot"></i></button><button id="idBtn"><img src="img/nt/ui3/n_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/nt/ui3/n_quests.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small><i id="vipDot"></i></button></div>
 <div id="side2"><button id="evBtn"><svg viewBox="0 0 40 40"><path d="M20 3l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L20 26.6l-9.3 4.9 1.8-10.3L5 13.9l10.4-1.5z" fill="#ffd54a" stroke="#7a4a00" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="18" r="5" fill="#ff5252"/><path d="M8 34h24" stroke="#ff5252" stroke-width="3" stroke-linecap="round"/></svg><small>EVENTS</small><i id="evDot">!</i></button><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button><button id="rwSBtn" style="display:none" aria-label="Rail Wars"><i id="rwDot"></i></button></div>
 <div id="xp" class="skP sk-mail"><div class="skBg"></div><div class="skH"><img class="hi" src="img/ui2/mail_h.webp" alt=""><div class="rsTop"><button class="rsB" id="xpBack">↩</button><div class="rsTi"><b id="xpT"></b><small id="xpS"></small></div><div class="rsTk" id="xpTk"></div></div></div><div id="xpBody" class="skB"></div></div>
 <div id="dq"><div id="dqBox"></div></div>
@@ -4437,6 +4440,13 @@ function renderIdle(){if(!idlEl.classList.contains('open'))return;const I=idleNo
   h+='<div class="idEG" style="'+box(150,1083,900,34)+'">'+ESI+' <b>+'+nfmt(I.ess)+'</b> &nbsp;·&nbsp; '+GPI+' <b>+'+nfmt(I.gp)+'</b> &nbsp;·&nbsp; 🔧 Garage parts <b>+'+nfmt(I.rp)+'</b> &nbsp;·&nbsp; '+PKI('bk')+' <b>+'+nfmt(I.bk)+'</b></div>';
   h+='<div class="idQI'+(qiLeft()?'':' off')+'" data-i="qi" style="'+box(330,1222,540,74)+'">🎁 QUICK IDLE 2h · '+(VLV?qiLeft()+' left':'VIP 1')+'</div>';
   h+='<div class="idInfo" style="'+box(292,1134,720,80)+'"><span>Money per hour grows with your <b>Reputation</b>, your <b>building levels</b> and your <b class="v">👑 VIP level</b> · VIP '+VLV+': <b class="v">'+(vb?pctT(vb):'+0%')+'</b>'+(VSUB?' (Pass ×'+SUB_MULT+')':'')+cc+'</span></div>';
+  // v-lang (26 nov): the picture has no text any more – titles / labels come from code, so every language works
+  const T=(x,y,w,h2,st,s)=>'<div class="idT" style="'+box(x,y,w,h2)+st+'">'+s+'</div>';
+  h+=T(330,34,540,92,'font:900 italic calc(var(--u)*78) Game,system-ui;color:#ffd23a;text-shadow:calc(var(--u)*3) calc(var(--u)*3) 0 #2a1500,calc(var(--u)*-2) calc(var(--u)*-2) 0 #2a1500,0 calc(var(--u)*7) calc(var(--u)*4) #000','IDLE REWARDS');
+  h+=T(170,150,860,96,'font:800 calc(var(--u)*37) Game,system-ui;color:#fff;text-shadow:0 calc(var(--u)*3) calc(var(--u)*4) #000;white-space:normal;line-height:1.15','Welcome back! While you were away your garage kept working.');
+  h+=T(205,742,620,66,'font:800 calc(var(--u)*44) Game,system-ui;color:#fff;justify-content:flex-start;text-shadow:0 calc(var(--u)*3) 0 #000','Money');
+  h+=T(210,838,620,66,'font:800 calc(var(--u)*44) Game,system-ui;color:#fff;justify-content:flex-start;text-shadow:0 calc(var(--u)*3) 0 #000','Recruit Tickets');
+  h+=T(515,962,470,96,'font:900 italic calc(var(--u)*68) Game,system-ui;color:#161208;letter-spacing:calc(var(--u)*2)','CLAIM');
   morph(idlBox,h);}
 idlEl.addEventListener('click',e=>{if(e.target===idlEl){closeIdle();return;}const t=e.target.closest('[data-i]');if(!t)return;
   if(t.dataset.i==='x')closeIdle();else if(t.dataset.i==='qi')quickIdle();else if(t.dataset.i==='claim'){if(idleNow().money<1){toast('🧰 The chest is still empty – come back later',2500);return;}claimIdle();}});
@@ -4494,7 +4504,7 @@ let hudN=0;function hud(){hudN++;if(hudN%30===1){sideLock();const R=incRates();$
   {const I=idleNow(),st=I.full?2:I.hrs>=1?1:0;if(st!==lastIdle){lastIdle=st;const d=$('idDot');d.style.display=st?'flex':'none';d.textContent=st===2?'!':'';d.classList.toggle('full',st===2);}}
   const vk=VLV*10+(VSUB?1:0)+'|'+SUB_MULT;if(vk!==lastV){lastV=vk;$('vipTxt').innerHTML='VIP '+VLV+(VSUB?'<b style="font-size:8px;margin-left:2px">×'+SUB_MULT+'</b>':'');}
   if(VLV!==lastVL){lastVL=VLV;window.ONLINE&&ONLINE.hud&&ONLINE.hud();}const rq=dqReady();if(rq!==lastQ){lastQ=rq;const d=$('dqDot');d.style.display=rq?'flex':'none';d.textContent=rq;}if(G.money!==lastM){lastM=G.money;$('money').textContent=fmt(G.money);fitT($('money'));}if((G.dm||0)!==lastDm){lastDm=G.dm||0;$('dmH').textContent=fmt(lastDm).replace('$','');fitT($('dmH'));if(window._hI)hBump('dmH');}if(G.sold!==lastS){lastS=G.sold;$('sold').textContent=G.sold>=1e6?(G.sold/1e6).toFixed(1)+'M':G.sold>=1e4?Math.round(G.sold/1e3)+'K':G.sold>=1e3?(G.sold/1e3).toFixed(1)+'K':G.sold;fitT($('sold'));}
-  if(G.xp!==lastX){lastX=G.xp;if(window._hI&&$('rep').textContent!=='REP '+G.rep)hBump('repPill');$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
+  if(G.xp!==lastX){lastX=G.xp;if(window._hI&&$('rep').dataset.r!==String(G.rep))hBump('repPill');$('rep').dataset.r=String(G.rep);$('rep').textContent='REP '+G.rep;fitT($('rep'));const a=REP_XP[G.rep-1],b=REP_XP[G.rep];$('repBar').style.width=(b?Math.min(100,(G.xp-a)/(b-a)*100):100)+'%';}}
 
 // v16-141: NEXT GOAL removed + automatic notifications muted (Marius 21 nov)
 function autoToast(){}
@@ -4525,6 +4535,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:161,d:'Nov 27, 2026',ic:'🌍',t:'The game now speaks 6 languages',l:['Torque Empire is now in <b>English, Français, Español, Português, 한국어 and 日本語</b> – it picks your phone language by itself.','Change it any time: <b>Profile → LANGUAGE</b> (or the 🌍 button on the loading screen). Hero and monster names stay in English.']},
  {id:160,d:'Nov 26, 2026',ic:'🐉',t:'World Boss: bigger damage milestones',l:['The daily <b>World Boss</b> damage milestones now need more damage: your 3 daily fights reach 10 rewards, the last 2 rewards need extra fights (VIP / pass keys).']},
  {id:159,d:'Nov 26, 2026',ic:'🎡',t:'Fairer wheel rankings',l:['<b>LUCKY WHEEL</b> and <b>KEY ROULETTE</b> rankings now count what you <b>WIN</b> (diamonds / keys), not the number of spins – everyone gets the same spins, so no more ties for everybody.','Same score? The one who got there first is ahead. Milestone rewards still count your spins.']},
  {id:158,d:'Nov 26, 2026',ic:'👑',t:'Gang Boss camera + smaller damage numbers',l:['When the <b>👑 GANG BOSS</b> comes, the camera now follows his van and takes you straight to him (touch the screen to take the camera back).','Battle damage numbers are a bit smaller, big hits show as <b>K</b> from 10 000.','Fixed: sometimes a thief raid stayed open with no thieves and no new thieves came.']},

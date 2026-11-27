@@ -1,0 +1,372 @@
+701	TIREUR	TIRADOR	ATIRADOR
+702	MAGE	MAGO	MAGO
+703	SOUTIEN	APOYO	SUPORTE
+704	TANK · PV & DÉF les plus hauts – protège l'équipe	TANQUE · más PV y DEF – protege al equipo	TANQUE · mais PV e DEF – protege a equipe
+705	GUERRIER · se soigne de	GUERRERO · se cura un	GUERREIRO · cura
+706	% des dégâts qu'il inflige	% del daño que inflige	% do dano que causa
+707	TIREUR · +#% de dégâts aux boss & mini boss	TIRADOR · +#% de daño a jefes y minijefes	ATIRADOR · +#% de dano a chefes e minichefes
+708	MAGE · +#% de dégâts de compétence	MAGO · +#% de daño de habilidad	MAGO · +#% de dano de habilidade
+709	SOUTIEN · +#% soins & boucliers	APOYO · +#% curas y escudos	SUPORTE · +#% curas e escudos
+716	⚠️ Combat lancé en mode sécurisé	⚠️ Combate iniciado en modo seguro	⚠️ Batalha iniciada em modo seguro
+717	Le combat n'a pas pu démarrer	No se pudo iniciar el combate	A batalha não pôde começar
+718	Envoie une capture d'écran de ceci au développeur :	Envía una captura de esto al desarrollador:	Envie uma captura de tela disto ao desenvolvedor:
+719	FERMER	CERRAR	FECHAR
+720	🦸 Tu n'as pas encore de héros – invoque tes premiers héros !	🦸 Aún no tienes héroes – ¡invoca a tus primeros héroes!	🦸 Você ainda não tem heróis – invoque seus primeiros heróis!
+721	MINI BOSS + ENRAGÉ	MINIJEFE + FURIA	MINICHEFE + FÚRIA
+722	MINI BOSS	MINIJEFE	MINICHEFE
+723	– monstres ×	– monstruos ×	– monstros ×
+724	ta puissance	tu poder	seu poder
+725	⚠ MINI BOSS + ENRAGÉ !	⚠ ¡MINIJEFE + FURIA!	⚠ MINICHEFE + FÚRIA!
+726	⚠ ATTENTION ! MINI BOSS	⚠ ¡CUIDADO! MINIJEFE	⚠ ATENÇÃO! MINICHEFE
+727	👹 MINI BOSS vaincu ! +	👹 ¡MINIJEFE derrotado! +	👹 MINICHEFE derrotado! +
+728	Essence	Esencia	Essência
+729	ESQUIVE	EVASIÓN	ESQUIVA
+730	ESQUIVE	ESQUIVA	DESVIO
+734	VITESSE +	VELOCIDAD +	VELOCIDADE +
+735	ATQ+#%	ATQ+#%	ATQ+#%
+736	CRIT +	CRÍT +	CRÍT +
+737	RÉPARÉ !	¡REPARADO!	REPARADO!
+738	DÉF +	DEF +	DEF +
+739	RÉANIMÉ !	¡REVIVIDO!	REVIVIDO!
+740	ATQ+#% DÉF +	ATQ+#% DEF +	ATQ+#% DEF +
+741	RENÉ !	¡RENACIDO!	RENASCIDO!
+742	SURRÉGIME !	¡OVERDRIVE!	OVERDRIVE!
+743	INVOCATION !	¡INVOCACIÓN!	INVOCAÇÃO!
+744	RAGE !	¡FURIA!	FÚRIA!
+745	ENRAGÉ !	¡ENFURECIDO!	ENFURECIDO!
+747	BOSS MONDIAL	JEFE MUNDIAL	CHEFE MUNDIAL
+748	DONJON	MAZMORRA	MASMORRA
+749	TOUR	TORRE	TORRE
+751	· ENRAGÉ	· ENFURECIDO	· ENFURECIDO
+752	ÉQUIPAGE	CUADRILLA	TRIPULAÇÃO
+753	TOUCHE !	¡TOCA!	TOQUE!
+754	DOUBLE K.O. !	¡DOBLE K.O.!	K.O. DUPLO!
+755	TRIPLE K.O. !	¡TRIPLE K.O.!	K.O. TRIPLO!
+756	QUADRUPLE K.O. !	¡CUÁDRUPLE K.O.!	K.O. QUÁDRUPLO!
+757	MÉGA K.O. ×	MEGA K.O. ×	MEGA K.O. ×
+759	VAGUE	OLEADA	ONDA
+760	COMBAT !	¡LUCHA!	LUTE!
+762	VICTOIRE !	¡VICTORIA!	VITÓRIA!
+763	DÉFAITE	DERROTA	DERROTA
+764	BOSS	JEFE	CHEFE
+765	VITESSE DE COMBAT ×#	VELOCIDAD DE COMBATE ×#	VELOCIDADE DE BATALHA ×#
+766	×# est gratuit pour tous.	×# es gratis para todos.	×# é grátis para todos.
+767	×# est un pack – à toi pour toujours, à chaque chapitre.	×# es un pack – tuyo para siempre, en cada capítulo.	×# é um pacote – seu para sempre, em todo capítulo.
+768	· DÉBLOQUER ×#	· DESBLOQUEAR ×#	· DESBLOQUEAR ×#
+769	NON MERCI	NO, GRACIAS	NÃO, OBRIGADO
+771	PAUSE	PAUSA	PAUSA
+772	▶ REPRENDRE	▶ CONTINUAR	▶ CONTINUAR
+773	🏳 RETRAITE	🏳 RETIRARSE	🏳 RECUAR
+774	⏩ Vitesse ×# : Pass Argent ou Or · ×# : Pass Platine ou Diamant (Boutique → VIP PASS)	⏩ Velocidad ×#: Pase Plata u Oro · ×#: Pase Platino o Diamante (Tienda → VIP PASS)	⏩ Velocidade ×#: Passe Prata ou Ouro · ×#: Passe Platina ou Diamante (Loja → VIP PASS)
+775	⏩ Vitesse de combat ×# débloquée pour toujours !	⏩ ¡Velocidad de combate ×# desbloqueada para siempre!	⏩ Velocidade de batalha ×# desbloqueada para sempre!
+776	⚡ Compétence en charge – touche la carte quand elle affiche TOUCHE !	⚡ Habilidad cargando – toca la carta cuando muestre ¡TOCA!	⚡ Habilidade carregando – toque na carta quando aparecer TOQUE!
+777	🔧 Tes mécaniciens attaquent seuls · touche une carte quand elle affiche TOUCHE ! pour lancer sa compétence	🔧 Tus mecánicos atacan solos · toca una carta cuando muestre ¡TOCA! para usar su habilidad	🔧 Seus mecânicos atacam sozinhos · toque numa carta quando aparecer TOQUE! para usar a habilidade
+778	DÉGÂTS	DAÑO	DANO
+779	SUBIS	RECIBIDO	RECEBIDO
+780	SOINS	CURADO	CURADO
+781	BOUCLIERS	ESCUDOS	ESCUDOS
+783	% des dégâts de l'équipe	% del daño del equipo	% do dano da equipe
+785	STATS DU COMBAT	ESTADÍSTICAS	ESTATÍSTICAS
+786	TON ÉQUIPE	TU EQUIPO	SUA EQUIPE
+787	RIVAL	RIVAL	RIVAL
+788	Campagne	Campaña	Campanha
+789	RÉCOMPENSES DE 1RE VICTOIRE	RECOMPENSAS DE 1.ª VICTORIA	RECOMPENSAS DA 1ª VITÓRIA
+790	RÉCOMPENSE DE REJEU	RECOMPENSA DE REPETICIÓN	RECOMPENSA DE REPETIÇÃO
+791	⭐⭐⭐ = aucun mécanicien K.O.	⭐⭐⭐ = ningún mecánico K.O.	⭐⭐⭐ = nenhum mecânico nocauteado
+792	Parfait ! Aucun mécanicien K.O.	¡Perfecto! Ningún mecánico K.O.	Perfeito! Nenhum mecânico foi nocauteado.
+793	CHAPITRE	CAPÍTULO	CAPÍTULO
+794	TERMINÉ !	¡COMPLETADO!	CONCLUÍDO!
+795	Chapitre	Capítulo	Capítulo
+796	est maintenant ouvert	ya está abierto	agora está aberto
+797	RECYCLAGE AUTO	RECICLAJE AUTO	RECICLAGEM AUTO
+798	Sac plein (	Bolsa llena (	Bolsa cheia (
+799	– recyclé pour	– reciclado por	– reciclado por
+800	⚠ SAC	⚠ BOLSA	⚠ BOLSA
+801	– rien n'est perdu, mais l'INVOCATION D'ÉQUIPEMENT est bloquée tant que tu ne recycles pas	– no se pierde nada, pero la INVOCACIÓN DE EQUIPAMIENTO se bloquea hasta que recicles	– nada se perde, mas a INVOCAÇÃO DE EQUIPAMENTO fica bloqueada até você reciclar
+802	ÉQUIPEMENT TROUVÉ	EQUIPAMIENTO ENCONTRADO	EQUIPAMENTO ENCONTRADO
+803	⟳ SUITE AUTO	⟳ SIGUIENTE AUTO	⟳ PRÓXIMA AUTO
+804	SUIVANT ▶	SIGUIENTE ▶	PRÓXIMA ▶
+805	INVOCATION D'ÉQUIPEMENT	INVOCACIÓN DE EQUIPAMIENTO	INVOCAÇÃO DE EQUIPAMENTO
+806	ÉQUIPER	EQUIPAR	EQUIPAR
+807	VICTOIRE	VICTORIA	VITÓRIA
+808	ÉTAPE	FASE	FASE
+809	CAMPAGNE	CAMPAÑA	CAMPANHA
+810	RETRAITE	RETIRARSE	RECUAR
+811	COMMENT DEVENIR PLUS FORT – touche un choix	CÓMO HACERTE MÁS FUERTE – toca una opción	COMO FICAR MAIS FORTE – toque numa opção
+812	Équipe & améliore l'équipement	Equipa y mejora el equipamiento	Equipe e melhore o equipamento
+813	marche seulement en combat	solo funciona en combate	funciona só nas batalhas
+814	Invoque plus de mécaniciens	Invoca más mecánicos	Invoque mais mecânicos
+815	couleur plus haute = bien plus fort · doublons +# étoile	color más alto = mucho más fuerte · duplicados +# estrella	cor mais alta = muito mais forte · duplicatas +# estrela
+816	Monte le niveau de tes héros	Sube de nivel a tus héroes	Suba o nível dos seus heróis
+817	Essence → NIVEAU + · Ascension tous les # niveaux	Esencia → SUBIR NIVEL · Ascensión cada # niveles	Essência → SUBIR NÍVEL · Ascensão a cada # níveis
+818	RÉESSAYER	REINTENTAR	TENTAR DE NOVO
+819	ACTIVÉ	SÍ	LIGADO
+820	DÉSACTIVÉ	NO	DESLIGADO
+821	étape suivante dans	siguiente fase en	próxima fase em
+822	touche pour activer	toca para activar	toque para ligar
+823	DIFFICILE	DIFÍCIL	DIFÍCIL
+824	SUR	DE	DE
+825	DIFFICILE ·	DIFÍCIL ·	DIFÍCIL ·
+826	étapes ·	fases ·	fases ·
+827	🔒 Termine l'étape	🔒 Supera la fase	🔒 Conclua a fase
+828	🔒 Le MODE DIFFICILE s'ouvre après le chapitre NORMAL # (étape #-	🔒 El MODO DIFÍCIL se abre tras el capítulo NORMAL # (fase #-	🔒 O MODO DIFÍCIL abre após o capítulo NORMAL # (fase #-
+829	MODE DIFFICILE	MODO DIFÍCIL	MODO DIFÍCIL
+830	Les mêmes chapitres avec	Los mismos capítulos con	Os mesmos capítulos com
+831	des monstres bien plus forts	monstruos mucho más fuertes	monstros muito mais fortes
+832	– et	– y	– e
+833	(argent, tickets, diamants).	(dinero, tickets, diamantes).	(dinheiro, tickets, diamantes).
+834	Le chapitre DIFFICILE N s'ouvre quand tu termines le chapitre NORMAL N.	El capítulo DIFÍCIL N se abre al superar el capítulo NORMAL N.	O capítulo DIFÍCIL N abre quando você conclui o capítulo NORMAL N.
+836	TOUS LES CHAPITRES	TODOS LOS CAPÍTULOS	TODOS OS CAPÍTULOS
+837	actes × # mondes ·	actos × # mundos ·	atos × # mundos ·
+838	chapitres ·	capítulos ·	capítulos ·
+840	ACTE	ACTO	ATO
+841	🔒 termine le chapitre NORMAL	🔒 supera el capítulo NORMAL	🔒 conclua o capítulo NORMAL
+842	🔒 bats	🔒 vence a	🔒 vença
+843	🔒 Termine le chapitre NORMAL	🔒 Supera el capítulo NORMAL	🔒 Conclua o capítulo NORMAL
+844	🔒 Bats	🔒 Vence a	🔒 Vença
+845	(étape	(fase	(fase
+846	-#) pour ouvrir le chapitre	-#) para abrir el capítulo	-#) para abrir o capítulo
+848	· DIFFICILE ×	· DIFÍCIL ×	· DIFÍCIL ×
+849	RÉCOMPENSES	RECOMPENSAS	RECOMPENSAS
+850	· suivant +	· siguiente +	· próximo +
+851	% dans ~	% en ~	% em ~
+853	🔥 NE LÂCHE RIEN :	🔥 NUNCA TE RINDAS:	🔥 NUNCA DESISTA:
+854	PV & attaque	PV y ataque	PV e ataque
+855	1RE VICTOIRE	1.ª VICTORIA	1ª VITÓRIA
+856	REJEU	REPETIR	REPETIR
+857	COM	COM	COM
+858	PCO	POC	INC
+859	RAR	RAR	RAR
+860	ÉPI	ÉPI	ÉPI
+861	LÉG	LEG	LEN
+862	MYT	MÍT	MÍT
+863	TRA	ASC	ASC
+864	CH	CAP	CAP
+865	VAGUES	OLEADAS	ONDAS
+866	ENNEMI	ENEMIGO	INIMIGO
+867	Retour	Volver	Voltar
+869	👑 Le BALAYAGE s'ouvre au VIP #	👑 El BARRIDO se abre en VIP #	👑 A VARREDURA abre no VIP #
+870	⚡ BALAYAGE :	⚡ BARRIDO:	⚡ VARREDURA:
+871	utilisé aujourd'hui – reviens demain	usado hoy – vuelve mañana	usado hoje – volte amanhã
+872	⚡ BALAYAGE	⚡ BARRIDO	⚡ VARREDURA
+874	Stat	Estad.	Atrib.
+875	Avant	Antes	Antes
+876	Après	Después	Depois
+877	Écart	Cambio	Mudança
+878	Puissance	Poder	Poder
+879	✅ AVANTAGES	✅ VENTAJAS	✅ VANTAGENS
+880	❌ INCONVÉNIENTS	❌ DESVENTAJAS	❌ DESVANTAGENS
+881	Plus de Médecin – personne ne soigne l'équipe	Sin Médico – nadie cura al equipo	Sem Médico – ninguém cura a equipe
+882	L'équipe gagne un Médecin – il soigne tout le monde	El equipo gana un Médico – cura a todos	A equipe ganha um Médico – cura todo mundo
+883	Pas de tank (Cogneur / Légende) – les monstres frappent tes mécaniciens fragiles	Sin tanque (Pegador / Leyenda) – los monstruos golpean a tus mecánicos débiles	Sem tanque (Brutamontes / Lenda) – os monstros batem nos seus mecânicos frágeis
+884	L'équipe gagne un tank devant	El equipo gana un tanque delante	A equipe ganha um tanque na frente
+885	Beaucoup de mécaniciens à distance, peu devant	Muchos mecánicos a distancia, pocos delante	Muitos mecânicos à distância, poucos na frente
+886	Déjà dans l'équipe	Ya está en el equipo	Já está na equipe
+887	FACILE	FÁCIL	FÁCIL
+888	ÉGAL	PAREJO	EQUILIBRADO
+889	Nouvelle compétence :	Nueva habilidad:	Nova habilidade:
+890	Perd la compétence :	Pierde la habilidad:	Perde a habilidade:
+891	Passif :	Pasiva:	Passiva:
+892	Perd le passif :	Pierde la pasiva:	Perde a passiva:
+893	Attaque de loin (plus sûr)	Ataca de lejos (más seguro)	Ataca de longe (mais seguro)
+894	Combat au corps à corps (prend plus de coups)	Lucha cuerpo a cuerpo (recibe más golpes)	Luta de perto (leva mais golpes)
+895	L'équipe n'a que	El equipo solo tiene	A equipe só tem
+896	: son équipement reste avec	: su equipamiento se queda con	: o equipamento fica com
+897	Remplacer dans l'équipe de combat	Reemplazar en el equipo de combate	Substituir na equipe de batalha
+898	Ajouter à l'équipe de combat	Añadir al equipo de combate	Adicionar à equipe de batalha
+899	Retirer de l'équipe de combat	Quitar del equipo de combate	Remover da equipe de batalha
+900	AVANT	ANTES	ANTES
+901	APRÈS	DESPUÉS	DEPOIS
+902	Avant / Après	Antes / Después	Antes / Depois
+903	À distance	A distancia	À distância
+904	Mêlée	Cuerpo a cuerpo	Corpo a corpo
+905	Rôle	Rol	Função
+906	Compétence	Habilidad	Habilidade
+907	Portée	Alcance	Alcance
+908	PUISSANCE D'ÉQUIPE	PODER DEL EQUIPO	PODER DA EQUIPE
+909	ANNULER	CANCELAR	CANCELAR
+910	✖ Retirer de l'équipe	✖ Quitar del equipo	✖ Remover da equipe
+911	Touche un mécanicien pour voir les avantages et inconvénients avant de changer.	Toca un mecánico para ver ventajas y desventajas antes de cambiar.	Toque num mecânico para ver vantagens e desvantagens antes de trocar.
+912	entre	entra	entra
+913	si remplacé	si se reemplaza	se substituído
+914	L'équipe est complète	El equipo está completo	A equipe está completa
+915	Qui doit	¿A quién debe	Quem
+916	remplacer ? Touche pour voir avant / après.	reemplazar? Toca para ver antes / después.	deve substituir? Toque para ver antes / depois.
+917	⚡ C'est déjà ta meilleure équipe	⚡ Ya es tu mejor equipo	⚡ Esta já é sua melhor equipe
+918	Puissance d'équipe +	Poder del equipo +	Poder da equipe +
+919	Puissance d'équipe −	Poder del equipo −	Poder da equipe −
+920	Auto meilleur – avant / après	Auto mejor – antes / después	Auto melhor – antes / depois
+921	Les mécaniciens les plus puissants.	Los mecánicos más poderosos.	Os mecânicos mais poderosos.
+922	QUITTER L'ÉQUIPE	SALIR DEL EQUIPO	SAIR DA EQUIPE
+923	REJOINDRE L'ÉQUIPE	UNIRSE AL EQUIPO	ENTRAR NA EQUIPE
+924	✓ CONFIRMER	✓ CONFIRMAR	✓ CONFIRMAR
+925	Niv	Nv	Nv
+927	MODIFIER L'ÉQUIPE DE COMBAT	EDITAR EQUIPO DE COMBATE	EDITAR EQUIPE DE BATALHA
+928	CHOISIS TON ÉQUIPE	ELIGE TU EQUIPO	ESCOLHA SUA EQUIPE
+929	touche un mécanicien ci-dessous pour l'ajouter · touche une place de l'équipe pour le changer	toca un mecánico abajo para añadirlo · toca un hueco del equipo para cambiarlo	toque num mecânico abaixo para adicioná-lo · toque numa vaga da equipe para trocá-lo
+930	touche un héros de l'équipe pour le changer	toca un héroe del equipo para cambiarlo	toque num herói da equipe para trocá-lo
+931	· FACILE	· FÁCIL	· FÁCIL
+932	· ÉGAL	· PAREJO	· EQUILIBRADO
+933	· DIFFICILE	· DIFÍCIL	· DIFÍCIL
+934	ÉQUIPEMENT	EQUIPAMIENTO	EQUIPAMENTO
+935	RETOUR	VOLVER	VOLTAR
+936	✓ TERMINÉ	✓ LISTO	✓ PRONTO
+937	· max # ·	· máx # ·	· máx # ·
+938	ÉQUIPE	EQUIPO	EQUIPE
+939	TES MÉCANICIENS	TUS MECÁNICOS	SEUS MECÂNICOS
+940	AUTO MEILLEUR	AUTO MEJOR	AUTO MELHOR
+941	Choisis au moins # héros	Elige al menos # héroe	Escolha pelo menos # herói
+942	ÉQUIPE DE COMBAT · campagne + Arène	EQUIPO DE COMBATE · campaña + Arena	EQUIPE DE BATALHA · campanha + Arena
+943	✓ Équipe de combat enregistrée	✓ Equipo de combate guardado	✓ Equipe de batalha salva
+944	OUVRIR UNE BOÎTE (	ABRIR UNA CAJA (	ABRIR UMA CAIXA (
+945	BOUTIQUE DES NOYAUX	TIENDA DE NÚCLEOS	LOJA DE NÚCLEOS
+946	Noyau Mythique :	Núcleo Mítico:	Núcleo Mítico:
+947	BOÎTE MYTHIQUE ROUGE	CAJA MÍTICA ROJA	CAIXA MÍTICA VERMELHA
+948	Ouvre-la et choisis	Ábrela y elige	Abra e escolha
+949	n'importe quel héros Mythique	cualquier héroe Mítico	qualquer herói Mítico
+950	– un nouveau héros ou +# copie pour l'ÉVEIL. Elle reste dans ton sac jusqu'à ce que tu l'ouvres et ne peut jamais être recyclée.	– un héroe nuevo o +# copia para el DESPERTAR. Se queda en tu bolsa hasta que la abras y nunca se puede reciclar.	– um herói novo ou +# cópia para o DESPERTAR. Fica na sua bolsa até você abrir e nunca pode ser reciclada.
+951	ACHETER ·	COMPRAR ·	COMPRAR ·
+952	Noyau Mythique	Núcleo Mítico	Núcleo Mítico
+953	vient des	viene de	vem de
+954	doublons de héros déjà au max	duplicados de héroes ya al máximo	duplicatas de heróis já no máximo
+955	: Commun	: Común	: Comum
+956	% · Peu commun	% · Poco común	% · Incomum
+957	% · Rare	% · Raro	% · Raro
+958	% · Épique	% · Épico	% · Épico
+959	% · Légendaire	% · Legendario	% · Lendário
+960	% (# Noyau) · Mythique : toujours	% (# Núcleo) · Mítico: siempre	% (# Núcleo) · Mítico: sempre
+961	. Sert pour	. Sirve para	. Serve para
+962	Niv #-#	Nv #-#	Nv #-#
+963	des héros Mythiques et ici.	de los héroes Míticos y aquí.	dos heróis Míticos e aqui.
+964	NOUVEAU	NUEVO	NOVO
+965	BOÎTE MYTHIQUE ROUGE · CHOISIS	CAJA MÍTICA ROJA · ELIGE	CAIXA MÍTICA VERMELHA · ESCOLHA
+966	Touche deux fois un héros Mythique. Boîtes :	Toca dos veces un héroe Mítico. Cajas:	Toque duas vezes num herói Mítico. Caixas:
+967	· max	· máx	· máx
+968	Essence :	Esencia:	Essência:
+969	Ascension	Ascensión	Ascensão
+970	· Niv compétence	· Nv habilidad	· Nv habilidade
+971	% dégâts & soins de compétence)	% daño y cura de habilidad)	% dano e cura de habilidade)
+972	MAX +	MÁX +	MÁX +
+973	PUISSANCE	PODER	PODER
+974	NOYAU	NÚCLEO	NÚCLEO
+975	ASCENSION	ASCENSIÓN	ASCENSÃO
+976	– Niv	– Nv	– Nv
+977	est la limite pour l'instant.	es el límite por ahora.	é o limite por enquanto.
+978	• toutes les stats	• todas las estadísticas	• todos os atributos
+979	(puissance	(poder	(poder
+980	• Niv compétence	• Nv habilidad	• Nv habilidade
+981	(+#% dégâts & soins de compétence)	(+#% daño y cura de habilidad)	(+#% dano e cura de habilidade)
+982	• niveau max	• nivel máx	• nível máx
+983	ASCENSION ·	ASCENDER ·	ASCENDER ·
+984	NIVEAU MAX	NIVEL MÁX	NÍVEL MÁX
+985	· toutes les ascensions faites	· todas las ascensiones hechas	· todas as ascensões feitas
+988	· Niv	· Nv	· Nv
+989	TALENT ·	TALENTO ·	TALENTO ·
+990	HÉROS MYTHIQUES → Niv #	HÉROES MÍTICOS → Nv #	HERÓIS MÍTICOS → Nv #
+991	: après Niv # niveaux et #	: después del Nv # niveles y #	: após o Nv # níveis e #
+992	Ascensions de Noyau	Ascensiones de Núcleo	Ascensões de Núcleo
+993	(+#% à toutes les stats par niveau, +#% et +# niveau de compétence par Ascension de Noyau). Le Noyau Mythique vient des doublons de héros au max (rare – un doublon Mythique donne	(+#% a todas las estadísticas por nivel, +#% y +# nivel de habilidad por Ascensión de Núcleo). El Núcleo Mítico viene de duplicados de héroes al máximo (raro – un duplicado Mítico da	(+#% em todos os atributos por nível, +#% e +# nível de habilidade por Ascensão de Núcleo). O Núcleo Mítico vem de duplicatas de heróis no máximo (raro – uma duplicata Mítica dá
+994	vient des Gains Idle, des étapes de campagne, de la Torque Tower, des Tours de Classe, de tous les Donjons, de l'événement Essence et des doublons de héros au max. Les niveaux comptent dans chaque combat et un peu au garage (+#% par niveau).	viene de Recompensas Idle, fases de campaña, Torque Tower, Torres de Clase, todas las Mazmorras, el evento de Esencia y duplicados de héroes al máximo. Los niveles cuentan en cada combate y un poco en el taller (+#% por nivel).	vem das Recompensas Idle, fases da campanha, Torque Tower, Torres de Classe, todas as Masmorras, o evento de Essência e duplicatas de heróis no máximo. Os níveis valem em toda batalha e um pouco na oficina (+#% por nível).
+995	NIV +	SUBIR	SUBIR
+998	COMPÉTENCES	HABILIDADES	HABILIDADES
+999	ULTIME	DEFINITIVA	ULTIMATE
+1000	PASSIF	PASIVA	PASSIVA
+1001	Épique +	Épico +	Épico +
+1002	ÉPIQUE+	ÉPICO+	ÉPICO+
+1003	TALENT	TALENTO	TALENTO
+1004	Mythique seulement	Solo Mítico	Só Mítico
+1005	MYTHIQUE	MÍTICO	MÍTICO
+1006	RESSOURCES	RECURSOS	RECURSOS
+1007	⚔️ ÉQUIPE DE COMBAT	⚔️ EQUIPO DE COMBATE	⚔️ EQUIPE DE BATALHA
+1008	pour TOUS les combats	para TODOS los combates	para TODAS as batalhas
+1009	puissance d'équipe	poder del equipo	poder da equipe
+1010	vs étape	vs fase	vs fase
+1011	% ATQ & PV	% ATQ y PV	% ATQ e PV
+1012	pas de bonus	sin bonus	sem bônus
+1013	manquant :	falta:	falta:
+1014	· # rôles +#% · # +#% · # +#%	· # roles +#% · # +#% · # +#%	· # funções +#% · # +#% · # +#%
+1015	les # rôles – bonus max !	los # roles – ¡bonus máx!	todas as # funções – bônus máx!
+1016	RÔLES D'ÉQUIPE	ROLES DEL EQUIPO	FUNÇÕES DA EQUIPE
+1017	GRADE	GRADO	GRAU
+1018	FUSION ✓	FUSIÓN ✓	FUSÃO ✓
+1019	Pas encore de héros – invoque tes premiers héros !	Aún no hay héroes – ¡invoca a tus primeros héroes!	Ainda sem heróis – invoque seus primeiros heróis!
+1020	INVOCATION DE HÉROS	INVOCACIÓN DE HÉROES	INVOCAÇÃO DE HERÓIS
+1021	Tu n'as pas encore de héros mécaniciens.	Aún no tienes héroes mecánicos.	Você ainda não tem heróis mecânicos.
+1022	Invoque tes premiers héros – ils combattent et portent de l'équipement.	Invoca a tus primeros héroes – luchan y llevan equipamiento.	Invoque seus primeiros heróis – eles lutam e usam equipamento.
+1023	Désactivé	No	Desligado
+1024	ART	ARTE	ARTE
+1025	· COMPÉTENCE	· HABILIDAD	· HABILIDADE
+1026	✖ QUITTER L'ÉQUIPE	✖ SALIR DEL EQUIPO	✖ SAIR DA EQUIPE
+1027	➕ AJOUTER À L'ÉQUIPE	➕ AÑADIR AL EQUIPO	➕ ADICIONAR À EQUIPE
+1028	NOUVEL ÉQUIPEMENT	NUEVO EQUIPAMIENTO	NOVO EQUIPAMENTO
+1029	NIVEAU + · Niv	SUBIR · Nv	SUBIR · Nv
+1030	ÉQUIPER AUTO	EQUIPAR AUTO	EQUIPAR AUTO
+1031	TOUT RETIRER	QUITAR TODO	REMOVER TUDO
+1032	🔒 PAS DANS TA COLLECTION · stats au Niv # sans équipement	🔒 NO ESTÁ EN TU COLECCIÓN · estadísticas a Nv # sin equipo	🔒 FORA DA SUA COLEÇÃO · atributos no Nv # sem equipamento
+1033	À OBTENIR PAR INVOCATION DE HÉROS	CONSÍGUELO EN INVOCACIÓN DE HÉROES	OBTENHA NA INVOCAÇÃO DE HERÓIS
+1034	APERÇU	VISTA PREVIA	PRÉVIA
+1035	TOUS	TODOS	TODOS
+1036	TOUT L'ÉQUIPEMENT	TODO EL EQUIPAMIENTO	TODO O EQUIPAMENTO
+1037	Pas encore d'équipement ici. Gagne des combats pour en trouver !	Aún no hay equipamiento. ¡Gana combates para encontrarlo!	Ainda sem equipamento aqui. Vença batalhas para encontrar!
+1038	reste :	quedan:	restam:
+1039	ATQ	ATQ	ATQ
+1040	DÉF	DEF	DEF
+1041	CRIT	CRÍT	CRÍT
+1042	DÉG CRIT	DAÑO CRÍT	DANO CRÍT
+1043	VITESSE	VELOCIDAD	VELOCIDADE
+1044	DÉG COMP	DAÑO HAB	DANO HAB
+1045	ACTIF :	ACTIVO:	ATIVO:
+1046	COMPLÈTE UNE COULEUR = BONUS POUR TOUS LES HÉROS	COMPLETA UN COLOR = BONUS PARA TODOS LOS HÉROES	COMPLETE UMA COR = BÔNUS PARA TODOS OS HERÓIS
+1047	✓ ACTIF · TOUS LES HÉROS	✓ ACTIVO · TODOS LOS HÉROES	✓ ATIVO · TODOS OS HERÓIS
+1048	BLOQUÉ · MYTHIQUE = INVOCATION	BLOQUEADO · MÍTICO = INVOCACIÓN	BLOQUEADO · MÍTICO = INVOCAÇÃO
+1049	BLOQUÉ · TOUS LES HÉROS	BLOQUEADO · TODOS LOS HÉROES	BLOQUEADO · TODOS OS HERÓIS
+1050	★ COLLECTION D'ÉTOILES	★ COLECCIÓN DE ESTRELLAS	★ COLEÇÃO DE ESTRELAS
+1051	Quand	Cuando	Quando
+1052	tes héros d'une couleur atteignent un palier,	tus héroes de un color alcanzan un nivel,	seus heróis de uma cor atingem um patamar,
+1053	chaque héros de combat	cada héroe de combate	cada herói de batalha
+1054	reçoit le bonus. Les héros manquants comptent comme non atteints.	recibe el bonus. Los héroes que faltan cuentan como no alcanzados.	recebe o bônus. Heróis que faltam contam como não atingidos.
+1055	aucun palier encore	ningún nivel aún	nenhum patamar ainda
+1056	ÉVL	DESP	DESP
+1057	Éveillé	Despertado	Desperto
+1058	Suivant : tous les	Siguiente: todos los	Próximo: todos os
+1059	héros à	héroes a	heróis em
+1060	encore en dessous	aún por debajo	ainda abaixo
+1061	✓ TERMINÉ	✓ COMPLETO	✓ COMPLETO
+1062	TES HÉROS · touche une couleur ci-dessus pour y aller	TUS HÉROES · toca un color arriba para ir	SEUS HERÓIS · toque numa cor acima para ir até ela
+1064	Le bonus marche en campagne et en Arène. Invoque de nouveaux héros pour remplir la collection.	El bonus funciona en la campaña y en la Arena. Invoca héroes nuevos para llenar la colección.	O bônus vale na campanha e na Arena. Invoque novos heróis para completar a coleção.
+1065	+ pièces de garage +	+ piezas de taller +	+ peças de oficina +
+1066	Rien à recycler	Nada que reciclar	Nada para reciclar
+1067	TOUT RECYCLER	RECICLAR TODO	RECICLAR TUDO
+1068	voir les objets gardés (	ver objetos guardados (	ver itens guardados (
+1069	L'équipement porté par un héros n'est jamais recyclé.	El equipamiento que lleva un héroe nunca se recicla.	O equipamento usado por um herói nunca é reciclado.
+1070	Touche les grades	Toca los grados	Toque nos graus
+1071	pour choisir ce qui part (enregistré) · touche un objet pour le garder	para elegir qué se recicla (guardado) · toca un objeto para conservarlo	para escolher o que vai (salvo) · toque num item para guardá-lo
+1072	RECYCLAGE AUTO ·	RECICLAJE AUTO ·	RECICLAGEM AUTO ·
+1073	le nouvel équipement des grades choisis (campagne + Invocation d'équipement) est recyclé direct · jamais les pièces de set	el equipamiento nuevo de los grados elegidos (campaña + Invocación) se recicla al instante · nunca las piezas de set	o equipamento novo dos graus escolhidos (campanha + Invocação) é reciclado na hora · peças de conjunto nunca
+1074	libre · dans le sac	libre · en la bolsa	livre · na bolsa
+1075	ÉQUIPER	EQUIPAR	EQUIPAR
+1076	SET ·	SET ·	CONJUNTO ·
+1077	★ ÉTOILES SEULEMENT	★ SOLO ESTRELLAS	★ SÓ ESTRELAS
+1078	AMÉLIORER	MEJORAR	MELHORAR
+1079	équipe d'abord	equipa primero	equipe primeiro
+1080	Tes Pièces d'équipement	Tus Piezas de equipamiento	Suas Peças de equipamento
+1081	TU AS	TIENES	VOCÊ TEM
+1082	emplacement +	ranura +	espaço +
+1083	🔧 Le	🔧 El	🔧 O
+1084	appartient à l'	pertenece a la	pertence ao
+1085	EMPLACEMENT	RANURA	ESPAÇO
+1086	du héros, pas à la pièce	del héroe, no a la pieza	do herói, não à peça
+1087	. Change la pièce – le + reste sur l'emplacement.	. Cambia la pieza – el + se queda en la ranura.	. Troque a peça – o + fica no espaço.
+1088	le héros	el héroe	o herói
+1089	= niveau de	= nivel de	= nível de
+1090	· chaque NIV	· cada NV	· cada NV
+1091	, tous les # NIV	, cada # NV	, a cada # NV
+1092	BOOST +#%	BOOST +#%	BOOST +#%
+1093	SI TU LE RETIRES DE	SI SE LO QUITAS A	SE VOCÊ TIRAR DE
+1094	l'emplacement devient vide	la ranura queda vacía	o espaço fica vazio
+1095	(retourne dans le sac)	(vuelve a la bolsa)	(volta para a bolsa)
+1096	Pris à	Quitado a	Tirado de
+1097	(sa puissance −	(su poder −	(poder dele −
+1098	AVANT / APRÈS SUR	ANTES / DESPUÉS EN	ANTES / DEPOIS EM
+1099	HÉROS SEULEMENT	SOLO HÉROES	SÓ HERÓIS
+1100	STAT DE SET de cette pièce :	ESTADÍSTICA DE SET de esta pieza:	ATRIBUTO DE CONJUNTO desta peça:

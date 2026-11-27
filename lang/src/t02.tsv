@@ -1,0 +1,34 @@
+579	MOTEUR	MOTOR	MOTOR
+581	Outil	Herramienta	Ferramenta
+582	Casque	Casco	Capacete
+583	Gilet de travail	Chaleco	Colete
+584	Gants	Guantes	Luvas
+585	Bottes	Botas	Botas
+586	Puce ECU	Chip ECU	Chip ECU
+587	Attaque	Ataque	Ataque
+588	PV	PV	PV
+589	Défense	Defensa	Defesa
+590	Chance de critique	Prob. crítico	Chance de crítico
+591	Dégâts critiques	Daño crítico	Dano crítico
+592	Vitesse d'attaque	Vel. de ataque	Vel. de ataque
+593	Dégâts de compétence	Daño de habilidad	Dano de habilidade
+634	Transcendé	Ascendido	Ascendido
+635	NIV	NV	NV
+636	NIV —	NV —	NV —
+637	Stat principale ×	Estadística principal ×	Atributo principal ×
+638	Stats bonus +	Estadísticas extra +	Atributos extras +
+681	Chaque pièce de set a # stat	Cada pieza de set tiene # estadística	Cada peça de conjunto tem # atributo
+682	STAT DE SET	ESTADÍSTICA DE SET	ATRIBUTO DE CONJUNTO
+683	: Commun +#% · Peu commun +#% · Rare +#% · Épique +#% · Légendaire +#% · Mythique +#% · Transcendé +#%. Toutes les pièces du set du	: Común +#% · Poco común +#% · Raro +#% · Épico +#% · Legendario +#% · Mítico +#% · Ascendido +#%. Todas las piezas del set del	: Comum +#% · Incomum +#% · Raro +#% · Épico +#% · Lendário +#% · Mítico +#% · Ascendido +#%. Todas as peças do conjunto do
+684	même grade	mismo grado	mesmo grau
+685	(Transcendé compte comme Mythique).	(Ascendido cuenta como Mítico).	(Ascendido conta como Mítico).
+686	◀ CETTE PIÈCE	◀ ESTA PIEZA	◀ ESTA PEÇA
+687	(pas encore)	(aún no)	(ainda não)
+688	Toutes les pièces du set du même grade	Todas las piezas del set del mismo grado	Todas as peças do conjunto do mesmo grau
+690	STAGE #	STAGE #	STAGE #
+691	Activé	Activado	Ligado
+695	ÉVEILLÉ	DESPERTADO	DESPERTO
+696	NON ÉVEILLÉ	SIN DESPERTAR	NÃO DESPERTO
+697	copies → ÉVL	copias → DESP	cópias → DESP
+699	TANK	TANQUE	TANQUE
+700	GUERRIER	GUERRERO	GUERREIRO
