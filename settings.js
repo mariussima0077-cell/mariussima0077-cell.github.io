@@ -129,13 +129,13 @@ window.TE_SET={get cam(){return ST.cam;},get sfx(){return ST.sfx;},get mus(){ret
 const css=document.createElement('style');css.textContent=`
 #zoom #stBtn{padding:0;display:flex;align-items:center;justify-content:center}
 #zoom #stBtn svg{width:30px;height:30px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
-#zoom #stBtn.pic{background:url(img/ui10/settings.webp) center/contain no-repeat!important;box-shadow:none!important;border-radius:0!important}#zoom #stBtn.pic svg{display:none}
+#zoom #stBtn.pic{background:url(img/ui10/settings.webp) center/contain no-repeat!important;box-shadow:none!important;border:0!important;border-radius:0!important;width:52px;height:52px;margin:-2px;filter:drop-shadow(0 4px 5px #000a)}#zoom #stBtn.pic svg{display:none}
 #stg{position:fixed;inset:0;z-index:9400;display:none;flex-direction:column;background:linear-gradient(180deg,#16212e,#0b1118);color:#fff;font:700 13px Body,system-ui}
 #stg.open{display:flex;animation:stgIn .18s ease-out}@keyframes stgIn{from{opacity:0;transform:translateY(14px)}}
 #stg .sgH{flex:none;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:linear-gradient(180deg,#2b3d52,#18232f);border-bottom:3px solid #e0aa25;box-shadow:0 4px 12px #0008}
 #stg .sgH button{width:44px;height:40px;border:0;border-radius:12px;font:900 20px Game,system-ui;color:#3a2200;background:linear-gradient(#ffe27a,#ffb300);box-shadow:0 3px 0 #8f4c00}
 #stg .sgH b{flex:1;font:900 24px Game,system-ui;color:#ffd54a;text-shadow:0 2px 0 #000;letter-spacing:1px}
-#stg .sgH svg{width:30px;height:30px}
+#stg .sgH img{width:38px;height:38px;filter:drop-shadow(0 2px 3px #000a)}
 #stg .sgB{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 12px calc(env(safe-area-inset-bottom) + 24px)}
 #stg h3{margin:16px 2px 7px;font:900 14px Game,system-ui;color:#ffd54a;letter-spacing:1px;text-shadow:0 1px 0 #000}
 #stg .sgR{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;margin:0 0 7px;border-radius:14px;background:linear-gradient(180deg,#263546,#18222e);border:1.5px solid #3b4d62;box-shadow:inset 0 1px 0 #ffffff14}
@@ -165,7 +165,7 @@ function render(){const B=$('stgB');if(!B)return;const G=window.GFX||{man:'auto'
 function open(){const o=$('stg');if(!o)return;render();o.classList.add('open');sfx('open');}
 function close(){const o=$('stg');if(o&&o.classList.contains('open')){o.classList.remove('open');sfx('close');}}
 function init(){const o=$('stg');if(!o||o.__in)return;o.__in=1;
-  o.innerHTML='<div class="sgH"><button id="stgX" aria-label="Back">↩</button>'+GEAR+'<b>SETTINGS</b></div><div class="sgB" id="stgB"></div>';
+  o.innerHTML='<div class="sgH"><button id="stgX" aria-label="Back">↩</button><img src="img/ui10/settings.webp" alt=""><b>SETTINGS</b></div><div class="sgB" id="stgB"></div>';
   $('stgX').onclick=close;
   $('stgB').addEventListener('click',e=>{
     const r=e.target.closest('[data-sg]');
@@ -179,7 +179,7 @@ function init(){const o=$('stg');if(!o||o.__in)return;o.__in=1;
       render();setTimeout(()=>location.reload(),700);return;}
     const lg=e.target.closest('[data-lng]');
     if(lg){sfx('tap');if(lg.dataset.lng!==(window.TE_LANG||'en')&&window.TE_SETLANG)window.TE_SETLANG(lg.dataset.lng);}});
-  const b=$('stBtn');if(b){b.innerHTML=GEAR;b.onclick=open;}}   // the gear is drawn from code until Marius sends his icon (then: class "pic" + img/ui10/settings.webp)
+  const b=$('stBtn');if(b){b.innerHTML=GEAR;b.classList.add('pic');b.onclick=open;}}   // v16-381: Marius' own icon (img/ui10/settings.webp); the drawn gear stays as a fallback in the code
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 window.TE_SETTINGS={open,close};
 })();

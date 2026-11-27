@@ -43,7 +43,16 @@ function st(){const G=T().G;if(!G.cc)G.cc={o:0,sp:2,p:['','','','','','']};const
 function owned(){return st().own.map(id=>BY[id]).filter(Boolean);}
 function parked(){return owned();}
 function show6(){return owned().slice().sort((a,b)=>b.price-a.price).slice(0,SPOTS);}   // the 6 most expensive are shown on the map
-function battleB(){const s=st();if(!s.o)return 0;return owned().reduce((a,c)=>a+c.b,0);}   // % ATK & HP for every hero
+// v16-381 COLLECTION DUST (Marius 27 nov: „mașinile din Collection Garage se prăfuiesc; le speli ca bonusul lor să rămână 100%”):
+// only with a Car Wash. The cars get dusty in 24 h (Car Wash LV 1) … 60 h (LV 10, +30 min per extra level, max 96 h); full dust = 80% of the
+// battle bonus. 🫧 WASH ALL (free, MY GARAGE) = 100% again. s.wt = last wash. The idle rewards of the cars are never touched.
+const DUST_MIN=.8;
+function dustH(){const G=T().G,l=G.lv.wash||0,x=(G.lx&&G.lx.wash)||0;return Math.min(96,24+(Math.max(1,l)-1)*4+x*.5);}
+function dust(){const G=T().G,s=st();if(!s.o||!(G.lv.wash>0))return 0;if(!s.wt){s.wt=Date.now();return 0;}return Math.max(0,Math.min(1,(Date.now()-s.wt)/(dustH()*36e5)));}
+function shine(){return 1-(1-DUST_MIN)*dust();}
+function wash(){const s=st();s.wt=Date.now();T().save();if(window.TE_SFX)window.TE_SFX('reward');T().toast('🫧 Your collection shines again – full bonus!',2600);render();}
+function battleB0(){const s=st();if(!s.o)return 0;return owned().reduce((a,c)=>a+c.b,0);}
+function battleB(){return battleB0()*shine();}   // % ATK & HP for every hero (× shine)   // % ATK & HP for every hero
 function rates(){const s=st(),o={dm:0,tk:0,ct:0,gt:0,es:0,gp:0,mon:0};if(!s.o)return o;
   for(const c of parked())for(const k in c.r)o[k]=(o[k]||0)+c.r[k];
   o.mon=owned().length*.01;return o;}   // v16-129: +1% idle money per car owned
@@ -199,9 +208,11 @@ function drawCar(g,m,L,W,t){
 
 // ---------------------------------------------------------------- the garage on the map (called from drawCollection)
 // x,y,w,h = where b_collection is drawn. Returns true when the garage is open (index.html then skips the "coming soon" tape).
-function drawMap(X,x,y,w,h,time){const s=st();if(!s.o)return false;const k=w/560;
+function drawMap(X,x,y,w,h,time){const s=st();if(!s.o)return false;const k=w/560,d=dust();
   for(let i=0;i<SPOTS;i++){const [sx,sy]=SPOT[i],cx=x+sx*k,cy=y+sy*k;
-    const m=show6()[i];if(!m)continue;X.save();X.translate(cx,cy);if(i%2)X.rotate(Math.PI);drawCar(X,m,52,24,time||0);X.restore();}
+    const m=show6()[i];if(!m)continue;X.save();X.translate(cx,cy);if(i%2)X.rotate(Math.PI);drawCar(X,m,52,24,time||0);
+    if(d>.08){X.fillStyle='rgba(150,128,96,'+(d*.5)+')';rrp(X,-26,-12,52,24,7);X.fill();}X.restore();}
+  if(d>.5&&owned().length&&((time||0)*1.5|0)%2){X.font='900 11px Game,system-ui';X.textAlign='center';X.lineWidth=3.5;X.strokeStyle='rgba(0,0,0,.75)';X.strokeText('🫧 WASH ME!',x+w/2,y+h*.2);X.fillStyle='#81d4fa';X.fillText('🫧 WASH ME!',x+w/2,y+h*.2);}
   return true;}
 const fmtS=n=>n>=1e9?'$'+(n/1e9).toFixed(1)+'B':n>=1e6?'$'+(n/1e6).toFixed(n%1e6?1:0)+'M':'$'+Math.round(n/1e3)+'K';
 
@@ -228,9 +239,10 @@ function render(){const T0=T(),G=T0.G,s=st();document.getElementById('ccMon').in
     h='<div class="ccClosed"><img src="'+thumb('dyn',260,120)+'"><h3>Open your Collection Garage</h3><p>Buy classic cars from the dealer and park them in your private showroom. Every parked car brings <b>diamonds</b> and <b>tickets</b> while you are away (collect them with <b>IDLE</b>).</p>'+
       '<button class="ccBuy'+(ok&&G.money>=OPEN_COST?'':' off')+'" data-cc="open">'+(ok?'OPEN · '+T0.fmt(OPEN_COST):'🔒 REP '+OPEN_REP)+'</button></div>';
     document.getElementById('ccBody').innerHTML=h;return;}
-  if(tab==='g'){const R=rates(),O=owned(),n=O.length,bb=Math.round(battleB()*100)/100;
+  if(tab==='g'){const R=rates(),O=owned(),n=O.length,bb=Math.round(battleB()*100)/100,sh=Math.round(shine()*100),hasW=G.lv.wash>0;
     h+='<div class="ccSum"><b>YOUR COLLECTION · '+n+' / '+CARS.length+' CARS</b><div>⚔️ All heroes in battle: <b style="color:#7dff8a">+'+bb+'% ATK &amp; HP</b></div><div>'+(n?rwLine(R):'Buy a car to get diamonds, Essence, Gear Parts and tickets')+'</div>'+
-      '<small>Idle money +'+n+'% (1% per car) · your 6 most expensive cars are shown in the garage on the map</small></div><div class="ccGrid">';
+      '<small>Idle money +'+n+'% (1% per car) · your 6 most expensive cars are shown in the garage on the map</small>'+
+      (hasW&&n?'<div class="ccShine"><div class="ccShB"><i style="width:'+sh+'%"></i><span>🫧 SHINE '+sh+'%</span></div><button class="ccBuy'+(sh>=100?' off':'')+'" data-cc="wash">🫧 WASH ALL</button></div><small>Dusty cars give less battle bonus (down to 80%). Washing is free.</small>':'')+'</div><div class="ccGrid">';
     for(const m of O.slice().sort((a,b)=>b.price-a.price))h+='<div class="ccSp" data-cc="car:'+m.id+'" style="--gc:'+gc(m.gr)+'"><div class="ccGl"><em>'+GN[m.gr]+'</em><img src="'+thumb(m.id,150,72)+'"><small>'+rwLine(m.r,0,m.b)+'</small></div><b class="ccPl">'+m.n+'</b></div>';
     h+='<div class="ccSp empty" data-cc="tab:d"><div class="ccGl"><span>＋</span><em>BUY MORE CARS</em></div><b class="ccPl">DEALER</b></div></div>';}
   else{h+='<div class="ccNote">Every car can be owned <b>once</b> and counts forever – no parking limit. Rewards are fixed – nothing random.</div>';
@@ -246,6 +258,7 @@ function pop(id){const T0=T(),G=T0.G,s=st(),m=BY[id],own=s.own.includes(id);
 function act(a){const T0=T(),G=T0.G,s=st();
   if(a==='x')return close();if(a==='px')return $p().classList.remove('open');
   if(a.startsWith('tab:')){tab=a.slice(4);return render();}
+  if(a==='wash'){if(shine()>=.995)return T0.toast('✨ Your collection is already clean',2000);return wash();}
   if(a==='open'){if(G.rep<OPEN_REP)return T0.toast('🔒 The Collection Garage opens at REP '+OPEN_REP,2500);if(G.money<OPEN_COST)return T0.toast('Not enough money',2000);
     G.money-=OPEN_COST;s.o=1;T0.save();T0.toast('🏆 Collection Garage OPEN! Buy your first classic car at the dealer.',3500);tab='d';return render();}
   if(a==='spot'){const i=s.sp,c=SPOT_COST[i];if(i>=SPOTS)return;if(G.money<c)return T0.toast('Not enough money',2000);G.money-=c;s.sp++;T0.save();T0.toast('🅿️ Spot '+(i+1)+' unlocked',2200);return render();}
@@ -273,6 +286,7 @@ body:has(#ccP.open) #game,body:has(#ccP.open) #side,body:has(#ccP.open) #side2{v
 .ccTabs img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px #000a)}.ccTabs .i1{display:none}.ccTabs button.on .i1{display:block}.ccTabs button.on .i0{display:none}
 #ccBody{flex:1;overflow-y:auto;padding:4px 10px 18px;touch-action:pan-y}
 .ccSum{background:linear-gradient(#1f1a33ee,#120f20ee);border:2px solid #e0aa2588;border-radius:14px;padding:10px;text-align:center;margin-bottom:10px}.ccSum b{color:#ffd54a;font-size:12px;letter-spacing:.5px}.ccSum div{margin:6px 0;font:800 13px Game,system-ui;text-shadow:0 1px 2px #000,0 0 4px #000}.ccSum small{color:#b8c7d6;text-shadow:0 1px 2px #000}.ccSum i{color:#7CFC9A;font-style:normal}
+.ccShine{display:flex;align-items:center;gap:8px;margin:8px 0 4px!important}.ccShB{position:relative;flex:1;height:26px;border-radius:13px;background:#0b0f18;box-shadow:inset 0 2px 4px #000,0 0 0 1.5px #3b4d62;overflow:hidden}.ccShB i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#b3e5fc,#29b6f6);border-radius:13px}.ccShB span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 12px Game,system-ui;color:#fff;text-shadow:0 1px 2px #000}.ccShine .ccBuy{padding:6px 10px;font-size:12px}
 .ccGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .ccSp{position:relative;aspect-ratio:420/539;background:url(img/cc/card.webp) center/100% 100% no-repeat;text-align:center;container-type:inline-size;filter:drop-shadow(0 4px 8px #000c)}
 .ccGl{position:absolute;left:8%;right:8%;top:12%;height:58%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,var(--gc,#000) 30%,transparent),transparent 70%)}
@@ -295,5 +309,5 @@ body:has(#ccP.open) #game,body:has(#ccP.open) #side,body:has(#ccP.open) #side2{v
 #ccP .tki,#ccPop .tki{height:1.3em;vertical-align:-.3em}
 `;document.head.appendChild(css);
 
-window.CC={CARS,drawMap,drawCar,open,close,rates,st,battleB,isOpen:()=>el.classList.contains('open'),sig:()=>{const s=T()&&T().G.cc;return s?s.o+'|'+(s.own||s.p).join(','):'';}};
+window.CC={CARS,drawMap,drawCar,open,close,rates,st,battleB,shine,dust,wash,isOpen:()=>el.classList.contains('open'),sig:()=>{const s=T()&&T().G.cc;return s?s.o+'|'+(s.own||s.p).join(','):'';}};
 })();

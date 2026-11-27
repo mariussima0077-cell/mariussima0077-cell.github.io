@@ -610,6 +610,10 @@ body:has(#xp.open) #toast{top:auto;bottom:30px}
 .raidC .rcB>div{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border-radius:9px;padding:5px 10px;margin:4px 0;font:800 13px Body,system-ui}
 .raidC .rcB>div span{flex:1;text-align:left}.raidC .rcB>div b{font:900 16px Game,system-ui;color:#7CFC9A}.raidC i{font-style:normal}.raidC .tki{width:22px;height:22px}
 .raidC button{margin-top:8px;font:900 16px Game,system-ui;color:#3a2200;background:linear-gradient(#ffe27a,#ffb300);border:0;border-radius:12px;padding:7px 34px;box-shadow:0 3px 0 #8f4c00}
+ #fuelChip{position:fixed;left:8px;top:calc(env(safe-area-inset-top,0px) + 70px);z-index:5;display:none;align-items:center;gap:5px;padding:4px 9px 4px 6px;border-radius:14px;font:900 11px Game,system-ui;color:#fff;background:linear-gradient(180deg,#324356,#141c26);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #e0aa25,0 4px 8px #000a;white-space:nowrap}
+#fuelChip.on{display:flex}#fuelChip b{font-size:15px}#fuelChip i{font-style:normal;color:#3a2200;background:linear-gradient(#ffe27a,#ffb300);border-radius:8px;padding:1px 6px}
+#fuelChip.tank{animation:fcP 1s ease-in-out infinite}@keyframes fcP{50%{transform:scale(1.06);box-shadow:0 0 0 1.5px #0a0f15,0 0 0 3px #ffd54a,0 0 14px #ffb300}}
+#fuelChip.boost i{background:linear-gradient(#80d8ff,#2979ff);color:#fff}
 .megaB{position:fixed;left:50%;top:22%;transform:translate(-50%,-50%);z-index:9000;pointer-events:none;text-align:center;padding:10px 26px 12px;border-radius:16px;background:linear-gradient(180deg,#c62828,#5a0a0a);border:3px solid #ffd54a;box-shadow:0 0 0 3px #3a0000,0 10px 30px #000c,0 0 44px #ff1744aa;animation:gRaid 3.3s ease-out forwards}
 .megaB b{display:block;font:900 34px Game,system-ui;color:#ffd54a;text-shadow:0 3px 0 #000;white-space:nowrap}.megaB span{display:block;font:900 15px Game,system-ui;color:#fff;letter-spacing:2px;text-shadow:0 2px 0 #000;white-space:nowrap}
 .raidC p.ht{color:#ffb74d}
@@ -1082,6 +1086,7 @@ body #side2{top:max(60px,calc(var(--hbw)/5.05 + 16px))}
   <div id="shopBtn"></div>
 </div></div>
 <div id="toast"></div>
+<div id="fuelChip"></div>
 <div id="zoom"><button id="stBtn" aria-label="Settings"></button><button id="hdBtn" aria-label="HD graphics">HD</button><button id="zin">+</button><button id="zout">−</button></div>
 <div id="side"><button id="cpBtn"><img src="img/nt/ui/ic_battle.webp" alt="Battle"><i id="cpDot"></i></button><button id="heBtn"><img src="img/nt/ui3/n_heroes.webp" alt="Heroes"><i id="heDot"></i></button><button id="smBtn"><img src="img/nt/ui3/n_summon.webp" alt="Summon"><i id="tkDot"></i></button><button id="tmBtn"><img src="img/nt/ui3/n_crew.webp" alt="Crew"><i id="rosDot"></i></button><button id="idBtn"><img src="img/nt/ui3/n_idle.webp" alt="Idle"><i id="idDot"></i></button><button id="dqBtn"><img src="img/nt/ui3/n_quests.webp" alt="Quests"><i id="dqDot"></i></button><button id="vipBtn"><img src="img/ui/ic_vip.webp" alt="VIP"><small id="vipTxt">VIP 0</small><i id="vipDot"></i></button></div>
 <div id="side2"><button id="evBtn"><svg viewBox="0 0 40 40"><path d="M20 3l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L20 26.6l-9.3 4.9 1.8-10.3L5 13.9l10.4-1.5z" fill="#ffd54a" stroke="#7a4a00" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="18" r="5" fill="#ff5252"/><path d="M8 34h24" stroke="#ff5252" stroke-width="3" stroke-linecap="round"/></svg><small>EVENTS</small><i id="evDot">!</i></button><button id="ciBtn"><svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="27" rx="5" fill="#f4f1ea"/><rect x="5" y="8" width="30" height="9" rx="4" fill="#e53935"/><rect x="5" y="13" width="30" height="4" fill="#e53935"/><rect x="11" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><rect x="25" y="4" width="4" height="9" rx="2" fill="#ffd54a" stroke="#5e3d00"/><path d="M12 26l5 5 11-11" fill="none" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><small>CHECK-IN</small><i id="ciDot">!</i></button><button id="nwBtn"><svg viewBox="0 0 40 40"><rect x="4" y="7" width="28" height="27" rx="3" fill="#f4f1ea"/><path d="M32 13h4v17a4 4 0 0 1-4 4z" fill="#cfc8b8"/><rect x="8" y="11" width="20" height="5" rx="1" fill="#e53935"/><rect x="8" y="19" width="9" height="8" rx="1" fill="#42a5f5"/><path d="M19 20h9M19 23.5h9M19 27h9M8 30.5h20" stroke="#5d6470" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="8" r="5.5" fill="#ffb300" stroke="#5e3d00"/><path d="M33 5v4M33 11v.5" stroke="#2a1600" stroke-width="2" stroke-linecap="round"/></svg><small>NEWS</small><i id="nwDot">!</i></button><button id="mlBtn"><svg viewBox="0 0 40 40"><rect x="4" y="10" width="32" height="22" rx="4" fill="#f4f1ea"/><path d="M5 12l15 11 15-11" fill="none" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/><path d="M5 31l11-9M35 31l-11-9" stroke="#cfc8b8" stroke-width="2"/><circle cx="20" cy="23" r="4" fill="#ffd54a" stroke="#5e3d00"/></svg><small>MAIL</small><i id="mlDot"></i></button><button id="rwSBtn" style="display:none" aria-label="Rail Wars"><i id="rwDot"></i></button></div>
@@ -1726,7 +1731,7 @@ function sales(dt){
   for(let j=0;j<PLV('office');j++){const a=agents[j];
     if(!a.car){const c=cars.find(c=>c.state==='forsale'&&!c.agent&&c.rich)||cars.find(c=>c.state==='forsale'&&!c.agent);if(c){a.car=c;c.agent=a;a.t=0;}}
     else{a.t+=dt;if(a.t>=SELL_T[olv-1]){const c=a.car;const price=Math.round(c.value*(1+SELL_BONUS[olv-1])*(1+VB('sale'))*(1+xWashSale())*(1+repSale())*lxInc('office'));qAdd('sell',1);qAdd('earn',price);if(c.type.fleet)qAdd('fleet',1);
-      G.money+=price;incSale(c,price);G.sold++;c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip||c.rich)driveAway(c);else if(Math.random()<BUYER_DRIVE)driveAway(c,1);
+      G.money+=price;incSale(c,price);G.sold++;if(xWashSale()>0&&DET&&onScreen(c.x,c.y,30))float(c.x,c.y-46,'✨ SHINE +'+Math.round(xWashSale()*100)+'%','#81d4fa');c.price=price;c.state='sold';c.agent=null;a.car=null;if(c.type.fleet||c.type.vip||c.rich)driveAway(c);else if(Math.random()<BUYER_DRIVE)driveAway(c,1);
       const xp=1+c.jobs.reduce((s,j)=>s+j.xp,0);addXP(xp);
       float(c.x,c.y-30,'+'+fmt(price),'#ffd54a');float(a.p.x,a.p.y-22,'SOLD ONLINE','#b39ddb');save();}}
   }
@@ -1927,8 +1932,14 @@ function addThief(ty,from){if(!RAID)return null;let c=freeCar()||shareCar();if(!
   if(c.state!=='theft'){c.prevState=c.state;c.state='theft';RAID.cars.push(c);}
   const T={ty,sk:pickSk(ty),st:'sneak',t:0,ft:0,ds:[],car:c,route:[],bt:TT[ty].brk*rnd(.9,1.12)*(1-.04*RAID.heat)*(RAID.kind==='mega'?.8:1),sc:0,scN:0,fr:0,spot:0,p:mkPerson({vis:true,suit:'#1b1b1b',pants:'#111'}),ph:Math.random()*9};
   thiefRoute(T,c,from);THF.push(T);RAID.n++;return T;}
+// v16-381 ⛽ FUEL THIEVES: they go for a pump of the Gas Station instead of a car (a pump stands in for the "car": never driven away)
+function addFuelThief(){if(!RAID||!(G.lv.gas>0))return null;const r=xRect('gas'),P=XGAS.p[r.t-1],i=Math.floor(Math.random()*P.length);
+  const c={fuel:1,x:r.x+r.w*P[i]+13,y:r.y+r.h*(XGAS.bot[r.t-1]-.1),a:0,type:{L:18,W:18},state:'theft',prevState:'pump',slot:{},path:[],alarm:0};
+  const T={ty:'am',fuel:1,sk:pickSk('am'),st:'sneak',t:0,ft:0,ds:[],car:c,route:[],bt:TT.am.brk*rnd(.9,1.12)*(1-.04*RAID.heat),sc:0,scN:0,fr:0,spot:0,p:mkPerson({vis:true,suit:'#1b1b1b',pants:'#111'}),ph:Math.random()*9};
+  T.o={x:r.x-190,y:r.y+r.h+46+rnd(-12,12)};T.p.x=T.o.x;T.p.y=T.o.y;T.route=[{x:r.x-20,y:r.y+r.h+20},{x:c.x+rnd(-5,5),y:c.y+10+rnd(-4,4)}];
+  THF.push(T);RAID.n++;RAID.fuel=(RAID.fuel||0)+1;return T;}
 // the car was stolen by somebody else / taken by a driver: go for another car, or leave with empty hands
-function retarget(T){const c=freeCar()||shareCar();
+function retarget(T){if(T.fuel)return;const c=freeCar()||shareCar();
   if(!c||c===T.car){T.st='flee';T.route=[T.o];T.ds=[];return;}
   if(c.state!=='theft'){c.prevState=c.state;c.state='theft';RAID.cars.push(c);}
   T.car=c;T.t=0;const s=carSide(c);T.route=[{x:s.x+rnd(-9,9),y:s.y+rnd(-7,7)}];T.st='come';}
@@ -1955,7 +1966,8 @@ function startRaid(force){const tg=theftTargets().length;if(!tg)return false;
   RAID={kind,t:0,n:0,caught:0,esc:0,loss:0,rw:{bk:0,ct:0,dm:0,tk:0},mw:0,alb:[],cars:[],proOK,proP:.3+.03*h,alarm:0,cop:null,q:{},vi:0,vq:0,waves:[],disp:{},m0:G.money,cap:0,heat:h,big:kind==='gang'||kind==='mega'};
   const R=RAID,foot=ty=>addThief(ty||(proOK&&Math.random()<R.proP?'pro':'am')),W_=(t,T,n,boss,o)=>R.waves.push({t,T,n,boss,o});
   const extra=Math.floor(h/4);                                        // 🔥 HEAT 4 / 8: +1 / +2 thieves
-  if(kind==='mega'){S.mn=(S.mn||0)+1;const N=Math.min(20,12+h+(lv-5)),rest=N-7;  // 4 on foot + 2 bikers + boss, the rest in vans and in the boss' truck
+  const nf=G.lv.gas>0?(kind==='mega'?3:kind==='gang'?2:kind==='duo'&&Math.random()<.3?1:0):0;for(let i=0;i<nf;i++)addFuelThief();   // v16-381 ⛽
+  if(kind==='mega'){S.mn=(S.mn||0)+1;const N=Math.min(20,12+h+(lv-5)),rest=N-7-nf;  // 4 on foot + 2 bikers + boss, the rest in vans and in the boss' truck
     const a=Math.min(5,Math.ceil(rest/3)),b=Math.min(5,Math.ceil((rest-a)/2)),c=Math.max(0,rest-a-b);
     for(let i=0;i<4;i++)foot();W_(1.5,GBIKE_T,1,0,{pro:1});W_(2.3,GBIKE_T,1,0,{pro:1});W_(5,GVAN_T,a);if(b)W_(10,GVAN_T,b);W_(15,GTRUCK_T,c,1);R.cap=.35;}
   else if(kind==='gang'){S.gn=(S.gn||0)+1;for(let i=0;i<4;i++)foot();if(lv>=6){W_(1.5,GBIKE_T,1,0,{pro:1});W_(2.4,GBIKE_T,1,0,{pro:1});}W_(5,GVAN_T,3+extra,1);R.cap=.30;}
@@ -1984,6 +1996,8 @@ function tapThief(x,y){if(!RAID)return false;let b=null,bd=26;for(const T of THF
 function lossFor(T){const R=RAID,pct=TT[T.ty].loss*(1-secRed())*(1-guardBonus().shield);let l=Math.min(G.money,Math.round(G.money*pct));
   if(R.cap)l=Math.max(0,Math.min(l,Math.round(R.m0*R.cap*(1-secRed()))-R.loss));return l;}   // a big raid never takes more than 30-35% of your cash in total
 function escape(T){const R=RAID,c=T.car;T.ds=[];
+  if(T.fuel){const loss=Math.round(lossFor(T)*.5);G.money-=loss;R.loss+=loss;R.esc++;G.sec.fuel=(G.sec.fuel||0)+1;c.alarm=0;c.state='gone';
+    float(T.p.x,T.p.y-46,'⛽ FUEL STOLEN!','#ff9100');float(T.p.x,T.p.y-30,'💸 −'+fmt(loss),'#ff5252');rsfx('cash');T.st='flee';T.route=[T.o];save();return;}   // v16-381: fuel thieves run away with full canisters
   if(!(c&&c.state==='theft'&&!c.stolenBy&&c.slot)){retarget(T);return;}                    // his car is gone → another car, or he leaves with nothing
   const loss=lossFor(T);G.money-=loss;R.loss+=loss;R.esc++;G.sec.stolen++;
   float(T.p.x,T.p.y-32,'💸 −'+fmt(loss),'#ff5252');rsfx('escape');
@@ -2041,6 +2055,7 @@ function endRaid(){const R=RAID;if(!R)return;
   else if(R.esc>0)G.sec.heat=R.big?Math.max(0,h0-3):0;
   G.sec.hbest=Math.max(G.sec.hbest||0,G.sec.heat||0);if(R.kind==='mega'&&won)G.sec.mega=(G.sec.mega||0)+1;
   R.won=won;R.h0=h0;R.h1=heatLv();
+  if(won&&G.lv.wash>0&&R.disp.b1)XS.secQ=Math.min(3,(XS.secQ||0)+1+(R.disp.k9?1:0)+(R.disp.b2?1:0));   // v16-381: the dirty security cars go to the Car Wash
   if(R.n>=3||R.kind==='boss'||R.mwAll||R.alb.length)raidCard(R);
   THF.length=0;RAID=null;window.__RAID_MUS=0;raidNext=rnd(80,150)*(1-.02*heatLv());
   if(SH.on)SH.st='out';
@@ -2102,7 +2117,7 @@ function updateSecurity(dt){
       if(T.st==='come'){if(T.sc>0){T.p.moving=false;continue;}if(goRoute(T,dt,85)){T.st='break';secAlarm(T);}}
       else if(T.st==='sneak'){if(T.sc>0){T.p.moving=false;continue;}if(goRoute(T,dt,58)){T.st='break';secAlarm(T);}}
       else if(T.st==='break'){const c=T.car;
-        if(!c||c.state!=='theft'||!c.slot){retarget(T);continue;}
+        if(!T.fuel&&(!c||c.state!=='theft'||!c.slot)){retarget(T);continue;}
         if(T.sc<=0)T.t+=dt*(T.spot>0?.45:1);c.alarm=1;T.p.a=Math.atan2(c.y-T.p.y,c.x-T.p.x);T.p.moving=false;
         if(T.sc<=0&&onScreen(T.p.x,T.p.y,20)&&Math.random()<dt*8)parts.push({x:T.p.x+Math.cos(T.p.a)*9,y:T.p.y+Math.sin(T.p.a)*9,vx:rnd(-30,30),vy:rnd(-30,30),life:.25,max:.25,r:rnd(.8,1.6),col:pick(['#ffd54a','#fff'])});
         if(T.t>=T.bt)escape(T);}
@@ -2981,6 +2996,17 @@ function drawRaidVeh(c){const T=c.type,k=T.rv,L=T.L,hl=L/2,hw=T.W/2,mv=!!(c.path
     box(-hl+12,-3.4,9,6.8,1.5,'#dfe5ea');box(hl-34,-3.4,9,6.8,1.5,'#dfe5ea');
     glass(hl-9,hl-3,3);X.fillStyle='#1565c0';X.font='900 7px Game,system-ui';X.textAlign='center';X.fillText('POLICE',-hl+34,2.5);
     bar(hl-14,'#ff1744','#2979ff');}
+  else if(k==='tanker'){wheels([hl-11,hl-30,-hl+12,-hl+24],5.4);
+    box(hl-20,-hw+1,20,T.W-2,4,'#c62828');X.fillStyle=grad('#d32f2f');rr(hl-20,-hw+1,20,T.W-2,4);X.fill();glass(hl-13,hl-6,3);box(hl-19,-hw+3.5,5,T.W-7,1.5,'#8e0000');     // cab
+    box(hl-25,-3,6,6,1,'#37474f');                                                                                                                                      // coupling
+    const g=X.createLinearGradient(0,-hw,0,hw);g.addColorStop(0,'#78838c');g.addColorStop(.3,'#e8edf1');g.addColorStop(.5,'#ffffff');g.addColorStop(.72,'#cfd8dc');g.addColorStop(1,'#6b767f');
+    X.fillStyle=g;rr(-hl,-hw+.5,L-25,T.W-1,11);X.fill();X.strokeStyle='rgba(0,0,0,.45)';X.lineWidth=.7;X.stroke();
+    X.strokeStyle='rgba(0,0,0,.22)';X.lineWidth=.8;for(let i=1;i<5;i++){const xx=-hl+i*(L-25)/5;X.beginPath();X.moveTo(xx,-hw+1.5);X.lineTo(xx,hw-1.5);X.stroke();}       // tank ribs
+    X.fillStyle='#ffb300';X.fillRect(-hl+6,-1.6,L-38,3.2);X.fillStyle='#37474f';for(let i=0;i<3;i++){const xx=-hl+12+i*(L-50)/2;circ(xx,0,3.6);X.fillStyle='#90a4ae';circ(xx,0,2);X.fillStyle='#37474f';}   // stripe + hatches
+    if(DET){X.fillStyle='#b71c1c';X.font='900 6px Game,system-ui';X.textAlign='center';X.fillText('FUEL',-hl+(L-25)/2+6,hw-3.4);
+      X.save();X.translate(-hl+7,0);X.rotate(Math.PI/4);box(-3,-3,6,6,.6,'#ff6d00');X.restore();}}
+  if(c.dirt>.05&&k!=='tanker'){X.fillStyle='rgba(110,84,52,'+Math.min(.62,c.dirt*.7)+')';rr(-hl,-hw,L,T.W,5);X.fill();    // mud after a raid (washed off in the Car Wash)
+    X.fillStyle='rgba(78,58,34,'+Math.min(.7,c.dirt*.8)+')';for(let i=0;i<7;i++)ell(-hl+6+((i*37+(c.id||0))%(L-12)),-hw+3+((i*53)%(T.W-6)),3.2+(i%3),2.2+(i%2));}
   lamps();beams();X.restore();}
 // the security helicopter with its searchlight (MEGA RAID · big gang raids)
 function drawSecHeli(){const h=SH;if(!h.on)return;
@@ -3032,6 +3058,7 @@ function drawSecPeople(){
     else if(T.ty==='boss')tag(T.p.x,ty-6,'👑 GANG BOSS','#b71c1c');
     else if(hint&&T.scN<1&&(T.st==='break'||T.st==='sneak'))tag(T.p.x,ty-(T.st==='break'?7:0),'👆 TAP!','#1565c0');
     else if(T.ty==='pro')tag(T.p.x,ty-(T.st==='break'?7:0),'★ PRO','#6a1b9a');
+    else if(T.fuel&&T.st!=='break')tag(T.p.x,ty,'⛽ FUEL THIEF','#e65100');
     else if(DET&&!many&&T.st!=='break')tag(T.p.x,ty,'🦹 THIEF','#c62828');}
 }
 function drawArm(px,py,L,v){const len=Math.max(2,L*Math.cos(v*Math.PI/2*.94)),hh=L*21/176;
@@ -3223,6 +3250,42 @@ function drawDistrict(){
     X.fillStyle='#fff';X.font='900 13px Game,system-ui';X.fillText(locked?'🔒 REP '+BLD[id].rep:'BUILD · '+PCOST(id,1)+(GROLE[id]?' PARTS':' KITS'),cx,cy+17);
     X.font='900 12px Game,system-ui';X.lineWidth=4;X.strokeStyle='rgba(0,0,0,.65)';const nm={wash:'🫧 CAR WASH',gas:'⛽ GAS STATION',factory:'🏭 CAR FACTORY'}[id];X.strokeText(nm,cx,cy-12);X.fillText(nm,cx,cy-12);}
 }
+// =================== v16-381 GAS STATION + CAR WASH extras (Marius 27 nov: "la benzinărie toate 3… spălătorie nr 3 + 1 și 2, bagă tot") ===================
+// ⛽ FUEL TANKER: comes up to 4× a day while you play; TAP it → the train fills 2× faster for 10 min (G.gs = {d, tn, bt})
+// ⚡ NITRO PUMP (Gas Station LV 5+): when a train is full, a chance that it goes up ONE grade (once per train, s.nz)
+// 🦹 FUEL THIEVES: in bigger raids some thieves go for the pumps (Thieves 3.0 block: addFuelThief)
+// 🫧 SECURITY CARS: after a raid you win, the security cars come dirty to the Car Wash → Builder Kit (XS.secQ)
+// 🫧 COLLECTION DUST is in classic.js (CC.shine) · ✨ SHINE float when a washed car is sold (the bonus itself is the old WASH_SALE)
+const TANK_MAX=4, TANK_BOOST=600, TANK_WAIT=100;
+const TANKER_T=RVT('tanker',84,27,95);
+const nitroP=l=>{l=l==null?(G.lv.gas||0):l;return l>=5?Math.min(.25,.05+.01*(l-5)+(l===(G.lv.gas||0)?.005*lvX('gas'):0)):0;};
+function GS(){const s=G.gs||(G.gs={d:'',tn:0,bt:0});const dk=dayK();if(s.d!==dk){s.d=dk;s.tn=0;}return s;}
+const fuelBoost=()=>Math.max(0,(((G.gs&&G.gs.bt)||0)-SEC.now())/1000);
+const TK={c:null,nx:rnd(150,330),chT:0};
+function tankerOK(){return G.lv.gas>0&&G.lv.rail>0&&G.lv.factory>0;}
+function tankerSpawn(){const r=xRect('gas'),c=newCar(false);c.type=TANKER_T;c.xk='tank';c.xs='in';c.x=-130;c.y=XLN;c.a=0;c.sp=95;c.dmg=[];c.dirt=0;c.tune={};c.siren=false;
+  c.path=[{x:r.x+r.w*.5,y:XLN}];TK.c=c;dcars.push(c);if(mapSeen())gsfx('engine');}
+function tankerTap(x,y){const c=TK.c;if(!c||c.xs!=='wait'||Math.hypot(c.x-x,c.y-y)>40)return false;const s=GS();
+  s.tn++;s.bt=SEC.now()+TANK_BOOST*1000;c.xs='pump';c.t=0;float(c.x,c.y-34,'⚡ FUEL BOOST! Train ×2','#ffd54a');gsfx('reward');save();fuelChip(1);return true;}
+function tankerStep(c,dt,done){
+  if(c.xs==='in'&&done){c.xs='wait';c.t=0;float(c.x,c.y-34,'⛽ FUEL TANKER!','#ffb74d');if(mapSeen())gsfx('horn');}
+  else if(c.xs==='wait'){c.t+=dt;if(c.t>TANK_WAIT){c.xs='out';c.path=[{x:W+160,y:XLN}];TK.nx=rnd(240,420);}}
+  else if(c.xs==='pump'){c.t+=dt;if(onScreen(c.x,c.y,60)&&Math.random()<dt*10)parts.push({x:c.x+rnd(-20,10),y:c.y-16+rnd(-3,3),vx:rnd(-8,8),vy:rnd(-22,-6),life:.5,max:.5,r:rnd(1.2,2.2),col:pick(['#ffd54a','#ffb300','#fff3c4'])});
+    if(c.t>3.5){c.xs='out';c.path=[{x:W+160,y:XLN}];TK.nx=rnd(900,1500);}}}
+// the small chip under the top bar: tanker waiting (tap = fly there) · fuel boost time left
+function fuelChip(now){TK.chT=0;const el=$('fuelChip');if(!el)return;const c=TK.c,b=fuelBoost();let h='',k='';
+  if(c&&c.xs==='wait'){h='<b>⛽</b><span>FUEL TANKER</span><i>TAP</i>';k='tank';}
+  else if(b>0){const m=b/60|0,x=b%60|0;h='<b>⚡</b><span>TRAIN ×2</span><i data-notr="1">'+m+':'+String(x).padStart(2,'0')+'</i>';k='boost';}
+  if(el.dataset.k!==k||k==='boost'){el.dataset.k=k;el.innerHTML=h;el.className=k?'on '+k:'';}}
+function updateFuel(dt){
+  TK.chT+=dt;if(TK.chT>.5)fuelChip();
+  if(TK.c&&!dcars.includes(TK.c))TK.c=null;
+  if(!TK.c&&started&&tankerOK()&&GS().tn<TANK_MAX&&fuelBoost()<=0&&!window.__TUTON){TK.nx-=dt;if(TK.nx<=0&&xLaneFree())tankerSpawn();}
+  // security cars from a won raid come to the Car Wash, one by one
+  if(XS.secQ>0&&G.lv.wash>0&&!XS.wash){XS.secT=(XS.secT||0)+dt;if(XS.secT>5){XS.secT=0;XS.secQ--;secWashSpawn();}}}
+function secWashSpawn(){const rw=xRect('wash'),lx=rw.x+rw.w*XWASH.lane[rw.t-1],L=SY-LN,c=newCar(false);
+  c.type=(XS.secN=(XS.secN||0)+1)%3===2?K9V_T:SSUV_T;c.sec=1;c.dirt=.85;c.dmg=[];c.tune={};c.siren=false;c.sp=110;c.x=W+100;c.y=L;c.a=Math.PI;
+  c.xk='wash';c.xs='in';XS.wash=c;c.path=roundPath([{x:W+100,y:L},{x:lx,y:L},{x:lx,y:rw.y+rw.h*XWASH.stop}],20);dcars.push(c);}
 // ---- customers & produced cars (their own little traffic, separate from the garage cars)
 const dcars=[],XS={washT:0,gasT:0,facT:0,wash:null,pumps:[null,null,null,null]};
 const XLN=SY+13;
@@ -3337,6 +3400,7 @@ function incRow(id,lv,nu){if(nu)return '';const R0=incRates();if(lv>=MAXLV&&lvT(
   let nx=now*incFac(id,lv+1)/incFac(id,lv);if(id==='office'){let sale=0;for(const k in R.r)if(ST[k]||k==='office')sale+=R.r[k];nx=now+sale*(incFac(id,lv+1)/incFac(id,lv)-1);}
   return '<div class="row incRow"><span>💰 Income now <small style="opacity:.65">(live)</small></span><b>'+fmt(now)+'/h</b>'+em(nx)+'</div>';}
 function updateDistrict(dt){
+  updateFuel(dt);
   // --- car factory: a new car leaves the right door every few seconds
   if(G.lv.factory>0){const r=xRect('factory'),lv=G.lv.factory;XS.facT+=dt;
     if(XS.facT>=FAC_EVERY[lv-1]){const dx=r.x+r.w*XFAC.door,y0=r.y+r.h*XFAC.doorY;
@@ -3347,13 +3411,14 @@ function updateDistrict(dt){
   for(let i=dcars.length-1;i>=0;i--){const c=dcars[i];if(c.fade!=null&&c.fade<1)c.fade=Math.min(1,c.fade+dt*1.8);
     const done=c.xs==='wash'||c.xs==='fuel'?false:xStep(c,dt);
     if(c.exp&&c.pi!=null&&c.xk!=='gas'&&XS.pumps[c.pi]===c){const rg=xRect('gas');if(c.y>rg.y+rg.h+4){XS.pumps[c.pi]=null;c.pi=null;}}
+    if(c.xk==='tank'){tankerStep(c,dt,done);if(c.xs==='out'&&done&&c.x>W+100){dcars.splice(i,1);if(TK.c===c)TK.c=null;}continue;}
     if(c.xk==='rail'){if(XS.wash===c){const rw=xRect('wash');if(c.y<rw.y+rw.h*.3)XS.wash=null;}if(c.y>SY+RW)c.fade=Math.max(0,Math.min(1,(c.ry-c.y)/30));if(done){railPark(c);dcars.splice(i,1);}else if(c.path.length&&onScreen(c.x,c.y,60)&&Math.random()<dt*3)exhaust(c,false);continue;}
     if(c.xk==='wash'){const r=xRect('wash'),lx=r.x+r.w*XWASH.lane[r.t-1];
       if(c.xs==='in'&&done){c.xs='wash';c.t=0;}
       else if(c.xs==='wash'){c.t+=dt;c.dirt=Math.max(0,c.dirt-dt*.3);
         if(DET&&parts.length<150&&Math.random()<dt*30){const s=pick([-1,1]);parts.push({x:c.x+s*rnd(10,16),y:c.y+rnd(-22,22),vx:-s*rnd(10,30),vy:rnd(-12,12),life:.6,max:.6,r:rnd(1.4,2.8),col:pick(['#e1f5fe','#ffffff','#81d4fa'])});}
         if(c.t>=WASH_T&&c.exp){c.xs='out';c.dirt=0;rwAfterWash(c,[{x:lx,y:c.y},{x:lx,y:XLANE_Y},{x:XLOOP,y:XLANE_Y},{x:XLOOP,y:XLN}]);}
-        else if(c.t>=WASH_T){c.xs='out';c.dirt=0;xEarn(washPay(G.lv.wash||1),lx,r.y+r.h*.86,'🫧 WASH','#81d4fa','wash');
+        else if(c.t>=WASH_T){c.xs='out';c.dirt=0;if(c.sec){const bk=Math.max(1,Math.round(65*PART_U()*.1*(1+VB('pk'))));pkAdd('bk',bk);float(lx,r.y+r.h*.86,'🫧 CLEAN! +'+bk+' 🧰','#7CFC9A');if(mapSeen())gsfx('coin');save();}else xEarn(washPay(G.lv.wash||1),lx,r.y+r.h*.86,'🫧 WASH','#81d4fa','wash');
           const loop=[{x:lx,y:c.y},{x:lx,y:XLANE_Y},{x:XLOOP,y:XLANE_Y},{x:XLOOP,y:XLN}];
           if(!(c.xGas&&G.lv.gas>0&&gasTo(c,loop,XLN)))c.path=roundPath([...loop,{x:W+140,y:XLN}],16);}}}
     if(XS.wash===c&&c.xs!=='wash'&&!(c.xk==='wash'&&c.xs==='in')){const r=xRect('wash');if(c.y<r.y+r.h*.3)XS.wash=null;}
@@ -3369,7 +3434,10 @@ function updateDistrict(dt){
 }
 function drawDistrictDyn(){
   if(!inView(-60,TRAIL_Y,W+120,SY-TRAIL_Y+60))return;
-  for(const c of dcars){if(!onScreen(c.x,c.y,40))continue;if(c.fade!=null&&c.fade<1)X.globalAlpha=c.fade;drawCar(c);X.globalAlpha=1;}
+  for(const c of dcars){if(!onScreen(c.x,c.y,50))continue;if(c.fade!=null&&c.fade<1)X.globalAlpha=c.fade;drawCar(c);X.globalAlpha=1;}
+  if(TK.c&&onScreen(TK.c.x,TK.c.y,60)){const c=TK.c;
+    if(c.xs==='wait'){const q=(time*1.6)%1;X.strokeStyle='rgba(255,213,74,'+(.7-q*.7)+')';X.lineWidth=2.5;X.beginPath();X.arc(c.x,c.y,26+q*24,0,7);X.stroke();if((time*2|0)%2)tag(c.x,c.y-30,'👆 TAP!','#1565c0');else tag(c.x,c.y-30,'⛽ FUEL TANKER','#e65100');}
+    else if(c.xs==='pump'&&G.lv.gas>0){const r=xRect('gas');X.strokeStyle='#212121';X.lineWidth=2.2;X.beginPath();X.moveTo(c.x-6,c.y-12);X.quadraticCurveTo(c.x-20,c.y-40,r.x+r.w*.5,r.y+r.h*.86);X.stroke();}}
   // the car wash roof covers the car inside the tunnel
   if(G.lv.wash>0){const r=xRect('wash');
     if(dcars.some(o=>(o.xk==='wash'||o===XS.wash)&&o.y>r.y-24&&o.y<r.y+r.h*XWASH.roof+28))xPic('wash',r,r.h*XWASH.roof);
@@ -3421,7 +3489,7 @@ const rwScore=()=>(G.lv.wash>0?lvT('wash'):0)+(G.lv.gas>0?lvT('gas'):0)+(G.lv.fa
 function rwW(){const q=Math.min(1,rwScore()/150);return [60-50*q,25,10+10*q,4+12*q,1+8*q,.2+4*q];}
 function rwRoll(min){const w=rwW();let r=Math.random()*w.reduce((a,b)=>a+b,0),g=0;for(;g<5;g++){r-=w[g];if(r<0)break;}return Math.max(min||0,g);}
 // v16-155 RAIL PASS (Marius 22 nov 2026, 4.99 €/month, PK.rail = end of the subscription): train fills in 45 min instead of 1 h, 3 refreshes, Street Tokens ×1.3, golden locomotive
-const RPON=()=>(+PK.rail||0)>Date.now(), rwFill=()=>RPON()?2700:RW_FILL, rwRfMax=()=>RPON()?3:2;
+const RPON=()=>(+PK.rail||0)>Date.now(), rwFill=()=>(RPON()?2700:RW_FILL)*(fuelBoost()>0?.5:1), rwRfMax=()=>RPON()?3:2;
 const rwTok=(g,n)=>Math.round(RW_TOK[g]*n/4*(RPON()?1.3:1));
 // v16-167: seconds until the NEXT car is on the train (Alex: show how long it takes) – a car on the way uses the measured trip time (factory → gas → wash → train)
 const rwTrip=()=>{const t=RWS().trip;return t>5&&t<600?t:45;};
@@ -3452,7 +3520,7 @@ function rwAfterGas(c){const px=c.x,L=SY-LN,q=[{x:px,y:L-22,rev:1}];for(let k=1;
   else{rwToRail(c,[st,{x:XLOOP,y:L},{x:XLOOP,y:XLN}]);c.path=[...q,...c.path];}}
 function rwAfterWash(c,loop){rwToRail(c,loop);}
 function railPark(c){let k=c.spot;if(k==null||k<0||RT.park[k])k=RT.park.findIndex((v,i)=>!v&&i<rCap());if(k<0)k=RT.park.length;RT.park[k]=c;c.path=[];c.fade=0;c.pt=0;}
-function rwSend(){const s=RWS();RT.g=s.g;RT.nOn=s.n;RT.st='leave';RT.v=20;s.n=0;s.rf=0;s.g=rwRoll(0);s.acc=0;save();}
+function rwSend(){const s=RWS();RT.g=s.g;RT.nOn=s.n;RT.st='leave';RT.v=20;s.n=0;s.rf=0;s.g=rwRoll(0);s.acc=0;s.nz=0;save();}
 function rwRefresh(){const s=RWS();if(s.rf>=rwRfMax())return false;s.rf++;s.g=rwRoll(s.g);if(RT.st==='dock')RT.g=s.g;save();return true;}
 const rSlot=(s)=>{const w=Math.floor(s/2),x0=RT.x-146-(w+1)*126;return {x:x0+(s%2?93:33),y:SOON.railY+5-rwWH()*.6};};
 const rwWH=()=>{const I=rwI('wag'+RT.g);return I.complete&&I.naturalWidth?124*I.naturalHeight/I.naturalWidth:30;};
@@ -3465,6 +3533,8 @@ function updateRail(dt){
   if(gap>5&&G.lv.factory>0&&RT.st==='dock'){const fl=dcars.filter(c=>c.exp).length+RT.park.filter(Boolean).length+RT.mv.length,add=Math.floor(gap/(rwFill()/cap));
     if(add>0&&s.n+fl<cap){s.n=Math.min(cap-fl,s.n+add);save();}}
   for(const c of RT.park)if(c&&c.fade<1)c.fade=Math.min(1,c.fade+dt*2);
+  // v16-381 ⚡ NITRO PUMP: a full train gets ONE roll – with luck it goes up a grade (kept by refreshes, which never lower)
+  if(s.n>=cap&&!s.nz&&RT.st==='dock'){s.nz=1;if(G.lv.gas>0&&s.g<5&&Math.random()<nitroP()){s.g++;s.nz=2;RT.g=s.g;float(stop-rLen()/2,SOON.railY-60,'⚡ NITRO! +1 GRADE','#40c4ff');if(mapSeen())gsfx('levelup');}save();}
   for(const c of dcars)if(c.exp)c.age=(c.age||0)+dt;   // v16-167: trip timer
   // export cars from the factory (one train ≈ 1 hour)
   const fly=dcars.filter(c=>c.exp).length+RT.park.filter(Boolean).length+RT.mv.length;
@@ -3489,7 +3559,7 @@ function drawRailDyn(){
     for(let i=0;i<n;i++){const p=rSlot(i);drawCarAt(rwCar(i),p.x,p.y,0,.5,1);}
     for(const m of RT.mv){const p=rSlot(m.s),e=m.t<.5?2*m.t*m.t:1-Math.pow(-2*m.t+2,2)/2;drawCarAt(m.c,m.x0+(p.x-m.x0)*e,m.y0+(p.y-m.y0)*e-Math.sin(e*Math.PI)*14,-Math.PI/2*(1-e),m.s0+(.5-m.s0)*e,1);}
     if(L.complete&&L.naturalWidth){const lh=146*L.naturalHeight/L.naturalWidth;X.drawImage(L,x1-146,ry+5-lh,146,lh);}else{X.fillStyle='#0d47a1';X.fillRect(x1-146,ry-30,146,34);}
-    if(DET&&RT.st==='dock'){const full=s.n>=cap,cx=x1-rLen()/2,cy=ry-46,txt=RW_GN[RT.g]+' TRAIN · '+(full?'READY TO SEND!':s.n+' / '+cap+' cars · next '+rwNextTxt());
+    if(DET&&RT.st==='dock'){const full=s.n>=cap,cx=x1-rLen()/2,cy=ry-46,txt=(s.nz===2?'⚡ ':'')+RW_GN[RT.g]+' TRAIN · '+(full?'READY TO SEND!':s.n+' / '+cap+' cars · next '+rwNextTxt());
       X.font='900 9px Game,system-ui';const tw=X.measureText(txt).width+16;X.fillStyle='rgba(0,0,0,.72)';rr(cx-tw/2,cy-10,tw,15,7);X.fill();
       X.strokeStyle=RW_GC[RT.g];X.lineWidth=1.5;X.stroke();X.fillStyle=full&&(time*2|0)%2?'#fff':RW_GC[RT.g];X.textAlign='center';X.fillText(txt,cx,cy+1);}}
   // the RAIL WARS button next to the terminal (opens the page)
@@ -3665,6 +3735,7 @@ function inR(x,y,x0,y0,w,h){return x>=x0&&x<=x0+w&&y>=y0&&y<=y0+h;}
 function tap(sx,sy){
   if(!started)return;const x=sx/Z+camX,y=(sy-TOP)/Z+camY;
   if(tapThief(x,y))return;   // v16-380: tap a thief = scare him
+  if(tankerTap(x,y))return;  // v16-381: tap the fuel tanker = train ×2 for 10 min
   let best=null,bd=26;for(const c of cars){if(c.state==='loaded')continue;const d=Math.hypot(c.x-x,c.y-y);if(d<bd){bd=d;best=c;}}
   if(best)return openPanel('car',best);
   for(const id of STIDS){const g=GAR[id];if(inR(x,y,g.x0,g.y0-16,GW,GD+32))return openPanel(id);}
@@ -3698,9 +3769,9 @@ const INFO={
     rows:[['Guards',l=>SEC_GUARDS[TIER(l)-1]+(l>=3?' (1 patrols)':'')],['Catch chance',l=>Math.round(Math.min(.95,SEC_CATCH[l-1]+VB('thief')+guardBonus().cat)*100)+'%'],['Guard run speed',l=>SEC_SPEED[l-1]],['Backup guards',l=>(l>=6?2:1)+' (security car)'],['Rapid response bikes',l=>l>=5?'2':l>=3?'1':'0'],['K9 dog unit',l=>l>=5?'Boss + Gang raids':'Gang raids'],['RIOT truck',l=>l>=7?'Gang + Mega':'Mega'],['Helicopter',l=>l>=8?'Gang + Mega':'Mega'],['MEGA RAID',l=>l>=5?'once a day':'from Security 5'],['Less cash stolen',l=>'−'+Math.round((Math.min(10,l)-1)*4.5)+'%'],['Extra CCTV cameras',l=>SEC_XCAMS[TIER(l)-1]]]},
   collection:{title:'🏆 Collection Garage',desc:'COMING SOON. A premium showroom for classic and vintage cars. Because these cars are priceless it has its own fence, CCTV cameras, a guard house, a barrier and a laser gate.',rows:[]},
   wash:{title:'🫧 Car Wash',desc:'Drivers come from the street for a wash and pay you. Your sold cars also get a free shine before delivery, so they sell for more. LV 1-4 make the car wash bigger, LV 5-10 bring more money.',
-    rows:[['Customer every',l=>l?WASH_EVERY[l-1]+'s':'—'],['Pay per wash',l=>l?fmt(washPay(l)):'—'],['Shine bonus on sold cars',l=>l?'+'+Math.round(WASH_SALE[l-1]*100)+'%':'—']]},
+    rows:[['Customer every',l=>l?WASH_EVERY[l-1]+'s':'—'],['Pay per wash',l=>l?fmt(washPay(l)):'—'],['Shine bonus on sold cars',l=>l?'+'+Math.round(WASH_SALE[l-1]*100)+'%':'—'],['Collection stays clean',l=>l?(24+(l-1)*4)+' h':'—'],['Security cars after a won raid',l=>l?'+ Builder Kit':'—']]},
   gas:{title:'⛽ Gas Station',desc:'Drivers stop at your pumps to fill up and pay you. Your car transporter fills up for free, so it comes back faster. LV 1-4 add pumps (2, 2, 3, 4), LV 5-10 bring more money.',
-    rows:[['Fuel pumps',l=>l?XGAS.p[TIER(l)-1].length:'—'],['Car every',l=>l?GAS_EVERY[l-1]+'s':'—'],['Pay per fill',l=>l?fmt(gasPay(l)):'—'],['Transporter back faster',l=>l?Math.round(GAS_TRL[l-1]*100)+'%':'—']]},
+    rows:[['Fuel pumps',l=>l?XGAS.p[TIER(l)-1].length:'—'],['Car every',l=>l?GAS_EVERY[l-1]+'s':'—'],['Pay per fill',l=>l?fmt(gasPay(l)):'—'],['Transporter back faster',l=>l?Math.round(GAS_TRL[l-1]*100)+'%':'—'],['Fuel tanker: train ×2 for 10 min',l=>l?TANK_MAX+' / day':'—'],['Nitro pump: train +1 grade',l=>l>=5?Math.round((.05+.01*(l-5))*100)+'%':'LV 5']]},
   rail:{title:'🚆 Rail Terminal',desc:'RAIL WARS: every hour the Car Factory sends EXPORT cars – they fuel at the Gas Station, get washed at the Car Wash and go up on your train. A full train is sent from the RAIL WARS page (RAIL WARS button on the right side of the screen): max 3 a day, 30 min on the way, other players may attack it. Its GRADE (Common → Mythic) depends on your Car Wash, Gas Station and Car Factory levels; you can refresh it 2 times. A higher grade brings more Street Tokens for the Street Shop. LV 1-4 = more cars per train (4, 7, 8, 10).',
     rows:[['Cars per train',l=>l?RART[TIER(l)].sp.length:'—'],['Full train in',()=>'≈ 60 min'],['Best grade chance',()=>'Mythic '+(rwW()[5]/rwW().reduce((a,b)=>a+b,0)*100).toFixed(1)+'%']]},
   factory:{title:'🏭 Car Factory',desc:'Robots build brand-new cars. Every new car leaves through the right gate and is sold straight to a dealer. LV 1-4 make the factory bigger with more robots, LV 5-10 build faster and sell for more.',
@@ -4810,6 +4881,7 @@ function rwHtml(r){const a=[];if(r.m)a.push('💰 '+fmt(ciMoney(r.m)));if(r.mone
 function giveRw(r){let m=0;if(r.m)m+=ciMoney(r.m);if(r.money)m+=r.money;if(m)G.money+=m;if(r.tk)G.h.tk+=r.tk;if(r.ct)G.h.ct+=r.ct;if(r.gt){G.gear.tk=(G.gear.tk==null?10:G.gear.tk)+r.gt;}if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.ess)G.ess=(G.ess||0)+r.ess;if(r.gp)G.gp=(G.gp||0)+r.gp;if(r.pk){['tank','warrior','ranger','mage','support'].forEach(k=>pkAdd(k,r.pk.r||0));pkAdd('bk',r.pk.bk||0);}if(r.vipTo){G.vip=Math.max(G.vip||0,VIP_PTS[Math.min(VIP_MAX,r.vipTo)]);vipRefresh();if(G.vipC==null||G.vipC<VLV)G.vipC=VLV;}if(r.heroes){r.heroes.forEach(id=>{if(HB[id]&&!G.h.own[id])gain(id);});try{heroRefresh();}catch(e){}}if(r.ascSet&&window.CAMPAIGN&&CAMPAIGN.giftAsc)for(const hid in r.ascSet)CAMPAIGN.giftAsc(hid,r.ascSet[hid]);return m;}
 // News: newest first. id must grow with every new entry (the red dot shows when there is an unread one).
 const NEWS=[
+ {id:165,d:'Nov 27, 2026',ic:'⛽',t:'GAS STATION & CAR WASH: tanker, nitro, dust',l:['<b>⛽ FUEL TANKER</b>: up to 4 times a day a tanker stops at your Gas Station – <b>tap it</b> and your Rail Wars train fills <b>2× faster for 10 minutes</b>. A small button under the top bar shows when it is there.','<b>⚡ NITRO PUMP</b> (Gas Station LV 5+): a full train has a chance to go up <b>one grade</b> – more coins.','<b>🦹 FUEL THIEVES</b>: in bigger raids some thieves go for your pumps. Your guards catch them like the others.','<b>🫧 CAR WASH</b>: after a raid you win, the dirty security cars come for a wash and bring <b>Builder Kit</b>. Sold cars show their <b>✨ SHINE</b> bonus.','<b>🏆 CLASSIC COLLECTION</b>: your classic cars get <b>dusty</b> with time (only if you have a Car Wash) and give less battle bonus – tap <b>🫧 WASH ALL</b> in MY GARAGE to bring it back to 100%. Free.','New <b>⚙ SETTINGS</b> icon.']},
  {id:164,d:'Nov 27, 2026',ic:'🚨',t:'THIEVES 3.0, MUSIC & SETTINGS',l:['<b>🎵 MUSIC & SOUNDS</b>: the game now has its own music (garage + battle) and sound effects for taps, rewards, upgrades, hits, skills and ultimates. New <b>⚙ SETTINGS</b> button (above HD): Music, Sound effects, Camera, Graphics and Language are all there.','<b>🚨 THIEVES 3.0</b>: a thief now needs <b>time</b> to break into a car (the bar over his head) – your guards must reach him first. <b>TAP a thief</b> to scare him: he stops for a moment and is easier to catch.','<b>MEGA RAID</b> (Security 5+, once a day): <b>12-20 thieves</b> with bikers, vans and the boss\' armoured truck against rapid-response bikes, security SUVs, the K9 van, the <b>RIOT truck</b> and the <b>helicopter</b>. The map flies to the thieves by itself.','<b>🔥 HEAT</b>: every raid you win raises it – more Builder Kit and bigger gangs. <b>📒 THIEF ALBUM</b>: badges with diamonds for catching the same thief 5 / 25 / 100 times. <b>🌙 NIGHT SHIFT</b>: your guards also catch thieves while you are away.','Fixed: the Most Wanted reward could be lost if you closed the game during a raid; "Cars stolen" now counts only cars.']},
  {id:163,d:'Nov 27, 2026',ic:'🦸',t:'BATTLE TEAM: 6 heroes!',l:['Your <b>BATTLE TEAM</b> now has <b>6 places</b>: <b>3 in front + 3 behind</b>. Rangers and mages stay in the back line and shoot from there.','More ways to build your team – double a role you like (2 tanks, 2 mages…) or mix all 5 roles.','Monsters from stage <b>2-1</b> on are a bit stronger to match (the first stages stay the same). The Arena is 6 vs 6 too.']},
  {id:162,d:'Nov 27, 2026',ic:'🔗',t:'TORQUE LINK & CRYSTAL COLLECTION',l:['<b>🔗 TORQUE LINK</b>: your <b>CORE 5</b> = your 5 strongest heroes. Level them up as usual – <b>every other hero</b> gets the level and ascension of the weakest Core hero, for free. No limit, no cooldown, no more Rebirth to try heroes.','Heroes you had levelled outside the Core 5 gave <b>100% of their Essence back</b>. Want another hero in the Core? Open his LEVEL UP → <b>⇄ PUT IN CORE 5</b> (free swap).','When all Core 5 reach <b>Lv 300 / ASC 14</b> the Link is maxed: every hero stays Lv 300 for good (Mythic Lv 300-400 stays personal).','<b>💎 CRYSTAL COLLECTION</b> (HEROES → HERO COLLECTION): every <b>new hero</b> and every <b>+</b> gives <b>Torque Crystals</b> – higher grade = more. 20 steps = up to <b>+15% HP / ATK / DEF</b>, <b>+10% CRIT DMG</b>, <b>+3% CRIT</b> for every battle hero. Your old heroes already count!']},
@@ -4999,7 +5071,7 @@ const mlUnread=()=>MAIL.filter(m=>!G.ml.r.includes(m.id)||(m.g&&!G.ml.c.includes
 const xpEl=$('xp');let xpMode='',xpMail='';
 function xpOpen(m){xpMode=m;xpMail='';if(m==='news'){G.nw=NEWS[0].id;save();}xpEl.classList.add('open');renderXP();updX();}
 function xpClose(){if(xpMode==='mail'&&xpMail){xpMail='';renderXP();return;}xpEl.classList.remove('open');xpMode='';updX();}
-$('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').onclick=()=>xpOpen('news');$('mlBtn').onclick=()=>xpOpen('mail');$('rwSBtn').onclick=()=>{if(window.STREET)STREET.open();};
+$('fuelChip').onclick=()=>{const k=$('fuelChip').dataset.k;if(k)camGlide(bRect(k==='tank'?'gas':'rail'));};$('xpBack').onclick=xpClose;$('ciBtn').onclick=()=>xpOpen('ci');$('nwBtn').onclick=()=>xpOpen('news');$('mlBtn').onclick=()=>xpOpen('mail');$('rwSBtn').onclick=()=>{if(window.STREET)STREET.open();};
 function renderXP(){const T=$('xpT'),S=$('xpS'),B=$('xpBody');$('xpTk').innerHTML=TKI+' '+G.h.tk;
   if(xpMode==='ci'){T.textContent='5000 FREE SUMMONS';const n=G.c5.n,rd=ciReady(),got=c5Got(n),blk=Math.floor((rd?n:Math.max(0,n-1))/30)*30;
     S.textContent=got>=C5_TOTAL?'ALL 5000 TICKETS COLLECTED!':'DAY '+(rd?n+1:n)+' OF '+C5_DAYS_()+' · LOG IN EVERY DAY';
@@ -5115,7 +5187,7 @@ try{migr99();migr247();heroRefresh();}catch(e){console.error(e);}
 function migr161(){if(G.m161)return;G.m161=1;let dm=0;for(const id in G.h.own){const h=HB[id],o=G.h.own[id];if(!h||!o||h.cat!=='m')continue;const mx=hMaxS(h),k=h.gr===5?1000:h.gr===4?150:0;if(k&&o.s>mx){dm+=(o.s-mx)*k;o.s=mx;}}
   if(dm){G.dm=(G.dm||0)+dm;setTimeout(()=>toast('💎 +'+dm.toLocaleString()+' · extra hero stars → diamonds (new AWAKENING / Legendary +10)',4200),4000);}save();}
 try{migr161();}catch(e){console.error(e);}
-window.__TE={SECT:{openSec:()=>openPanel("security"),startRaid,cars:()=>cars,mkTest:()=>{[...yardSpots.slice(0,6),...expSpots.slice(0,4)].forEach(s=>{if(s.car)return;const c=newCar();c.slot=s;s.car=c;c.x=s.x;c.y=s.y;c.a=s.a;c.state=s.kind==="exp"?"forsale":"yard";c.value=500;cars.push(c);});},get RAID(){return RAID;},THF,XG,guards,police,VAN_T,SH,tapThief,scareThief,nightShift,TT,get sec(){return G.sec;},setCam:(x,y,z)=>{Z=z;camX=x-VW/2/Z;camY=y-(VH-TOP)/2/Z;},set raidNext(v){raidNext=v;}},MC_LV,MC_CH,MC_N,MC_ASC,MC_BOX,isMM,hMax,lvMC,ascMC,lvHave,ascHave,rebirthMC,MCI,hMaxS,sLbl,mTier,isAwk,ROM,sStars,awkNeed,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,rebirth,linkInfo,isLinked,linkSwap,linkSync,linkDirty,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleCalc,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3)),spdX:()=>(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3))?3:(S2()&&SHOP2.spd()>=2?2:0)};
+window.__TE={SECT:{openSec:()=>openPanel("security"),startRaid,cars:()=>cars,mkTest:()=>{[...yardSpots.slice(0,6),...expSpots.slice(0,4)].forEach(s=>{if(s.car)return;const c=newCar();c.slot=s;s.car=c;c.x=s.x;c.y=s.y;c.a=s.a;c.state=s.kind==="exp"?"forsale":"yard";c.value=500;cars.push(c);});},get RAID(){return RAID;},THF,XG,guards,police,VAN_T,SH,TK,XS,fuelBoost,tankerSpawn,tankerTap,addFuelThief,dcars,tapThief,scareThief,nightShift,TT,get sec(){return G.sec;},setCam:(x,y,z)=>{Z=z;camX=x-VW/2/Z;camY=y-(VH-TOP)/2/Z;},set raidNext(v){raidNext=v;}},MC_LV,MC_CH,MC_N,MC_ASC,MC_BOX,isMM,hMax,lvMC,ascMC,lvHave,ascHave,rebirthMC,MCI,hMaxS,sLbl,mTier,isAwk,ROM,sStars,awkNeed,awakenFx,LEG_MAXS,PITY_M,MYTH_CUM,ESS_Ui,GP_Ui,RPON,rwRfMax,rwFill,rwNext,rwNextTxt,rwSend,rwRefresh,RWS,rwTok,rCap,RW_GN,RW_GC,rwW,rwScore,rebirthVal,rebirth,linkInfo,isLinked,linkSwap,linkSync,linkDirty,idleRate,PART_U,pkRoles,pkAdd,pkN,PKI,PK_K,PK_N,garB,lvT,GB,CLSG,MAXT,numDraw,numH,NUMF,VIP_EUR,VP,VLV:()=>VLV,VIPI,VIP_PTS,addVip,vipDaily,vipWeekly,popRes,resHtml,incRates,openPanel,closePanel,SPLASH,srun,summon,smRefresh:()=>{smKey='';renderSm();},giveRw,HEROES,openSummon,openFuse:id=>{toast('🧪 Fusion is closed · Mythic heroes now come from Summon',2600);},canFuse:id=>false,lvOf,ascOf,lvCap,lvCost,ascCost,lvMul,heroLvK,expMul,expLv,ESS_U,GP_U,addEss,addGp,lvUp,ascend,skLv,ESI,GPI,nf:nfmt,hMaxS,mythT,LV_MAX,ASC_STEP,payAsk,DMI,DM_SUM,addDm,savePacks,FIN,FPL,fbox,starK,HB,ST,GRADES,SKINS,HAIRS,portrait,save,toast,fmt,addTickets,shade:shadeC,idleCalc,idleNow,G,PK,gain,heroRefresh,claimIdle,idleMax,vipRefresh,vtStart:()=>{VT.t=VT.next=8;},spd2:()=>!!(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3)),spdX:()=>(PK.spd2||PK.fdr||(S2()&&SHOP2.spd()>=3))?3:(S2()&&SHOP2.spd()>=2?2:0)};
 setTimeout(()=>{try{linkSync();}catch(e){}},4000); // v16-375 TORQUE LINK: clean the save once after start
 if(window.SEC&&SEC.TEST_MODE)window.__TE.dbg=()=>({VT:VT.st,VTx:Math.round(VT.x),load:VT.load.length,rich:cars.filter(c=>c.rich).length,leaving:cars.filter(c=>c.toX).length,d:dcars.map(c=>c.xk+':'+c.xs).join(','),money:Math.round(G.money),pumps:XS.pumps.map(p=>p?1:0).join(''),wash:!!XS.wash});
 if(window.SEC&&SEC.TEST_MODE)window.__TE.cam=(z,x,y)=>{if(z)Z=z;if(x!=null)camX=x;if(y!=null)camY=y;return {Z,camX,camY,W,H,VW,VH};};

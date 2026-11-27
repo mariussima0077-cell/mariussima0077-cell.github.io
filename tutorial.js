@@ -238,6 +238,10 @@ setglow:{ok:()=>isOpen('cpGear')&&!isOpen('cpPop')&&!!document.querySelector('#g
   lockhub:{ok:()=>isOpen('hub')&&vis(document.querySelector('#hub.open .hubM.lk')),L:()=>[
     {el:()=>document.querySelector('#hub.open .hubM.lk'),t:`<b>🔒 GREY = LOCKED</b>: every battle mode opens when you win the <b>campaign stage</b> written on it. Win more <b>CAMPAIGN</b> stages to open Arena, Towers, World Boss and Dungeons.`,next:'GOT IT'}]},
   gogo:{ok:()=>isOpen('gpx')&&vis(document.querySelector('#gpx [data-g=go]')),t:`<b>GO</b>: tap GO on a mission → you go straight to the place where it is done (campaign, summon, Dungeons…). Close that page and you are back here. Daily Quests and event quests have <b>GO</b> too.`},
+  // v16-381 (Marius 27 nov: Gas Station + Car Wash extras, Collection dust)
+  gasx:{ok:()=>isOpen('sheet')&&sel0()==='gas'&&G.lv.gas>0,t:`<b>⛽ FUEL TANKER</b><br>A fuel tanker stops here a few times a day: tap it and your train fills 2× faster for 10 minutes. From LV 5 the Nitro pump can lift a full train one grade higher. In big raids thieves steal fuel too.`},
+  washx:{ok:()=>isOpen('sheet')&&sel0()==='wash'&&G.lv.wash>0,t:`<b>🫧 CAR WASH</b><br>After a raid you win, the security cars come here for a wash and bring Builder Kit. The Car Wash also keeps your Classic Collection clean for longer.`},
+  ccdust:{ok:()=>vis(document.querySelector('#ccP.open .ccShine')),t:`<b>🫧 SHINE</b><br>Your classic cars get dusty with time and give less battle bonus. Tap WASH ALL to bring them back to 100% – it is free.`},
   // v16-380 (Marius 27 nov: Thieves 3.0 + ⚙ SETTINGS with music / sound effects)
   thieves3:{ok:()=>isOpen('sheet')&&sel0()==='security'&&vis(document.querySelector('#sheet .htB')),L:()=>[
     {el:()=>document.querySelector('#sheet .htB'),t:`<b>THIEVES 3.0</b><br>A thief now needs time to break into a car – watch the bar over his head. TAP a thief to scare him: he stops for a moment and is easier to catch.`,next:'NEXT'},
