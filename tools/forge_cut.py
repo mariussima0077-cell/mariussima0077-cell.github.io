@@ -84,3 +84,13 @@ cols = np.where(diff.mean(0) > 0.3)[0]
 ban.crop((cols[0], rows[0], cols[-1] + 1, rows[-1] + 1)).resize((1100, 143), Image.LANCZOS).save(R + '/img/ui7/m_forge.webp', quality=90)
 Image.open(U + 'forge_bg.webp').convert('RGB').save(OUT + 'forge_bg.webp', quality=82)
 print(sorted(os.listdir(OUT)))
+# v16-390: 9-slice panel + Junkyard card (green cut away, cropped tight) and the Golem stage
+for nm in ['panel', 'card']:
+    im = key(U + nm + '_src.webp')
+    im = im.crop(im.getbbox())
+    w, h = im.size
+    k = 2 / 3 if nm == 'panel' else 1 / 2
+    im = im.resize((round(w * k), round(h * k)), Image.LANCZOS)
+    im.save(OUT + nm + '.webp', quality=90)
+    print(nm, im.size)
+Image.open(U + 'stage_src.webp').convert('RGB').resize((1020, 574), Image.LANCZOS).save(OUT + 'stage.webp', quality=84)

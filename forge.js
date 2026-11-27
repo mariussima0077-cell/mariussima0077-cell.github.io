@@ -100,16 +100,16 @@ const css=document.createElement('style');css.textContent=`
 .fgC{position:relative;text-align:center;font-size:9px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
 .fgC .fr{position:relative;width:100%;aspect-ratio:220/221;background:var(--fr) center/100% 100% no-repeat}.fgC .fr img{position:absolute;left:14%;top:14%;width:72%;height:72%;object-fit:contain}.fgC.lk{opacity:.4;filter:grayscale(1)}
 .fgC small{display:block;color:var(--gc);font-size:9px}.fgC i{position:absolute;right:0;top:0;width:10px;height:10px;border-radius:50%;background:#ff2b2b;border:1.5px solid #fff}
-.fgBx{margin-top:10px;border-radius:12px;background:#11151bdd;border:1px solid #ffd54a44;padding:9px 10px}
+.fgBx{margin-top:10px;border-style:solid;border-color:transparent;border-width:20px;border-image:url(img/forge/panel.webp) 104 fill/20px stretch;background:none;padding:0 2px} /* v16-390 Marius' 9-slice panel */
 .fgBx h4{margin:0 0 4px;font-size:13px;color:#ffb347;letter-spacing:.5px}.fgBx p{margin:0 0 6px;font-size:11px;color:#9aa4ae;line-height:1.35}
 .fgRow{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;color:#6c757d}.fgRow.on{color:#ffd54a}
-.fgTr{border-radius:12px;background:#11151bdd;border:1px solid #3a414a;padding:9px 10px;margin-top:8px}
+.fgTr{border-style:solid;border-color:transparent;border-width:22px;border-image:url(img/forge/card.webp) 124 fill/22px stretch;background:none;padding:0 2px;margin-top:8px} /* v16-390 Junkyard card */
 .fgTr .h{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:14px}.fgTr .h span{font-size:12px;color:#ffb347}
 .fgTr .m{font-size:11px;color:#9aa4ae;margin:4px 0}.fgTr .b{height:7px;border-radius:4px;background:#2a2f36;overflow:hidden}.fgTr .b i{display:block;height:100%;background:#5ec2ff}
 .fgTr .a{display:flex;gap:6px;margin-top:8px}.fgTr .a button{flex:1;height:44px;--bh:44px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_blue_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;box-shadow:none;border-radius:0;color:#fff;font:900 italic 12px Game,system-ui;text-shadow:0 1px 0 #0008}
 .fgTr .a button.off{border-image-source:url(img/ui8/btn_grey_s.webp);color:#cfd8dc}
-.fgBs{position:relative;margin-top:4px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 70%,#5a2a12,#140b07 75%);border:1px solid #6b3a1c;height:230px;display:flex;align-items:flex-end;justify-content:center}
-.fgBs img{height:96%;object-fit:contain}.fgBs b{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:22px;color:#ff9d3a;text-shadow:0 2px 4px #000}
+.fgBs{position:relative;margin-top:4px;border-radius:12px;overflow:hidden;background:url(img/forge/stage.webp) center/cover no-repeat;border:2px solid #ffb74d;box-shadow:0 0 12px #ff6d0055;height:230px;display:flex;align-items:flex-end;justify-content:center}
+.fgBs img{height:82%;margin-bottom:9%;object-fit:contain;filter:drop-shadow(0 6px 8px #000a)}.fgBs b{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:22px;color:#ff9d3a;text-shadow:0 2px 4px #000,0 0 8px #000}
 `;document.head.appendChild(css);
 const P=document.createElement('div');P.id='fgP';P.innerHTML='<div id="fgPB"></div>';document.body.appendChild(P);
 const PG=document.createElement('div');PG.id='fg';PG.innerHTML='<div id="fgW"></div>';document.body.appendChild(PG);
