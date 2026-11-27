@@ -193,3 +193,68 @@ The All-Seeing Eye bends time: all enemies take #% damage, are slowed #% and mar
 Belly-flop into the enemies: #% damage, stun #s. Black diesel smoke weakens them: they deal −#% damage for #s. Shield + taunt.	Plat du ventre sur les ennemis : #% de dégâts, étourdit #s. Une fumée de diesel noire les affaiblit : ils infligent −#% de dégâts pendant #s. Bouclier + provocation.	Panzazo sobre los enemigos: #% de daño, aturde #s. El humo negro de diésel los debilita: infligen −#% de daño durante #s. Escudo + provocación.	Barrigada nos inimigos: #% de dano, atordoa #s. A fumaça preta de diesel os enfraquece: eles causam −#% de dano por #s. Escudo + provocação.
 Dumbbell jump slam: #% damage, stun #s. Then he goes wild: +#% attack and +#% attack speed for #s. Shield + taunt.	Saut écrasant avec haltère : #% de dégâts, étourdit #s. Puis il se déchaîne : +#% d'attaque et +#% de vitesse d'attaque pendant #s. Bouclier + provocation.	Salto aplastante con pesa: #% de daño, aturde #s. Luego se desata: +#% de ataque y +#% de velocidad de ataque durante #s. Escudo + provocación.	Salto esmagador com haltere: #% de dano, atordoa #s. Depois enlouquece: +#% de ataque e +#% de velocidade de ataque por #s. Escudo + provocação.
 Lifts a whole engine block and drops it: #% damage in a big area, toxic fumes burn #s and weaken enemies (−#% damage). Shield + taunt.	Soulève un bloc moteur entier et le lâche : #% de dégâts dans une grande zone, des fumées toxiques brûlent #s et affaiblissent les ennemis (−#% de dégâts). Bouclier + provocation.	Levanta un bloque de motor entero y lo suelta: #% de daño en un área grande, humos tóxicos queman #s y debilitan a los enemigos (−#% de daño). Escudo + provocación.	Levanta um bloco de motor inteiro e o solta: #% de dano numa área grande, fumaça tóxica queima por #s e enfraquece os inimigos (−#% de dano). Escudo + provocação.
+SIGNATURE TOOL	OUTIL SIGNATURE	HERRAMIENTA EXCLUSIVA	FERRAMENTA EXCLUSIVA
+Signature Tool	Outil signature	Herramienta exclusiva	Ferramenta exclusiva
+Transcendent	Transcendant	Trascendente	Transcendente
+BREAKTHROUGH	PERCÉE	AVANCE	AVANÇO
+BREAKTHROUGH!	PERCÉE !	¡AVANCE!	AVANÇO!
+LEVEL UP	NIVEAU SUP.	SUBIR NIVEL	SUBIR NÍVEL
+Base chance #%	Chance de base #%	Probabilidad base #%	Chance base #%
++ #% from failed tries	+ #% grâce aux échecs	+ #% por intentos fallidos	+ #% por tentativas falhas
+Every failure: +#% next time.	Chaque échec : +#% la prochaine fois.	Cada fallo: +#% la próxima vez.	Cada falha: +#% na próxima vez.
+A failed try costs only the Molten Core.	Un échec ne coûte que le Noyau en fusion.	Un intento fallido solo cuesta el Núcleo fundido.	Uma falha custa apenas o Núcleo fundido.
+Small bonus every level. Every # levels: BREAKTHROUGH to the next grade – a big jump.	Petit bonus à chaque niveau. Tous les # niveaux : PERCÉE vers le grade suivant – un grand saut.	Pequeño bonus en cada nivel. Cada # niveles: AVANCE al siguiente grado – un gran salto.	Pequeno bônus a cada nível. A cada # níveis: AVANÇO para o próximo grau – um grande salto.
+Molten Core	Noyau en fusion	Núcleo fundido	Núcleo fundido
++# Molten Core	+# Noyau en fusion	+# Núcleo fundido	+# Núcleo fundido
+Green Blueprint	Plan vert	Plano verde	Planta verde
+Blue Blueprint	Plan bleu	Plano azul	Planta azul
+Purple Blueprint	Plan violet	Plano morado	Planta roxa
+Yellow Blueprint	Plan jaune	Plano amarillo	Planta amarela
+Red Blueprint	Plan rouge	Plano rojo	Planta vermelha
+Rainbow Blueprint	Plan arc-en-ciel	Plano arcoíris	Planta arco-íris
++# Blueprints	+# plans	+# planos	+# plantas
+TRY BREAKTHROUGH	TENTER LA PERCÉE	INTENTAR AVANCE	TENTAR AVANÇO
+NOT ENOUGH	PAS ASSEZ	NO ALCANZA	NÃO É SUFICIENTE
+WHERE TO GET?	OÙ EN TROUVER ?	¿DÓNDE CONSEGUIR?	ONDE CONSEGUIR?
+Failed	Échec	Fallo	Falhou
++#% chance next time	+#% de chance la prochaine fois	+#% de probabilidad la próxima vez	+#% de chance na próxima vez
+Failed – try again	Échec – réessaie	Fallo – inténtalo otra vez	Falhou – tente de novo
+You don't own this hero yet.	Tu n'as pas encore ce héros.	Aún no tienes este héroe.	Você ainda não tem este herói.
+MAX	MAX	MÁX	MÁX
+Molten Core + Blueprints: JUNKYARD trips and the SCRAP GOLEM in THE FORGE (Battle)	Noyau en fusion + plans : sorties JUNKYARD et SCRAP GOLEM dans THE FORGE (Bataille)	Núcleo fundido + planos: viajes JUNKYARD y SCRAP GOLEM en THE FORGE (Batalla)	Núcleo fundido + plantas: viagens JUNKYARD e SCRAP GOLEM em THE FORGE (Batalha)
+TOOLS	OUTILS	HERRAMIENTAS	FERRAMENTAS
+TOOL COLLECTION	COLLECTION D'OUTILS	COLECCIÓN DE HERRAMIENTAS	COLEÇÃO DE FERRAMENTAS
+# tools of different heroes at the same grade → a bonus for ALL your heroes.	# outils de héros différents au même grade → un bonus pour TOUS tes héros.	# herramientas de héroes distintos del mismo grado → un bonus para TODOS tus héroes.	# ferramentas de heróis diferentes no mesmo grau → um bônus para TODOS os seus heróis.
+# × Rare (#/#)	# × Rare (#/#)	# × Raro (#/#)	# × Raro (#/#)
+# × Epic (#/#)	# × Épique (#/#)	# × Épico (#/#)	# × Épico (#/#)
+# × Legendary (#/#)	# × Légendaire (#/#)	# × Legendario (#/#)	# × Lendário (#/#)
+# × Mythic (#/#)	# × Mythique (#/#)	# × Mítico (#/#)	# × Mítico (#/#)
+# × Transcendent (#/#)	# × Transcendant (#/#)	# × Trascendente (#/#)	# × Transcendente (#/#)
++#% skill damage	+#% dégâts de compétence	+#% daño de habilidad	+#% dano de habilidade
++#% ATK, HP, DEF & skill	+#% ATQ, PV, DÉF et compétence	+#% ATQ, PV, DEF y habilidad	+#% ATQ, PV, DEF e habilidade
+Every Mythic hero has a SIGNATURE TOOL (also on the hero page, under the hero). Lv # → # · every # levels a BREAKTHROUGH to the next grade: Common → Uncommon → Rare → Epic → Legendary → Mythic → Transcendent. Levels use Molten Core; a breakthrough also needs a Blueprint of the next colour. Chances get lower at every grade – every failed breakthrough adds chance.	Chaque héros Mythique a un OUTIL SIGNATURE (aussi sur la page du héros, sous le héros). Niv. # → # · tous les # niveaux, une PERCÉE vers le grade suivant : Commun → Peu commun → Rare → Épique → Légendaire → Mythique → Transcendant. Les niveaux coûtent du Noyau en fusion ; une percée demande aussi un plan de la couleur suivante. Les chances baissent à chaque grade – chaque percée ratée ajoute de la chance.	Cada héroe Mítico tiene una HERRAMIENTA EXCLUSIVA (también en la página del héroe, bajo el héroe). Nv # → # · cada # niveles un AVANCE al siguiente grado: Común → Poco común → Raro → Épico → Legendario → Mítico → Trascendente. Los niveles usan Núcleo fundido; un avance también necesita un plano del color siguiente. La probabilidad baja en cada grado – cada avance fallido suma probabilidad.	Todo herói Mítico tem uma FERRAMENTA EXCLUSIVA (também na página do herói, embaixo do herói). Nv # → # · a cada # níveis um AVANÇO para o próximo grau: Comum → Incomum → Raro → Épico → Lendário → Mítico → Transcendente. Os níveis usam Núcleo fundido; um avanço também precisa de uma planta da próxima cor. A chance cai a cada grau – cada avanço falho soma chance.
+Send your # best free heroes to dig in the scrap. Longer trips bring more – rare colours only on long trips. Better heroes find more.	Envoie tes # meilleurs héros libres fouiller la ferraille. Les sorties longues rapportent plus – couleurs rares seulement en sortie longue. De meilleurs héros trouvent plus.	Envía a tus # mejores héroes libres a buscar en la chatarra. Los viajes largos dan más – colores raros solo en viajes largos. Mejores héroes encuentran más.	Envie seus # melhores heróis livres para cavar na sucata. Viagens longas rendem mais – cores raras só em viagens longas. Heróis melhores encontram mais.
+TRIP #	SORTIE #	VIAJE #	VIAGEM #
+TRIP # · #h	SORTIE # · #h	VIAJE # · #h	VIAGEM # · #h
+Heroes:	Héros :	Héroes:	Heróis:
+DIGGING…	FOUILLE…	EXCAVANDO…	CAVANDO…
+No free heroes for a trip	Aucun héros libre pour une sortie	No hay héroes libres para un viaje	Nenhum herói livre para uma viagem
+JUNKYARD · +# Molten Core	JUNKYARD · +# Noyau en fusion	JUNKYARD · +# Núcleo fundido	JUNKYARD · +# Núcleo fundido
+# / # TRIES THIS WEEK	# / # ESSAIS CETTE SEMAINE	# / # INTENTOS ESTA SEMANA	# / # TENTATIVAS ESTA SEMANA
+# seconds with your battle team – the Golem cannot die, only the damage counts. Every fight gives Molten Core; weekly damage tiers give Blueprints. New tries every Monday.	# secondes avec ton équipe de bataille – le Golem ne peut pas mourir, seuls les dégâts comptent. Chaque combat donne du Noyau en fusion ; les paliers de dégâts de la semaine donnent des plans. Nouveaux essais chaque lundi.	# segundos con tu equipo de batalla – el Gólem no puede morir, solo cuenta el daño. Cada combate da Núcleo fundido; los niveles de daño semanales dan planos. Nuevos intentos cada lunes.	# segundos com seu time de batalha – o Golem não pode morrer, só o dano conta. Cada luta dá Núcleo fundido; os níveis de dano semanais dão plantas. Novas tentativas toda segunda-feira.
+(# bars)	(# barres)	(# barras)	(# barras)
+ATTACK · # s	ATTAQUE · # s	ATACAR · # s	ATACAR · # s
+NO TRIES	PLUS D'ESSAIS	SIN INTENTOS	SEM TENTATIVAS
+NEW ON MONDAY	NOUVEAUX LUNDI	NUEVOS EL LUNES	NOVAS NA SEGUNDA
+No tries left this week	Plus d'essais cette semaine	No quedan intentos esta semana	Sem tentativas esta semana
+new on Monday	nouveaux lundi	nuevos el lunes	novas na segunda
+#/# tries left	#/# essais restants	#/# intentos restantes	#/# tentativas restantes
+TOOLS · JUNKYARD · GOLEM #/#	OUTILS · JUNKYARD · GOLEM #/#	HERRAMIENTAS · JUNKYARD · GOLEM #/#	FERRAMENTAS · JUNKYARD · GOLEM #/#
+is open! Every MYTHIC hero gets a	est ouvert ! Chaque héros MYTHIQUE reçoit un	¡está abierto! Cada héroe MÍTICO recibe una	está aberto! Todo herói MÍTICO ganha uma
+– level it up with	– améliore-le avec du	– súbela de nivel con	– suba de nível com
+from the JUNKYARD and the SCRAP GOLEM. Also on the hero page, under the hero.	du JUNKYARD et du SCRAP GOLEM. Aussi sur la page du héros, sous le héros.	del JUNKYARD y del SCRAP GOLEM. También en la página del héroe, bajo el héroe.	do JUNKYARD e do SCRAP GOLEM. Também na página do herói, embaixo do herói.
+TRANSCENDENT	TRANSCENDANT	TRASCENDENTE	TRANSCENDENTE
++#% ATK	+#% ATQ	+#% ATQ	+#% ATQ
++#% HP	+#% PV	+#% PV	+#% PV
++#% DEF	+#% DÉF	+#% DEF	+#% DEF
+READY	PRÊT	LISTO	PRONTO

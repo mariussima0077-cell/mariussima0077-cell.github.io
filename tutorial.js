@@ -163,7 +163,8 @@ const MG={arena:`<b>ARENA</b>: your battle team fights other players' teams. 5 f
   tower:`<b>TORQUE TOWER</b> is open! Climb floor by floor – every floor is harder and gives better rewards.`,
   class:`<b>CLASS TOWERS</b> are open: a tower for every hero class. Build strong teams for each one!`,
   boss:`<b>WORLD BOSS</b> is open! 3 keys a day: hit the boss as hard as you can and climb the damage ranking.`,
-  dg:`<b>DUNGEONS</b> are open! 2 free keys a day in each dungeon – unused keys stack up. Money, gear and NITRO BOOST.`};
+  dg:`<b>DUNGEONS</b> are open! 2 free keys a day in each dungeon – unused keys stack up. Money, gear and NITRO BOOST.`,
+  forge:`<b>THE FORGE</b> is open! Every MYTHIC hero gets a <b>SIGNATURE TOOL</b> – level it up with <b>Molten Core</b> from the JUNKYARD and the SCRAP GOLEM. Also on the hero page, under the hero.`}; // v16-388
 let hubDone=false; // max one mini-guide each time the Battle Hub is opened
 setInterval(()=>{if(!isOpen('hub')){hubDone=false;return;}if(running||hubDone||!window.__TE)return;
   const open=Object.keys(MG).filter(k=>vis(document.querySelector('#hub.open .hubM[data-hb="'+k+'"]:not(.lk)')));

@@ -325,3 +325,68 @@ The All-Seeing Eye bends time: all enemies take #% damage, are slowed #% and mar
 Belly-flop into the enemies: #% damage, stun #s. Black diesel smoke weakens them: they deal −#% damage for #s. Shield + taunt.	적에게 배치기: #% 피해, #초 기절. 검은 디젤 연기로 약화: #초간 주는 피해 −#%. 보호막 + 도발.	敵へボディプレス：#%ダメージ、#秒スタン。黒いディーゼル煙で弱体化：#秒間与ダメージ−#%。シールド＋挑発。
 Dumbbell jump slam: #% damage, stun #s. Then he goes wild: +#% attack and +#% attack speed for #s. Shield + taunt.	덤벨 점프 강타: #% 피해, #초 기절. 이후 폭주: #초간 공격 +#%, 공격 속도 +#%. 보호막 + 도발.	ダンベルジャンプ叩きつけ：#%ダメージ、#秒スタン。その後暴走：#秒間攻撃+#%、攻撃速度+#%。シールド＋挑発。
 Lifts a whole engine block and drops it: #% damage in a big area, toxic fumes burn #s and weaken enemies (−#% damage). Shield + taunt.	엔진 블록을 들어 떨어뜨림: 넓은 범위 #% 피해, 유독 가스 #초 화상 및 적 약화(피해 −#%). 보호막 + 도발.	エンジンブロックを持ち上げ落とす：広範囲#%ダメージ、有毒ガスで#秒炎上し敵を弱体化（ダメージ−#%）。シールド＋挑発。
+SIGNATURE TOOL	전용 도구	専用ツール
+Signature Tool	전용 도구	専用ツール
+Transcendent	초월	超越
+BREAKTHROUGH	돌파	突破
+BREAKTHROUGH!	돌파!	突破！
+LEVEL UP	레벨 업	レベルアップ
+Base chance #%	기본 확률 #%	基本確率 #%
++ #% from failed tries	+ 실패 보너스 #%	+ 失敗ボーナス #%
+Every failure: +#% next time.	실패할 때마다 다음 확률 +#%.	失敗するたびに次回 +#%。
+A failed try costs only the Molten Core.	실패 시 용융 코어만 소모됩니다.	失敗時は溶融コアのみ消費します。
+Small bonus every level. Every # levels: BREAKTHROUGH to the next grade – a big jump.	레벨마다 작은 보너스. #레벨마다 다음 등급으로 돌파 – 큰 도약.	レベルごとに小さなボーナス。#レベルごとに次のグレードへ突破 – 大きな飛躍。
+Molten Core	용융 코어	溶融コア
++# Molten Core	+# 용융 코어	+# 溶融コア
+Green Blueprint	초록 설계도	緑の設計図
+Blue Blueprint	파란 설계도	青の設計図
+Purple Blueprint	보라 설계도	紫の設計図
+Yellow Blueprint	노란 설계도	黄の設計図
+Red Blueprint	빨간 설계도	赤の設計図
+Rainbow Blueprint	무지개 설계도	虹の設計図
++# Blueprints	+# 설계도	+# 設計図
+TRY BREAKTHROUGH	돌파 시도	突破に挑戦
+NOT ENOUGH	부족	不足
+WHERE TO GET?	어디서 얻나요?	入手方法は？
+Failed	실패	失敗
++#% chance next time	다음 확률 +#%	次回の確率 +#%
+Failed – try again	실패 – 다시 시도	失敗 – もう一度
+You don't own this hero yet.	아직 이 영웅이 없습니다.	まだこのヒーローを持っていません。
+MAX	MAX	MAX
+Molten Core + Blueprints: JUNKYARD trips and the SCRAP GOLEM in THE FORGE (Battle)	용융 코어 + 설계도: THE FORGE(전투)의 JUNKYARD 탐사와 SCRAP GOLEM	溶融コア + 設計図: THE FORGE（バトル）のJUNKYARD探索とSCRAP GOLEM
+TOOLS	도구	ツール
+TOOL COLLECTION	도구 컬렉션	ツールコレクション
+# tools of different heroes at the same grade → a bonus for ALL your heroes.	서로 다른 영웅의 도구 #개가 같은 등급 → 모든 영웅 보너스.	異なるヒーローのツール#個が同じグレード → 全ヒーローにボーナス。
+# × Rare (#/#)	# × 레어 (#/#)	# × レア (#/#)
+# × Epic (#/#)	# × 에픽 (#/#)	# × エピック (#/#)
+# × Legendary (#/#)	# × 전설 (#/#)	# × レジェンド (#/#)
+# × Mythic (#/#)	# × 신화 (#/#)	# × ミシック (#/#)
+# × Transcendent (#/#)	# × 초월 (#/#)	# × 超越 (#/#)
++#% skill damage	스킬 피해 +#%	スキルダメージ +#%
++#% ATK, HP, DEF & skill	공격·HP·방어·스킬 +#%	攻撃・HP・防御・スキル +#%
+Every Mythic hero has a SIGNATURE TOOL (also on the hero page, under the hero). Lv # → # · every # levels a BREAKTHROUGH to the next grade: Common → Uncommon → Rare → Epic → Legendary → Mythic → Transcendent. Levels use Molten Core; a breakthrough also needs a Blueprint of the next colour. Chances get lower at every grade – every failed breakthrough adds chance.	모든 신화 영웅은 전용 도구를 가집니다(영웅 페이지, 영웅 아래에도 있음). Lv # → # · #레벨마다 다음 등급으로 돌파: 일반 → 고급 → 레어 → 에픽 → 전설 → 신화 → 초월. 레벨업에는 용융 코어가, 돌파에는 다음 색의 설계도도 필요합니다. 등급이 오를수록 확률이 낮아지며, 돌파에 실패할 때마다 확률이 올라갑니다.	すべてのミシックヒーローは専用ツールを持ちます（ヒーローページのヒーローの下にもあります）。Lv # → # · #レベルごとに次のグレードへ突破：コモン → アンコモン → レア → エピック → レジェンド → ミシック → 超越。レベルアップには溶融コア、突破には次の色の設計図も必要です。グレードごとに確率は下がり、突破に失敗するたびに確率が上がります。
+Send your # best free heroes to dig in the scrap. Longer trips bring more – rare colours only on long trips. Better heroes find more.	쉬고 있는 최강 영웅 #명을 고철 더미로 보내세요. 긴 탐사일수록 더 많이 – 희귀한 색은 긴 탐사에서만. 강한 영웅일수록 더 많이 찾습니다.	空いている最強ヒーロー#人をスクラップ探しに送りましょう。長い探索ほど多く手に入り、レアな色は長い探索のみ。強いヒーローほど多く見つけます。
+TRIP #	탐사 #	探索 #
+TRIP # · #h	탐사 # · #시간	探索 # · #時間
+Heroes:	영웅:	ヒーロー：
+DIGGING…	탐사 중…	探索中…
+No free heroes for a trip	탐사에 보낼 영웅이 없습니다	探索に出せるヒーローがいません
+JUNKYARD · +# Molten Core	JUNKYARD · +# 용융 코어	JUNKYARD · +# 溶融コア
+# / # TRIES THIS WEEK	이번 주 도전 # / #	今週の挑戦 # / #
+# seconds with your battle team – the Golem cannot die, only the damage counts. Every fight gives Molten Core; weekly damage tiers give Blueprints. New tries every Monday.	전투 팀으로 #초 – 골렘은 죽지 않으며 피해량만 계산됩니다. 매 전투마다 용융 코어, 주간 피해 단계마다 설계도. 매주 월요일 새 도전.	バトルチームで#秒 – ゴーレムは倒れず、ダメージだけが数えられます。毎回溶融コア、週間ダメージ段階で設計図。毎週月曜に挑戦回数リセット。
+(# bars)	(#칸)	(#本)
+ATTACK · # s	공격 · #초	攻撃 · #秒
+NO TRIES	도전 없음	挑戦なし
+NEW ON MONDAY	월요일 갱신	月曜に更新
+No tries left this week	이번 주 도전 횟수 없음	今週の挑戦は残っていません
+new on Monday	월요일 갱신	月曜に更新
+#/# tries left	남은 도전 #/#	残り挑戦 #/#
+TOOLS · JUNKYARD · GOLEM #/#	도구 · JUNKYARD · GOLEM #/#	ツール · JUNKYARD · GOLEM #/#
+is open! Every MYTHIC hero gets a	오픈! 모든 신화 영웅이 받는	オープン！すべてのミシックヒーローが手に入れる
+– level it up with	– 레벨업 재료:	– レベルアップには
+from the JUNKYARD and the SCRAP GOLEM. Also on the hero page, under the hero.	(JUNKYARD와 SCRAP GOLEM에서 획득). 영웅 페이지의 영웅 아래에도 있습니다.	（JUNKYARDとSCRAP GOLEMで入手）。ヒーローページのヒーローの下にもあります。
+TRANSCENDENT	초월	超越
++#% ATK	공격 +#%	攻撃 +#%
++#% HP	HP +#%	HP +#%
++#% DEF	방어 +#%	防御 +#%
+READY	완료	完了

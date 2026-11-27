@@ -1225,7 +1225,8 @@ function rTag(h,sz){const k=bRoleOf(h);if(!k)return '';const r=BROLE[k];return `
 function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its,h.id),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
   const gk=h.crew||!TE().garB?1:1+TE().garB(clsOf(h)); // v16-129: the garage that trains this class (LV 1-100) → +ATK & HP
   const MR=Object.assign({},MYTH_RNG[h.id]||{});{const K=MYTH_RK[h.id];if(K){MR.hp=(MR.hp||1)*(K.hp||1);MR.def=(MR.def||1)*(K.def||1);MR.atk=K.atk||1;}} // v16-141: Mythic rangers · v16-349: Mythic role stats
-  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)*(MR.hp||1)),atk:R.atk*m*gk*(1+b.atk/100)*(MR.atk||1),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100)*(MR.def||1),mv:R.mv,rng:MR.rng||R.rng,as:R.as*(MR.as||1)/(1+softCap(b.aspd,60,150)/100),crit:Math.min(CRIT_CAP,R.crit+b.crit/100),cdm:CRIT_DM+softCap(b.cdmg||0,150,300)/100,eg:1,sd:(1+softCap(b.en,80,200)/100)*(!h.crew&&(bRoleOf(h)==='mage'||bRoleOf(h)==='support')?RB_MAGE:1),b};} // v16-299 (Marius 24 nov): 'en' = SKILL DAMAGE now (skills hit harder), no faster ultimate any more
+  const FM=!h.crew&&window.TFORGE&&TFORGE.mul?TFORGE.mul(h):null; // v16-388 (Marius 27 nov): SIGNATURE TOOL of the Mythic + TOOL COLLECTION → × ATK/HP/DEF/skill damage
+  return {hp:Math.round(R.hp*m*gk*(1+b.hp/100)*(MR.hp||1)*(FM?FM.hp:1)),atk:R.atk*m*gk*(1+b.atk/100)*(MR.atk||1)*(FM?FM.atk:1),def:R.def*(h.crew?1:1+h.gr*.12)*(1+b.def/100)*(MR.def||1)*(FM?FM.def:1),mv:R.mv,rng:MR.rng||R.rng,as:R.as*(MR.as||1)/(1+softCap(b.aspd,60,150)/100),crit:Math.min(CRIT_CAP,R.crit+b.crit/100),cdm:CRIT_DM+softCap(b.cdmg||0,150,300)/100,eg:1,sd:(1+softCap(b.en,80,200)/100)*(!h.crew&&(bRoleOf(h)==='mage'||bRoleOf(h)==='support')?RB_MAGE:1)*(FM?FM.sd:1),b};} // v16-299 (Marius 24 nov): 'en' = SKILL DAMAGE now (skills hit harder), no faster ultimate any more
 // v16-98: Attack speed – full value up to +60%, then slower, never above +150% · v16-299: Skill damage full up to +80%, then slower, never above +200%
 // v16-294 (Marius 24 nov): CRIT CHANCE max 60% (also with buffs) · CRIT DAMAGE separate: base 180%, gloves / extra stats add more (full up to +150%, then slower, never above +300%)
 const CRIT_CAP=.6,CRIT_DM=1.8;
@@ -2972,7 +2973,7 @@ const BIM={};['pause','x1','x15','x2','x3','aoff','aon'].forEach(k=>{const im=ne
 function ibtn(x,y,s,k,id){const im=BIM[k];if(!im||!im.complete||!im.naturalWidth)return false;g.drawImage(im,x,y,s,s*im.naturalHeight/im.naturalWidth);HIT.push({x,y,w:s,h:s,id});return true;}
 function drawHUD(t){HIT=[];const top=10,bh=38;
   if(!ibtn(8,top-2,44,'pause','pause')){btn(10,top,44,bh,'',false,'pause');g.drawImage(badgeCv('pause','#ffb300',64),10+22-13,top+bh/2-13,26,26);}
-  g.textAlign='center';const tt=B.tw&&B.tw.demo?B.stage.n:(B.wbB?'WORLD BOSS':B.tw&&B.tw.dg?'DUNGEON':B.tw?'TOWER':sLabel(B.si))+' · '+B.stage.n.toUpperCase();let fs=Math.round(15*S);g.font='900 '+fs+'px Game,system-ui';while(fs>9&&g.measureText(tt).width>W-250){fs--;g.font='900 '+fs+'px Game,system-ui';}g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(tt,W/2,top+17);g.fillStyle='#ffe0b2';g.fillText(tt,W/2,top+17);
+  g.textAlign='center';const tt=B.tw&&B.tw.demo?B.stage.n:(B.wbB?(B.tw.fg?'THE FORGE':'WORLD BOSS'):B.tw&&B.tw.dg?'DUNGEON':B.tw?'TOWER':sLabel(B.si))+' · '+B.stage.n.toUpperCase();let fs=Math.round(15*S);g.font='900 '+fs+'px Game,system-ui';while(fs>9&&g.measureText(tt).width>W-250){fs--;g.font='900 '+fs+'px Game,system-ui';}g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(tt,W/2,top+17);g.fillStyle='#ffe0b2';g.fillText(tt,W/2,top+17);
   const nw=B.wbB?0:B.stage.w.length;for(let i=0;i<nw;i++){const x=W/2+(i-(nw-1)/2)*22,y=top+33;const boss=B.stage.w[i].some(m=>MON[m].boss);g.fillStyle=i<B.wave?'#66bb6a':i===B.wave?'#ffb300':'rgba(255,255,255,.25)';
     if(boss){g.font='900 13px Game,system-ui';g.fillText('💀',x,y+5);}else{rr(g,x-7,y-3,14,7,3);g.fill();}}
   if(ibtn(W-104,top-2,44,B.spd===3?'x3':B.spd===2?'x2':B.spd===1.5?'x15':'x1','spd')){if(B.spd===1.5&&!(TE().spdX?TE().spdX():TE().spd2()))g.drawImage(badgeCv('lock','#8d6e63',64),W-104+32,top-6,16,16);}
@@ -3514,7 +3515,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon your first heroes – they fight and wear gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const HSK_=setKeyOf(h,heroGear(h.id));const slotBox=sl=>{const it=itemById(eq[sl.k]),lv=SLV(h.id,sl.k),tr=slvTier(lv);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it,'','',it.set?(it.set===HSK_?'On':'Off'):''):''}${lv>1?`<b class="slvB${tr>=10?' mx':''}" style="--c:${SLV_COL[tr]}">+${lv}</b>`:''}</div>`;}; // v16-280: slot + in the corner, a new colour every +5 // v16-240 (Marius): set piece on the right class glows all the time
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
-  $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'');
+  $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'')+(window.TFORGE&&TFORGE.on()&&h.gr===5&&!h.crew&&!gPrev?TFORGE.slot(h.id):'');
   $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>${SL(h,1)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(clsOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[clsOf(h)].n}${h.gr===5?' '+awkLine(h,1):''}</small>${rTag(h)}<small class="rBon" style="display:block;color:#9fe8ff;font-weight:800;font-size:.78em">${roleBonTxt(h)}</small><div class="gPow">${IMGI(PWU,'1.2em','-.22em')} ${pow(h).toLocaleString()}</div>`;
   $m('gInfo').innerHTML=hsPanel(h); // v16-303 (Marius 25 nov): hero page = skills, gear, stats only – SKILLS panel (4 fixed frames for all heroes); set info only in the gear popup
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
@@ -3715,6 +3716,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
     pop(`<div class="pT">${IMGI('img/ui2/i_scrap.webp','1.4em','-.4em')} Salvage ${L.length} item${L.length>1?'s':''}?</div><div class="gDrop">${L.map(it=>itemCard(it)).join('')}</div><div class="pD">You get <b style="color:#ffd54a">+${T.fmt(sum)}</b>. Salvaged gear is gone forever.</div><button class="cpGo" data-p="svok">✓ SALVAGE</button><button class="cpGo alt" data-p="x">CANCEL</button>`);return;}
   if(el.dataset.g==='hsum'){if(T.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T.openSummon('m');}return;}
   if(el.dataset.g==='art'){const h=gHero();if(h&&window.showSplash)showSplash(h.id);return;}
+  if(el.dataset.g==='tool'){const h=gHero();if(h&&window.TFORGE)TFORGE.tool(h.id);return;}
   if(el.dataset.sk!==undefined){hsPop(gHero(),el.dataset.sk);return;}
   if(el.dataset.g==='lvl'){const h=gHero();if(h)popLvl(h);return;}
   if(el.dataset.g==='tedit'){heroTeamEdit();return;}
@@ -3933,7 +3935,7 @@ function anxTower(can,go){const G=TE().G;const show=()=>{const on=G.cp.autoNext!
     ANX.id=setInterval(()=>{if(!$('cpRes').classList.contains('open')){clearInterval(ANX.id);return;}{const bo=document.getElementById('bsOv');if(bo&&bo.classList.contains('open'))return;} /* v16-350: AUTO NEXT waits while BATTLE STATS is open */ANX.n--;show();if(ANX.n<=0){clearInterval(ANX.id);$('cpRes').classList.remove('open');go();}},1000);};
   start();return ()=>{G.cp.autoNext=G.cp.autoNext===false;TE().save();start();};}
 function twFinish(win,retreat){if(B.tw&&B.tw.demo){const cb=B.tw.cb,trn=B.tw.trn,L=B.heroes.filter(u=>u.hero);close();try{cb&&cb(win);}catch(e){}if(trn)setTimeout(()=>bStats(L),300); /* v16-351: Training Room → BATTLE STATS */return;}{const F0=B.tw||{};if(window.TEQ&&!retreat&&(win||F0.wb))TEQ(F0.wb?'wb':F0.dg?'dg':'tower',1);}   // v16-238: daily quests
-  if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
+  if(B.tw.fg)return fgFinish(win,retreat);if(B.tw.wb)return wbFinish(win,retreat);if(B.tw.dg)return dgFinish(win,retreat);if(B.tw.ct)return ctFinish(win,retreat);const T=TE(),G=T.G,t=twG(),F=B.tw,f=F.f;let html;
   if(win&&f===t.b+1){const r=twRew(f);t.b=f;G.money+=r.money;giveEG(r);if(r.dm)G.dm=(G.dm||0)+r.dm;if(r.gtk)GSD().tk+=r.gtk;if(r.ct)G.h.ct+=r.ct;T.save();if(r.tk)T.addTickets(r.tk,'Tower floor '+f);
     const rws=[[`<img src="img/ui2/i_coins.webp">`,T.fmt(r.money)],[T.DMI,'+'+r.dm]];if(r.pk&&T.PKI)for(const q in r.pk)rws.push([T.PKI(q),'+'+T.nf(r.pk[q])]);if(r.gtk)rws.push([GTKI,'+'+r.gtk]);if(r.tk)rws.push([TKI,'+'+r.tk]);if(r.ct)rws.push(['<img src="img/cticket.webp">','+'+r.ct]);
     html=`<div class="rsV"><img class="hi" src="img/ui2/victory.webp" alt="VICTORY"><div class="rsL">TORQUE TOWER · FLOOR ${f}<small>${f>=TW_N?'THE TOWER IS CLEARED!':'FLOOR '+(f+1)+' IS OPEN'}</small></div>
@@ -4008,7 +4010,8 @@ function rootOn(){if(!root.classList.contains('open')){root.classList.add('open'
 // taller tab = the banner cut in 3: left title block + right frame end at the same scale, the middle art cropped around cx (no stretching).
 const HUBM=[
  {k:'camp',im:'m_camp',sh:160,cx:600},{k:'arena',im:'m_arena',sh:143,cx:670},{k:'tower',im:'m_tower',sh:144,cx:600},
- {k:'class',im:'m_class',sh:143,cx:735},{k:'cup',im:'m_cup',sh:144,cx:690},{k:'boss',full:'img/wb/m_boss.webp',ar:1100/250},{k:'dg',full:'img/dg/m_dg.webp',ar:1100/255}]; // v16-60: WORLD BOSS in place of COMING SOON (Marius' banner, shown whole)
+ {k:'class',im:'m_class',sh:143,cx:735},{k:'cup',im:'m_cup',sh:144,cx:690},{k:'boss',full:'img/wb/m_boss.webp',ar:1100/250},{k:'dg',full:'img/dg/m_dg.webp',ar:1100/255}];
+if(window.SEC&&SEC.TEST_ACC)HUBM.push({k:'forge',im:'m_forge',sh:143,cx:560}); // v16-388: THE FORGE – only on the owner's test account for now // v16-60: WORLD BOSS in place of COMING SOON (Marius' banner, shown whole)
 const HUB_L=395,HUB_R=46,HUB_W=1012;
 function hubTab(m,hh){const f=hh/m.sh,u='url(img/ui7/'+m.im+'.webp)',L=HUB_L*f,R=HUB_R*f,M=HUB_W-L-R,full=1100*f,
     px=Math.min(-HUB_L*f,Math.max(M-(1100-HUB_R)*f,M/2-m.cx*f)); // background x of the middle part: src cx in its centre, never past the title or the frame end
@@ -4019,12 +4022,13 @@ function hubTab(m,hh){const f=hh/m.sh,u='url(img/ui7/'+m.im+'.webp)',L=HUB_L*f,R
 function hubTodo(){const o={};try{
   if(wbOK()){const w=wbG();o.boss=wbKeys()>0||(w.dmg>0&&WB_TIER.some((q,i)=>wbTierSt(i)===1));}
   if(dgOK())o.dg=DG_K.some(k=>dgDay(k)>0);
+  if(window.TFORGE&&TFORGE.on())o.forge=TFORGE.todo();
   if(arOK())o.arena=!!(window.ONLINE&&ONLINE.arTk&&ONLINE.arTk()>0);
  }catch(e){}return o;}
 function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');const TD=hubTodo();
   let h=tallBg()+'<button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
   const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:arOK()?'PvP · ONLINE':'🔒 STAGE '+sLabel(AR_UNLOCK),tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
-    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',
+    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',forge:window.TFORGE&&TFORGE.sub?TFORGE.sub():'',
     boss:wbOK()?WBOSS[wbCur()].n+' · KEYS '+wbKeys()+'/'+wbKMax():'🔒 STAGE '+sLabel(WB_UNLOCK-1),
     dg:dgOK()?'KEYS '+DG_K.reduce((a,k)=>a+dgDay(k),0)+'/'+DG_K.length*dgMax()+((t=>t?' +'+t:'')(DG_K.reduce((a,k)=>a+dgBon(k),0))):'🔒 STAGE '+sLabel(DG_UNLOCK)};
   const top=285,avail=1536+HX-(HX>0?250:20)-top,n=HUBM.length,ex=m=>m.full?1.3:m.k==='camp'?1.08:1,
@@ -4036,6 +4040,7 @@ function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');const TD=hubTodo();
 function hubOpen(){HM=0;rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
 function hubClose(){hubEl.classList.remove('open');close();}
 function hubGo(k){if(k==='back'){hubClose();return;}
+  if(k==='forge'){if(window.TFORGE)TFORGE.open();return;}
   if(k==='soon'){TE().toast('🔒 New battle modes are coming soon!',2200);return;}
   if(k==='tower'&&!twOK()){TE().toast('🔒 TORQUE TOWER opens after campaign stage '+sLabel(TW_UNLOCK),2600);return;}
   if(k==='class'&&!ctOK()){TE().toast('🔒 CLASS TOWERS open after campaign stage '+sLabel(CT_UNLOCK),2600);return;}
@@ -4279,6 +4284,9 @@ MSPR.crusher2={w:269,h:236,ax:143.0,ay:232.0,ih:199.0,wb:{v2:1,ni:6,pr:3,fxP:1,f
 MSPR.inferno2={w:264,h:230,ax:126.5,ay:223.5,ih:200.5,wb:{v2:1,ni:6,pr:2,lz:2,fx:{w:1024,h:171,ya:0.9}}};MDRAW.spr_inferno2=(g,u,t)=>drawSprMon(g,u,t,'inferno2');
 MSPR.tow2={w:259,h:234,ax:139.0,ay:225.0,ih:188.0,wb:{v2:1,ni:6,pr:3,fxP:1,fx:{w:1024,h:171,ya:0.8}}};MDRAW.spr_tow2=(g,u,t)=>drawSprMon(g,u,t,'tow2');
 for(const [k,sp] of [['scrap','scrapzilla2'],['crushk','crusher2'],['infp','inferno2'],['tows','tow2']]){MON[k].sp=sp;MON[k].dr='spr_'+sp;}
+// v16-388 THE FORGE boss SCRAP GOLEM (Marius' 4 sheets, tools/golem_cut.py): World Boss engine, own tries + rewards (forge.js)
+MON.golem={n:'SCRAP GOLEM',hp:12500,atk:118,def:28,mv:0,rng:150,as:1.8,h:230,boss:1,b:'titan',big:5,lc:'#ff6d00',lz:[40,120],dr:'spr_golem2',dr0:'titan',sp:'golem2',sc:1,noLz:1,desc:'Forge boss'};
+MSPR.golem2={w:196,h:238,ax:97.0,ay:228.0,ih:203.0,wb:{v2:1,ni:6,pr:3,fxP:1,fx:{w:1024,h:171,ya:0.9}}};MDRAW.spr_golem2=(g,u,t)=>drawSprMon(g,u,t,'golem2');
 MON.scrap.lz=[138,150];MON.infp.lz=[60,0]; // v16-134: SCRAPZILLA mouth in the new skill frames · INFERNO lava starts at its feet
 const WBFX={};function wbFxIm(id){if(!WBFX[id]){WBFX[id]=new Image();WBFX[id].decoding='async';WBFX[id].src='img/wb/fx_'+id.replace(/2$/,'')+'.webp';}return WBFX[id];}
 const WBS={ret:0,sending:0,rank:null,raf:0};
@@ -4376,6 +4384,16 @@ async function wbRank(){const w=wbG(),esc=s=>String(s).replace(/[&<>"]/g,c=>'&#'
     x+=r.top.length?r.top.map((p,i)=>wRowB(i===0?5:i<3?4:i<10?3:i<50?2:1,'<b>#'+(i+1)+'</b> '+esc(p.name),null,fmtD(p.dmg))).join(''):'<div class="wP">Nobody has attacked yet this week – be the first!</div>';}
   x+='<div class="wS">WEEKLY REWARDS · BY MAIL ON MONDAY</div>'+WB_RANK.map((q,i)=>wRowB(5-i,'<b>'+(q[0]===q[1]?'#'+q[0]:'#'+q[0]+' – '+q[1])+'</b>',null,wbRwHtml(q[2]))).join('');
   popW('DAMAGE RANKING',x);}
+// v16-388 THE FORGE · SCRAP GOLEM: same fight as the World Boss (60 s, endless HP bars, only the damage counts) – tries, rewards and the result live in forge.js
+function fgFight(L){const eq=wbEq();return {wb:1,fg:1,f:0,eq,mod:-1,mul:stageMul0(eq)*.6,L,weak:'elec',boss:true,mini:false,w:[['golem']],st:{n:'SCRAP GOLEM',bio:18,w:[['golem']],boss:true,mini:false}};}
+function fgGo(L){let team=teamHeroes();if(!team||!team.length)team=bestTeam().map(heroOf);rootOn();['cpGear','cpPop','hub','wb','tw','ct'].forEach(id=>{const e=$(id);if(e)e.classList.remove('open');});
+  try{team.forEach(h=>{const d=sprOf(h);if(d)sprLoad(d);});}catch(e){}msprLoad('golem2');safeStart(wbEq(),team,fgFight(L));return !!(B&&B.wbB&&running);}
+function fgFinish(win,retreat){const dmg=Math.round(B.wbD||0),r=window.TFORGE?TFORGE.bossDone(dmg):{html:''};
+  const html=`<div class="wbRes"><div class="wbRK" style="color:#ff9d3a">SCRAP GOLEM</div><div class="wbRK">${B.wbUp?'TIME UP!':retreat?'RETREAT':'TEAM DEFEATED'}</div>
+    <div class="wbRD"><img src="img/wb/dmg.webp" alt=""><div><small>DAMAGE</small><b>${fmtD(dmg)}</b></div></div>${r.html}
+    <div class="cpRow"><button class="cpGo" data-a="fg">THE FORGE</button></div></div>`;
+  $('cpResBox').classList.remove('rsSk');$('cpResBox').classList.add('wbSk');$('cpResBox').innerHTML=html;$('cpRes').classList.add('open');bsBtn();$('cpResBox').scrollTop=0;clearInterval(ANX.id);
+  $('cpResBox').onclick=e=>{const el=e.target.closest('[data-a]');if(!el)return;$('cpRes').classList.remove('open');$('cpResBox').classList.remove('wbSk');$('bt').classList.remove('open');showMap();close();if(window.TFORGE)TFORGE.open('boss');};}
 function wbFinish(win,retreat){const T=TE(),w=wbG(),dmg=Math.round(B.wbD||0),before=w.dmg;
   w.dmg+=dmg;const nb=dmg>w.best;w.best=Math.max(w.best,dmg);w.wd+=dmg;w.wbest=Math.max(w.wbest||0,dmg);if(dmg>0)w.pend.push({d:dmg,t:Date.now()});T.save();wbSend();
   const nt=WB_TIER.filter(q=>before<q.b*w.L&&w.dmg>=q.b*w.L).length;
@@ -4720,7 +4738,7 @@ function trainRoom(){if(!(window.SEC&&SEC.TEST_ACC))return;const T=TE(),HB=T.HB;
 function trainFight(){const T=TE(),team=TRN.ids.map(heroOf).filter(Boolean),si=TRN.si,S0=STAGES[si];team.forEach(h=>{const dd=sprOf(h);if(dd)sprLoad(dd);});
   const F={demo:1,trn:1,cb:()=>trainRoom(),f:0,w:S0.w,mod:-1,eq:si,mul:stageMul(si)*stEase(si),st:{n:'TRAINING · '+sLabel(si),bio:S0.bio,w:S0.w,boss:S0.boss}};
   root.classList.add('open');window.__BATTLE_ON=true;safeStart(si,team,F);}
-window.CAMPAIGN={demoFight,trainRoom,tutSetFor:id=>{const h=TE().HB[id];const k=h?clsOf(h):'';return SETS[k]?k:SETK[0];},todo:()=>{const o=hubTodo();return o.boss||o.dg||o.arena;},dgTodo:()=>!!hubTodo().dg,peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[clsOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,set);g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&heroWhy(h));}catch(e){return false;}},heroWhy:()=>{try{const a=[...new Set(curTeamList().map(heroWhy).filter(Boolean))];return a.length>1?'×'+a.length:a[0]||'';}catch(e){return '';}},hubWhy:()=>{const o=hubTodo();return o.dg?'':o.boss?'BOSS':o.arena?'FIGHT':'';},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),sumQ:n=>gsummon(n,0,1),sumQP:n=>gsummon(n,1,1),res:(r,n,s,hd)=>gsResults(r,n,s,hd),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[clsOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
+window.CAMPAIGN={fgGo,fgL:()=>wbLayer(),fmtD:n=>fmtD(n),gRefresh:()=>{try{if($('cpGear').classList.contains('open'))renderGear();}catch(e){}},ustats:h=>unitStats(typeof h==='string'?TE().HB[h]:h),demoFight,trainRoom,tutSetFor:id=>{const h=TE().HB[id];const k=h?clsOf(h):'';return SETS[k]?k:SETK[0];},todo:()=>{const o=hubTodo();return o.boss||o.dg||o.arena;},dgTodo:()=>!!hubTodo().dg,peekGear,peekSkill,roleOfId:id=>{const h=TE().HB[id];return h?ROLE[clsOf(h)].n:'';},giftAsc:(hid,set)=>{const g=GR();GSLOT.forEach(sl=>{const it=newItem(sl.k,6,set);g.inv.push(it);equip(hid,it);});TE().save();},freeMem,idleAsc:h=>idleAsc(h),itemName:it=>itemName(it),heroes:()=>{if(!root.classList.contains('open')){open();collHome=1;}openGear();},heroDot:()=>{try{return curTeamList().some(h=>h&&heroWhy(h));}catch(e){return false;}},heroWhy:()=>{try{const a=[...new Set(curTeamList().map(heroWhy).filter(Boolean))];return a.length>1?'×'+a.length:a[0]||'';}catch(e){return '';}},hubWhy:()=>{const o=hubTodo();return o.dg?'':o.boss?'BOSS':o.arena?'FIGHT':'';},gs:{guide:()=>gearGuide(),d:GSD,sum:n=>gsummon(n),sumQ:n=>gsummon(n,0,1),sumQP:n=>gsummon(n,1,1),res:(r,n,s,hd)=>gsResults(r,n,s,hd),rates:()=>gsRates(),icon:(sl,r)=>itemIconURL(sl,r),RATE:GS_RATE,PITY:GS_PITY.l,PITYM:GS_PITY.m,get INV(){return GINV_();},GTKI,bag:()=>gsBag()},spr:id=>SPRD[id]||null,gearSum:()=>{if(!root.classList.contains('open')){open();gsHome=1;}if(!$('cpGear').classList.contains('open'))openGear();openGSum();},openColl:()=>{if(!root.classList.contains('open')){open();collHome=1;}if(!$('cpGear').classList.contains('open'))openGear();gPage('coll');},passives:pasOf,skill:h=>skOf(h),roleName:h=>ROLE[clsOf(h)].n,open,close,openGear,mini,arenaTeam,pose,hasSpr,sLabel:i=>sLabel(Math.max(0,Math.min(NST-1,i))),NST:()=>NST,heroOf,portraitURL,teamPower:()=>teamPower(curTeamList().filter(Boolean)),best:()=>TE().G.cp.best,tower:()=>twOpen(),hub:()=>hubOpen(),classTowers:k=>ctOpen(k),worldBoss:()=>wbOpen(),dungeons:k=>dgOpen(k),wbReady:()=>{try{return wbReady();}catch(e){return false;}}};
 // v16-280: VIP set box – 6 pieces of one class set, grade r, into the bag (not equipped)
 CAMPAIGN.sets=()=>SETK.map(k=>({k,n:SETS[k].n,c:SETCOL[k],cls:({engine:'Engine',tuning:'Tuning',inspect:'Inspection',service:'Service',paint:'Body & Paint',elec:'Electronics'})[k]||k}));
 CAMPAIGN.giftSet=(set,r)=>{const g=GR();const L=GSLOT.map(sl=>newItem(sl.k,r,set));L.forEach(it=>g.inv.push(it));TE().save();return L;};
