@@ -10,13 +10,13 @@
 //  • TOOL COLLECTION: 2 tools of different heroes at the same grade → a bonus for ALL heroes
 //  • JUNKYARD: 3 idle trips (2h / 4h / 8h, the 3rd slot from VIP 3), your 3 best free heroes go → Molten Core + Blueprints
 //  • SCRAP GOLEM: 3 tries a week, World Boss fight (battle.js fgGo/fgFinish) → Molten Core every fight + weekly damage tiers
-//  For now ONLY on the owner's FULL TEST ACCOUNT (SEC.TEST_ACC) – Marius tests, then it opens for everybody.
+//  v16-392 (Marius 27 nov): open for EVERYBODY from campaign stage 121 (chapter 5) – battle.js fgOK(); the test account always.
 //  Save: G.fg = {lv:{heroId:L}, pt:{heroId:pity%}, mc:Molten Core, bp:[_,green,blue,purple,yellow,red,rainbow], ex:[trips], bw:{wk,n,dmg,cl}}
 // =====================================================================
 (function(){
 'use strict';
 const T=()=>window.__TE,$=id=>document.getElementById(id);
-const ON=()=>!!(window.SEC&&SEC.TEST_ACC);
+const ON=()=>!!(window.CAMPAIGN&&CAMPAIGN.fgOK&&CAMPAIGN.fgOK()); // v16-392: everybody from campaign stage 121 (chapter 5); the test account always
 const MY=['m5_0','m5_1','m5_2','m5_3','m5_4','m5_5','m5_6','m5_7','m5_8','m5_9'];
 const TOOL={m5_0:'Crown Wrench',m5_1:'Twin Turbo Fists',m5_2:'Phoenix Torch',m5_3:'Bulwark Hammer',m5_4:'Starfire Bow',m5_5:'Coil Railgun',m5_6:'Rainbow Spray Staff',m5_7:'Jump-Start Defibrillator',m5_8:'Ghost Wrenches',m5_9:'Crash Shield'};
 const GN=['Common','Uncommon','Rare','Epic','Legendary','Mythic','Transcendent'];
@@ -40,7 +40,7 @@ const wk=()=>{const d=new Date(now());const u=Date.UTC(d.getUTCFullYear(),d.getU
 function S(){const G=T().G;if(!G.fg)G.fg={lv:{},pt:{},mc:0,bp:[0,0,0,0,0,0,0],ex:[],bw:{}};const f=G.fg;
   if(!f.bp||f.bp.length<7)f.bp=[0,0,0,0,0,0,0];if(!f.ex)f.ex=[];if(!f.lv)f.lv={};if(!f.pt)f.pt={};
   if(!f.bw||f.bw.wk!==wk())f.bw={wk:wk(),n:0,dmg:0,cl:[]};
-  if(ON()&&!f.gift){f.gift=1;f.mc+=20000;[0,10,8,6,4,3,2].forEach((v,i)=>f.bp[i]+=v);} // test account: something to test with
+  if(window.SEC&&SEC.TEST_ACC&&!f.gift){f.gift=1;f.mc+=20000;[0,10,8,6,4,3,2].forEach((v,i)=>f.bp[i]+=v);} // test account: something to test with
   return f;}
 const own=id=>!!T().G.h.own[id];
 const lv=id=>S().lv[id]||0;
