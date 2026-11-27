@@ -158,7 +158,7 @@ button{font-family:inherit;cursor:pointer}
 #s2 .buy.dm{background:linear-gradient(180deg,#bfe9ff,#3fa9ff 55%,#1567d6);color:#fff;box-shadow:0 4px 0 #0d3c78,0 8px 14px rgba(0,0,0,.5);display:flex;align-items:center;gap:4px;justify-content:center}
 #s2 .buy.dm img{width:18px;height:18px}
 #s2 .buy.cf{background:linear-gradient(#ff8a65,#e53935);color:#fff;box-shadow:0 4px 0 #7a1010}
-#s2 .buy.own{background:#1d3b25;color:#7CFC9A;box-shadow:inset 0 0 0 1.5px #3c7a4c;font-size:13px}
+#s2 .buy.own{background:#1d3b25;color:#7CFC9A;box-shadow:inset 0 0 0 1.5px #3c7a4c;font-size:13px}#s2 .buy{--bh:44px;height:44px;padding:0 12px!important;border-style:solid!important;border-color:transparent!important;border-width:0!important;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch!important;background:none!important;box-shadow:none!important;border-radius:0!important;animation:none}#s2 .buy.dm{border-image-source:url(img/ui8/btn_blue_s.webp)!important;color:#fff;text-shadow:0 1px 0 #0008}#s2 .buy.cf{border-image-source:url(img/ui8/btn_red_s.webp)!important;color:#fff}#s2 .buy.own{border-image-source:url(img/ui8/btn_green_s.webp)!important;color:#fff}#s2 .buy.lock{border-image-source:url(img/ui8/btn_grey_s.webp)!important;color:#e8edf2} /* v16-394 game buttons (Marius) */
 #s2 .buy.lock{background:#2a313a;color:#7d8996;box-shadow:inset 0 0 0 1.5px #3d4a5e;font-size:12px}
 #s2 .pack{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #1f2a35}
 #s2 .pack .th{flex:none;width:74px;height:70px;border-radius:12px;background:#1d2935;border:1.5px solid #ffcf5a;display:flex;align-items:center;justify-content:center}

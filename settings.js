@@ -130,24 +130,24 @@ const css=document.createElement('style');css.textContent=`
 #zoom #stBtn{padding:0;display:flex;align-items:center;justify-content:center}
 #zoom #stBtn svg{width:30px;height:30px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 #zoom #stBtn.pic{background:url(img/ui10/settings.webp) center/contain no-repeat!important;box-shadow:none!important;border:0!important;border-radius:0!important;width:52px;height:52px;margin:-2px;filter:drop-shadow(0 4px 5px #000a)}#zoom #stBtn.pic svg{display:none}
-#stg{position:fixed;inset:0;z-index:9400;display:none;flex-direction:column;background:linear-gradient(180deg,#16212e,#0b1118);color:#fff;font:700 13px Body,system-ui}
+#stg{position:fixed;inset:0;z-index:9400;display:none;flex-direction:column;background:#0b1118 url(img/forge/forge_bg.webp) center top/cover no-repeat;color:#fff;font:700 13px Body,system-ui}#stg::before{content:"";position:absolute;inset:0;background:linear-gradient(#000a,#000c);pointer-events:none}#stg>*{position:relative} /* v16-394 Marius' pictures */
 #stg.open{display:flex;animation:stgIn .18s ease-out}@keyframes stgIn{from{opacity:0;transform:translateY(14px)}}
-#stg .sgH{flex:none;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:linear-gradient(180deg,#2b3d52,#18232f);border-bottom:3px solid #e0aa25;box-shadow:0 4px 12px #0008}
-#stg .sgH button{width:44px;height:40px;border:0;border-radius:12px;font:900 20px Game,system-ui;color:#3a2200;background:linear-gradient(#ffe27a,#ffb300);box-shadow:0 3px 0 #8f4c00}
-#stg .sgH b{flex:1;font:900 24px Game,system-ui;color:#ffd54a;text-shadow:0 2px 0 #000;letter-spacing:1px}
-#stg .sgH img{width:38px;height:38px;filter:drop-shadow(0 2px 3px #000a)}
+#stg .sgH{flex:none;display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top) + 6px) 8px 4px}
+#stg .sgH button{flex:none;width:56px;height:40px;border:0;background:url(img/ui8/ic_back.webp) center/contain no-repeat;font-size:0}
+#stg .sgH b{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#stg .sgH img{flex:1;min-width:0;width:100%;height:auto;max-height:84px;object-fit:contain;filter:drop-shadow(0 3px 6px #000a)}
 #stg .sgB{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 12px calc(env(safe-area-inset-bottom) + 24px)}
 #stg h3{margin:16px 2px 7px;font:900 14px Game,system-ui;color:#ffd54a;letter-spacing:1px;text-shadow:0 1px 0 #000}
-#stg .sgR{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;margin:0 0 7px;border-radius:14px;background:linear-gradient(180deg,#263546,#18222e);border:1.5px solid #3b4d62;box-shadow:inset 0 1px 0 #ffffff14}
-#stg .sgR.sel{border-color:#e0aa25;background:linear-gradient(180deg,#3a3320,#221d10)}
+#stg .sgR{display:flex;align-items:center;gap:10px;min-height:56px;padding:2px 4px;margin:0 0 7px;border-style:solid;border-color:transparent;border-width:14px;border-image:url(img/forge/panel.webp) 104 fill/14px stretch;background:none}
+#stg .sgR.sel{filter:drop-shadow(0 0 5px #ffd54a)}
 #stg .sgR>div{flex:1;min-width:0}
 #stg .sgR b{display:block;font:900 14.5px Game,system-ui;color:#fff;text-shadow:0 1px 0 #000}
 #stg .sgR small{display:block;margin-top:2px;font:700 11px Body,system-ui;color:#9fb0c3;line-height:1.25}
 #stg .sgR small b{display:inline;font:800 11px Body,system-ui;color:#ffd54a}
 #stg .sgR>i{flex:none;font:900 16px Game,system-ui;font-style:normal;color:#7CFC9A}
-#stg .sgT{flex:none;position:relative;width:58px;height:30px;border-radius:15px;background:#3a4553;box-shadow:inset 0 2px 4px #000a,0 0 0 1.5px #0a0f15;transition:background .15s}
-#stg .sgT::after{content:'';position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:linear-gradient(#fff,#c9d2dc);box-shadow:0 2px 3px #0008;transition:left .15s}
-#stg .sgT.on{background:linear-gradient(#5be06a,#1f9d35)}#stg .sgT.on::after{left:31px}
+#stg .sgT{flex:none;position:relative;width:64px;height:33px;background:url(img/ui11/tog_off.webp) center/100% 100% no-repeat}
+#stg .sgT::after{content:none}
+#stg .sgT.on{background-image:url(img/ui11/tog_on.webp)}
 #stg .sgN{margin:14px 4px 0;font:700 11px Body,system-ui;color:#7f8fa3;text-align:center;line-height:1.4}`;
 document.head.appendChild(css);
 const GEAR='<svg viewBox="0 0 40 40"><path d="M17 3h6l1 4.3 3 1.3 3.8-2.3 4.2 4.2-2.3 3.8 1.3 3 4.3 1v6l-4.3 1-1.3 3 2.3 3.8-4.2 4.2-3.8-2.3-3 1.3-1 4.3h-6l-1-4.3-3-1.3-3.8 2.3-4.2-4.2 2.3-3.8-1.3-3-4.3-1v-6l4.3-1 1.3-3-2.3-3.8 4.2-4.2 3.8 2.3 3-1.3z" fill="#ffd54a" stroke="#5e3d00" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="20" r="6.5" fill="#1a2430" stroke="#5e3d00" stroke-width="2"/><circle cx="20" cy="20" r="2.4" fill="#ffd54a"/></svg>';
@@ -165,7 +165,7 @@ function render(){const B=$('stgB');if(!B)return;const G=window.GFX||{man:'auto'
 function open(){const o=$('stg');if(!o)return;render();o.classList.add('open');sfx('open');}
 function close(){const o=$('stg');if(o&&o.classList.contains('open')){o.classList.remove('open');sfx('close');}}
 function init(){const o=$('stg');if(!o||o.__in)return;o.__in=1;
-  o.innerHTML='<div class="sgH"><button id="stgX" aria-label="Back">↩</button><img src="img/ui10/settings.webp" alt=""><b>SETTINGS</b></div><div class="sgB" id="stgB"></div>';
+  o.innerHTML='<div class="sgH"><button id="stgX" aria-label="Back">↩</button><img src="img/ui11/settings_h.webp" alt="SETTINGS"><b>SETTINGS</b></div><div class="sgB" id="stgB"></div>';
   $('stgX').onclick=close;
   $('stgB').addEventListener('click',e=>{
     const r=e.target.closest('[data-sg]');

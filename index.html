@@ -539,6 +539,7 @@ img.tki{height:1.25em;width:auto;vertical-align:-.3em;margin:0 .1em;filter:drop-
 .rsC.better .fc{filter:drop-shadow(0 0 6px #6f6)}
 .rsC i.bt{background:#1fa31a!important;color:#fff!important}
 .fc.emp{display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px dashed #d79b2288;border-radius:12px;color:#ffd54a;font-size:28px;font-weight:900;background:#0007;line-height:.9}.fc.emp small{font-size:9px}
+/* v16-394 (Marius' picture): empty bay = gold "+" slot card */.fc.emp{border:0!important;border-radius:0!important;background:url(img/ui11/crew_slot.webp) center/100% 100% no-repeat!important;font-size:0!important;color:transparent!important}.fc.emp small{display:none}
 .rsEmpty{text-align:center;color:#c8d3e0;font-weight:800;padding:18px 10px;font-size:13px}
 .rsNote{margin-top:14px;font-size:11.5px;color:#9fd3ff;background:#0b2450aa;border:1px solid #4aa3ff66;border-radius:12px;padding:8px 10px;line-height:1.4}
 .resCrew{margin-top:10px;height:46px;padding:0 20px;border:0;border-radius:14px;background:linear-gradient(#5ab4ff,#1f6fe0 55%,#0f3f9c);box-shadow:0 0 0 2px #8fd0ff,0 4px 0 #082a66,0 0 16px #2f8cff88;color:#fff;font-weight:900;font-size:15px}
@@ -5343,6 +5344,16 @@ html body #toast .ti{display:inline-flex;align-items:center;gap:4px;white-space:
 #res .resB button.gold{background-image:url(img/ui9/res_b10.webp)!important;color:#3a2200;text-shadow:0 1px 0 #fff6}
 #res .resB button:active{transform:scale(.96)}
 #res .resCrew{width:min(88vw,400px);height:auto;aspect-ratio:700/141;padding:0 14% 2px;border:0;border-radius:0;box-shadow:none;background:url(img/ui9/res_crew.webp) 0 0/100% 100% no-repeat;color:#3a2200;text-shadow:0 1px 0 #fff8;font:900 min(3.6vw,15px) Game,system-ui;filter:drop-shadow(0 4px 6px #000a)}
+</style>
+<style id="ui394">
+/* v16-394 (Marius 27 nov: "caută ce e desenat din cod… modificăm"): pictures instead of CSS boxes/buttons */
+.subcard,.vipGift,#sheet.skn .subcard{border-style:solid!important;border-color:transparent!important;border-width:16px!important;border-image:url(img/ui11/vip_card.webp) 96 fill/16px stretch!important;background:none!important;box-shadow:none!important;border-radius:0!important;padding:2px 4px!important}
+.buy,#sheet .buy{--bh:40px;border-style:solid!important;border-color:transparent!important;border-width:0!important;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch!important;background:none!important;box-shadow:none!important;border-radius:0!important;color:#3a2300!important;text-shadow:none}
+.buy.own,#sheet .buy.own{border-image-source:url(img/ui8/btn_green_s.webp)!important;color:#fff!important;text-shadow:0 1px 0 #0008}
+#shBtn{--bh:50px;border-style:solid!important;border-color:transparent!important;border-width:0!important;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch!important;background:none!important;box-shadow:none!important;border-radius:0!important;color:#3a2300!important}
+#shBtn:disabled{border-image-source:url(img/ui8/btn_grey_s.webp)!important;color:#e8edf2!important}
+#st .card{border-style:solid;border-color:transparent;border-width:16px;border-image:url(img/forge/panel.webp) 104 fill/16px stretch;background:none!important;box-shadow:none!important;border-radius:0!important;padding:0 2px}
+#gpPop .box{border-style:solid;border-color:transparent;border-width:20px;border-image:url(img/ui11/vip_card.webp) 96 fill/20px stretch;background:none!important;box-shadow:none!important;border-radius:0!important;padding:4px 6px!important}
 </style>
 </body>
 </html>
