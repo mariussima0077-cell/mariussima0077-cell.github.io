@@ -1234,7 +1234,7 @@ function powS(s,R){return Math.round(s.hp*.25+s.atk*6*(R.as/s.as)*(1+s.crit*((s.
 function pow(h,ov){return powS(unitStats(h,ov),ROLE[roleOf(h)]);}
 function crewHero(k){return {id:'crew'+k,crew:true,n:CREW_NAMES[k],gr:0,cat:'m',sp:'crew',f:false};}
 function teamHeroes(){const T=TE(),ids=(T.G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&T.G.h.own[id]);
-  return ids.slice(0,5).map(id=>id.startsWith('crew')?crewHero(+id.slice(4)):T.HB[id]);}
+  return ids.slice(0,TMAX).map(id=>id.startsWith('crew')?crewHero(+id.slice(4)):T.HB[id]);} // v16-386 (Marius 27 nov): was slice(0,5) – the 6th hero never fought in Campaign / World Boss / Dungeons / Tower
 const TMAX=6; // v16-377 (Marius 27 nov): BATTLE TEAM = 6 heroes (3 front + 3 back)
 function bestTeam(){return myMechs().slice(0,TMAX).map(h=>h.id);} // v16-122 (Marius): no more old 'Rookie Crew' helpers – only your real heroes
 function teamPower(list){const L=list.filter(Boolean),k=1+teamRoles(L.filter(h=>!h.crew)).bon;return Math.round(L.reduce((a,h)=>a+pow(h)*(h.crew?1:k),0));} // v16-136: + TEAM ROLES bonus
@@ -3353,7 +3353,8 @@ function cmpBlock(sa,sb,pa,pb,extraPros,extraCons,hideZero){const pros=[...(extr
 // ---------------------------------------------------------------- team select (with before / after before every change)
 let tsel=[],tsi=0,TCX=null; // v16-99: TCX = team screen opened from Tower / Class Towers / Dungeons / World Boss {t,ep,pool,get,set,best,go,back}
 const tPool=()=>TCX?TCX.pool():[...myMechs(),...[0,1,2,3,4].map(crewHero)],tEP=()=>TCX?TCX.ep():enemyPower(tsi),tBest=()=>TCX?TCX.best():bestTeam();
-function tSave(){const T=TE();if(TCX)TCX.set(tsel.slice());else T.G.cp.team=tsel.slice();T.save();}
+function tSave(){const T=TE();if(TCX)TCX.set(tsel.slice());else T.G.cp.team=tsel.slice();T.save();teamSync();}
+let tSyncT=0;function teamSync(){clearTimeout(tSyncT);tSyncT=setTimeout(()=>{try{if(window.ONLINE&&ONLINE.sync)ONLINE.sync();}catch(e){}},1500);} // v16-386: new team → Arena defense / profile updated at once (not after 5 min)
 const isTank=r=>r==='engine'||r==='all';
 function curTeamList(){const T=TE(),G=T.G;let ids=(G.cp.team||[]).filter(id=>!id.startsWith('crew')&&T.HB[id]&&G.h.own[id]);
   // v16-378 (Marius 27 nov: „obligă jucătorii să mai adauge unul”): old 5-hero teams get their 6th hero by themselves (the strongest one not in the team), once
@@ -3428,7 +3429,7 @@ function openTeam(si,cx){const T=TE(),G=T.G;tsi=si;TCX=cx||null;cleanGear();tsel
 function heroTeamEdit(){const T=TE(),G=T.G,si=Math.max(0,Math.min(NST-1,tsi==null?CPX().best:tsi)),tm=$('cpTeam'),bk=()=>{tm.style.zIndex='';openTeam.render=renderGear;tsel=curTeamList().map(x=>x.id);renderGear();};
   tm.style.zIndex=8;
   openTeam(si,{done:1,t:'BATTLE TEAM · campaign + Arena',ep:()=>enemyPower(si),pool:()=>[...myMechs(),...[0,1,2,3,4].map(crewHero)],best:()=>bestTeam(),
-    get:()=>curTeamList().map(h=>h.id),set:ids=>{G.cp.team=ids.slice();},go:()=>{T.toast('✓ Battle team saved',1500);bk();},back:bk});}
+    get:()=>curTeamList().map(h=>h.id),set:ids=>{G.cp.team=ids.slice();},go:()=>{T.toast('✓ Battle team saved',1500);teamSync();bk();},back:bk});}
 // v16-99 (Marius): LEVEL UP window – Essence → levels (max 300), ASCENSION every 20 levels (+3% all stats, +1 skill level, +20 max level)
 function powLv(h,dl,da){const o=TE().G.h.own[h.id];if(!o)return pow(h);const l0=o.lv,a0=o.a;o.lv=(o.lv||1)+dl;o.a=(o.a||0)+da;TE().linkDirty&&TE().linkDirty();const p=pow(h);o.lv=l0;o.a=a0;TE().linkDirty&&TE().linkDirty();return p;}
 // v16-207 (Marius): CORE SHOP – Red Mythic Box = a Mythic battle hero of your choice (+1 copy for AWAKENING). The box is not gear: it can never be salvaged.
