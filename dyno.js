@@ -345,7 +345,7 @@ function sub(){if(!ON())return '';const y=S();return 'RUNS '+runsLeft()+' / '+FR
 // "tot timpul când facem upgrade la ceva să ne apară pe ecran puterea veche plus puterea nouă… câteva secunde"
 // After every save: if the open hero's power (hero page) or the battle team power changed → old ➜ new for ~2.6 s.
 // Test account first (rule 28 nov: new things private until Marius says OK) → for everybody: PON = ()=>true
-const PON=()=>!!(window.SEC&&SEC.TEST_ACC);
+const PON=()=>true; // v16-400 (Marius 28 nov: „bagă live doar aia cu putere”) – for everybody
 const pcss=document.createElement('style');pcss.textContent=`
 #pwFx{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);z-index:95;pointer-events:none;transform:translate(-50%,-16px) scale(.9);opacity:0;transition:transform .25s cubic-bezier(.2,1.5,.4,1),opacity .2s;font-family:Game,system-ui,sans-serif;color:#fff;text-align:center;white-space:nowrap;
  background:linear-gradient(#2a2108f2,#120d03f2);border:2px solid #ffd54a;border-radius:16px;padding:6px 16px 7px;box-shadow:0 4px 16px #000c,0 0 14px #ffb30066}
