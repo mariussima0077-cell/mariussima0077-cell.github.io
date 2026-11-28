@@ -36,7 +36,9 @@ const pCash=(c,l)=>Math.round(CASH0[c]*Math.pow(l+1,1.6)/10)*10,pDp=(c,l)=>Math.
 const unCash=c=>CASH0[c]*50,unDp=c=>DPK[c]*30;
 const FREE=3,EXTRA=[50,100,200];
 // ---- chips
-const SL=[['TURBO','🌀','atk'],['ECU','💻','crit'],['SUSPENSION','🛡️','hp'],['NITRO','🧪','en']];
+const CHI=i=>'<img class="dyI" src="img/dyno/chip'+i+'.webp" alt="">'; // v16-399 Marius' chip icons
+const SL=[['TURBO',CHI(0),'atk'],['ECU',CHI(1),'crit'],['SUSPENSION',CHI(2),'hp'],['NITRO',CHI(3),'en']];
+const DPI='<img class="dyI" src="img/dyno/dp.webp" alt="">',OILI='<img class="dyI" src="img/dyno/oil.webp" alt="">';
 const MAINB={atk:[1.5,2.5,4,6,8.5,12],hp:[1.5,2.5,4,6,8.5,12],en:[1.5,2.5,4,6,8.5,12],crit:[.6,1,1.6,2.4,3.4,4.8]};
 const SUBK=['atk','hp','def','crit','cdmg','aspd','en'];
 const SUBB={atk:[.8,1.2,1.8,2.5,3.5,5],hp:[.8,1.2,1.8,2.5,3.5,5],def:[.8,1.2,1.8,2.5,3.5,5],cdmg:[1,1.5,2.2,3,4.2,6],en:[.8,1.2,1.8,2.5,3.5,5],crit:[.4,.6,.9,1.25,1.75,2.5],aspd:[.4,.6,.9,1.25,1.75,2.5]};
@@ -88,7 +90,7 @@ const css=document.createElement('style');css.textContent=`
 #dyHd h1{flex:1;margin:0;text-align:center;font:900 calc(var(--u)*66) Game,system-ui;color:#ffd23a;text-shadow:0 calc(var(--u)*5) 0 #5a3000,0 0 calc(var(--u)*14) #000;letter-spacing:1px}
 #dyHd .sp{width:calc(var(--u)*150);flex:none}
 #dyHd .r2{display:flex;gap:calc(var(--u)*30);justify-content:center;font:900 calc(var(--u)*38) Game,system-ui;text-shadow:0 2px 3px #000}
-#dyHd .r2 img{height:1.15em;vertical-align:-.25em;margin-right:3px}
+#dyHd .r2 img{height:1.3em;vertical-align:-.25em;margin-right:3px}
 .dyWh,.dyFan{position:absolute;border-radius:50%;background-size:100% 100%;will-change:transform}
 .dyCar{position:absolute;will-change:transform}
 .dyCar>img{position:absolute;left:0;top:0;width:100%;height:100%}
@@ -144,7 +146,10 @@ const css=document.createElement('style');css.textContent=`
 .dyGo.bl{border-image-source:url(img/ui8/btn_blue_s.webp);color:#fff}
 .dyCI{display:inline-block;position:relative;width:64px;height:64px;flex:none;background:var(--fr) center/100% 100% no-repeat;text-align:center;font-size:28px;line-height:64px;vertical-align:middle}
 .dyCI b{position:absolute;right:4px;bottom:2px;font:900 11px/1 Game,system-ui;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
-.dyCI img{position:absolute;left:-4px;top:-4px;width:24px;height:24px;border-radius:50%;border:2px solid #ffd54a;object-fit:cover}
+.dyCI img.ci{position:absolute;left:15%;top:15%;width:70%;height:70%;object-fit:contain}
+.dyCI img.po{position:absolute;left:-4px;top:-4px;width:24px;height:24px;border-radius:50%;border:2px solid #ffd54a;object-fit:cover}
+.dyI{height:1.25em;width:auto;vertical-align:-.3em;margin-right:2px}
+.dyRwd .bx .dyI{height:80%;margin:0}
 .dyGr{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
 .dyGr .dyCI{width:100%;height:auto;aspect-ratio:1;line-height:normal;display:flex;align-items:center;justify-content:center}
 .dyTb{display:flex;gap:4px;margin-bottom:8px}.dyTb button{flex:1;height:32px;border-radius:8px;border:1px solid #3a434e;background:#1b2028;color:#cfd8dc;font:900 10px Game,system-ui;padding:0}.dyTb button.on{background:#ffd54a;color:#3a2300;border-color:#ffd54a}
@@ -200,7 +205,7 @@ function curve(hp,nm,upto){const W=445,H=240,mx=Math.max(hp,nm)*1.12,pt=(f,v)=>{
     '<text x="'+(W-20)+'" y="30" text-anchor="end" font-family="Game,system-ui" font-weight="900" font-size="18" fill="#9fb3c8">'+(upto>0?Math.round(hp)+' HP · '+Math.round(nm)+' Nm':'RPM →')+'</text>';}
 function render(){const y=S(),c=SH,lock=c>y.c,hp=carHP(c),nm=carNm(c,hp),gmax=CAR[c].hp[1]*1.1,t=tune(c),rl=runsLeft(),ex=y.x<EXTRA.length;
   const W=$('dyS');let h='<div class="dyA" id="dyHd" '+A(0,0,1024,205)+'><div class="r1"><button class="bk" data-d="back">↩</button><h1>DYNO GARAGE</h1><span class="sp"></span></div>'+
-    '<div class="r2"><span><img src="img/ui2/i_coins.webp" alt="">'+T().fmt(T().G.money||0)+'</span><span>🔩 '+T().nf(y.dp)+'</span><span>🛢️ '+T().nf(y.oil)+'</span></div></div>';
+    '<div class="r2"><span><img src="img/ui2/i_coins.webp" alt="">'+T().fmt(T().G.money||0)+'</span><span>'+DPI+T().nf(y.dp)+'</span><span>'+OILI+T().nf(y.oil)+'</span></div></div>';
   h+='<img class="dyFan" id="dyFan" src="img/dyno/fan.webp" alt="" style="left:calc(var(--u)*18);top:calc(var(--u)*640);width:calc(var(--u)*200);height:calc(var(--u)*200)">';
   h+=gauge(0,lock?0:hp,gmax,'HP')+gauge(1,lock?0:nm,gmax*CAR[c].nm,'Nm');
   const L=LAST&&LAST.c===c?LAST:null;
@@ -210,7 +215,7 @@ function render(){const y=S(),c=SH,lock=c>y.c,hp=carHP(c),nm=carNm(c,hp),gmax=CA
   h+='<div class="dyNm"><button data-d="prev"'+(c>0?'':' disabled')+'>❮</button><div class="t"><b>'+CAR[c].n+'</b><span><b>'+GN[c].toUpperCase()+'</b> · '+(lock?'🔒 LOCKED':hp+' HP · '+nm+' Nm')+'</span>'+(y.best[c]&&!lock?'<span> · BEST '+y.best[c]+' HP</span>':'')+'</div><button data-d="next"'+(c<5?'':' disabled')+'>❯</button></div>';
   if(lock){const ok=c===y.c+1&&tune(y.c)>=TMAX;
     h+='<div class="dyInf">'+(c===y.c+1?'Max out the tune of the car before ('+tune(y.c)+' / '+TMAX+') to unlock this car.':'Unlock the cars before this one first.')+'</div>';
-    h+='<div class="dyBt"><button class="'+(ok?'gd':'off')+'" data-d="unlock">UNLOCK<small><img src="img/ui2/i_coins.webp" style="height:1em;vertical-align:-.15em"> '+T().fmt(unCash(c))+' · 🔩 '+unDp(c)+'</small></button></div>';}
+    h+='<div class="dyBt"><button class="'+(ok?'gd':'off')+'" data-d="unlock">UNLOCK<small><img src="img/ui2/i_coins.webp" style="height:1em;vertical-align:-.15em"> '+T().fmt(unCash(c))+' · '+DPI+unDp(c)+'</small></button></div>';}
   else{h+='<div class="dyBar"><i style="width:'+(t/TMAX*100)+'%"></i><b>TUNE '+t+' / '+TMAX+'</b></div>';
     const pd=PART.some((q,i)=>canPart(c,i)),cd=chipTodo();
     h+='<div class="dyBt"><button data-d="parts">🔧<small>PARTS</small>'+(pd?'<i></i>':'')+'</button><button class="go'+(rl||ex?'':' off')+'" data-d="run">RUN<small>'+(rl?rl+' / '+FREE+' FREE':ex?'+1 · '+EXTRA[y.x]+' 💎':'0 / '+FREE+' · TOMORROW')+'</small>'+(rl?'<i></i>':'')+'</button><button data-d="chips">💾<small>CHIPS</small>'+(cd?'<i></i>':'')+'</button></div>';
@@ -222,7 +227,7 @@ function canPart(c,i){const y=S(),l=y.p[c][i];return c<=y.c&&l<PMAX&&(T().G.mone
 function partsPop(){const y=S(),c=SH,p=y.p[c];
   let h='<button class="dyX" data-q="x">x</button><div class="dyPT">🔧 '+CAR[c].n+' · PARTS</div><div class="dyPD">Every part goes from Lv 0 to '+PMAX+' – parts cost cash + 🔩 Dyno Parts (from dyno runs).</div>';
   PART.forEach((q,i)=>{const l=p[i],mx=l>=PMAX,ok=canPart(c,i),dh=mx?0:Math.round((CAR[c].hp[1]-CAR[c].hp[0])*q[2]/PMAX);
-    h+='<div class="dyRw"><div class="ic">'+q[1]+'</div><div class="tx"><b>'+q[0]+'</b> · Lv '+l+'/'+PMAX+(mx?'':' <span style="color:#7cff7c">+'+dh+' HP</span>')+'<div class="pl">'+Array.from({length:PMAX},(_,k)=>'<i class="'+(k<l?'on':'')+'"></i>').join('')+'</div>'+(mx?'':'<small><img src="img/ui2/i_coins.webp" style="height:1em;vertical-align:-.15em"> '+T().fmt(pCash(c,l))+' · 🔩 '+pDp(c,l)+'</small>')+'</div>'+
+    h+='<div class="dyRw"><div class="ic">'+q[1]+'</div><div class="tx"><b>'+q[0]+'</b> · Lv '+l+'/'+PMAX+(mx?'':' <span style="color:#7cff7c">+'+dh+' HP</span>')+'<div class="pl">'+Array.from({length:PMAX},(_,k)=>'<i class="'+(k<l?'on':'')+'"></i>').join('')+'</div>'+(mx?'':'<small><img src="img/ui2/i_coins.webp" style="height:1em;vertical-align:-.15em"> '+T().fmt(pCash(c,l))+' · '+DPI+pDp(c,l)+'</small>')+'</div>'+
       '<button class="dyUp'+(mx||!ok?' off':'')+'" data-q="pu" data-i="'+i+'">'+(mx?'MAX':'UPGRADE')+'</button></div>';});
   if(tune(c)>=TMAX&&c<5&&y.c===c)h+='<button class="dyGo" data-q="tonext">✅ MAX TUNE · SEE THE NEXT CAR</button>';
   pop(h);}
@@ -262,14 +267,14 @@ function finish(c,hp,nm,paid){const y=S(),[a,b]=CAR[c].hp,q=Math.max(0,Math.min(
   LAST={c,hp,nm};T().save();RUN=null;PG.classList.remove('run');sfx('reward');
   let h='<div class="dyPT">DYNO RESULT</div><div class="dyRes"><div><b style="color:#ff8f00">'+hp+'</b><small>HP</small></div><div><b style="color:#29b6f6">'+nm+'</b><small>Nm</small></div></div>'+(rec?'<div class="dyRec">🏆 NEW RECORD!</div>':'');
   h+='<div class="dyRwd">'+chips.map((ch,i)=>'<div style="animation-delay:'+(i*.15)+'s;color:'+GC[ch.g]+'">'+chipIc(ch)+'<br>'+GN[ch.g]+'</div>').join('')+
-    '<div style="animation-delay:.3s"><div class="bx">🔩</div>+'+dp+'</div><div style="animation-delay:.45s"><div class="bx">🛢️</div>+'+oil+'</div></div>';
+    '<div style="animation-delay:.3s"><div class="bx">'+DPI+'</div>+'+dp+'</div><div style="animation-delay:.45s"><div class="bx">'+OILI+'</div>+'+oil+'</div></div>';
   h+='<button class="dyGo" data-q="x">CLAIM</button>';pop(h);render();}
 // ---------------------------------------------------------------- chips UI
-function chipIc(ch,own){const H=own&&T().HB[own];return '<span class="dyCI" style="--fr:url(img/fr'+ch.g+'.webp)">'+SL[ch.s][1]+'<b>+'+ch.l+'</b>'+(H?'<img src="'+(window.CAMPAIGN&&CAMPAIGN.portraitURL?CAMPAIGN.portraitURL(H):'')+'" alt="" onerror="this.remove()">':'')+'</span>';}
+function chipIc(ch,own){const H=own&&T().HB[own];return '<span class="dyCI" style="--fr:url(img/fr'+ch.g+'.webp)"><img class="ci" src="img/dyno/chip'+ch.s+'.webp" alt=""><b>+'+ch.l+'</b>'+(H?'<img class="po" src="'+(window.CAMPAIGN&&CAMPAIGN.portraitURL?CAMPAIGN.portraitURL(H):'')+'" alt="" onerror="this.remove()">':'')+'</span>';}
 function chipTodo(){return false;}
 let BAG=-1,CHP=null,HID=null,HSL=0;
 function bagPop(){const y=S();const L=y.ch.filter(ch=>BAG<0||ch.s===BAG).sort((a,b)=>b.g-a.g||b.l-a.l||a.s-b.s);
-  let h='<button class="dyX" data-q="x">x</button><div class="dyPT">💾 TUNING CHIPS · '+y.ch.length+'</div><div class="dyPD">Equip chips on the HERO PAGE (button TUNE).<br>🛢️ <b>'+T().nf(y.oil)+'</b> Tuning Oil</div>';
+  let h='<button class="dyX" data-q="x">x</button><div class="dyPT">💾 TUNING CHIPS · '+y.ch.length+'</div><div class="dyPD">Equip chips on the HERO PAGE (button TUNE).<br>'+OILI+' <b>'+T().nf(y.oil)+'</b> Tuning Oil</div>';
   h+='<div class="dyTb">'+[[-1,'ALL']].concat(SL.map((s,i)=>[i,s[1]+' '+s[0]])).map(([k,t])=>'<button data-q="bag" data-i="'+k+'" class="'+(BAG===k?'on':'')+'">'+t+'</button>').join('')+'</div>';
   h+=L.length?'<div class="dyGr">'+L.map(ch=>'<div data-q="chip" data-i="'+ch.id+'">'+chipIc(ch,ownerOf(ch.id))+'</div>').join('')+'</div>':'<div class="dyPD">No chips yet – make dyno runs!</div>';
   pop(h);}
@@ -278,9 +283,9 @@ function chipPop(id){const ch=chipById(id);if(!ch){bagPop();return;}CHP=id;const
   h+='<div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">'+chipIc(ch,own)+'<div class="dySt" style="flex:1"><div class="mn">'+SN[SL[ch.s][2]]+' <b>'+fmtS(0,mainV(ch))+'</b></div>Lv +'+ch.l+' / '+CMAX+(own?'<br><span style="color:#9aa4ae">🦸 <b>'+hName(own)+'</b></span>':'')+'</div></div>';
   h+='<div class="dySt">'+(ch.sub.length?ch.sub.map((s,i)=>'<div class="sb"><span>'+SN[s[0]]+' <b>'+fmtS(0,subV(ch,i))+'</b></span><button data-q="recal" data-i="'+i+'">🔄 '+RECAL[ch.g]+' 💎</button></div>').join(''):'<div class="sb"><span style="color:#9aa4ae">No sub stats yet – every +3 adds one (max 4).</span></div>')+'</div>';
   h+='<div class="dyPD" style="margin-top:6px">Every +3: a new sub stat (max 4) or one sub stat grows. 🔄 RECALIBRATE = a new stat type, same roll.</div>';
-  h+='<div style="display:flex;gap:6px">'+(mx?'<button class="dyUp off" style="flex:1">MAX</button>':'<button class="dyUp'+(y.oil>=oc?'':' off')+'" style="flex:1" data-q="cup">UPGRADE · 🛢️ '+oc+'</button>')+
+  h+='<div style="display:flex;gap:6px">'+(mx?'<button class="dyUp off" style="flex:1">MAX</button>':'<button class="dyUp'+(y.oil>=oc?'':' off')+'" style="flex:1" data-q="cup">UPGRADE<br>'+OILI+' '+oc+'</button>')+
     (HID?(own===HID?'<button class="dyUp bl" style="flex:1" data-q="uneq">REMOVE</button>':'<button class="dyUp bl" style="flex:1" data-q="eq">EQUIP</button>'):'')+
-    (own?'':'<button class="dyUp rd" data-q="salv">SALVAGE<br>🛢️ +'+salvV(ch)+'</button>')+'</div>';
+    (own?'':'<button class="dyUp rd" data-q="salv">SALVAGE<br>'+OILI+' +'+salvV(ch)+'</button>')+'</div>';
   pop(h);}
 const salvV=ch=>{let s=SALV[ch.g];for(let l=0;l<ch.l;l++)s+=Math.floor(Math.ceil((l+1)*OILK[ch.g])*.8);return s;};
 function chipUp(){const ch=chipById(CHP),y=S();if(!ch||ch.l>=CMAX)return;const oc=oilCost(ch);if(y.oil<oc){toast('Not enough Tuning Oil – dyno runs and salvaged chips give oil',2400);sfx('deny');return;}
@@ -336,5 +341,42 @@ PG.addEventListener('click',e=>{if(RUN)return;const el=e.target.closest('[data-d
   else if(a==='unlock')unlock();});
 function todo(){if(!ON())return false;return runsLeft()>0;}
 function sub(){if(!ON())return '';const y=S();return 'RUNS '+runsLeft()+' / '+FREE;}
+// ---------------------------------------------------------------- v16-399 (Marius 28 nov): POWER POPUP
+// "tot timpul când facem upgrade la ceva să ne apară pe ecran puterea veche plus puterea nouă… câteva secunde"
+// After every save: if the open hero's power (hero page) or the battle team power changed → old ➜ new for ~2.6 s.
+// Test account first (rule 28 nov: new things private until Marius says OK) → for everybody: PON = ()=>true
+const PON=()=>!!(window.SEC&&SEC.TEST_ACC);
+const pcss=document.createElement('style');pcss.textContent=`
+#pwFx{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);z-index:95;pointer-events:none;transform:translate(-50%,-16px) scale(.9);opacity:0;transition:transform .25s cubic-bezier(.2,1.5,.4,1),opacity .2s;font-family:Game,system-ui,sans-serif;color:#fff;text-align:center;white-space:nowrap;
+ background:linear-gradient(#2a2108f2,#120d03f2);border:2px solid #ffd54a;border-radius:16px;padding:6px 16px 7px;box-shadow:0 4px 16px #000c,0 0 14px #ffb30066}
+#pwFx.on{opacity:1;transform:translate(-50%,0) scale(1)}
+#pwFx.dn{border-color:#ff6b6b;box-shadow:0 4px 16px #000c,0 0 14px #ff3b3b55}
+#pwFx small{display:block;font:900 10px Game,system-ui;color:#ffd54a;letter-spacing:.5px}
+#pwFx small span{color:#fff}
+#pwFx .r{font:900 17px Game,system-ui;display:flex;align-items:center;gap:7px;justify-content:center}
+#pwFx .o{color:#9aa4ae;text-decoration:line-through;font-size:14px}
+#pwFx .n{color:#7cff7c;text-shadow:0 0 8px #3cff3c88}
+#pwFx.dn .n{color:#ff8a80;text-shadow:none}
+#pwFx .p{font-size:12px;color:#7cff7c}#pwFx.dn .p{color:#ff8a80}
+`;document.head.appendChild(pcss);
+const PF=document.createElement('div');PF.id='pwFx';document.body.appendChild(PF);
+let PB=null,PT=0,PH=0,PA=0;
+const pfmt=(n,d)=>{const U=[[1e12,'T'],[1e9,'B'],[1e6,'M'],[1e3,'K']];for(const [v,u] of U)if(Math.abs(n)>=v)return (n/v).toFixed(d==null?2:d)+u;return String(Math.round(n));};
+const pdec=(a,b)=>{for(let d=2;d<6;d++)if(pfmt(a,d)!==pfmt(b,d))return d;return 2;};
+function psnap(){try{if(!window.CAMPAIGN||!CAMPAIGN.teamPower)return null;return {t:CAMPAIGN.teamPower(),h:CAMPAIGN.heroPow?CAMPAIGN.heroPow():null};}catch(e){return null;}}
+function pshow(lbl,who,a,b){const up=b>a,pc=a>0?(b-a)/a*100:0,ps=(up?'+':'')+(Math.abs(pc)<.1?pc.toFixed(2):Math.abs(pc)<10?pc.toFixed(1):Math.round(pc))+'%';
+  const D=pdec(a,b);PF.className=up?'':'dn';PF.innerHTML='<small>⚔️ '+lbl+(who?' · <span>'+who+'</span>':'')+'</small><div class="r"><span class="o">'+pfmt(a,D)+'</span><span>➜</span><span class="n" id="pwN">'+pfmt(a,D)+'</span><span class="p">'+ps+'</span></div>';
+  requestAnimationFrame(()=>PF.classList.add('on'));cancelAnimationFrame(PA);const t0=performance.now(),el=$('pwN');
+  const st=t=>{const k=Math.min(1,(t-t0)/600),e=1-Math.pow(1-k,3);el.textContent=pfmt(a+(b-a)*e,D);if(k<1)PA=requestAnimationFrame(st);};PA=requestAnimationFrame(st);
+  clearTimeout(PH);PH=setTimeout(()=>PF.classList.remove('on'),2600);}
+function pcheck(){const s=psnap();if(!s)return;const b=PB;PB=s;if(!b||(window.CAMPAIGN&&CAMPAIGN.inFight&&CAMPAIGN.inFight()))return;
+  const ch=(x,y)=>x>0&&Math.abs(y-x)/x>1e-6;
+  if(s.h&&b.h&&s.h.id===b.h.id&&ch(b.h.p,s.h.p)){pshow('HERO POWER',String(s.h.n).split(',')[0],b.h.p,s.h.p);return;}
+  if(ch(b.t,s.t))pshow('TEAM POWER','',b.t,s.t);}
+(function hook(){const T0=window.__TE;if(!T0||!T0.save||!window.CAMPAIGN){setTimeout(hook,1000);return;}if(!PON())return;
+  const o=T0.save;T0.save=function(){const r=o.apply(this,arguments);clearTimeout(PT);PT=setTimeout(pcheck,180);return r;};
+  PB=psnap();
+  // the hero page: switching heroes is not an upgrade → refresh the snapshot on every tap there (no popup)
+  document.addEventListener('click',()=>{setTimeout(()=>{const s=psnap();if(s&&PB&&s.h&&(!PB.h||s.h.id!==PB.h.id))PB.h=s.h;},0);},true);})();
 window.TDYNO={on:ON,open,bon,btn,hero,todo,sub,S,carHP,newChip};
 })();
