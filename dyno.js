@@ -322,36 +322,30 @@ function uneq(){const ch=chipById(CHP),id=HID,y=S();if(!ch||!id||!y.eq[id])retur
 // ---------------------------------------------------------------- v16-403 (Marius 28 nov): TUNING BAR on the hero page (under SKILLS)
 // "bara separat pentru noul content tot pe pagina de erou" – Signature Tool (Mythic) + the 4 chip slots in one panel (code-drawn until Marius' picture)
 function bar(h){if(!ON()||!h||h.crew)return '';const id=h.id,y=S(),e=y.eq[id]||[];
-  // v16-404 (Marius: „bara nouă pentru următoarele content ca și ce am încercuit”) – same look as SKILLS (img/ui9/hs_panel.webp):
-  // one round frame per system: SIGNATURE TOOL · TUNING · 2 free frames for the next content (COMING SOON)
-  const X=[16.38,39.73,62.3,84.51],Yy=[46.9,46.4,46.4,45.2];
-  const sl=(i,inner,name,sub,attr,lock,dot)=>'<div class="hsS'+(lock?' lk':'')+'" '+attr+' style="left:'+X[i]+'%;top:'+Yy[i]+'%">'+inner+(lock?'<u>🔒<small>'+lock+'</small></u>':'')+(dot?'<i class="tnD"></i>':'')+'</div><div class="hsN" style="left:'+X[i]+'%"><b>'+name+'</b><small>'+sub+'</small></div>';
-  const TF=window.TFORGE&&TFORGE.on()&&h.gr===5;let x='<div class="hsP tnP2"><div class="hsT">UPGRADES</div>';
-  if(TF){const L=TFORGE.lv(id),dot=TFORGE.slot(id).indexOf('<i></i>')>=0;x+=sl(0,'<img src="img/forge/tool_'+id+'.webp" alt="" style="object-fit:contain;padding:12%;box-sizing:border-box" onerror="this.remove()">','TOOL','Lv '+L,'data-g="tool"','',dot);}
+  // v16-404/405 (Marius: „bara nouă pentru următoarele content ca și ce am încercuit… îți fac eu alte cadre”) – his panel img/dyno/up_panel.webp
+  // one round frame per system: SIGNATURE TOOL · TUNING · 2 free frames for the next content (SOON)
+  const X=[16.1,38.7,61.3,83.9];
+  const sl=(i,inner,name,sub,attr,lock,dot)=>'<div class="upS'+(lock?' lk':'')+'" '+attr+' style="left:'+X[i]+'%">'+inner+(lock?'<u>🔒<small>'+lock+'</small></u>':'')+'</div>'+(dot?'<i class="tnD" style="left:calc('+X[i]+'% + 5.2%)"></i>':'')+'<div class="upN" style="left:'+X[i]+'%"><b>'+name+'</b><small>'+sub+'</small></div>';
+  const TF=window.TFORGE&&TFORGE.on()&&h.gr===5;let x='<div class="upP"><div class="upT">UPGRADES</div>';
+  if(TF){const L=TFORGE.lv(id),dot=TFORGE.slot(id).indexOf('<i></i>')>=0;x+=sl(0,'<img src="img/forge/tool_'+id+'.webp" alt="" onerror="this.remove()">','TOOL','Lv '+L,'data-g="tool"','',dot);}
   else x+=sl(0,'<i>🔧</i>','TOOL','&nbsp;','','MYTHIC',false);
   const n=e.filter(Boolean).length,op=[0,1,2,3].filter(k=>slotOpen(id,k)).length,dt=[0,1,2,3].some(k=>slotOpen(id,k)&&!e[k]&&y.ch.some(c=>c.s===k&&!ownerOf(c.id)));
-  x+=sl(1,'<img src="img/dyno/chip0.webp" alt="" style="object-fit:contain;padding:14%;box-sizing:border-box">','TUNING',n+' / '+op+' CHIPS','data-g="tune" data-s="0"','',dt);
-  x+=sl(2,'<i>❔</i>','SOON','&nbsp;','','SOON',false)+sl(3,'<i>❔</i>','SOON','&nbsp;','','SOON',false);
+  x+=sl(1,'<img src="img/dyno/chip0.webp" alt="">','TUNING',n+' / '+op+' CHIPS','data-g="tune" data-s="0"','',dt);
+  x+=sl(2,'','SOON','&nbsp;','','SOON',false)+sl(3,'','SOON','&nbsp;','','SOON',false);
   return x+'</div>';}
 const bcss=document.createElement('style');bcss.textContent=`
-.tnP2 .hsS{overflow:visible}.tnP2 .hsT{letter-spacing:.5px;font-size:min(3.6vw,15px)}.tnP2 .hsN small{color:#ffd54a}.tnP2 .hsS>img{border-radius:50%}
-.tnD{position:absolute;right:2%;top:2%;width:12px;height:12px;border-radius:50%;background:#ff2b2b;border:2px solid #fff;z-index:2}
-.tnP{position:relative;margin:4px 2px 6px;padding:30px 6px 8px;border-radius:16px;background:radial-gradient(120% 90% at 50% 0%,#1c2d52,#0b1328 70%);border:3px solid #d9a227;box-shadow:inset 0 0 0 2px #5a3b07,inset 0 0 18px #000a,0 3px 8px #000a}
-.tnT{position:absolute;left:12px;top:-2px;padding:3px 18px 4px;border-radius:0 0 12px 12px;background:linear-gradient(#ffe27a,#d99a17);border:2px solid #7a4b05;border-top:0;color:#3a1c00;font:900 min(4vw,16px) Game,system-ui;letter-spacing:2px;text-shadow:0 1px 0 #ffe9a8}
-.tnR{display:flex;justify-content:space-around;gap:4px}
-.tnS{flex:1;min-width:0;text-align:center;cursor:pointer;line-height:1.05}
-.tnS b{display:block;margin-top:4px;color:#fff;font:900 min(2.7vw,11px) Game,system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
-.tnS small{display:block;color:var(--gc);font:800 min(2.3vw,9.5px) Game,system-ui;text-transform:uppercase}
-.tnB{position:relative;width:100%;max-width:64px;margin:0 auto;aspect-ratio:1;border-radius:12px;border:2px dashed #4a5a78;background:#0a1020 center/100% 100% no-repeat;display:flex;align-items:center;justify-content:center}
-.tnB.on{border:0}.tnB.tool{border:3px solid var(--gc);border-radius:50%;box-shadow:0 0 10px var(--gc);background:#101a33}
-.tnB>img{width:72%;height:72%;object-fit:contain}.tnB.tool>img{width:86%;height:86%}
-.tnS:not(.lk) .tnB:not(.on):not(.tool)>img{opacity:.35;filter:grayscale(.5)}
-.tnB>s{position:absolute;text-decoration:none;color:#ffd54a;font:900 min(6vw,26px) Game,system-ui;text-shadow:0 2px 3px #000}
-.tnB>em{position:absolute;right:4px;bottom:2px;font:900 min(2.8vw,11px)/1 Game,system-ui;font-style:normal;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
-.tnB>u{position:absolute;inset:0;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000a;border-radius:10px;font-size:min(4.5vw,18px);line-height:1}
-.tnB>u small{font:900 min(2.2vw,9px) Game,system-ui;color:#ffd54a;margin-top:2px}
-.tnS.lk>.tnB>img{filter:grayscale(1) brightness(.45)}
-.tnB>i{position:absolute;right:-3px;top:-3px;width:11px;height:11px;border-radius:50%;background:#ff2b2b;border:2px solid #fff}
+.upP{position:relative;width:100%;aspect-ratio:1080/334;background:url(img/dyno/up_panel.webp) center/100% 100% no-repeat;margin-bottom:2px}
+.upT{position:absolute;left:4.2%;top:.6%;width:28.2%;height:17.2%;display:flex;align-items:center;justify-content:center;color:#3a1c00;font-weight:900;font-size:min(3.8vw,16px);letter-spacing:1px;text-shadow:0 1px 0 #ffe9a8}
+.upS{position:absolute;top:49.9%;width:13.9%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.upS>img{width:78%;height:78%;object-fit:contain;filter:drop-shadow(0 3px 4px #000a)}
+.upS>i{font-style:normal;font-size:min(7vw,30px)}
+.upS>u{position:absolute;inset:0;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:min(5vw,22px);line-height:1;opacity:.85}
+.upS>u small{font:900 min(2.4vw,10px) Game,system-ui;color:#ffd54a;margin-top:3px}
+.upS.lk>img,.upS.lk>i{filter:grayscale(.8) brightness(.45)}
+.upN{position:absolute;top:79%;width:22%;transform:translateX(-50%);text-align:center;line-height:1.05;pointer-events:none}
+.upN b{display:block;color:#fff;font-size:min(3vw,12.5px);font-weight:900;white-space:nowrap;text-shadow:0 1px 2px #000}
+.upN small{display:block;color:#ffd54a;font-size:min(2.3vw,9.5px);font-weight:800;white-space:nowrap}
+.upP .tnD{position:absolute;top:22%;width:12px;height:12px;border-radius:50%;background:#ff2b2b;border:2px solid #fff;z-index:2;pointer-events:none}
 `;document.head.appendChild(bcss);
 // ---------------------------------------------------------------- popup plumbing
 function pop(h){$('dyPB').innerHTML=h;P.classList.add('open');}
