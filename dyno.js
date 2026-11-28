@@ -305,7 +305,7 @@ function salvage(){const ch=chipById(CHP),y=S();if(!ch||ownerOf(ch.id))return;co
 // ---------------------------------------------------------------- hero page: TUNE button + 4 slots
 function btn(id){if(!ON())return '';return '<button class="gTune" data-g="tune" aria-label="Tuning chips">💾<small>TUNE</small>'+(heroTodo(id)?'<i></i>':'')+'</button>';}
 function heroTodo(id){const e=S().eq[id]||[];for(let s=0;s<4;s++)if(slotOpen(id,s)&&!e[s]&&S().ch.some(ch=>ch.s===s&&!ownerOf(ch.id)))return true;return false;}
-function hero(id){if(!ON())return;HID=id;HSL=0;heroPop();sfx('open');}
+function hero(id,sl){if(!ON())return;HID=id;HSL=sl!=null&&sl!==''?+sl:0;heroPop();sfx('open');}
 function heroPop(){const id=HID,y=S(),e=y.eq[id]||[],b=bon(T().HB[id])||{};
   let h='<button class="dyX" data-q="hx">x</button><div class="dyPT">💾 TUNING</div><div class="dyPD" style="margin-top:-6px;font-weight:900;color:#fff">'+hName(id)+'</div>';
   h+='<div class="dyHS">'+SL.map((s,i)=>{const op=slotOpen(id,i),ch=e[i]&&chipById(e[i]);return '<div data-q="hs" data-i="'+i+'" class="'+(HSL===i?'on':'')+'">'+(ch?chipIc(ch):'<div class="em">'+(op?'+':'🔒')+'</div>')+'<br>'+s[1]+' '+s[0]+(op?'':'<br><span style="color:#ff8a80">Lv '+HSLOT[i]+'</span>')+'</div>';}).join('')+'</div>';
@@ -319,6 +319,35 @@ function heroPop(){const id=HID,y=S(),e=y.eq[id]||[],b=bon(T().HB[id])||{};
 function equip(){const ch=chipById(CHP),id=HID,y=S();if(!ch||!id)return;if(!slotOpen(id,ch.s)){toast('🔒 This slot opens at hero Lv '+HSLOT[ch.s],2000);sfx('deny');return;}
   const o=ownerOf(ch.id);if(o)y.eq[o][ch.s]=0;if(!y.eq[id])y.eq[id]=[0,0,0,0];y.eq[id][ch.s]=ch.id;HSL=ch.s;T().save();refresh();sfx('upgrade');heroPop();}
 function uneq(){const ch=chipById(CHP),id=HID,y=S();if(!ch||!id||!y.eq[id])return;y.eq[id][ch.s]=0;T().save();refresh();sfx('close');heroPop();}
+// ---------------------------------------------------------------- v16-403 (Marius 28 nov): TUNING BAR on the hero page (under SKILLS)
+// "bara separat pentru noul content tot pe pagina de erou" – Signature Tool (Mythic) + the 4 chip slots in one panel (code-drawn until Marius' picture)
+function bar(h){if(!ON()||!h||h.crew)return '';const id=h.id,y=S(),e=y.eq[id]||[];
+  const TF=window.TFORGE&&TFORGE.on()&&h.gr===5;let tl='',td=false;
+  if(TF){const L=TFORGE.lv(id),g=Math.min(5,Math.floor(L/10));td=TFORGE.slot(id).indexOf('<i></i>')>=0;
+    tl='<div class="tnS" data-g="tool" style="--gc:'+GC[g]+'"><div class="tnB tool"><img src="img/forge/tool_'+id+'.webp" alt="" onerror="this.remove()">'+(td?'<i></i>':'')+'</div><b>TOOL</b><small>Lv '+L+'</small></div>';}
+  else tl='<div class="tnS lk"><div class="tnB"><u>🔒<small>MYTHIC</small></u></div><b>TOOL</b><small>&nbsp;</small></div>';
+  let x='<div class="tnP"><div class="tnT">TUNING</div><div class="tnR">'+tl;
+  SL.forEach((s,i)=>{const op=slotOpen(id,i),ch=e[i]&&chipById(e[i]);const dot=op&&!ch&&y.ch.some(c=>c.s===i&&!ownerOf(c.id));
+    x+='<div class="tnS'+(op?'':' lk')+'" data-g="tune" data-s="'+i+'" style="--gc:'+(ch?GC[ch.g]:'#3a4a63')+'"><div class="tnB'+(ch?' on':'')+'" style="'+(ch?'background-image:url(img/fr'+ch.g+'.webp)':'')+'"><img src="img/dyno/chip'+i+'.webp" alt="">'+(ch?'<em>+'+ch.l+'</em>':op?'<s>+</s>':'<u>🔒<small>Lv '+HSLOT[i]+'</small></u>')+(dot?'<i></i>':'')+'</div><b>'+s[0]+'</b><small>'+(ch?GN[ch.g]:'&nbsp;')+'</small></div>';});
+  return x+'</div></div>';}
+const bcss=document.createElement('style');bcss.textContent=`
+.tnP{position:relative;margin:4px 2px 6px;padding:30px 6px 8px;border-radius:16px;background:radial-gradient(120% 90% at 50% 0%,#1c2d52,#0b1328 70%);border:3px solid #d9a227;box-shadow:inset 0 0 0 2px #5a3b07,inset 0 0 18px #000a,0 3px 8px #000a}
+.tnT{position:absolute;left:12px;top:-2px;padding:3px 18px 4px;border-radius:0 0 12px 12px;background:linear-gradient(#ffe27a,#d99a17);border:2px solid #7a4b05;border-top:0;color:#3a1c00;font:900 min(4vw,16px) Game,system-ui;letter-spacing:2px;text-shadow:0 1px 0 #ffe9a8}
+.tnR{display:flex;justify-content:space-around;gap:4px}
+.tnS{flex:1;min-width:0;text-align:center;cursor:pointer;line-height:1.05}
+.tnS b{display:block;margin-top:4px;color:#fff;font:900 min(2.7vw,11px) Game,system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+.tnS small{display:block;color:var(--gc);font:800 min(2.3vw,9.5px) Game,system-ui;text-transform:uppercase}
+.tnB{position:relative;width:100%;max-width:64px;margin:0 auto;aspect-ratio:1;border-radius:12px;border:2px dashed #4a5a78;background:#0a1020 center/100% 100% no-repeat;display:flex;align-items:center;justify-content:center}
+.tnB.on{border:0}.tnB.tool{border:3px solid var(--gc);border-radius:50%;box-shadow:0 0 10px var(--gc);background:#101a33}
+.tnB>img{width:72%;height:72%;object-fit:contain}.tnB.tool>img{width:86%;height:86%}
+.tnS:not(.lk) .tnB:not(.on):not(.tool)>img{opacity:.35;filter:grayscale(.5)}
+.tnB>s{position:absolute;text-decoration:none;color:#ffd54a;font:900 min(6vw,26px) Game,system-ui;text-shadow:0 2px 3px #000}
+.tnB>em{position:absolute;right:4px;bottom:2px;font:900 min(2.8vw,11px)/1 Game,system-ui;font-style:normal;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+.tnB>u{position:absolute;inset:0;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000a;border-radius:10px;font-size:min(4.5vw,18px);line-height:1}
+.tnB>u small{font:900 min(2.2vw,9px) Game,system-ui;color:#ffd54a;margin-top:2px}
+.tnS.lk>.tnB>img{filter:grayscale(1) brightness(.45)}
+.tnB>i{position:absolute;right:-3px;top:-3px;width:11px;height:11px;border-radius:50%;background:#ff2b2b;border:2px solid #fff}
+`;document.head.appendChild(bcss);
 // ---------------------------------------------------------------- popup plumbing
 function pop(h){$('dyPB').innerHTML=h;P.classList.add('open');}
 function closePop(){P.classList.remove('open');}
@@ -385,5 +414,5 @@ function pcheck(){const s=psnap();if(!s)return;const b=PB;PB=s;if(!b||(window.CA
   PB=psnap();
   // the hero page: switching heroes is not an upgrade → refresh the snapshot on every tap there (no popup)
   document.addEventListener('click',()=>{setTimeout(()=>{const s=psnap();if(s&&PB&&s.h&&(!PB.h||s.h.id!==PB.h.id))PB.h=s.h;},0);},true);})();
-window.TDYNO={on:ON,open,bon,btn,hero,todo,sub,S,carHP,newChip};
+window.TDYNO={on:ON,open,bon,btn,bar,hero,todo,sub,S,carHP,newChip};
 })();

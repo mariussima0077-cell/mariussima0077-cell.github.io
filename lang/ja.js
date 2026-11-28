@@ -2084,6 +2084,7 @@ TE_LANG_LOAD({
 "TODAY'S QUESTS · FREE SPINS": "今日のクエスト · 無料スピン",
 "TODAY:": "今日：",
 "TODAY: BRUISER · RACER": "今日：ブルーザー · レーサー",
+"TOOL": "ツール",
 "TOOL COLLECTION": "ツールコレクション",
 "TOOLS": "ツール",
 "TOOLS · JUNKYARD · GOLEM #/#": "ツール · JUNKYARD · GOLEM #/#",

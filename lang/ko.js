@@ -2084,6 +2084,7 @@ TE_LANG_LOAD({
 "TODAY'S QUESTS · FREE SPINS": "오늘의 퀘스트 · 무료 회전",
 "TODAY:": "오늘:",
 "TODAY: BRUISER · RACER": "오늘: 파이터 · 레이서",
+"TOOL": "도구",
 "TOOL COLLECTION": "도구 컬렉션",
 "TOOLS": "도구",
 "TOOLS · JUNKYARD · GOLEM #/#": "도구 · JUNKYARD · GOLEM #/#",
