@@ -1222,7 +1222,7 @@ const RLI=k=>'img/ui12/role_'+k+'.webp';
 const TR_BON=[0,0,0,.05,.10,.15];   // TEAM ROLES: 3 different roles +5% · 4 → +10% · all 5 → +15% (attack + HP)
 function teamRoles(tl){const have=new Set(tl.filter(Boolean).map(bRoleOf).filter(Boolean));return {have,n:have.size,bon:TR_BON[have.size]||0};}
 function rTag(h,sz){const k=bRoleOf(h);if(!k)return '';const r=BROLE[k];return `<span class="rTag" style="--rc:${r.c}"><img src="${RLI(k)}" style="width:${sz||'1.35em'};height:${sz||'1.35em'}">${r.n}</span>`;}
-function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its,h.id),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}} // v16-129: Classic Collection cars → +ATK & HP for every hero
+function unitStats(h,ov){const R=ROLE[roleOf(h)],m=h.crew?.85:GMUL[h.gr]*(TE().starK?TE().starK(stars(h),h.gr):1+.2*stars(h))*(TE().heroLvK?TE().heroLvK(h.id):1)/* v16-99: × hero level + ascension */;let b=ZB;if(!h.crew){const its=heroGear(h.id,ov),g1=gearBon(its,h.id),g2=setBon(h,its),g3=collBon();b={};for(const k in g1)b[k]=g1[k]+g2[k]+g3[k];const cc=window.CC&&CC.battleB?CC.battleB():0;if(cc){b.atk+=cc;b.hp+=cc;}const dy=window.TDYNO&&TDYNO.bon?TDYNO.bon(h):null;if(dy)for(const k in dy)b[k]=(b[k]||0)+dy[k];} // v16-129: Classic Collection cars → +ATK & HP for every hero
   const gk=h.crew||!TE().garB?1:1+TE().garB(clsOf(h)); // v16-129: the garage that trains this class (LV 1-100) → +ATK & HP
   const MR=Object.assign({},MYTH_RNG[h.id]||{});{const K=MYTH_RK[h.id];if(K){MR.hp=(MR.hp||1)*(K.hp||1);MR.def=(MR.def||1)*(K.def||1);MR.atk=K.atk||1;}} // v16-141: Mythic rangers · v16-349: Mythic role stats
   const FM=!h.crew&&window.TFORGE&&TFORGE.mul?TFORGE.mul(h):null; // v16-388 (Marius 27 nov): SIGNATURE TOOL of the Mythic + TOOL COLLECTION → × ATK/HP/DEF/skill damage
@@ -3515,7 +3515,7 @@ function renderGear(){const T=TE(),G=T.G,g=GR(),h=gHero();
   if(!h){$m('gMain').innerHTML=`<div class="gEmpty">You have no mechanic heroes yet.<br><br>${TKI} Summon your first heroes – they fight and wear gear.</div>`;$m('gStats').innerHTML='';$m('gBtns').innerHTML='';$m('gInfo').innerHTML='';$m('gHName').innerHTML='';renderBag(null);if(gpg==='hero')gPage('');if(gpg==='coll')renderColl();return;}
   const eq=g.eq[h.id]||{};const HSK_=setKeyOf(h,heroGear(h.id));const slotBox=sl=>{const it=itemById(eq[sl.k]),lv=SLV(h.id,sl.k),tr=slvTier(lv);return `<div class="gsl q-${sl.k}" data-s="${sl.k}">${it?itemCard(it,'','',it.set?(it.set===HSK_?'On':'Off'):''):''}${lv>1?`<b class="slvB${tr>=10?' mx':''}" style="--c:${SLV_COL[tr]}">+${lv}</b>`:''}</div>`;}; // v16-280: slot + in the corner, a new colour every +5 // v16-240 (Marius): set piece on the right class glows all the time
   const st=unitStats(h),st0=unitStats(h,{tool:null,helm:null,vest:null,glove:null,boots:null,chip:null});
-  $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'')+(window.TFORGE&&TFORGE.on()&&h.gr===5&&!h.crew&&!gPrev?TFORGE.slot(h.id):'');
+  $m('gMain').innerHTML=GSLOT.map(slotBox).join('')+(hasSpr(h.id)?'':`<div class="gPor">${T.fbox(h,0,stars(h))}</div>`)+(T.SPLASH&&T.SPLASH[h.id]?'<button class="gArt2" data-g="art">🖼<small>ART</small></button>':'')+(window.TFORGE&&TFORGE.on()&&h.gr===5&&!h.crew&&!gPrev?TFORGE.slot(h.id):'')+(window.TDYNO&&TDYNO.on()&&!h.crew&&!gPrev?TDYNO.btn(h.id):''); // v16-398: TUNING CHIPS (test account)
   $m('gHName').innerHTML=`<b style="color:${gcol(h)}">${h.n} <em>${SL(h,1)}</em></b><small style="color:#e2c6ff;font-weight:900">Lv ${T.lvOf(h.id)}/${T.lvCap(h.id)}${T.ascOf(h.id)?' · <img class="ascI" src="img/ui9/asc_badge.webp" alt="Ascension"> ASC '+T.ascOf(h.id):''} · SKILL ${T.skLv(h.id)}</small><small>${IMGI(roleBadge(clsOf(h)),'1.3em','-.3em')} ${T.GRADES[h.gr||0]?T.GRADES[h.gr||0].n+' · ':''}${ROLE[clsOf(h)].n}${h.gr===5?' '+awkLine(h,1):''}</small>${rTag(h)}<small class="rBon" style="display:block;color:#9fe8ff;font-weight:800;font-size:.78em">${roleBonTxt(h)}</small><div class="gPow">${IMGI(PWU,'1.2em','-.22em')} ${pow(h).toLocaleString()}</div>`;
   $m('gInfo').innerHTML=hsPanel(h); // v16-303 (Marius 25 nov): hero page = skills, gear, stats only – SKILLS panel (4 fixed frames for all heroes); set info only in the gear popup
   $m('gStats').innerHTML=STROWS.map(([ic,n,f,fmt])=>{const a=f(st0),b=f(st),d=b-a;return `<div><span>${IMGI(glyphURL(ic,'#ffcc80'),'1.15em','-.25em')} ${n}</span><b>${fmt(b)}</b><em>${Math.abs(d)>1e-6?'+'+String(fmt(d)).replace('+',''):''}</em></div>`;}).join('');
@@ -3717,6 +3717,7 @@ $('cpGear').addEventListener('click',e=>{const T=TE(),el=e.target.closest('[data
   if(el.dataset.g==='hsum'){if(T.openSummon){const sm=document.getElementById('sm');if(sm)sm.style.zIndex=30;T.openSummon('m');}return;}
   if(el.dataset.g==='art'){const h=gHero();if(h&&window.showSplash)showSplash(h.id);return;}
   if(el.dataset.g==='tool'){const h=gHero();if(h&&window.TFORGE)TFORGE.tool(h.id);return;}
+  if(el.dataset.g==='tune'){const h=gHero();if(h&&window.TDYNO)TDYNO.hero(h.id);return;} // v16-398
   if(el.dataset.sk!==undefined){hsPop(gHero(),el.dataset.sk);return;}
   if(el.dataset.g==='lvl'){const h=gHero();if(h)popLvl(h);return;}
   if(el.dataset.g==='tedit'){heroTeamEdit();return;}
@@ -4011,7 +4012,8 @@ function rootOn(){if(!root.classList.contains('open')){root.classList.add('open'
 const HUBM=[
  {k:'camp',im:'m_camp',sh:160,cx:600},{k:'arena',im:'m_arena',sh:143,cx:670},{k:'tower',im:'m_tower',sh:144,cx:600},
  {k:'class',im:'m_class',sh:143,cx:735},{k:'cup',im:'m_cup',sh:144,cx:690},{k:'boss',full:'img/wb/m_boss.webp',ar:1100/250},{k:'dg',full:'img/dg/m_dg.webp',ar:1100/255}];
-HUBM.push({k:'forge',im:'m_forge',sh:143,cx:560}); // v16-392: THE FORGE for everybody (Marius 27 nov), opens at chapter 5 (stage 121)
+HUBM.push({k:'forge',im:'m_forge',sh:143,cx:560});
+if(window.SEC&&SEC.TEST_ACC)HUBM.push({k:'dyno',full:'img/dyno/m_dyno.webp',ar:1100/255}); // v16-398 (Marius 28 nov): DYNO GARAGE – only the owner's test account until the Grand Release // v16-392: THE FORGE for everybody (Marius 27 nov), opens at chapter 5 (stage 121)
 const FG_UNLOCK=120,fgOK=()=>TE().G.cp.best>=FG_UNLOCK||!!(window.SEC&&SEC.TEST_ACC); // v16-60: WORLD BOSS in place of COMING SOON (Marius' banner, shown whole)
 const HUB_L=395,HUB_R=46,HUB_W=1012;
 function hubTab(m,hh){const f=hh/m.sh,u='url(img/ui7/'+m.im+'.webp)',L=HUB_L*f,R=HUB_R*f,M=HUB_W-L-R,full=1100*f,
@@ -4024,12 +4026,13 @@ function hubTodo(){const o={};try{
   if(wbOK()){const w=wbG();o.boss=wbKeys()>0||(w.dmg>0&&WB_TIER.some((q,i)=>wbTierSt(i)===1));}
   if(dgOK())o.dg=DG_K.some(k=>dgDay(k)>0);
   if(window.TFORGE&&TFORGE.on())o.forge=TFORGE.todo();
+  if(window.TDYNO&&TDYNO.on())o.dyno=TDYNO.todo();
   if(arOK())o.arena=!!(window.ONLINE&&ONLINE.arTk&&ONLINE.arTk()>0);
  }catch(e){}return o;}
 function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');const TD=hubTodo();
   let h=tallBg()+'<button class="cpB hubBk" data-hb="back" style="'+gbx(18,18,96,96)+'">↩</button>';
   const st={camp:'STAGE '+sLabel(Math.min(G.cp.best,NST-1)),arena:arOK()?'PvP · ONLINE':'🔒 STAGE '+sLabel(AR_UNLOCK),tower:twOK()?'FLOOR '+Math.min(TW_N,twG().b+1)+' / '+TW_N:'🔒 STAGE '+sLabel(TW_UNLOCK),
-    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',forge:fgOK()?(window.TFORGE&&TFORGE.sub?TFORGE.sub():''):'🔒 STAGE '+sLabel(FG_UNLOCK),
+    class:ctOK()?'TODAY: '+ctToday().map(k=>ROLE[k].n.toUpperCase()).join(' · '):'🔒 STAGE '+sLabel(CT_UNLOCK),cup:arOK()?'EVERY WEEKEND':'🔒 STAGE '+sLabel(AR_UNLOCK),soon:'',forge:fgOK()?(window.TFORGE&&TFORGE.sub?TFORGE.sub():''):'🔒 STAGE '+sLabel(FG_UNLOCK),dyno:window.TDYNO&&TDYNO.sub?TDYNO.sub():'',
     boss:wbOK()?WBOSS[wbCur()].n+' · KEYS '+wbKeys()+'/'+wbKMax():'🔒 STAGE '+sLabel(WB_UNLOCK-1),
     dg:dgOK()?'KEYS '+DG_K.reduce((a,k)=>a+dgDay(k),0)+'/'+DG_K.length*dgMax()+((t=>t?' +'+t:'')(DG_K.reduce((a,k)=>a+dgBon(k),0))):'🔒 STAGE '+sLabel(DG_UNLOCK)};
   const top=285,avail=1536+HX-(HX>0?250:20)-top,n=HUBM.length,ex=m=>m.full?1.3:m.k==='camp'?1.08:1,
@@ -4041,6 +4044,7 @@ function hubRender(){const T=TE(),G=T.G;tallBox('hubBox');const TD=hubTodo();
 function hubOpen(){HM=0;rootOn();HUBS.from=0;hubEl.classList.add('open');hubRender();}
 function hubClose(){hubEl.classList.remove('open');close();}
 function hubGo(k){if(k==='back'){hubClose();return;}
+  if(k==='dyno'){if(window.TDYNO)TDYNO.open();return;}
   if(k==='forge'){if(!fgOK()){TE().toast('🔒 THE FORGE opens after campaign stage '+sLabel(FG_UNLOCK),2600);return;}if(window.TFORGE)TFORGE.open();return;}
   if(k==='soon'){TE().toast('🔒 New battle modes are coming soon!',2200);return;}
   if(k==='tower'&&!twOK()){TE().toast('🔒 TORQUE TOWER opens after campaign stage '+sLabel(TW_UNLOCK),2600);return;}
