@@ -29,11 +29,14 @@ const CAR=[
 const GEO=[
  {h:497,w:[[202.9,396.9],[805.3,396.9]],r:93.6},{h:572,w:[[166,463.4],[766.5,463.4]],r:99.9},{h:373,w:[[213.8,276.1],[746,276.1]],r:91.8},
  {h:371,w:[[210.7,259.5],[767.9,259.5]],r:88.3},{h:324,w:[[178.4,225.8],[731.5,225.8]],r:91.5},{h:351,w:[[191.8,248.2],[765.8,248.2]],r:94.2}];
-const PART=[['ENGINE','⚙️',.26],['TURBO','🌀',.24],['EXHAUST','💨',.12],['ECU','💻',.16],['INTERCOOLER','❄️',.12],['TIRES','🛞',.10]];
+const PTI=i=>'<img src="img/dyno/part'+i+'.webp" alt="" style="width:42px;height:42px;object-fit:contain">'; // v16-401 Marius' part icons
+const PART=[['ENGINE',PTI(0),.26],['TURBO',PTI(1),.24],['EXHAUST',PTI(2),.12],['ECU',PTI(3),.16],['INTERCOOLER',PTI(4),.12],['TIRES',PTI(5),.10]];
 const PMAX=10,TMAX=PART.length*PMAX;
-const CASH0=[1e3,6e3,30e3,150e3,7e5,3e6],DPK=[1,2,3,5,8,12];
+const CASH0=[1e3,6e3,30e3,150e3,7e5,3e6],DPK=[2,3,5,8,12,18]; // v16-401 (Marius: „mai greu de la început… pe bază de RNG… câteva luni”)
+const PCH=(c,l)=>Math.max(25,100-l*7-c*4),PPITY=5; // part upgrade chance %, +5% after every fail (per part)
+const CCH=(g,l)=>Math.max(20,100-l*5-g*3),CPITY=4; // chip upgrade chance %, +4% after every fail (per chip)
 const pCash=(c,l)=>Math.round(CASH0[c]*Math.pow(l+1,1.6)/10)*10,pDp=(c,l)=>Math.ceil((l+1)*DPK[c]);
-const unCash=c=>CASH0[c]*50,unDp=c=>DPK[c]*30;
+const unCash=c=>CASH0[c]*50,unDp=c=>DPK[c]*60;
 const FREE=3,EXTRA=[50,100,200];
 // ---- chips
 const CHI=i=>'<img class="dyI" src="img/dyno/chip'+i+'.webp" alt="">'; // v16-399 Marius' chip icons
@@ -45,7 +48,7 @@ const SUBB={atk:[.8,1.2,1.8,2.5,3.5,5],hp:[.8,1.2,1.8,2.5,3.5,5],def:[.8,1.2,1.8
 const SN={atk:'ATK',hp:'HP',def:'DEF',crit:'Crit Chance',cdmg:'Crit Damage',aspd:'Attack Speed',en:'Skill Damage'};
 const SUB0=[0,1,1,2,2,3],CMAX=15,OILK=[4,6,10,16,25,40],RECAL=[20,30,50,80,120,200],SALV=[5,10,20,40,80,160];
 const HSLOT=[1,60,140,220]; // hero level to open chip slot 1-4 (the test account: all open)
-const mainV=c=>MAINB[SL[c.s][2]][c.g]*(1+c.l*.17);
+const mainV=c=>MAINB[SL[c.s][2]][c.g]*(1+c.l*.27); // v16-401: more stats per +level (+15 = ×5)
 const subV=(c,i)=>SUBB[c.sub[i][0]][c.g]*c.sub[i][1];
 const oilCost=c=>Math.ceil((c.l+1)*OILK[c.g]);
 const fmtS=(k,v)=>'+'+(Math.round(v*10)/10)+'%';
@@ -134,7 +137,7 @@ const css=document.createElement('style');css.textContent=`
 .dyPT{font:900 18px Game,system-ui;text-align:center;margin:-6px 30px 8px;color:#ffd54a;text-shadow:0 2px 0 #000}
 .dyPD{font-size:11.5px;color:#b0bec5;text-align:center;margin-bottom:8px;line-height:1.35}
 .dyRw{display:flex;align-items:center;gap:8px;background:#161a20cc;border:1px solid #2a2f36;border-radius:10px;padding:6px 8px;margin-bottom:6px}
-.dyRw .ic{font-size:22px;width:30px;text-align:center}
+.dyRw .ic{font-size:22px;width:44px;flex:none;text-align:center;display:flex;align-items:center;justify-content:center}
 .dyRw .tx{flex:1;min-width:0;font-size:12px;line-height:1.25}.dyRw .tx b{font-size:13px}.dyRw .tx small{display:block;color:#9aa4ae;font-size:10.5px}
 .dyRw .pl{display:flex;gap:2px;margin-top:3px}.dyRw .pl i{flex:1;height:5px;border-radius:2px;background:#2a2f36}.dyRw .pl i.on{background:#ffb300}
 .dyUp{height:40px;min-width:84px;--bh:40px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;color:#3a2300;font:900 11px/1.1 Game,system-ui;padding:0 4px}
@@ -228,12 +231,14 @@ function partsPop(){const y=S(),c=SH,p=y.p[c];
   let h='<button class="dyX" data-q="x">x</button><div class="dyPT">🔧 '+CAR[c].n+' · PARTS</div><div class="dyPD">Every part goes from Lv 0 to '+PMAX+' – parts cost cash + 🔩 Dyno Parts (from dyno runs).</div>';
   PART.forEach((q,i)=>{const l=p[i],mx=l>=PMAX,ok=canPart(c,i),dh=mx?0:Math.round((CAR[c].hp[1]-CAR[c].hp[0])*q[2]/PMAX);
     h+='<div class="dyRw"><div class="ic">'+q[1]+'</div><div class="tx"><b>'+q[0]+'</b> · Lv '+l+'/'+PMAX+(mx?'':' <span style="color:#7cff7c">+'+dh+' HP</span>')+'<div class="pl">'+Array.from({length:PMAX},(_,k)=>'<i class="'+(k<l?'on':'')+'"></i>').join('')+'</div>'+(mx?'':'<small><img src="img/ui2/i_coins.webp" style="height:1em;vertical-align:-.15em"> '+T().fmt(pCash(c,l))+' · '+DPI+pDp(c,l)+'</small>')+'</div>'+
-      '<button class="dyUp'+(mx||!ok?' off':'')+'" data-q="pu" data-i="'+i+'">'+(mx?'MAX':'UPGRADE')+'</button></div>';});
+      '<button class="dyUp'+(mx||!ok?' off':'')+'" data-q="pu" data-i="'+i+'">'+(mx?'MAX':'UPGRADE<br>'+Math.min(100,PCH(c,l)+((y.pt||{})[c+'_'+i]||0))+'%')+'</button></div>';});
   if(tune(c)>=TMAX&&c<5&&y.c===c)h+='<button class="dyGo" data-q="tonext">✅ MAX TUNE · SEE THE NEXT CAR</button>';
   pop(h);}
 function partUp(i){const y=S(),c=SH,l=y.p[c][i];if(l>=PMAX)return;const cs=pCash(c,l),dp=pDp(c,l);
   if((T().G.money||0)<cs){toast('Not enough cash',1800);sfx('deny');return;}if(y.dp<dp){toast('Not enough Dyno Parts – make dyno runs',2200);sfx('deny');return;}
-  T().G.money-=cs;y.dp-=dp;y.p[c][i]++;T().save();sfx('upgrade');partsPop();render();}
+  if(!y.pt)y.pt={};const k=c+'_'+i,ch=Math.min(100,PCH(c,l)+(y.pt[k]||0));T().G.money-=cs;y.dp-=dp;
+  if(Math.random()*100<ch){y.p[c][i]++;y.pt[k]=0;T().save();sfx('upgrade');}else{y.pt[k]=(y.pt[k]||0)+PPITY;T().save();sfx('deny');toast('❌ Upgrade failed – next try +'+PPITY+'% chance',2200);}
+  partsPop();render();}
 function unlock(){const y=S(),c=SH;if(c!==y.c+1||tune(y.c)<TMAX){sfx('deny');return;}
   if((T().G.money||0)<unCash(c)){toast('Not enough cash',1800);sfx('deny');return;}if(y.dp<unDp(c)){toast('Not enough Dyno Parts',1800);sfx('deny');return;}
   T().G.money-=unCash(c);y.dp-=unDp(c);y.c=c;y.s=c;T().save();sfx('levelup');toast('🚗 New car unlocked!',2400);render();}
@@ -256,13 +261,13 @@ function start(c,paid){const y=S(),hp0=carHP(c),hp=Math.round(hp0*rnd(.965,1.025
     if(t-pf>140&&car){pf=t;const p=document.createElement('i');p.className='dyPf';p.style.left='calc(var(--u)*'+(Math.random()*20)+')';p.style.top='calc(var(--u)*'+(GEO[c].h*.62+Math.random()*20)+')';car.appendChild(p);setTimeout(()=>p.remove(),1200);}
     if(k<1)requestAnimationFrame(step);else finish(c,hp,nm,paid);};
   requestAnimationFrame(step);}
-function odds(c,q){const cap=capG(c),W=[];for(let g=Math.max(0,cap-2);g<=cap;g++){const k=cap-g;W.push([g,k===0?6*(1+2*q):k===1?30:64]);}if(c===0)W.splice(0,W.length,[0,70],[1,30*(1+q)]);const s=W.reduce((a,b)=>a+b[1],0);return W.map(([g,w])=>[g,w/s*100]);}
+function odds(c,q){const cap=capG(c),W=[];for(let g=Math.max(0,cap-2);g<=cap;g++){const k=cap-g;W.push([g,k===0?6*(1+2*q):k===1?30:64]);}if(c===0)W.splice(0,W.length,[0,80],[1,20*(1+q)]);const s=W.reduce((a,b)=>a+b[1],0);return W.map(([g,w])=>[g,w/s*100]);}
 function oddsHtml(c){const [a,b]=CAR[c].hp,q=Math.max(0,Math.min(1,(carHP(c)-a)/(b-a)));return '<div class="dyInf">'+odds(c,q).map(([g,p])=>'<b style="color:'+GC[g]+'">'+GN[g]+'</b> <b style="color:'+GC[g]+'">'+(p<10?p.toFixed(1):Math.round(p))+'%</b>').join(' · ')+'</div>';}
 function pickG(c,q){const cap=capG(c),W=[];for(let g=Math.max(0,cap-2);g<=cap;g++){const k=cap-g;W.push([g,k===0?6*(1+2*q):k===1?30:64]);}
-  if(c===0)W.splice(0,W.length,[0,70],[1,30*(1+q)]);
+  if(c===0)W.splice(0,W.length,[0,80],[1,20*(1+q)]);
   const s=W.reduce((a,b)=>a+b[1],0);let r=Math.random()*s;for(const [g,w] of W){if((r-=w)<0)return g;}return W[0][0];}
 function finish(c,hp,nm,paid){const y=S(),[a,b]=CAR[c].hp,q=Math.max(0,Math.min(1,(hp-a)/(b-a)));
-  const dp=10*(c+1)+Math.floor(rnd(0,6)),oil=Math.round((c+1)*rnd(4,8)),chips=[newChip(pickG(c,q))];if(Math.random()<.15+.35*q)chips.push(newChip(pickG(c,q)));
+  const dp=Math.round((40+8*c)*rnd(.85,1.15)),oil=Math.round((c+1)*rnd(3,6)),chips=[newChip(pickG(c,q))];if(Math.random()<.08+.22*q)chips.push(newChip(pickG(c,q)));
   y.dp+=dp;y.oil+=oil;chips.forEach(ch=>y.ch.push(ch));const rec=hp>(y.best[c]||0);if(rec)y.best[c]=hp;
   LAST={c,hp,nm};T().save();RUN=null;PG.classList.remove('run');sfx('reward');
   let h='<div class="dyPT">DYNO RESULT</div><div class="dyRes"><div><b style="color:#ff8f00">'+hp+'</b><small>HP</small></div><div><b style="color:#29b6f6">'+nm+'</b><small>Nm</small></div></div>'+(rec?'<div class="dyRec">🏆 NEW RECORD!</div>':'');
@@ -283,13 +288,15 @@ function chipPop(id){const ch=chipById(id);if(!ch){bagPop();return;}CHP=id;const
   h+='<div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">'+chipIc(ch,own)+'<div class="dySt" style="flex:1"><div class="mn">'+SN[SL[ch.s][2]]+' <b>'+fmtS(0,mainV(ch))+'</b></div>Lv +'+ch.l+' / '+CMAX+(own?'<br><span style="color:#9aa4ae">🦸 <b>'+hName(own)+'</b></span>':'')+'</div></div>';
   h+='<div class="dySt">'+(ch.sub.length?ch.sub.map((s,i)=>'<div class="sb"><span>'+SN[s[0]]+' <b>'+fmtS(0,subV(ch,i))+'</b></span><button data-q="recal" data-i="'+i+'">🔄 '+RECAL[ch.g]+' 💎</button></div>').join(''):'<div class="sb"><span style="color:#9aa4ae">No sub stats yet – every +3 adds one (max 4).</span></div>')+'</div>';
   h+='<div class="dyPD" style="margin-top:6px">Every +3: a new sub stat (max 4) or one sub stat grows. 🔄 RECALIBRATE = a new stat type, same roll.</div>';
-  h+='<div style="display:flex;gap:6px">'+(mx?'<button class="dyUp off" style="flex:1">MAX</button>':'<button class="dyUp'+(y.oil>=oc?'':' off')+'" style="flex:1" data-q="cup">UPGRADE<br>'+OILI+' '+oc+'</button>')+
+  h+='<div style="display:flex;gap:6px">'+(mx?'<button class="dyUp off" style="flex:1">MAX</button>':'<button class="dyUp'+(y.oil>=oc?'':' off')+'" style="flex:1" data-q="cup">UPGRADE · '+Math.min(100,CCH(ch.g,ch.l)+(ch.pt||0))+'%<br>'+OILI+' '+oc+'</button>')+
     (HID?(own===HID?'<button class="dyUp bl" style="flex:1" data-q="uneq">REMOVE</button>':'<button class="dyUp bl" style="flex:1" data-q="eq">EQUIP</button>'):'')+
     (own?'':'<button class="dyUp rd" data-q="salv">SALVAGE<br>'+OILI+' +'+salvV(ch)+'</button>')+'</div>';
   pop(h);}
 const salvV=ch=>{let s=SALV[ch.g];for(let l=0;l<ch.l;l++)s+=Math.floor(Math.ceil((l+1)*OILK[ch.g])*.8);return s;};
 function chipUp(){const ch=chipById(CHP),y=S();if(!ch||ch.l>=CMAX)return;const oc=oilCost(ch);if(y.oil<oc){toast('Not enough Tuning Oil – dyno runs and salvaged chips give oil',2400);sfx('deny');return;}
-  y.oil-=oc;ch.l++;if(ch.l%3===0){if(ch.sub.length<4)addSub(ch);else{const s=ch.sub[Math.floor(Math.random()*ch.sub.length)];s[1]=Math.round((s[1]+rnd(.7,1))*100)/100;}}
+  y.oil-=oc;const pc=Math.min(100,CCH(ch.g,ch.l)+(ch.pt||0));
+  if(Math.random()*100>=pc){ch.pt=(ch.pt||0)+CPITY;T().save();sfx('deny');toast('❌ Upgrade failed – next try +'+CPITY+'% chance',2200);chipPop(ch.id);return;}
+  ch.pt=0;ch.l++;if(ch.l%3===0){if(ch.sub.length<4)addSub(ch);else{const s=ch.sub[Math.floor(Math.random()*ch.sub.length)];s[1]=Math.round((s[1]+rnd(.8,1.2))*100)/100;}}
   T().save();refresh();sfx(ch.l%3===0?'levelup':'upgrade');chipPop(ch.id);}
 function recal(i){const ch=chipById(CHP),c=RECAL[ch.g];if((T().G.dm||0)<c){toast('Not enough diamonds',1800);sfx('deny');return;}
   const main=SL[ch.s][2],have=ch.sub.map(q=>q[0]),pool=SUBK.filter(k=>k!==main&&(k===ch.sub[i][0]||!have.includes(k))&&k!==ch.sub[i][0]);if(!pool.length)return;
