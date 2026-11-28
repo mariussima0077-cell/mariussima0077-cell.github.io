@@ -43,11 +43,11 @@ const MW=[['w1','Summon 150 times','sum',150,1900],['w2','Win 100 campaign battl
 const ME=[['ult','40 NEW campaign stages + 50 NEW Tower floors','ult',90,8000],['e2','Summon 600 times during the event','esum',600,3500],
  ['e3','Clear 80 NEW campaign stages','stg',80,3000],['e4','Climb 30 NEW floors in the Class Towers','ctw',30,3000],['e5','Upgrade buildings +5 levels in total','bld',5,3000],
  ['e6','Collect 8 NEW heroes','hero',8,2500],['e7','Use 60 Dungeon keys during the event','edgk',60,2500],
- ['c1','WEEK 2 · Clear campaign stage 250','abst',250,4000,1],['c2','WEEK 2 · Own a LEGENDARY hero at +5','leg5',1,4000,1],
+ ['c1','WEEK 2 · Clear campaign stage 350','abst',350,4000,1],['c2','WEEK 2 · Own a LEGENDARY hero at +3','leg3',1,4000,1],
  ['c3','WEEK 3 · Reach Torque Tower floor 120','atw',120,5000,2],['c4','WEEK 3 · Own 1 ASCENDED gear piece','asc',1,5000,2],
- ['c5','WEEK 4 · Own a LEGENDARY hero at +10','leg10',1,6000,3],['fin','🏆 CHAMPION · Own a MYTHIC hero AWAKENED I','awk',1,10000,3]];
+ ['c5','WEEK 4 · Own a LEGENDARY hero at +5','leg5',1,6000,3],['fin','🏆 CHAMPION · Own 2 MYTHIC heroes AWAKENED I','awk',2,10000,3]];
 const mWk=m=>m[5]||0,mOpen=m=>wkN()>=mWk(m);
-const MIC={sold:'🛠️',win:'⚔️',sum:'🎰',dgk:'🗝️',lvl:'⬆️',idle:'💤',login:'📅',ult:'🏁',esum:'🎰',stg:'⚔️',ctw:'🗼',bld:'🏭',hero:'🧩',edgk:'🗝️',abst:'⚔️',leg5:'⭐',atw:'🗼',asc:'✦',leg10:'🌟',awk:'👑'};
+const MIC={sold:'🛠️',win:'⚔️',sum:'🎰',dgk:'🗝️',lvl:'⬆️',idle:'💤',login:'📅',ult:'🏁',esum:'🎰',stg:'⚔️',ctw:'🗼',bld:'🏭',hero:'🧩',edgk:'🗝️',abst:'⚔️',leg3:'⭐',leg5:'⭐',atw:'🗼',asc:'✦',leg10:'🌟',awk:'👑'};
 // ---------------------------------------------------------------- road (free lane) – rewards cycle every 10 tiers; tier 50 = MYTHIC of your choice
 const RD=[{dm:300},{tk:8},{essU:6},{key:5},{gt:8},{bkU:6},{ct:8},{dm:450},{tk:15},{essU:12}];
 const MYTH=['m5_0','m5_2','m5_3','m5_4','m5_5','m5_1','m5_6','m5_7','m5_8','m5_9'];
@@ -62,8 +62,10 @@ const CHEST={dm:300,tk:5,key:2};
 const GOAL=[[150e3,{dm:200}],[400e3,{tk:10}],[800e3,{key:5}],[1.4e6,{dm:300}],[2.2e6,{dm:500,tk:10}]];
 const WEEKS=[['summon','Days 1-7 · Hero, Crew & Gear summons'],['essence','Days 8-14 · Level up & Ascend your heroes'],['dungeon','Days 15-21 · Dungeons – your bonus keys stack'],['rail','Days 22-28 · Trains, Rail Wars & the final sprint']];
 // ---------------------------------------------------------------- state
+// v16-396 (Marius 28 nov, bug): building levels = LV1-10 (G.lv) + LV11-100 (G.lx) – before, a player with all buildings at LV10 could never finish 'Upgrade buildings +5 levels'
+const bldSum=G=>[G.lv,G.lx].reduce((t,o)=>t+(o?Object.values(o).reduce((a,b)=>a+(+b||0),0):0),0);
 function snap(){const G=T().G;return {best:(G.cp&&G.cp.best)||0,tw:(G.tw&&G.tw.b)||0,ct:G.ct?Object.values(G.ct).reduce((a,b)=>a+(+b||0),0):0,
-  bld:G.lv?Object.values(G.lv).reduce((a,b)=>a+(+b||0),0):0,hero:G.h&&G.h.own?Object.keys(G.h.own).length:0,sold:G.sold||0};}
+  bld:bldSum(G),hero:G.h&&G.h.own?Object.keys(G.h.own).length:0,sold:G.sold||0};}
 function S(){const G=T().G;if(!G.gpx)G.gpx={tok:0,pts:0,b:snap(),e:{c:{},got:[]},rf:[],gs:[],fin:0};const s=G.gpx;
   const dk=dKey();if(!s.d||s.d.k!==dk)s.d={k:dk,c:{login:1},got:[],s0:G.sold||0};
   const wi=wkN();if(!s.w||s.w.k!==wi)s.w={k:wi,c:{},got:[],s0:G.sold||0};
@@ -76,8 +78,9 @@ function prog(list,m){const s=S(),G=T().G,k=m[2],B=s.b,c=snap();
   if(k==='ult')return Math.min(40,c.best-B.best)+Math.min(50,c.tw-B.tw);
   if(k==='esum')return s.e.c.sum||0;if(k==='edgk')return s.e.c.dgk||0;
   if(k==='abst')return c.best;if(k==='atw')return c.tw;if(k==='asc'){const g=G.gear;return g&&g.inv?g.inv.filter(x=>x&&x.r>=6).length:0;}
-  if(k==='leg5'||k==='leg10'||k==='awk'){const H=T().HEROES||[],O=(G.h&&G.h.own)||{},mt=T().mTier;return H.some(h=>{const o=O[h.id];if(!o||h.cat!=='m')return false;
-    return k==='awk'?(h.gr===5&&mt&&mt(o.s)>=1):(h.gr===4&&(o.s||0)>=(k==='leg5'?5:10));})?1:0;}
+  // v16-396 (Marius 28 nov): Legendary +3 (week 2) / +5 (week 4, was +10 = pure luck) · CHAMPION = 2 Mythic heroes AWAKENED I (counted)
+  if(k==='leg3'||k==='leg5'||k==='leg10'||k==='awk'){const H=T().HEROES||[],O=(G.h&&G.h.own)||{},mt=T().mTier;const n=H.filter(h=>{const o=O[h.id];if(!o||h.cat!=='m')return false;
+    return k==='awk'?(h.gr===5&&mt&&mt(o.s)>=1):(h.gr===4&&(o.s||0)>=(k==='leg3'?3:k==='leg5'?5:10));}).length;return k==='awk'?n:Math.min(1,n);}
   if(k==='stg')return c.best-B.best;if(k==='ctw')return c.ct-B.ct;if(k==='bld')return c.bld-B.bld;if(k==='hero')return c.hero-B.hero;return 0;}
 const LISTS={d:MD,w:MW,e:ME};
 function mState(list,m){const s=S(),got=(list==='d'?s.d:list==='w'?s.w:s.e).got;if(got.includes(m[0]))return 'done';if(list==='e'&&!mOpen(m))return 'lock';return Math.max(0,prog(list,m))>=m[3]?'ready':'go';}
@@ -324,7 +327,7 @@ function closePop(){if(popEl)popEl.classList.remove('on');}
 const left=ms=>{const s=Math.max(0,ms/1000|0),d=s/86400|0,h=(s%86400)/3600|0,m=(s%3600)/60|0;return d?d+'d '+h+'h':h+'h '+String(m).padStart(2,'0')+'m';};
 // v16-228 TOP 10 = the first 10 of the server who finish ALL event missions (first come, first served)
 function top10(){const t=T(),s=S(),F=(RK&&RK.fins)||[],nd=ME.filter(m=>s.e.got.includes(m[0])).length;
-  let h='<img class="gpFinB" src="img/gp/finishers.webp" alt="GRAND PRIX FINISHERS"><div class="gpNote">Finish <b>ALL '+ME.length+' event missions</b> (the last one: a <b>MYTHIC AWAKENED I</b>). The first <b>10 players</b> of your server win – checked by Torque Guard:<br>'+
+  let h='<img class="gpFinB" src="img/gp/finishers.webp" alt="GRAND PRIX FINISHERS"><div class="gpNote">Finish <b>ALL '+ME.length+' event missions</b> (the last one: <b>2 MYTHIC heroes AWAKENED I</b>). The first <b>10 players</b> of your server win – checked by Torque Guard:<br>'+
    '<img class="gpTk" src="img/gp/top1.webp"> #1 <b class="gpN1">GP CHAMPION</b> – Golden Statue, Trophy #1, Royal Entrance, Diamond Rain, Legend Car + '+t.DMI+' 10,000 + 30 Hero, 20 Gear Tickets, 10 keys + <b>gold name</b><br>'+
    '<img class="gpTk" src="img/gp/top2.webp"> #2-3 <b class="gpN2">GP PODIUM</b> – '+t.DMI+' 6,000 / 5,000 + Tickets + <b>silver name</b><br><img class="gpTk" src="img/gp/top3.webp"> #4-10 <b class="gpN3">GP FINISHER</b> – '+t.DMI+' 2,500 + Tickets + <b>purple name</b><br>'+
    'When the 10th player finishes, the event closes <b>7 days later</b> – everybody can still claim the Road.<br><b>Your missions: '+nd+' / '+ME.length+'</b>'+
@@ -392,7 +395,7 @@ function rainFx(){if(fxT)return;fxT=1;let n=0,r=document.getElementById('gpRc');
 function intro(force){const s=S();if(s.intro&&s.i228&&s.i230&&!force)return;s.intro=1;s.i228=1;s.i230=1;T().save();   // v16-228: shown again once (new rules = new mini-guide)
   pop('<img src="img/gp/logo.webp" style="width:80%;display:block;margin:0 auto">'+
    '<p>🏁 A <b>ONE-TIME</b> event with <b>NO TIME LIMIT</b>: it stays open until 10 players finish ALL the event missions (+7 days), then it never comes back.</p><p>📋 Do <b>missions</b> (daily, weekly, event) → earn '+TOKI+' <b>GP Tokens</b>.</p>'+
-   '<p>🎖️ Your tokens move you up the <b>Grand Prix Road</b> (<b>100 tiers</b>). Tier 50 = <b>a MYTHIC hero of your choice</b> – free! Tier 100 = the big final prize.</p><p>🔓 New <b>CHAMPION missions</b> open every week (week 2, 3, 4). The last one: a <b>MYTHIC AWAKENED I</b>.</p><p>🏆 <b>TOP 10</b>: the first 10 who finish ALL event missions win titles, name colours and big prizes – #1 is the <b>GP CHAMPION</b>.</p><p>💎 <b>DIAMOND PASS</b>: buy it with diamonds → a bonus lane on every tier of the Road.</p><p>🛒 Spend tokens in the <b>GP Shop</b> · 🎁 a free <b>Pit-Stop Chest</b> every week.</p>'+
+   '<p>🎖️ Your tokens move you up the <b>Grand Prix Road</b> (<b>100 tiers</b>). Tier 50 = <b>a MYTHIC hero of your choice</b> – free! Tier 100 = the big final prize.</p><p>🔓 New <b>CHAMPION missions</b> open every week (week 2, 3, 4). The last one: <b>2 MYTHIC heroes AWAKENED I</b>.</p><p>🏆 <b>TOP 10</b>: the first 10 who finish ALL event missions win titles, name colours and big prizes – #1 is the <b>GP CHAMPION</b>.</p><p>💎 <b>DIAMOND PASS</b>: buy it with diamonds → a bonus lane on every tier of the Road.</p><p>🛒 Spend tokens in the <b>GP Shop</b> · 🎁 a free <b>Pit-Stop Chest</b> every week.</p>'+
    '<p>👑 <b>LEGENDS</b>: the live ranking of your server · 🌍 <b>SERVER GOAL</b>: gifts for everybody.</p><div style="text-align:center"><button class="gpBtn g" data-g="ok" style="padding:10px 30px">LET’S RACE!</button></div>');}
 function open(){if(!T()||!T().G)return;build();S();el.classList.add('open');tab='ev';render.rdS=0;render();intro();if(live())sendSc();
   clearInterval(open.t);open.t=setInterval(()=>{if(!el.classList.contains('open')){clearInterval(open.t);return;}if(tab!=='rd'&&tab!=='ms')render();},30000);}
