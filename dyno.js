@@ -322,15 +322,20 @@ function uneq(){const ch=chipById(CHP),id=HID,y=S();if(!ch||!id||!y.eq[id])retur
 // ---------------------------------------------------------------- v16-403 (Marius 28 nov): TUNING BAR on the hero page (under SKILLS)
 // "bara separat pentru noul content tot pe pagina de erou" – Signature Tool (Mythic) + the 4 chip slots in one panel (code-drawn until Marius' picture)
 function bar(h){if(!ON()||!h||h.crew)return '';const id=h.id,y=S(),e=y.eq[id]||[];
-  const TF=window.TFORGE&&TFORGE.on()&&h.gr===5;let tl='',td=false;
-  if(TF){const L=TFORGE.lv(id),g=Math.min(5,Math.floor(L/10));td=TFORGE.slot(id).indexOf('<i></i>')>=0;
-    tl='<div class="tnS" data-g="tool" style="--gc:'+GC[g]+'"><div class="tnB tool"><img src="img/forge/tool_'+id+'.webp" alt="" onerror="this.remove()">'+(td?'<i></i>':'')+'</div><b>TOOL</b><small>Lv '+L+'</small></div>';}
-  else tl='<div class="tnS lk"><div class="tnB"><u>🔒<small>MYTHIC</small></u></div><b>TOOL</b><small>&nbsp;</small></div>';
-  let x='<div class="tnP"><div class="tnT">TUNING</div><div class="tnR">'+tl;
-  SL.forEach((s,i)=>{const op=slotOpen(id,i),ch=e[i]&&chipById(e[i]);const dot=op&&!ch&&y.ch.some(c=>c.s===i&&!ownerOf(c.id));
-    x+='<div class="tnS'+(op?'':' lk')+'" data-g="tune" data-s="'+i+'" style="--gc:'+(ch?GC[ch.g]:'#3a4a63')+'"><div class="tnB'+(ch?' on':'')+'" style="'+(ch?'background-image:url(img/fr'+ch.g+'.webp)':'')+'"><img src="img/dyno/chip'+i+'.webp" alt="">'+(ch?'<em>+'+ch.l+'</em>':op?'<s>+</s>':'<u>🔒<small>Lv '+HSLOT[i]+'</small></u>')+(dot?'<i></i>':'')+'</div><b>'+s[0]+'</b><small>'+(ch?GN[ch.g]:'&nbsp;')+'</small></div>';});
-  return x+'</div></div>';}
+  // v16-404 (Marius: „bara nouă pentru următoarele content ca și ce am încercuit”) – same look as SKILLS (img/ui9/hs_panel.webp):
+  // one round frame per system: SIGNATURE TOOL · TUNING · 2 free frames for the next content (COMING SOON)
+  const X=[16.38,39.73,62.3,84.51],Yy=[46.9,46.4,46.4,45.2];
+  const sl=(i,inner,name,sub,attr,lock,dot)=>'<div class="hsS'+(lock?' lk':'')+'" '+attr+' style="left:'+X[i]+'%;top:'+Yy[i]+'%">'+inner+(lock?'<u>🔒<small>'+lock+'</small></u>':'')+(dot?'<i class="tnD"></i>':'')+'</div><div class="hsN" style="left:'+X[i]+'%"><b>'+name+'</b><small>'+sub+'</small></div>';
+  const TF=window.TFORGE&&TFORGE.on()&&h.gr===5;let x='<div class="hsP tnP2"><div class="hsT">UPGRADES</div>';
+  if(TF){const L=TFORGE.lv(id),dot=TFORGE.slot(id).indexOf('<i></i>')>=0;x+=sl(0,'<img src="img/forge/tool_'+id+'.webp" alt="" style="object-fit:contain;padding:12%;box-sizing:border-box" onerror="this.remove()">','TOOL','Lv '+L,'data-g="tool"','',dot);}
+  else x+=sl(0,'<i>🔧</i>','TOOL','&nbsp;','','MYTHIC',false);
+  const n=e.filter(Boolean).length,op=[0,1,2,3].filter(k=>slotOpen(id,k)).length,dt=[0,1,2,3].some(k=>slotOpen(id,k)&&!e[k]&&y.ch.some(c=>c.s===k&&!ownerOf(c.id)));
+  x+=sl(1,'<img src="img/dyno/chip0.webp" alt="" style="object-fit:contain;padding:14%;box-sizing:border-box">','TUNING',n+' / '+op+' CHIPS','data-g="tune" data-s="0"','',dt);
+  x+=sl(2,'<i>❔</i>','SOON','&nbsp;','','SOON',false)+sl(3,'<i>❔</i>','SOON','&nbsp;','','SOON',false);
+  return x+'</div>';}
 const bcss=document.createElement('style');bcss.textContent=`
+.tnP2 .hsS{overflow:visible}.tnP2 .hsT{letter-spacing:.5px;font-size:min(3.6vw,15px)}.tnP2 .hsN small{color:#ffd54a}.tnP2 .hsS>img{border-radius:50%}
+.tnD{position:absolute;right:2%;top:2%;width:12px;height:12px;border-radius:50%;background:#ff2b2b;border:2px solid #fff;z-index:2}
 .tnP{position:relative;margin:4px 2px 6px;padding:30px 6px 8px;border-radius:16px;background:radial-gradient(120% 90% at 50% 0%,#1c2d52,#0b1328 70%);border:3px solid #d9a227;box-shadow:inset 0 0 0 2px #5a3b07,inset 0 0 18px #000a,0 3px 8px #000a}
 .tnT{position:absolute;left:12px;top:-2px;padding:3px 18px 4px;border-radius:0 0 12px 12px;background:linear-gradient(#ffe27a,#d99a17);border:2px solid #7a4b05;border-top:0;color:#3a1c00;font:900 min(4vw,16px) Game,system-ui;letter-spacing:2px;text-shadow:0 1px 0 #ffe9a8}
 .tnR{display:flex;justify-content:space-around;gap:4px}
