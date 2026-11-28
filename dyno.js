@@ -37,7 +37,7 @@ const PCH=(c,l)=>Math.max(25,100-l*7-c*4),PPITY=5; // part upgrade chance %, +5%
 const CCH=(g,l)=>Math.max(20,100-l*5-g*3),CPITY=4; // chip upgrade chance %, +4% after every fail (per chip)
 const pCash=(c,l)=>Math.round(CASH0[c]*Math.pow(l+1,1.6)/10)*10,pDp=(c,l)=>Math.ceil((l+1)*DPK[c]);
 const unCash=c=>CASH0[c]*50,unDp=c=>DPK[c]*60;
-const FREE=3,EXTRA=[50,100,200];
+const FREE=3,EXTRA=[100,200,300]; // v16-402 (Marius 28 nov): max 3 extra runs a day – 100 / 200 / 300 diamonds (600 in total)
 // ---- chips
 const CHI=i=>'<img class="dyI" src="img/dyno/chip'+i+'.webp" alt="">'; // v16-399 Marius' chip icons
 const SL=[['TURBO',CHI(0),'atk'],['ECU',CHI(1),'crit'],['SUSPENSION',CHI(2),'hp'],['NITRO',CHI(3),'en']];
