@@ -171,6 +171,9 @@ function renderPage(){const f=S(),W=$('fgW'),n=now();
     const N=collN();
     h+='<div class="fgBx"><h4>TOOL COLLECTION</h4><p>2 tools of different heroes at the same grade → a bonus for ALL your heroes.</p>'+CB.map(([g,nm,st,v])=>'<div class="fgRow'+(N[g]>=2?' on':'')+'"><span style="color:'+(N[g]>=2?GC[g]:'')+'">2 × '+nm+' ('+Math.min(2,N[g])+'/2)</span><b>+'+v+'% '+(st==='all'?'ATK, HP, DEF &amp; skill':st==='sd'?'skill damage':st.toUpperCase())+'</b></div>').join('')+'</div>';
     h+='<div class="fgBx"><h4>HOW IT WORKS</h4><p>Every Mythic hero has a SIGNATURE TOOL (also on the hero page, under the hero). Lv 0 → 70 · every 10 levels a BREAKTHROUGH to the next grade: Common → Uncommon → Rare → Epic → Legendary → Mythic → Transcendent. Levels use Molten Core; a breakthrough also needs a Blueprint of the next colour. Chances get lower at every grade – every failed breakthrough adds chance.</p></div>';}
+  else if(TAB==='junk'&&JV2()){
+    h+='<div class="fgBx"><h4>JUNKYARD</h4><p>Every trip has a grade – REFRESH for a better one (2 a trip). Pick up to 3 heroes: every hero adds a bonus by its grade. Longer trips bring more – rare colours only on long trips.</p></div>';
+    for(let i=0;i<3;i++){if(i>=slots()){h+='<div class="fgTr"><div class="h">TRIP '+(i+1)+'<span>🔒 VIP 3</span></div></div>';continue;}h+=jCard(i,n);}}
   else if(TAB==='junk'){
     h+='<div class="fgBx"><h4>JUNKYARD</h4><p>Send your 3 best free heroes to dig in the scrap. Longer trips bring more – rare colours only on long trips. Better heroes find more.</p></div>';
     for(let i=0;i<3;i++){const e=f.ex[i],lock=i>=slots();
@@ -179,19 +182,180 @@ function renderPage(){const f=S(),W=$('fgW'),n=now();
       const done=n>=e.e,pc=Math.min(100,(n-e.t)/(e.e-e.t)*100);
       h+='<div class="fgTr"><div class="h">TRIP '+(i+1)+' · '+TRIP[e.d].h+'h<span>'+(done?'READY':left(e.e-n))+'</span></div><div class="m">'+e.h.map(id=>T().HB[id]?String(T().HB[id].n).split(',')[0]:id).join(', ')+'</div><div class="b"><i style="width:'+pc+'%"></i></div><div class="a"><button data-p="claim" data-i="'+i+'" class="'+(done?'':'off')+'">'+(done?'CLAIM':'DIGGING…')+'</button></div></div>';}}
   else{const L=window.CAMPAIGN&&CAMPAIGN.fgL?CAMPAIGN.fgL():1,fd=CAMPAIGN.fmtD;
-    h+='<div class="fgBs"><b>SCRAP GOLEM</b><img src="img/forge/golem.webp" alt=""></div>';
+    h+='<div class="fgBs"><b>SCRAP GOLEM</b>'+gmHtml()+'</div>';
     h+='<div class="fgBx"><h4><span>'+(BW_TRY-f.bw.n)+' / '+BW_TRY+' TRIES THIS WEEK</span> · <span>DAMAGE</span> <b>'+fd(f.bw.dmg)+'</b></h4><p>60 seconds with your battle team – the Golem cannot die, only the damage counts. Every fight gives Molten Core; weekly damage tiers give Blueprints. New tries every Monday.</p>'+
       BW_T.map((q,i)=>{const got=f.bw.cl.includes(i);return '<div class="fgRow'+(got?' on':'')+'"><span><b>'+fd(q.b*L)+'</b> <span>('+q.b+' bars)</span></span><b>'+MCI()+' '+q.mc+' + '+BPI(q.bp[0])+' '+q.bp[1]+(got?' ✓':'')+'</b></div>';}).join('')+'</div>';
     h+='<button class="fgGo'+(bd?'':' off')+'" style="margin-top:10px" data-p="fight">'+(bd?'ATTACK · 60 s':'NO TRIES · NEW ON MONDAY')+'</button>';}
-  h+='</div>';W.innerHTML=h;}
+  h+='</div>';W.innerHTML=h;if(JPI>=0)jPickR();if(TAB==='boss')gmStart();}
 PG.addEventListener('click',e=>{const el=e.target.closest('[data-p]');if(!el)return;const a=el.dataset.p;
   if(a==='back'){closePage();sfx('close');}
   else if(a==='tab'){TAB=el.dataset.t;sfx('tap');renderPage();}
   else if(a==='tool'){tool(el.dataset.h);}
   else if(a==='send')send(+el.dataset.i,+el.dataset.d);
   else if(a==='claim')claim(+el.dataset.i);
-  else if(a==='fight')fight();});
-setInterval(()=>{if(PG.classList.contains('open')&&TAB==='junk')renderPage();},30000);
+  else if(a==='fight')fight();
+  else if(a==='gmtap')gmAct('attack');
+  else if(a==='jrf')jRefresh(+el.dataset.i);
+  else if(a==='jauto')jAuto(+el.dataset.i);
+  else if(a==='jpick')jPick(+el.dataset.i);
+  else if(a==='jtg')jToggle(el.dataset.h);
+  else if(a==='jclr'){jOf(JPI).h=[];T().save();jPickR();}
+  else if(a==='jok'){JPI=-1;jPickR();renderPage();}
+  else if(a==='jgo')jStart(+el.dataset.i,+el.dataset.d);
+  else if(a==='jclaim')jClaim(+el.dataset.i);
+  else if(a==='jrx'){const o=$('fgJR');if(o)o.remove();}});
+setInterval(()=>{if(PG.classList.contains('open')&&TAB==='junk'&&JPI<0&&JRB<0&&!$('fgJR'))renderPage();},30000);
+
+// ---------------------------------------------------------------- v16-397 JUNKYARD 2.0 (Marius 28 nov: „ca la Rail Wars – animații, alegeri pe grad… adăugăm noi eroii manual…
+//   fiecare erou, depinde de grad, aduce bonus materiale pe lângă gradul ce am prins”) – ONLY the test account for now (rule 28 nov: private first)
+//   every free trip has an EXPEDITION GRADE (Common → Mythic, rolled) · REFRESH 2× (slot-machine spin like Rail Wars) then locked
+//   you pick up to 3 heroes yourself (AUTO fills the best) · every hero adds a bonus by its grade · 2h / 4h / 8h
+//   Save: G.fg.jx[i] = {g, rf, h:[ids]} (the offer of a free slot) · G.fg.ex[i].g = grade of a running trip
+const JV2=()=>!!(window.SEC&&SEC.TEST_ACC);
+const JW=[40,28,17,10,4,1],JRF=2;                     // grade chances % · refreshes per trip
+const JMC=[60,80,100,130,170,230];                    // Molten Core of an 8h trip by expedition grade
+const JBK=[.6,.8,1,1.3,1.7,2.4];                      // × Blueprint chances by expedition grade
+const JHB=[0,3,6,10,18,30];                           // hero bonus % by hero grade (Common → Mythic)
+const JGT=[0,0,1,2,3,4];                              // 8h trip: 1 sure Blueprint of this colour (Rare → Green … Mythic → Yellow)
+function jRoll(){let r=Math.random()*100;for(let g=0;g<JW.length;g++){r-=JW[g];if(r<0)return g;}return 0;}
+function jOf(i){const f=S();if(!f.jx)f.jx=[];if(!f.jx[i])f.jx[i]={g:jRoll(),rf:0,h:[]};const o=f.jx[i];o.h=(o.h||[]).filter(id=>own(id)&&!busy().has(id));return o;}
+function jHK(ids){return ids.reduce((a,id)=>{const h=T().HB[id];return a+(h?JHB[h.gr]||0:0);},0);}
+function jGain(g,d,ids){const tr=TRIP[d],hk=jHK(ids)/100,base=Math.round(JMC[g]*tr.k),bonus=Math.round(base*hk),bp=[0,0,0,0,0,0,0];
+  for(let c=1;c<=6;c++)bp[c]=BPCH[c]*tr.k*JBK[g]*(1+hk)/100; // expected
+  return {base,bonus,mc:base+bonus,bp,sure:d===2?JGT[g]:0,hk};}
+function jPicked(){const s=new Set();const f=S();(f.jx||[]).forEach((o,i)=>{if(o&&!f.ex[i])(o.h||[]).forEach(id=>s.add(id));});return s;}
+function jFree(i){const b=busy(),HB=T().HB,O=T().G.h.own,o=jOf(i),pk=jPicked();
+  return Object.keys(O).filter(id=>HB[id]&&HB[id].cat==='m'&&!HB[id].crew&&!b.has(id)&&(!pk.has(id)||o.h.includes(id))).sort((a,c)=>(HB[c].gr||0)-(HB[a].gr||0)||(O[c].s||0)-(O[a].s||0));}
+function jAuto(i){const o=jOf(i);const pk=jPicked();o.h.forEach(id=>pk.delete(id));o.h=jFree(i).filter(id=>!pk.has(id)||o.h.includes(id)).slice(0,3);T().save();sfx('tap');renderPage();}
+const pURL=id=>{try{return CAMPAIGN.portraitURL(T().HB[id]);}catch(e){return '';}};
+const hN=id=>{const h=T().HB[id];return h?String(h.n).split(',')[0]:id;};
+let JRB=-1; // slot spinning
+function jRefresh(i){if(JRB>=0)return;const o=jOf(i);if(o.rf>=JRF){T().toast('🔒 This trip grade is locked ('+JRF+' refreshes used)',2200);return;}
+  const g0=o.g;o.rf++;o.g=jRoll();const g1=o.g;T().save();const card=$('fgW').querySelector('.fjC[data-i="'+i+'"]');
+  const end=()=>{JRB=-1;renderPage();const c2=$('fgW').querySelector('.fjC[data-i="'+i+'"]');if(c2){c2.classList.add(g1>g0?'up':'land');if(g1>g0)c2.insertAdjacentHTML('beforeend','<div class="fjUp">⬆ UPGRADE!</div>');}
+    sfx(g1>g0?'levelup':'tap');T().toast(g1>g0?'✨ UPGRADE! → '+GN[g1]:'🔄 '+GN[g1]+' · '+(JRF-o.rf)+' refresh left',2200);};
+  if(!card){end();return;}JRB=i;card.classList.add('spin');const gb=card.querySelector('.fjG'),bt=card.querySelector('[data-p="jrf"]');if(bt){bt.classList.add('off');bt.textContent='🎰 ...';}
+  const N=6,STEPS=14;let k=0;const tick=()=>{if(k>=STEPS){card.classList.remove('spin');end();return;}k++;const g=k===STEPS?g1:(g0+k)%N;
+    if(gb){gb.textContent=GN[g];}card.style.setProperty('--gc',GC[g]);sfx('tap');setTimeout(tick,40+k*k*1.1);};tick();}
+function jStart(i,d){const f=S(),o=jOf(i);if(f.ex[i])return;if(!o.h.length){T().toast('Pick at least 1 hero first',2200);return;}
+  f.ex[i]={h:o.h.slice(),d,g:o.g,t:now(),e:now()+TRIP[d].h*36e5};f.jx[i]=null;T().save();sfx('reward');renderPage();
+  const c=$('fgW').querySelector('.fjC[data-i="'+i+'"]');if(c)c.classList.add('go');}
+// picker (overlay inside the Forge page)
+let JPI=-1;
+function jPick(i){JPI=i;jPickR();}
+function jPickR(){let o=$('fgJP');if(JPI<0){if(o)o.remove();return;}if(!o){o=document.createElement('div');o.id='fgJP';$('fgW').appendChild(o);}
+  const s=jOf(JPI),L=jFree(JPI);
+  o.innerHTML='<div class="box"><div class="hd"><b>PICK HEROES</b><span>'+s.h.length+' / 3 · <span>bonus</span> +'+jHK(s.h)+'%</span></div><div class="gr">'+(L.length?L.map(id=>{const h=T().HB[id],on=s.h.includes(id);
+    return '<div class="hc'+(on?' on':'')+'" data-p="jtg" data-h="'+id+'" style="--gc:'+GC[h.gr]+'"><img src="'+pURL(id)+'" alt=""><b>'+hN(id)+'</b><small>+'+JHB[h.gr]+'%</small>'+(on?'<i>✓</i>':'')+'</div>';}).join(''):'<p>No free heroes</p>')+
+    '</div><div class="ft"><button class="fgGo off" data-p="jclr">CLEAR</button><button class="fgGo" data-p="jok">OK</button></div></div>';}
+function jToggle(id){const s=jOf(JPI),k=s.h.indexOf(id);if(k>=0)s.h.splice(k,1);else{if(s.h.length>=3){T().toast('Max 3 heroes',1600);return;}s.h.push(id);}T().save();sfx('tap');jPickR();}
+// claim with a reward burst
+function jClaim(i){const f=S(),e=f.ex[i];if(!e||now()<e.e)return;
+  if(e.g===undefined){claim(i);return;}
+  const r=jGain(e.g,e.d,e.h),got={mc:r.mc,bp:[0,0,0,0,0,0,0]};
+  for(let c=1;c<=6;c++){const p=r.bp[c];let n=Math.floor(p);if(Math.random()<p-n)n++;got.bp[c]=n;}
+  if(r.sure)got.bp[r.sure]++;
+  f.mc+=got.mc;got.bp.forEach((n,c)=>f.bp[c]+=n);f.ex[i]=null;T().save();sfx('reward');renderPage();
+  const it=['<div class="ri" style="--d:0s">'+MCI('46px')+'<b>+'+r.base+'</b><small>'+GN[e.g]+'</small></div>'];
+  if(r.bonus)it.push('<div class="ri hb" style="--d:.25s">'+MCI('46px')+'<b>+'+r.bonus+'</b><small>HERO BONUS</small></div>');
+  got.bp.forEach((n,c)=>{if(n)it.push('<div class="ri" style="--d:'+(.25+it.length*.22)+'s">'+BPI(c,'46px')+'<b>+'+n+'</b><small>'+BPN[c]+'</small></div>');});
+  const o=document.createElement('div');o.id='fgJR';o.style.setProperty('--gc',GC[e.g]);
+  o.innerHTML='<div class="rays"></div><div class="box"><div class="tt">JUNKYARD</div><div class="gg">'+GN[e.g]+'</div><div class="its">'+it.join('')+'</div><button class="fgGo" data-p="jrx">CLAIM</button></div>';
+  $('fgW').appendChild(o);}
+function jCard(i,n){const f=S(),e=f.ex[i];
+  if(!e){const o=jOf(i),q=jGain(o.g,2,o.h),lk=o.rf>=JRF;
+    let h='<div class="fjC" data-i="'+i+'" style="--gc:'+GC[o.g]+'"><div class="fjT"><span>TRIP '+(i+1)+'</span><div class="fjG">'+GN[o.g]+'</div></div>';
+    h+='<div class="fjH">'+[0,1,2].map(k=>{const id=o.h[k];return '<div class="fjS" data-p="jpick" data-i="'+i+'"'+(id?' style="--hc:'+GC[T().HB[id].gr]+'"':'')+'>'+(id?'<img src="'+pURL(id)+'" alt=""><b>+'+JHB[T().HB[id].gr]+'%</b>':'<i>+</i>')+'</div>';}).join('')+'<button class="fjA" data-p="jauto" data-i="'+i+'">AUTO</button></div>';
+    h+='<div class="fjR"><span>8h:</span> '+MCI()+' '+q.base+(q.bonus?' <em>+'+q.bonus+'</em>':'')+(q.sure?' · '+BPI(q.sure)+' 1':'')+' · <span>hero bonus</span> <em>+'+jHK(o.h)+'%</em></div>';
+    h+='<div class="fjB"><button class="fjRf'+(lk?' off':'')+'" data-p="jrf" data-i="'+i+'">'+(lk?'🔒 LOCKED':'🔄 '+(JRF-o.rf)+'/'+JRF)+'</button>'+TRIP.map((t,d)=>'<button data-p="jgo" data-i="'+i+'" data-d="'+d+'" class="'+(o.h.length?'':'off')+'">'+t.h+'h<small>'+MCI()+' '+jGain(o.g,d,o.h).mc+'</small></button>').join('')+'</div></div>';
+    return h;}
+  const done=n>=e.e,pc=Math.min(100,(n-e.t)/(e.e-e.t)*100),g=e.g===undefined?0:e.g;
+  let h='<div class="fjC run'+(done?' done':'')+'" data-i="'+i+'" style="--gc:'+GC[g]+'"><div class="fjT"><span>TRIP '+(i+1)+' · '+TRIP[e.d].h+'h</span>'+(e.g===undefined?'':'<div class="fjG">'+GN[g]+'</div>')+'</div>';
+  h+='<div class="fjDig">'+e.h.map((id,k)=>'<div class="dh" style="--k:'+k+'"><img src="'+pURL(id)+'" alt=""></div>').join('')+'<div class="pile"><i></i><i></i><i></i><i></i><i></i></div></div>';
+  h+='<div class="fjP"><i style="width:'+pc+'%"></i><span>'+(done?'READY':left(e.e-n))+'</span></div>';
+  h+='<div class="fjB"><button class="'+(done?'':'off')+'" data-p="jclaim" data-i="'+i+'">'+(done?'CLAIM':'DIGGING…')+'</button></div></div>';return h;}
+const jcss=document.createElement('style');jcss.textContent=`
+.fjC{position:relative;margin-top:9px;border-style:solid;border-color:transparent;border-width:22px;border-image:url(img/forge/card.webp) 124 fill/22px stretch;padding:0 2px;filter:drop-shadow(0 0 7px color-mix(in srgb,var(--gc) 55%,transparent));transition:filter .3s}
+.fjT{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:14px;margin:-6px 0 4px}
+.fjG{font:900 italic 15px Game,system-ui;color:var(--gc);text-transform:uppercase;padding:2px 12px;border-radius:999px;background:#000a;box-shadow:inset 0 0 0 2px var(--gc),0 0 10px var(--gc);text-shadow:0 0 6px var(--gc)}
+.fjC.spin .fjG{animation:fjSp .12s linear infinite}@keyframes fjSp{50%{transform:translateY(-3px) scale(1.08)}}
+.fjC.land .fjG{animation:fjLd .5s ease-out}@keyframes fjLd{0%{transform:scale(1.6)}60%{transform:scale(.9)}100%{transform:scale(1)}}
+.fjC.up{animation:fjUpG 1.2s ease-out}@keyframes fjUpG{0%{filter:drop-shadow(0 0 30px var(--gc)) brightness(1.8)}100%{}}
+.fjUp{position:absolute;left:0;right:0;top:30%;text-align:center;font:900 italic 26px Game,system-ui;color:#fff;text-shadow:0 0 10px var(--gc),0 3px 0 #000;animation:fjUpT 1.4s ease-out forwards;pointer-events:none}@keyframes fjUpT{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.2);opacity:1}70%{opacity:1}100%{transform:translateY(-30px);opacity:0}}
+.fjC.go{animation:fjGo .6s ease-out}@keyframes fjGo{30%{transform:scale(1.04)}}
+.fjH{display:flex;gap:7px;align-items:center}
+.fjS{position:relative;width:56px;height:56px;border-radius:12px;background:#0008;box-shadow:inset 0 0 0 2px var(--hc,#55606c);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.fjS img{width:100%;height:100%;object-fit:cover}.fjS i{font-style:normal;font-size:28px;color:#9aa4ae;animation:fjPl 1.6s ease-in-out infinite}@keyframes fjPl{50%{transform:scale(1.18);color:#ffd54a}}
+.fjS b{position:absolute;left:0;right:0;bottom:0;font-size:10px;text-align:center;background:#000b;color:#7dff9a}
+.fjA{margin-left:auto;height:38px;padding:0 12px;--bh:38px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_blue_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;color:#fff;font:900 italic 12px Game,system-ui;text-shadow:0 1px 0 #0008}
+.fjR{font-size:11.5px;color:#cfd8dc;margin:7px 0 2px}.fjR em{font-style:normal;color:#7dff9a;font-weight:900}
+.fjB{display:flex;gap:5px;margin-top:6px}.fjB button{flex:1;height:46px;--bh:46px;border-style:solid;border-color:transparent;border-width:0;border-image:url(img/ui8/btn_gold_s.webp) 0 100 fill/0 calc(var(--bh)*1.08) stretch;background:none;color:#3a2300;font:900 italic 13px Game,system-ui;line-height:1}
+.fjB button small{display:block;font:900 10px Game,system-ui;margin-top:2px}.fjB button small .fgI{height:1.1em}
+.fjB .fjRf{flex:.9;border-image-source:url(img/ui8/btn_red_s.webp);color:#fff;text-shadow:0 1px 0 #0008}
+.fjB button.off{border-image-source:url(img/ui8/btn_grey_s.webp);color:#cfd8dc;text-shadow:0 1px 0 #0008}
+.fjC.run .fjB button{border-image-source:url(img/ui8/btn_blue_s.webp);color:#fff}.fjC.run .fjB button.off{border-image-source:url(img/ui8/btn_grey_s.webp)}
+.fjC.done .fjB button:not(.off){border-image-source:url(img/ui8/btn_gold_s.webp);color:#3a2300;animation:fjPl2 1s ease-in-out infinite}@keyframes fjPl2{50%{transform:scale(1.05);filter:brightness(1.25)}}
+.fjDig{position:relative;height:64px;display:flex;align-items:flex-end;gap:10px;padding-left:6px;overflow:hidden;border-radius:10px;background:linear-gradient(#0000 40%,#3b2a1c 41%,#24180f);}
+.fjDig .dh{width:48px;height:48px;border-radius:10px;overflow:hidden;box-shadow:0 0 0 2px var(--gc);animation:fjDg .9s ease-in-out infinite;animation-delay:calc(var(--k)*.3s);transform-origin:50% 100%}
+.fjDig .dh img{width:100%;height:100%;object-fit:cover}
+@keyframes fjDg{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-9px) rotate(-6deg)}60%{transform:translateY(2px) rotate(4deg)}}
+.fjC.done .fjDig .dh{animation:fjWin .7s ease-in-out infinite}@keyframes fjWin{50%{transform:translateY(-12px)}}
+.fjDig .pile{position:absolute;right:10px;bottom:4px;width:90px;height:44px}
+.fjDig .pile i{position:absolute;bottom:0;width:10px;height:7px;border-radius:2px;background:#8d6e63;opacity:0;animation:fjBit 1.8s ease-out infinite}
+.fjDig .pile i:nth-child(1){left:10px;background:#b0bec5}.fjDig .pile i:nth-child(2){left:30px;animation-delay:.35s;background:var(--gc)}.fjDig .pile i:nth-child(3){left:50px;animation-delay:.7s;background:#ff8a3d}.fjDig .pile i:nth-child(4){left:70px;animation-delay:1.05s}.fjDig .pile i:nth-child(5){left:40px;animation-delay:1.4s;background:#ffd54a}
+@keyframes fjBit{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(-18px,-40px) rotate(260deg);opacity:0}}
+.fjC.done .fjDig .pile i{background:var(--gc);box-shadow:0 0 6px var(--gc)}
+.fjP{position:relative;height:16px;border-radius:8px;background:#11161c;overflow:hidden;margin-top:6px;box-shadow:inset 0 0 0 1px #ffffff22}
+.fjP i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--gc) 0 10px,color-mix(in srgb,var(--gc) 60%,#000) 10px 20px);background-size:28px 28px;animation:fjSt 1s linear infinite}@keyframes fjSt{to{background-position:28px 0}}
+.fjP span{position:absolute;inset:0;text-align:center;font:900 11px/16px Game,system-ui;text-shadow:0 1px 2px #000}
+#fgJP{position:absolute;inset:0;z-index:20;background:#000c;display:flex;align-items:center;justify-content:center;padding:14px}
+#fgJP .box{width:100%;max-height:88%;display:flex;flex-direction:column;border-style:solid;border-color:transparent;border-width:20px;border-image:url(img/forge/panel.webp) 104 fill/20px stretch}
+#fgJP .hd{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:#ffb347;margin-bottom:6px}#fgJP .hd>span{font-size:12px;color:#7dff9a}
+#fgJP .gr{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:3px}
+#fgJP .hc{position:relative;text-align:center;font-size:9px;border-radius:10px;padding:3px;background:#0007;box-shadow:inset 0 0 0 2px var(--gc)}#fgJP .hc img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:7px}
+#fgJP .hc b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--gc)}#fgJP .hc small{color:#7dff9a;font-weight:900}
+#fgJP .hc.on{box-shadow:inset 0 0 0 3px #7dff9a,0 0 10px #7dff9a;transform:scale(.95)}#fgJP .hc i{position:absolute;right:2px;top:2px;width:20px;height:20px;border-radius:50%;background:#2ecc71;color:#fff;font-style:normal;font-weight:900;line-height:20px}
+#fgJP .ft{display:flex;gap:8px;margin-top:8px}#fgJP .ft .fgGo{height:44px}
+#fgJR{position:absolute;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:#000d;overflow:hidden}
+#fgJR .rays{position:absolute;left:50%;top:45%;width:700px;height:700px;margin:-350px;background:repeating-conic-gradient(color-mix(in srgb,var(--gc) 35%,transparent) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:fjRay 8s linear infinite;mask:radial-gradient(#000 20%,transparent 65%);-webkit-mask:radial-gradient(#000 20%,transparent 65%)}@keyframes fjRay{to{transform:rotate(360deg)}}
+#fgJR .box{position:relative;width:88%;text-align:center;animation:fjLd .5s ease-out}
+#fgJR .tt{font:900 italic 26px Game,system-ui;color:#ffb347;text-shadow:0 3px 0 #000}#fgJR .gg{font:900 italic 18px Game,system-ui;color:var(--gc);text-transform:uppercase;text-shadow:0 0 10px var(--gc)}
+#fgJR .its{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px 0}
+#fgJR .ri{width:78px;padding:8px 2px;border-radius:12px;background:#000a;box-shadow:inset 0 0 0 2px var(--gc);opacity:0;animation:fjRi .5s ease-out forwards;animation-delay:var(--d)}#fgJR .ri.hb{box-shadow:inset 0 0 0 2px #7dff9a}
+#fgJR .ri b{display:block;font-size:17px;color:#fff}#fgJR .ri small{display:block;font-size:9px;color:#cfd8dc;text-transform:uppercase}
+@keyframes fjRi{0%{opacity:0;transform:translateY(30px) scale(.4)}70%{opacity:1;transform:translateY(-6px) scale(1.12)}100%{opacity:1;transform:none}}
+#fgJR .fgGo{max-width:240px}
+`;document.head.appendChild(jcss);
+
+// ---------------------------------------------------------------- v16-397 SCRAP GOLEM animated on the Forge page (Marius 28 nov: „bagă animație la boss”)
+// the battle atlas img/mon/golem2.webp (6 cols × 7 rows: 0 idle · 2 attack · 3 skill) – idle loop, every ~5 s an attack or the skill (shake + flash), tap = attack
+const gcss=document.createElement('style');gcss.textContent=`
+.fgBs .gm{position:relative;height:88%;aspect-ratio:196/238;margin-bottom:5%;cursor:pointer}
+.fgBs .gm .sp{position:absolute;inset:0;background:url(img/mon/golem2.webp) 0 0/600% 700% no-repeat;filter:drop-shadow(0 6px 8px #000a)}
+.fgBs .gm .gl{position:absolute;left:18%;right:18%;top:30%;height:36%;border-radius:50%;background:radial-gradient(#ff8a1e 0,#ff5a0055 45%,transparent 70%);animation:gmGl 1.6s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes gmGl{50%{transform:scale(1.25);opacity:.55}}
+.fgBs .gm .sh{position:absolute;left:8%;right:8%;bottom:-2%;height:12%;border-radius:50%;background:radial-gradient(#000c,transparent 70%)}
+.fgBs .em{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.fgBs .em i{position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:#ffb13b;box-shadow:0 0 6px #ff7a00,0 0 2px #fff;animation:gmEm 3.2s linear infinite;opacity:0}
+@keyframes gmEm{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(var(--x),-230px);opacity:0}}
+.fgBs.shk{animation:gmShk .35s linear}@keyframes gmShk{20%{transform:translate(-5px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+.fgBs .fl{position:absolute;inset:0;background:radial-gradient(circle at 50% 75%,#ffb347cc,#ff4d0055 45%,transparent 70%);opacity:0;pointer-events:none}
+.fgBs .fl.on{animation:gmFl .45s ease-out}@keyframes gmFl{0%{opacity:1}100%{opacity:0}}
+.fgBs b{z-index:2}
+`;document.head.appendChild(gcss);
+const GM={t:0,row:0,f:0,dir:1,next:0,act:null,timer:0};
+function gmHtml(){let e='';for(let k=0;k<14;k++)e+='<i style="left:'+(5+Math.random()*90).toFixed(1)+'%;--x:'+((Math.random()-.5)*60).toFixed(0)+'px;animation-delay:'+(Math.random()*3.2).toFixed(2)+'s;animation-duration:'+(2.4+Math.random()*1.8).toFixed(2)+'s"></i>';
+  return '<div class="em">'+e+'</div><div class="fl"></div><div class="gm" data-p="gmtap"><div class="sh"></div><div class="gl"></div><div class="sp"></div></div>';}
+function gmSet(){const sp=$('fgW')&&$('fgW').querySelector('.fgBs .sp');if(!sp)return false;sp.style.backgroundPosition=(GM.f*20)+'% '+(GM.row*100/6)+'%';return true;}
+function gmAct(k){if(GM.act)return;GM.act=k;GM.row=k==='skill'?3:2;GM.f=0;}
+function gmTick(){if(!PG.classList.contains('open')||TAB!=='boss'||!gmSet()){clearInterval(GM.timer);GM.timer=0;return;}
+  const t=Date.now();
+  if(GM.act){GM.f++;const hit=GM.act==='skill'?3:3;if(GM.f===hit){const bs=$('fgW').querySelector('.fgBs'),fl=bs&&bs.querySelector('.fl');if(bs){bs.classList.remove('shk');void bs.offsetWidth;bs.classList.add('shk');}if(fl){fl.classList.remove('on');void fl.offsetWidth;fl.classList.add('on');}sfx(GM.act==='skill'?'crit':'hit');}
+    if(GM.f>5){GM.act=null;GM.row=0;GM.f=0;GM.dir=1;GM.next=t+4000+Math.random()*2500;}}
+  else{GM.f+=GM.dir;if(GM.f>=5){GM.f=5;GM.dir=-1;}else if(GM.f<=0){GM.f=0;GM.dir=1;}
+    if(!GM.next)GM.next=t+2500;if(t>=GM.next)gmAct(Math.random()<.4?'skill':'attack');}
+  gmSet();}
+function gmStart(){GM.act=null;GM.row=0;GM.f=0;GM.next=0;gmSet();if(!GM.timer)GM.timer=setInterval(gmTick,130);}
 
 // ---------------------------------------------------------------- SCRAP GOLEM
 function fight(){const f=S();if(f.bw.n>=BW_TRY){T().toast('No tries left this week · new on Monday',2400);return;}

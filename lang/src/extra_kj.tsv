@@ -400,3 +400,23 @@ THE FORGE opens after campaign stage #-#	THE FORGE는 캠페인 스테이지 #-#
 (the last one:	(마지막:	（最後：
 open every week (week # # #). The last one:	매주 오픈(#주차 # #). 마지막:	毎週解放（第#週 # #）。最後：
 # MYTHIC heroes AWAKENED I	신화 각성 I 영웅 #명	神話 覚醒Iのヒーロー#体
+Every trip has a grade – REFRESH for a better one (# a trip). Pick up to # heroes: every hero adds a bonus by its grade. Longer trips bring more – rare colours only on long trips.	탐사마다 등급이 있습니다 – 새로고침으로 더 좋은 등급을 노리세요(탐사당 #회). 영웅을 최대 #명 고르세요: 영웅마다 등급에 따라 보너스를 더합니다. 긴 탐사일수록 더 많이 – 희귀 색상은 긴 탐사에서만.	探索ごとにグレードがあります – 更新でより良いグレードに（1回の探索につき#回）。ヒーローを最大#人選択：各ヒーローがグレードに応じてボーナスを追加。長い探索ほど多く – レア色は長い探索のみ。
+PICK HEROES	영웅 선택	ヒーロー選択
+No free heroes	가능한 영웅 없음	空いているヒーローなし
+CLEAR	비우기	クリア
+OK	확인	OK
+AUTO	자동	オート
+HERO BONUS	영웅 보너스	ヒーローボーナス
+hero bonus	영웅 보너스	ヒーローボーナス
+bonus	보너스	ボーナス
+# refresh left	새로고침 #회 남음	残り更新#回
+Max # heroes	최대 영웅 #명	最大#人
+Pick at least # hero first	먼저 영웅을 #명 이상 고르세요	先にヒーローを#人以上選んでください
+This trip grade is locked (# refreshes used)	이 탐사 등급은 고정되었습니다(새로고침 #회 사용)	この探索のグレードは固定されました（更新#回使用）
+#h:	#시간:	#時間:
+Green	초록	緑
+Blue	파랑	青
+Purple	보라	紫
+Yellow	노랑	黄
+Red	빨강	赤
+Rainbow	무지개	虹
