@@ -85,7 +85,7 @@ function slotOpen(hid,s){return (window.SEC&&SEC.TEST_ACC)||hLv(hid)>=HSLOT[s];}
 const css=document.createElement('style');css.textContent=`
 #dy{position:fixed;inset:0;z-index:30;display:none;justify-content:center;align-items:flex-start;background:#05070b;font-family:Game,system-ui,sans-serif;color:#fff;overflow:hidden}
 #dy.open{display:flex}
-#dyS{position:relative;width:calc(var(--u)*1024);height:100%;min-height:calc(var(--u)*1536);background:url(img/dyno/room.webp) 0 0/100% auto no-repeat,linear-gradient(#2a303a,#10141a 60%);background-color:#10141a;overflow:hidden;flex:none}
+#dyS{will-change:transform;position:relative;width:calc(var(--u)*1024);height:100%;min-height:calc(var(--u)*1536);background:url(img/dyno/room.webp) 0 0/100% auto no-repeat,linear-gradient(#2a303a,#10141a 60%);background-color:#10141a;overflow:hidden;flex:none}
 .dyA{position:absolute;left:calc(var(--u)*var(--x));top:calc(var(--u)*var(--y));width:calc(var(--u)*var(--w));height:calc(var(--u)*var(--h))}
 #dyHd{left:0;top:0;width:100%;height:calc(var(--u)*205);background:linear-gradient(#000d,#0009 70%,#0000);display:flex;flex-direction:column;align-items:center;padding-top:env(safe-area-inset-top)}
 #dyHd .r1{display:flex;align-items:center;width:100%;height:calc(var(--u)*110);padding:0 calc(var(--u)*16)}
@@ -130,7 +130,7 @@ const css=document.createElement('style');css.textContent=`
 @keyframes dyPf{from{transform:translate(0,0) scale(.4);opacity:.9}to{transform:translate(calc(var(--u)*-160),calc(var(--u)*-90)) scale(2.4);opacity:0}}
 #dyP{position:fixed;inset:0;z-index:62;display:none;align-items:center;justify-content:center;background:rgba(2,3,6,.82);font-family:Game,system-ui,sans-serif;color:#fff}
 #dyP.open{display:flex}
-#dyPB{position:relative;width:min(94vw,380px);max-height:90vh;overflow:auto;padding:58px 20px 22px;box-sizing:border-box}
+#dyPB{will-change:transform;position:relative;width:min(94vw,380px);max-height:90vh;overflow:auto;padding:58px 20px 22px;box-sizing:border-box}
 #dyPB::before{content:'';position:absolute;inset:0;border-style:solid;border-color:transparent;border-width:80px 48px 48px;border-image:url(img/forge/popup.webp) 118 70 70 fill/80px 48px 48px stretch;pointer-events:none;z-index:0}
 #dyPB>*{position:relative;z-index:1}
 .dyX{position:absolute!important;right:14px;top:14px;width:44px;height:30px;border:0;background:url(img/ui8/ic_close.webp) center/contain no-repeat;font-size:0;z-index:2!important}
@@ -209,11 +209,14 @@ function curve(hp,nm,upto){const W=445,H=240,mx=Math.max(hp,nm)*1.12,pt=(f,v)=>{
 function render(){const y=S(),c=SH,lock=c>y.c,hp=carHP(c),nm=carNm(c,hp),gmax=CAR[c].hp[1]*1.1,t=tune(c),rl=runsLeft(),ex=y.x<EXTRA.length;
   const W=$('dyS');let h='<div class="dyA" id="dyHd" '+A(0,0,1024,205)+'><div class="r1"><button class="bk" data-d="back">↩</button><h1>DYNO GARAGE</h1><span class="sp"></span></div>'+
     '<div class="r2"><span><img src="img/ui2/i_coins.webp" alt="">'+T().fmt(T().G.money||0)+'</span><span>'+DPI+T().nf(y.dp)+'</span><span>'+OILI+T().nf(y.oil)+'</span></div></div>';
-  h+='<img class="dyFan" id="dyFan" src="img/dyno/fan.webp" alt="" style="left:calc(var(--u)*18);top:calc(var(--u)*640);width:calc(var(--u)*200);height:calc(var(--u)*200)">';
+  // v16-407 (Marius: „iar am flash-urile alea… paginile noi”, ca în videoul cu profilul): the fan + the car are NOT re-created on every render
+  // (a new <img> = a blank frame on cheaper WebViews) – the old nodes are moved back in; all Dyno pictures are decoded once at start (PRE)
+  const oF=$('dyFan'),oC=$('dyCar'),ck=c+(lock?'L':'');
+  h+=oF?'<i id="dyFanPH"></i>':'<img class="dyFan" id="dyFan" src="img/dyno/fan.webp" alt="" style="left:calc(var(--u)*18);top:calc(var(--u)*640);width:calc(var(--u)*200);height:calc(var(--u)*200)">';
   h+=gauge(0,lock?0:hp,gmax,'HP')+gauge(1,lock?0:nm,gmax*CAR[c].nm,'Nm');
   const L=LAST&&LAST.c===c?LAST:null;
   h+='<svg id="dyScr" class="dyA" '+A(290,238,445,240)+' viewBox="0 0 445 240">'+curve(L?L.hp:hp,L?L.nm:nm,L?1:0)+'</svg>';
-  h+=carHtml(c,lock);
+  h+=oC&&oC.dataset.k===ck?'<i id="dyCarPH"></i>':carHtml(c,lock);
   h+='<div class="dyA dyFl" style="--gc:'+GC[c]+'">';
   h+='<div class="dyNm"><button data-d="prev"'+(c>0?'':' disabled')+'>❮</button><div class="t"><b>'+CAR[c].n+'</b><span><b>'+GN[c].toUpperCase()+'</b> · '+(lock?'🔒 LOCKED':hp+' HP · '+nm+' Nm')+'</span>'+(y.best[c]&&!lock?'<span> · BEST '+y.best[c]+' HP</span>':'')+'</div><button data-d="next"'+(c<5?'':' disabled')+'>❯</button></div>';
   if(lock){const ok=c===y.c+1&&tune(y.c)>=TMAX;
@@ -224,7 +227,8 @@ function render(){const y=S(),c=SH,lock=c>y.c,hp=carHP(c),nm=carNm(c,hp),gmax=CA
     h+='<div class="dyBt"><button data-d="parts">🔧<small>PARTS</small>'+(pd?'<i></i>':'')+'</button><button class="go'+(rl||ex?'':' off')+'" data-d="run">RUN<small>'+(rl?rl+' / '+FREE+' FREE':ex?'+1 · '+EXTRA[y.x]+' 💎':'0 / '+FREE+' · TOMORROW')+'</small>'+(rl?'<i></i>':'')+'</button><button data-d="chips">💾<small>CHIPS</small>'+(cd?'<i></i>':'')+'</button></div>';
     h+='<div class="dyInf">Chips from this car: up to <b style="color:'+GC[capG(c)]+'">'+GN[capG(c)].toUpperCase()+'</b> · more HP = better odds</div>'+oddsHtml(c);}
   h+='<div class="dyRec2"><div class="h">🏆 BEST RUNS</div>'+CAR.map((q,i)=>'<div style="color:'+(i<=y.c?GC[i]:'#5f6b78')+'"><span>'+q.n+'</span><b>'+(i>y.c?'🔒':y.best[i]?y.best[i]+' HP':'—')+'</b></div>').join('')+'</div>';
-  h+='</div>';W.innerHTML=h;}
+  h+='</div>';W.innerHTML=h;
+  const pf=$('dyFanPH');if(pf&&oF)pf.replaceWith(oF);const pc=$('dyCarPH');if(pc&&oC)pc.replaceWith(oC);else{const nc=$('dyCar');if(nc)nc.dataset.k=ck;}}
 // ---------------------------------------------------------------- parts
 function canPart(c,i){const y=S(),l=y.p[c][i];return c<=y.c&&l<PMAX&&(T().G.money||0)>=pCash(c,l)&&y.dp>=pDp(c,l);}
 function partsPop(){const y=S(),c=SH,p=y.p[c];
@@ -413,5 +417,10 @@ function pcheck(){const s=psnap();if(!s)return;const b=PB;PB=s;if(!b||(window.CA
   PB=psnap();
   // the hero page: switching heroes is not an upgrade → refresh the snapshot on every tap there (no popup)
   document.addEventListener('click',()=>{setTimeout(()=>{const s=psnap();if(s&&PB&&s.h&&(!PB.h||s.h.id!==PB.h.id))PB.h=s.h;},0);},true);})();
+// v16-407: decode every Dyno / Tuning picture once (kept in PRE) → pages and popups show them in the same frame, no blink
+const PRE=[];function preload(){if(!ON()||PRE.length)return;const L=['room','fan','m_dyno','dp','oil','up_panel'];for(let i=0;i<6;i++){L.push('car'+i,'w'+i+'_0','w'+i+'_1','part'+i);}for(let i=0;i<4;i++)L.push('chip'+i);
+  const U=L.map(n=>'img/dyno/'+n+'.webp');for(let g=0;g<7;g++)U.push('img/fr'+g+'.webp');U.push('img/forge/popup.webp');
+  U.forEach(u=>{const im=new Image();im.decoding='async';im.src=u;PRE.push(im);if(im.decode)im.decode().then(()=>{try{if(window.PAGEFX)PAGEFX.ready.add(new URL(u,location.href).href);}catch(e){}}).catch(()=>{});});}
+setTimeout(function pl(){if(window.SEC&&window.__TE){preload();}else setTimeout(pl,1500);},2500);
 window.TDYNO={on:ON,open,bon,btn,bar,hero,todo,sub,S,carHP,newChip};
 })();
