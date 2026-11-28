@@ -999,13 +999,15 @@ const gpCost0=it=>Math.max(1,Math.round(upCost(it)/10)); // v16-99 cost per piec
 // v16-280 (Marius 24 nov): SLOT UPGRADES – the +1 … +50 belongs to the hero's SLOT (g.slv[hero][slot]), not to the piece ("classic" system).
 // Any Common–Mythic piece put in that slot gets the slot's +. Ascended keeps its own stars. A free piece in the bag is +1.
 // The cost no longer depends on the grade of the piece (else: upgrade with a Common, then swap in a Mythic) – it grows with the level, ×2 (never lost now)
-const slotCost=lv=>Math.max(1,2*Math.round(150*Math.pow(1+(lv-1)/10,1.6)*Math.pow(1.4,Math.min(lv,10)-1)*Math.pow(1.08,Math.max(0,lv-10))/10));
+const slotCost0=lv=>Math.max(1,2*Math.round(150*Math.pow(1+(lv-1)/10,1.6)*Math.pow(1.4,Math.min(lv,10)-1)*Math.pow(1.08,Math.max(0,lv-10))/10));
+const slotCost=lv=>Math.max(1,Math.round(slotCost0(lv)*1.5)); // v16-406 (Marius 28 nov: „level up mai greu la echipamente”) ×1.5 – old levels are refunded at the old price (g.s15)
 const gpCost=it=>slotCost(it.lv||1);
 const SLV=(hid,s)=>{const v=GR().slv;return (v&&v[hid]&&v[hid][s])||1;};
 const eLv=(it,hid)=>it.r>=6||!hid?it.lv:SLV(hid,it.s);
-function slvSync(){const g=GR(),sv=g.slv||(g.slv={}),own={};for(const hid in g.eq)for(const s in g.eq[hid])own[g.eq[hid][s]]=hid;
+function slvSync(){s15Mig();const g=GR(),sv=g.slv||(g.slv={}),own={};for(const hid in g.eq)for(const s in g.eq[hid])own[g.eq[hid][s]]=hid;
   for(const it of g.inv){if(it.r>=6)continue;const o=own[it.id];it.lv=(o&&sv[o]&&sv[o][it.s])||1;}}
-function slvRefund(hid){const g=GR(),v=(g.slv||{})[hid];let c=0;if(v)for(const s in v)for(let l=1;l<v[s];l++)c+=slotCost(l);return c;}
+function slvRefund(hid){const g=GR(),v=(g.slv||{})[hid],o=((g.s15||{})[hid])||{};let c=0;if(v)for(const s in v)for(let l=1;l<v[s];l++)c+=l<(o[s]||0)?slotCost0(l):slotCost(l);if(g.s15)delete g.s15[hid];return c;}
+function s15Mig(){const g=GR();if(g.m406)return;g.m406=1;g.s15={};const v=g.slv||{};for(const h in v)g.s15[h]={...v[h]};}
 const slvTier=lv=>Math.min(10,Math.floor((lv||1)/5));
 const SLV_COL=['#9e9e9e','#69f0ae','#40c4ff','#448aff','#b388ff','#ea5cff','#ff4081','#ff9100','#ff3d00','#ff1744','#ffd54a']; // v16-311 (Marius): real colour already from +5 (no more white) // corner badge colour: every +5 a new colour
 const GPN=n=>TE().GPI+' '+TE().nf(n);
@@ -3761,7 +3763,7 @@ $('cpPop').addEventListener('click',e=>{const T=TE(),G=T.G;if(e.target.id==='cpP
   const it=el.dataset.it?itemById(+el.dataset.it):null,h=gHero();
   if(a==='eq'&&it&&h){equip(h.id,it);T.save();closePop();renderGear();T.toast('✓ '+itemName(it)+' equipped on '+h.n,1800);return;}
   if(a==='ueq'&&it){const o=ownerOf(it);if(o)delete GR().eq[o][it.s];slvSync();T.save();closePop();renderGear();return;}
-  if(a==='up'&&it){const ow=ownerOf(it);if(!ow&&it.r<6){T.toast('Equip it first – the upgrade (+) belongs to the hero\'s SLOT',2400);return;}const c=gpCost(it);if((G.gp||0)<c){T.toast('Not enough Gear Parts ('+GPN(c)+') · salvage gear, Dungeons, campaign, Idle Rewards',2600);return;}if(it.lv>=gMax(it))return;
+  if(a==='up'&&it){s15Mig();const ow=ownerOf(it);if(!ow&&it.r<6){T.toast('Equip it first – the upgrade (+) belongs to the hero\'s SLOT',2400);return;}const c=gpCost(it);if((G.gp||0)<c){T.toast('Not enough Gear Parts ('+GPN(c)+') · salvage gear, Dungeons, campaign, Idle Rewards',2600);return;}if(it.lv>=gMax(it))return;
     const v0=mainV(it),p0=gHero()?pow(gHero()):0;G.gp-=c;{const g=GR(),sv=g.slv||(g.slv={});(sv[ow]||(sv[ow]={}))[it.s]=it.lv+1;slvSync();}T.save();renderGear();popItem(it.id,true);upFx(it,v0,p0);return;}
   if(a==='star'&&it){const f=starFood(it);if(!f)return;
     if(gstar!==it.id+a){gstar=it.id+a;el.innerHTML='TAP AGAIN<small>'+itemName(f)+' '+gLvTxt(f)+' is used</small>';return;}gstar='';

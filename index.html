@@ -4137,7 +4137,8 @@ const isMM=id=>{const h=HB[id];return !!h&&h.gr===5&&h.cat==='m';},hMax=id=>isMM
 const lvCap=id=>Math.min(hMax(id),ASC_STEP*(ascOf(id)+1));
 const lvCost0=L=>Math.max(10,Math.round(25*Math.pow(L,1.55)/10)*10);   // v16-190: the OLD price – only used to size rewards (rewards do not follow the price any more)
 const LVX=L=>1+19*Math.min(1,Math.max(0,(L-10)/50));   // v16-190 (Marius 22 nov): hero levels ×20 more expensive (×1 up to Lv 10, ×20 from Lv 60)
-const lvCostE=L=>Math.round(lvCost0(L)*LVX(L)/10)*10;
+const LVH=L=>L<=10?1:1.5;   // v16-406 (Marius 28 nov: „level up mai greu la echipamente și la eroi”) – ×1.5 after Lv 10 (tutorial levels stay cheap). Monsters NOT changed (CUM1 keeps the old price) → progress is really slower
+const lvCostE=L=>Math.round(lvCost0(L)*LVX(L)*LVH(L)/10)*10;
 const lvCost=L=>L>=LV_MAX?1+Math.floor((L-LV_MAX)/10):lvCostE(L);   // v16-207: Lv 300+ costs Mythic Core (1 … 10 a level)
 const ascCost=a=>a>=ASC_MAX?MC_ASC[a-ASC_MAX]||MC_ASC[MC_ASC.length-1]:Math.round(lvCostE(ASC_STEP*(a+1))*6/100)*100;
 const lvMC=L=>L>=LV_MAX,ascMC=a=>a>=ASC_MAX;   // true = paid in Mythic Core
@@ -4161,9 +4162,12 @@ const MCI='<img class="mcI" src="img/ui9/mcore.webp" alt="">'; // v16-208: Mythi
 // v16-133 (Marius): REBIRTH – a hero goes back to Lv 1 / no Ascension, 100% of the Essence comes back (free). The refunded Essence is
 // remembered in G.essR: spending it again does NOT count for the Essence event (no ranking farming with reset + re-level).
 const essEvt=sp=>{const r=Math.min(sp,G.essR||0);G.essR=(G.essR||0)-r;return sp-r;};
-function rebirthVal(id){const o=G.h.own[id];if(!o||o.lg)return 0;let e=0;for(let L=1;L<Math.min(o.lv||1,LV_MAX);L++)e+=lvCost(L);for(let k=0;k<Math.min(o.a||0,ASC_MAX);k++)e+=ascCost(k);return e;}
+// v16-406: levels / ascensions bought BEFORE the ×1.5 price come back at the OLD price (o.l15 / o.a15 written once at load) – no free +50% Essence from REBIRTH
+const lvCostO=L=>Math.round(lvCost0(L)*LVX(L)/10)*10,ascCostO=a=>Math.round(lvCostO(ASC_STEP*(a+1))*6/100)*100;
+function rebirthVal(id){const o=G.h.own[id];if(!o||o.lg)return 0;let e=0;const l0=o.l15||0,a0=o.a15||0;for(let L=1;L<Math.min(o.lv||1,LV_MAX);L++)e+=L<l0?lvCostO(L):lvCost(L);for(let k=0;k<Math.min(o.a||0,ASC_MAX);k++)e+=k<a0?ascCostO(k):ascCost(k);return e;}
 function rebirthMC(id){const o=G.h.own[id];if(!o)return 0;let c=0;for(let L=LV_MAX;L<(o.lv||1);L++)c+=lvCost(L);for(let k=ASC_MAX;k<(o.a||0);k++)c+=ascCost(k);return c;}
-function rebirth(id){const o=G.h.own[id];if(!o)return 0;const e=rebirthVal(id),c=rebirthMC(id);o.lv=1;o.a=0;delete o.lg;linkDirty();if(e){G.ess=(G.ess||0)+e;G.essR=(G.essR||0)+e;}if(c)G.mc=(G.mc||0)+c;save();return e;}
+if(!G.m406){G.m406=1;try{for(const id in G.h.own){const o=G.h.own[id];if(o&&typeof o==='object'){if((o.lv||1)>1)o.l15=o.lv;if(o.a)o.a15=o.a;}}}catch(e){}}
+function rebirth(id){const o=G.h.own[id];if(!o)return 0;const e=rebirthVal(id),c=rebirthMC(id);o.lv=1;o.a=0;delete o.lg;delete o.l15;delete o.a15;linkDirty();if(e){G.ess=(G.ess||0)+e;G.essR=(G.essR||0)+e;}if(c)G.mc=(G.mc||0)+c;save();return e;}
 function lvUp(id,n){const o=G.h.own[id];if(!o||isLinked(id)&&!o.lg)return 0;if(!o.lv)o.lv=1;let k=0,sp=0;while(k<n&&o.lv<lvCap(id)){const c=lvCost(o.lv),M=lvMC(o.lv);if(lvHave(o.lv)<c)break;if(M)G.mc-=c;else{G.ess-=c;sp+=c;}o.lv++;k++;}if(k){gsfx('levelup');linkDirty();save();if(window.EVT){const ev=essEvt(sp);if(ev)EVT.add('ess',ev);EVT.q('lvl',k);}}return k;}
 function ascend(id){const o=G.h.own[id];if(!o||isLinked(id)&&!o.lg||(o.lv||1)<lvCap(id)||lvCap(id)>=hMax(id))return false;const a0=o.a||0,c=ascCost(a0);if(ascHave(a0)<c)return false;if(ascMC(a0)){G.mc-=c;o.a=a0+1;linkDirty();save();return true;}G.ess-=c;o.a=a0+1;linkDirty();save();if(window.EVT){const ev=essEvt(c);if(ev)EVT.add('ess',ev);EVT.q('lvl',1);}return true;}
 const HCAP={crit:.6,shield:.8,tip:.8};
